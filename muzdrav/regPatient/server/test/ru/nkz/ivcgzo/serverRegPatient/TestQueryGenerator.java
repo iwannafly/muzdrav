@@ -41,26 +41,41 @@ public class TestQueryGenerator {
     }
 
     @Test
-    public final void testGenSelectQuery() {
+    public final void genSelectQuery_isQueryTextCorrectOnFilledObject() {
         String testSqlQuery = pqg.genSelectQuery(testPatient2Field, sqlQuery);
         assertEquals("comparison of the query text",
                 sqlQuery + " WHERE im = ? AND npasp = ?;", testSqlQuery);
+    }
 
-        testSqlQuery = pqg.genSelectQuery(testPatientEmpty, sqlQuery);
+    @Test
+    public final void genSelectQuery_isQueryTextCorrectOnEmptyObject() {
+        String testSqlQuery = pqg.genSelectQuery(testPatientEmpty, sqlQuery);
         assertEquals("comparison of the query text",
                 sqlQuery + ";", testSqlQuery);
     }
 
     @Test
-    public final void testGenIndexes() {
+    public final void genIndexes_isIndexesLengthCorrectOnFilledObject() {
         int[] testIndexes = pqg.genIndexes(testPatient2Field);
         assertEquals("length of the indexes array", 2, testIndexes.length);
+    }
+
+    @Test
+    public final void genIndexes_isIndexesLengthCorrectOnEmptyObject() {
+        int[] testIndexes = pqg.genIndexes(testPatient2Field);
         assertEquals("first element", 2, testIndexes[0]);
         assertEquals("second element", 0, testIndexes[1]);
+    }
 
-        testIndexes = pqg.genIndexes(testPatientEmpty);
+    @Test
+    public final void genIndexes_isIndexesValueCorrectOnFilledObject() {
+        int[] testIndexes = pqg.genIndexes(testPatientEmpty);
         assertEquals("length of the indexes array", 0, testIndexes.length);
+    }
 
+    @Test
+    public final void genIndexes_isThrowExceptionOnEmptyObject() {
+        int[] testIndexes = pqg.genIndexes(testPatientEmpty);
         testException.expect(IndexOutOfBoundsException.class);
         assertEquals("first element", 2, testIndexes[0]);
         assertEquals("second element", 0, testIndexes[1]);
