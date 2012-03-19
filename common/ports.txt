@@ -1,0 +1,5 @@
+thrift base port 55000
+
+base port + 0	auth
+1	vrachInfo
+2	stationar
