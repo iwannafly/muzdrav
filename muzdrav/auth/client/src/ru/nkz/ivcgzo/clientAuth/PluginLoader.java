@@ -3,17 +3,13 @@ package ru.nkz.ivcgzo.clientAuth;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
@@ -105,23 +101,14 @@ public class PluginLoader {
 		}
 		
 		private void loadParams() throws Exception {
-			try (JarFile jar = new JarFile(path)) {
-				Enumeration<JarEntry> entries = jar.entries();
-				while (entries.hasMoreElements()) {
-					JarEntry entry = entries.nextElement();
-					if (entry.getName().equalsIgnoreCase(".prop")) {
-						try (InputStream stream = jar.getInputStream(entry)) {
-							Properties prop = new Properties();
-							prop.load(stream);
-							if (!prop.containsKey("className") || !prop.containsKey("appName") || !prop.containsKey("appId"))
-								throw new Exception("The '.prop' file doesn't contain needed properties");
-							className = prop.getProperty("className");
-							name = new String(prop.getProperty("appName").getBytes("ISO-8859-1"), "utf-8");
-							id = Integer.parseInt(prop.getProperty("appId"));
-							break;
-						}
-					}
-				}
+			File file = new File(path);
+			try (JarFile jar = new JarFile(file);
+					URLClassLoader confLoader = new URLClassLoader(new URL[] {file.toURI().toURL()}, null);
+				) {
+				Class<?> confClass = confLoader.loadClass("ru.nkz.ivcgzo.configuration");
+				className = (String) confClass.getDeclaredField("clientClassName").get(null);
+				name = (String) confClass.getDeclaredField("appName").get(null);
+				id = confClass.getDeclaredField("appId").getInt(null);
 			}
 		}
 		

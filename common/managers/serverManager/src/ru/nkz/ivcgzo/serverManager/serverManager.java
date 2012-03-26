@@ -5,16 +5,12 @@ package ru.nkz.ivcgzo.serverManager;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import ru.nkz.ivcgzo.adminManager.AdminController;
@@ -37,8 +33,6 @@ public class serverManager extends AdminController {
 	public static final int ERR_LOAD_SERVER = 3;
 	public static DatabaseDriver driver = DatabaseDriver.postgre;
 	public static final String pluginsDirectory = "plugin";
-	public static final String propertiesFileName = ".prop";
-	public static final String propertyClassName = "classname";
 	
 	private static Map<String, IServer> plugins;
 	private static ISqlSelectExecutor sse;
@@ -178,30 +172,13 @@ public class serverManager extends AdminController {
 	 * <code>propertiesFileName</code>, а в нем - свойства <code>propertyClassName</code>.
 	 */
 	private void loadPlugin(String fileName) throws Exception {
-		JarFile jar = null;
-		
-		try {
-			File file = new File(pluginsDirectory, fileName);
-			jar = new JarFile(file);
-			Enumeration<JarEntry> enm = jar.entries();
-			while (enm.hasMoreElements()) {
-				JarEntry elm = enm.nextElement();
-				if (elm.getName().equalsIgnoreCase(propertiesFileName)) {
-					InputStream str = jar.getInputStream(elm);
-					Properties prop = new Properties(); prop.load(str);
-					if (prop.containsKey(propertyClassName))
-						loadPluginClass(file, prop.getProperty(propertyClassName));
-					else
-						throw new Exception(String.format("Property '%s' not found", propertyClassName));
-					return;
-				}
-			}
-			throw new Exception(String.format("Properties file '%s' not found", propertiesFileName));
-		} catch (Exception e) {
-			throw new Exception(String.format("Error loading plugin '%s': %s", fileName, e.getMessage()), e);
-		} finally {
-			if (jar != null)
-				jar.close();
+		File plugDir = new File(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath(), pluginsDirectory);
+		File file = new File(plugDir, fileName);
+		try (JarFile jar = new JarFile(file);
+				URLClassLoader confLoader = new URLClassLoader(new URL[] {file.toURI().toURL()}, null);
+			) {
+			Class<?> confClass = confLoader.loadClass("ru.nkz.ivcgzo.configuration");
+			loadPluginClass(file, (String) confClass.getDeclaredField("serverClassName").get(null));
 		}
 	}
 	
