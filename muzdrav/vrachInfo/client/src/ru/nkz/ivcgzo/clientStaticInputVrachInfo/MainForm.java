@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.MestoRab;
 import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfoAdmin.ThriftServerStaticInputVrachInfoAdmin;
@@ -61,13 +62,13 @@ public class MainForm extends Client {
 	 * Create the application.
 	 */
 	public MainForm() {
-		super(null, 0);
+		super(null, null, 0);
 		adminMode = false;
 		initialize();
 	}
 	
-	public MainForm(ConnectionManager conMan, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		super(conMan, lncPrm);
+	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		super(conMan, authInfo, lncPrm);
 		adminMode = lncPrm == 2;
 		initialize();
 		conMan.add(ThriftServerStaticInputVrachInfoAdmin.Client.class, configuration.thrPort);

@@ -19,9 +19,9 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Iface;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth;
-import ru.nkz.ivcgzo.thriftServerAuth.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 
 public class ServerAuth extends Server implements Iface {

@@ -18,15 +18,16 @@ import java.util.jar.JarFile;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
 /**
  * Класс для загрузки модулей системы.
  * @author bsv798
  */
 public class PluginLoader {
-	ConnectionManager conMan;
-	String pdost;
-	List<Plugin> plst;
+	private ConnectionManager conMan;
+	private UserAuthInfo authInfo;
+	private List<Plugin> plst;
 	
 	/**
 	 * Конструктор класса.
@@ -34,9 +35,9 @@ public class PluginLoader {
 	 * @param pdost - строка с правами доступа, на основе которой будет строиться
 	 * список доступных данному пользователю модулей
 	 */
-	public PluginLoader(ConnectionManager conMan, String pdost) throws FileNotFoundException {
+	public PluginLoader(ConnectionManager conMan, UserAuthInfo authInfo) throws FileNotFoundException {
 		this.conMan = conMan;
-		this.pdost = pdost;
+		this.authInfo = authInfo;
 		
 		loadPluginList();
 	}
@@ -60,7 +61,7 @@ public class PluginLoader {
 		
 		for (File file : files) {
 			try {
-				Plugin plg = new Plugin(file.getAbsolutePath(), pdost);
+				Plugin plg = new Plugin(file.getAbsolutePath());
 				if (plg.getLaunchParam() != 0)
 					plst.add(plg);
 			} catch (Exception e) {
@@ -93,14 +94,14 @@ public class PluginLoader {
 		private int id;
 		private int launchParam;
 		
-		protected Plugin(String path, String pdost) throws Exception {
+		protected Plugin(String path) throws Exception {
 			this.path = path;
 			
 			loadParams();
 			
-			if (pdost != null)
-				if (id < pdost.length())
-					launchParam = Integer.parseInt(String.valueOf(pdost.charAt(id)));
+			if (authInfo.pdost != null)
+				if (id < authInfo.pdost.length())
+					launchParam = Integer.parseInt(String.valueOf(authInfo.pdost.charAt(id)));
 		}
 		
 		private void loadParams() throws Exception {
@@ -128,8 +129,8 @@ public class PluginLoader {
 			URL fileUrl = new File(path).toURI().toURL();
 			URLClassLoader clLdr = new URLClassLoader(new URL[] {fileUrl});
 			Class<?> plug = clLdr.loadClass(className);
-			Constructor<?> cntr = plug.getConstructor(ConnectionManager.class, int.class);
-			return (IClient) cntr.newInstance(conMan, launchParam);
+			Constructor<?> cntr = plug.getConstructor(ConnectionManager.class, UserAuthInfo.class, int.class);
+			return (IClient) cntr.newInstance(conMan, authInfo, launchParam);
 		}
 		
 		public String getName() {

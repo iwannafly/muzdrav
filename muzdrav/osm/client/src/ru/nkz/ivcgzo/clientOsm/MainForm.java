@@ -14,6 +14,7 @@ import org.apache.thrift.transport.TTransportException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 
 public class MainForm extends Client {
@@ -27,7 +28,7 @@ public class MainForm extends Client {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					new MainForm(null, 0);
+					new MainForm(null, null, 0);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -35,8 +36,8 @@ public class MainForm extends Client {
 		});
 	}
 
-	public MainForm(ConnectionManager conMan, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		super(conMan, lncPrm);
+	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		super(conMan, authInfo, lncPrm);
 		
 		initialize();
 		if (conMan != null) {

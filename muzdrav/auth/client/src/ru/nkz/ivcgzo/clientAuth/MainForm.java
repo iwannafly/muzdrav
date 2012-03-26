@@ -34,9 +34,9 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Client;
-import ru.nkz.ivcgzo.thriftServerAuth.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 
 public class MainForm {
@@ -56,6 +56,7 @@ public class MainForm {
 	
 	private static ConnectionManager conMan;
 	private static ThriftServerAuth.Client client; 
+	private UserAuthInfo authInfo;
 	private IClient plug;
 	private PluginLoader pldr;
 
@@ -132,7 +133,8 @@ public class MainForm {
 		btnEnter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					showSelectionPane(client.auth(tbLogin.getText(), tbPass.getText()));
+					authInfo = client.auth(tbLogin.getText(), tbPass.getText());
+					showSelectionPane();
 				} catch (UserNotFoundException e1) {
 					JOptionPane.showMessageDialog(frame, "Пользователя с таким логином и паролем не существует");
 					tbLogin.selectAll();
@@ -298,22 +300,22 @@ public class MainForm {
 		return instance;
 	}
 	
-	private void showSelectionPane(UserAuthInfo ui) {
+	private void showSelectionPane() {
 		frame.setTitle("Выбор модуля");
-		lblFio.setText(String.format("%s %s", lblFio.getText(), ui.name));
-		lblLpu.setText(String.format("%s %d", lblLpu.getText(), ui.clpu));
-		lblPodr.setText(String.format("%s %d", lblPodr.getText(), ui.cpodr));
+		lblFio.setText(String.format("%s %s", lblFio.getText(), authInfo.name));
+		lblLpu.setText(String.format("%s %d", lblLpu.getText(), authInfo.clpu));
+		lblPodr.setText(String.format("%s %d", lblPodr.getText(), authInfo.cpodr));
 		
 		frame.getContentPane().remove(pnlLogin);
 		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);
 		frame.getContentPane().validate();
 		
-		showPluginList(ui.pdost);
+		showPluginList();
 	}
 	
-	private void showPluginList(String pdost) {
+	private void showPluginList() {
 		try {
-			pldr = new PluginLoader(conMan, pdost);
+			pldr = new PluginLoader(conMan, authInfo);
 			
 			lbxAvailSys.setModel(new DefaultListModel<String>() {
 				private static final long serialVersionUID = 7809752864081111668L;
