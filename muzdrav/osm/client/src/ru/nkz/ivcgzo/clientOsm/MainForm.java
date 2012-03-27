@@ -99,7 +99,7 @@ public class MainForm extends Client {
 					.addContainerGap())
 		);
 		
-		table = new CustomTable<>(false, true, ZapVr.class, ZapVr._Fields.values(), 0,"Внутр.номер",7, "Фамилия", 8, "Имя");
+		table = new CustomTable<>(false, true, ZapVr.class, ZapVr._Fields.values(), 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);

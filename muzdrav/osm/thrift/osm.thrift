@@ -7,18 +7,13 @@ include "../../../common/thrift/kmiacServer.thrift"
  */
 struct ZapVr{
 	1: i32 npasp;
-	2: i32 idvr;
-	3: string cdol;
-	4: string fio_vr;
-	5: i32 vid_p; /*вид приема-первичность*/
-	6: i64 timepn; /*время начала приема*/
-	7: i64 datapt; /*Дата и время приема*/
-	8: string fam;
-	9: string im;
-	10: string oth;
-	11: string cpos;
-	12: string serpolis;
-	13: string nompolis;
+	2: i32 vid_p; /*вид приема-первичность*/
+	3: i64 timepn; /*время начала приема*/
+	4: string fam;
+	5: string im;
+	6: string oth;
+	7: string serpolis;
+	8: string nompolis;
 }
 
 /**
