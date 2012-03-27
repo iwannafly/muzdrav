@@ -30,8 +30,8 @@ public class ServerOsm extends Server implements Iface {
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp", "pcod_sp", "cdol", "fio_vr", "vidp", "timepn", "datapt", "fam", "im", "ot", "cpos", "poms_ser", "poms_nom");
-		zapVrTypes = new Class<?>[] {Integer.class, Integer.class, String.class, String.class, Integer.class, Time.class, Timestamp.class, String.class, String.class, String.class, String.class, String.class, String.class};
+		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp", "vidp", "timepn", "fam", "im", "ot", "poms_ser", "poms_nom");
+		zapVrTypes = new Class<?>[] {Integer.class, Integer.class, Time.class, String.class, String.class, String.class, String.class, String.class};
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<ZapVr> getZapVr(int idvr, String cdol, long datap) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, tal.pcod_sp, tal.cdol, 'врач' as fio_vr, tal.vidp, tal.timepn, tal.datapt, pat.fam, pat.im, pat.ot, 'посещение' as cpos, pat.poms_ser, pat.poms_nom FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?)", idvr, cdol, new Date(datap))) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, tal.vidp, tal.timepn, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?)", idvr, cdol, new Date(datap))) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
