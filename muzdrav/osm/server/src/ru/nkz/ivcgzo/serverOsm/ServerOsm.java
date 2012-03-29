@@ -3,7 +3,7 @@ package ru.nkz.ivcgzo.serverOsm;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -18,6 +18,9 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
@@ -66,6 +69,48 @@ public class ServerOsm extends Server implements Iface {
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
+	}
+
+	@Override
+	public int AddPvizit(Pvizit vizit) throws TException {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
+	@Override
+	public void UpdatePvizit(Pvizit vizit) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeletePvizit(int zab) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int AddPvizitAmb(PvizitAmb pos) throws TException {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
+	@Override
+	public void UpdatePvizitAmb(PvizitAmb pos) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeletePvizitAmb(int pos) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_cpos() throws TException {
+		// TODO Auto-generated method stub
+		return new ArrayList<>();
 	}
 
 }
