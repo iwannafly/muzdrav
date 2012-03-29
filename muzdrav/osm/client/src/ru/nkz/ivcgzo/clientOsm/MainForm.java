@@ -56,14 +56,14 @@ public class MainForm extends Client {
 			conMan.add(ThriftOsm.Client.class, configuration.thrPort);
 			conMan.setLocalForm(frame);
 		} else //такой подход рекомендуется только на начальных этапах разработки
-//			try {
-//				TTransport transport = new TFramedTransport(new TSocket("localhost", configuration.thrPort));
-//				transport.open();
-//				onConnect(new ThriftOsm.Client(new TBinaryProtocol(transport)));
-//			} catch (TTransportException e) {
-//				e.printStackTrace();
-//				System.exit(1);
-//			}
+			try {
+				TTransport transport = new TFramedTransport(new TSocket("localhost", configuration.thrPort));
+				transport.open();
+				onConnect(new ThriftOsm.Client(new TBinaryProtocol(transport)));
+			} catch (TTransportException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
 		frame.setVisible(true);
 	}
 
@@ -82,8 +82,6 @@ public class MainForm extends Client {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				Vvod vvod = new Vvod();
-				vvod.setVisible(true);
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
