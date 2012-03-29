@@ -1,11 +1,17 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -22,15 +28,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-
 public class MainForm extends Client {
-	private ThriftOsm.Client tcl;
+	public static ThriftOsm.Client tcl;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 
@@ -57,14 +56,14 @@ public class MainForm extends Client {
 			conMan.add(ThriftOsm.Client.class, configuration.thrPort);
 			conMan.setLocalForm(frame);
 		} else //такой подход рекомендуется только на начальных этапах разработки
-			try {
-				TTransport transport = new TFramedTransport(new TSocket("localhost", configuration.thrPort));
-				transport.open();
-				onConnect(new ThriftOsm.Client(new TBinaryProtocol(transport)));
-			} catch (TTransportException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+//			try {
+//				TTransport transport = new TFramedTransport(new TSocket("localhost", configuration.thrPort));
+//				transport.open();
+//				onConnect(new ThriftOsm.Client(new TBinaryProtocol(transport)));
+//			} catch (TTransportException e) {
+//				e.printStackTrace();
+//				System.exit(1);
+//			}
 		frame.setVisible(true);
 	}
 
@@ -79,6 +78,14 @@ public class MainForm extends Client {
 		JScrollPane scrollPane = new JScrollPane();
 		
 		JButton btnNewButton = new JButton("Выбор");
+		btnNewButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				Vvod vvod = new Vvod();
+				vvod.setVisible(true);
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
