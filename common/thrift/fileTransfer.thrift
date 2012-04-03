@@ -31,6 +31,11 @@ service FileTransfer extends kmiacServer.KmiacServer {
 	i32 openWriteServerSocket(1: string path) throws (1: OpenFileException ofe);
 	
 	/**
+	 * Получает текущий размер открытого файла в байтах.
+	 */
+	i32 getFileSize(1: i32 port);
+	
+	/**
 	 * Закрывает сокет, удаляя по необходимости ранее открытый файл.
 	 */
 	void closeServerSocket(1: i32 port, 2: bool delFile);

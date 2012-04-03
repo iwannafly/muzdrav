@@ -1,7 +1,8 @@
 namespace java ru.nkz.ivcgzo.thriftServerAuth
 
-include "../../../common/thrift/fileTransfer.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
+include "../../../common/thrift/fileTransfer.thrift"
+include "../../../common/thrift/libraryUpdater.thrift"
 
 /**
  * Пользователя с таким логином и паролем не найдено.
@@ -9,7 +10,7 @@ include "../../../common/thrift/kmiacServer.thrift"
 exception UserNotFoundException {
 }
 
-service ThriftServerAuth extends fileTransfer.FileTransfer {
+service ThriftServerAuth extends libraryUpdater.LibraryUpdater {
 	/**
 	 * Процедура аутентификации.
 	 */
