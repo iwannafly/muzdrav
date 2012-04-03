@@ -59,6 +59,7 @@ public class MainForm {
 	private UserAuthInfo authInfo;
 	private IClient plug;
 	private PluginLoader pldr;
+//	private ModulesUpdater modUpd;
 
 	/**
 	 * Launch the application.
@@ -315,7 +316,22 @@ public class MainForm {
 	
 	private void showPluginList() {
 		try {
+			
+//			modUpd = new ModulesUpdater(conMan);
 			pldr = new PluginLoader(conMan, authInfo);
+			while (true) {
+				try {
+					
+//					TODO На этапе разработки апдейтер будет только мешать
+//					modUpd.checkAndUpdate(authInfo.pdost);
+					pldr.loadPluginList();
+					break;
+				} catch (Exception e) {
+					e.printStackTrace();
+					if (JOptionPane.showConfirmDialog(frame, String.format("%s%sПовторить операцию?", e.getMessage(), System.lineSeparator()), "Ошибка обновления модулей", JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION)
+						break;
+				}
+			}
 			
 			lbxAvailSys.setModel(new DefaultListModel<String>() {
 				private static final long serialVersionUID = 7809752864081111668L;
