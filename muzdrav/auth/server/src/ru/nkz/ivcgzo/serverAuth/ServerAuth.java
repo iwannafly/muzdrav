@@ -28,7 +28,7 @@ public class ServerAuth extends Server implements Iface {
 	private TServer thrServ;
 	private TResultSetMapper<UserAuthInfo, UserAuthInfo._Fields> rsmAuth;
 	private SocketManager scMan;
-
+	
 	public ServerAuth(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
