@@ -12,11 +12,11 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<triggers>auto,full,incremental,</triggers>
+			<triggers>auto,</triggers>
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/serverStaticInputVrachInfo_ant.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/serverVrachInfo_Builder.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
