@@ -8,7 +8,7 @@
 	<property name="lib.dir" value="..\..\..\..\lib" />
 	<property name="bin_client_manager.dir" location="..\..\..\common\managers\clientManager\bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="..\..\auth\client\plugin\vrachInfo.jar" />
+	<property name="export.dir" location="..\..\auth\client\plugin\clientVrachInfo.jar" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
@@ -19,8 +19,7 @@
 	
 	<property name="build.classpath" refid="build.classpath"/>
 	
-	<!-- Очистка директорий -->
-	
+	<!-- Очистка директорий -->	
 	<target name="clean" description = "Очистка директорий">
 	        <delete dir="${build.dir}"/>
 	</target>
