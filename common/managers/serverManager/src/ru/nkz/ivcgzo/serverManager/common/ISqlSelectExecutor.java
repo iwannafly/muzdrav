@@ -50,7 +50,7 @@ public interface ISqlSelectExecutor {
 	 * @param indexes - индексы полей в порядке, указанном в запросе;
 	 * @throws SqlExecutorException
 	 */
-	<T extends TBase<?, F>, F extends TFieldIdEnum> AutoCloseableResultSet execPreparedQuery(String sql, T obj, F[] fields, Class<?>[] types, int... indexes) throws SqlExecutorException;
+	<T extends TBase<?, F>, F extends TFieldIdEnum> AutoCloseableResultSet execPreparedQueryT(String sql, T obj, Class<?>[] types, int... indexes) throws SqlExecutorException;
 	
 	/**
 	 * Закрывает запрос и его набор данных.

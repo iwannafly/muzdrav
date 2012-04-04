@@ -64,7 +64,7 @@ public interface ISqlModifyExecutor extends ISqlSelectExecutor {
 	 * @param indexes - индексы полей в порядке, указанном в запросе;
 	 * @throws SqlExecutorException
 	 */
-	<T extends TBase<?, F>, F extends TFieldIdEnum> int execPreparedUpdate(String sql, boolean keys, T obj, F[] fields, Class<?>[] types, int... indexes) throws SqlExecutorException;
+	<T extends TBase<?, F>, F extends TFieldIdEnum> int execPreparedUpdateT(String sql, boolean keys, T obj, Class<?>[] types, int... indexes) throws SqlExecutorException;
 	
 	/**
 	 * Параметризированный запрос на любую манипуляцию с данными.
@@ -93,7 +93,7 @@ public interface ISqlModifyExecutor extends ISqlSelectExecutor {
 	 * @param indexes - индексы полей в порядке, указанном в запросе;
 	 * @throws SqlExecutorException
 	 */
-	<T extends TBase<?, F>, F extends TFieldIdEnum> boolean execPrepared(String sql, boolean keys, T obj, F[] fields, Class<?>[] types, int... indexes) throws SqlExecutorException;
+	<T extends TBase<?, F>, F extends TFieldIdEnum> boolean execPreparedT(String sql, boolean keys, T obj, Class<?>[] types, int... indexes) throws SqlExecutorException;
 	
 	/**
 	 * Возвращает набор данных, содержащий сгенерированные в результате выполнения

@@ -33,7 +33,7 @@ public class TableComboBoxIntegerEditor extends AbstractCellEditor implements Ta
 	private Map<Integer, Integer> pcd;
 	
 	public TableComboBoxIntegerEditor(List<IntegerClassifier> list) {
-		cmb = new JComboBox<String>();
+		cmb = new JComboBox<>();
 		cmb.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "check");
         cmb.getActionMap().put("check", new AbstractAction() {
 			private static final long serialVersionUID = 8883313793725297972L;

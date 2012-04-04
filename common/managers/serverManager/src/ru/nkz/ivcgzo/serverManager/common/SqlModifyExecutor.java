@@ -162,11 +162,11 @@ public class SqlModifyExecutor extends SqlSelectExecutor implements ISqlModifyEx
 	 * @throws SqlExecutorException
 	 */
 	@Override
-	public <T extends TBase<?, F>, F extends TFieldIdEnum> int execPreparedUpdate(String sql, boolean keys, T obj, F[] fields, Class<?>[] types, int... indexes) throws SqlExecutorException {
+	public <T extends TBase<?, F>, F extends TFieldIdEnum> int execPreparedUpdateT(String sql, boolean keys, T obj, Class<?>[] types, int... indexes) throws SqlExecutorException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(sql, (keys) ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
-			prepareStatement(ps, obj, fields, types, indexes);
+			prepareStatementT(ps, obj, types, indexes);
 			if (keys) {
 				int res = ps.executeUpdate();
 				setGeneratedKeys(ps.getGeneratedKeys());
@@ -188,11 +188,11 @@ public class SqlModifyExecutor extends SqlSelectExecutor implements ISqlModifyEx
 	 * @throws SqlExecutorException
 	 */
 	@Override
-	public <T extends TBase<?, F>, F extends TFieldIdEnum> boolean execPrepared(String sql, boolean keys, T obj, F[] fields, Class<?>[] types, int... indexes) throws SqlExecutorException {
+	public <T extends TBase<?, F>, F extends TFieldIdEnum> boolean execPreparedT(String sql, boolean keys, T obj, Class<?>[] types, int... indexes) throws SqlExecutorException {
 		PreparedStatement ps = null;
 		try {
 			ps = conn.prepareStatement(sql, (keys) ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
-			prepareStatement(ps, obj, fields, types, indexes);		
+			prepareStatementT(ps, obj, types, indexes);		
 			if (keys) {
 				boolean res = ps.execute();
 				setGeneratedKeys(ps.getGeneratedKeys());

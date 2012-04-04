@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class ThriftServerAuth {
 
-  public interface Iface extends ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer.Iface {
+  public interface Iface extends ru.nkz.ivcgzo.thriftCommon.libraryUpdater.LibraryUpdater.Iface {
 
     /**
      * Процедура аутентификации.
@@ -41,13 +41,13 @@ public class ThriftServerAuth {
 
   }
 
-  public interface AsyncIface extends ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer .AsyncIface {
+  public interface AsyncIface extends ru.nkz.ivcgzo.thriftCommon.libraryUpdater.LibraryUpdater .AsyncIface {
 
     public void auth(String login, String password, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.auth_call> resultHandler) throws org.apache.thrift.TException;
 
   }
 
-  public static class Client extends ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer.Client implements Iface {
+  public static class Client extends ru.nkz.ivcgzo.thriftCommon.libraryUpdater.LibraryUpdater.Client implements Iface {
     public static class Factory implements org.apache.thrift.TServiceClientFactory<Client> {
       public Factory() {}
       public Client getClient(org.apache.thrift.protocol.TProtocol prot) {
@@ -95,7 +95,7 @@ public class ThriftServerAuth {
     }
 
   }
-  public static class AsyncClient extends ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer.AsyncClient implements AsyncIface {
+  public static class AsyncClient extends ru.nkz.ivcgzo.thriftCommon.libraryUpdater.LibraryUpdater.AsyncClient implements AsyncIface {
     public static class Factory implements org.apache.thrift.async.TAsyncClientFactory<AsyncClient> {
       private org.apache.thrift.async.TAsyncClientManager clientManager;
       private org.apache.thrift.protocol.TProtocolFactory protocolFactory;
@@ -149,7 +149,7 @@ public class ThriftServerAuth {
 
   }
 
-  public static class Processor<I extends Iface> extends ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer.Processor implements org.apache.thrift.TProcessor {
+  public static class Processor<I extends Iface> extends ru.nkz.ivcgzo.thriftCommon.libraryUpdater.LibraryUpdater.Processor implements org.apache.thrift.TProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(Processor.class.getName());
     public Processor(I iface) {
       super(iface, getProcessMap(new HashMap<String, org.apache.thrift.ProcessFunction<I, ? extends org.apache.thrift.TBase>>()));

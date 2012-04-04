@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="serverStaticInputVrachInfo" default="main" basedir=".">
+<project name="serverVrachInfo" default="main" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_server.dir" location="src" />
@@ -8,7 +8,7 @@
 	<property name="lib.dir" value="..\..\..\..\lib" />
 	<property name="bin_server_manager.dir" location="..\..\..\common\managers\serverManager\bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="..\..\manager\plugin\serverStaticVrachInfo.jar" />
+	<property name="export.dir" location="..\..\manager\plugin\vrachInfo.jar" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">

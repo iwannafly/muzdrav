@@ -2,18 +2,19 @@ package ru.nkz.ivcgzo.serverManager.common;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Менеджер транзакций.
  * @author bsv798
  */
 public class TransactedSqlManager implements ITransactedSqlExecutor {
-	private ArrayList<SqlModifyExecutor> trans;
+	private List<SqlModifyExecutor> trans;
 	
 	public TransactedSqlManager(String connString, String user, String pass, int count) throws SQLException {
 		if (count < 1)
 			throw new SQLException("Transaction manager requires more than zero connections to work");
-		trans = new ArrayList<SqlModifyExecutor>(count);
+		trans = new ArrayList<>(count);
 		while (count-- > 0)
 			trans.add(new SqlModifyExecutor(connString, user, pass, this));
 	}

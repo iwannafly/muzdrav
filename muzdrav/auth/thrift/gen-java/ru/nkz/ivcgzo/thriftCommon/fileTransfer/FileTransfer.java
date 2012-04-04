@@ -46,6 +46,13 @@ public class FileTransfer {
     public int openWriteServerSocket(String path) throws OpenFileException, org.apache.thrift.TException;
 
     /**
+     * Получает текущий размер открытого файла в байтах.
+     * 
+     * @param port
+     */
+    public int getFileSize(int port) throws org.apache.thrift.TException;
+
+    /**
      * Закрывает сокет, удаляя по необходимости ранее открытый файл.
      * 
      * @param port
@@ -60,6 +67,8 @@ public class FileTransfer {
     public void openReadServerSocket(String path, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.openReadServerSocket_call> resultHandler) throws org.apache.thrift.TException;
 
     public void openWriteServerSocket(String path, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.openWriteServerSocket_call> resultHandler) throws org.apache.thrift.TException;
+
+    public void getFileSize(int port, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.getFileSize_call> resultHandler) throws org.apache.thrift.TException;
 
     public void closeServerSocket(int port, boolean delFile, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.closeServerSocket_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -138,6 +147,29 @@ public class FileTransfer {
         throw result.ofe;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "openWriteServerSocket failed: unknown result");
+    }
+
+    public int getFileSize(int port) throws org.apache.thrift.TException
+    {
+      send_getFileSize(port);
+      return recv_getFileSize();
+    }
+
+    public void send_getFileSize(int port) throws org.apache.thrift.TException
+    {
+      getFileSize_args args = new getFileSize_args();
+      args.setPort(port);
+      sendBase("getFileSize", args);
+    }
+
+    public int recv_getFileSize() throws org.apache.thrift.TException
+    {
+      getFileSize_result result = new getFileSize_result();
+      receiveBase(result, "getFileSize");
+      if (result.isSetSuccess()) {
+        return result.success;
+      }
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "getFileSize failed: unknown result");
     }
 
     public void closeServerSocket(int port, boolean delFile) throws org.apache.thrift.TException
@@ -243,6 +275,38 @@ public class FileTransfer {
       }
     }
 
+    public void getFileSize(int port, org.apache.thrift.async.AsyncMethodCallback<getFileSize_call> resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      getFileSize_call method_call = new getFileSize_call(port, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class getFileSize_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private int port;
+      public getFileSize_call(int port, org.apache.thrift.async.AsyncMethodCallback<getFileSize_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.port = port;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getFileSize", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        getFileSize_args args = new getFileSize_args();
+        args.setPort(port);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public int getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        return (new Client(prot)).recv_getFileSize();
+      }
+    }
+
     public void closeServerSocket(int port, boolean delFile, org.apache.thrift.async.AsyncMethodCallback<closeServerSocket_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
       closeServerSocket_call method_call = new closeServerSocket_call(port, delFile, resultHandler, this, ___protocolFactory, ___transport);
@@ -293,6 +357,7 @@ public class FileTransfer {
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
       processMap.put("openReadServerSocket", new openReadServerSocket());
       processMap.put("openWriteServerSocket", new openWriteServerSocket());
+      processMap.put("getFileSize", new getFileSize());
       processMap.put("closeServerSocket", new closeServerSocket());
       return processMap;
     }
@@ -337,6 +402,23 @@ public class FileTransfer {
         } catch (OpenFileException ofe) {
           result.ofe = ofe;
         }
+        return result;
+      }
+    }
+
+    private static class getFileSize<I extends Iface> extends org.apache.thrift.ProcessFunction<I, getFileSize_args> {
+      public getFileSize() {
+        super("getFileSize");
+      }
+
+      protected getFileSize_args getEmptyArgsInstance() {
+        return new getFileSize_args();
+      }
+
+      protected getFileSize_result getResult(I iface, getFileSize_args args) throws org.apache.thrift.TException {
+        getFileSize_result result = new getFileSize_result();
+        result.success = iface.getFileSize(args.port);
+        result.setSuccessIsSet(true);
         return result;
       }
     }
@@ -2065,6 +2147,708 @@ public class FileTransfer {
           struct.ofe = new OpenFileException();
           struct.ofe.read(iprot);
           struct.setOfeIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class getFileSize_args implements org.apache.thrift.TBase<getFileSize_args, getFileSize_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getFileSize_args");
+
+    private static final org.apache.thrift.protocol.TField PORT_FIELD_DESC = new org.apache.thrift.protocol.TField("port", org.apache.thrift.protocol.TType.I32, (short)1);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new getFileSize_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new getFileSize_argsTupleSchemeFactory());
+    }
+
+    public int port; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      PORT((short)1, "port");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // PORT
+            return PORT;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __PORT_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.PORT, new org.apache.thrift.meta_data.FieldMetaData("port", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getFileSize_args.class, metaDataMap);
+    }
+
+    public getFileSize_args() {
+    }
+
+    public getFileSize_args(
+      int port)
+    {
+      this();
+      this.port = port;
+      setPortIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getFileSize_args(getFileSize_args other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      this.port = other.port;
+    }
+
+    public getFileSize_args deepCopy() {
+      return new getFileSize_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setPortIsSet(false);
+      this.port = 0;
+    }
+
+    public int getPort() {
+      return this.port;
+    }
+
+    public getFileSize_args setPort(int port) {
+      this.port = port;
+      setPortIsSet(true);
+      return this;
+    }
+
+    public void unsetPort() {
+      __isset_bit_vector.clear(__PORT_ISSET_ID);
+    }
+
+    /** Returns true if field port is set (has been assigned a value) and false otherwise */
+    public boolean isSetPort() {
+      return __isset_bit_vector.get(__PORT_ISSET_ID);
+    }
+
+    public void setPortIsSet(boolean value) {
+      __isset_bit_vector.set(__PORT_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case PORT:
+        if (value == null) {
+          unsetPort();
+        } else {
+          setPort((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case PORT:
+        return Integer.valueOf(getPort());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case PORT:
+        return isSetPort();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getFileSize_args)
+        return this.equals((getFileSize_args)that);
+      return false;
+    }
+
+    public boolean equals(getFileSize_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_port = true;
+      boolean that_present_port = true;
+      if (this_present_port || that_present_port) {
+        if (!(this_present_port && that_present_port))
+          return false;
+        if (this.port != that.port)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(getFileSize_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getFileSize_args typedOther = (getFileSize_args)other;
+
+      lastComparison = Boolean.valueOf(isSetPort()).compareTo(typedOther.isSetPort());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetPort()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.port, typedOther.port);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getFileSize_args(");
+      boolean first = true;
+
+      sb.append("port:");
+      sb.append(this.port);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bit_vector = new BitSet(1);
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class getFileSize_argsStandardSchemeFactory implements SchemeFactory {
+      public getFileSize_argsStandardScheme getScheme() {
+        return new getFileSize_argsStandardScheme();
+      }
+    }
+
+    private static class getFileSize_argsStandardScheme extends StandardScheme<getFileSize_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, getFileSize_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // PORT
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.port = iprot.readI32();
+                struct.setPortIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, getFileSize_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(PORT_FIELD_DESC);
+        oprot.writeI32(struct.port);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class getFileSize_argsTupleSchemeFactory implements SchemeFactory {
+      public getFileSize_argsTupleScheme getScheme() {
+        return new getFileSize_argsTupleScheme();
+      }
+    }
+
+    private static class getFileSize_argsTupleScheme extends TupleScheme<getFileSize_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, getFileSize_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetPort()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetPort()) {
+          oprot.writeI32(struct.port);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, getFileSize_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.port = iprot.readI32();
+          struct.setPortIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class getFileSize_result implements org.apache.thrift.TBase<getFileSize_result, getFileSize_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("getFileSize_result");
+
+    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.I32, (short)0);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new getFileSize_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new getFileSize_resultTupleSchemeFactory());
+    }
+
+    public int success; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      SUCCESS((short)0, "success");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 0: // SUCCESS
+            return SUCCESS;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __SUCCESS_ISSET_ID = 0;
+    private BitSet __isset_bit_vector = new BitSet(1);
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(getFileSize_result.class, metaDataMap);
+    }
+
+    public getFileSize_result() {
+    }
+
+    public getFileSize_result(
+      int success)
+    {
+      this();
+      this.success = success;
+      setSuccessIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public getFileSize_result(getFileSize_result other) {
+      __isset_bit_vector.clear();
+      __isset_bit_vector.or(other.__isset_bit_vector);
+      this.success = other.success;
+    }
+
+    public getFileSize_result deepCopy() {
+      return new getFileSize_result(this);
+    }
+
+    @Override
+    public void clear() {
+      setSuccessIsSet(false);
+      this.success = 0;
+    }
+
+    public int getSuccess() {
+      return this.success;
+    }
+
+    public getFileSize_result setSuccess(int success) {
+      this.success = success;
+      setSuccessIsSet(true);
+      return this;
+    }
+
+    public void unsetSuccess() {
+      __isset_bit_vector.clear(__SUCCESS_ISSET_ID);
+    }
+
+    /** Returns true if field success is set (has been assigned a value) and false otherwise */
+    public boolean isSetSuccess() {
+      return __isset_bit_vector.get(__SUCCESS_ISSET_ID);
+    }
+
+    public void setSuccessIsSet(boolean value) {
+      __isset_bit_vector.set(__SUCCESS_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case SUCCESS:
+        if (value == null) {
+          unsetSuccess();
+        } else {
+          setSuccess((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case SUCCESS:
+        return Integer.valueOf(getSuccess());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case SUCCESS:
+        return isSetSuccess();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof getFileSize_result)
+        return this.equals((getFileSize_result)that);
+      return false;
+    }
+
+    public boolean equals(getFileSize_result that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_success = true;
+      boolean that_present_success = true;
+      if (this_present_success || that_present_success) {
+        if (!(this_present_success && that_present_success))
+          return false;
+        if (this.success != that.success)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    public int compareTo(getFileSize_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+      getFileSize_result typedOther = (getFileSize_result)other;
+
+      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSuccess()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("getFileSize_result(");
+      boolean first = true;
+
+      sb.append("success:");
+      sb.append(this.success);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class getFileSize_resultStandardSchemeFactory implements SchemeFactory {
+      public getFileSize_resultStandardScheme getScheme() {
+        return new getFileSize_resultStandardScheme();
+      }
+    }
+
+    private static class getFileSize_resultStandardScheme extends StandardScheme<getFileSize_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, getFileSize_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 0: // SUCCESS
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.success = iprot.readI32();
+                struct.setSuccessIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, getFileSize_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+        oprot.writeI32(struct.success);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class getFileSize_resultTupleSchemeFactory implements SchemeFactory {
+      public getFileSize_resultTupleScheme getScheme() {
+        return new getFileSize_resultTupleScheme();
+      }
+    }
+
+    private static class getFileSize_resultTupleScheme extends TupleScheme<getFileSize_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, getFileSize_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetSuccess()) {
+          optionals.set(0);
+        }
+        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetSuccess()) {
+          oprot.writeI32(struct.success);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, getFileSize_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(1);
+        if (incoming.get(0)) {
+          struct.success = iprot.readI32();
+          struct.setSuccessIsSet(true);
         }
       }
     }

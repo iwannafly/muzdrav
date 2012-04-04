@@ -392,7 +392,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		});
 
 		if (sortable) {
-			this.setRowSorter(new TableRowSorter<TableModel>((TableModel)this.getModel()));
+			this.setRowSorter(new TableRowSorter<>((TableModel)this.getModel()));
 			this.getRowSorter().addRowSorterListener(new RowSorterListener() {
 				
 				@Override
