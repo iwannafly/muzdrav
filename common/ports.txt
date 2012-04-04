@@ -3,3 +3,7 @@ thrift base port 55000
 base port + 0	auth
 1	vrachInfo
 2	stationar
+3	osm
+4	lds
+
+55201	libUpd

@@ -35,15 +35,13 @@ public class PluginLoader {
 		this.conMan = conMan;
 		this.authInfo = authInfo;
 		
-		loadPluginList();
+		plst = new ArrayList<>();
 	}
 	
 	/**
 	 * Построение списка доступных пользователю модулей.
 	 */
-	private void loadPluginList() throws FileNotFoundException {
-		plst = new ArrayList<>();
-		
+	public void loadPluginList() throws FileNotFoundException {
 		String exePath = new File(MainForm.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
 		File plgDir = new File(exePath, "plugin");
 		if (!plgDir.exists())
@@ -72,6 +70,14 @@ public class PluginLoader {
 	 */
 	public List<Plugin> getPluginList() {
 		return plst;
+	}
+	
+	public boolean hasPlugin(int id) {
+		for (Plugin plugin : plst) {
+			if (plugin.getId() == id)
+				return true;
+		}
+		return false;
 	}
 	
 	/**
