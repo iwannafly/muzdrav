@@ -30,6 +30,9 @@ struct Pvizit {
 	10: i32 talon;
 	11: string ztext;
 	12: i32 cod_sp;
+	13: i32 cuser;
+	14: i64 dataz;
+	/**16: */
 }
 
 struct PvizitAmb {
@@ -41,6 +44,53 @@ struct PvizitAmb {
 	6: i32 cod_sp;
 	7: i32 rez;
 	8: i32 opl;
+	9: string cdol;
+	10: i32 mobs;
+	11: i32 stoim;
+	12: string diag; 
+}
+
+struct PdiagAmb {
+	1: i32 id;
+	2: i32 npasp;
+	3: i32 idzab;
+	4: i64 datrg;
+	5: string diag;
+	6: string named;/*медицинское описание д-за*/
+	7: i32 cod_sp;
+	8: string obstreg;
+	9: i64 datap;
+	10: i64 dataot;
+	11: i32 obstot;
+	12: i32 codsp_ot;
+	13: string cdol_ot;
+	14: i32 vid_tr;
+	15: i32 prizn;
+	16: i32 priznp; 
+}
+
+struct Psign{
+	1: i32 id;
+	2: i32 npasp;
+	3: string grup;
+	4: string rezus;
+	5: string allerg;
+	6: string farmkol;
+	7: string vitae;
+	8: string vred;
+}
+
+struct Priem{
+	1: i32 id;
+	2: i32 npasp;
+	3: i32 idzab;
+	4: i32 idpos;
+	5: string osmotr;
+	6: i32 sl_ob;
+	7: i32 n_is;
+	8: i32 n_kons;
+	9: i32 n_proc;
+	10: i32 n_lek;
 }
 
 /**
@@ -57,5 +107,15 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPvizitAmb(1: PvizitAmb pos);
 	void UpdatePvizitAmb(1: PvizitAmb pos);
 	void DeletePvizitAmb(1: i32 pos);
+	i32 AddPdiagAmb(1: PdiagAmb diag);
+	void UpdatePdiagAmb(1: PdiagAmb diag);
+	void DeletePdiagAmb(1: i32 diag);
+	i32 AddPsign(1: Psign sign);
+	void UpdatePsign(1: Psign sign);
+	void DeletePsign(1: i32 sign);
+	i32 AddPriem(1: Priem pr);
+	void UpdatePriem(1: Priem pr);
+	void DeletePriem(1: i32 pr);
+
 	list<classifier.IntegerClassifier> get_n_cpos();
 }

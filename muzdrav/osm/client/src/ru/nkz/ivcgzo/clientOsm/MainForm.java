@@ -32,6 +32,8 @@ public class MainForm extends Client {
 	public static ThriftOsm.Client tcl;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
+	private Vvod vvod;
+	private UserAuthInfo authInfo;
 
 	/**
 	 * Launch the application.
@@ -50,6 +52,7 @@ public class MainForm extends Client {
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, lncPrm);
+		this.authInfo = authInfo;
 		
 		initialize();
 		if (conMan != null) {
@@ -81,7 +84,7 @@ public class MainForm extends Client {
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
+				vvod.showVvod(authInfo, table.getSelectedItem());
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -108,6 +111,8 @@ public class MainForm extends Client {
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
+		
+		vvod = new Vvod();
 	}
 
 	@Override
