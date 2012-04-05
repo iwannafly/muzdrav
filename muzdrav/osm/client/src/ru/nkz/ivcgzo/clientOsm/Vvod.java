@@ -76,11 +76,11 @@ public class Vvod extends JFrame {
 	 * Create the frame.
 	 */
 	public Vvod() {
-		 pvizit=new Pvizit();
+		 pvizit = new Pvizit();
 		 sign = new FormSign();
-		 pos=new PvizitAmb();
-		 diag=new PdiagAmb();
-		pr = new Priem();
+		 pos = new PvizitAmb();
+		 diag = new PdiagAmb();
+		 pr = new Priem();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1029, 747);

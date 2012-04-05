@@ -93,6 +93,15 @@ struct Priem{
 	10: i32 n_lek;
 }
 
+struct PdiagZ{
+	1: i32 id;
+	2: i32 npasp;
+	3: string diag;
+	4: string named;
+	5: i64 datad;
+	6: i32 nmvd;
+}
+
 /**
  * 
  */
@@ -116,6 +125,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPriem(1: Priem pr);
 	void UpdatePriem(1: Priem pr);
 	void DeletePriem(1: i32 pr);
+	void AddPdiagZ(1: PdiagZ dz);
 
 	list<classifier.IntegerClassifier> get_n_cpos();
 }
