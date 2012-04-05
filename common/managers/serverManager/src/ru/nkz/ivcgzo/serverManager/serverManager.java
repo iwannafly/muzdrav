@@ -148,7 +148,7 @@ public class serverManager extends AdminController {
 	 * Загружает все плагины из директории <code>pluginsDirectory</code>.
 	 */
 	public void loadPlugins(){
-		plugins = new HashMap<String, IServer>();
+		plugins = new HashMap<>();
 		File[] files = new File(pluginsDirectory).listFiles(new FileFilter() {
 			
 			@Override

@@ -62,6 +62,16 @@ public class SocketManager {
 		}
 	}
 	
+	public int getSize(int port) {
+		try {
+			if (sockets.containsKey(port))
+				return sockets.get(port).getSize();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
 	private class ScmSocket extends Thread implements Runnable {
 		private ServerSocket ssc;
 		private Socket client;
@@ -93,6 +103,15 @@ public class SocketManager {
 			return ssc.getLocalPort();
 		}
 		
+		public int getSize() throws IOException {
+			if (!writeMode)
+				return (int) fis.getChannel().size();
+			else {
+				fos.flush();
+				return (int) fos.getChannel().size();
+			}
+		}
+
 		public void close(boolean delFile) {
 			closeFilesAndSocket();
 			try {
