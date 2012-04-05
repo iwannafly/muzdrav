@@ -19,6 +19,9 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.Priem;
+import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
@@ -111,6 +114,60 @@ public class ServerOsm extends Server implements Iface {
 	public List<IntegerClassifier> get_n_cpos() throws TException {
 		// TODO Auto-generated method stub
 		return new ArrayList<>();
+	}
+
+	@Override
+	public int AddPdiagAmb(PdiagAmb diag) throws TException {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
+	@Override
+	public void UpdatePdiagAmb(PdiagAmb diag) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeletePdiagAmb(int diag) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int AddPsign(Psign sign) throws TException {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
+	@Override
+	public void UpdatePsign(Psign sign) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeletePsign(int sign) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int AddPriem(Priem pr) throws TException {
+		// TODO Auto-generated method stub
+		return -1;
+	}
+
+	@Override
+	public void UpdatePriem(Priem pr) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeletePriem(int pr) throws TException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
