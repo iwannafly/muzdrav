@@ -3,17 +3,17 @@
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_server.dir" location="src" />
-	<property name="src_config.dir" location="..\config" />
-	<property name="src_thrift.dir" location="..\thrift\gen-java" />
-	<property name="lib.dir" value="..\..\..\..\lib" />
-	<property name="bin_server_manager.dir" location="..\..\..\common\managers\serverManager\bin" />
+	<property name="src_config.dir" location="../config" />
+	<property name="src_thrift.dir" location="../thrift/gen-java" />
+	<property name="lib.dir" value="../../../../lib" />
+	<property name="bin_server_manager.dir" location="../../../common/managers/serverManager/bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="..\..\manager\plugin\serverAuth.jar" />
+	<property name="export.dir" location="../../manager/plugin/serverAuth.jar" />
 	<property name="export.name" value="serverAuth" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
-	     <include name="**.jar"/>
+	     <include name="*.jar"/>
 	  </fileset>	
 	  <pathelement path="${bin_server_manager.dir}"/>		
 	</path>		
@@ -39,11 +39,7 @@
 	
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description = "Создание jar">
-		<jar destfile="${export.dir}" basedir="${build.dir}">
-			<manifest>
-				<attribute name="Class-Path" value="${jar.classpath}" />
-			</manifest>
-		</jar>
+		<jar destfile="${export.dir}" basedir="${build.dir}" />
 	</target>
 
 	<target name="main" depends="compile, jar">

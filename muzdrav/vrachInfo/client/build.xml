@@ -3,18 +3,18 @@
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_client.dir" location="src" />
-	<property name="src_config.dir" location="..\config" />
-	<property name="src_thrift.dir" location="..\thrift\gen-java" />
-	<property name="lib.dir" value="..\..\..\..\lib" />
-	<property name="bin_client_manager.dir" location="..\..\..\common\managers\clientManager\bin" />
+	<property name="src_config.dir" location="../config" />
+	<property name="src_thrift.dir" location="../thrift/gen-java" />
+	<property name="lib.dir" value="../../../../lib" />
+	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="com_resources.dir" location="../../../common/resources" />
 	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="..\..\auth\client\plugin\clientVrachInfo.jar" />
+	<property name="export.dir" location="../../auth/client/plugin/clientVrachInfo.jar" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
-	     <include name="**.jar"/>
+	     <include name="*.jar"/>
 	  </fileset>	
 	  <pathelement path="${bin_client_manager.dir}"/>		
 	</path>		
@@ -44,8 +44,7 @@
 	
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description = "Создание jar">
-		<jar destfile="${export.dir}" basedir="${build.dir}">
-		</jar>
+		<jar destfile="${export.dir}" basedir="${build.dir}" />
 	</target>
 
 	<target name="main" depends="compile, jar">

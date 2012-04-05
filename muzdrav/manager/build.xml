@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientAuth" default="main" basedir=".">
+<project name="managerAuth" default="main" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
-	<property name="src_client.dir" location="src" />
-	<property name="src_config.dir" location="../config" />
-	<property name="src_thrift.dir" location="../thrift/gen-java" />
-	<property name="lib.dir" value="../../../../lib" />
-	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
-	<property name="com_resources.dir" location="../../../common/resources" />
-	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientAuth/resources" />
+	<property name="src_server.dir" location="src" />
+	<property name="lib.dir" value="../../../lib" />
+	<property name="bin_admin_manager.dir" location="../../common/managers/adminManager/bin" />
+	<property name="bin_server_manager.dir" location="../../common/managers/serverManager/bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.file" location="../../auth/client/auth.jar" />
-	<property name="main.class" value="ru.nkz.ivcgzo.clientAuth.MainForm" />
-	<property name="muzdrav.dir" location="../../../muzdrav" />
+	<property name="export.file" location="managerAuth.jar" />
+	<property name="main.class" value="ru.nkz.ivcgzo.managerAuth.ManagerAuth" />
+	<property name="muzdrav.dir" location="../../muzdrav" />
 	
 	<path id="build.classpath" >
 	  <fileset dir="${lib.dir}">
 	     <include name="*.jar"/>
 	  </fileset>
-	  <pathelement path="${bin_client_manager.dir}"/>		
+	  <pathelement path="${bin_admin_manager.dir}"/>		
+	  <pathelement path="${bin_server_manager.dir}"/>		
 	</path>
 	
 	<pathconvert pathsep=" " property="jar.classpath" refid="build.classpath">
@@ -40,25 +38,20 @@
 	<!-- Создание директорий -->
 	<target name="makedir" description="Создание директорий">
 		<mkdir dir="${build.dir}" />
-		<mkdir dir="${bin_resources.dir}" />
 	</target>
 
 	<!-- Компилирование  исходного кода -->
 	<target name="compile" depends="clean,makedir" description="Компиляция">
-		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8">
+		<javac includeantruntime="false" srcdir="${src_server.dir}" destdir="${build.dir}" encoding="utf-8">
 			<classpath refid="build.classpath"/>
 		</javac>
-		<copy file="${com_resources.dir}/icon_1_16x16.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/icon_2_32x32.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/icon_3_64x64.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/icon_4_128x128.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/kmiacLogo_small.png" todir="${bin_resources.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description = "Создание jar">
 		<jar destfile="${export.file}" basedir="${build.dir}" >
-			<fileset dir="${bin_client_manager.dir}"/>
+			<fileset dir="${bin_admin_manager.dir}"/>
+			<fileset dir="${bin_server_manager.dir}"/>
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}" />
 				<attribute name="Class-Path" value=". ${jar.classpath}"/>
@@ -69,7 +62,7 @@
 	<target name="main" depends="compile, jar">
 		<description>Main target</description>
 		<subant>
-			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
+			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
 		</subant>
 	</target>
 
