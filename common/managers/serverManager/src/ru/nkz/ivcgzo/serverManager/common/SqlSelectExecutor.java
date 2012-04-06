@@ -128,7 +128,7 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 	 */
 	protected <T extends TBase<?, F>, F extends TFieldIdEnum> void prepareStatementT(PreparedStatement ps, T obj, Class<?>[] types, int... indexes) throws SQLException {
 		for (int i = 0; i < indexes.length; i++) {
-			F fld = obj.fieldForId(indexes[i]);
+			F fld = obj.fieldForId(indexes[i] + 1);
 			if (!obj.isSet(fld)) {
 				ps.setNull(i + 1, java.sql.Types.NULL);
 			} else {

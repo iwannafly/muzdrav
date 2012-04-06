@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientVrachInfo" default="main" basedir=".">
+<project name="serverOsm" default="main" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
-	<property name="src_client.dir" location="src" />
+	<property name="src_server.dir" location="src" />
 	<property name="src_config.dir" location="../config" />
 	<property name="src_thrift.dir" location="../thrift/gen-java" />
 	<property name="lib.dir" value="../../../../lib" />
-	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
-	<property name="com_resources.dir" location="../../../common/resources" />
-	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources" />
+	<property name="bin_server_manager.dir" location="../../../common/managers/serverManager/bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="../../auth/client/plugin/clientVrachInfo.jar" />
+	<property name="export.dir" location="../../manager/plugin/serverOsm.jar" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
 	     <include name="*.jar"/>
 	  </fileset>	
-	  <pathelement path="${bin_client_manager.dir}"/>		
+	  <pathelement path="${bin_server_manager.dir}"/>		
 	</path>		
 	
 	<property name="build.classpath" refid="build.classpath"/>
@@ -33,13 +31,9 @@
 
 	<!-- Компилирование  исходного кода -->
 	<target name="compile" depends="clean, makedir" description="Компиляция">
-		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
+		<javac includeantruntime="false" srcdir="${src_server.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
-		<copy file="${com_resources.dir}/1331789242_Add.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/1331789257_User.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/1331789259_Delete.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/icon_2_32x32.png" todir="${bin_resources.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->

@@ -9,7 +9,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 
@@ -187,11 +189,12 @@ public class serverManager extends AdminController {
 	 */
 	private void loadPluginClass(File file, String clName) throws Exception {
 		try {
+			String fileName = file.getName();
 			URL fileUrl = file.toURI().toURL();
 			URLClassLoader clLdr = new URLClassLoader(new URL[] {fileUrl});
 			Class<?> plug = clLdr.loadClass(clName);
 			Constructor<?> cntr = plug.getConstructor(ISqlSelectExecutor.class, ITransactedSqlExecutor.class);
-			plugins.put(file.getName(), new ThreadedServer((IServer) cntr.newInstance(sse, tse)));
+			plugins.put(fileName.substring(0, fileName.length() - 4), new ThreadedServer((IServer) cntr.newInstance(sse, tse)));
 		} catch (Exception e) {
 			throw new Exception(e);
 		}
@@ -217,7 +220,7 @@ public class serverManager extends AdminController {
 			if (plug != null)
 				plug.start();
 			else {
-				loadPlugin(name);
+				loadPlugin(name.concat(".jar"));
 				plugins.get(name).start();
 			}
 		} catch (Exception e) {
@@ -282,6 +285,11 @@ public class serverManager extends AdminController {
 	@Override
 	public String getManagerName() {
 		return "server";
+	}
+
+	@Override
+	public List<String> getServerList() throws Exception {
+		return new ArrayList<>(plugins.keySet());
 	}
 	
 }
