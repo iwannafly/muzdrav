@@ -1,0 +1,1 @@
+namespace java ru.nkz.ivcgzo.thriftRegPatientinclude "../../../common/thrift/kmiacServer.thrift"service ThriftRegPatient extends kmiacServer.KmiacServer {}
