@@ -7,15 +7,17 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.List;
 
 public abstract class AdminController {
+	public abstract String getManagerName();
+	public abstract List<String> getServerList() throws Exception;
 	public abstract void startServers() throws Exception;
 	public abstract void startServer(String name) throws Exception;
 	public abstract void pauseServers() throws Exception;
 	public abstract void pauseServer(String name) throws Exception;
 	public abstract void stopServers() throws Exception;
 	public abstract void stopServer(String name) throws Exception;
-	public abstract String getManagerName();
 
 	public static AdminListener listener;
 	
@@ -73,6 +75,10 @@ public abstract class AdminController {
 							switch (funcName.toLowerCase()) {
 							case "getmanagername":
 								pwr.println(getManagerName());
+								pwr.flush();
+								break;
+							case "list":
+								pwr.println(getServerList().toString());
 								pwr.flush();
 								break;
 							case "starts":

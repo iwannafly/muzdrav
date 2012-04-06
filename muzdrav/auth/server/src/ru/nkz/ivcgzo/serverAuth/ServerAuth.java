@@ -65,7 +65,9 @@ public class ServerAuth extends Server implements Iface {
 	@Override
 	public void stop() {
 		if (thrServ != null)
-		thrServ.stop();
+			thrServ.stop();
+		if (remInst != null)
+			remInst.stopListen();
 	}
 
 	@Override
