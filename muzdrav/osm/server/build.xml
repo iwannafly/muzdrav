@@ -30,8 +30,8 @@
 	</target>
 
 	<!-- Компилирование  исходного кода -->
-	<target name="compile" depends="clean,makedir" description="Компиляция">
-		<javac includeantruntime="false" srcdir="${src_server.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8">
+	<target name="compile" depends="clean, makedir" description="Компиляция">
+		<javac includeantruntime="false" srcdir="${src_server.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
 	</target>
@@ -41,8 +41,13 @@
 		<jar destfile="${export.dir}" basedir="${build.dir}" />
 	</target>
 
-	<target name="main" depends="compile, jar">
-		<description>Main target</description>
+	<target name="main" depends="jar">
+	</target>
+
+	<target name="main_d">
+		<antcall target="main">
+			<param name="debug.build" value="true"/>
+		</antcall>
 	</target>
 
 </project>

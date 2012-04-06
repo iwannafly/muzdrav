@@ -44,8 +44,8 @@
 	</target>
 
 	<!-- Компилирование  исходного кода -->
-	<target name="compile" depends="clean,makedir" description="Компиляция">
-		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8">
+	<target name="compile" depends="clean, makedir" unless="debug.set" description="Компиляция">
+		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
 		<copy file="${com_resources.dir}/icon_1_16x16.png" todir="${bin_resources.dir}" />
@@ -56,7 +56,7 @@
 	</target>
 	
 	<!-- Создание jar файла -->
-	<target name="jar" depends="compile" description = "Создание jar">
+	<target name="jar" depends="compile" description="Создание jar">
 		<jar destfile="${export.file}" basedir="${build.dir}" >
 			<fileset dir="${bin_client_manager.dir}"/>
 			<manifest>
@@ -66,11 +66,16 @@
 		</jar>
 	</target>
 
-	<target name="main" depends="compile, jar">
-		<description>Main target</description>
+	<target name="main" depends="jar" description="Компиляция всех клиентских модулей">
 		<subant>
 			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
 		</subant>
+	</target>
+
+	<target name="main_d" description="Компиляция всех модулей с возможностью дебага">
+		<antcall target="main">
+			<param name="debug.build" value="true"/>
+		</antcall>
 	</target>
 
 </project>
