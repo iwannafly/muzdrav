@@ -24,6 +24,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
@@ -136,6 +137,9 @@ public class MainForm extends Client {
 			tcl = (ThriftOsm.Client) conn;
 			try {
 				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+			} catch (KmiacServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (TException | ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -15,6 +15,7 @@ import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 
@@ -734,7 +735,7 @@ public class Vvod extends JFrame {
 		pvizit.setCod_sp(authInfo.pcod);
 		pos.setCod_sp(authInfo.pcod);
 		diag.setCod_sp(authInfo.pcod);
-		pvizit.setDatap(System.currentTimeMillis());//системная дата
+		pvizit.setDatao(System.currentTimeMillis());//системная дата
 		pvizit.setDataz(System.currentTimeMillis());
 		pos.setDatap(System.currentTimeMillis());
 		diag.setDatap(System.currentTimeMillis());
@@ -746,6 +747,9 @@ public class Vvod extends JFrame {
 				MainForm.tcl.AddPvizitAmb(pos);
 				MainForm.tcl.AddPdiagAmb(diag);
 				MainForm.tcl.AddPriem(pr);
+			} catch (KmiacServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -761,6 +765,9 @@ public class Vvod extends JFrame {
 			}
 			MainForm.tcl.AddPriem(pr);
 			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
+		} catch (KmiacServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} catch (TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

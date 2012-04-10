@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import javax.swing.JScrollPane;
@@ -90,11 +91,14 @@ public class FormSign extends JFrame {
 				psign.setVitae(tpanamnz.getText());
 				try {
 					tcl.AddPsign(psign);
+				} catch (KmiacServerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				}
+			}
 		});
 		
 		JTextPane tpallerg = new JTextPane();
