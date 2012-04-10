@@ -41,7 +41,11 @@ public class RemoteInstaller extends Thread implements Runnable {
 	}
 	
 	public void stopListen() {
-		stopping = true;
+		try {
+			stopping = true;
+			servSct.close();
+		} catch (IOException e) {
+		}
 	}
 
 	@Override
@@ -51,7 +55,8 @@ public class RemoteInstaller extends Thread implements Runnable {
 				Socket clientSct = listenForClient();
 				checkAndTransferLibs(clientSct);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (!stopping)
+					e.printStackTrace();
 			}
 		}
 	}
