@@ -37,7 +37,7 @@ public class ServerAuth extends Server implements Iface {
 	public ServerAuth(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name");
+		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id");
 		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size");
 		
 		scMan = new SocketManager(5, Constants.bufSize);
@@ -72,7 +72,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public UserAuthInfo auth(String login, String password) throws UserNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name FROM s_users u join s_vrach v ON (v.pcod = u.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id FROM s_users u join s_vrach v ON (v.pcod = u.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
 			if (acrs.getResultSet().next())
 				return rsmAuth.map(acrs.getResultSet());
 			else
