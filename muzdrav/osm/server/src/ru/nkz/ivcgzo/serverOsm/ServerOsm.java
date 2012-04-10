@@ -20,6 +20,7 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
@@ -166,6 +167,12 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public void DeletePriem(int pr) throws TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void AddPdiagZ(PdiagZ dz) throws TException {
 		// TODO Auto-generated method stub
 		
 	}

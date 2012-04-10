@@ -58,7 +58,7 @@ struct PdiagAmb {
 	5: string diag;
 	6: string named;/*медицинское описание д-за*/
 	7: i32 cod_sp;
-	8: string obstreg;
+	8: i32 obstreg;
 	9: i64 datap;
 	10: i64 dataot;
 	11: i32 obstot;

@@ -10,6 +10,7 @@ import javax.swing.border.EmptyBorder;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
@@ -43,11 +44,11 @@ public class Vvod extends JFrame {
 	private static final long serialVersionUID = 1L;
 //	private JComboBox<String> cobr;
 	private FormSign sign;
-	private ThriftOsm.Client tcl;
 	private Pvizit pvizit;
 	private PvizitAmb pos;
 	private PdiagAmb diag;
 	private Priem pr;
+	private PdiagZ dz;
 	private JTextField tfdiag;
 	private JTextField tfnamed;
 	private JTextField tftemp;
@@ -64,7 +65,7 @@ public class Vvod extends JFrame {
 	private JTextPane tpperk;
 	private JTextPane tposm;
 	private JTextPane tpaus;
-	private JTextPane tplocalis;
+	private JTextPane tpLocalis;
 	private JTextPane tpJalob;
 
 	/**
@@ -81,6 +82,7 @@ public class Vvod extends JFrame {
 		 pos = new PvizitAmb();
 		 diag = new PdiagAmb();
 		 pr = new Priem();
+		 dz = new PdiagZ();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1029, 747);
@@ -738,13 +740,12 @@ public class Vvod extends JFrame {
 		diag.setDatap(System.currentTimeMillis());
 		
 		
-		
 		if (zapVr.vid_p == 1) {
 			try {
-				tcl.AddPvizit(pvizit);
-				tcl.AddPvizitAmb(pos);
-				tcl.AddPdiagAmb(diag);
-				tcl.AddPriem(pr);
+				MainForm.tcl.AddPvizit(pvizit);
+				MainForm.tcl.AddPvizitAmb(pos);
+				MainForm.tcl.AddPdiagAmb(diag);
+				MainForm.tcl.AddPriem(pr);
 			} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -752,9 +753,13 @@ public class Vvod extends JFrame {
 			
 		} else {
 		try {
-			tcl.AddPvizitAmb(pos);
-			tcl.UpdatePvizit(pvizit);
-			
+			MainForm.tcl.AddPvizitAmb(pos);
+			MainForm.tcl.UpdatePvizit(pvizit);
+			MainForm.tcl.AddPdiagAmb(diag);
+			if (diag.prizn == 2){//присвоить значение полей данным.вписать в табл.
+			MainForm.tcl.AddPdiagZ(dz);	
+			}
+			MainForm.tcl.AddPriem(pr);
 			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
 		} catch (TException e) {
 			// TODO Auto-generated catch block
@@ -766,4 +771,5 @@ public class Vvod extends JFrame {
 		
 		setVisible(true);
 	}
+	
 }
