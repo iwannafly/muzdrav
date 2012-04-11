@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="adminManager" default="main" basedir=".">
+	
+	<!-- Создание свойств, используемых далее в текущем скрипте -->
+	<property name="src_admin.dir" location="src" />
+	<property name="build.dir" location="bin" />
+	<property name="export.file" location="adminManager.jar" />
+	<property name="main.class" value="ru.nkz.ivcgzo.adminManager.AdminManager" />
+	
+	<!-- Очистка директорий -->	
+	<target name="clean" description = "Очистка директорий">
+	        <delete dir="${build.dir}"/>
+	</target>
+	
+	<!-- Создание директорий -->
+	<target name="makedir" description="Создание директорий">
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<!-- Компилирование  исходного кода -->
+	<target name="compile" depends="clean,makedir" description="Компиляция">
+		<javac includeantruntime="false" srcdir="${src_admin.dir}" destdir="${build.dir}" encoding="utf-8" />
+	</target>
+	
+	<!-- Создание jar файла -->
+	<target name="jar" depends="compile" description = "Создание jar">
+		<jar destfile="${export.file}" basedir="${build.dir}" >
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}" />
+				<attribute name="Class-Path" value="."/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="main" depends="compile, jar">
+		<description>Main target</description>
+	</target>
+
+</project>

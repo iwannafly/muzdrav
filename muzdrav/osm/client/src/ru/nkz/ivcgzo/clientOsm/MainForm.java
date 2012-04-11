@@ -24,6 +24,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
@@ -32,6 +33,8 @@ public class MainForm extends Client {
 	public static ThriftOsm.Client tcl;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
+	private Vvod vvod;
+	private UserAuthInfo authInfo;
 
 	/**
 	 * Launch the application.
@@ -50,6 +53,7 @@ public class MainForm extends Client {
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, lncPrm);
+		this.authInfo = authInfo;
 		
 		initialize();
 		if (conMan != null) {
@@ -81,7 +85,7 @@ public class MainForm extends Client {
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
+				vvod.showVvod(authInfo, table.getSelectedItem());
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -108,6 +112,8 @@ public class MainForm extends Client {
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
+		
+		vvod = new Vvod();
 	}
 
 	@Override
@@ -131,6 +137,9 @@ public class MainForm extends Client {
 			tcl = (ThriftOsm.Client) conn;
 			try {
 				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+			} catch (KmiacServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} catch (TException | ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

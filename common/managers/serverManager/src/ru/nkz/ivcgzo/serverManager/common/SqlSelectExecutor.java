@@ -107,10 +107,10 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 	}
 
 	@Override
-	public <T extends TBase<?, F>, F extends TFieldIdEnum> AutoCloseableResultSet execPreparedQuery(String sql, T obj, F[] fields, Class<?>[] types, int... indexes) throws SqlExecutorException {
+	public <T extends TBase<?, F>, F extends TFieldIdEnum> AutoCloseableResultSet execPreparedQueryT(String sql, T obj, Class<?>[] types, int... indexes) throws SqlExecutorException {
 		try {
 			PreparedStatement ps = conn.prepareStatement(sql);
-			prepareStatement(ps, obj, fields, types, indexes);		
+			prepareStatementT(ps, obj, types, indexes);		
 			return new AutoCloseableResultSet(this, ps.executeQuery());
 		} catch (SQLException e) {
 			throw new SqlExecutorException(e.getMessage(), e);
@@ -126,9 +126,9 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 	 * @param indexes - индексы полей в порядке, указанном в запросе;
 	 * @throws SQLException
 	 */
-	protected <T extends TBase<?, F>, F extends TFieldIdEnum> void prepareStatement(PreparedStatement ps, T obj, F[] fields, Class<?>[] types, int... indexes) throws SQLException {
+	protected <T extends TBase<?, F>, F extends TFieldIdEnum> void prepareStatementT(PreparedStatement ps, T obj, Class<?>[] types, int... indexes) throws SQLException {
 		for (int i = 0; i < indexes.length; i++) {
-			F fld = fields[indexes[i]];
+			F fld = obj.fieldForId(indexes[i] + 1);
 			if (!obj.isSet(fld)) {
 				ps.setNull(i + 1, java.sql.Types.NULL);
 			} else {

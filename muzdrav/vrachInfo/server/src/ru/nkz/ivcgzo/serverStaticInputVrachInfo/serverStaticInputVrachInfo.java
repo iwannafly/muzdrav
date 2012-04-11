@@ -87,7 +87,7 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 	public int AddVrach(VrachInfo vr) throws VrachExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isVrachExists(vr)) {
-				sme.execPrepared("INSERT INTO s_vrach (fam, im, ot, pol, datar, obr, snils, idv) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, vr, VrachInfo._Fields.values(), vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8);
+				sme.execPreparedT("INSERT INTO s_vrach (fam, im, ot, pol, datar, obr, snils, idv) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8);
 				int pcod = sme.getGeneratedKeys().getInt("pcod");
 				sme.setCommit();
 				return pcod;
@@ -102,7 +102,7 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 	public void UpdVrach(VrachInfo vr) throws VrachExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isVrachExists(vr)) {
-				sme.execPrepared("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, VrachInfo._Fields.values(), vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
+				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
 				sme.setCommit();
 			} else
 				throw new VrachExistsException();
@@ -147,7 +147,7 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 	public int AddMrab(MestoRab mr) throws MestoRabExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isMrabExists(mr)) {
-				sme.execPrepared("INSERT INTO s_mrab (pcod, clpu, cslu, cpodr, cdol, datau, priznd) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, mr, MestoRab._Fields.values(), mrabTypes, 1, 2, 3, 4, 5, 6, 7);
+				sme.execPreparedT("INSERT INTO s_mrab (pcod, clpu, cslu, cpodr, cdol, datau, priznd) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, mr, mrabTypes, 1, 2, 3, 4, 5, 6, 7);
 				int id = sme.getGeneratedKeys().getInt("id");
 				sme.setCommit();
 				return id;
@@ -162,7 +162,7 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 	public void UpdMrab(MestoRab mr) throws MestoRabExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isMrabExists(mr)) {
-				sme.execPrepared("UPDATE s_mrab SET cslu = ?, cpodr = ?, cdol = ?, datau = ?, priznd = ? WHERE id = ? ", false, mr, MestoRab._Fields.values(), mrabTypes, 3, 4, 5, 6, 7, 0);
+				sme.execPreparedT("UPDATE s_mrab SET cslu = ?, cpodr = ?, cdol = ?, datau = ?, priznd = ? WHERE id = ? ", false, mr, mrabTypes, 3, 4, 5, 6, 7, 0);
 				sme.setCommit();
 			} else
 				throw new MestoRabExistsException();
@@ -263,13 +263,13 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 
 
 	private boolean isVrachExists(VrachInfo vi) throws SQLException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) AND (obr = ?) AND (idv = ?) ", vi, VrachInfo._Fields.values(), vrachTypes, 1, 2, 3, 4, 5, 6, 8)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) AND (obr = ?) AND (idv = ?) ", vi, vrachTypes, 1, 2, 3, 4, 5, 6, 8)) {
 			return acrs.getResultSet().next();
 		}
 	}
 	
 	private boolean isMrabExists(MestoRab mr) throws SQLException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM s_mrab WHERE (pcod = ?) AND (clpu = ?) AND (cslu = ?) AND (cpodr = ?) AND (cdol = ?) AND (datau = ?) AND (priznd = ?) ", mr, MestoRab._Fields.values(), mrabTypes, 1, 2, 3, 4, 5, 6, 7)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQueryT("SELECT id FROM s_mrab WHERE (pcod = ?) AND (clpu = ?) AND (cslu = ?) AND (cpodr = ?) AND (cdol = ?) AND (datau = ?) AND (priznd = ?) ", mr, mrabTypes, 1, 2, 3, 4, 5, 6, 7)) {
 			return acrs.getResultSet().next();
 		}
 	}

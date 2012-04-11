@@ -25,5 +25,9 @@ public class ManagerAuth extends serverManager {
 			}
 		}
 	}
-
+	
+	@Override
+	public String getManagerName() {
+		return "muzdrav";
+	}
 }

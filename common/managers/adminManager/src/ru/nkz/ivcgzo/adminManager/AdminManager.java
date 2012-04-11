@@ -33,7 +33,7 @@ public class AdminManager {
 		int port;
 		String name;
 		
-		managers = new HashMap<String, Integer>();
+		managers = new HashMap<>();
 		try {
 			ssc = new ServerSocket(9090);
 			Thread.sleep(2000);

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="managerAuth" default="main" basedir=".">
+	
+	<!-- Создание свойств, используемых далее в текущем скрипте -->
+	<property name="src_server.dir" location="src" />
+	<property name="lib.dir" value="../../../lib" />
+	<property name="bin_admin_manager.dir" location="../../common/managers/adminManager/bin" />
+	<property name="bin_server_manager.dir" location="../../common/managers/serverManager/bin" />
+	<property name="build.dir" location="bin" />
+	<property name="export.file" location="managerAuth.jar" />
+	<property name="main.class" value="ru.nkz.ivcgzo.managerAuth.ManagerAuth" />
+	<property name="muzdrav.dir" location="../../muzdrav" />
+	
+	<path id="build.classpath" >
+	  <fileset dir="${lib.dir}">
+	     <include name="*.jar"/>
+	  </fileset>
+	  <pathelement path="${bin_admin_manager.dir}"/>		
+	  <pathelement path="${bin_server_manager.dir}"/>		
+	</path>
+	
+	<pathconvert pathsep=" " property="jar.classpath" refid="build.classpath">
+		<mapper>
+			<chainedmapper>
+				<flattenmapper/>
+				<globmapper from="*.jar" to="${lib.dir}/*.jar"/>
+			</chainedmapper>
+		</mapper>
+	</pathconvert>
+	
+	<property name="build.classpath" refid="build.classpath" />
+	
+	<!-- Очистка директорий -->	
+	<target name="clean" description = "Очистка директорий">
+	        <delete dir="${build.dir}"/>
+	</target>
+	
+	<!-- Создание директорий -->
+	<target name="makedir" description="Создание директорий">
+		<mkdir dir="${build.dir}" />
+	</target>
+
+	<!-- Компилирование  исходного кода -->
+	<target name="compile" depends="clean, makedir" description="Компиляция">
+		<javac includeantruntime="false" srcdir="${src_server.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
+			<classpath refid="build.classpath"/>
+		</javac>
+	</target>
+	
+	<!-- Создание jar файла -->
+	<target name="jar" depends="compile" description = "Создание jar">
+		<jar destfile="${export.file}" basedir="${build.dir}" >
+			<fileset dir="${bin_admin_manager.dir}"/>
+			<fileset dir="${bin_server_manager.dir}"/>
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}" />
+				<attribute name="Class-Path" value=". ${jar.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="main" depends="jar" description="Компиляция всех серверных модулей">
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
+		</subant>
+	</target>
+
+	<target name="main_d" description="Компиляция всех модулей с возможностью дебага">
+		<antcall target="main">
+			<param name="debug.build" value="true"/>
+		</antcall>
+	</target>
+
+</project>
