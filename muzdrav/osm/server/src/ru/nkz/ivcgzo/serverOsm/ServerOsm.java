@@ -120,7 +120,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO pvizit (npasp, cpol, cobr, datao, ishod, rezult, talon, cod_sp, cdol, cuser, ztext, dataz, id_etal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, obr, pvizitTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+			sme.execPreparedT("INSERT INTO p_vizit (npasp, cpol, cobr, datao, ishod, rezult, talon, cod_sp, cdol, cuser, ztext, dataz, id_etal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, obr, pvizitTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -131,7 +131,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public Pvizit getPvizit(int obrId) throws PvizitNotFoundException, KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM pvizit WHERE id = ? ", obrId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE id = ? ", obrId)) {
 			if (acrs.getResultSet().next())
 				return rsmPvizit.map(acrs.getResultSet());
 			else
@@ -144,7 +144,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE pvizit SET ishod = ?, rezult = ?, talon = ?, ztext = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 12, 0);
+			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, ztext = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 12, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -154,7 +154,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void DeletePvizit(int obrId) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM pvizit WHERE id = ? ", false, obrId);
+			sme.execPrepared("DELETE FROM p_vizit WHERE id = ? ", false, obrId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();
@@ -164,7 +164,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO pvizit_amb (id_obr, npasp, datap, cod_sp, cdol, diag, mobs, rezult, opl, uet, k_lr, n_sp, pr_opl, pl_extr, vpom) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18);
+			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, diag, mobs, rezult, opl, uet, k_lr, n_sp, pr_opl, pl_extr, vpom) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -175,7 +175,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public PvizitAmb getPvizitAmb(int posId) throws KmiacServerException, PvizitAmbNotFoundException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM pvizit_amb WHERE id = ? ", posId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit_amb WHERE id = ? ", posId)) {
 			if (acrs.getResultSet().next())
 				return rsmPvizitAmb.map(acrs.getResultSet());
 			else
@@ -188,7 +188,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE pvizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -198,7 +198,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void DeletePvizitAmb(int posId) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM pvizit_amb WHERE id = ? ", false, posId);
+			sme.execPrepared("DELETE FROM p_vizit_amb WHERE id = ? ", false, posId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();

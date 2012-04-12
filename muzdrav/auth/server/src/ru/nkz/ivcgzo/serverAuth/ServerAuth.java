@@ -125,7 +125,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public List<LibraryInfo> getModulesList() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM libs WHERE (id > 0) ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM s_libs WHERE (id > 0) ")) {
 			return rsmLibInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -134,7 +134,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public int openModuleReadSocket(int id) throws ModuleNotFound, OpenFileException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT name FROM libs WHERE (id = ?) ", id)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT name FROM s_libs WHERE (id = ?) ", id)) {
 			acrs.getResultSet().next();
 			File modFile = getModuleFile(acrs.getResultSet().getString(1));
 			if (!modFile.exists())
