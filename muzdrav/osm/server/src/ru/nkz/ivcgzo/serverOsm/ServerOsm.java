@@ -3,7 +3,6 @@ package ru.nkz.ivcgzo.serverOsm;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -18,6 +17,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -42,14 +42,25 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] zapVrTypes; 
 	private final TResultSetMapper<Pvizit, Pvizit._Fields> rsmPvizit;
 	private final Class<?>[] pvizitTypes; 
+	private final TResultSetMapper<PvizitAmb, PvizitAmb._Fields> rsmPvizitAmb;
+	private final Class<?>[] pvizitAmbTypes; 
+	private final TResultSetMapper<Psign, Psign._Fields> rsmPsign;
+	private final Class<?>[] psignTypes; 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp", "vidp", "timepn", "fam", "im", "ot", "poms_ser", "poms_nom");
-		zapVrTypes = new Class<?>[] {Integer.class, Integer.class, Time.class, String.class, String.class, String.class, String.class, String.class};
-		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id", "npasp", "cpol", "cobr", "datao", "ishod", "rezult", "talon", "cod_sp", "cdol", "cuser", "ztext", "dataz", "id_etal");
-		pvizitTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, Integer.class};
+		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "vidp",        "timepn",   "fam",        "im",         "ot",         "poms_ser",   "poms_nom");
+		zapVrTypes = new Class<?>[] {                  Integer.class, Integer.class, Time.class, String.class, String.class, String.class, String.class, String.class};
+		
+		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "ztext",      "dataz",    "id_etal");
+		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, Integer.class};
+		
+		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom");
+		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+		
+		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred");
+		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class};
 	}
 
 	@Override
@@ -66,14 +77,25 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public void start() throws Exception {
-		// FIXME ffff
+		// FIXME replace with junit
 		
-		Pvizit obr = new Pvizit(0, 1, 2, 3, 4, 5, 6, 7, 8, "9", 10, "11", 12, 13);
+//		Pvizit obr = new Pvizit(0, 1, 2, 3, 4, 5, 6, 7, 8, "9", 10, "11", 12, 13);
 //		obr.setId(AddPvizit(obr));
 //		Pvizit obr1 = getPvizit(obr.id);
 //		obr = new Pvizit(obr1.id, 2, 3, 4, 5, 6, 7, 8, 9, "10", 11, "12", 13, 14);
 //		UpdatePvizit(obr);
 //		DeletePvizit(obr.id);
+		
+//		Psign psign = new Psign(1, "2", "3", "4", "5", "6", "7");
+//		setPsign(psign);
+//		psign = getPsign(psign.npasp);
+		
+//		PvizitAmb pos = new PvizitAmb(2, 1, 2, 3, 4, "5", "6", 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+//		pos.setId(AddPvizitAmb(pos));
+//		PvizitAmb pos1 = getPvizitAmb(pos.id);
+//		pos = new PvizitAmb(pos1.id, 2, 3, 4, 5, "6", "7", 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
+//		UpdatePvizitAmb(pos);
+//		DeletePvizitAmb(pos.id);
 		
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -141,28 +163,46 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return 0;
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO pvizit_amb (id_obr, npasp, datap, cod_sp, cdol, diag, mobs, rezult, opl, uet, k_lr, n_sp, pr_opl, pl_extr, vpom) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
 	public PvizitAmb getPvizitAmb(int posId) throws KmiacServerException, PvizitAmbNotFoundException, TException {
-		// TODO Auto-generated method stub
-		return null;
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM pvizit_amb WHERE id = ? ", posId)) {
+			if (acrs.getResultSet().next())
+				return rsmPvizitAmb.map(acrs.getResultSet());
+			else
+				throw new PvizitAmbNotFoundException();
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		
+	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE pvizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public void DeletePvizitAmb(int posId) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		
+	public void DeletePvizitAmb(int posId) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM pvizit_amb WHERE id = ? ", false, posId);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
@@ -194,28 +234,31 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public int AddPsign(Psign sign) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public Psign getPsign(int npasp) throws KmiacServerException, PsignNotFoundException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT npasp, grup, ph, allerg, farmkol, vitae, vred FROM p_sign WHERE npasp = ? ", npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmPsign.map(acrs.getResultSet());
+			else
+				throw new PsignNotFoundException();
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public Psign getPsign(int signId) throws KmiacServerException,
-			PsignNotFoundException, TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void UpdatePsign(Psign sign) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void DeletePsign(int signId) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
+	public void setPsign(Psign sign) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			try {
+				getPsign(sign.npasp);
+				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ? WHERE npasp = ? ", false, sign, psignTypes, 1, 2, 3, 4, 5, 6, 0);
+				sme.setCommit();
+			} catch (PsignNotFoundException e) {
+				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6);
+				sme.setCommit();
+			}
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
