@@ -24,6 +24,9 @@ import org.apache.thrift.TException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.UIManager;
 
 public class FormSign extends JFrame {
 	/**
@@ -61,11 +64,11 @@ public class FormSign extends JFrame {
 	public FormSign() {
 		psign  = new Psign();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 503, 388);
+		setBounds(100, 100, 503, 408);
 		
 		JPanel panel = new JPanel();
 		
-		JLabel label = new JLabel("Фармакологический анамнез");
+		JLabel label = new JLabel("<html>Фармакологический<br>\r\nанамнез</html>");
 		
 		JLabel label_1 = new JLabel("Группа крови");
 		
@@ -85,12 +88,12 @@ public class FormSign extends JFrame {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				psign.setGrup(tfgrup.getText());
-				psign.setRezus(tfrezus.getText());
+				psign.setPh(tfrezus.getText());
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
 				try {
-					tcl.AddPsign(psign);
+					tcl.setPsign(psign);
 				} catch (KmiacServerException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -102,46 +105,38 @@ public class FormSign extends JFrame {
 		});
 		
 		JTextPane tpallerg = new JTextPane();
-		tpallerg.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JTextPane tpfarm = new JTextPane();
-		tpfarm.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JTextPane tpanamnz = new JTextPane();
-		tpanamnz.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(label_4)
-							.addGap(10)
-							.addComponent(tpanamnz, GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(label)
-							.addGap(10)
-							.addComponent(tpfarm, GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(label_1)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(tfgrup)
-							.addGap(274))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(label_2)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(tfrezus)
-							.addGap(273))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(label_3)
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(label, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_4)
+								.addComponent(label_2)
+								.addComponent(label_1))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tpallerg, GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)))
-					.addGap(46))
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(34)
-					.addComponent(button)
-					.addContainerGap(374, Short.MAX_VALUE))
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(tpfarm, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+								.addComponent(tpanamnz, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(tfrezus, Alignment.LEADING)
+									.addComponent(tfgrup, Alignment.LEADING))))
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+							.addComponent(label_3)
+							.addGap(45)
+							.addComponent(tpallerg, GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE))
+						.addComponent(button, Alignment.TRAILING))
+					.addContainerGap())
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -154,30 +149,22 @@ public class FormSign extends JFrame {
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_2)
 						.addComponent(tfrezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(40)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(36)
-							.addComponent(label_3)))
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(label)
-							.addGap(34)))
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(27)
-							.addComponent(label_4)))
+						.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_3))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(button)
-					.addContainerGap(31, Short.MAX_VALUE))
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(label_4, Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
+							.addGap(17)
+							.addComponent(button)))
+					.addContainerGap())
 		);
 		panel.setLayout(gl_panel);
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
