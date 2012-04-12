@@ -49,7 +49,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<ObInfIsl> GetObInfIslt(int npasp) throws TException {
 		
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM pisl_ld where npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_isl_ld where npasp = ? ", npasp)) {
 			return rsmObInIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -60,7 +60,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public ObInfIsl GetIsl(int npasp) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM pisl_ld WHERE npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_isl_ld WHERE npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmObInIs.map(acrs.getResultSet());
 			else
@@ -75,7 +75,7 @@ public class LDSserver extends Server implements Iface {
 
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPrepared("INSERT INTO pisl_ld (npasp, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, fio, vopl, diag, kodvr, kodm, kods, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, info, ObInfIsl._Fields.values(), islTypes, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
+				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, fio, vopl, diag, kodvr, kodm, kods, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, info, islTypes, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
 				int nisl = sme.getGeneratedKeys().getInt("nisl");
 				sme.setCommit();
 				return nisl;
@@ -90,7 +90,7 @@ public class LDSserver extends Server implements Iface {
 	public void UpdIsl(ObInfIsl info) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPrepared("UPDATE pisl_ld SET nprob = ?, pcisl = ?, cisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, fio = ?, vopl = ?, diag = ?, kodvr = ?, kodm = ?, kods = ? WHERE nisl = ? ", false, info, ObInfIsl._Fields.values(), islTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1 );
+				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, cisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, fio = ?, vopl = ?, diag = ?, kodvr = ?, kodm = ?, kods = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1 );
 				sme.setCommit();
 //			} else
 //				throw new IslExistsException();
@@ -102,7 +102,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public void DelIsl(int nisl) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM pisl_ld WHERE nisl = ? ", false, nisl);
+			sme.execPrepared("DELETE FROM p_isl_ld WHERE nisl = ? ", false, nisl);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -112,7 +112,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<DiagIsl> GetDiagIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM prez_d where nisl = ? ", nisl)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_rez_d where nisl = ? ", nisl)) {
 			return rsmDiIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -121,7 +121,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public DiagIsl GetDIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM prez_d WHERE nisl = ? ", nisl)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_rez_d WHERE nisl = ? ", nisl)) {
 			if (acrs.getResultSet().next())
 				return rsmDiIs.map(acrs.getResultSet());
 			else
@@ -135,7 +135,7 @@ public class LDSserver extends Server implements Iface {
 	public void AddDIsl(DiagIsl di) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPrepared("INSERT INTO prez_d (npasp, nisl, kodisl, rez, anamnez, anestezi, model, kol, op_name, rez_name, stoim, pcod_m) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, di, DiagIsl._Fields.values(), dislTypes, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+				sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl, rez, anamnez, anestezi, model, kol, op_name, rez_name, stoim, pcod_m) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, di, dislTypes, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
 				sme.setCommit();
 			//} else
 				//throw new VrachExistsException();
@@ -149,7 +149,7 @@ public class LDSserver extends Server implements Iface {
 	public void UpdDIsl(DiagIsl di) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPrepared("UPDATE prez_d SET kodisl = ?, rez = ?, anamnez = ?, anestezi = ?, model = ?, kol = ?, op_name = ?, rez_name = ?, stoim = ?, pcod_m = ? WHERE (nisl = ?) ", false, di, DiagIsl._Fields.values(), dislTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1);
+				sme.execPreparedT("UPDATE p_rez_d SET kodisl = ?, rez = ?, anamnez = ?, anestezi = ?, model = ?, kol = ?, op_name = ?, rez_name = ?, stoim = ?, pcod_m = ? WHERE (nisl = ?) ", false, di, dislTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1);
 				sme.setCommit();
 //			} else
 //				throw new IslExistsException();
@@ -162,7 +162,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public void DelDIsl(int nisl, String kodisl) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM prez_d WHERE (nisl = ?) and (kodisl = ?) ", false, nisl);
+			sme.execPrepared("DELETE FROM p_rez_d WHERE (nisl = ?) and (kodisl = ?) ", false, nisl);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -171,7 +171,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<LabIsl> GetLabIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM prez_l where nisl = ? ", nisl)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_rez_l where nisl = ? ", nisl)) {
 			return rsmLabIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -180,7 +180,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public LabIsl GetLIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM prez_l WHERE nisl = ? ", nisl)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_rez_l WHERE nisl = ? ", nisl)) {
 			if (acrs.getResultSet().next())
 				return rsmLabIs.map(acrs.getResultSet());
 			else
@@ -194,7 +194,7 @@ public class LDSserver extends Server implements Iface {
 	public void AddLIsl(LabIsl li) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPrepared("INSERT INTO prez_l (npasp, nisl, cpok, zpok, stoim, pcod_m, pvibor) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, li, LabIsl._Fields.values(), lislTypes, 0, 1, 2, 3, 4, 5, 6);
+				sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok, zpok, stoim, pcod_m, pvibor) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, li, lislTypes, 0, 1, 2, 3, 4, 5, 6);
 				sme.setCommit();
 			//} else
 				//throw new VrachExistsException();
@@ -207,7 +207,7 @@ public class LDSserver extends Server implements Iface {
 	public void UpdLIsl(LabIsl li) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPrepared("UPDATE prez_l SET zpok = ?, stoim = ?, pcod_m = ?, pvibor = ? WHERE (nisl = ?) and (cpok = ?) ", false, li, LabIsl._Fields.values(), lislTypes, 3, 4, 5, 6, 1, 2);
+				sme.execPreparedT("UPDATE p_rez_l SET zpok = ?, stoim = ?, pcod_m = ?, pvibor = ? WHERE (nisl = ?) and (cpok = ?) ", false, li, lislTypes, 3, 4, 5, 6, 1, 2);
 				sme.setCommit();
 //			} else
 //				throw new IslExistsException();
@@ -220,7 +220,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public void DelLIsl(int nisl, String cpok) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM prez_l WHERE (nisl = ?) and (cpok = ?) ", false, nisl, cpok);
+			sme.execPrepared("DELETE FROM p_rez_l WHERE (nisl = ?) and (cpok = ?) ", false, nisl, cpok);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
