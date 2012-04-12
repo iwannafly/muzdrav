@@ -1,4 +1,4 @@
-namespace java ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo
+namespace java ru.nkz.ivcgzo.thriftServerVrachInfo
 
 include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
@@ -52,7 +52,7 @@ exception MestoRabNotFoundException {
 }
 
 
-service ThriftServerStaticInputVrachInfo extends kmiacServer.KmiacServer {
+service ThriftServerVrachInfo extends kmiacServer.KmiacServer {
 /**
  * Список всех врачей для данного лпу.
  */
@@ -110,4 +110,31 @@ service ThriftServerStaticInputVrachInfo extends kmiacServer.KmiacServer {
 	void ClearVrachMrab(1: i32 vrPcod);
 
 	list<classifier.IntegerClassifier> getPrizndList();
+
+
+	/**
+	 * Получает логин пользователя.
+	 */
+	string getLogin(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod);
+
+	/**
+	 * Устанавливает пароль для пользователя, открывая ему доступ к системе.
+	 */
+	string setPassword(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string login);
+
+	/**
+	 * Очищает пароль пользователя, закрывая ему доступ к системе.
+	 */
+	void remPassword(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod);
+
+	/**
+	 * Получает разрешения пользователя, то есть, к каким частям системы у него есть доступ.
+	 */
+	string getPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod);
+
+	/**
+	 * Устанавливает разрешения пользователя.
+	 */
+	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
+
 }

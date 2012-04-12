@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.serverStaticInputVrachInfo;
+package ru.nkz.ivcgzo.serverVrachInfo;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -23,16 +23,16 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.MestoRab;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.MestoRabExistsException;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.MestoRabNotFoundException;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.VrachExistsException;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.VrachInfo;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.VrachNotFoundException;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfoAdmin.ThriftServerStaticInputVrachInfoAdmin.Iface;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfoAdmin.ThriftServerStaticInputVrachInfoAdmin;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRabExistsException;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRabNotFoundException;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachExistsException;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachNotFoundException;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo.Iface;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 
-public class serverStaticInputVrachInfo extends Server implements Iface {
+public class serverVrachInfo extends Server implements Iface {
 	private TServer thrServ;
 	private TResultSetMapper<VrachInfo, VrachInfo._Fields> rsmVrach;
 	private static final Class<?>[] vrachTypes = new Class<?>[] {Integer.class, String.class, String.class, String.class, Short.class, Date.class, Short.class, String.class, String.class}; 
@@ -42,7 +42,7 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 	
 	@Override
 	public void start() throws Exception {
-		ThriftServerStaticInputVrachInfoAdmin.Processor<Iface> proc = new ThriftServerStaticInputVrachInfoAdmin.Processor<Iface>(this);
+		ThriftServerVrachInfo.Processor<Iface> proc = new ThriftServerVrachInfo.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
 	}
@@ -54,7 +54,7 @@ public class serverStaticInputVrachInfo extends Server implements Iface {
 	}
 
 	
-	public serverStaticInputVrachInfo(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
+	public serverVrachInfo(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 
 		rsmVrach = new TResultSetMapper<>(VrachInfo.class, "pcod", "fam", "im", "ot", "pol", "datar", "obr", "snils", "idv");

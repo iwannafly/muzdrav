@@ -8,7 +8,7 @@
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="com_resources.dir" location="../../../common/resources" />
-	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources" />
+	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientVrachInfo/resources" />
 	<property name="build.dir" location="bin" />
 	<property name="export.dir" location="../../auth/client/plugin/clientVrachInfo.jar" />
 	
