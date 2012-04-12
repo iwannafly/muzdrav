@@ -327,4 +327,14 @@ public class serverVrachInfo extends Server implements Iface {
 		return null;
 	}
 
+	@Override
+	public void saveUserConfig(int id, String config) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new TException();
+		}
+	}
+
 }

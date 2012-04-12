@@ -76,6 +76,16 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
+	public void saveUserConfig(int id, String config) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new TException();
+		}
+	}
+
+	@Override
 	public void start() throws Exception {
 		// FIXME replace with junit
 		

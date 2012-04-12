@@ -10,6 +10,7 @@ struct UserAuthInfo {
 	4: string pdost;
 	5: string name;
 	6: i32 user_id;
+	7: string config;
 }
 
 /**
@@ -30,4 +31,9 @@ service KmiacServer {
 	 * Получает версию клиента (для обновления).
 	 */
 	string getClientVersion();
+	
+	/**
+	 * Сохранение настроек.
+	 */
+	void saveUserConfig(1: i32 id, 2: string config);
 }
