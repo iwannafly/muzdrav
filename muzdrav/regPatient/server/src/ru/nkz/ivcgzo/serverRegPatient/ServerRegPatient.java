@@ -77,7 +77,8 @@ public class ServerRegPatient extends Server implements Iface {
             final ITransactedSqlExecutor tse) {
         super(sse, tse);
 
-        rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class, PATIENT_BRIEF_FIELD_NAMES);
+        rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class,
+                PATIENT_BRIEF_FIELD_NAMES);
         qgPatientBrief = new QueryGenerator<PatientBrief>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
         rsmAdpAdress = new TResultSetMapper<>(Address.class, ADP_ADDRESS_FIELD_NAMES);
