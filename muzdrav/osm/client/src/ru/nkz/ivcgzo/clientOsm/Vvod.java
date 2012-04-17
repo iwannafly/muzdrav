@@ -119,7 +119,7 @@ public class Vvod extends JFrame {
 		button_1.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				pvizit.setZtext("<Рекомендации> "+tprecom.getText()+"<Заключение> "+tpzakl.getText());
+				//pvizit.setZtext("<Рекомендации> "+tprecom.getText()+"<Заключение> "+tpzakl.getText());
 				diag.setDiag(tfkodmkb.getText());
 				diag.setNamed(tfname.getText());
 				pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
@@ -457,35 +457,64 @@ public class Vvod extends JFrame {
 		JLabel lblcobr = new JLabel("Цель обращения");
 		
 		JComboBox c_obr = new JComboBox();
+		
+		JLabel lblrez = new JLabel("Результат");
+		
+		JComboBox cbrez = new JComboBox();
+		
+		JLabel lblish = new JLabel("Исход");
+		
+		JComboBox cbish = new JComboBox();
 		GroupLayout gl_panel_Talon = new GroupLayout(panel_Talon);
 		gl_panel_Talon.setHorizontalGroup(
 			gl_panel_Talon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_Talon.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel_Talon.createSequentialGroup()
 							.addComponent(lblcobr)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(c_obr, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap(411, Short.MAX_VALUE))
+							.addComponent(c_obr, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_Talon.createSequentialGroup()
 							.addComponent(lblvid_opl)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(vid_opl, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addGap(411))))
+							.addComponent(vid_opl, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING, false)
+						.addGroup(gl_panel_Talon.createSequentialGroup()
+							.addComponent(lblrez, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+							.addGap(10)
+							.addComponent(cbrez, GroupLayout.PREFERRED_SIZE, 359, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_Talon.createSequentialGroup()
+							.addComponent(lblish, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cbish, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addContainerGap(359, Short.MAX_VALUE))
 		);
 		gl_panel_Talon.setVerticalGroup(
 			gl_panel_Talon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_Talon.createSequentialGroup()
 					.addGap(5)
-					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblvid_opl)
-						.addComponent(vid_opl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblcobr)
-						.addComponent(c_obr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(28, Short.MAX_VALUE))
+					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_Talon.createSequentialGroup()
+							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_Talon.createSequentialGroup()
+									.addGap(3)
+									.addComponent(lblrez))
+								.addComponent(cbrez, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(9)
+							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblish)
+								.addComponent(cbish, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_panel_Talon.createSequentialGroup()
+							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblvid_opl)
+								.addComponent(vid_opl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblcobr)
+								.addComponent(c_obr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_Talon.setLayout(gl_panel_Talon);
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -513,10 +542,6 @@ public class Vvod extends JFrame {
 					.addComponent(cbTalon))
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGap(10)
-					.addComponent(panel_Talon, GroupLayout.DEFAULT_SIZE, 1241, Short.MAX_VALUE)
-					.addGap(2775))
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(10)
 					.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 1864, GroupLayout.PREFERRED_SIZE)
 					.addGap(4)
 					.addComponent(label_14)
@@ -526,7 +551,9 @@ public class Vvod extends JFrame {
 					.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 1859, GroupLayout.PREFERRED_SIZE))
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 1004, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+						.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE))
 					.addContainerGap(3012, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
@@ -547,7 +574,7 @@ public class Vvod extends JFrame {
 							.addGap(4)
 							.addComponent(lblTalon))
 						.addComponent(cbTalon))
-					.addGap(2)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 561, GroupLayout.PREFERRED_SIZE)
@@ -778,5 +805,4 @@ public class Vvod extends JFrame {
 		
 		setVisible(true);
 	}
-	
 }
