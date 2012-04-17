@@ -16,6 +16,7 @@ import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
@@ -23,8 +24,8 @@ import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftCommon.libraryUpdater.LibraryInfo;
 import ru.nkz.ivcgzo.thriftCommon.libraryUpdater.ModuleNotFound;
-import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Iface;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth;
+import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Iface;
 import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 
 public class ServerAuth extends Server implements Iface {
@@ -37,7 +38,7 @@ public class ServerAuth extends Server implements Iface {
 	public ServerAuth(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name");
+		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config");
 		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size");
 		
 		scMan = new SocketManager(5, Constants.bufSize);
@@ -72,7 +73,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public UserAuthInfo auth(String login, String password) throws UserNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name FROM s_users u join s_vrach v ON (v.pcod = u.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config FROM s_users u join s_vrach v ON (v.pcod = u.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
 			if (acrs.getResultSet().next())
 				return rsmAuth.map(acrs.getResultSet());
 			else
@@ -80,6 +81,16 @@ public class ServerAuth extends Server implements Iface {
 		} catch (SQLException e) {
 			// TODO: handle exception
 			throw new TException(e);
+		}
+	}
+
+	@Override
+	public void saveUserConfig(int id, String config) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new TException();
 		}
 	}
 
@@ -125,7 +136,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public List<LibraryInfo> getModulesList() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM libs WHERE (id > 0) ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM s_libs WHERE (id > 0) ")) {
 			return rsmLibInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -134,7 +145,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public int openModuleReadSocket(int id) throws ModuleNotFound, OpenFileException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT name FROM libs WHERE (id = ?) ", id)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT name FROM s_libs WHERE (id = ?) ", id)) {
 			acrs.getResultSet().next();
 			File modFile = getModuleFile(acrs.getResultSet().getString(1));
 			if (!modFile.exists())

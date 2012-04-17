@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientVrachInfo" default="main" basedir=".">
+<project name="lds_client" default="main" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_client.dir" location="src" />
@@ -7,10 +7,8 @@
 	<property name="src_thrift.dir" location="../thrift/gen-java" />
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
-	<property name="com_resources.dir" location="../../../common/resources" />
-	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientVrachInfo/resources" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="../../auth/client/plugin/clientVrachInfo.jar" />
+	<property name="export.dir" location="../../auth/client/plugin/clientLds.jar" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
@@ -36,10 +34,6 @@
 		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
-		<copy file="${com_resources.dir}/1331789242_Add.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/1331789257_User.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/1331789259_Delete.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/icon_2_32x32.png" todir="${bin_resources.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->

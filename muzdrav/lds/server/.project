@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>serverVrachInfo</name>
+	<name>lds_server</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -16,7 +16,7 @@
 			<arguments>
 				<dictionary>
 					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/serverVrachInfo_Builder.launch</value>
+					<value>&lt;project&gt;/.externalToolBuilders/lds_server_Builder.launch</value>
 				</dictionary>
 			</arguments>
 		</buildCommand>
@@ -28,12 +28,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/vrachInfo/config</locationURI>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/lds/config</locationURI>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/vrachInfo/thrift/gen-java</locationURI>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/lds/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -1,6 +1,5 @@
-package ru.nkz.ivcgzo.clientStaticInputVrachInfo;
+package ru.nkz.ivcgzo.clientVrachInfo;
 
-import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +14,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -29,49 +27,25 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.MestoRab;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.VrachInfo;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfoAdmin.ThriftServerStaticInputVrachInfoAdmin;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 
 public class MainForm extends Client {
 	private final boolean adminMode;
-	private ThriftServerStaticInputVrachInfoAdmin.Client tcl;
+	private final UserAuthInfo authInfo;
+	private ThriftServerVrachInfo.Client tcl;
 	private JFrame frame;
 	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
 	private CustomTable<MestoRab, MestoRab._Fields> tblMrab;
 	private PermForm permForm;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-					MainForm window = new MainForm();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the application.
-	 */
-	public MainForm() {
-		super(null, null, 0);
-		adminMode = false;
-		initialize();
-	}
-	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, lncPrm);
 		adminMode = lncPrm == 2;
+		this.authInfo = authInfo;
 		initialize();
-		conMan.add(ThriftServerStaticInputVrachInfoAdmin.Client.class, configuration.thrPort);
+		conMan.add(ThriftServerVrachInfo.Client.class, configuration.thrPort);
 		conMan.setLocalForm(frame);
 		permForm.setConnectionManager(conMan);
 		frame.setVisible(true);
@@ -82,7 +56,7 @@ public class MainForm extends Client {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/icon_2_32x32.png")));
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/icon_2_32x32.png")));
 		frame.setTitle(configuration.appName);
 		frame.setBounds(100, 100, 600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,7 +123,7 @@ public class MainForm extends Client {
 		tblVrach.setFillsViewportHeight(true);
 		
 		JButton btnVrAdd = new JButton();
-		btnVrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/1331789242_Add.png")));
+		btnVrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789242_Add.png")));
 		btnVrAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -160,7 +134,7 @@ public class MainForm extends Client {
 		btnVrAdd.setEnabled(tblVrach.isEditable());
 		
 		JButton btnVrDel = new JButton();
-		btnVrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/1331789259_Delete.png")));
+		btnVrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789259_Delete.png")));
 		btnVrDel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -222,14 +196,14 @@ public class MainForm extends Client {
 		tblMrab.setFillsViewportHeight(true);
 		
 		JButton btnVrPerm = new JButton();
-		btnVrPerm.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/1331789257_User.png")));
+		btnVrPerm.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789257_User.png")));
 		btnVrPerm.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					tcl.getServerVersion();
 					permForm.setLocationRelativeTo(frame);
-					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem());
+					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem(), ((tblVrach.getSelectedItem().pcod == authInfo.pcod) && (tblMrab.getSelectedItem().cpodr == authInfo.cpodr) && (tblMrab.getSelectedItem().clpu == authInfo.clpu)));
 				} catch (TTransportException e1) {
 					conMan.reconnect(e1);
 				} catch (TException e1) {
@@ -240,7 +214,7 @@ public class MainForm extends Client {
 		});
 
 		JButton btnMrAdd = new JButton();
-		btnMrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/1331789242_Add.png")));
+		btnMrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789242_Add.png")));
 		btnMrAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -251,7 +225,7 @@ public class MainForm extends Client {
 		btnMrAdd.setEnabled(tblMrab.isEditable());
 		
 		JButton btnMrDel = new JButton();
-		btnMrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/1331789259_Delete.png")));
+		btnMrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789259_Delete.png")));
 		btnMrDel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -340,8 +314,8 @@ public class MainForm extends Client {
 
 	@Override
 	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
-		if (conn instanceof ThriftServerStaticInputVrachInfoAdmin.Client) {
-			tcl = (ThriftServerStaticInputVrachInfoAdmin.Client) conn;
+		if (conn instanceof ThriftServerVrachInfo.Client) {
+			tcl = (ThriftServerVrachInfo.Client) conn;
 			permForm.setClient(tcl);
 			try {
 				tblVrach.setData(tcl.GetVrachList());

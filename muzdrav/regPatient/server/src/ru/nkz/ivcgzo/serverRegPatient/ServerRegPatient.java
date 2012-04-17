@@ -78,7 +78,7 @@ public class ServerRegPatient extends Server implements Iface {
         super(sse, tse);
 
         rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class, PATIENT_BRIEF_FIELD_NAMES);
-        qgPatientBrief = new QueryGenerator<PatientBrief>(PatientBrief.class, 
+        qgPatientBrief = new QueryGenerator<PatientBrief>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
         rsmAdpAdress = new TResultSetMapper<>(Address.class, ADP_ADDRESS_FIELD_NAMES);
         rsmAdmAdress = new TResultSetMapper<>(Address.class, ADM_ADDRESS_FIELD_NAMES);
