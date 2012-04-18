@@ -1,38 +1,30 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
-import ru.nkz.ivcgzo.thriftOsm.Psign;
-import javax.swing.JScrollPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 
 import org.apache.thrift.TException;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
-import javax.swing.UIManager;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JCheckBox;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.Psign;
+import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 
 public class FormSign extends JFrame {
 	/**
@@ -48,6 +40,10 @@ public class FormSign extends JFrame {
 	private JCheckBox cbk;
 	private JCheckBox cba;
 	private JCheckBox cbn;
+	private String s1;
+	private String s2;
+	private String s3;
+	private String prv;
 
 	/**
 	 * Launch the application.
@@ -117,6 +113,7 @@ public class FormSign extends JFrame {
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
+				psign.setVred(getVrPr());
 				try {
 					MainForm.tcl.setPsign(psign);
 				} catch (KmiacServerException e) {
@@ -146,7 +143,28 @@ public class FormSign extends JFrame {
 		JButton button_1 = new JButton("1111");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				getVrPr();
+				
+//				if (cbk.isSelected()){
+//					s1 = "1";	
+//				}else {
+//					s1 = "0";
+//				}
+//				System.out.println(s1);
+//				
+//				if (cba.isSelected()){
+//					s2 = "1";	
+//					}else {
+//						s2 = "0";
+//					}
+//				System.out.println(s2);
+//				if (cbn.isSelected()){
+//					s3 = "1";	
+//					}else {
+//						s3 = "0";
+//					}
+//				System.out.println(s3);
+//				
+//				prv = s1+s2+s3;
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -226,11 +244,11 @@ public class FormSign extends JFrame {
 					.addGap(61))
 		);
 		
-		JCheckBox cbk = new JCheckBox("Курение");
+		cbk = new JCheckBox("Курение");
 		
-		JCheckBox cba = new JCheckBox("Алкоголь");
+		cba = new JCheckBox("Алкоголь");
 		
-		JCheckBox cbn = new JCheckBox("Наркотики");
+		cbn = new JCheckBox("Наркотики");
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -302,6 +320,6 @@ public class FormSign extends JFrame {
 ////				prv[1] = '2';
 //			if (cbk.)
 ////			
-			return new String(prv);
+			return prv;
 		}
 }
