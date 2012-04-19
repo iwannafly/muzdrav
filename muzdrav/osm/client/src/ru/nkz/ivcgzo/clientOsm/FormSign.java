@@ -25,6 +25,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
+import sun.org.mozilla.javascript.internal.regexp.SubString;
 
 public class FormSign extends JFrame {
 	/**
@@ -44,6 +45,11 @@ public class FormSign extends JFrame {
 	private String s2;
 	private String s3;
 	private String prv;
+	private String v1;
+	private String v2;
+	private String v3;
+	private String vrp;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -75,8 +81,9 @@ public class FormSign extends JFrame {
 				tpallerg.setText(psign.allerg);
 				tpanamnz.setText(psign.vitae);
 				tpfarm.setText(psign.farmkol);
+//				v1 = ;
 			} catch (KmiacServerException e1) {
-				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошипка");
+				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошибка");
 			} catch (PsignNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -143,30 +150,25 @@ public class FormSign extends JFrame {
 		JButton button_1 = new JButton("1111");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-//				if (cbk.isSelected()){
-//					s1 = "1";	
-//				}else {
-//					s1 = "0";
-//				}
-//				System.out.println(s1);
-//				
-//				if (cba.isSelected()){
-//					s2 = "1";	
-//					}else {
-//						s2 = "0";
-//					}
-//				System.out.println(s2);
-//				if (cbn.isSelected()){
-//					s3 = "1";	
-//					}else {
-//						s3 = "0";
-//					}
-//				System.out.println(s3);
-//				
-//				prv = s1+s2+s3;
+			vrp=psign.getVred();
+			v1=vrp.substring(0, 1);
+			v2=vrp.substring(1, 2);
+			v3=vrp.substring(2, 3);
+			if (v1=="1"){
+				cbk.isSelected();
+			}
+			if (v2=="1"){
+				cba.isSelected();
+			}
+			if (v3=="1"){
+				cbn.isSelected();
+			}
 			}
 		});
+		
+		textField = new JTextField();
+		textField.setVisible(false);
+		textField.setColumns(10);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -174,7 +176,7 @@ public class FormSign extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 										.addComponent(label, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
@@ -192,8 +194,10 @@ public class FormSign extends JFrame {
 									.addComponent(label_3)
 									.addGap(45)
 									.addComponent(tpallerg, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
-								.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
-									.addComponent(label_5)
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(label_5)
+										.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 									.addGap(30)
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 										.addComponent(button_1)
@@ -240,7 +244,9 @@ public class FormSign extends JFrame {
 							.addComponent(button))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(18)
-							.addComponent(button_1)))
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(button_1)
+								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 					.addGap(61))
 		);
 		
@@ -307,18 +313,7 @@ public class FormSign extends JFrame {
 			System.out.println(s3);
 			
 			prv = s1+s2+s3;
-//			char[] prv = new char[3];
-//
-////			prv[0] = '1';
-////			for (Component cmp : pnlPermChb.getComponents()) {
-////				TaggedJCheckBox cmp = (TaggedJCheckBox) cmp;
-////				
-////				prv[cmp.getTag()] = (cmp.isSelected()) ? '1' : '0';
-////			}
-////			
-////			if (ownRecord)
-////				prv[1] = '2';
-//			if (cbk.)
+
 ////			
 			return prv;
 		}

@@ -150,8 +150,6 @@ public class Vvod extends JFrame {
 		 diag = new PdiagAmb();
 		 pr = new Priem();
 		 dz = new PdiagZ();
-
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1029, 747);
 		//JPanel JPanel = new JPanel();
 		setBorder(new EmptyBorder(5, 5, 5, 5));
