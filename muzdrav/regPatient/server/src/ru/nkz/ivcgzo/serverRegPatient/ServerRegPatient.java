@@ -20,16 +20,18 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientAgent;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientAllGosp;
+import ru.nkz.ivcgzo.thriftRegPatient.Agent;
+import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
+import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
+import ru.nkz.ivcgzo.thriftRegPatient.Jalob;
+import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
+import ru.nkz.ivcgzo.thriftRegPatient.Lgota;
+import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientGosp;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientJalob;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientKontingent;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientLgota;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientNambk;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientSign;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Polis;
+import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SpravStruct;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
@@ -44,6 +46,10 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<PatientBrief, PatientBrief._Fields> rsmPatientBrief;
     private TResultSetMapper<Address, Address._Fields> rsmAdpAdress;
     private TResultSetMapper<Address, Address._Fields> rsmAdmAdress;
+    private TResultSetMapper<PatientFullInfo, PatientFullInfo._Fields> rsmPatientFullInfo;
+    private TResultSetMapper<Polis, Polis._Fields> rsmPolisOms;
+    private TResultSetMapper<Polis, Polis._Fields> rsmPolisDms;
+    private TResultSetMapper<Nambk, Nambk._Fields> rsmNambk;
     private QueryGenerator<PatientBrief> qgPatientBrief;
     private static final Class<?>[] PATIENT_BRIEF_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
@@ -57,6 +63,12 @@ public class ServerRegPatient extends Server implements Iface {
     //  admFlat
         String.class
     };
+    private static final String[] POLIS_OMS_FIELD_NAMES = {
+        "poms_strg", "poms_ser", "poms_nom", "poms_tdoc"
+    };
+    private static final String[] POLIS_DMS_FIELD_NAMES = {
+        "pdms_strg", "pdms_ser", "pdms_nom"
+    };
     private static final String[] ADP_ADDRESS_FIELD_NAMES = {
         "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_kv"
     };
@@ -65,6 +77,14 @@ public class ServerRegPatient extends Server implements Iface {
     };
     private static final String[] PATIENT_BRIEF_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom"
+    };
+    private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
+        "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
+        "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
+        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv"
+    };
+    private static final String[] NAMBK_FIELD_NAMES = {
+        "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
     };
 
     /**
@@ -83,10 +103,15 @@ public class ServerRegPatient extends Server implements Iface {
                 PATIENT_BRIEF_FIELD_NAMES);
         rsmAdpAdress = new TResultSetMapper<>(Address.class, ADP_ADDRESS_FIELD_NAMES);
         rsmAdmAdress = new TResultSetMapper<>(Address.class, ADM_ADDRESS_FIELD_NAMES);
+        rsmPatientFullInfo = new TResultSetMapper<>(PatientFullInfo.class,
+                PATIENT_FULL_INFO_FIELD_NAMES);
+        rsmPolisOms = new TResultSetMapper<>(Polis.class, POLIS_OMS_FIELD_NAMES);
+        rsmPolisDms = new TResultSetMapper<>(Polis.class, POLIS_DMS_FIELD_NAMES);
+        rsmNambk = new TResultSetMapper<>(Nambk.class, NAMBK_FIELD_NAMES);
     }
 
     /**
-     * Метод запускающий сервер.
+     * Запускает сервер.
      */
     @Override
     public final void start() throws Exception {
@@ -100,7 +125,7 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     /**
-     * Метод останавливающий сервер.
+     * Останавливает сервер.
      */
     @Override
     public final void stop() {
@@ -110,84 +135,113 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     /**
-     * Метод, возвращающий краткие сведения
+     * Возвращает краткие сведения
      * о всех пациентах, удовлетворяющих введенным данным.
      * @param patient - информация о пациентах, по которой производится поиск
+     * @return список thrift-объектов, содержащих краткую информацию о пациентах
+     * @throws PatientNotFoundException
      */
     @Override
     public final List<PatientBrief> getAllPatientBrief(
-            final PatientBrief patient) throws TException {
+            final PatientBrief patient) throws TException, PatientNotFoundException {
         String  sqlQuery = "SELECT npasp, fam, im, ot, datar, poms_ser, poms_nom, "
                 + "adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, "
                 + "adm_obl, adm_gorod, adm_ul, adm_dom, adm_kv "
                 + "FROM patient";
         try {
             sqlQuery = qgPatientBrief.genSelectQuery(patient, sqlQuery);
-            System.out.println(sqlQuery);
             int[] indexes = qgPatientBrief.genIndexes(patient);
             AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
                     PATIENT_BRIEF_TYPES, indexes);
             ResultSet rs = acrs.getResultSet();
             List<PatientBrief> patientsInfo = new ArrayList<PatientBrief>();
-            while (rs.next()) {
-                PatientBrief curPatient = rsmPatientBrief.map(rs);
-                curPatient.setAdpAddress(new Address(rsmAdpAdress.map(rs)));
-                curPatient.setAdmAddress(new Address(rsmAdmAdress.map(rs)));
-                patientsInfo.add(curPatient);
+            if (rs.next()) {
+                do {
+                    PatientBrief curPatient = rsmPatientBrief.map(rs);
+                    curPatient.setAdpAddress(new Address(rsmAdpAdress.map(rs)));
+                    curPatient.setAdmAddress(new Address(rsmAdmAdress.map(rs)));
+                    patientsInfo.add(curPatient);
+                } while (rs.next());
+                return patientsInfo;
+            } else {
+                throw new PatientNotFoundException();
             }
-            return patientsInfo;
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    /**
+     * Возвращает полные сведения о пациенте с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return thrift-объект, содержащий полную информацию о пациенте
+     * @throws PatientNotFoundException
+     */
+    @Override
+    public final PatientFullInfo getPatientFullInfo(final int npasp)
+            throws TException, PatientNotFoundException {
+        String sqlQuery = "SELECT * FROM patient LEFT JOIN p_nambk ON "
+            + "patient.npasp = p_nambk.npasp WHERE npasp = ?;";
+        try {
+            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+            if (acrs.getResultSet().next()) {
+                PatientFullInfo patient = rsmPatientFullInfo.map(acrs.getResultSet());
+                patient.setNpasp(npasp);
+                patient.setAdpAddress(rsmAdpAdress.map(acrs.getResultSet()));
+                patient.setAdmAddress(rsmAdmAdress.map(acrs.getResultSet()));
+                patient.setPolis_oms(rsmPolisOms.map(acrs.getResultSet()));
+                patient.setPolis_dms(rsmPolisDms.map(acrs.getResultSet()));
+                Nambk nambk = new Nambk(rsmNambk.map(acrs.getResultSet()));
+                nambk.setNpasp(npasp);
+                patient.setNambk(nambk);
+                return patient;
+            } else {
+                throw new PatientNotFoundException();
+            }
         } catch (SQLException e) {
             throw new TException(e);
         }
     }
 
     @Override
-    public final PatientFullInfo getPatientFullInfo(final int npasp) throws TException {
+    public final Agent getAgent(final int npasp) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final PatientAgent getPatientAgent(final int npasp) throws TException {
+    public final List<Lgota> getLgota(final int npasp) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<PatientLgota> getPatientLgota(final int npasp) throws TException {
+    public final List<Kontingent> getKontingent(final int npasp) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<PatientKontingent> getPatientKontingent(
-            final int npasp) throws TException {
+    public final Sign getSign(final int npasp) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final PatientSign getPatientSign(final int npasp) throws TException {
+    public final Nambk getNambk(final int npasp) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final PatientNambk getPatientNambk(final int npasp) throws TException {
+    public final List<AllGosp> getAllGosp(final int npasp, final int ngosp) 
+            throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<PatientAllGosp> getPatientAllGosp(final int npasp,
-            final int ngosp) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public final PatientGosp getPatientGosp(final int npasp,
-            final int ngosp) throws TException {
+    public final Gosp getGosp(final int npasp, final int ngosp) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -205,117 +259,140 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public void addLgota(final PatientLgota lgota) throws TException {
+    public void addLgota(final Lgota lgota) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void addKont(final PatientKontingent kont) throws TException {
+    public void addKont(final Kontingent kont) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void addAgent(final PatientAgent agent) throws TException {
+    public void addAgent(final Agent agent) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void addSign(final PatientSign sign) throws TException {
+    public void addSign(final Sign sign) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void addJalob(final PatientJalob jalob) throws TException {
+    public void addJalob(final Jalob jalob) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void addGosp(final PatientGosp gosp) throws TException {
+    public void addGosp(final Gosp gosp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void addNambk(final PatientNambk nambk) throws TException {
+    public void addNambk(final Nambk nambk) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deletePatient(final int npasp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteNambk(final int npasp, final int cpol) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteLgota(final int npasp, final int lgota) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteKont(final int npasp, final int kateg) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteAgent(final int npasp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteSign(final int npasp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteJalob(final int npasp, final int ngosp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void deleteGosp(final int npasp, final int ngosp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void updatePatient(final PatientFullInfo patinfo) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void updateNambk(final PatientNambk nambk) throws TException {
+    public void updateNambk(final Nambk nambk) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void updateLgota(final int npasp, final int lgota) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void updateKont(final int npasp, final int kateg) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void updateAgent(final PatientAgent agent) throws TException {
+    public void updateAgent(final Agent agent) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void updateSign(final PatientSign sign) throws TException {
+    public void updateSign(final Sign sign) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void updateJalob(final PatientJalob jalob) throws TException {
+    public void updateJalob(final Jalob jalob) throws TException {
         // TODO Auto-generated method stub
+        
     }
 
     @Override
-    public void updateGosp(final PatientGosp gosp) throws TException {
+    public void updateGosp(final Gosp gosp) throws TException {
         // TODO Auto-generated method stub
+        
     }
 }

@@ -1,30 +1,47 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
-import junit.framework.TestCase;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import org.apache.thrift.TException;
-import org.junit.Before;
-import org.junit.Test;
 
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 
-public class TestServerRegPatien extends TestCase {
+/**
+ * @author Avdeev Alexander
+ */
+public class TestServerRegPatien {
     private String conn = String.format("jdbc:postgresql://%s:%s/%s",
             "10.0.0.66", "5432", "zabol");
     private ISqlSelectExecutor sse;
     private ITransactedSqlExecutor tse;
-    private ServerRegPatient srp;
+    private ServerRegPatient testServer;
     private static final int COUNT_CONNECTIONS = 5;
+    private PatientBrief testPatientFull;
+    private PatientBrief testPatientEmpty;
+
+    @Rule
+    public ExpectedException testException = ExpectedException.none();
 
     @Before
     public final void setUp() throws Exception {
         sse = new SqlSelectExecutor(conn, "postgres", "postgres");
         tse = new TransactedSqlManager(conn, "postgres", "postgres", COUNT_CONNECTIONS);
-        srp = new ServerRegPatient(sse, tse);
+        testServer = new ServerRegPatient(sse, tse);
+        testPatientFull = new PatientBrief();
+        testPatientFull.setIm("СЕРГЕЙ");
+        testPatientEmpty = new PatientBrief();
+        testPatientEmpty.setNpasp(-1);
     }
 
     @Test
@@ -42,17 +59,18 @@ public class TestServerRegPatien extends TestCase {
     }
 
     @Test
-    public final void testGetAllPatientBrief() throws TException {
-        java.util.List <PatientBrief> lPb;
-        PatientBrief patient = new PatientBrief();
-        //patient.setNpasp(1);
-        patient.setIm("Иван");
-        lPb = srp.getAllPatientBrief(patient);
-        //assertNotNull(lPb);
-        System.out.println(lPb.size());
-        System.out.println(lPb.get(0).getSpolis());
-        System.out.println(lPb.get(0).getAdpAddress().getCity());
-        //assertEquals(lPb.size(),4);
-        //assertTrue(lPb.size()>0);
+    public final void testGetAllPatientBrief()
+            throws TException, PatientNotFoundException {
+        final int expectedListSize = 312;
+        java.util.List <PatientBrief> testPatientList;
+        testPatientList = testServer.getAllPatientBrief(testPatientFull);
+        assertEquals("list size", expectedListSize, testPatientList.size());
+        assertEquals("elemet 0 city field", "НОВОКУЗНЕЦК Г.",
+                testPatientList.get(0).getAdpAddress().getCity());
+
+        testPatientList.clear();
+        testException.expect(PatientNotFoundException.class);
+        testPatientList = testServer.getAllPatientBrief(testPatientEmpty);
+        testPatientList.clear();
     }
 }
