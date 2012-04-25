@@ -148,7 +148,6 @@ public class ClassifierImporter {
 	
 	private void executeImportScript(String[] impScript) throws Exception {
 		File scrFile = new File(saveScriptToTempFile(impScript));
-		scrFile.deleteOnExit();
 		try {
 			String errorMsg = "";
 			String lastLine = "";
@@ -170,6 +169,7 @@ public class ClassifierImporter {
 				throw new IOException("Can't open psql input stream.", e);
 			}
 			psqlProcess.waitFor();
+			scrFile.deleteOnExit();
 			if (psqlProcess.exitValue() != 0)
 				throw new Exception(String.format("psql failed with code %d: '%s'.", psqlProcess.exitValue(), lastLine));
 			else if (errorMsg.length() > 0)
@@ -180,7 +180,7 @@ public class ClassifierImporter {
 	}
 	
 	private String saveScriptToTempFile(String[] impScript) throws Exception {
-		String tmpFile = Misc.createTempFile(dstConn.databaseParams.login);
+		String tmpFile = Misc.createTempFile(dstConn.databaseParams.login, dstConn.databaseParams.tempDir);
 		try (PrintWriter writer = new PrintWriter(tmpFile);) {
 			for (String impStr : impScript) {
 				writer.println(impStr);

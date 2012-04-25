@@ -21,7 +21,7 @@ public class BinaryExporter {
 	}
 	
 	public Path exportToFile(String tableName) throws Exception {
-		Path binFile = Misc.createTempFile();
+		Path binFile = Misc.createTempFile(conn.databaseParams.tempDir);
 		
 		switch (conn.databaseParams.type) {
 		case oracle:

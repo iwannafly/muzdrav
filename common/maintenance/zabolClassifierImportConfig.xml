@@ -1,6 +1,6 @@
 <importConfig>
-	<srcBase type="oracle" host="oracle.ivcgzo.nkz.ru" port="1521" schema="ORCL" name="NSF" login="talon" password="xtalon" />
-	<dstBase host="localhost" port="5432" schema="public" name="test" login="postgres" password="postgres" />
+	<srcBase type="oracle" host="oracle.ivcgzo.nkz.ru" port="1521" schema="ORCL" name="NSF" login="talon" password="xtalon" tempDir="\\10.0.0.186\SomeSharedResource" />
+	<dstBase host="10.0.0.66" port="5432" schema="public" name="zabol" login="postgres" password="postgres" tempDir="\\10.0.0.186\SomeSharedResource" />
 	<tableList>
 		<table srcName="ABB" dstName="n_abb" />
 		<table srcName="ABC" dstName="n_abc" />

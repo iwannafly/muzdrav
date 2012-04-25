@@ -12,6 +12,7 @@ public class DBParams {
 	public final String name;
 	public final String login;
 	public final String password;
+	public final String tempDir;
 	
 	public DBParams(Element databaseElement) throws SAXException {
 		if (!databaseElement.hasAttribute("type"))
@@ -38,10 +39,15 @@ public class DBParams {
 			else
 				throw new SAXException("Attribute 'schema' must be specified for oracle database.");
 		else
-			schema = "public";
+			schema = databaseElement.getAttribute("schema");
 			
 		name = databaseElement.getAttribute("name");
 		login = databaseElement.getAttribute("login");
 		password = databaseElement.getAttribute("password");
+		
+		if (databaseElement.hasAttribute("tempDir"))
+			tempDir = databaseElement.getAttribute("tempDir");
+		else
+			tempDir = null;
 	}
 }

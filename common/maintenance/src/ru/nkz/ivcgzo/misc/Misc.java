@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.misc;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
@@ -14,14 +15,18 @@ import java.util.Set;
 
 public class Misc {
 	
-	public static String createTempFile(String userName) throws Exception {
-		Path tmp = createTempFile();
+	public static String createTempFile(String userName, String tempDir) throws Exception {
+		Path tmp = createTempFile(tempDir);
 		setReadWriteFilePermissions(tmp, userName);
 		return tmp.toString();
 	}
 	
-	public static Path createTempFile() throws Exception {
-		Path tmp = Files.createTempFile("tmp", ".tmp");
+	public static Path createTempFile(String tempDir) throws Exception {
+		Path tmp;
+		if (tempDir == null)
+			tmp = Files.createTempFile("tmp", ".tmp");
+		else
+			tmp = Files.createTempFile(Paths.get(tempDir), "tmp", ".tmp");
 		return tmp;
 	}
 	
