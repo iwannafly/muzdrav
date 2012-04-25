@@ -22,23 +22,30 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
+import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
+import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Jalob;
+import ru.nkz.ivcgzo.thriftRegPatient.JalobAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.JalobNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
+import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Lgota;
+import ru.nkz.ivcgzo.thriftRegPatient.LgotaAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.LgotaNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
+import ru.nkz.ivcgzo.thriftRegPatient.NambkAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
+import ru.nkz.ivcgzo.thriftRegPatient.SignAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SpravStruct;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
@@ -77,17 +84,33 @@ public class ServerRegPatient extends Server implements Iface {
         String.class
     };
     private static final Class<?>[] PATIENT_FULL_TYPES = new Class<?>[] {
-        //  npasp          fam           im            ot
-            Integer.class, String.class, String.class, String.class,
-        //  datar       spolis        npolis        adpRegion
-            Date.class, String.class, String.class, String.class,
-        //  adpCity       adpStreet     adpHouse      adpFlat
-            String.class, String.class, String.class, String.class,
-        //  admRegion     admCity       admStreet     admHouse
-            String.class, String.class, String.class, String.class,
-        //  admFlat
-            String.class
-        };
+    //  npasp          fam           im            ot
+        Integer.class, String.class, String.class, String.class,
+    //  datar       spolis        npolis        adpRegion
+        Date.class, String.class, String.class, String.class,
+    //  adpCity       adpStreet     adpHouse      adpFlat
+        String.class, String.class, String.class, String.class,
+    //  admRegion     admCity       admStreet     admHouse
+        String.class, String.class, String.class, String.class,
+    //  admFlat
+        String.class
+    };
+    private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
+    //  id             npasp          kateg         datal
+        Integer.class, Integer.class, Short.class, Date.class,
+    //  name
+        String.class
+    };
+    private static final Class<?>[] AGENT_TYPES = new Class<?>[] {
+    //  npasp          fam           im            ot
+        Integer.class, String.class, String.class, String.class,
+    //  datar       pol          name_str      ogrn_str
+        Date.class, Short.class, String.class, String.class,
+    //  vpolis         spolis        npolis        tdoc
+        Integer.class, String.class, String.class, Integer.class,
+    //  docser        docnum        birthplace
+        String.class, String.class, String.class
+    };
     private static final String[] POLIS_OMS_FIELD_NAMES = {
         "poms_strg", "poms_ser", "poms_nom", "poms_tdoc"
     };
@@ -116,7 +139,7 @@ public class ServerRegPatient extends Server implements Iface {
         "vpolis", "spolis" , "npolis", "tdoc", "docser", "docnum", "birthplace"
     };
     private static final String[] KONTINGENT_FIELD_NAMES = {
-        "npasp", "kateg", "datal", "name"
+        "id", "npasp", "kateg", "datal", "name"
     };
     private static final String[] SIGN_FIELD_NAMES = {
         "npasp", "grup", "ph", "allerg", "farmkol", "vitae", "vred"
@@ -435,14 +458,15 @@ public class ServerRegPatient extends Server implements Iface {
     /**
      * Проверяет, существует ли в БД пациент с такими данными
      * @param patinfo - thrift-объект с информацией о пациенте
-     * @return true - если пациент с такими данными уже существует, 
+     * @return true - если пациент с такими данными уже существует,
      * false - если не существует
      */
     private boolean isPatientExist(final PatientFullInfo patinfo) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT (
+        final int[] indexes = {1, 2, 3, 4};
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
                 "SELECT npasp FROM patient WHERE (fam = ?) AND (im = ?) AND (ot = ?) "
                 + "AND (datar = ?);",
-                patinfo, PATIENT_FULL_TYPES, 1, 2, 3, 4)) {
+                patinfo, PATIENT_FULL_TYPES, indexes)) {
             return acrs.getResultSet().next();
         }
     }
@@ -471,7 +495,7 @@ public class ServerRegPatient extends Server implements Iface {
                         + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?) ", true,
+                        + "?, ?);", true,
                         patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                         new Date(patinfo.getDatar()),
                         patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -501,46 +525,130 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    /**
+     * Добавляет сведения о льготах пациента
+     * @param lgota - сведения о льготах пациента
+     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @throws LgotaAlreadyExistException
+     */
     @Override
-    public void addLgota(final Lgota lgota) throws TException {
+    public final int addLgota(final Lgota lgota)
+            throws LgotaAlreadyExistException, TException {
+        // TODO Реализовать метод
+        // Структура таблицы БД и трифт объекта не совпадают,
+        // поэтому непонятно что и куда
+        return 0;
+    }
+
+    /**
+     * Проверяет, существует ли в БД категория пациента с такими данными
+     * @param patinfo - thrift-объект с информацией о категории
+     * @return true - если категория с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isKontingentExist(final Kontingent kontingent) throws SQLException {
+        final int[] indexes = {1, 2};
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT id FROM p_konti WHERE (npasp = ?) AND (kateg = ?);",
+                kontingent, KONTINGENT_TYPES, indexes)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Добавляет информацию о категории пациента в БД
+     * @param kont - информация о категории пациента
+     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @throws KontingentAlreadyExistException
+     */
+    @Override
+    public final int addKont(final Kontingent kont)
+            throws KontingentAlreadyExistException, TException {
+        final int[] indexes = {1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isKontingentExist(kont)) {
+                sme.execPreparedT(
+                        "INSERT INTO p_konti (npasp, kateg, datal, name) "
+                        + "VALUES (?, ?, ?, ?);", true, kont,
+                        KONTINGENT_TYPES, indexes);
+                int id = sme.getGeneratedKeys().getInt("id");
+                sme.setCommit();
+                return id;
+            } else {
+                throw new KontingentAlreadyExistException();
+            }
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД категория пациента с такими данными
+     * @param patinfo - thrift-объект с информацией о категории
+     * @return true - если категория с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isAgentExist(final Agent agent) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT npasp FROM p_preds WHERE (npasp = ?)",
+                agent, AGENT_TYPES, 0)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Добавляет информацию о представителе пациента в БД
+     * @param agent - информация о представителе пациента
+     * @throws AgentAlreadyExistException
+     */
+    @Override
+    public final void addAgent(final Agent agent)
+            throws AgentAlreadyExistException, TException {
+        final int[] indexes = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+        };
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isAgentExist(agent)) {
+                sme.execPreparedT(
+                        "INSERT INTO p_preds (npasp, fam, im, ot, "
+                        + "datar, pol, name_str, ogrn_str, vpolis, "
+                        + "spolis, npolis, tdoc, docser, docnum, "
+                        + "birthplace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
+                        + "?, ?, ?, ?, ?, ?, ?);", false, agent,
+                        AGENT_TYPES, indexes);
+                sme.setCommit();
+            } else {
+                throw new AgentAlreadyExistException();
+            }
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public void addSign(final Sign sign) throws SignAlreadyExistException, TException {
         // TODO Auto-generated method stub
         
     }
 
     @Override
-    public void addKont(final Kontingent kont) throws TException {
+    public final int addJalob(final Jalob jalob) throws JalobAlreadyExistException,
+            TException {
         // TODO Auto-generated method stub
-        
+        return 0;
     }
 
     @Override
-    public void addAgent(final Agent agent) throws TException {
+    public final int addGosp(final Gosp gosp) throws GospAlreadyExistException, TException {
         // TODO Auto-generated method stub
-        
+        return 0;
     }
 
     @Override
-    public void addSign(final Sign sign) throws TException {
+    public final int addNambk(final Nambk nambk) throws NambkAlreadyExistException,
+            TException {
         // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addJalob(final Jalob jalob) throws TException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addGosp(final Gosp gosp) throws TException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void addNambk(final Nambk nambk) throws TException {
-        // TODO Auto-generated method stub
-        
+        return 0;
     }
 
     @Override

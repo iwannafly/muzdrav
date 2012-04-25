@@ -19,8 +19,10 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
+import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
+import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
@@ -36,7 +38,7 @@ public class TestServerRegPatien {
     private ISqlSelectExecutor sse;
     private ITransactedSqlExecutor tse;
     private ServerRegPatient testServer;
-    private static final int COUNT_CONNECTIONS = 5;
+    private static final int COUNT_CONNECTIONS = 1;
     private PatientBrief testPatientFull;
     private PatientBrief testPatientEmpty;
 
@@ -223,10 +225,12 @@ public class TestServerRegPatien {
         final Date birthDate2 = new Date(102, 1, 2);
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
+        assertEquals("id value", 1, kontingent.get(0).getId());
         assertEquals("npasp value", npasp, kontingent.get(0).getNpasp());
         assertEquals("kateg value", 1, kontingent.get(0).getKateg());
         assertEquals("datau value", birthDate1, new Date(kontingent.get(0).getDatau()));
         assertEquals("name value", "нэйм1", kontingent.get(0).getName());
+        assertEquals("id value", 2, kontingent.get(1).getId());
         assertEquals("npasp value", npasp, kontingent.get(1).getNpasp());
         assertEquals("kateg value", 2, kontingent.get(1).getKateg());
         assertEquals("datau value", birthDate2, new Date(kontingent.get(1).getDatau()));
@@ -263,6 +267,46 @@ public class TestServerRegPatien {
         patientFullInfo.setFam("Уникальная_фамилия");
         int afterAddId = testServer.addPatient(patientFullInfo);
         //assertEquals(afterAddId, 0);
+    }
+
+    @Test
+    public final void isKontingentExist_isThrowAlreadyExistException()
+            throws TException, KontingentNotFoundException, KontingentAlreadyExistException {
+        int npasp = 2;
+        List<Kontingent> kontingent =
+                testServer.getKontingent(npasp);
+        testException.expect(KontingentAlreadyExistException.class);
+        int afterAddId = testServer.addKont(kontingent.get(0));
+        //assertEquals(afterAddId, 0);
+    }
+
+    @Test
+    public final void addKontingent_isKontingentActuallyAdded()
+            throws TException, KontingentNotFoundException, KontingentAlreadyExistException {
+        int npasp = 2;
+        List<Kontingent> kontingent =
+                testServer.getKontingent(npasp);
+        kontingent.get(0).setKateg((short) 12);
+        int afterAddId = testServer.addKont(kontingent.get(0));
+    }
+
+    @Test
+    public final void isAgentExist_isThrowAlreadyExistException()
+            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+        int npasp = 2;
+        Agent agent = testServer.getAgent(npasp);
+        testException.expect(AgentAlreadyExistException.class);
+        testServer.addAgent(agent);
+        //assertEquals(afterAddId, 0);
+    }
+
+    @Test
+    public final void addAgent_isAgentActuallyAdded()
+            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+        int npasp = 2;
+        Agent agent = testServer.getAgent(npasp);
+        agent.setNpasp(5);
+        testServer.addAgent(agent);
     }
 
 }
