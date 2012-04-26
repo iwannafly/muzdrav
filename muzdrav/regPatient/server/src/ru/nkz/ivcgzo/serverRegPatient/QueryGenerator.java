@@ -3,11 +3,14 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
+
+import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 
 
 /**
@@ -68,12 +71,16 @@ public final class QueryGenerator<T> {
      * исходного thrift-объекта.
      */
     public <TriftObject extends TBase<?, ThriftField>, ThriftField extends TFieldIdEnum>
-    String genSelectQuery(final TriftObject tObject, final String selectQueryTemplate) {
+    InputData genSelect(final TriftObject tObject, final String selectQueryTemplate) {
         StringBuilder resultQuery =
                 new StringBuilder(selectQueryTemplate + " " + "WHERE");
         Map<String, Integer> definedFields = fieldIsSetCheck(tObject);
+        int[] indexes = new int[definedFields.size()];
+        int i = 0;
         for (Map.Entry<String, Integer> entry : definedFields.entrySet()) {
             resultQuery.append(String.format(" %s = ? AND", entry.getKey()));
+            indexes[i] = entry.getValue();
+            i++;
         }
         if (definedFields.isEmpty()) {
             resultQuery.replace(resultQuery.indexOf(" WHERE"), resultQuery.length(), ";");
@@ -82,7 +89,8 @@ public final class QueryGenerator<T> {
                     resultQuery.length() - " AND".length(), resultQuery.length());
             resultQuery.append(";");
         }
-        return resultQuery.toString();
+        InputData inData = new InputData(resultQuery.toString(), indexes);
+        return inData;
     }
 
     /**
