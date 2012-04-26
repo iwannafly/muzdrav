@@ -8,7 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
+import org.apache.thrift.TFieldIdEnum;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
@@ -225,9 +228,10 @@ public class ServerRegPatient extends Server implements Iface {
                 + "adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, "
                 + "adm_obl, adm_gorod, adm_ul, adm_dom, adm_kv "
                 + "FROM patient";
+        InputData inData = qgPatientBrief.genSelect(patient, sqlQuery);
         try {
-            sqlQuery = qgPatientBrief.genSelectQuery(patient, sqlQuery);
-            int[] indexes = qgPatientBrief.genIndexes(patient);
+            sqlQuery = inData.getQueryText();
+            int[] indexes = inData.getIndexes();
             AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
                     PATIENT_BRIEF_TYPES, indexes);
             ResultSet rs = acrs.getResultSet();
@@ -625,10 +629,27 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    /**
+     * Проверяет, существует ли в БД категория пациента с такими данными
+     * @param <F>
+     * @param patinfo - thrift-объект с информацией о категории
+     * @return true - если категория с такими данными уже существует,
+     * false - если не существует
+     */
+    @SuppressWarnings("unused")
+    private <T extends TBase<?, F>, F extends TFieldIdEnum> boolean isSmthExist(
+            final T tObject, final Class<?>[] types, final String sqlQuery,
+            final int[] indexes) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                sqlQuery, tObject, types, indexes)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+
     @Override
     public void addSign(final Sign sign) throws SignAlreadyExistException, TException {
-        // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -743,6 +764,24 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public void updateGosp(final Gosp gosp) throws TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public String getServerVersion() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getClientVersion() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void saveUserConfig(int id, String config) throws TException {
         // TODO Auto-generated method stub
         
     }
