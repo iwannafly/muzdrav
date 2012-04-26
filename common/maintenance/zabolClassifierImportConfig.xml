@@ -32,6 +32,7 @@
 		<table srcName="NZ1" dstName="n_nz1" />
 		<table srcName="O00" dstName="n_o00" />
 		<table srcName="OPL" dstName="n_opl" />
+		<table srcName="OT9" dstName="n_ot9" />
 		<table srcName="P0C" dstName="n_p0c" />
 		<table srcName="P0E1" dstName="n_p0e1" />
 		<table srcName="P0S" dstName="n_p0s" />
