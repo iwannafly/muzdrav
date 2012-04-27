@@ -32,7 +32,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 /**
  * @author Avdeev Alexander
  */
-public class TestServerRegPatien {
+public class TestServerRegPatient {
     private String conn = String.format("jdbc:postgresql://%s:%s/%s",
             "10.0.0.66", "5432", "zabol");
     private ISqlSelectExecutor sse;
@@ -52,6 +52,7 @@ public class TestServerRegPatien {
         testServer = new ServerRegPatient(sse, tse);
         testPatientFull = new PatientBrief();
         testPatientFull.setIm("СЕРГЕЙ");
+        testPatientFull.setFam("ИВАНОВ");
         testPatientEmpty = new PatientBrief();
         testPatientEmpty.setNpasp(-1);
     }

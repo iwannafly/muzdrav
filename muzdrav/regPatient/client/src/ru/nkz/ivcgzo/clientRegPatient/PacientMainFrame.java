@@ -99,12 +99,11 @@ public class PacientMainFrame extends JFrame {
 		JButton btnPoisk = new JButton("Поиск");
 		btnPoisk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			    //мои исправления
+			    //TODO мои исправления
 				try {
 					instance = PacientMainFrame.this;
-					//pat = new ArrayList<PatientAllStruct>();
 					PatientBrief patBr = new PatientBrief();
-					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText());
+					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().trim());
 					if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().trim());
 					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().trim());
 					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().trim());
@@ -120,29 +119,11 @@ public class PacientMainFrame extends JFrame {
                             pacientInfoFrame.setVisible(true);
                             pacientInfoFrame.setSize(954, 672); 
                     } catch (PatientNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        //e.printStackTrace();
-                        System.out.println(tfFam.getText().trim());
                         System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
                     }
-//					if (pat.isEmpty()){
-//						System.out.println(tfFam.getText().trim());
-//						System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
-//					}
-//					else {
-//						//System.out.println(pat.get(0).fam);
-//						dispose();
-//						if (pacientInfoFrame == null) {
-//							pacientInfoFrame = new PacientInfoFrame(pat);
-//							pacientInfoFrame.pack();
-//						} else
-//							pacientInfoFrame.refresh(pat);
-//							pacientInfoFrame.setVisible(true);
-//							pacientInfoFrame.setSize(954, 672); //ширина, высота
-//					}
-				//} catch (KmiacServerException | TException e) {
 				} catch (TException e) {
 					// TODO Auto-generated catch block
+				    System.out.println("поймали тэиксэпшн");
 					e.printStackTrace();
 				}
 			}
