@@ -14,6 +14,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.ldsThrift.DiagIsl;
+import ru.nkz.ivcgzo.ldsThrift.KlasM00;
 import ru.nkz.ivcgzo.ldsThrift.LDSThrift;
 import ru.nkz.ivcgzo.ldsThrift.LabIsl;
 import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
@@ -24,6 +25,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 
 
 
@@ -37,6 +39,8 @@ public class LDSserver extends Server implements Iface {
 	private static final Class<?>[] dislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Short.class, String.class, String.class, Double.class, String.class};
 	private TResultSetMapper<LabIsl, LabIsl._Fields> rsmLabIs;	
 	private static final Class<?>[] lislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, String.class, Double.class, String.class, Integer.class};
+	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmKlas;	
+	private TResultSetMapper<KlasM00, KlasM00._Fields> rsmM00;
 	public LDSserver(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 				
@@ -254,6 +258,78 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
+	public List<KlasM00> GetKlasM00(String pr) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod,name FROM n_m00 where pr = 'Л' ")) {
+			return rsmM00.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasCpos2() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_cpos2 ")) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasPopl() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_popl ")) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasNapr() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_napr ")) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasO00(int clpu) throws TException {
+		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_o00.pcod, n_o00.name FROM n_o00 JOIN n_ot9 ON (n_ot9.cotd = n_o00.pcod) where n_ot9.clpu = ? ", clpu)) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasN00() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_n00 ")) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasOpl() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_opl ")) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> GetKlasArez() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_arez ")) {
+			return rsmKlas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
 	public void saveUserConfig(int id, String config) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
