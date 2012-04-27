@@ -2749,7 +2749,7 @@ public class PacientInfoFrame extends JFrame {
 			if (Id_gospInfo.nal_p==1) {
 				cbx_nalp.setSelected(true);
 			}
-			if (Id_gospInfo.messr==1) {
+			if (Id_gospInfo.messr) {
 				cbx_messr.setSelected(true);
 			}
 			tf_ntalon.setText(Integer.toString(Id_gospInfo.ntalon));
@@ -2897,9 +2897,9 @@ public class PacientInfoFrame extends JFrame {
 			if (rbtn_extr.isSelected()) {
 				Id_gospInfo.pl_extr = 2;
 			}
-			Id_gospInfo.messr = 0;
+			Id_gospInfo.messr = false;
 			if (cbx_messr.isSelected()) {
-				Id_gospInfo.messr = 1;
+				Id_gospInfo.messr = true;
 			}
 			Id_gospInfo.nal_z = 0;
 			Id_gospInfo.nal_p = 0;

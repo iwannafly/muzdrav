@@ -3,14 +3,11 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
-
-import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 
 
 /**
@@ -91,26 +88,5 @@ public final class QueryGenerator<T> {
         }
         InputData inData = new InputData(resultQuery.toString(), indexes);
         return inData;
-    }
-
-    /**
-     * Формирует массив порядковых номеров заполненных полей thrift-объекта,
-     * необходимый в
-     * {@link ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor
-     * #execPreparedQueryT(String, T, String[], int[]) execPreparedQueryT(...) }
-     * @param tObject - thrift-объект, для которого надо составить запрос.
-     * @return целочисленный массив порядковых номеров полей thrift-объекта в
-     * select запросе.
-     */
-    public <TriftObject extends TBase<?, ThriftField>, ThriftField extends TFieldIdEnum>
-    int[] genIndexes(final TriftObject tObject) {
-        Map<String, Integer> definedFields = fieldIsSetCheck(tObject);
-        int[] indexes = new int[definedFields.size()];
-        int i = 0;
-        for (Map.Entry<String, Integer> entry : definedFields.entrySet()) {
-            indexes[i] = entry.getValue();
-            i++;
-        }
-        return indexes;
     }
 }

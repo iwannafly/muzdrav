@@ -116,10 +116,10 @@ public class ServerRegPatient extends Server implements Iface {
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
         //  id             npasp          kateg         datal
-            Integer.class, Integer.class, Short.class, Date.class,
+        Integer.class, Integer.class, Short.class, Date.class,
         //  name
-            String.class
-        };
+        String.class
+    };
     private static final String[] POLIS_OMS_FIELD_NAMES = {
         "poms_strg", "poms_ser", "poms_nom", "poms_tdoc"
     };
@@ -635,40 +635,37 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-//    /**
-//     * Проверяет, существует ли в БД категория пациента с такими данными
-//     * @param <F>
-//     * @param patinfo - thrift-объект с информацией о категории
-//     * @return true - если категория с такими данными уже существует,
-//     * false - если не существует
-//     */
-//    @SuppressWarnings("unused")
-//    private <T extends TBase<?, F>, F extends TFieldIdEnum> boolean isSmthExist(
-//            final T tObject, final Class<?>[] types, final String sqlQuery,
-//            final int[] indexes) throws SQLException {
-//        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-//                sqlQuery, tObject, types, indexes)) {
-//            return acrs.getResultSet().next();
-//        }
-//    }
-
-
     /**
      * Проверяет, существует ли в БД особая информация о пациенте с такими данными
      * @param patinfo - thrift-объект с особой информацией о пациенте
      * @return true - если особая информация о пациенте с такими данными уже существует,
      * false - если не существует
      */
-    private boolean isSignExist(final Agent agent) throws SQLException {
+    private boolean isSignExist(final Sign sign) throws SQLException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
                 "SELECT npasp FROM p_sign WHERE (npasp = ?)",
-                agent, SIGN_TYPES, 0)) {
+                sign, SIGN_TYPES, 0)) {
             return acrs.getResultSet().next();
         }
     }
     @Override
-    public void addSign(final Sign sign) throws SignAlreadyExistException, TException {
-
+    public final void addSign(final Sign sign) throws SignAlreadyExistException, TException {
+        final int[] indexes = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+        };
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isSignExist(sign)) {
+                sme.execPreparedT(
+                        "INSERT INTO p_sign (npasp, grup, ph, allerg, "
+                        + "farmkol, vitae, vred VALUES (?, ?, ?, ?, ?, ?, ?);",
+                        false, sign,SIGN_TYPES, indexes);
+                sme.setCommit();
+            } else {
+                throw new SignAlreadyExistException();
+            }
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
