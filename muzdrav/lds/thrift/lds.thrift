@@ -1,6 +1,7 @@
 namespace java ru.nkz.ivcgzo.ldsThrift
 
 include "../../../common/thrift/kmiacServer.thrift"
+include "../../../common/thrift/classifier.thrift"
 
 struct ObInfIsl {
 	 1: i32 npasp;
@@ -48,6 +49,12 @@ struct LabIsl {
 	 6: string pcod_m;
 	 7: i32 pvibor;
 }
+
+struct KlasM00 {
+	1: i32 pcod;
+	2: string name;
+	3: string pr;
+	}
 
 
 /*
@@ -108,4 +115,13 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void AddLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
+
+	list <classifier.IntegerClassifier> GetKlasCpos2();
+	list <classifier.IntegerClassifier> GetKlasPopl();
+	list <classifier.IntegerClassifier> GetKlasNapr();
+	list <classifier.IntegerClassifier> GetKlasO00(1: i32 clpu);
+	list <classifier.IntegerClassifier> GetKlasN00();
+	list <KlasM00> GetKlasM00(1: string pr);
+	list <classifier.IntegerClassifier> GetKlasOpl();
+	list <classifier.IntegerClassifier> GetKlasArez();
 }
