@@ -2743,10 +2743,10 @@ public class PacientInfoFrame extends JFrame {
 			if (Id_gospInfo.pl_extr==2) {
 				rbtn_extr.setSelected(true);
 			}
-			if (Id_gospInfo.nal_z==1) {
+			if (Id_gospInfo.nal_z) {
 				cbx_nalz.setSelected(true);
 			}
-			if (Id_gospInfo.nal_p==1) {
+			if (Id_gospInfo.nal_p) {
 				cbx_nalp.setSelected(true);
 			}
 			if (Id_gospInfo.messr) {
@@ -2901,13 +2901,13 @@ public class PacientInfoFrame extends JFrame {
 			if (cbx_messr.isSelected()) {
 				Id_gospInfo.messr = true;
 			}
-			Id_gospInfo.nal_z = 0;
-			Id_gospInfo.nal_p = 0;
+			Id_gospInfo.nal_z = false;
+			Id_gospInfo.nal_p = false;
 			if (cbx_nalz.isSelected()) {
-				Id_gospInfo.nal_z = 1;
+				Id_gospInfo.nal_z = true;
 			}
 			if (cbx_nalp.isSelected()) {
-				Id_gospInfo.nal_p = 1;
+				Id_gospInfo.nal_p = true;
 			}
 
 //			Id_gospInfo.vidtr = cmb_travm.getSelectedIndex();
