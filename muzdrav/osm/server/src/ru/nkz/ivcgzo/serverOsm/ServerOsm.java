@@ -17,7 +17,6 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
-import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -39,6 +38,7 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 public class ServerOsm extends Server implements Iface {
 	private TServer thrServ;
 	private final TResultSetMapper<ZapVr, ZapVr._Fields> rsmZapVr;
+	@SuppressWarnings("unused")
 	private final Class<?>[] zapVrTypes; 
 	private final TResultSetMapper<Pvizit, Pvizit._Fields> rsmPvizit;
 	private final Class<?>[] pvizitTypes; 
@@ -46,6 +46,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pvizitAmbTypes; 
 	private final TResultSetMapper<Psign, Psign._Fields> rsmPsign;
 	private final Class<?>[] psignTypes; 
+	private final TResultSetMapper<Priem, Priem._Fields> rsmPriem;
+	private final Class<?>[] priemTypes; 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -61,6 +63,9 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred");
 		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class};
+		
+		rsmPriem = new TResultSetMapper<>(Priem.class, "id_obr",      "npasp",       "id_pos",      "sl_ob",       "n_is",        "n_kons",      "n_proc",      "n_lek",       "t_jalob_d",  "t_jalob_krov", "t_jalob_p",  "t_jalob_moch", "t_jalob_endo", "t_jalob_nerv", "t_jalob_opor", "t_jalob_lih", "t_jalob_obh", "t_jalob_proch", "t_nachalo_zab", "t_sympt",    "t_otn_bol",  "t_ps_syt",   "t_ob_sost",  "t_koj_pokr", "t_sliz",     "t_podk_kl",  "t_limf_uzl", "t_kost_mysh", "t_nervn_ps", "t_chss",     "t_temp",     "t_ad",       "t_rost",     "t_ves",      "t_telo",     "t_sust",     "t_dyh",      "t_gr_kl",    "t_perk_l",   "t_aus_l",    "t_bronho",   "t_arter",    "t_obl_s",    "t_perk_s",   "t_aus_s",    "t_pol_rta",  "t_jivot",    "t_palp_jivot", "t_jel_kish", "t_palp_jel", "t_palp_podjel", "t_pechen",   "t_jelch",    "t_selez",    "t_obl_zad",  "t_poyasn",   "t_pochk",    "t_moch",     "t_mol_jel", "t_gr_jel",    "t_matka",    "t_nar_polov", "t_chitov",   "t_st_localis", "t_ocenka");
+		priemTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class,   String.class, String.class,   String.class,   String.class,   String.class,   String.class,  String.class,  String.class,    String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,   String.class, String.class, String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class,   String.class};
 	}
 
 	@Override
@@ -73,6 +78,16 @@ public class ServerOsm extends Server implements Iface {
 	public String getClientVersion() throws TException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void saveUserConfig(int id, String config) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new TException();
+		}
 	}
 
 	@Override
@@ -90,7 +105,7 @@ public class ServerOsm extends Server implements Iface {
 //		setPsign(psign);
 //		psign = getPsign(psign.npasp);
 		
-//		PvizitAmb pos = new PvizitAmb(2, 1, 2, 3, 4, "5", "6", 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+//		PvizitAmb pos = new PvizitAmb(2, obr.id, 2, 3, 4, "5", "6", 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
 //		pos.setId(AddPvizitAmb(pos));
 //		PvizitAmb pos1 = getPvizitAmb(pos.id);
 //		pos = new PvizitAmb(pos1.id, 2, 3, 4, 5, "6", "7", 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
@@ -120,7 +135,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO pvizit (npasp, cpol, cobr, datao, ishod, rezult, talon, cod_sp, cdol, cuser, ztext, dataz, id_etal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, obr, pvizitTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+			sme.execPreparedT("INSERT INTO p_vizit (npasp, cpol, cobr, datao, ishod, rezult, talon, cod_sp, cdol, cuser, ztext, dataz, id_etal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, obr, pvizitTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -131,7 +146,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public Pvizit getPvizit(int obrId) throws PvizitNotFoundException, KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM pvizit WHERE id = ? ", obrId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE id = ? ", obrId)) {
 			if (acrs.getResultSet().next())
 				return rsmPvizit.map(acrs.getResultSet());
 			else
@@ -144,7 +159,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE pvizit SET ishod = ?, rezult = ?, talon = ?, ztext = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 12, 0);
+			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, ztext = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 12, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -154,7 +169,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void DeletePvizit(int obrId) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM pvizit WHERE id = ? ", false, obrId);
+			sme.execPrepared("DELETE FROM p_vizit WHERE id = ? ", false, obrId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();
@@ -164,8 +179,9 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO pvizit_amb (id_obr, npasp, datap, cod_sp, cdol, diag, mobs, rezult, opl, uet, k_lr, n_sp, pr_opl, pl_extr, vpom) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18);
+			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, diag, mobs, rezult, opl, uet, k_lr, n_sp, pr_opl, pl_extr, vpom) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18);
 			int id = sme.getGeneratedKeys().getInt("id");
+			sme.execPrepared("INSERT INTO p_priem (id_obr, npasp, id_pos) VALUES (?, ?, ?) ", false, pos.id_obr, pos.npasp, id);
 			sme.setCommit();
 			return id;
 		} catch (InterruptedException | SQLException e) {
@@ -175,7 +191,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public PvizitAmb getPvizitAmb(int posId) throws KmiacServerException, PvizitAmbNotFoundException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM pvizit_amb WHERE id = ? ", posId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit_amb WHERE id = ? ", posId)) {
 			if (acrs.getResultSet().next())
 				return rsmPvizitAmb.map(acrs.getResultSet());
 			else
@@ -188,7 +204,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE pvizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -198,7 +214,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void DeletePvizitAmb(int posId) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM pvizit_amb WHERE id = ? ", false, posId);
+			sme.execPrepared("DELETE FROM p_vizit_amb WHERE id = ? ", false, posId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();
@@ -262,30 +278,27 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public int AddPriem(Priem pr) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public Priem getPriem(int obrId, int npasp, int posId) throws KmiacServerException, PriemNotFoundException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_priem WHERE id_obr = ?, npasp = ?, id_pos = ? ", obrId, npasp, posId)) {
+			if (acrs.getResultSet().next())
+				return rsmPriem.map(acrs.getResultSet());
+			else
+				throw new PriemNotFoundException();
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public Priem getPriem(int prId) throws KmiacServerException,
-			PriemNotFoundException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public void setPriem(Priem pr) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_priem SET sl_ob = ?, n_is = ?, n_kons = ?, n_proc = ?, n_lek = ?, t_jalob_d = ?, t_jalob_krov = ?, t_jalob_p = ?, t_jalob_moch = ?, t_jalob_endo = ?, t_jalob_nerv = ?, t_jalob_opor = ?, t_jalob_lih = ?, t_jalob_obh = ?, t_jalob_proch = ?, t_nachalo_zab = ?, t_sympt = ?, t_otn_bol = ?, t_ps_syt = ?, t_ob_sost = ?, t_koj_pokr = ?, t_sliz = ?, t_podk_kl = ?, t_limf_uzl = ?, t_kost_mysh = ?, t_nervn_ps = ?, t_chss = ?, t_temp = ?, t_ad = ?, t_rost = ?, t_ves = ?, t_telo = ?, t_sust = ?, t_dyh = ?, t_gr_kl = ?, t_perk_l = ?, t_aus_l = ?, t_bronho = ?, t_arter = ?, t_obl_s = ?, t_perk_s = ?, t_aus_s = ?, t_pol_rta = ?, t_jivot = ?, t_palp_jivot = ?, t_jel_kish = ?, t_palp_jel = ?, t_palp_podjel = ?, t_pechen = ?, t_jelch = ?, t_selez = ?, t_obl_zad = ?, t_poyasn = ?, t_pochk = ?, t_moch = ?, t_mol_jel = ?, t_gr_jel = ?, t_matka = ?, t_nar_polov = ?, t_chitov = ?, t_st_localis = ?, t_ocenka = ? WHERE id_obr = ?, npasp = ?, id_pos = ? ", false, pr, priemTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 0, 1, 2);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
-
-	@Override
-	public void UpdatePriem(Priem pr) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void DeletePriem(int prId) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void AddPdiagZ(PdiagZ dz) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub

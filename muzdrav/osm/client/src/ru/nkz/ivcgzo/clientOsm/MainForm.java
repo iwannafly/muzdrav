@@ -31,6 +31,7 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class MainForm extends Client {
 	public static ThriftOsm.Client tcl;
+	public static ConnectionManager conMan;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
@@ -68,6 +69,7 @@ public class MainForm extends Client {
 				e.printStackTrace();
 				System.exit(1);
 			}
+		this.conMan = conMan;
 		frame.setVisible(true);
 	}
 

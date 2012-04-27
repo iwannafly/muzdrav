@@ -37,6 +37,7 @@ import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
 /**
  * Класс, подключающий клиентов к трифт-серверам и следящий за актуальностью этих
@@ -351,5 +352,9 @@ public class ConnectionManager {
 			}
 			closeServerSocket(port, false);
 		}
+	}
+	
+	public void saveConfig(UserAuthInfo authInfo) throws TException {
+		filTrans.saveUserConfig(authInfo.user_id, authInfo.config);
 	}
 }

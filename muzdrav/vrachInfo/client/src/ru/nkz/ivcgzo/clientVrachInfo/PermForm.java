@@ -1,43 +1,40 @@
-package ru.nkz.ivcgzo.clientStaticInputVrachInfo;
+package ru.nkz.ivcgzo.clientVrachInfo;
 
-import javax.swing.JDialog;
-
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.TitledBorder;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.MestoRab;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfo.VrachInfo;
-import ru.nkz.ivcgzo.thriftServerStaticInputVrachInfoAdmin.ThriftServerStaticInputVrachInfoAdmin;
-
-import java.awt.Component;
-import java.awt.FlowLayout;
-import javax.swing.JCheckBox;
-import java.awt.Toolkit;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 
 public class PermForm extends JDialog {
 	private static final long serialVersionUID = 5320450245161207797L;
-	private ThriftServerStaticInputVrachInfoAdmin.Client client;
+	private ThriftServerVrachInfo.Client client;
 	private ConnectionManager conMan;
 	private VrachInfo vInf;
 	private MestoRab mRab;
@@ -48,12 +45,13 @@ public class PermForm extends JDialog {
 	private JPanel pnlPermBtn;
 	private JButton btnPassDel;
 	private boolean opened;
+	private boolean ownRecord;
 
 	/**
 	 * Create the dialog.
 	 */
 	public PermForm() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientStaticInputVrachInfo/resources/icon_2_32x32.png")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/icon_2_32x32.png")));
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setBounds(100, 100, 778, 300);
 		
@@ -143,6 +141,9 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3);
 		pnlPermChb.add(chbOsm);
 				
+		TaggedJCheckBox chbLds = new TaggedJCheckBox("Параотделение", 4);
+		pnlPermChb.add(chbLds);
+
 		gbPerm.setLayout(gl_gbPerm);
 		
 		tbLog = new JTextField();
@@ -263,7 +264,7 @@ public class PermForm extends JDialog {
 		});
 	}
 	
-	public void setClient(ThriftServerStaticInputVrachInfoAdmin.Client client) {
+	public void setClient(ThriftServerVrachInfo.Client client) {
 		this.client = client;
 	}
 	
@@ -271,9 +272,10 @@ public class PermForm extends JDialog {
 		this.conMan = conMan;
 	}
 	
-	public void showWindow(VrachInfo vi, MestoRab mr) {
+	public void showWindow(VrachInfo vi, MestoRab mr, boolean ownRecord) {
 		vInf = vi;
 		mRab = mr;
+		this.ownRecord = ownRecord;
 		setVisible(true);
 	}
 	
@@ -286,7 +288,10 @@ public class PermForm extends JDialog {
 			else
 				chb.setSelected(false);
 		}
-	}
+
+		if (ownRecord)
+			((TaggedJCheckBox) pnlPermChb.getComponents()[0]).setSelected(true);
+}
 	
 	private String getPermissions() {
 		char[] perm = new char[128];
@@ -297,6 +302,9 @@ public class PermForm extends JDialog {
 			
 			perm[chb.getTag()] = (chb.isSelected()) ? '1' : '0';
 		}
+		
+		if (ownRecord)
+			perm[1] = '2';
 		
 		return new String(perm).replace('\0', ' ').trim();
 	}
@@ -320,6 +328,9 @@ public class PermForm extends JDialog {
 		for (Component cmp : pnlPermBtn.getComponents()) {
 			cmp.setEnabled(enabled);
 		}
+
+		if (ownRecord)
+			pnlPermChb.getComponents()[0].setEnabled(false);
 	}
 }
 

@@ -132,7 +132,7 @@ public class RemoteInstaller extends Thread implements Runnable {
 	}
 	
 	private String getSharedLibrariesInfo() throws Exception {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM libs WHERE (id < 0) ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM s_libs WHERE (id < 0) ")) {
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			Element root = doc.createElement("libInfoList");
 			doc.appendChild(root);
