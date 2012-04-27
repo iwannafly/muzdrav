@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientOsm" default="main" basedir=".">
+<project name="clientRegPatient" default="main" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_client.dir" location="src" />
@@ -8,7 +8,7 @@
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="../../auth/client/plugin/clientOsm.jar" />
+	<property name="export.dir" location="../../auth/client/plugin/clientRegPatient.jar" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">

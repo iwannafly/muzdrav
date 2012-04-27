@@ -35,6 +35,8 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.JCheckBox;
 
 import ru.nkz.ivcgzo.thriftRegPatient.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 //import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 //import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -207,7 +209,7 @@ public class PacientInfoFrame extends JFrame {
 		JPanel panel = new JPanel();
 		
 		JTabbedPane tbMain = new JTabbedPane(JTabbedPane.TOP);
-		tbMain.setSelectedIndex(0);
+		//tbMain.setSelectedIndex(0);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -2257,6 +2259,11 @@ public class PacientInfoFrame extends JFrame {
 		JPanel panel_1 = new JPanel();
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent arg0) {
+		    }
+		});
 		
 		JButton btnDel = new JButton("Удалить");
 		btnDel.addActionListener(new ActionListener() {

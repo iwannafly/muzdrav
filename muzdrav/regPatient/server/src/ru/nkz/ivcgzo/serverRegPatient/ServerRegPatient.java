@@ -114,6 +114,12 @@ public class ServerRegPatient extends Server implements Iface {
     //  docser        docnum        birthplace
         String.class, String.class, String.class
     };
+    private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
+        //  id             npasp          kateg         datal
+            Integer.class, Integer.class, Short.class, Date.class,
+        //  name
+            String.class
+        };
     private static final String[] POLIS_OMS_FIELD_NAMES = {
         "poms_strg", "poms_ser", "poms_nom", "poms_tdoc"
     };
@@ -629,24 +635,37 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+//    /**
+//     * Проверяет, существует ли в БД категория пациента с такими данными
+//     * @param <F>
+//     * @param patinfo - thrift-объект с информацией о категории
+//     * @return true - если категория с такими данными уже существует,
+//     * false - если не существует
+//     */
+//    @SuppressWarnings("unused")
+//    private <T extends TBase<?, F>, F extends TFieldIdEnum> boolean isSmthExist(
+//            final T tObject, final Class<?>[] types, final String sqlQuery,
+//            final int[] indexes) throws SQLException {
+//        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+//                sqlQuery, tObject, types, indexes)) {
+//            return acrs.getResultSet().next();
+//        }
+//    }
+
+
     /**
-     * Проверяет, существует ли в БД категория пациента с такими данными
-     * @param <F>
-     * @param patinfo - thrift-объект с информацией о категории
-     * @return true - если категория с такими данными уже существует,
+     * Проверяет, существует ли в БД особая информация о пациенте с такими данными
+     * @param patinfo - thrift-объект с особой информацией о пациенте
+     * @return true - если особая информация о пациенте с такими данными уже существует,
      * false - если не существует
      */
-    @SuppressWarnings("unused")
-    private <T extends TBase<?, F>, F extends TFieldIdEnum> boolean isSmthExist(
-            final T tObject, final Class<?>[] types, final String sqlQuery,
-            final int[] indexes) throws SQLException {
+    private boolean isSignExist(final Agent agent) throws SQLException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                sqlQuery, tObject, types, indexes)) {
+                "SELECT npasp FROM p_sign WHERE (npasp = ?)",
+                agent, SIGN_TYPES, 0)) {
             return acrs.getResultSet().next();
         }
     }
-
-
     @Override
     public void addSign(final Sign sign) throws SignAlreadyExistException, TException {
 
@@ -673,116 +692,146 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public void deletePatient(final int npasp) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deletePatient(final int npasp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM patient WHERE npasp = ?;", false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteNambk(final int npasp, final int cpol) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteNambk(final int npasp, final int cpol) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_nambk WHERE npasp = ? AND cpol = ?;",
+                    false, npasp, cpol);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteLgota(final int npasp, final int lgota) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteLgota(final int npasp, final int lgota) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_konti WHERE npasp = ? AND lgot = ?;",
+                    false, npasp, lgota);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteKont(final int npasp, final int kateg) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteKont(final int npasp, final int kateg) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_konti WHERE npasp = ? AND kateg = ?;",
+                    false, npasp, kateg);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteAgent(final int npasp) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteAgent(final int npasp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_preds WHERE npasp = ?;", false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteSign(final int npasp) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteSign(final int npasp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_sign WHERE npasp = ?;", false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
+    //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
-    public void deleteJalob(final int npasp, final int ngosp) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteJalob(final int npasp, final int ngosp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM c_jalob WHERE npasp = ? AND ngosp = ?;",
+                    false, npasp, ngosp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
+    //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
-    public void deleteGosp(final int npasp, final int ngosp) throws TException {
-        // TODO Auto-generated method stub
-        
+    public final void deleteGosp(final int npasp, final int ngosp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM c_gosp WHERE npasp = ? AND ngosp = ?;",
+                    false, npasp, ngosp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
     public void updatePatient(final PatientFullInfo patinfo) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateNambk(final Nambk nambk) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateLgota(final int npasp, final int lgota) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateKont(final int npasp, final int kateg) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateAgent(final Agent agent) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateSign(final Sign sign) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateJalob(final Jalob jalob) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void updateGosp(final Gosp gosp) throws TException {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
-    public String getServerVersion() throws TException {
+    public final String getServerVersion() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String getClientVersion() throws TException {
+    public final String getClientVersion() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void saveUserConfig(int id, String config) throws TException {
+    public void saveUserConfig(final int id, final String config) throws TException {
         // TODO Auto-generated method stub
-        
     }
 }
