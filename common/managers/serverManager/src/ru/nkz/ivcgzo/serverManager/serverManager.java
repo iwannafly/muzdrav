@@ -47,7 +47,7 @@ public class serverManager extends AdminController {
 		serverManager servMan = new serverManager();
 		
 		try {
-			servMan.ConnectToDatabase(DatabaseDriver.postgre, "localhost", "5432", "test", null, 5, "postgres", "postgres");
+			servMan.ConnectToDatabase(DatabaseDriver.postgre, "10.0.0.66", "5432", "zabol", null, 5, "postgres", "postgres");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();

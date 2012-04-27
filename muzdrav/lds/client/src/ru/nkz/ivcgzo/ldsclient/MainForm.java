@@ -19,6 +19,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainForm extends Client{
 
@@ -79,6 +81,13 @@ public class MainForm extends Client{
 		menuBar.add(mnNewMenu);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("Данные");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {				
+				PIslForm winPat = new PIslForm();
+				winPat.frame.setVisible(true);
+				winPat.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+			}
+		});
 		mnNewMenu.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Ввод значений показателей");
