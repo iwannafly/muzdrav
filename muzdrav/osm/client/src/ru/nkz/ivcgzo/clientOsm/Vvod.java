@@ -243,6 +243,7 @@ public class Vvod extends JFrame {
 				pr.setT_ocenka(tpOcenka.getText());
 			 	
 				//pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
+//				pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
 
 			}
 		});
@@ -898,7 +899,6 @@ public class Vvod extends JFrame {
 				MainForm.tcl.AddPvizit(pvizit);
 				MainForm.tcl.AddPvizitAmb(pos);
 				MainForm.tcl.AddPdiagAmb(diag);
-				MainForm.tcl.AddPriem(pr);
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -915,7 +915,6 @@ public class Vvod extends JFrame {
 			if (diag.prizn == 2){//присвоить значение полей данным.вписать в табл.
 			MainForm.tcl.AddPdiagZ(dz);	
 			}
-			MainForm.tcl.AddPriem(pr);
 			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
