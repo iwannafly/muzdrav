@@ -1,38 +1,31 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
-import ru.nkz.ivcgzo.thriftOsm.Psign;
-import javax.swing.JScrollPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 
 import org.apache.thrift.TException;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
-import javax.swing.UIManager;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JCheckBox;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.Psign;
+import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
+import sun.org.mozilla.javascript.internal.regexp.SubString;
 
 public class FormSign extends JFrame {
 	/**
@@ -48,6 +41,15 @@ public class FormSign extends JFrame {
 	private JCheckBox cbk;
 	private JCheckBox cba;
 	private JCheckBox cbn;
+	private String s1;
+	private String s2;
+	private String s3;
+	private String prv;
+	private String v1;
+	private String v2;
+	private String v3;
+	private String vrp;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -79,8 +81,9 @@ public class FormSign extends JFrame {
 				tpallerg.setText(psign.allerg);
 				tpanamnz.setText(psign.vitae);
 				tpfarm.setText(psign.farmkol);
+//				v1 = ;
 			} catch (KmiacServerException e1) {
-				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошипка");
+				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошибка");
 			} catch (PsignNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -117,6 +120,7 @@ public class FormSign extends JFrame {
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
+				psign.setVred(getVrPr());
 				try {
 					MainForm.tcl.setPsign(psign);
 				} catch (KmiacServerException e) {
@@ -146,9 +150,25 @@ public class FormSign extends JFrame {
 		JButton button_1 = new JButton("1111");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				getVrPr();
+			vrp=psign.getVred();
+			v1=vrp.substring(0, 1);
+			v2=vrp.substring(1, 2);
+			v3=vrp.substring(2, 3);
+			if (v1=="1"){
+				cbk.isSelected();
+			}
+			if (v2=="1"){
+				cba.isSelected();
+			}
+			if (v3=="1"){
+				cbn.isSelected();
+			}
 			}
 		});
+		
+		textField = new JTextField();
+		textField.setVisible(false);
+		textField.setColumns(10);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -156,7 +176,7 @@ public class FormSign extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 										.addComponent(label, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
@@ -174,8 +194,10 @@ public class FormSign extends JFrame {
 									.addComponent(label_3)
 									.addGap(45)
 									.addComponent(tpallerg, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
-								.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
-									.addComponent(label_5)
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(label_5)
+										.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 									.addGap(30)
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 										.addComponent(button_1)
@@ -222,15 +244,17 @@ public class FormSign extends JFrame {
 							.addComponent(button))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(18)
-							.addComponent(button_1)))
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(button_1)
+								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 					.addGap(61))
 		);
 		
-		JCheckBox cbk = new JCheckBox("Курение");
+		cbk = new JCheckBox("Курение");
 		
-		JCheckBox cba = new JCheckBox("Алкоголь");
+		cba = new JCheckBox("Алкоголь");
 		
-		JCheckBox cbn = new JCheckBox("Наркотики");
+		cbn = new JCheckBox("Наркотики");
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -289,19 +313,8 @@ public class FormSign extends JFrame {
 			System.out.println(s3);
 			
 			prv = s1+s2+s3;
-//			char[] prv = new char[3];
-//
-////			prv[0] = '1';
-////			for (Component cmp : pnlPermChb.getComponents()) {
-////				TaggedJCheckBox cmp = (TaggedJCheckBox) cmp;
-////				
-////				prv[cmp.getTag()] = (cmp.isSelected()) ? '1' : '0';
-////			}
+
 ////			
-////			if (ownRecord)
-////				prv[1] = '2';
-//			if (cbk.)
-////			
-			return new String(prv);
+			return prv;
 		}
 }

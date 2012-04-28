@@ -62,7 +62,7 @@ public class MainForm extends Client {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JScrollPane spVrach = new JScrollPane();
-		tblVrach = new  CustomTable<>(true, true, VrachInfo.class, VrachInfo._Fields.values(), 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Пол", 5, "Дата рождения", 6, "Образование", 7, "СНИЛС", 8, "Диплом");
+		tblVrach = new  CustomTable<>(true, true, VrachInfo.class, 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Пол", 5, "Дата рождения", 6, "Образование", 7, "СНИЛС", 8, "Диплом");
 		tblVrach.setDateField(4);
 		tblVrach.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -144,7 +144,7 @@ public class MainForm extends Client {
 		btnVrDel.setEnabled(tblVrach.isEditable());
 		
 		JScrollPane spMrab = new JScrollPane();
-		tblMrab = new CustomTable<>(true, true, MestoRab.class, MestoRab._Fields.values(), 3, "Вид службы", 4, "Подразделение", 5, "Должность", 6, "Увольнение", 7, "Медперсонал");
+		tblMrab = new CustomTable<>(true, true, MestoRab.class, 3, "Вид службы", 4, "Подразделение", 5, "Должность", 6, "Увольнение", 7, "Медперсонал");
 		tblMrab.setDateField(3);
 //		tblMrab.sortColumns(4, 3, 2, 1, 0);
 		tblMrab.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<MestoRab>() {

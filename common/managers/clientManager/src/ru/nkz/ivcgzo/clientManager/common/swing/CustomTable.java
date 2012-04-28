@@ -73,16 +73,15 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * методом {@link #setDateField(int)} для редактирования дат и на <code>TableComboBoxIntegerEditor</code>
 	 * методом {@link #setIntegerClassifierSelector(int, List)} для отображения/редатирования
 	 * классификаторов в виде выпадающего списка
-	 * @param thrFlds - массив полей thrift-структуры
 	 * @param fldIdName - чередующиеся пары значений типа <code>Integer</code> и
 	 * <code>String</code>, где первое значение - это индекс поля в массиве
 	 * <b>thrFlds</b>, а второе - название поля, отображаемое в заголовке
 	 * @see TableDateEditor
 	 * @see TableComboBoxIntegerEditor
 	 */
-	public CustomTable(boolean editable, boolean sortable, Class<T> thrCls, F[] thrFlds, Object... fldIdName) {
+	public CustomTable(boolean editable, boolean sortable, Class<T> thrCls, Object... fldIdName) {
 		this.cls = thrCls;
-		this.thrFields = thrFlds;
+		this.thrFields = getThriftFields(thrCls);
 		colCount = fldIdName.length / 2;
 		colNames = new String[colCount];
 		colTypes = new Class<?>[colCount];
@@ -163,6 +162,20 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		}
 		
 		this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+	
+	private F[] getThriftFields(Class<T> cls) {
+		try {
+			T thrObj = cls.newInstance();
+			int objFldCnt = cls.getFields().length - 1;
+			@SuppressWarnings("unchecked")
+			F[] thrFlds = (F[]) new TFieldIdEnum[objFldCnt];
+			for (int i = 0; i < objFldCnt; i++)
+				thrFlds[i] = thrObj.fieldForId(i + 1);
+			return thrFlds;
+		} catch (Exception e) {
+			throw new RuntimeException();
+		}
 	}
 	
 	/**
