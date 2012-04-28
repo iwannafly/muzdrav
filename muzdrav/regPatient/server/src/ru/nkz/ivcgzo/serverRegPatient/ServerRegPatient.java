@@ -6,6 +6,7 @@ package ru.nkz.ivcgzo.serverRegPatient;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,14 +90,18 @@ public class ServerRegPatient extends Server implements Iface {
     private static final Class<?>[] PATIENT_FULL_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
         Integer.class, String.class, String.class, String.class,
-    //  datar       spolis        npolis        adpRegion
-        Date.class, String.class, String.class, String.class,
-    //  adpCity       adpStreet     adpHouse      adpFlat
-        String.class, String.class, String.class, String.class,
-    //  admRegion     admCity       admStreet     admHouse
-        String.class, String.class, String.class, String.class,
-    //  admFlat
-        String.class
+    //  datar       pol          jitel        sgrp
+        Date.class, Short.class, Short.class, Short.class,
+    //  mrab          name_mr       ncex           cpol_pr
+        String.class, String.class, Integer.class, Integer.class,
+    //  terp           tdoc           docser        docnum
+        Integer.class, Integer.class, String.class, String.class,
+    //  datadoc     odoc          snils         dataz
+        Date.class, String.class, String.class, Date.class,
+    //  prof          tel           dsv         prizn
+        String.class, String.class, Date.class, Integer.class,
+    //  ter_liv        region_liv
+        Integer.class, Integer.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg         datal
@@ -115,9 +120,35 @@ public class ServerRegPatient extends Server implements Iface {
         String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
-        //  id             npasp          kateg         datal
+    //  id             npasp          kateg         datal
         Integer.class, Integer.class, Short.class, Date.class,
-        //  name
+    //  name
+        String.class
+    };
+    private static final Class<?>[] GOSP_TYPES = new Class<?>[] {
+    //  id             ngosp          npasp          nist
+        Integer.class, Integer.class, Integer.class, Integer.class,
+    //  datap       timep       s_napr       naprav        ush_n
+        Date.class, Time.class, Short.class, String.class, Integer.class,
+    //  cotd           svoevr         svoevrd        ntalon
+        Integer.class, Integer.class, Integer.class, Integer.class,
+    //  vidtr          pr_out         alkg         soobr
+        Integer.class, Integer.class, Short.class, Boolean.class,
+    //  vid_tran       diag_n        diag_p        named_n       named_p
+        Integer.class, String.class, String.class, String.class, String.class,
+    //  nal_z          nal_p          t0c           ad            datacp
+        Boolean.class, Boolean.class, String.class, String.class, Date.class,
+    //  vremcp      nomcp          kodotd         datagos     vremgos
+        Time.class, Integer.class, Integer.class, Date.class, Time.class,
+    //  cuser          dataosm     vremosm     kod_rez        dat_tf
+        Integer.class, Date.class, Time.class, Integer.class, Date.class,
+    //  dat_smo     dataz
+        Date.class, Date.class
+    };
+    private static final Class<?>[] JALOB_TYPES = new Class<?>[] {
+    //  id             id_gosp        dataz       timez
+        Integer.class, Integer.class, Date.class, Time.class,
+    //  jalob
         String.class
     };
     private static final String[] POLIS_OMS_FIELD_NAMES = {
@@ -465,6 +496,7 @@ public class ServerRegPatient extends Server implements Iface {
         // TODO Auto-generated method stub
         return null;
     }
+
     /**
      * Проверяет, существует ли в БД пациент с такими данными
      * @param patinfo - thrift-объект с информацией о пациенте
@@ -552,7 +584,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     /**
      * Проверяет, существует ли в БД категория пациента с такими данными
-     * @param patinfo - thrift-объект с информацией о категории
+     * @param kontingent - thrift-объект с информацией о категории
      * @return true - если категория с такими данными уже существует,
      * false - если не существует
      */
@@ -594,7 +626,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     /**
      * Проверяет, существует ли в БД категория пациента с такими данными
-     * @param patinfo - thrift-объект с информацией о категории
+     * @param agent - thrift-объект с информацией о категории
      * @return true - если категория с такими данными уже существует,
      * false - если не существует
      */
@@ -637,7 +669,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     /**
      * Проверяет, существует ли в БД особая информация о пациенте с такими данными
-     * @param patinfo - thrift-объект с особой информацией о пациенте
+     * @param sign - thrift-объект с особой информацией о пациенте
      * @return true - если особая информация о пациенте с такими данными уже существует,
      * false - если не существует
      */
@@ -648,17 +680,21 @@ public class ServerRegPatient extends Server implements Iface {
             return acrs.getResultSet().next();
         }
     }
+
+    /**
+     * Добавляет особую информацию о представителе пациента в БД
+     * @param sign - особая информация о представителе пациента
+     * @throws SignAlreadyExistException
+     */
     @Override
     public final void addSign(final Sign sign) throws SignAlreadyExistException, TException {
-        final int[] indexes = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-        };
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isSignExist(sign)) {
                 sme.execPreparedT(
                         "INSERT INTO p_sign (npasp, grup, ph, allerg, "
                         + "farmkol, vitae, vred VALUES (?, ?, ?, ?, ?, ?, ?);",
-                        false, sign,SIGN_TYPES, indexes);
+                        false, sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             } else {
                 throw new SignAlreadyExistException();
@@ -668,17 +704,78 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    /**
+     * Проверяет, существует ли в БД жалоба пациента с такими данными
+     * @param jalob - thrift-объект с особой информацией о пациенте
+     * @return true - если особая информация о пациенте с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isJalobExist(final Jalob jalob) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT id FROM c_jalob WHERE (id_gosp = ?) and (jalob = ?)",
+                jalob, JALOB_TYPES, 1, 2)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Добавляет жалобу пациента в БД
+     * @param jalob - особая информация о представителе пациента
+     * @throws JalobAlreadyExistException
+     */
     @Override
     public final int addJalob(final Jalob jalob) throws JalobAlreadyExistException,
             TException {
-        // TODO Auto-generated method stub
-        return 0;
+        final int[] indexes = {1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isJalobExist(jalob)) {
+                sme.execPreparedT(
+                        "INSERT INTO c_jalob (id_gosp, dataz, timez, jalob) "
+                        + "VALUES (?, ?, ?, ?);", true, jalob,
+                        JALOB_TYPES, indexes);
+                int id = sme.getGeneratedKeys().getInt("id");
+                sme.setCommit();
+                return id;
+            } else {
+                throw new JalobAlreadyExistException();
+            }
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД запись госпитализации пациента с такими данными
+     * @param gosp - thrift-объект с особой информацией о пациенте
+     * @return true - если особая информация о пациенте с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isGospExist(final Gosp gosp) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT id FROM c_gosp WHERE (npasp = ?) and (ngosp = ?)",
+                gosp, GOSP_TYPES, 0)) {
+            return acrs.getResultSet().next();
+        }
     }
 
     @Override
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException, TException {
-        // TODO Auto-generated method stub
-        return 0;
+        final int[] indexes = {1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isGospExist(gosp)) {
+                sme.execPreparedT(
+                        "INSERT INTO p_konti (npasp, kateg, datal, name) "
+                        + "VALUES (?, ?, ?, ?);", true, gosp,
+                        GOSP_TYPES, indexes);
+                int id = sme.getGeneratedKeys().getInt("id");
+                sme.setCommit();
+                return id;
+            } else {
+                throw new GospAlreadyExistException();
+            }
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
