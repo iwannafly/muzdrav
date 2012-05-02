@@ -12,26 +12,26 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 
 /**
  * Параметризированный класс для работы с комбобоксами swing. В качестве параметра должна
  * указываться thrift-структура.
  * @author bsv798
  *
- * @param <T> - thrift-структура {@link IntegerClassifier}
+ * @param <T> - thrift-структура {@link StringClassifier}
  */
-public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extends JComboBox<IntegerClassifier> {
-	private static final long serialVersionUID = 8540397050277967316L;
-	private List<IntegerClassifier> items;
+public class ThriftStringClassifierCombobox<T extends StringClassifier> extends JComboBox<StringClassifier> {
+	private static final long serialVersionUID = -8720200365221036747L;
+	private List<StringClassifier> items;
 	private Searcher searcher;
 	
 	/**
 	 * Конструктор комбобокса.
 	 * @param searcheable - включать ли поиск по первым буквам
 	 */
-	public ThriftIntegerClassifierCombobox(boolean searcheable) {
-		this(searcheable, new ArrayList<IntegerClassifier>());
+	public ThriftStringClassifierCombobox(boolean searcheable) {
+		this(searcheable, new ArrayList<StringClassifier>());
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * @param searcheable - включать ли поиск по первым буквам
 	 * @param list - список из thrift-структур для отображения
 	 */
-	public ThriftIntegerClassifierCombobox(boolean searcheable, List<IntegerClassifier> list) {
+	public ThriftStringClassifierCombobox(boolean searcheable, List<StringClassifier> list) {
 		if (searcheable) {
 			setEditable(true);
 			searcher = new Searcher();
@@ -49,11 +49,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	}
 	
 	private void setModel() {
-		DefaultComboBoxModel<IntegerClassifier> model = new DefaultComboBoxModel<IntegerClassifier>() {
+		DefaultComboBoxModel<StringClassifier> model = new DefaultComboBoxModel<StringClassifier>() {
 			private static final long serialVersionUID = 8684385138292155382L;
 			
 			@Override
-			public IntegerClassifier getElementAt(int index) {
+			public StringClassifier getElementAt(int index) {
 				return items.get(index);
 			}
 			
@@ -68,10 +68,10 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	/**
 	 * Устанавливает список для отображения. 
 	 */
-	public void setData(List<IntegerClassifier> list) {
+	public void setData(List<StringClassifier> list) {
 		items = new ArrayList<>(list.size());
-		for (IntegerClassifier item : list) {
-			items.add(new IntegerClassifierItem(item));
+		for (StringClassifier item : list) {
+			items.add(new StringClassifierItem(item));
 		}
 	}
 	
@@ -79,11 +79,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Получает выбранный объект.
 	 */
 	@Override
-	public IntegerClassifier getSelectedItem() {
+	public StringClassifier getSelectedItem() {
 		Object selItem = super.getSelectedItem();
 		
-		if (selItem instanceof IntegerClassifier)
-			return (IntegerClassifier) selItem;
+		if (selItem instanceof StringClassifier)
+			return (StringClassifier) selItem;
 		else
 			return null;
 	}
@@ -91,7 +91,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	/**
 	 * Получает выбранный пользовательский код. 
 	 */
-	public int getSelectedPcod() {
+	public String getSelectedPcod() {
 		return getSelectedItem().pcod;
 	}
 	
@@ -99,11 +99,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Устанавливает объект на основе пользовательского кода. Выбрасывает {@link RuntimeException},
 	 * если такой код не найден.  
 	 */
-	public void setSelectedPcod(int pcod) {
-		IntegerClassifier selItem = null;
+	public void setSelectedPcod(String pcod) {
+		StringClassifier selItem = null;
 		
-		for (IntegerClassifier item : items) {
-			if (item.pcod == pcod) {
+		for (StringClassifier item : items) {
+			if (item.pcod.equals(pcod)) {
 				selItem = item;
 				break;
 			}
@@ -120,13 +120,13 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			}
 		
 		if (selItem == null)
-			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
+			throw new RuntimeException(String.format("Unknown pcod '%s'.", pcod));
 	}
 	
-	class IntegerClassifierItem extends IntegerClassifier {
-		private static final long serialVersionUID = 5955074073218292470L;
-		
-		private IntegerClassifierItem(IntegerClassifier item) {
+	class StringClassifierItem extends StringClassifier {
+		private static final long serialVersionUID = -2948760587239238424L;
+
+		private StringClassifierItem(StringClassifier item) {
 			super(item);
 		}
 		
@@ -137,11 +137,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	}
 	
 	class Searcher implements DocumentListener {
-		private ThriftIntegerClassifierCombobox<T> cmb = ThriftIntegerClassifierCombobox.this;
+		private ThriftStringClassifierCombobox<T> cmb = ThriftStringClassifierCombobox.this;
 		private JTextField editor = (JTextField) getEditor().getEditorComponent();
 		private boolean searching = false;
 		private boolean enabled = false;
-		private IntegerClassifier lastSelected;
+		private StringClassifier lastSelected;
 		
 		public Searcher() {
 			cmb.addActionListener(new ActionListener() {
@@ -184,7 +184,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 								editor.select(editTextLow.length(), lastSelTextLow.length());
 							}
 						} else							
-							for (IntegerClassifier item : cmb.items) {
+							for (StringClassifier item : cmb.items) {
 								if (item.name.toLowerCase().indexOf(editTextLow) == 0) {
 									searching = true;
 									lastSelected = item;
