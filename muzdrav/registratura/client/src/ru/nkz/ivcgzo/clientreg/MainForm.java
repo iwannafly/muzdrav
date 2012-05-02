@@ -1,12 +1,21 @@
-package ru.nkz.ivcgzo.clientRegPatient;
+package ru.nkz.ivcgzo.clientreg;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
@@ -16,17 +25,16 @@ import org.apache.thrift.transport.TTransportException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+//import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
+import ru.nkz.ivcgzo.thriftreg.Thriftreg;
 
 public class MainForm extends Client {
-    public static ThriftRegPatient.Client tcl;
-	//public static Thriftreg.Client tcl;
+	public static Thriftreg.Client tcl;
 	private JFrame frame;
-	private UserAuthInfo authInfo;
-	//private ThriftIntegerClassifier ComboBox<IntegerClassifier> combobox;
-	
+//	private UserAuthInfo authInfo;
+
 	/**
 	 * Launch the application.
 	 */
@@ -47,13 +55,13 @@ public class MainForm extends Client {
 		this.authInfo = authInfo;
 		
 		if (conMan != null) {
-			conMan.add(ThriftRegPatient.Client.class, configuration.thrPort);
+			conMan.add(Thriftreg.Client.class, configuration.thrPort);
 			conMan.setLocalForm(frame);
 		} else //такой подход рекомендуется только на начальных этапах разработки
 			try {
 				TTransport transport = new TFramedTransport(new TSocket("localhost", configuration.thrPort));
 				transport.open();
-				onConnect(new ThriftRegPatient.Client(new TBinaryProtocol(transport)));
+				onConnect(new Thriftreg.Client(new TBinaryProtocol(transport)));
 			} catch (TTransportException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -91,8 +99,8 @@ public class MainForm extends Client {
 
 	@Override
 	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
-		if (conn instanceof ThriftRegPatient.Client) {
-			tcl = (ThriftRegPatient.Client) conn;
+		if (conn instanceof Thriftreg.Client) {
+			tcl = (Thriftreg.Client) conn;
 //			try {
 ////				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
 //			} catch (KmiacServerException e) {

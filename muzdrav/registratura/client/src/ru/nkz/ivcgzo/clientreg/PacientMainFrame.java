@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientRegPatient;
+package ru.nkz.ivcgzo.clientreg;
 
 import java.awt.EventQueue;
 import org.apache.thrift.TException;
@@ -16,10 +16,8 @@ import javax.swing.border.TitledBorder;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import ru.nkz.ivcgzo.thriftreg.*;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 
 public class PacientMainFrame extends JFrame {
 
@@ -36,7 +34,7 @@ public class PacientMainFrame extends JFrame {
 	private JTextField tfSer;
 	private JTextField tfNom;
 	private PacientInfoFrame pacientInfoFrame;
-	public List<PatientBrief> pat;
+	public List<PatientAllStruct> pat;
 
 	/**
 	 * Launch the application.
@@ -99,32 +97,32 @@ public class PacientMainFrame extends JFrame {
 		JButton btnPoisk = new JButton("Поиск");
 		btnPoisk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			    //TODO мои исправления
 				try {
 					instance = PacientMainFrame.this;
-					PatientBrief patBr = new PatientBrief();
-					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().trim());
-					if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().trim());
-					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().trim());
-					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().trim());
-					if (!tfNom.getText().isEmpty()) patBr.setNpolis(tfNom.getText().trim());
-					try {
-                        pat = MainForm.tcl.getAllPatientBrief(patBr);
-                        dispose();
-                        if (pacientInfoFrame == null) {
-                            pacientInfoFrame = new PacientInfoFrame(pat);
-                            pacientInfoFrame.pack();
-                        } else
-                            pacientInfoFrame.refresh(pat);
-                        pacientInfoFrame.setVisible(true);
-                        pacientInfoFrame.setSize(954, 672);
-                        
-                    } catch (PatientNotFoundException e) {
-                        System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
-                    }
+					//pat = new ArrayList<PatientAllStruct>();
+					pat = MainForm.tcl.getAllPatientInfo(new PatientInfoStruct(
+							tfFam.getText().trim(),
+							tfIm.getText().trim(),tfOt.getText().trim(),
+							new Long(0),tfSer.getText().trim(),
+							tfNom.getText().trim()));
+					if (pat.isEmpty()){
+						System.out.println(tfFam.getText().trim());
+						System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
+					}
+					else {
+						//System.out.println(pat.get(0).fam);
+						dispose();
+						if (pacientInfoFrame == null) {
+							pacientInfoFrame = new PacientInfoFrame(pat);
+							pacientInfoFrame.pack();
+						} else
+							pacientInfoFrame.refresh(pat);
+							pacientInfoFrame.setVisible(true);
+							pacientInfoFrame.setSize(954, 672); //ширина, высота
+					}
+				//} catch (KmiacServerException | TException e) {
 				} catch (TException e) {
 					// TODO Auto-generated catch block
-				    System.out.println("поймали тэиксэпшн");
 					e.printStackTrace();
 				}
 			}

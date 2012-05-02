@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>clientRegPatient</name>
+	<name>serverreg</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -18,12 +18,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/regPatient/config</locationURI>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/registratura/config</locationURI>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/regPatient/thrift/gen-java</locationURI>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/registratura/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
