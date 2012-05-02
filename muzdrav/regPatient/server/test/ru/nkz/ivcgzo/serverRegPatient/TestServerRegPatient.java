@@ -114,6 +114,7 @@ public class TestServerRegPatient {
         int npasp = 2;
         final int pomsStrg = 9;
         final int nambkIshod = 5;
+        final int terp = 10;
         final Date birthDate = new Date(101, 4, 4);
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
@@ -123,6 +124,9 @@ public class TestServerRegPatient {
         assertEquals("ot value", "АЛЕКСЕЕВНА", patientFullInfo.getOt());
         assertEquals("datar value", birthDate,
                 new Date(patientFullInfo.getDatar()));
+        assertEquals("pol value", 2, patientFullInfo.getPol());
+        assertEquals("terp value", terp, patientFullInfo.getTerp());
+        assertEquals("name_mr value", "555555", patientFullInfo.getNamemr());
         assertEquals("poms_nom value", "43090551104",
                 patientFullInfo.getPolis_oms().getNom());
         assertEquals("pol value", 2, patientFullInfo.getPol());
