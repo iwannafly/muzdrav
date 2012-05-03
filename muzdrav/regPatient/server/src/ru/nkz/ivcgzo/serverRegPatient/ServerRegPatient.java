@@ -22,6 +22,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
@@ -89,7 +90,7 @@ public class ServerRegPatient extends Server implements Iface {
     //  npasp          fam           im            ot
         Integer.class, String.class, String.class, String.class,
     //  datar       pol          jitel        sgrp
-        Date.class, Short.class, Short.class, Short.class,
+        Date.class, Integer.class, Integer.class, Integer.class,
     //  mrab          name_mr       ncex           cpol_pr
         String.class, String.class, Integer.class, Integer.class,
     //  terp           tdoc           docser        docnum
@@ -103,7 +104,7 @@ public class ServerRegPatient extends Server implements Iface {
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg         datal
-        Integer.class, Integer.class, Short.class, Date.class,
+        Integer.class, Integer.class, Integer.class, Date.class,
     //  name
         String.class
     };
@@ -111,7 +112,7 @@ public class ServerRegPatient extends Server implements Iface {
     //  npasp          fam           im            ot
         Integer.class, String.class, String.class, String.class,
     //  datar       pol          name_str      ogrn_str
-        Date.class, Short.class, String.class, String.class,
+        Date.class, Integer.class, String.class, String.class,
     //  vpolis         spolis        npolis        tdoc
         Integer.class, String.class, String.class, Integer.class,
     //  docser        docnum        birthplace
@@ -119,7 +120,7 @@ public class ServerRegPatient extends Server implements Iface {
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
     //  id             npasp          kateg         datal
-        Integer.class, Integer.class, Short.class, Date.class,
+        Integer.class, Integer.class, Integer.class, Date.class,
     //  name
         String.class
     };
@@ -127,11 +128,11 @@ public class ServerRegPatient extends Server implements Iface {
     //  id             ngosp          npasp          nist
         Integer.class, Integer.class, Integer.class, Integer.class,
     //  datap       timep       s_napr       naprav        ush_n
-        Date.class, Time.class, Short.class, String.class, Integer.class,
+        Date.class, Time.class, Integer.class, String.class, Integer.class,
     //  cotd           svoevr         svoevrd        ntalon
         Integer.class, Integer.class, Integer.class, Integer.class,
     //  vidtr          pr_out         alkg         soobr
-        Integer.class, Integer.class, Short.class, Boolean.class,
+        Integer.class, Integer.class, Integer.class, Boolean.class,
     //  vid_tran       diag_n        diag_p        named_n       named_p
         Integer.class, String.class, String.class, String.class, String.class,
     //  nal_z          nal_p          t0c           ad            datacp
@@ -151,7 +152,7 @@ public class ServerRegPatient extends Server implements Iface {
         //  npasp          nambk         cpol           nuch
         Integer.class, String.class, Integer.class, Integer.class,
         //  datapr      dataot      ishod
-        Date.class, Date.class, Short.class
+        Date.class, Date.class, Integer.class
     };
     private static final String[] POLIS_OMS_FIELD_NAMES = {
         "poms_strg", "poms_ser", "poms_nom", "poms_tdoc"
@@ -491,12 +492,6 @@ public class ServerRegPatient extends Server implements Iface {
         } catch (SQLException e) {
             throw new TException(e);
         }
-    }
-
-    @Override
-    public final List<SpravStruct> getSpravInfo(final String param) throws TException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /**
@@ -1076,5 +1071,83 @@ public class ServerRegPatient extends Server implements Iface {
         } catch (InterruptedException | SQLException e) {
             throw new TException();
         }
+    }
+
+    @Override
+    public List<IntegerClassifier> getPol() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getSgrp() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getObl() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getGorod(int codObl) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getUl(int codGorod) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getDom(int codUl) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getKorp(int codDom) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getMrab() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getMsStrg() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getPomsTdoc() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getCpolPr() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getTdoc() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getTerCod(int pcod) throws TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
