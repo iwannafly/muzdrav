@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientreg;
+package ru.nkz.ivcgzo.clientRegPatient;
 
 import java.util.Date;
 

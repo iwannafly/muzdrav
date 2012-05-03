@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientreg;
+package ru.nkz.ivcgzo.clientRegPatient;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
@@ -7,16 +7,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ru.nkz.ivcgzo.thriftreg.PatientAllGospInfoStruct;
+import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 
 public class GospTableModel  implements TableModel{
 	private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	
-	// список пациентов отделения
-	private List<PatientAllGospInfoStruct> PatientGospList;
+	// ������ ��������� ���������
+	private List<AllGosp> PatientGospList;
 	
-	public GospTableModel(List<PatientAllGospInfoStruct> inputPatientGospList){
+	public GospTableModel(List<AllGosp> inputPatientGospList){
 		this.PatientGospList = inputPatientGospList;
 	}
 
@@ -32,27 +32,38 @@ public class GospTableModel  implements TableModel{
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		    case 0:
-		        return "N ист.";
+		        return "� ���. ���.";
 		    case 1:
-		        return "Дата обращения";
+		        return "���� �����������";
 		    case 2:
-		        return "Отделение";
+		        return "���������";
 			case 3:
-		        return "Диагноз";
+		        return "�������";
 		    case 4:
 		        return "";
 		    case 5:
-		        return "Npasp";
+		        return "��";
 		    case 6:
-		        return "Ngosp";
+		        return "��";
 		    case 7:
-		        return "Id";
+		        return "��";
 	    }
-	    return "Нет столбца с таким номером";
+	    return "��� ������� � ����� �������";
 	}
 
+	public Class<?> getColumnClass(int columnIndex) {
+			return String.class;		
+	}
+
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		// TODO Auto-generated method stub
+		if (columnIndex == 0 || columnIndex == 1)
+			return true;
+		else	return false;
+	}
+	// ����� ������������ �������� ����������� �������� 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		PatientAllGospInfoStruct tempGosp = PatientGospList.get(rowIndex);
+		AllGosp tempGosp = PatientGospList.get(rowIndex);
 		
 		switch (columnIndex){
 			case 0:
@@ -75,16 +86,6 @@ public class GospTableModel  implements TableModel{
 		return "";
 	}
 
-	public Class<?> getColumnClass(int columnIndex) {
-		return String.class;		
-	}
-
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-	// TODO Auto-generated method stub
-	if (columnIndex == 0 || columnIndex == 1)
-		return true;
-	else	return false;
-	}
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 
 	}

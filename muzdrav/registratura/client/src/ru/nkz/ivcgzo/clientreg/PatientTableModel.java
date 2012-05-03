@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientreg;
+package ru.nkz.ivcgzo.clientRegPatient;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -10,7 +10,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import ru.nkz.ivcgzo.thriftreg.PatientAllStruct;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
+
 
 
 public class PatientTableModel implements TableModel{
@@ -18,9 +19,9 @@ public class PatientTableModel implements TableModel{
 	private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	
-	private List<PatientAllStruct> PatientsList;
+	private List<PatientBrief> PatientsList;
 	
-	public PatientTableModel(List<PatientAllStruct> inputPatientsList){
+	public PatientTableModel(List<PatientBrief> inputPatientsList){
 		this.PatientsList = inputPatientsList;
 	}
 
@@ -62,31 +63,6 @@ public class PatientTableModel implements TableModel{
 	    return "Нет столбца с таким номером";
 	}
 
-	// Метод возвращающий значение
-	public Object getValueAt(int rowIndex, int columnIndex) {
-		PatientAllStruct tempPatient = PatientsList.get(rowIndex);
-		
-		switch (columnIndex){
-			case 0:
-		        return tempPatient.getFam();
-		    case 1:
-		        return tempPatient.getIm();
-		    case 2:
-		        return tempPatient.getOt();
-			case 3:
-				return tempPatient.getNpasp();
-//		    case 4:
-//		        return DATE_FORMAT.format(tempPatient.getDatar());
-//		    case 5:
-//		        return tempPatient.getSpolis()+' '+tempPatient.getNpolis();
-//		    case 6:
-//		        return tempPatient.getAdpAddress().city+' '+tempPatient.getAdpAddress().street+' '+tempPatient.getAdpAddress().house+'-'+tempPatient.getAdpAddress().flat;				
-		    //case 8:
-		      //  return tempPatient.getAdmAddress().city+' '+tempPatient.getAdmAddress().street+' '+tempPatient.getAdmAddress().house;				
-		}
-		return "";
-	}
-
 	public Class<?> getColumnClass(int columnIndex) {
 		if (columnIndex == 3){
 			return Integer.class;
@@ -109,6 +85,30 @@ public class PatientTableModel implements TableModel{
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	// Метод возвращающий значение
+	public Object getValueAt(int rowIndex, int columnIndex) {
+	    PatientBrief tempPatient = PatientsList.get(rowIndex);
+		
+		switch (columnIndex){
+			case 0:
+		        return tempPatient.getFam();
+		    case 1:
+		        return tempPatient.getIm();
+		    case 2:
+		        return tempPatient.getOt();
+			case 3:
+				return tempPatient.getNpasp();
+//		    case 4:
+//		        return DATE_FORMAT.format(tempPatient.getDatar());
+//		    case 5:
+//		        return tempPatient.getSpolis()+' '+tempPatient.getNpolis();
+//		    case 6:
+//		        return tempPatient.getAdpAddress().city+' '+tempPatient.getAdpAddress().street+' '+tempPatient.getAdpAddress().house+'-'+tempPatient.getAdpAddress().flat;				
+		    //case 8:
+		      //  return tempPatient.getAdmAddress().city+' '+tempPatient.getAdmAddress().street+' '+tempPatient.getAdmAddress().house;				
+		}
+		return "";
 	}
 
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {

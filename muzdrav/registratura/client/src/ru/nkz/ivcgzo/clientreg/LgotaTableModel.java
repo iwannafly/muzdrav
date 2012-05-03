@@ -1,22 +1,24 @@
-package ru.nkz.ivcgzo.clientreg;
+package ru.nkz.ivcgzo.clientRegPatient;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
+
+import ru.nkz.ivcgzo.thriftRegPatient.Lgota;
+
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ru.nkz.ivcgzo.thriftreg.PatientLgotaInfoStruct;
 
 public class LgotaTableModel implements TableModel{
 	private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
 	
-	// список льгот
-	private List<PatientLgotaInfoStruct> PatientLgotaList;
+	// ������ ��������� ���������
+	private List<Lgota> PatientLgotaList;
 	
-	public LgotaTableModel(List<PatientLgotaInfoStruct> inputPatientLgotaList){
+	public LgotaTableModel(List<Lgota> inputPatientLgotaList){
 		this.PatientLgotaList = inputPatientLgotaList;
 	}
 
@@ -28,24 +30,36 @@ public class LgotaTableModel implements TableModel{
 		return 5;
 	}
 	
+	// ����� ������������ �������� ������� �� ������
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		    case 0:
-		        return "Дата";
+		        return "����";
 		    case 1:
-		        return "Льгота";
+		        return "������";
 		    case 2:
-		        return "Наименование";
+		        return "������������";
 			case 3:
-		        return "КОВ";
+		        return "���";
 		    case 4:
-		        return "ПФ/СЗ";
+		        return "��/��";
 	    }
-	    return "Нет столбца с таким номером";
+	    return "��� ������� � ����� �������";
 	}
 
+	public Class<?> getColumnClass(int columnIndex) {
+			return String.class;		
+	}
+
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		// TODO Auto-generated method stub
+		if (columnIndex == 0 || columnIndex == 1)
+			return true;
+		else	return false;
+	}
+	// ����� ������������ �������� ����������� �������� 
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		PatientLgotaInfoStruct tempLgota = PatientLgotaList.get(rowIndex);
+		Lgota tempLgota = PatientLgotaList.get(rowIndex);
 		
 		switch (columnIndex){
 			case 0:
@@ -60,17 +74,6 @@ public class LgotaTableModel implements TableModel{
 		        return tempLgota.getPf();
 		}
 		return "";
-	}
-
-	public Class<?> getColumnClass(int columnIndex) {
-			return String.class;		
-	}
-
-	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		// TODO Auto-generated method stub
-		if (columnIndex == 0 || columnIndex == 1)
-			return true;
-		else	return false;
 	}
 
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {

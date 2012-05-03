@@ -116,10 +116,10 @@ public class PacientMainFrame extends JFrame {
                             pacientInfoFrame.pack();
                         } else
                             pacientInfoFrame.refresh(pat);
-                        pacientInfoFrame.setVisible(true);
-                        pacientInfoFrame.setSize(954, 672);
-                        
-                    } catch (PatientNotFoundException e) {
+                        	pacientInfoFrame.setVisible(true);
+                        	pacientInfoFrame.setSize(954, 672);
+                    	}
+					catch (PatientNotFoundException e) {
                         System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
                     }
 				} catch (TException e) {

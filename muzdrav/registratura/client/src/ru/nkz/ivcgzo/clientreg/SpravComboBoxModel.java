@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientreg;
+package ru.nkz.ivcgzo.clientRegPatient;
 
 import java.util.HashSet;
 import java.util.List;
@@ -7,7 +7,8 @@ import java.util.Set;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 
-import ru.nkz.ivcgzo.thriftreg.SpravStruct;
+import ru.nkz.ivcgzo.thriftRegPatient.SpravStruct;
+
 
 public class SpravComboBoxModel implements ComboBoxModel<String>{
 	private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
