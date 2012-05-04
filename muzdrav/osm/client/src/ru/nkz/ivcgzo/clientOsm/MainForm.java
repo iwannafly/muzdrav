@@ -110,7 +110,7 @@ public class MainForm extends Client {
 					.addContainerGap())
 		);
 		
-		table = new CustomTable<>(false, true, ZapVr.class, ZapVr._Fields.values(), 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
+		table = new CustomTable<>(false, true, ZapVr.class, 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
@@ -139,6 +139,7 @@ public class MainForm extends Client {
 			tcl = (ThriftOsm.Client) conn;
 			try {
 				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+				vvod.onConnect();
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -162,7 +162,9 @@ struct PdiagZ{
 	6: i32 nmvd;
 }
 
-
+struct Settings{
+	1: i32 pcod
+	2: string config}
 
 exception PvizitNotFoundException {
 }
@@ -183,6 +185,11 @@ exception PriemNotFoundException {
  * 
  */
 service ThriftOsm extends kmiacServer.KmiacServer {
+	
+	list<classifier.StringClassifier> getP0c() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getAp0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
+	
 	/**
 	 * Получение списка записанных на прием на заданную дату.
 	 */
@@ -211,5 +218,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
 
-	list<classifier.IntegerClassifier> get_n_cpos() throws (1: kmiacServer.KmiacServerException kse);
+	void UpdateSettings(1: Settings codp) throws (1: kmiacServer.KmiacServerException kse);
+	Settings getSettings(1: i32 codp) throws (1: kmiacServer.KmiacServerException kse);
 }
