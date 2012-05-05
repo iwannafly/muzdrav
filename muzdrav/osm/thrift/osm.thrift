@@ -162,9 +162,57 @@ struct PdiagZ{
 	6: i32 nmvd;
 }
 
-struct Settings{
-	1: i32 pcod
-	2: string config}
+struct PatientCommonInfo {
+	 1: optional i32 npasp;
+	 2: optional string fam;
+	 3: optional string im;
+	 4: optional string ot;
+	 5: optional i64 datar;
+	 6: string poms_ser;
+	 7: string poms_nom;
+	 8: optional i32 pol;
+	 9: optional i32 jitel;
+	10: optional i32 sgrp;
+	11: string adp_obl;
+	12: string adp_gorod;
+	13: string adp_ul;
+	14: string adp_dom;
+	15: string adp_korp;
+	16: string adp_kv;
+	17: string adm_obl;
+	18: string adm_gorod;
+	19: string adm_ul;
+	20: string adm_dom;
+	21: string adm_korp;
+	22: string adm_kv;
+	23: string mrab;
+	24: string name_mr;
+	25: optional i32 ncex;
+	26: optional i32 poms_strg;
+	27: optional i32 poms_tdoc;
+	28: string poms_ndog;
+	29: optional i32 pdms_strg;
+	30: string pdms_ser;
+	31: string pdms_nom;
+	32: string pdms_ndog;
+	33: optional i32 cpol_pr;
+	34: optional i32 terp;
+	35: optional i64 datapr;
+	36: optional i32 tdoc;
+	37: string docser;
+	38: string docnum;
+	39: optional i64 datadoc;
+	40: string odoc;
+	41: string snils;
+	42: optional i64 dataz;
+	43: string prof;
+	44: string tel;
+	45: optional i64 dsv;
+	46: optional i32 prizn;
+	47: optional i32 ter_liv;
+	48: optional i32 region_liv;
+}
+
 
 exception PvizitNotFoundException {
 }
@@ -181,15 +229,14 @@ exception PsignNotFoundException {
 exception PriemNotFoundException {
 }
 
+exception PatientNotFoundException {
+}
+
 /**
  * 
  */
 service ThriftOsm extends kmiacServer.KmiacServer {
 	
-	list<classifier.StringClassifier> getP0c() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getAp0() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
 	
 	/**
 	 * Получение списка записанных на прием на заданную дату.
@@ -219,6 +266,22 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
 
-	void UpdateSettings(1: Settings codp) throws (1: kmiacServer.KmiacServerException kse);
-	Settings getSettings(1: i32 codp) throws (1: kmiacServer.KmiacServerException kse);
+//classifiers
+	list<classifier.IntegerClassifier> get_n_z30() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_am0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_az9() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z43() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_kas() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_n00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_l01() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_az0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_l02() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getP0c() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getAp0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
+
+//patient info
+	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
+	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 }

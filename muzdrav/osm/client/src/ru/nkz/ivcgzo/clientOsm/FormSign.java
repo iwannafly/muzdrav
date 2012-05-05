@@ -40,6 +40,9 @@ public class FormSign extends JFrame {
 	private JCheckBox cbk;
 	private JCheckBox cba;
 	private JCheckBox cbn;
+	private String v1;
+	private String v2;
+	private String v3;
 	private String vrp;
 	private JTextField textField;
 
@@ -73,7 +76,7 @@ public class FormSign extends JFrame {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (TException e1) {
-				MainForm.conMan.reconnect(e1);
+//				MainForm.conMan.reconnect(e1);
 			}	
 			}
 		});
