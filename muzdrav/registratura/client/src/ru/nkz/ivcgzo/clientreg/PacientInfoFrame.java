@@ -190,7 +190,7 @@ public class PacientInfoFrame extends JFrame {
 //	}
 
 	public void refresh(List<PatientBrief> pat) {
-		//tbMain.setSelectedIndex(0);
+		tbMain.setSelectedIndex(0);
 		tbl_patient.setData(pat);
 	}
 	/**
@@ -206,13 +206,13 @@ public class PacientInfoFrame extends JFrame {
 		JPanel panel = new JPanel();
 		
 		final JTabbedPane tbMain = new JTabbedPane(JTabbedPane.TOP);
-        //tbMain.setSelectedIndex(0);
+        tbMain.setSelectedIndex(0);
 		tbMain.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-//				if (tbMain.getSelectedIndex() == 0 && tbMain.isShowing()) {
-//					curPatientId =(int) tbl_patient.getSelectedItem().npasp;
-//					changePatientPersonalInfo(curPatientId);
-//				}
+				if (tbMain.getSelectedIndex() == 0) {
+					curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+					changePatientPersonalInfo(curPatientId);
+				}
 				if (tbMain.getSelectedIndex() == 1) {
 					curPatientId =(int) tbl_patient.getSelectedItem().npasp;
 					changePatientLgotaInfo(curPatientId);
@@ -982,7 +982,7 @@ public class PacientInfoFrame extends JFrame {
 		);
 		
 		tbl_kateg =new CustomTable<>(true, false, Kontingent.class, 3,"Дата",2,"Категория",4,"Наименование");
-		//tbl_kateg.setDateField(3);
+		tbl_kateg.setDateField(3);
 		scrollPane_2.setViewportView(tbl_kateg);
 		panel_12.setLayout(gl_panel_12);
 		

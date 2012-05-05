@@ -9,12 +9,14 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
@@ -33,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
@@ -41,13 +44,17 @@ import java.awt.Component;
 import javax.swing.JTable;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 
 public class Vvod extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-//	private JComboBox<String> cobr;
+	public static ZapVr zapVrSave;
 	private FormSign sign;
+	private SettingsOsm settingsosm;
 	private Pvizit pvizit;
 	private PvizitAmb pos;
 	private PdiagAmb diag;
@@ -123,7 +130,10 @@ public class Vvod extends JFrame {
 	private JTextPane tpChitov;
 	private JTextPane tpOcenka;
 	private JTable table;
-
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> c_obr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbrez;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbish;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -146,6 +156,7 @@ public class Vvod extends JFrame {
 		});
 		 pvizit = new Pvizit();
 		 sign = new FormSign();
+		 settingsosm = new SettingsOsm();
 		 pos = new PvizitAmb();
 		 diag = new PdiagAmb();
 		 pr = new Priem();
@@ -577,15 +588,24 @@ public class Vvod extends JFrame {
 		
 		JLabel lblcobr = new JLabel("Цель обращения");
 		
-		JComboBox c_obr = new JComboBox();
+		c_obr = new ThriftIntegerClassifierCombobox<>(true);
+		c_obr.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(Vvod.this, c_obr.getSelectedItem().pcod);
+			}
+		});
 		
 		JLabel lblrez = new JLabel("Результат");
 		
-		JComboBox cbrez = new JComboBox();
+		cbrez = new ThriftIntegerClassifierCombobox<>(true);
+		
 		
 		JLabel lblish = new JLabel("Исход");
 		
-		JComboBox cbish = new JComboBox();
+		 cbish = new ThriftIntegerClassifierCombobox<>(true);
+		 
 		GroupLayout gl_panel_Talon = new GroupLayout(panel_Talon);
 		gl_panel_Talon.setHorizontalGroup(
 			gl_panel_Talon.createParallelGroup(Alignment.LEADING)
@@ -638,44 +658,54 @@ public class Vvod extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_Talon.setLayout(gl_panel_Talon);
+		
+		JButton button_6 = new JButton("Настройка");
+		button_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				settingsosm.setVisible(true);}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(10)
-					.addComponent(btnAnamz)
-					.addGap(10)
-					.addComponent(button)
-					.addGap(10)
-					.addComponent(button_1)
-					.addGap(10)
-					.addComponent(button_2)
-					.addGap(10)
-					.addComponent(button_3)
-					.addGap(10)
-					.addComponent(button_4)
-					.addGap(6)
-					.addComponent(button_5))
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(10)
-					.addComponent(lblTalon)
-					.addGap(6)
-					.addComponent(cbTalon))
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(10)
-					.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 1864, GroupLayout.PREFERRED_SIZE)
-					.addGap(4)
-					.addComponent(label_14)
-					.addGap(6)
-					.addComponent(checkBox_7)
-					.addGap(2)
-					.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 1859, GroupLayout.PREFERRED_SIZE))
-				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-						.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE))
-					.addContainerGap(3012, Short.MAX_VALUE))
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(10)
+							.addComponent(btnAnamz)
+							.addGap(10)
+							.addComponent(button)
+							.addGap(10)
+							.addComponent(button_1)
+							.addGap(10)
+							.addComponent(button_2)
+							.addGap(10)
+							.addComponent(button_3)
+							.addGap(10)
+							.addComponent(button_4)
+							.addGap(6)
+							.addComponent(button_5)
+							.addGap(18)
+							.addComponent(button_6))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(10)
+							.addComponent(lblTalon)
+							.addGap(6)
+							.addComponent(cbTalon))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(10)
+							.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 1864, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(label_14)
+							.addGap(6)
+							.addComponent(checkBox_7)
+							.addGap(2)
+							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 1859, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+								.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE))))
+					.addContainerGap(114, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -688,7 +718,9 @@ public class Vvod extends JFrame {
 						.addComponent(button_2)
 						.addComponent(button_3)
 						.addComponent(button_4)
-						.addComponent(button_5))
+						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+							.addComponent(button_5)
+							.addComponent(button_6)))
 					.addGap(18)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
@@ -880,15 +912,22 @@ public class Vvod extends JFrame {
 		
 	}
 	public void showVvod(UserAuthInfo authInfo, ZapVr zapVr) {
+		zapVrSave = zapVr;
 		pvizit = new Pvizit();
 		pvizit.setNpasp(zapVr.npasp);
 		pos.setNpasp(zapVr.npasp);
 		diag.setNpasp(zapVr.npasp);
 		pr.setNpasp(zapVr.npasp);
 		pvizit.setCod_sp(authInfo.pcod);
+		pvizit.setCdol("11");
 		pos.setCod_sp(authInfo.pcod);
 		diag.setCod_sp(authInfo.pcod);
-		pvizit.setDatao(System.currentTimeMillis());//системная дата
+		try {
+			pvizit.setDatao(SimpleDateFormat.getDateInstance().parse("01.02.2012").getTime());
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		pvizit.setDataz(System.currentTimeMillis());
 		pos.setDatap(System.currentTimeMillis());
 		diag.setDatap(System.currentTimeMillis());
@@ -928,5 +967,16 @@ public class Vvod extends JFrame {
 		}
 		
 		setVisible(true);
+	}
+	
+	public void onConnect() {
+		try {
+			c_obr.setData(MainForm.tcl.getAp0());
+			cbrez.setData(MainForm.tcl.getAp0());
+			cbish.setData(MainForm.tcl.getAq0());
+		} catch (KmiacServerException | TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

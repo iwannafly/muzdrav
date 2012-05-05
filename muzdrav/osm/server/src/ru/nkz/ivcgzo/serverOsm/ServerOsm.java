@@ -327,9 +327,7 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<IntegerClassifier> get_n_cpos() throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
+	public List<StringClassifier> getP0c() throws KmiacServerException, TException {
 		return null;
 	}
 
@@ -341,6 +339,17 @@ public class ServerOsm extends Server implements Iface {
 			else
 				throw new PatientNotFoundException();
 		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getAp0() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_ap0 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -434,6 +443,17 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_l02 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+	
+	@Override
+	public List<IntegerClassifier> getAq0() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_aq0 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}

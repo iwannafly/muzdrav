@@ -149,6 +149,7 @@ public class MainForm extends Client {
 			tcl = (ThriftOsm.Client) conn;
 			try {
 				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+				vvod.onConnect();
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

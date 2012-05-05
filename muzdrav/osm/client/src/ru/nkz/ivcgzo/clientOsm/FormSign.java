@@ -49,18 +49,7 @@ public class FormSign extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					FormSign frame = new FormSign();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+
 
 	/**
 	 * Create the frame.
@@ -70,13 +59,17 @@ public class FormSign extends JFrame {
 			@Override
 			public void windowActivated(WindowEvent e) {
 			try {
-				psign = MainForm.tcl.getPsign(1);
+				psign = MainForm.tcl.getPsign(Vvod.zapVrSave.npasp);
 				tfgrup.setText(psign.grup);
 				tfrezus.setText(psign.ph);
 				tpallerg.setText(psign.allerg);
 				tpanamnz.setText(psign.vitae);
 				tpfarm.setText(psign.farmkol);
-//				v1 = ;
+				
+				vrp = psign.getVred();
+				cbk.setSelected(vrp.charAt(0) == '1');
+				cba.setSelected(vrp.charAt(1) == '1');
+				cbn.setSelected(vrp.charAt(2) == '1');
 			} catch (KmiacServerException e1) {
 				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошибка");
 			} catch (PsignNotFoundException e1) {
@@ -116,6 +109,7 @@ public class FormSign extends JFrame {
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
 				psign.setVred(getVrPr());
+				
 				try {
 					MainForm.tcl.setPsign(psign);
 				} catch (KmiacServerException e) {
@@ -141,26 +135,7 @@ public class FormSign extends JFrame {
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		
-		JButton button_1 = new JButton("1111");
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			vrp=psign.getVred();
-			v1=vrp.substring(0, 1);
-			v2=vrp.substring(1, 2);
-			v3=vrp.substring(2, 3);
-			if (v1=="1"){
-				cbk.isSelected();
-			}
-			if (v2=="1"){
-				cba.isSelected();
-			}
-			if (v3=="1"){
-				cbn.isSelected();
-			}
-			}
-		});
-		
+				
 		textField = new JTextField();
 		textField.setVisible(false);
 		textField.setColumns(10);
@@ -195,7 +170,6 @@ public class FormSign extends JFrame {
 										.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 									.addGap(30)
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(button_1)
 										.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))))
 							.addContainerGap())
 						.addGroup(gl_panel.createSequentialGroup()
@@ -240,7 +214,6 @@ public class FormSign extends JFrame {
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(18)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(button_1)
 								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 					.addGap(61))
 		);
