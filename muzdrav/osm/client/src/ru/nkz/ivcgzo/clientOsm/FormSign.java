@@ -25,7 +25,6 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
-import sun.org.mozilla.javascript.internal.regexp.SubString;
 
 public class FormSign extends JFrame {
 	/**
@@ -41,10 +40,6 @@ public class FormSign extends JFrame {
 	private JCheckBox cbk;
 	private JCheckBox cba;
 	private JCheckBox cbn;
-	private String s1;
-	private String s2;
-	private String s3;
-	private String prv;
 	private String v1;
 	private String v2;
 	private String v3;
@@ -88,7 +83,7 @@ public class FormSign extends JFrame {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (TException e1) {
-				MainForm.conMan.reconnect(e1);
+//				MainForm.conMan.reconnect(e1);
 			}	
 			}
 		});

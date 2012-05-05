@@ -8,6 +8,7 @@
 		<table srcName="AI0" dstName="n_ai0" />
 		<table srcName="AL0" dstName="n_al0" />
 		<table srcName="ALK" dstName="n_alk" />
+		<table srcName="AM0" dstName="n_am0" />
 		<table srcName="AO0" dstName="n_ao0" />
 		<table srcName="AP0" dstName="n_ap0" />
 		<table srcName="AQ0" dstName="n_aq0" />
@@ -36,6 +37,7 @@
 		<table srcName="P0C" dstName="n_p0c" />
 		<table srcName="P0E1" dstName="n_p0e1" />
 		<table srcName="P0S" dstName="n_p0s" />
+		<table srcName="R0C" dstName="n_r0c" />
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
 		<table srcName="T00" dstName="n_t00" />
