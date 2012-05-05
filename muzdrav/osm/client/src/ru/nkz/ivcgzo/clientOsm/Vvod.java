@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
@@ -129,10 +130,11 @@ public class Vvod extends JFrame {
 	private JTextPane tpNarpolov;
 	private JTextPane tpChitov;
 	private JTextPane tpOcenka;
-	private JTable table;
+	private CustomTable<PdiagAmb, PdiagAmb._Fields> tableDiag;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> c_obr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbrez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbish;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> vid_opl;
 	
 	/**
 	 * Launch the application.
@@ -584,7 +586,7 @@ public class Vvod extends JFrame {
 		
 		JLabel lblvid_opl = new JLabel("Вид оплаты");
 		
-		JComboBox vid_opl = new JComboBox();
+		 vid_opl = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblcobr = new JLabel("Цель обращения");
 		
@@ -802,14 +804,15 @@ public class Vvod extends JFrame {
 		GroupBox2.add(jbpredv);
 		GroupBox2.add(jbzakl);
 		
-		table = new JTable();
+		tableDiag = new CustomTable<>(false,true,PdiagAmb.class,5,"Код МКБ",6, "Наименование");
+//		table = new CustomTable<>(false, true, ZapVr.class, 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
 		GroupLayout gl_pds = new GroupLayout(pds);
 		gl_pds.setHorizontalGroup(
 			gl_pds.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, gl_pds.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pds.createParallelGroup(Alignment.TRAILING)
-						.addComponent(table, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+						.addComponent(tableDiag, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
 						.addGroup(Alignment.LEADING, gl_pds.createSequentialGroup()
 							.addComponent(lblkod)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -828,7 +831,7 @@ public class Vvod extends JFrame {
 			gl_pds.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pds.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(table, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+					.addComponent(tableDiag, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblkod)
@@ -974,6 +977,7 @@ public class Vvod extends JFrame {
 			c_obr.setData(MainForm.tcl.getAp0());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
+			//vid_opl.setData(MainForm.tcl.getOpl());потом убрать знак комментария
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

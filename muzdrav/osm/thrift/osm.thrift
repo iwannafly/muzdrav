@@ -189,6 +189,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> getP0c() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getAp0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
 	
 	/**
 	 * Получение списка записанных на прием на заданную дату.
