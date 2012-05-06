@@ -330,7 +330,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<ZapVr> getZapVr(int idvr, String cdol, long datap) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, tal.datap, p_nambk.nuch FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) JOIN p_nambk ON (pat.npasp=p_nambk.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL", idvr, cdol, new Date(datap))) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, tal.datap, p_nambk.nuch FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) LEFT JOIN p_nambk ON (pat.npasp=p_nambk.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL", idvr, cdol, new Date(datap))) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
