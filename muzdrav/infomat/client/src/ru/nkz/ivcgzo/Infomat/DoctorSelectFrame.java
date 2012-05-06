@@ -11,8 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 import javax.swing.JList;
 import java.awt.Font;
 import javax.swing.ListSelectionModel;
@@ -21,6 +19,8 @@ import javax.swing.JButton;
 import javax.swing.Box;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class DoctorSelectFrame extends JFrame {
     private static final long serialVersionUID = -7345770092441907375L;
@@ -34,6 +34,7 @@ public class DoctorSelectFrame extends JFrame {
     private JScrollPane spDoctor;
     private JList<Doctor> lDoctor;
     private DoctorListModel dlm;
+    private Component horizontalGlue_1;
 
 
     public DoctorSelectFrame () {
@@ -100,11 +101,20 @@ public class DoctorSelectFrame extends JFrame {
 
         addBackwardButton();
         addHorizontalDelimiter();
-        addForwardButton();
+//        addForwardButton();
     }
 
     private void addBackwardButton() {
         btnBackward = new JButton("");
+        btnBackward.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        });
+        {
+            horizontalGlue_1 = Box.createHorizontalGlue();
+            pnButton.add(horizontalGlue_1);
+        }
         btnBackward.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "resources/backwardButton.png")));
         btnBackward.setBorder(null);
@@ -118,15 +128,15 @@ public class DoctorSelectFrame extends JFrame {
         pnButton.add(horizontalGlue);
     }
 
-    private void addForwardButton() {
-        btnForward = new JButton("");
-        btnForward.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/forwardButton.png")));
-        btnForward.setBorder(null);
-        btnForward.setBackground(Color.WHITE);
-        btnForward.setForeground(Color.BLACK);
-        pnButton.add(btnForward);
-    }
+//    private void addForwardButton() {
+//        btnForward = new JButton("");
+//        btnForward.setIcon(new ImageIcon(MainFrame.class.getResource(
+//                "resources/forwardButton.png")));
+//        btnForward.setBorder(null);
+//        btnForward.setBackground(Color.WHITE);
+//        btnForward.setForeground(Color.BLACK);
+//        pnButton.add(btnForward);
+//    }
 
     private void addListPanel() {
         pnLists = new JPanel();

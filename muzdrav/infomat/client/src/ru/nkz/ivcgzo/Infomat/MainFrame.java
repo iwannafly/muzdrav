@@ -73,7 +73,9 @@ public class MainFrame extends JFrame {
         btnAppointment = new JButton("Запись на приём");
         btnAppointment.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frmDoctorSelect = new DoctorSelectFrame();
+                if (frmDoctorSelect == null) {
+                    frmDoctorSelect = new DoctorSelectFrame();
+                }
                 frmDoctorSelect.setVisible(true);
             }
         });

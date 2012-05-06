@@ -25,8 +25,9 @@ public class SpecialityListModel implements ListModel<Speciality> {
         String sqlQuery = "SELECT DISTINCT n_cdol.pcod, n_cdol.name FROM n_cdol "
                 + "INNER JOIN s_vrach ON s_vrach.cdol = n_cdol.pcod "
                 + "INNER JOIN e_talon ON s_vrach.cdol = e_talon.cdol "
-                + "where s_vrach.opl = 2 and s_vrach.yvolen = 0 and "
-                + "((s_vrach.prizn is null) or (s_vrach.prizn <> '*')) order by n_cdol.name";
+                + "where s_vrach.opl = 2 AND s_vrach.yvolen = 0 AND "
+                + "((s_vrach.prizn is null) or (s_vrach.prizn <> '*')) "
+                + "AND e_talon.npasp = 0 order by n_cdol.name ";
         DbManager dbManager = DbManager.getInstance();
         List<Speciality> specs = new ArrayList<Speciality>();
         try {
