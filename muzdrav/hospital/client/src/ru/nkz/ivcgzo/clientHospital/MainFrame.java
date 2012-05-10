@@ -489,18 +489,9 @@ public class MainFrame extends JFrame {
         btnIssled.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
-                    IClient client;
-                    try {
-                        client = ClientHospital.conMan.getPluginLoader().loadPluginByAppId(15);
-                        client.showModal(ClientHospital.instance, patient.getPatientId(),
-                                patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                                patient.getGospitalCod());
-                    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-                            | InstantiationException | IllegalAccessException
-                            | IllegalArgumentException | InvocationTargetException
-                            | IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
+                            patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                            patient.getGospitalCod());
                 }
             }
         });

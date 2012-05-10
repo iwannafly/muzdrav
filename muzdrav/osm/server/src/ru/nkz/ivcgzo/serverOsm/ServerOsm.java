@@ -16,6 +16,8 @@ import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;

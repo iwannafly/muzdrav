@@ -19,8 +19,8 @@ public class ClientLab extends Client<ThriftLab.Client> {
     public ClientLab(final ConnectionManager conMan, final UserAuthInfo authInfo,
             final int accessParam) throws IllegalAccessException, NoSuchMethodException,
             InstantiationException, InvocationTargetException {
-        super(conMan, authInfo, ThriftLab.Client.class, configuration.appId,
-                configuration.thrPort, accessParam);
+        super(conMan, authInfo, ThriftLab.Client.class, configuration.labAppId,
+                configuration.labThrPort, accessParam);
         initialize(authInfo);
         instance = this;
     }

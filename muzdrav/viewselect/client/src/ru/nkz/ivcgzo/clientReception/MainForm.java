@@ -19,8 +19,8 @@ public class MainForm extends Client<ThriftReception.Client> {
     public MainForm(final ConnectionManager conMan, final UserAuthInfo authInfo,
             final int accessParam) throws IllegalAccessException, NoSuchMethodException,
             InvocationTargetException, InstantiationException {
-        super(conMan, authInfo, ThriftReception.Client.class, configuration.appId,
-                configuration.thrPort, accessParam);
+        super(conMan, authInfo, ThriftReception.Client.class, configuration.recAppId,
+                configuration.recThrPort, accessParam);
 
         initialize(authInfo);
         instance = this;
@@ -51,7 +51,7 @@ public class MainForm extends Client<ThriftReception.Client> {
     public final Object showModal(final IClient parent, final Object... params) {
         JDialog dialog = prepareModal(parent);
         talonSelectFrame.fillPatientInfoLabels((int) params[0], (String) params[1],
-                (String) params[2], (String) params[3], (long) params[4], (int) params[5]);
+                (String) params[2], (String) params[3], (int) params[4]);
         dialog.setVisible(true);
         disposeModal();
         return null;
