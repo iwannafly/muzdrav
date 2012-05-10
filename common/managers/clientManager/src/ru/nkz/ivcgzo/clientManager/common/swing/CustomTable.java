@@ -101,7 +101,9 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		setModel();
 		if (editable) {
 //			this.setSurrendersFocusOnKeystroke(true);
-			this.setDefaultEditor(Date.class, new TableDateEditor());
+			TableDateEditor tde = new TableDateEditor();
+			this.setDefaultEditor(Date.class, tde);
+			this.setDefaultRenderer(Date.class, tde.getRenderer());
 			
 			this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 				@Override

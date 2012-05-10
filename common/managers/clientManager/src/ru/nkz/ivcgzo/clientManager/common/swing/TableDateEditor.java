@@ -6,14 +6,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.border.LineBorder;
-import javax.swing.text.DateFormatter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.text.MaskFormatter;
 
 /**
  * Класс, представляющий собой компонент для редактирования дат, заменяющий
@@ -24,12 +27,29 @@ import javax.swing.text.DateFormatter;
 public class TableDateEditor extends DefaultCellEditor {
 	private static final long serialVersionUID = -6671230063586063616L;
 	private JFormattedTextField txt;
+	private TableDateRenderer renderer;
+	private SimpleDateFormat dateFormatter;
+	private static char placeHolderChar = '_';
+	private String placeHolder = "";
 	
 	public TableDateEditor() {
-		super(new JFormattedTextField(DateFormat.getDateInstance(DateFormat.MEDIUM)));
+		super(new JFormattedTextField(new MaskFormatter()));
 		
 		txt = (JFormattedTextField) this.getComponent();
-		((DateFormat) ((DateFormatter) txt.getFormatter()).getFormat()).setLenient(false);
+		renderer = new TableDateRenderer();
+		dateFormatter = new SimpleDateFormat(convertDatePattern(((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT)).toPattern()));
+		try {
+			MaskFormatter formatter = (MaskFormatter) txt.getFormatter();
+			String mask = convertDatePattern(dateFormatter.toPattern());
+			mask = mask.replace('d', '#').replace('M', '#').replace('y', '#');
+			formatter.setMask(mask);
+			formatter.setPlaceholderCharacter(placeHolderChar);
+			placeHolder = mask.replace('#', placeHolderChar);
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+		dateFormatter.setLenient(false);
+		
         txt.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "check");
         txt.getActionMap().put("check", new AbstractAction() {
 			private static final long serialVersionUID = 8883313793725297972L;
@@ -40,32 +60,67 @@ public class TableDateEditor extends DefaultCellEditor {
         });
 	}
 	
+	private String convertDatePattern(String pattern)
+	{
+		pattern = pattern.replaceAll("dd", "d");
+		pattern = pattern.replaceAll("MM", "M");
+		pattern = pattern.replaceAll("yy", "y");
+		pattern = pattern.replaceAll("yy", "y");
+		pattern = pattern.replaceAll("d", "dd");
+		pattern = pattern.replaceAll("M", "MM");
+		pattern = pattern.replaceAll("y", "yyyy");
+		
+		return pattern;
+	}
+	
 	@Override
 	public Object getCellEditorValue() {
-		if (txt.getText().length() == 0)
-			return null;
-		else
-			return txt.getValue();
+		try {
+			if (!txt.getText().equals(placeHolder))
+				return dateFormatter.parse(txt.getText());
+		} catch (ParseException e) {
+		}
+		return null;
 	}
 
 	@Override
 	public Component getTableCellEditorComponent(JTable arg0, Object arg1, boolean arg2, int arg3, int arg4) {
 		txt.setBorder(new LineBorder(Color.black));
-		txt.setValue(arg1);
+		txt.setValue((arg1 == null) ? null : dateFormatter.format(arg1));
 		return txt;
 	}
 	
 	@Override
 	public boolean stopCellEditing() {
-		if (txt.isEditValid() || txt.getText().length() == 0) {
 			try {
-				txt.commitEdit();
+				if (txt.getText().equals(placeHolder))
+					txt.setValue(null);	
+				else if (txt.getText().indexOf(placeHolderChar) < 0)
+					dateFormatter.parse(txt.getText());
+				else
+					throw new ParseException(null, 0);
+				txt.setBorder(new LineBorder(Color.black));
+				return super.stopCellEditing();
 			} catch (ParseException e) {
 			}
-			return super.stopCellEditing();
-		} else {
-			txt.setBorder(new LineBorder(Color.red));
-			return false;
+		txt.setBorder(new LineBorder(Color.red));
+		return false;
+	}
+	
+	public TableDateRenderer getRenderer() {
+		return renderer;
+	}
+	
+	class TableDateRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = -6219585518858657636L;
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			
+			lbl.setText((value == null) ? null : dateFormatter.format(value));
+			
+			return lbl;
 		}
 	}
 }
