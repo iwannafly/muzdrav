@@ -213,11 +213,60 @@ struct PatientCommonInfo {
 	48: optional i32 region_liv;
 }
 
-
-exception PvizitNotFoundException {
+struct RdSlStruct{
+        1:i32 idDispb;
+        2:i32 npasp;
+        3:i64 datay;
+        4:i32 kolpr;
+        5:i32 abort;
+        6:string oslAb;
+        7:i64 dataosl;
+        8:i64 dataM;
+        9:i32 yavka1;
+	10:string plrod;
+       11:string prRod;
+       12:i64 DataZs;
+       13:i32 kolRod;
+       14:i32 let,
+       15:i32 prmen,
+       16:i32 deti
+       17:i32 polj,
+       18:i32 kont,
+       19:i32 oslrod,
+       20:i32 rost,
+       21:i32 vesd,
+       22:i32 dsp,
+       23:i32 dsr,
+       24:i32 dTroch,
+       25:i32 cext,
+       26:i32 indSol,
+       27:i64 Datasn, 
 }
 
-exception PvizitAmbNotFoundException {
+struct RdDinStruct{
+	1:i32 idDispb,
+	2:i32 id,
+	3:i64 datapos,
+	4:i32 srok,
+	5:i32 ves,
+	6:i32 oj,
+	7:i32 hdm,
+	8:string dspos,
+	9:i32 art1,
+	10:i32 art2,
+	11:i32 art3;
+	12:i32 art4,
+	13:i64 datasl,
+	14:i32 spl,
+	15:i32 oteki,
+	16:i32 chcc,
+	17:i32 polpl,
+	18:i32 predpl,
+	19:i32 serd,
+	20:i32 serd1;
+}
+
+exception PvizitNotFoundException {
 }
 
 exception PdiagAmbNotFoundException {
@@ -232,6 +281,7 @@ exception PriemNotFoundException {
 exception PatientNotFoundException {
 }
 
+
 /**
  * 
  */
@@ -242,19 +292,20 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 * Получение списка записанных на прием на заданную дату.
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
-
+	
 	i32 AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPvizitAmb(1: PvizitAmb pos) throws (1: kmiacServer.KmiacServerException kse);
-	PvizitAmb getPvizitAmb(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitAmbNotFoundException pne);
+	list<PvizitAmb> getPvizitAmb(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePvizitAmb(1: PvizitAmb pos) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizitAmb(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagAmb getPdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagAmbNotFoundException dne);
+
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -265,6 +316,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	
 
 //classifiers
 	list<classifier.IntegerClassifier> get_n_z30() throws (1: kmiacServer.KmiacServerException kse);
@@ -284,4 +336,16 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
+
+/*DispBer*/
+	list<RdSlStruct> getRdSlInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdDinStruct> getRdDinInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
+	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
+
+	void DeleteRdSl(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteRdDin(1:i32 idDispb,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
+
+	void UpdateRdSl(1:i32 npasp, 2:i32 lgota) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdateRdDin(1:i32 idDispb,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
 }

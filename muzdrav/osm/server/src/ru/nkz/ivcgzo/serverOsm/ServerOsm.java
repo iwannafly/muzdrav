@@ -32,8 +32,9 @@ import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
-import ru.nkz.ivcgzo.thriftOsm.PvizitAmbNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
@@ -211,12 +212,9 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public PvizitAmb getPvizitAmb(int posId) throws KmiacServerException, PvizitAmbNotFoundException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit_amb WHERE id = ? ", posId)) {
-			if (acrs.getResultSet().next())
-				return rsmPvizitAmb.map(acrs.getResultSet());
-			else
-				throw new PvizitAmbNotFoundException();
+	public List<PvizitAmb> getPvizitAmb(int obrId) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit_amb WHERE id = ? ", obrId)) {
+			return rsmPvizitAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
@@ -463,5 +461,61 @@ public class ServerOsm extends Server implements Iface {
 			TException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<RdSlStruct> getRdSlInfo(int idDispb, int npasp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void AddRdSl(RdSlStruct rdSl) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void AddRdDin(RdDinStruct RdDin) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeleteRdSl(int idDispb, int npasp) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeleteRdDin(int idDispb, int iD) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void UpdateRdSl(int npasp, int lgota) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void UpdateRdDin(int idDispb, int iD) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
 	}
 }
