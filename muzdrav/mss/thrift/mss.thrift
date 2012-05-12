@@ -1,4 +1,4 @@
-﻿namespace java ru.nkz.ivcgzo.thriftMss
+namespace java ru.nkz.ivcgzo.thriftMss
 
 include "../../../common/thrift/kmiacServer.thrift"
 include "../../../common/thrift/classifier.thrift"
