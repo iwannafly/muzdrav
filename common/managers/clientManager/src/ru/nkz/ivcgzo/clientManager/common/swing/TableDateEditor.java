@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -14,7 +15,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.MaskFormatter;
 
@@ -29,7 +33,8 @@ public class TableDateEditor extends DefaultCellEditor {
 	private JFormattedTextField txt;
 	private TableDateRenderer renderer;
 	private SimpleDateFormat dateFormatter;
-	private static char placeHolderChar = '_';
+	private char dateSeparator;
+	private char placeHolderChar = '_';
 	private String placeHolder = "";
 	
 	public TableDateEditor() {
@@ -39,11 +44,11 @@ public class TableDateEditor extends DefaultCellEditor {
 		renderer = new TableDateRenderer();
 		dateFormatter = new SimpleDateFormat(convertDatePattern(((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT)).toPattern()));
 		try {
-			MaskFormatter formatter = (MaskFormatter) txt.getFormatter();
-			String mask = convertDatePattern(dateFormatter.toPattern());
+			MaskFormatter maskFormatter = (MaskFormatter) txt.getFormatter();
+			String mask = dateFormatter.toPattern();
 			mask = mask.replace('d', '#').replace('M', '#').replace('y', '#');
-			formatter.setMask(mask);
-			formatter.setPlaceholderCharacter(placeHolderChar);
+			maskFormatter.setMask(mask);
+			maskFormatter.setPlaceholderCharacter(placeHolderChar);
 			placeHolder = mask.replace('#', placeHolderChar);
 		} catch (ParseException e1) {
 			e1.printStackTrace();
@@ -58,10 +63,18 @@ public class TableDateEditor extends DefaultCellEditor {
                     txt.postActionEvent();
             }
         });
+        txt.addCaretListener(new TableDateSelector());
 	}
 	
 	private String convertDatePattern(String pattern)
 	{
+		if (pattern.indexOf('/') > -1)
+			dateSeparator = '/';
+		else if (pattern.indexOf('-') > -1)
+			dateSeparator = '-';
+		else
+			dateSeparator = '.';
+
 		pattern = pattern.replaceAll("dd", "d");
 		pattern = pattern.replaceAll("MM", "M");
 		pattern = pattern.replaceAll("yy", "y");
@@ -121,6 +134,61 @@ public class TableDateEditor extends DefaultCellEditor {
 			lbl.setText((value == null) ? null : dateFormatter.format(value));
 			
 			return lbl;
+		}
+	}
+	
+	class TableDateSelector implements CaretListener {
+		private boolean updating = false;
+		
+		public TableDateSelector() {
+			txt.addKeyListener(new KeyAdapter() {
+				
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+						int pos = txt.getCaretPosition();
+						
+						if (pos == txt.getText().length()) {
+							return;
+						}
+						
+						while (pos > 0) {
+							if (txt.getText().charAt(pos) != dateSeparator)
+								break;
+							pos--;
+						}
+						
+						if (pos > 0)
+							txt.setCaretPosition(pos);
+						else if (txt.getText() != null)
+							txt.setCaretPosition(0);
+					}
+					super.keyPressed(e);
+				}
+			});
+		}
+		
+		@Override
+		public synchronized void caretUpdate(CaretEvent e) {
+			if (updating)
+				return;
+			
+			if (e.getDot() == e.getMark())
+				if (e.getDot() != txt.getText().length()) {
+					updating = true;
+					SwingUtilities.invokeLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							int dot = txt.getCaretPosition();
+							if (dot < txt.getText().length()) {
+								txt.setCaretPosition(dot + 1);
+								txt.moveCaretPosition(dot);
+							}
+							updating = false;
+						}
+					});
+				}
 		}
 	}
 }
