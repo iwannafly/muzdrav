@@ -534,26 +534,24 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * методом {@link #setData(List)}.
 	 */
 	public void updateSelectedItem() {
-		if (editable) {
-			if (isEditing())
-				this.getCellEditor().stopCellEditing();
-			
-			if (itemUpd) {
-				itemUpd = false;
-				if (!itemAdd) {
-					if (!deepEquals(sel, cop)) {
-						if (!updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)))
-							lst.set(copIdx, cop);
-						updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
-					}
-				} else {
-					if (!checkEmpty(sel)) {
-						addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
-					} else {
-						deleteSelectedRow();
-					}
-					itemAdd = false;
+		if (isEditing())
+			this.getCellEditor().stopCellEditing();
+		
+		if (itemUpd) {
+			itemUpd = false;
+			if (!itemAdd) {
+				if (!deepEquals(sel, cop)) {
+					if (!updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)))
+						lst.set(copIdx, cop);
+					updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				}
+			} else {
+				if (!checkEmpty(sel)) {
+					addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
+				} else {
+					deleteSelectedRow();
+				}
+				itemAdd = false;
 			}
 		}
 	}
@@ -585,5 +583,18 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			} catch (Exception e) {
 			}
 		}
+	}
+	
+	/**
+	 * Добавление новой строки. Строку можно изменять вне таблицы. Изменения подтверждать
+	 * методом {@link #updateSelectedItem()}.
+	 */
+	public T addExternalItem() {
+		addItem();
+		
+		if (isEditing())
+			this.getCellEditor().stopCellEditing();
+		
+		return getSelectedItem();
 	}
 }
