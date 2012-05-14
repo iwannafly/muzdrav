@@ -32,7 +32,7 @@ public class MainForm extends Client {
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
-	private UserAuthInfo authInfo;
+	public static UserAuthInfo authInfo;
 	
 	private PatientInfoViewMainForm patInfoView;
 
@@ -71,7 +71,6 @@ public class MainForm extends Client {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		

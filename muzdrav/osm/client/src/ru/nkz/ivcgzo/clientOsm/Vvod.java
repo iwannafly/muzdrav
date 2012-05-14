@@ -1,8 +1,5 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -48,6 +45,11 @@ import java.awt.event.WindowEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.UIManager;
+import java.awt.Color;
 
 
 public class Vvod extends JFrame {
@@ -56,6 +58,7 @@ public class Vvod extends JFrame {
 	public static ZapVr zapVrSave;
 	private FormSign sign;
 	private SettingsOsm settingsosm;
+	private FormPostBer postber;
 	private Pvizit pvizit;
 	private PvizitAmb pos;
 	private PdiagAmb diag;
@@ -135,6 +138,7 @@ public class Vvod extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbrez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbish;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> vid_opl;
+	private CustomTable<PvizitAmb, PvizitAmb._Fields> TabPos;
 	
 	/**
 	 * Launch the application.
@@ -148,16 +152,12 @@ public class Vvod extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
-			//создать таблицу Custom Table
-//				table_vizit = new CustomTable<>(false, true, .class, ZapVr._Fields.values(), 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
-//				table.setFillsViewportHeight(true);
-//				scrollPane.setViewportView(table);
-//				frame.getContentPane().setLayout(groupLayout);
-//
+
 			}
 		});
 		 pvizit = new Pvizit();
 		 sign = new FormSign();
+		 postber = new FormPostBer();
 		 settingsosm = new SettingsOsm();
 		 pos = new PvizitAmb();
 		 diag = new PdiagAmb();
@@ -267,17 +267,8 @@ public class Vvod extends JFrame {
 		
 		JButton button_4 = new JButton("Печатные формы");
 		
-		JLabel lblTalon = new JLabel("Талон амбулаторного пациента");
-		
-		JCheckBox cbTalon = new JCheckBox("Скрыть/раскрыть");
-		cbTalon.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
-		
 		JPanel panel_Talon = new JPanel();
-				panel_Talon.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+				panel_Talon.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0422\u0430\u043B\u043E\u043D \u0430\u043C\u0431.\u043F\u0430\u0446\u0438\u0435\u043D\u0442\u0430", TitledBorder.LEFT, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		
 		JLabel label_14 = new JLabel("Диагнозы");
 		
@@ -666,6 +657,15 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				settingsosm.setVisible(true);}
 		});
+		
+		JScrollPane sPos = new JScrollPane();
+		
+		JButton button_7 = new JButton("Наблюдение за берем.");
+		button_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				postber.setVisible(true);
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -673,7 +673,16 @@ public class Vvod extends JFrame {
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(10)
-							.addComponent(btnAnamz)
+							.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 1864, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(label_14)
+							.addGap(6)
+							.addComponent(checkBox_7)
+							.addGap(2)
+							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 1859, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(10)
+							.addComponent(btnAnamz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addGap(10)
 							.addComponent(button)
 							.addGap(10)
@@ -687,27 +696,25 @@ public class Vvod extends JFrame {
 							.addGap(6)
 							.addComponent(button_5)
 							.addGap(18)
-							.addComponent(button_6))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(lblTalon)
-							.addGap(6)
-							.addComponent(cbTalon))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 1864, GroupLayout.PREFERRED_SIZE)
-							.addGap(4)
-							.addComponent(label_14)
-							.addGap(6)
-							.addComponent(checkBox_7)
-							.addGap(2)
-							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 1859, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-								.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE))))
-					.addContainerGap(114, Short.MAX_VALUE))
+							.addComponent(button_6)
+							.addGap(2938)))
+					.addGap(114))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(panel_Talon, 0, 0, Short.MAX_VALUE)
+					.addGap(3012))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 1004, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(3012, Short.MAX_VALUE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(sPos, GroupLayout.DEFAULT_SIZE, 995, Short.MAX_VALUE)
+					.addGap(3021))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(button_7)
+					.addContainerGap(3927, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -723,17 +730,15 @@ public class Vvod extends JFrame {
 						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 							.addComponent(button_5)
 							.addComponent(button_6)))
-					.addGap(18)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(4)
-							.addComponent(lblTalon))
-						.addComponent(cbTalon))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+					.addComponent(button_7)
+					.addPreferredGap(ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+					.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 561, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 495, GroupLayout.PREFERRED_SIZE)
+					.addGap(72)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel.createSequentialGroup()
@@ -747,6 +752,27 @@ public class Vvod extends JFrame {
 							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE))))
 		);
 		
+		TabPos = new CustomTable<>(false,true,PvizitAmb.class,4,"Дата",5,"Код спец.",6,"Должность");
+		sPos.setViewportView(TabPos);
+		TabPos.setFillsViewportHeight(true);
+			TabPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()){
+					if (TabPos.getSelectedItem()!=null){
+						//tfkodmkb.setText(diag.getDiag(TabPos.getSelectedItem().id));
+						//diag.setDiag(tfkodmkb.getText());	
+					}
+					
+				}
+//					if (!arg0.getValueIsAdjusting()) {
+//						if (TabPos.getSelectedItem() != null)
+//								TabPos.setData(MainForm.tcl.getPvizitAmb(TabPos.getSelectedItem().id));
+//							} 
+					}
+			
+		});
+			
 		JPanel plocst = new JPanel();
 		tabbedPane.addTab("Localis status", null, plocst, null);
 		
@@ -934,8 +960,7 @@ public class Vvod extends JFrame {
 		pvizit.setDataz(System.currentTimeMillis());
 		pos.setDatap(System.currentTimeMillis());
 		diag.setDatap(System.currentTimeMillis());
-		
-		
+			
 		if (zapVr.vid_p == 1) {
 			try {
 				MainForm.tcl.AddPvizit(pvizit);
@@ -974,9 +999,10 @@ public class Vvod extends JFrame {
 	
 	public void onConnect() {
 		try {
-			c_obr.setData(MainForm.tcl.getAp0());
+			//c_obr.setData(MainForm.tcl.getAp0());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
+			TabPos.setData(MainForm.tcl.getPvizitAmb(1));
 			//vid_opl.setData(MainForm.tcl.getOpl());потом убрать знак комментария
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
