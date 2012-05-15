@@ -133,7 +133,9 @@ public class ServerRegPatient extends Server implements Iface {
     //  vremcp      nomcp          kodotd         datagos     vremgos
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
     //  cuser          dataosm     vremosm     dataz       jalob
-        Integer.class, Date.class, Time.class, Date.class, String.class
+        Integer.class, Date.class, Time.class, Date.class, String.class,
+    //  zap_vrach
+        String.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
         //  npasp          nambk         cpol           nuch
@@ -182,7 +184,7 @@ public class ServerRegPatient extends Server implements Iface {
         "cotd", "svoevr", "svoevrd", "ntalon", "vidtr", "pr_out", "alkg", "soobr",
         "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c",
         "ad", "datacp", "vremcp", "nomcp", "kodotd", "datagos", "vremgos", "cuser",
-        "dataosm", "vremosm", "dataz", "jalob"
+        "dataosm", "vremosm", "dataz", "jalob", "zap_vrach"
     };
 
     /**
@@ -532,7 +534,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final int addLgota(final Lgota lgota)
             throws LgotaAlreadyExistException, TException {
         // TODO Реализовать метод
-        // Структура таблицы БД и трифт объекта не совпадают,
+        // Структура таблицы БД и thrift-объекта не совпадают,
         // поэтому непонятно что и куда
         return 0;
     }
@@ -594,7 +596,8 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     /**
-     * Добавляет информацию о представителе пациента в БД
+     * Добавляет или обновляет информацию о представителе пациента в БД,
+     * в зависимости от наличия данного представителя пациента в базе.
      * @param agent - информация о представителе пациента
      * @throws AgentAlreadyExistException
      */
@@ -622,6 +625,7 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    // Обновляет информацию о представителе пациента
     private void updateAgent(final Agent agent) throws TException {
         final int[] indexes = {
             1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
@@ -654,7 +658,8 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     /**
-     * Добавляет особую информацию о пациенте в БД
+     * Добавляет или обновляет особую информацию о пациенте в БД,
+     * в зависимости от наличия в базе.
      * @param sign - особая информация о пациенте
      * @throws SignAlreadyExistException
      */
@@ -676,6 +681,7 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    // Обновляет особую информацию пациента
     private void updateSign(final Sign sign) throws TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -711,7 +717,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException, TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
@@ -720,7 +726,7 @@ public class ServerRegPatient extends Server implements Iface {
                         + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
                         + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
                         + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
-                        + "dataosm, vremosm, dataz, jalob) "
+                        + "dataosm, vremosm, dataz, jalob, zap_vrach) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
@@ -922,7 +928,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void updateGosp(final Gosp gosp) throws TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 0
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 0
         };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE c_gosp SET "
@@ -934,7 +940,7 @@ public class ServerRegPatient extends Server implements Iface {
                     + "nal_z = ?, nal_p = ?, t0c = ?, ad = ?, smp_data = ?, "
                     + "smp_time = ?, smp_num = ?, cotd_p = ?, datagos = ?, "
                     + "vremgos = ?, cuser = ?, dataosm = ?, vremosm = ?, "
-                    + "dataz = ?, jalob = ? WHERE id = ?;", false,
+                    + "dataz = ?, jalob = ?, zap_vrach = ? WHERE id = ?;", false,
                     gosp, GOSP_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
