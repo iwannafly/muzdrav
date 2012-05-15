@@ -159,7 +159,6 @@ public class PacientInfoFrame extends JFrame {
 	private Sign SignInfo;
 	private Gosp Id_gosp;
 	private List<AllGosp> AllGospInfo;
-	private List<Jalob> Id_jalob;
 	private CustomTable<PatientBrief, PatientBrief._Fields> tbl_patient;
 	private CustomTable<Lgota, Lgota._Fields> tbl_lgota;
 	private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
@@ -2462,82 +2461,8 @@ public class PacientInfoFrame extends JFrame {
 			return true;
 			}
 		});
-//	//добавить
-//	tbl_priem.registerAddRowListener(new CustomTableItemChangeEventListener<AllGosp>() {
-//		
-//		@Override
-//		public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
-//	        try {
-//	        	Kontingent item = event.getItem();
-//			    item.setNpasp(curPatientId);
-//			    item.setKateg(tbl_kateg.getSelectedItem().kateg);
-//			    item.setDatau(tbl_kateg.getSelectedItem().datau);
-//			    item.setName(tbl_kateg.getSelectedItem().name);
-//			    curId = MainForm.tcl.addKont(event.getItem());
-//			} catch (KontingentAlreadyExistException kaee) {
-//				kaee.printStackTrace();
-//				return false;
-//			} catch (TException e) {
-//				e.printStackTrace();
-//				return false;
-//			}
-//            System.out.println("add" );
-//			return true;
-//		}
-//	});
-//	//изменить
-//	tbl_kateg.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Kontingent>() {
-//		@Override
-//		public boolean doAction(CustomTableItemChangeEvent<Kontingent> event) {
-//	        try {
-//			    MainForm.tcl.updateKont(event.getItem());
-//			} catch (TException e) {
-//				e.printStackTrace();
-//				return false;
-//			}
-//            System.out.println("update" );
-//			return true;
-//		}
-//	});
-//	
-//	JButton btnDel_kat = new JButton("Удалить");
-//	btnDel_kat.addActionListener(new ActionListener() {
-//		public void actionPerformed(ActionEvent arg0) {
-//			try{
-//				tbl_kateg.requestFocus();
-//			    tbl_kateg.deleteSelectedRow();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	});
-//	
-//	JButton btnAdd_kat = new JButton("Добавить");
-//	btnAdd_kat.addActionListener(new ActionListener() {
-//		public void actionPerformed(ActionEvent arg0) {
-//			try{
-//				tbl_kateg.requestFocus();
-//				tbl_kateg.addItem();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	});
-//	
-//	JButton btnSave_kat = new JButton("Сохранить");
-//	btnSave_kat.addActionListener(new ActionListener() {
-//		public void actionPerformed(ActionEvent arg0) {
-//			try{
-//				tbl_kateg.updateSelectedItem();
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	});
-
 		
 		JPanel panel_1 = new JPanel();
-		
 		JScrollPane scrollPane = new JScrollPane();
 		
 		JButton btnDel = new JButton("Удалить");
@@ -3164,12 +3089,9 @@ public class PacientInfoFrame extends JFrame {
 	// просмотр информации о госпитализациях
 	private void changePatientPriemInfo(int PatId){
 		try {
-	    //TODO метод получения госпитализации требует только 1 аргумент! 
-		//TODO Jalob теперь отдельный класс
 			curId = tbl_priem.getSelectedItem().id;
 			curNgosp = tbl_priem.getSelectedItem().ngosp;
 	        Id_gosp = MainForm.tcl.getGosp(curId);
-	        Id_jalob = MainForm.tcl.getAllJalob(curNgosp);
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 
 			rbtn_plan.setSelected(false);
@@ -3183,7 +3105,9 @@ public class PacientInfoFrame extends JFrame {
 			sp_datagosp.setEnabled(false);
 			tf_smpn.setEnabled(false);
 
-			//ta_jal_pr.setText(Id_jalob.jalob.trim());
+			if (Id_gosp.getJalob() != null){
+				ta_jal_pr.setText(Id_gosp.jalob.trim());
+			}
 			if (Id_gosp.isSetPl_extr()){
 				if (Id_gosp.pl_extr==1) {
 					rbtn_plan.setSelected(true);
@@ -3330,15 +3254,12 @@ public class PacientInfoFrame extends JFrame {
 			Id_gosp.setNpasp(curPatientId);
 			Id_gosp.setNgosp(curNgosp);
 			Id_gosp.setId(curId);
-			//TODO Jalob теперь отдельный класс
-//			Id_gospInfo.jalob.dataz = Date.parse(sdf.format(new Date()));
-//			Id_gospInfo.jalob.jalob = ta_jal_pr.getText().trim();
-//			Id_jalob.id_gosp = curId;
-//			Id_jalob.id = curPatientId;
+			Id_gosp.setJalob(ta_jal_pr.getText().trim());
 			//Id_gosp.nist ???
 			//Id_gosp.cotd_p ???
 			//Id_gosp.cuser ???
-			//Id_gosp.setDatap(Date.parse(sp_datap.getValue().toString()));
+
+//			Id_gosp.setDatap(Date.parse(sp_datap.getValue().toString()));
 //			Id_gosp.setSmp_data(Date.parse(sp_datasmp.getValue().toString()));
 //			Id_gosp.setDatagos(Date.parse(sp_sdatagop.getValue().toString()));
 //			Id_gosp.setDataosm(Date.parse(sp_dataosm.getValue().toString()));
