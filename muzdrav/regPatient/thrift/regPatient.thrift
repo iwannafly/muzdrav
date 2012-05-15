@@ -69,14 +69,14 @@ struct PatientFullInfo{
 	24:i32 prizn,
 	25:i32 ter_liv,
 	26:i32 region_liv,
-	27:Nambk nambk
+	27:Nambk nambk,
 	28:Address adpAddress,
-	29:Address admAddress
+	29:Address admAddress,
 	30:Polis polis_oms,
-	31:Polis polis_dms,
+	31:Polis polis_dms
 }
 
-/*сведения о представителе табл. p_preds*/
+/*сведени о представителе табл. p_preds*/
 struct Agent{
 	1:i32 npasp,
 	2:string fam,
@@ -124,14 +124,6 @@ struct Sign{
 	5:string farmkol,
 	6:string vitae,
 	7:string vred
-}
-
-/*c_jalob*/
-struct Jalob{
-	1:i32 id,
-	2:i32 id_gosp,
-	3:i64 dataz,
-	4:string jalob
 }
 
 /*c_gosp*/
@@ -183,14 +175,11 @@ struct Gosp{
 	33:i32 cuser,
 	34:i64 dataosm,
 	35:string vremosm,
-	36:i64 dataz
+	36:i64 dataz,
+	37:string jalob,
+	38:string zap_vrach
 }
 
-/*справочники*/
-struct SpravStruct{
-	1:i32 pcod,
-	2:string name
-}
 
 /**
  * Пациент с такими данными не найден.
@@ -217,7 +206,7 @@ exception KontingentNotFoundException {
 }
 
 /**
- * Особая информация о пациенте с такими данными не найдены
+ * Особа информаци о пациенте с такими данными не найдены
  */
 exception SignNotFoundException {
 }
@@ -291,16 +280,6 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	Sign getSign(1:i32 npasp) throws (1: SignNotFoundException snfe),
 	list<AllGosp> getAllGosp(1:i32 npasp) throws (1: GospNotFoundException gnfe),
 	Gosp getGosp(1:i32 id) throws (1: GospNotFoundException gnfe),
-	list<Jalob> getAllJalob(1:i32 idGosp) throws (1: JalobNotFoundException jnfe),
-
-	i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
-	i32 addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
-	i32 addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
-	void addAgent(1:Agent agent) throws (1:AgentAlreadyExistException aaee),
-	void addSign(1:Sign sign) throws (1:SignAlreadyExistException saee),
-	i32 addJalob(1:Jalob jalob) throws (1:JalobAlreadyExistException jaee),
-	i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
-	void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
 
 	void deletePatient(1:i32 npasp),
 	void deleteNambk(1:i32 npasp, 2:i32 cpol),
@@ -308,8 +287,15 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void deleteKont(1:i32 id),
 	void deleteAgent(1:i32 npasp),
 	void deleteSign(1:i32 npasp),
-	void deleteJalob(1:i32 npasp, 2:i32 ngosp),
 	void deleteGosp(1:i32 npasp, 2:i32 ngosp),
+
+	i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
+	i32 addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
+	i32 addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
+	void addAgent(1:Agent agent) throws (1:AgentAlreadyExistException aaee),
+	void addSign(1:Sign sign) throws (1:SignAlreadyExistException saee),
+	i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
+	void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
 
 	void updatePatient(1:PatientFullInfo patinfo),
 	void updateNambk(1:Nambk nambk),
@@ -317,7 +303,6 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void updateKont(1:Kontingent kont),
 	void updateAgent(1:Agent agent),
 	void updateSign(1:Sign sign),
-	void updateJalob(1:Jalob jalob),
 	void updateGosp(1:Gosp gosp),
 	
 /*Классификаторы*/
@@ -373,19 +358,78 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getPomsTdoc(),
 	
 	/**
-	 * Классификатор поликлиники фактического прикрепления (N_n00 (pcod))
+	 * Классификатор поликлиники фактического прикреплени (N_n00 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getCpolPr(),
 	
 	/**
-	 * Классификатор типа документа, удостоверяющего личность (N_f008 (pcod))
+	 * Классификатор типа документа, удостоверющего личность (N_az0 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getTdoc(),
 	
 	/**
-	 * Классификатор территории проживания/прикрепления (N_l02 (pcod))
+	 * Классификатор территории проживани (N_l02 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getTerCod(1:i32 pcod)	
+	list<classifier.IntegerClassifier> getTerCod(1:i32 pcod),
+
+	/**
+	 * Классификатор кем направлен (N_K02 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getNaprav(),
+	
+	/**
+	 * Классификатор ЛПУ (N_M00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getM00(1:string codNaprav),
+
+	/**
+	 * Классификатор поликлиник (N_N00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getN00(1:string codNaprav),
+
+	/**
+	 * Классификатор отделений ЛПУ (N_O00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getO00(1:string codNaprav),
+
+	/**
+	 * Классификатор ведомственное подчинение (N_AL0 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAL0(1:string codNaprav),
+
+	/**
+	 * Классификатор военкоматы (N_W04 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getW04(1:string codNaprav),
+
+	/**
+	 * Классификатор отделений ЛПУ (N_O00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getOtdLpu(1:string codLpu),
+
+	/**
+	 * Классификатор вид травмы (N_AI0 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAI0(),
+
+	/**
+	 * Классификатор отказов в госпитализации (N_AF0 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAF0(),
+
+	/**
+	 * Классификатор состояние опьянения (N_ALK (pcod))
+	 */
+	list<classifier.IntegerClassifier> getALK(),
+
+	/**
+	 * Классификатор вид транспортировки (N_VTR (pcod))
+	 */
+	list<classifier.IntegerClassifier> getVTR(),
+
+	/**
+	 * Классификатор кода страховой организации (N_C00 (pcod,name))
+	 */
+	list<classifier.IntegerClassifier> getC00()
+
 }
-
-
