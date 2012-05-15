@@ -119,10 +119,10 @@ public class ServerRegPatient extends Server implements Iface {
         String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
-    //  id             npasp          kateg         datal
-        Integer.class, Integer.class, Integer.class, Date.class,
-    //  name
-        String.class
+    //  npasp          grup          ph            allerg
+        Integer.class, String.class, String.class, String.class,
+    //  farmkol       vitae         vred
+        String.class, String.class, String.class
     };
     private static final Class<?>[] GOSP_TYPES = new Class<?>[] {
     //  id             ngosp          npasp          nist
@@ -139,8 +139,8 @@ public class ServerRegPatient extends Server implements Iface {
         Boolean.class, Boolean.class, String.class, String.class, Date.class,
     //  vremcp      nomcp          kodotd         datagos     vremgos
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
-    //  cuser          dataosm     vremosm     dataz
-        Integer.class, Date.class, Time.class, Date.class
+    //  cuser          dataosm     vremosm     dataz       jalob
+        Integer.class, Date.class, Time.class, Date.class, String.class
     };
     private static final Class<?>[] JALOB_TYPES = new Class<?>[] {
     //  id             id_gosp        dataz       timez
@@ -195,7 +195,7 @@ public class ServerRegPatient extends Server implements Iface {
         "cotd", "svoevr", "svoevrd", "ntalon", "vidtr", "pr_out", "alkg", "soobr",
         "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c",
         "ad", "datacp", "vremcp", "nomcp", "kodotd", "datagos", "vremgos", "cuser",
-        "dataosm", "vremosm", "dataz"
+        "dataosm", "vremosm", "dataz", "jalob"
     };
     private static final String[] JALOB_FIELD_NAMES = {
         "id", "id_gosp", "dataz", "jalob"
@@ -763,7 +763,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException, TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
+                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
@@ -772,10 +772,10 @@ public class ServerRegPatient extends Server implements Iface {
                         + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
                         + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
                         + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
-                        + "dataosm, vremosm, dataz) "
+                        + "dataosm, vremosm, dataz, jalob) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
+                        + "?, ?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
                 return id;
@@ -1032,7 +1032,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void updateGosp(final Gosp gosp) throws TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 0
         };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE c_gosp SET "
@@ -1044,7 +1044,7 @@ public class ServerRegPatient extends Server implements Iface {
                     + "nal_z = ?, nal_p = ?, t0c = ?, ad = ?, smp_data = ?, "
                     + "smp_time = ?, smp_num = ?, cotd_p = ?, datagos = ?, "
                     + "vremgos = ?, cuser = ?, dataosm = ?, vremosm = ?, "
-                    + "dataz = ? WHERE id = ?;", false,
+                    + "dataz = ?, jalob = ? WHERE id = ?;", false,
                     gosp, GOSP_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
