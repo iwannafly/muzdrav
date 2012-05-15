@@ -244,18 +244,6 @@ exception KontingentAlreadyExistException {
 /**
  * Пациент с такими данными уже существует
  */
-exception AgentAlreadyExistException {
-}
-
-/**
- * Пациент с такими данными уже существует
- */
-exception SignAlreadyExistException {
-}
-
-/**
- * Пациент с такими данными уже существует
- */
 exception JalobAlreadyExistException {
 }
 
@@ -292,8 +280,8 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
 	i32 addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
 	i32 addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
-	void addAgent(1:Agent agent) throws (1:AgentAlreadyExistException aaee),
-	void addSign(1:Sign sign) throws (1:SignAlreadyExistException saee),
+	void addOrUpdateAgent(1:Agent agent),
+	void addOrUpdateSign(1:Sign sign),
 	i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
 	void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
 
@@ -301,8 +289,6 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void updateNambk(1:Nambk nambk),
 	void updateLgota(1:Lgota lgota),
 	void updateKont(1:Kontingent kont),
-	void updateAgent(1:Agent agent),
-	void updateSign(1:Sign sign),
 	void updateGosp(1:Gosp gosp),
 	
 /*Классификаторы*/
