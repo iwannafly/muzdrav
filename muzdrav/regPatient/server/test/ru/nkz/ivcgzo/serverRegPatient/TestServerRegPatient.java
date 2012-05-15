@@ -27,6 +27,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 
 /**
  * @author Avdeev Alexander
@@ -292,6 +293,21 @@ public class TestServerRegPatient {
                 testServer.getKontingent(npasp);
         kontingent.get(0).setKateg((short) 12);
         int afterAddId = testServer.addKont(kontingent.get(0));
+    }
+    
+    @Test
+    public final void addSign_isSignActuallyAdded()
+            throws TException {
+        int npasp = 2;
+        Sign s =new Sign();
+        s.setNpasp(2);
+        s.setGrup("9");
+        s.setPh("1");
+        s.setAllerg("9");
+        s.setFarmkol("9");
+        s.setVitae("9");
+        s.setVred("9");
+        testServer.addOrUpdateSign(s);
     }
 
 //    @Test

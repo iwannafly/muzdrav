@@ -101,9 +101,7 @@ struct Lgota{
 	2:i32 npasp,
 	3:i32 lgota,
 	4:i64 datau,
-	5:string name,
-	6:string kov,
-	7:string pf
+	5:string name
 }
 
 /*pkonti*/
