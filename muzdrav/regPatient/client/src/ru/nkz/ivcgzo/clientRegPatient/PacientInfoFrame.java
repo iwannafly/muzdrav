@@ -1638,6 +1638,13 @@ public class PacientInfoFrame extends JFrame {
 					SignInfo.setAllerg(ta_allerg.getText().trim());
 					SignInfo.setFarmkol(ta_farm.getText().trim());
 					SignInfo.setVitae(ta_vitae.getText().trim());
+					System.out.println(SignInfo.getNpasp());
+					System.out.println(SignInfo.getAllerg());
+					System.out.println(SignInfo.getFarmkol());
+					System.out.println(SignInfo.getGrup());
+					System.out.println(SignInfo.getPh());
+					System.out.println(SignInfo.getVitae());
+					System.out.println(SignInfo.getVred());
 					MainForm.tcl.addOrUpdateSign(SignInfo);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -3050,7 +3057,8 @@ public class PacientInfoFrame extends JFrame {
 			if (SignInfo.getVitae() != null){
 				ta_vitae.setText(SignInfo.vitae.trim());
 			}
-			
+		} catch (SignNotFoundException snfe) {
+		    System.out.println("Информации нет.");
 		} catch (Exception e) {
 			e.printStackTrace();						
 		}
@@ -3195,6 +3203,8 @@ public class PacientInfoFrame extends JFrame {
 			if (Id_gosp.isSetPr_out()) {
 				cmb_otkaz.setSelectedIndex(Id_gosp.pr_out);
 			}
+		} catch (GospNotFoundException gnfe) {
+		    System.out.println("Информации нет.");
 		} catch (Exception e) {
 			e.printStackTrace();						
 		}

@@ -659,7 +659,7 @@ public class ServerRegPatient extends Server implements Iface {
                 final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
                 sme.execPreparedT(
                         "INSERT INTO p_sign (npasp, grup, ph, allerg, "
-                        + "farmkol, vitae, vred VALUES (?, ?, ?, ?, ?, ?, ?);",
+                        + "farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?);",
                         false, sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             } else {

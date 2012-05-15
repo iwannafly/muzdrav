@@ -300,7 +300,7 @@ public class TestServerRegPatient {
             throws TException {
         int npasp = 2;
         Sign s =new Sign();
-        s.setNpasp(2);
+        s.setNpasp(26006);
         s.setGrup("9");
         s.setPh("1");
         s.setAllerg("9");
