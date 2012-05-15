@@ -19,7 +19,6 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
-import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
@@ -295,23 +294,23 @@ public class TestServerRegPatient {
         int afterAddId = testServer.addKont(kontingent.get(0));
     }
 
-    @Test
-    public final void isAgentExist_isThrowAlreadyExistException()
-            throws TException, AgentNotFoundException, AgentAlreadyExistException {
-        int npasp = 2;
-        Agent agent = testServer.getAgent(npasp);
-        testException.expect(AgentAlreadyExistException.class);
-        testServer.addAgent(agent);
-        //assertEquals(afterAddId, 0);
-    }
-
-    @Test
-    public final void addAgent_isAgentActuallyAdded()
-            throws TException, AgentNotFoundException, AgentAlreadyExistException {
-        int npasp = 2;
-        Agent agent = testServer.getAgent(npasp);
-        agent.setNpasp(5);
-        testServer.addAgent(agent);
-    }
+//    @Test
+//    public final void isAgentExist_isThrowAlreadyExistException()
+//            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+//        int npasp = 2;
+//        Agent agent = testServer.getAgent(npasp);
+//        testException.expect(AgentAlreadyExistException.class);
+//        testServer.addAgent(agent);
+//        //assertEquals(afterAddId, 0);
+//    }
+//
+//    @Test
+//    public final void addAgent_isAgentActuallyAdded()
+//            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+//        int npasp = 2;
+//        Agent agent = testServer.getAgent(npasp);
+//        agent.setNpasp(5);
+//        testServer.addAgent(agent);
+//    }
 
 }
