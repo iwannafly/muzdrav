@@ -29,7 +29,7 @@ public class TableComboBoxStringEditor extends AbstractCellEditor implements Tab
 	private static final long serialVersionUID = -1007012035130398318L;
 	private final JComboBox<String> cmb;
 	private List<StringClassifier> lst;
-	private TableComboBoxIntegerRender rnd;
+	private TableComboBoxStringRender rnd;
 	private Map<String, Integer> pcd;
 	
 	public TableComboBoxStringEditor(List<StringClassifier> list) {
@@ -42,15 +42,15 @@ public class TableComboBoxStringEditor extends AbstractCellEditor implements Tab
 				cmb.transferFocus();
             }
         });
-		rnd = new TableComboBoxIntegerRender();
+		rnd = new TableComboBoxStringRender();
 		setModel(list);
 	}
 	
-	public TableComboBoxIntegerRender getRender() {
+	public TableComboBoxStringRender getRender() {
 		return rnd;
 	}
 	
-	public Integer getIdx(int pcod) {
+	public Integer getIdx(String pcod) {
 		if (pcd.containsKey(pcod))
 			return pcd.get(pcod);
 		else
@@ -86,7 +86,7 @@ public class TableComboBoxStringEditor extends AbstractCellEditor implements Tab
 		if (arg1 == null)
 			cmb.setSelectedIndex(-1);
 		else
-			cmb.setSelectedIndex(getIdx((int) arg1));
+			cmb.setSelectedIndex(getIdx((String) arg1));
 		
 		return cmb;
 	}
@@ -99,7 +99,7 @@ public class TableComboBoxStringEditor extends AbstractCellEditor implements Tab
 			return lst.get(cmb.getSelectedIndex()).pcod;
 	}
 	
-	class TableComboBoxIntegerRender extends DefaultTableCellRenderer {
+	class TableComboBoxStringRender extends DefaultTableCellRenderer {
 		private static final long serialVersionUID = -2915705885392742240L;
 		
 		@Override
@@ -109,7 +109,7 @@ public class TableComboBoxStringEditor extends AbstractCellEditor implements Tab
 			if (value == null)
 				lbl.setText("");
 			else {
-				int idx = getIdx((int) value);
+				int idx = getIdx((String) value);
 				if (idx < 0)
 					lbl.setText(value.toString());
 				else
