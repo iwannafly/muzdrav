@@ -218,12 +218,6 @@ exception GospNotFoundException {
 }
 
 /**
- * Жалобы пациента с такими данными не найдены
- */
-exception JalobNotFoundException {
-}
-
-/**
  * Пациент с такими данными уже существует
  */
 exception PatientAlreadyExistException {
@@ -239,12 +233,6 @@ exception LgotaAlreadyExistException {
  * Пациент с такими данными уже существует
  */
 exception KontingentAlreadyExistException {
-}
-
-/**
- * Пациент с такими данными уже существует
- */
-exception JalobAlreadyExistException {
 }
 
 /**

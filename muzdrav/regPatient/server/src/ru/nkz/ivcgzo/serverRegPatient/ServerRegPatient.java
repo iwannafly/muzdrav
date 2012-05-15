@@ -25,15 +25,11 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
-import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
 import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.Jalob;
-import ru.nkz.ivcgzo.thriftRegPatient.JalobAlreadyExistException;
-import ru.nkz.ivcgzo.thriftRegPatient.JalobNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
@@ -48,9 +44,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
-import ru.nkz.ivcgzo.thriftRegPatient.SignAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.SpravStruct;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 
@@ -72,7 +66,6 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<Sign, Sign._Fields> rsmSign;
     private TResultSetMapper<AllGosp, AllGosp._Fields> rsmAllGosp;
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
-    private TResultSetMapper<Jalob, Jalob._Fields> rsmJalob;
     private QueryGenerator<PatientBrief> qgPatientBrief;
     private static final Class<?>[] PATIENT_BRIEF_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
@@ -142,12 +135,6 @@ public class ServerRegPatient extends Server implements Iface {
     //  cuser          dataosm     vremosm     dataz       jalob
         Integer.class, Date.class, Time.class, Date.class, String.class
     };
-    private static final Class<?>[] JALOB_TYPES = new Class<?>[] {
-    //  id             id_gosp        dataz       timez
-        Integer.class, Integer.class, Date.class, Time.class,
-    //  jalob
-        String.class
-    };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
         //  npasp          nambk         cpol           nuch
         Integer.class, String.class, Integer.class, Integer.class,
@@ -197,9 +184,6 @@ public class ServerRegPatient extends Server implements Iface {
         "ad", "datacp", "vremcp", "nomcp", "kodotd", "datagos", "vremgos", "cuser",
         "dataosm", "vremosm", "dataz", "jalob"
     };
-    private static final String[] JALOB_FIELD_NAMES = {
-        "id", "id_gosp", "dataz", "jalob"
-    };
 
     /**
      * Конструктор класса.
@@ -227,7 +211,6 @@ public class ServerRegPatient extends Server implements Iface {
         rsmSign = new TResultSetMapper<>(Sign.class, SIGN_FIELD_NAMES);
         rsmAllGosp = new TResultSetMapper<>(AllGosp.class, ALL_GOSP_FIELD_NAMES);
         rsmGosp = new TResultSetMapper<>(Gosp.class, GOSP_FIELD_NAMES);
-        rsmJalob = new TResultSetMapper<>(Jalob.class, JALOB_FIELD_NAMES);
     }
 
     /**
@@ -470,31 +453,6 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     /**
-     * Возвращает все жалобы пациента с указанным идентификатором госпитализации
-     * @param idGosp - уникальный идентификатор госпитализации
-     * @return список thrift-объектов, содержащий все жалобы пациента
-     * @throws GospNotFoundException
-     */
-    @Override
-    public final List<Jalob> getAllJalob(final int idGosp)
-            throws JalobNotFoundException, TException {
-        String sqlQuery = "SELECT id, id_gosp, dataz, jalob "
-                + "FROM c_jalob WHERE id_gosp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp);
-            ResultSet rs = acrs.getResultSet();
-            List<Jalob> jalob = rsmJalob.mapToList(rs);
-            if (jalob.size() > 0) {
-                return jalob;
-            } else {
-                throw new JalobNotFoundException();
-            }
-        } catch (SQLException e) {
-            throw new TException(e);
-        }
-    }
-
-    /**
      * Проверяет, существует ли в БД пациент с такими данными
      * @param patinfo - thrift-объект с информацией о пациенте
      * @return true - если пациент с такими данными уже существует,
@@ -641,8 +599,8 @@ public class ServerRegPatient extends Server implements Iface {
      * @throws AgentAlreadyExistException
      */
     @Override
-    public final void addAgent(final Agent agent)
-            throws AgentAlreadyExistException, TException {
+    public final void addOrUpdateAgent(final Agent agent)
+            throws TException {
         final int[] indexes = {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
         };
@@ -657,8 +615,25 @@ public class ServerRegPatient extends Server implements Iface {
                         AGENT_TYPES, indexes);
                 sme.setCommit();
             } else {
-                throw new AgentAlreadyExistException();
+                updateAgent(agent);
             }
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+    private void updateAgent(final Agent agent) throws TException {
+        final int[] indexes = {
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
+        };
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("UPDATE p_preds SET "
+                    + "fam = ?, im = ?, ot = ?, "
+                    + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
+                    + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
+                    + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
+                    agent, AGENT_TYPES, indexes);
+            sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
         }
@@ -684,7 +659,7 @@ public class ServerRegPatient extends Server implements Iface {
      * @throws SignAlreadyExistException
      */
     @Override
-    public final void addSign(final Sign sign) throws SignAlreadyExistException, TException {
+    public final void addOrUpdateSign(final Sign sign) throws TException {
         final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isSignExist(sign)) {
@@ -694,48 +669,21 @@ public class ServerRegPatient extends Server implements Iface {
                         false, sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             } else {
-                throw new SignAlreadyExistException();
+                updateSign(sign);
             }
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
         }
     }
 
-    /**
-     * Проверяет, существует ли в БД жалоба пациента с такими данными
-     * @param jalob - thrift-объект с информацией о жалобе пациента
-     * @return true - если жалоба пациента с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isJalobExist(final Jalob jalob) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT id FROM c_jalob WHERE (id_gosp = ?) and (jalob = ?)",
-                jalob, JALOB_TYPES, 1, 2)) {
-            return acrs.getResultSet().next();
-        }
-    }
-
-    /**
-     * Добавляет жалобу пациента в БД
-     * @param jalob - thrift-объект с информацией о жалобе пациента
-     * @throws JalobAlreadyExistException
-     */
-    @Override
-    public final int addJalob(final Jalob jalob) throws JalobAlreadyExistException,
-            TException {
-        final int[] indexes = {1, 2, 3, 4};
+    private void updateSign(final Sign sign) throws TException {
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            if (!isJalobExist(jalob)) {
-                sme.execPreparedT(
-                        "INSERT INTO c_jalob (id_gosp, dataz, timez, jalob) "
-                        + "VALUES (?, ?, ?, ?);", true, jalob,
-                        JALOB_TYPES, indexes);
-                int id = sme.getGeneratedKeys().getInt("id");
-                sme.setCommit();
-                return id;
-            } else {
-                throw new JalobAlreadyExistException();
-            }
+            sme.execPreparedT("UPDATE p_sign SET "
+                    + "grup = ?, ph = ?, allerg = ?, "
+                    + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
+                    sign, SIGN_TYPES, indexes);
+            sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
         }
@@ -890,18 +838,6 @@ public class ServerRegPatient extends Server implements Iface {
 
     //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
-    public final void deleteJalob(final int npasp, final int ngosp) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_jalob WHERE npasp = ? AND ngosp = ?;",
-                    false, npasp, ngosp);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
-    @Override
     public final void deleteGosp(final int npasp, final int ngosp) throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM c_gosp WHERE npasp = ? AND ngosp = ?;",
@@ -977,52 +913,6 @@ public class ServerRegPatient extends Server implements Iface {
             sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg =?, datal = ?, "
                     + "name = ? WHERE id = ?", false,
                     kont, KONTINGENT_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateAgent(final Agent agent) throws TException {
-        final int[] indexes = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
-        };
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_preds SET "
-                    + "fam = ?, im = ?, ot = ?, "
-                    + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                    + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
-                    + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
-                    agent, AGENT_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateSign(final Sign sign) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_sign SET "
-                    + "grup = ?, ph = ?, allerg = ?, "
-                    + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
-                    sign, SIGN_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateJalob(final Jalob jalob) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 0};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE c_jalob SET "
-                    + "id_gosp = ?, dataz = ?, timez = ?, jalob = ? "
-                    + "WHERE id = ?;", false,
-                    jalob, JALOB_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -1147,6 +1037,78 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public List<IntegerClassifier> getTerCod(int pcod) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getNaprav() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getM00(String codNaprav) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getN00(String codNaprav) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getO00(String codNaprav) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getAL0(String codNaprav) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getW04(String codNaprav) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getOtdLpu(String codLpu) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getAI0() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getAF0() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getALK() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getVTR() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<IntegerClassifier> getC00() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
