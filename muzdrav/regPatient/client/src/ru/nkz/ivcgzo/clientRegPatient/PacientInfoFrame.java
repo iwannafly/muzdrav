@@ -900,7 +900,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap())
 		);
 		
-		tbl_lgota =new CustomTable<>(true, false, Lgota.class, 3,"Дата",2,"Льгота",4,"Наименование",1,"ВН",0,"ID");
+		tbl_lgota =new CustomTable<>(true, false, Lgota.class, 3,"Дата",2,"Льгота",4,"Наименование");
 		tbl_lgota.setDateField(0);
 		tbl_lgota.setFillsViewportHeight(true);
 		tbl_lgota.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -1261,7 +1261,7 @@ public class PacientInfoFrame extends JFrame {
 						AgentInfo.setPol(2);
 					}
 					//MainForm.tcl.updateAgent(AgentInfo);
-					MainForm.tcl.addAgent(AgentInfo);
+					MainForm.tcl.addOrUpdateAgent(AgentInfo);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1599,6 +1599,9 @@ public class PacientInfoFrame extends JFrame {
 				try{
 					SignInfo = new Sign();
 					SignInfo.setNpasp(curPatientId);
+					SignInfo.setVred("");
+					SignInfo.setGrup("");
+					SignInfo.setPh("");
 					if (rbtn_gk1.isSelected()) {
 						SignInfo.setGrup("1");
 					}
@@ -1617,7 +1620,6 @@ public class PacientInfoFrame extends JFrame {
 					if (rbtn_rf2.isSelected()) {
 						SignInfo.setPh("-");
 					}
-					SignInfo.setVred("");
 					if (rbtn_vp1.isSelected()) {
 						SignInfo.vred += "1";
 					}else {
@@ -1636,10 +1638,7 @@ public class PacientInfoFrame extends JFrame {
 					SignInfo.setAllerg(ta_allerg.getText().trim());
 					SignInfo.setFarmkol(ta_farm.getText().trim());
 					SignInfo.setVitae(ta_vitae.getText().trim());
-					MainForm.tcl.addSign(SignInfo);
-					//MainForm.tcl.updateSign(SignInfo);
-				} catch (SignAlreadyExistException saee) {
-				    System.out.println("Ошибка при сохранении данных.");
+					MainForm.tcl.addOrUpdateSign(SignInfo);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
