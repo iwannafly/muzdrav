@@ -563,12 +563,12 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final int addKont(final Kontingent kont)
             throws KontingentAlreadyExistException, TException {
-        final int[] indexes = {1, 2, 3, 4};
+        final int[] indexes = {1, 2, 3};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isKontingentExist(kont)) {
                 sme.execPreparedT(
-                        "INSERT INTO p_konti (npasp, kateg, datal, name) "
-                        + "VALUES (?, ?, ?, ?);", true, kont,
+                        "INSERT INTO p_konti (npasp, kateg, datal) "
+                        + "VALUES (?, ?, ?);", true, kont,
                         KONTINGENT_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
@@ -599,16 +599,15 @@ public class ServerRegPatient extends Server implements Iface {
      * Добавляет или обновляет информацию о представителе пациента в БД,
      * в зависимости от наличия данного представителя пациента в базе.
      * @param agent - информация о представителе пациента
-     * @throws AgentAlreadyExistException
      */
     @Override
     public final void addOrUpdateAgent(final Agent agent)
             throws TException {
-        final int[] indexes = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-        };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isAgentExist(agent)) {
+                final int[] indexes = {
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                };
                 sme.execPreparedT(
                         "INSERT INTO p_preds (npasp, fam, im, ot, "
                         + "datar, pol, name_str, ogrn_str, vpolis, "
@@ -618,26 +617,17 @@ public class ServerRegPatient extends Server implements Iface {
                         AGENT_TYPES, indexes);
                 sme.setCommit();
             } else {
-                updateAgent(agent);
+                final int[] indexes = {
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
+                };
+                sme.execPreparedT("UPDATE p_preds SET "
+                        + "fam = ?, im = ?, ot = ?, "
+                        + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
+                        + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
+                        + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
+                        agent, AGENT_TYPES, indexes);
+                sme.setCommit();
             }
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    // Обновляет информацию о представителе пациента
-    private void updateAgent(final Agent agent) throws TException {
-        final int[] indexes = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
-        };
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_preds SET "
-                    + "fam = ?, im = ?, ot = ?, "
-                    + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                    + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
-                    + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
-                    agent, AGENT_TYPES, indexes);
-            sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
         }
@@ -661,35 +651,25 @@ public class ServerRegPatient extends Server implements Iface {
      * Добавляет или обновляет особую информацию о пациенте в БД,
      * в зависимости от наличия в базе.
      * @param sign - особая информация о пациенте
-     * @throws SignAlreadyExistException
      */
     @Override
     public final void addOrUpdateSign(final Sign sign) throws TException {
-        final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isSignExist(sign)) {
+                final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
                 sme.execPreparedT(
                         "INSERT INTO p_sign (npasp, grup, ph, allerg, "
                         + "farmkol, vitae, vred VALUES (?, ?, ?, ?, ?, ?, ?);",
                         false, sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             } else {
-                updateSign(sign);
+                final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
+                sme.execPreparedT("UPDATE p_sign SET "
+                        + "grup = ?, ph = ?, allerg = ?, "
+                        + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
+                        sign, SIGN_TYPES, indexes);
+                sme.setCommit();
             }
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    // Обновляет особую информацию пациента
-    private void updateSign(final Sign sign) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_sign SET "
-                    + "grup = ?, ph = ?, allerg = ?, "
-                    + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
-                    sign, SIGN_TYPES, indexes);
-            sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
         }
@@ -914,10 +894,10 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final void updateKont(final Kontingent kont) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 0};
+        final int[] indexes = {1, 2, 3, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg =?, datal = ?, "
-                    + "name = ? WHERE id = ?", false,
+            sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg =?, datal = ? "
+                    + "WHERE id = ?", false,
                     kont, KONTINGENT_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
