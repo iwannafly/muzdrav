@@ -333,6 +333,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getAp0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);

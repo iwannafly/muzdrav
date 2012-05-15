@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientOsm.patientInfo;
 import java.util.List;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 
 public class Classifiers {
@@ -15,6 +16,7 @@ public class Classifiers {
 	public static List<IntegerClassifier> n_l01;
 	public static List<IntegerClassifier> n_az0;
 	public static List<IntegerClassifier> n_l02;
+	public static List<StringClassifier> n_s00;
 	
 	public static boolean load(ThriftOsm.Client tcl) {
 		try {
@@ -36,6 +38,8 @@ public class Classifiers {
 				n_az0 = tcl.get_n_az0();
 			if (n_l02 == null)
 				n_l02 = tcl.get_n_l02();
+			if (n_s00 == null)
+				n_s00 = tcl.get_n_s00();
 			return true;
 		} catch (Exception e) {
 		}

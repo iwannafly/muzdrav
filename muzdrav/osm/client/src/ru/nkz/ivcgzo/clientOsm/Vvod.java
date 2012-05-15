@@ -9,6 +9,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagAmbNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
@@ -752,7 +753,8 @@ public class Vvod extends JFrame {
 							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE))))
 		);
 		
-		TabPos = new CustomTable<>(false,true,PvizitAmb.class,4,"Дата",5,"Код спец.",6,"Должность");
+		TabPos = new CustomTable<>(false,true,PvizitAmb.class,3,"Дата",4,"Код спец.",5,"Должность");
+		TabPos.setDateField(0);
 		sPos.setViewportView(TabPos);
 		TabPos.setFillsViewportHeight(true);
 			TabPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -760,17 +762,21 @@ public class Vvod extends JFrame {
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()){
 					if (TabPos.getSelectedItem()!=null){
-						//tfkodmkb.setText(diag.getDiag(TabPos.getSelectedItem().id));
-						//diag.setDiag(tfkodmkb.getText());	
+						try {
+							PdiagAmb pda = MainForm.tcl.getPdiagAmb(TabPos.getSelectedItem().id_obr);
+							tfdiag.setText(pda.getDiag());
+						} catch (KmiacServerException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PdiagAmbNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (TException e) {
+							MainForm.conMan.reconnect(e);
+						} 
 					}
-					
 				}
-//					if (!arg0.getValueIsAdjusting()) {
-//						if (TabPos.getSelectedItem() != null)
-//								TabPos.setData(MainForm.tcl.getPvizitAmb(TabPos.getSelectedItem().id));
-//							} 
-					}
-			
+			}
 		});
 			
 		JPanel plocst = new JPanel();
@@ -1002,7 +1008,7 @@ public class Vvod extends JFrame {
 			//c_obr.setData(MainForm.tcl.getAp0());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
-			TabPos.setData(MainForm.tcl.getPvizitAmb(1));
+			TabPos.setData(MainForm.tcl.getPvizitAmb(6));
 			//vid_opl.setData(MainForm.tcl.getOpl());потом убрать знак комментария
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
