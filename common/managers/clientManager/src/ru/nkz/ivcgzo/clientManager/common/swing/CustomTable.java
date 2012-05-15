@@ -29,6 +29,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 
 /**
  * Параметризованный класс для работы с таблицами swing. В качестве параметра
@@ -206,6 +207,24 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		for (int i = 0; i < colCount; i++)
 			colOrder[i] = idx[i];
 		setModel();
+	}
+	
+	/**
+	 * Генерирует на основе списка <code>JComboBox</code> и заменяет им
+	 * указанный столбец. Номер столбца должен указываться без учета сортировки
+	 * методом {@link #sortColumns(int...)}.
+	 * @param colIdx
+	 * @param lst
+	 */
+	public void setStringClassifierSelector(int colIdx, final List<StringClassifier> lst) {
+		for (int i = 0; i < colCount; i++)
+			if (colOrder[i] == colIdx) {
+				colIdx = i;
+				break;
+			}
+		TableComboBoxStringEditor edt = new TableComboBoxStringEditor(lst);
+		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
+		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
 	}
 	
 	/**
