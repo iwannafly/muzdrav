@@ -616,4 +616,18 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		
 		return getSelectedItem();
 	}
+	
+	/**
+	 * Установка ширин столбцов и, как следствие, выключение автоматического ресайзинга.
+	 * @param wdt - массив ширин столбцов. Должен совпадать по размеру с количеством столбцов.
+	 */
+	public void setPreferredWidths(int... wdt) {
+		if (wdt.length != colOrder.length)
+			throw new RuntimeException("Width count doesn't match column count");
+		
+		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		for (int i = 0; i < colOrder.length; i++) {
+			this.getColumnModel().getColumn(colOrder[i]).setPreferredWidth(wdt[i]);
+		}
+	}
 }
