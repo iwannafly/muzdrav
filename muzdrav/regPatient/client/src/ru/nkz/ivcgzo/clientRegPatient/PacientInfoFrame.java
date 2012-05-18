@@ -2508,23 +2508,23 @@ public class PacientInfoFrame extends JFrame {
 					  changePatientPersonalInfo(curPatientId);
 					}  
 					if (tbMain.getSelectedIndex() == 1) {
-						curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+						curPatientId = tbl_patient.getSelectedItem().npasp;
 						changePatientLgotaInfo(curPatientId);
 					}
 					if (tbMain.getSelectedIndex() == 2) {
-						curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+						curPatientId = tbl_patient.getSelectedItem().npasp;
 						changePatientKategInfo(curPatientId);
 					}
 					if (tbMain.getSelectedIndex() == 3) {
-						curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+						curPatientId = tbl_patient.getSelectedItem().npasp;
 						changePatientAgentInfo(curPatientId);
 					}
 					if (tbMain.getSelectedIndex() == 4) {
-						curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+						curPatientId = tbl_patient.getSelectedItem().npasp;
 						changePatientSignInfo(curPatientId);
 					}
 					if (tbMain.getSelectedIndex() == 5) {
-						curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+						curPatientId = tbl_patient.getSelectedItem().npasp;
 						changePatientPriemInfo(curPatientId);
 					}
 				}
@@ -2536,6 +2536,7 @@ public class PacientInfoFrame extends JFrame {
 			public boolean doAction(CustomTableItemChangeEvent<PatientBrief> event) {
 		        try {
 					MainForm.tcl.deletePatient(curPatientId);
+					NewPatient();
 				} catch (TException e) {
 					e.printStackTrace();
 					return false;
@@ -2553,7 +2554,7 @@ public class PacientInfoFrame extends JFrame {
 		btnDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 		      try{
-				curPatientId =(int) tbl_patient.getSelectedItem().npasp;
+				curPatientId = tbl_patient.getSelectedItem().npasp;
 				tbl_patient.requestFocus();
 				tbl_patient.deleteSelectedRow();
 		      } catch (Exception e) {
@@ -2588,51 +2589,55 @@ public class PacientInfoFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					PersonalInfo = new PatientFullInfo();
-					PersonalInfo.npasp = curPatientId;
-					PersonalInfo.fam = tfFam.getText().trim();
-					PersonalInfo.im = tfIm.getText().trim();
-					PersonalInfo.ot = tfOt.getText().trim();
-					PersonalInfo.admAddress.region = tf_Adm_obl.getText().trim();
-					PersonalInfo.admAddress.city = tf_Adm_gorod.getText().trim();
-					PersonalInfo.admAddress.street = tf_Adm_ul.getText().trim();
-					PersonalInfo.admAddress.house = tf_Adm_dom.getText().trim();
-					PersonalInfo.admAddress.flat= tf_Adm_kv.getText().trim();
-					PersonalInfo.adpAddress.region = tf_Adp_obl.getText().trim();
-					PersonalInfo.adpAddress.city = tf_Adp_gorod.getText().trim();
-					PersonalInfo.adpAddress.street = tf_Adp_ul.getText().trim();
-					PersonalInfo.adpAddress.house = tf_Adp_dom.getText().trim();
-					PersonalInfo.adpAddress.flat = tf_Adp_kv.getText().trim();
-					PersonalInfo.namemr = tfMrname.getText().trim();
-					PersonalInfo.mrab = tfMr.getText().trim();
-					PersonalInfo.prof = tfDolj.getText().trim();
-					PersonalInfo.tel = tfTel.getText().trim();
-					PersonalInfo.cpol_pr = Short.valueOf(tf_Cpol.getText());
-					PersonalInfo.nambk.nambk = tf_Nambk.getText();
-					PersonalInfo.nambk.nuch = Short.valueOf(tf_Nuch.getText());
-					PersonalInfo.snils = tf_Snils.getText().trim();
-					PersonalInfo.odoc = tf_Odoc.getText().trim();
-					PersonalInfo.docser = tf_serdoc.getText().trim();
-					PersonalInfo.docnum = tf_nomdoc.getText().trim();
-					PersonalInfo.polis_dms.ser = tf_dms_ser.getText().trim();
-					PersonalInfo.polis_dms.nom = tf_dms_nom.getText().trim();
-					PersonalInfo.polis_oms.ser = tf_oms_ser.getText().trim();
-					PersonalInfo.polis_oms.nom = tf_oms_nom.getText().trim();
-					PersonalInfo.polis_oms.strg = Short.valueOf(tf_oms_smo.getText());
-					PersonalInfo.polis_dms.strg = Short.valueOf(tf_dms_smo.getText());
-					PersonalInfo.datar = Date.parse(tfDr.getText());
-					PersonalInfo.nambk.datapr = Date.parse(tf_Datapr.getText());
-					PersonalInfo.nambk.dataot = Date.parse(tf_Dataot.getText());
-					PersonalInfo.datadoc = Date.parse(tf_datadoc.getText());
+					PersonalInfo.setNpasp(curPatientId);
+					PersonalInfo.setFam(tfFam.getText().trim());
+					PersonalInfo.setIm(tfIm.getText().trim());
+					PersonalInfo.setOt(tfOt.getText().trim());
+					PersonalInfo.admAddress.setRegion(tf_Adm_obl.getText().trim());
+					PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().trim());
+					PersonalInfo.admAddress.setStreet(tf_Adm_ul.getText().trim());
+					PersonalInfo.admAddress.setHouse(tf_Adm_dom.getText().trim());
+					PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().trim());
+					PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().trim());
+					PersonalInfo.adpAddress.setCity(tf_Adp_gorod.getText().trim());
+					PersonalInfo.adpAddress.setStreet(tf_Adp_ul.getText().trim());
+					PersonalInfo.adpAddress.setHouse(tf_Adp_dom.getText().trim());
+					PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().trim());
+					PersonalInfo.setNamemr(tfMrname.getText().trim());
+					PersonalInfo.setMrab(tfMr.getText().trim());
+					PersonalInfo.setProf(tfDolj.getText().trim());
+					PersonalInfo.setTel(tfTel.getText().trim());
+					PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
+					PersonalInfo.setSnils(tf_Snils.getText().trim());
+					PersonalInfo.setOdoc(tf_Odoc.getText().trim());
+					PersonalInfo.setDocser(tf_serdoc.getText().trim());
+					PersonalInfo.setDocnum(tf_nomdoc.getText().trim());
+					PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().trim());
+					PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().trim());
+					PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().trim());
+					PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().trim());
+					PersonalInfo.polis_oms.setStrg(Integer.valueOf(tf_oms_smo.getText()));
+					PersonalInfo.polis_dms.setStrg(Integer.valueOf(tf_dms_smo.getText()));
+					PersonalInfo.nambk.setNambk(tf_Nambk.getText());
+					PersonalInfo.nambk.setNuch(Integer.valueOf(tf_Nuch.getText()));
+
+					PersonalInfo.setDatar(SimpleDateFormat.getDateTimeInstance().parse(tfDr.getText()).getTime());
+					PersonalInfo.setDatadoc(SimpleDateFormat.getDateTimeInstance().parse(tf_datadoc.getText()).getTime());
+					PersonalInfo.nambk.setDatapr(SimpleDateFormat.getDateTimeInstance().parse(tf_Datapr.getText()).getTime());
+					PersonalInfo.nambk.setDataot(SimpleDateFormat.getDateTimeInstance().parse(tf_Dataot.getText()).getTime());
+					//Date.parse(tfDr.getText());
+//					PersonalInfo.nambk.datapr = Date.parse(tf_Datapr.getText());
+//					PersonalInfo.nambk.dataot = Date.parse(tf_Dataot.getText());
+//					PersonalInfo.datadoc = Date.parse(tf_datadoc.getText());
 					if (rbtn_pol_m.isSelected()) {
-						PersonalInfo.pol = 1;
+						PersonalInfo.setPol(1);
 					}
 					if (rbtn_pol_j.isSelected()) {
-						PersonalInfo.pol = 2;
+						PersonalInfo.setPol(2);
 					}
 					//cmbStatus.getSelectedItem();
 					curPatientId = MainForm.tcl.addPatient(PersonalInfo);
 					//tbl_patient.requestFocus();
-					//tbl_patient.getSelectedItem().npasp = curPatientId;
 				    RefreshTablePatient();
 					//tbl_patient.updateSelectedItem();
 				} catch (Exception e) {
@@ -2853,13 +2858,13 @@ public class PacientInfoFrame extends JFrame {
 			}
 			
 			if (PersonalInfo.isSetPol()){
-				if (Integer.valueOf(PersonalInfo.pol)==1) {
+				switch (PersonalInfo.pol) {
+				case 1: 
 					rbtn_pol_m.setSelected(true);
-					rbtn_pol_j.setSelected(false);
-				}
-				if (Integer.valueOf(PersonalInfo.pol)==2) {
-					rbtn_pol_m.setSelected(false);
+					break;
+				case 2: 
 					rbtn_pol_j.setSelected(true);
+					break;
 				}
 			}
 //			if (PersonalInfo.isSetSgrp()) {
@@ -2965,13 +2970,13 @@ public class PacientInfoFrame extends JFrame {
 			if (AgentInfo.getDocser() != null) tf_Ser_doc_pr.setText(AgentInfo.docser.trim());
 			if (AgentInfo.getDocnum() != null) tf_Nomdoc_pr.setText(AgentInfo.docnum.trim());
 			if (AgentInfo.isSetPol()){
-				if (Integer.valueOf(AgentInfo.pol)==1) {
+				switch (PersonalInfo.pol) {
+				case 1: 
 					rbtn_pol_pr_m.setSelected(true);
-					rbtn_pol_pr_j.setSelected(false);
-				}
-				if (Integer.valueOf(AgentInfo.pol)==2) {
-					rbtn_pol_pr_m.setSelected(false);
+					break;
+				case 2: 
 					rbtn_pol_pr_j.setSelected(true);
+					break;
 				}
 			}
 		} catch (AgentNotFoundException anfe) {
@@ -3006,47 +3011,38 @@ public class PacientInfoFrame extends JFrame {
 		try {
 			NewSign();
 			SignInfo = MainForm.tcl.getSign(PatId);
-			rbtn_gk1.setSelected(false);
-			rbtn_gk2.setSelected(false);
-			rbtn_gk3.setSelected(false);
-			rbtn_gk4.setSelected(false);
-			rbtn_rf1.setSelected(false);
-			rbtn_rf2.setSelected(false);
-			rbtn_vp1.setSelected(false);
-			rbtn_vp2.setSelected(false);
-			rbtn_vp3.setSelected(false);
 			if (SignInfo.getGrup() != null){
-				if (SignInfo.grup=="1") {
+				switch (SignInfo.grup) {
+				case "1": 
 					rbtn_gk1.setSelected(true);
-				}
-				if (SignInfo.grup=="2") {
+					break;
+				case "2": 
 					rbtn_gk2.setSelected(true);
-				}
-				if (SignInfo.grup=="3") {
+					break;
+				case "3": 
 					rbtn_gk3.setSelected(true);
-				}
-				if (SignInfo.grup=="4") {
+					break;
+				case "4": 
 					rbtn_gk4.setSelected(true);
+					break;
+				default: System.out.println("Нет такой группы крови."); 
 				}
 			}
 			if (SignInfo.getPh() != null){
-				if (SignInfo.ph=="+") {
+				switch (SignInfo.ph) {
+				case "+": 
 					rbtn_rf1.setSelected(true);
-				}
-				if (SignInfo.ph=="-") {
+					break;
+				case "-": 
 					rbtn_rf2.setSelected(true);
+					break;
+				default: System.out.println("Резус-фактор отсутствует."); 
 				}
 			}
 			if (SignInfo.getVred() != null){
-				if (SignInfo.vred.substring(0, 1)=="1") {
-					rbtn_vp1.setSelected(true);
-				}
-				if (SignInfo.vred.substring(1, 2)=="1") {
-					rbtn_vp2.setSelected(true);
-				}
-				if (SignInfo.vred.substring(2, 3)=="1") {
-					rbtn_vp3.setSelected(true);
-				}
+				rbtn_vp1.setSelected(SignInfo.vred.charAt(0) == '1');
+				rbtn_vp2.setSelected(SignInfo.vred.charAt(1) == '1');
+				rbtn_vp3.setSelected(SignInfo.vred.charAt(2) == '1');
 			}
 			if (SignInfo.getAllerg() != null){
 				ta_allerg.setText(SignInfo.allerg.trim());
@@ -3116,11 +3112,13 @@ public class PacientInfoFrame extends JFrame {
 				ta_jal_pr.setText(Id_gosp.jalob.trim());
 			}
 			if (Id_gosp.isSetPl_extr()){
-				if (Id_gosp.pl_extr==1) {
+				switch (Id_gosp.pl_extr) {
+				case 1: 
 					rbtn_plan.setSelected(true);
-				}
-				if (Id_gosp.pl_extr==2) {
+					break;
+				case 2: 
 					rbtn_extr.setSelected(true);
+					break;
 				}
 			}
 			if (Id_gosp.isSetNal_z()){
