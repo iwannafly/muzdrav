@@ -23,6 +23,7 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -254,11 +255,10 @@ public class ServerRegPatient extends Server implements Iface {
                 + "adm_obl, adm_gorod, adm_ul, adm_dom, adm_kv "
                 + "FROM patient";
         InputData inData = qgPatientBrief.genSelect(patient, sqlQuery);
-        try {
-            sqlQuery = inData.getQueryText();
-            int[] indexes = inData.getIndexes();
-            AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
-                    PATIENT_BRIEF_TYPES, indexes);
+        sqlQuery = inData.getQueryText();
+        int[] indexes = inData.getIndexes();
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
+                PATIENT_BRIEF_TYPES, indexes)) {
             ResultSet rs = acrs.getResultSet();
             List<PatientBrief> patientsInfo = new ArrayList<PatientBrief>();
             if (rs.next()) {
@@ -302,8 +302,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "p_nambk.datapr, p_nambk.dataot, p_nambk.ishod "
                 + "FROM patient LEFT JOIN p_nambk ON "
                 + "patient.npasp = p_nambk.npasp WHERE patient.npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 PatientFullInfo patient = rsmPatientFullInfo.map(rs);
@@ -331,8 +330,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final Agent getAgent(final int npasp)
             throws AgentNotFoundException, TException {
         String sqlQuery = "SELECT * FROM p_preds WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 Agent agent = rsmAgent.map(rs);
@@ -370,8 +368,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<Kontingent> getKontingent(final int npasp)
             throws KontingentNotFoundException, TException {
         String sqlQuery = "SELECT * FROM p_konti WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<Kontingent> kontingent = rsmKontingent.mapToList(rs);
             if (kontingent.size() > 0) {
@@ -393,8 +390,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final Sign getSign(final int npasp) throws SignNotFoundException, TException {
         String sqlQuery = "SELECT * FROM p_sign WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmSign.map(rs);
@@ -417,8 +413,7 @@ public class ServerRegPatient extends Server implements Iface {
             throws GospNotFoundException, TException {
         String sqlQuery = "SELECT id, ngosp, npasp, nist, datap, cotd, "
                 + "diag_p, named_p FROM c_gosp WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<AllGosp> allGosp = rsmAllGosp.mapToList(rs);
             if (allGosp.size() > 0) {
@@ -441,8 +436,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final Gosp getGosp(final int id) throws GospNotFoundException, TException {
         String sqlQuery = "SELECT * FROM c_gosp WHERE id = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmGosp.map(rs);
@@ -618,7 +612,7 @@ public class ServerRegPatient extends Server implements Iface {
                 sme.setCommit();
             } else {
                 final int[] indexes = {
-                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
                 };
                 sme.execPreparedT("UPDATE p_preds SET "
                         + "fam = ?, im = ?, ot = ?, "
@@ -950,151 +944,228 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public List<IntegerClassifier> getPol() throws TException {
+    public final List<IntegerClassifier> getPol() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_z30";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmPol =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmPol.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getSgrp() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_az9";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmSgrp =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmSgrp.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getObl() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_l02";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmObl =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmObl.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+////////////////////////////////////////////////////////////////
+// Временно не реализовано из-за кривых классификаторов в БД  //
+////////////////////////////////////////////////////////////////
+
+    @Override
+    public final List<IntegerClassifier> getGorod(final int codObl) throws TException {
+//        final String sqlQuery = "SELECT pcod, name FROM n_l02";
+//        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmObl =
+//                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+//        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+//            return rsmObl.mapToList(acrs.getResultSet());
+//        } catch (SQLException e) {
+//            throw new TException(e);
+//        }
+        return null;
+    }
+
+    @Override
+    public final List<IntegerClassifier> getUl(final int codGorod) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getSgrp() throws TException {
+    public final List<IntegerClassifier> getDom(final int codUl) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getObl() throws TException {
+    public final List<IntegerClassifier> getKorp(final int codDom) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public final List<IntegerClassifier> getMrab() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getGorod(int codObl) throws TException {
+    public final List<IntegerClassifier> getPomsTdoc() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    // А нужен ли он вообще если уже есть выше метод с тем жэ классификатором?
+    @Override
+    public final List<IntegerClassifier> getTerCod(final int pcod) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+///////////////////////////////////////////////////////////////
+//////     Окончание участка нереализованного кода     ////////
+///////////////////////////////////////////////////////////////
+
+    @Override
+    public final List<IntegerClassifier> getMsStrg() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_kas";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmMsStrg =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmMsStrg.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getCpolPr() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_n00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmCpolPr =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmCpolPr.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getTdoc() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_az0";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmTdoc =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmTdoc.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<StringClassifier> getNaprav() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_k02";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmNaprav =
+                new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmNaprav.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getM00() throws TException {
+        final String sqlQuery = "SELECT pcod, name_s FROM n_m00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmM00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name_s");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmM00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getN00() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_n00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmN00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getO00() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_o00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmO00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getAL0() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getUl(int codGorod) throws TException {
+    public final List<IntegerClassifier> getW04() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getDom(int codUl) throws TException {
+    public final List<IntegerClassifier> getOtdLpu(final String codLpu) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getKorp(int codDom) throws TException {
+    public final List<IntegerClassifier> getAI0() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getMrab() throws TException {
+    public final List<IntegerClassifier> getAF0() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getMsStrg() throws TException {
+    public final List<IntegerClassifier> getALK() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getPomsTdoc() throws TException {
+    public final List<IntegerClassifier> getVTR() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getCpolPr() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getTdoc() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getTerCod(int pcod) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getNaprav() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getM00(String codNaprav) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getN00(String codNaprav) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getO00(String codNaprav) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getAL0(String codNaprav) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getW04(String codNaprav) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getOtdLpu(String codLpu) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getAI0() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getAF0() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getALK() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getVTR() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getC00() throws TException {
+    public final List<IntegerClassifier> getC00() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
