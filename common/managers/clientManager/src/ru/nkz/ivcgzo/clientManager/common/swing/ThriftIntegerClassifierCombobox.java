@@ -14,18 +14,35 @@ import javax.swing.event.DocumentListener;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 
+/**
+ * Параметризированный класс для работы с комбобоксами swing. В качестве параметра должна
+ * указываться thrift-структура.
+ * @author bsv798
+ *
+ * @param <T> - thrift-структура {@link IntegerClassifier}
+ */
 public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extends JComboBox<IntegerClassifier> {
 	private static final long serialVersionUID = 8540397050277967316L;
 	private List<IntegerClassifier> items;
+	private Searcher searcher;
 	
+	/**
+	 * Конструктор комбобокса.
+	 * @param searcheable - включать ли поиск по первым буквам
+	 */
 	public ThriftIntegerClassifierCombobox(boolean searcheable) {
 		this(searcheable, new ArrayList<IntegerClassifier>());
 	}
 	
+	/**
+	 * Конструктор комбобокса.
+	 * @param searcheable - включать ли поиск по первым буквам
+	 * @param list - список из thrift-структур для отображения
+	 */
 	public ThriftIntegerClassifierCombobox(boolean searcheable, List<IntegerClassifier> list) {
 		if (searcheable) {
 			setEditable(true);
-			new Searcher();
+			searcher = new Searcher();
 		}
 		setModel();
 		setData(list);
@@ -48,6 +65,9 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		this.setModel(model);
 	}
 	
+	/**
+	 * Устанавливает список для отображения. 
+	 */
 	public void setData(List<IntegerClassifier> list) {
 		items = new ArrayList<>(list.size());
 		for (IntegerClassifier item : list) {
@@ -55,6 +75,9 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		}
 	}
 	
+	/**
+	 * Получает выбранный объект.
+	 */
 	@Override
 	public IntegerClassifier getSelectedItem() {
 		Object selItem = super.getSelectedItem();
@@ -63,6 +86,41 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			return (IntegerClassifier) selItem;
 		else
 			return null;
+	}
+	
+	/**
+	 * Получает выбранный пользовательский код. 
+	 */
+	public int getSelectedPcod() {
+		return getSelectedItem().pcod;
+	}
+	
+	/**
+	 * Устанавливает объект на основе пользовательского кода. Выбрасывает {@link RuntimeException},
+	 * если такой код не найден.  
+	 */
+	public void setSelectedPcod(int pcod) {
+		IntegerClassifier selItem = null;
+		
+		for (IntegerClassifier item : items) {
+			if (item.pcod == pcod) {
+				selItem = item;
+				break;
+			}
+		}
+		
+		if (searcher == null)
+			setSelectedItem(selItem);
+		else
+			try {
+				searcher.setSearchEnabled(false);
+				setSelectedItem(selItem);
+			} finally {
+				searcher.setSearchEnabled(true);
+			}
+		
+		if (selItem == null)
+			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
 	}
 	
 	class IntegerClassifierItem extends IntegerClassifier {
@@ -82,6 +140,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		private ThriftIntegerClassifierCombobox<T> cmb = ThriftIntegerClassifierCombobox.this;
 		private JTextField editor = (JTextField) getEditor().getEditorComponent();
 		private boolean searching = false;
+		private boolean enabled = false;
 		private IntegerClassifier lastSelected;
 		
 		public Searcher() {
@@ -92,7 +151,17 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 					editor.selectAll();
 				}
 			});
-			editor.getDocument().addDocumentListener(this);
+			setSearchEnabled(true);
+		}
+		
+		public void setSearchEnabled(boolean searchEnabled) {
+			if (searchEnabled) {
+				if (!enabled)
+					editor.getDocument().addDocumentListener(this);
+			} else {
+				editor.getDocument().removeDocumentListener(this);
+			}
+			enabled = searchEnabled;
 		}
 		
 		@Override
@@ -105,24 +174,31 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 				@Override
 				public void run() {
 					try {
-						if (!cmb.isPopupVisible())
-							cmb.showPopup();
-						String str = editor.getText().toLowerCase();
-						if ((lastSelected != null) && (lastSelected.name.toLowerCase().indexOf(str) == 0)) {
+						lastSelected = cmb.getSelectedItem();
+						String editTextLow = editor.getText().toLowerCase();
+						String lastSelTextLow = (lastSelected != null) ? lastSelected.name.toLowerCase() : "";
+						if ((lastSelected != null) && (lastSelTextLow.indexOf(editTextLow) == 0)) {
 							searching = true;
-							editor.setText(lastSelected.name);
-							editor.select(str.length(), lastSelected.name.length());
+							if (!lastSelTextLow.equals(editTextLow)) {
+								editor.setText(lastSelected.name);
+								editor.select(editTextLow.length(), lastSelTextLow.length());
+							}
 						} else							
 							for (IntegerClassifier item : cmb.items) {
-								if (item.name.toLowerCase().indexOf(str) == 0) {
+								if (item.name.toLowerCase().indexOf(editTextLow) == 0) {
 									searching = true;
 									lastSelected = item;
+									lastSelTextLow = lastSelected.name.toLowerCase();
 									cmb.setSelectedItem(lastSelected);
 									editor.setText(lastSelected.name);
-									editor.select(str.length(), lastSelected.name.length());
+									editor.select(editTextLow.length(), lastSelTextLow.length());
 									break;
 								}
 							}
+						if ((lastSelected == null))
+							cmb.showPopup();
+						else if (!lastSelTextLow.equals(editTextLow))
+							cmb.showPopup();
 					} finally {
 						searching = false;
 					}

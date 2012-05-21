@@ -29,6 +29,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 
 /**
  * Параметризованный класс для работы с таблицами swing. В качестве параметра
@@ -101,7 +102,9 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		setModel();
 		if (editable) {
 //			this.setSurrendersFocusOnKeystroke(true);
-			this.setDefaultEditor(Date.class, new TableDateEditor());
+			TableDateEditor tde = new TableDateEditor();
+			this.setDefaultEditor(Date.class, tde);
+			this.setDefaultRenderer(Date.class, tde.getRenderer());
 			
 			this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 				@Override
@@ -204,6 +207,24 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		for (int i = 0; i < colCount; i++)
 			colOrder[i] = idx[i];
 		setModel();
+	}
+	
+	/**
+	 * Генерирует на основе списка <code>JComboBox</code> и заменяет им
+	 * указанный столбец. Номер столбца должен указываться без учета сортировки
+	 * методом {@link #sortColumns(int...)}.
+	 * @param colIdx
+	 * @param lst
+	 */
+	public void setStringClassifierSelector(int colIdx, final List<StringClassifier> lst) {
+		for (int i = 0; i < colCount; i++)
+			if (colOrder[i] == colIdx) {
+				colIdx = i;
+				break;
+			}
+		TableComboBoxStringEditor edt = new TableComboBoxStringEditor(lst);
+		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
+		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
 	}
 	
 	/**
@@ -532,26 +553,24 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * методом {@link #setData(List)}.
 	 */
 	public void updateSelectedItem() {
-		if (editable) {
-			if (isEditing())
-				this.getCellEditor().stopCellEditing();
-			
-			if (itemUpd) {
-				itemUpd = false;
-				if (!itemAdd) {
-					if (!deepEquals(sel, cop)) {
-						if (!updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)))
-							lst.set(copIdx, cop);
-						updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
-					}
-				} else {
-					if (!checkEmpty(sel)) {
-						addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
-					} else {
-						deleteSelectedRow();
-					}
-					itemAdd = false;
+		if (isEditing())
+			this.getCellEditor().stopCellEditing();
+		
+		if (itemUpd) {
+			itemUpd = false;
+			if (!itemAdd) {
+				if (!deepEquals(sel, cop)) {
+					if (!updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)))
+						lst.set(copIdx, cop);
+					updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				}
+			} else {
+				if (!checkEmpty(sel)) {
+					addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
+				} else {
+					deleteSelectedRow();
+				}
+				itemAdd = false;
 			}
 		}
 	}
@@ -582,6 +601,33 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				itemAdd = true;
 			} catch (Exception e) {
 			}
+		}
+	}
+	
+	/**
+	 * Добавление новой строки. Строку можно изменять вне таблицы. Изменения подтверждать
+	 * методом {@link #updateSelectedItem()}.
+	 */
+	public T addExternalItem() {
+		addItem();
+		
+		if (isEditing())
+			this.getCellEditor().stopCellEditing();
+		
+		return getSelectedItem();
+	}
+	
+	/**
+	 * Установка ширин столбцов и, как следствие, выключение автоматического ресайзинга.
+	 * @param wdt - массив ширин столбцов. Должен совпадать по размеру с количеством столбцов.
+	 */
+	public void setPreferredWidths(int... wdt) {
+		if (wdt.length != colOrder.length)
+			throw new RuntimeException("Width count doesn't match column count");
+		
+		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		for (int i = 0; i < colOrder.length; i++) {
+			this.getColumnModel().getColumn(colOrder[i]).setPreferredWidth(wdt[i]);
 		}
 	}
 }
