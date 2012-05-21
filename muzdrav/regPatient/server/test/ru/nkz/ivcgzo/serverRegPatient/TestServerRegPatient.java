@@ -294,7 +294,7 @@ public class TestServerRegPatient {
         kontingent.get(0).setKateg((short) 12);
         int afterAddId = testServer.addKont(kontingent.get(0));
     }
-    
+
     @Test
     public final void addSign_isSignActuallyAdded()
             throws TException {
@@ -310,6 +310,16 @@ public class TestServerRegPatient {
         testServer.addOrUpdateSign(s);
     }
 
+    @Test
+    public final void updatePatient_isPatientActuallyUpdated()
+            throws TException, PatientNotFoundException, PatientAlreadyExistException {
+        int npasp = 2;
+        PatientFullInfo patientFullInfo =
+                testServer.getPatientFullInfo(npasp);
+        patientFullInfo.setFam("Уникальная_фамилия");
+        testServer.updatePatient(patientFullInfo);
+        //assertEquals(afterAddId, 0);
+    }
 //    @Test
 //    public final void isAgentExist_isThrowAlreadyExistException()
 //            throws TException, AgentNotFoundException, AgentAlreadyExistException {

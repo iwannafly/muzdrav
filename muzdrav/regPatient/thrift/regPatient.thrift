@@ -347,32 +347,32 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Классификатор кем направлен (N_K02 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getNaprav(),
+	list<classifier.StringClassifier> getNaprav(),
 	
 	/**
 	 * Классификатор ЛПУ (N_M00 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getM00(1:string codNaprav),
+	list<classifier.IntegerClassifier> getM00(),
 
 	/**
 	 * Классификатор поликлиник (N_N00 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getN00(1:string codNaprav),
+	list<classifier.IntegerClassifier> getN00(),
 
 	/**
 	 * Классификатор отделений ЛПУ (N_O00 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getO00(1:string codNaprav),
+	list<classifier.IntegerClassifier> getO00(),
 
 	/**
 	 * Классификатор ведомственное подчинение (N_AL0 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getAL0(1:string codNaprav),
+	list<classifier.IntegerClassifier> getAL0(),
 
 	/**
 	 * Классификатор военкоматы (N_W04 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getW04(1:string codNaprav),
+	list<classifier.IntegerClassifier> getW04(),
 
 	/**
 	 * Классификатор отделений ЛПУ (N_O00 (pcod))
