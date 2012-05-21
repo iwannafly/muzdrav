@@ -54,7 +54,7 @@ struct S_ot01{
 	1: i32 cotd;
 	2: string pcod;
 	3: string c_obst;
-	4: string c_nzl;	
+	4: string c_nz1;	
 }
 
 
@@ -78,7 +78,7 @@ struct Metod {
 
 struct N_ldi {
 	1: string pcod;
-	2: string c_nzl;
+	2: string c_nz1;
 	3: string name_n;
 	4: string name;
 	5: string norma;
@@ -170,7 +170,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod) throws (1: MetodNotFoundException mnfe);
 	
-	list<N_ldi> getN_ldi(1: string c_nzl; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
+	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
 
 	list <classifier.IntegerClassifier> GetKlasCpos2();
 	list <classifier.IntegerClassifier> GetKlasPopl();
@@ -181,5 +181,5 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
 	list <classifier.IntegerClassifier> GetKlasP0e1();
-	list <classifier.StringClassifier> GetKlasNzl();
+	list <classifier.StringClassifier> GetKlasNz1();
 }

@@ -12,15 +12,29 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
+
+import org.apache.thrift.TException;
+
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.ldsThrift.LdiNotFoundException;
+import ru.nkz.ivcgzo.ldsThrift.N_ldi;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Option {
 
 	public JFrame frame;
-	private JTable table;
+	private CustomTable<N_ldi, N_ldi._Fields> table;
 	private JTable table_1;
 	private JTable table_2;
-
+	public ThriftIntegerClassifierCombobox<IntegerClassifier> p0e1;
+	public ThriftStringClassifierCombobox<StringClassifier> n_nz1;
 	/**
 	 * Launch the application.
 	 */
@@ -49,7 +63,7 @@ public class Option {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 678, 559);
+		frame.setBounds(100, 100, 784, 670);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		JPanel panel = new JPanel();
@@ -59,54 +73,62 @@ public class Option {
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 670, GroupLayout.PREFERRED_SIZE)
-				.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 682, Short.MAX_VALUE)
+				.addComponent(splitPane)
+				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 776, Short.MAX_VALUE)
 		);
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+					.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
 					.addGap(0))
 		);
 		
 		JLabel lblNewLabel = new JLabel("Органы и системы");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		JComboBox comboBox = new JComboBox();
+		p0e1 = new ThriftIntegerClassifierCombobox<>(false);		
+		p0e1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				filtN_ldi();
+			}
+		});
+		
+		n_nz1 = new ThriftStringClassifierCombobox<>(false);
+		n_nz1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				filtN_ldi();
+			}
+		});
 		
 		JLabel label = new JLabel("Исследования");
 		label.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
-		JComboBox comboBox_1 = new JComboBox();
+
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+			gl_panel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(label)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(comboBox_1, 0, 147, Short.MAX_VALUE)
+					.addComponent(p0e1, GroupLayout.PREFERRED_SIZE, 239, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNewLabel)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE)
+					.addComponent(n_nz1, GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
+			gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-					.addContainerGap(16, Short.MAX_VALUE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)
-						.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(p0e1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel)
+						.addComponent(n_nz1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
 		panel.setLayout(gl_panel);
@@ -134,20 +156,19 @@ public class Option {
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
-				.addGroup(gl_panel_2.createSequentialGroup()
-					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 317, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+				.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
-					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE))
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
 		);
 		
-		table = new JTable();
+		table = new CustomTable<>(false, true, N_ldi.class, 1, "Список анализов", 2, "Название");
+		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		
 		JLabel lblNewLabel_1 = new JLabel("Список исследований");
@@ -178,15 +199,15 @@ public class Option {
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
-				.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+				.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
 		);
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_3.createSequentialGroup()
-					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE))
+				.addGroup(Alignment.TRAILING, gl_panel_3.createSequentialGroup()
+					.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
 		);
 		
 		table_1 = new JTable();
@@ -200,13 +221,14 @@ public class Option {
 				.addGroup(gl_panel_5.createSequentialGroup()
 					.addGap(138)
 					.addComponent(lblNewLabel_2)
-					.addContainerGap(139, Short.MAX_VALUE))
+					.addContainerGap(159, Short.MAX_VALUE))
 		);
 		gl_panel_5.setVerticalGroup(
-			gl_panel_5.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_5.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(lblNewLabel_2))
+			gl_panel_5.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addContainerGap(26, Short.MAX_VALUE)
+					.addComponent(lblNewLabel_2)
+					.addContainerGap())
 		);
 		panel_5.setLayout(gl_panel_5);
 		panel_3.setLayout(gl_panel_3);
@@ -256,4 +278,19 @@ public class Option {
 		panel_6.setLayout(gl_panel_6);
 		frame.getContentPane().setLayout(groupLayout);
 	}
+	
+	private void filtN_ldi() {
+		try {
+			if ((p0e1.getSelectedItem() != null) && (n_nz1.getSelectedItem() != null)){
+				table.setData(MainForm.ltc.getN_ldi(n_nz1.getSelectedPcod(), p0e1.getSelectedPcod()));
+			}
+		} catch (LdiNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }

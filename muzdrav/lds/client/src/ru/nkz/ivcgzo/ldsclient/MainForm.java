@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
 
+import org.apache.thrift.TException;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.transport.TFramedTransport;
 import org.apache.thrift.transport.TSocket;
@@ -15,6 +16,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.ldsThrift.LDSThrift;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -23,7 +25,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class MainForm extends Client{
-
+	Option winOpt;
+	public static LDSThrift.Client ltc;
+	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) {
 		super(conMan, authInfo, lncPrm);
 
@@ -73,6 +77,8 @@ public class MainForm extends Client{
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		winOpt = new Option();		
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -95,11 +101,12 @@ public class MainForm extends Client{
 		
 		JMenu mnNewMenu_1 = new JMenu("Сервис");
 		menuBar.add(mnNewMenu_1);
+
+		
 		
 		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Настройка");
 		mntmNewMenuItem_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Option winOpt = new Option();
 				winOpt.frame.setVisible(true);
 				winOpt.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);				
 			}
@@ -108,6 +115,7 @@ public class MainForm extends Client{
 		
 		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Исправление ошибок");
 		mnNewMenu_1.add(mntmNewMenuItem_3);
+		
 	}
 
 	@Override
@@ -131,8 +139,22 @@ public class MainForm extends Client{
 	@Override
 	public void onConnect(
 			ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
-		// TODO Auto-generated method stub
-		
+		if (conn instanceof LDSThrift.Client) {
+			ltc = (LDSThrift.Client) conn;
+			
+			try {
+				/*TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
+				c_obr.setData(MainForm.tcl.getP0c());
+				cbrez.setData(MainForm.tcl.getAp0());
+				cbish.setData(MainForm.tcl.getAq0());*/
+				winOpt.p0e1.setData(ltc.GetKlasP0e1());
+				winOpt.n_nz1.setData(ltc.GetKlasNz1());
+			} catch (TException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
 	}
 
 }

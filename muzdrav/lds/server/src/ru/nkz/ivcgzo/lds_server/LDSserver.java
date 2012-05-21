@@ -47,11 +47,15 @@ public class LDSserver extends Server implements Iface {
 	private static final Class<?>[] dislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Short.class, String.class, String.class, Double.class, String.class};
 	private TResultSetMapper<LabIsl, LabIsl._Fields> rsmLabIs;	
 	private static final Class<?>[] lislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, String.class, Double.class, String.class, Integer.class};
-	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmKlas;	
-	private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmstKlas;
 	private TResultSetMapper<Patient, Patient._Fields> rmsPatient;
 	private TResultSetMapper<Metod, Metod._Fields> rmsMetod;
 	private TResultSetMapper<N_ldi, N_ldi._Fields> rmsnldi;
+	private final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] intClasTypes; 
+	private final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] strClasTypes; 
 	public LDSserver(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 				
@@ -59,6 +63,11 @@ public class LDSserver extends Server implements Iface {
 		rsmDiIs = new TResultSetMapper<>(DiagIsl.class, "npasp", "nisl", "kodisl", "rez", "anamnez", "anastezi", "model", "kol", "op_name", "rez_name", "stoim", "pcod_m");
 		rsmLabIs = new TResultSetMapper<>(LabIsl.class, "npasp", "nisl", "cpok", "zpok", "stoim", "pcod_m", "pvibor");	
 		
+		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod",        "name");
+		intClasTypes = new Class<?>[] {                              Integer.class, String.class};
+		
+		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
+		strClasTypes = new Class<?>[] {                              String.class, String.class};
 	}
 
 	@Override
@@ -271,7 +280,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> GetKlasM00() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod,name FROM n_m00 where pr = 'Л' ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -279,8 +288,8 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasCpos2() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_cpos2 ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_cpos2 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -288,8 +297,8 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasPopl() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_popl ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_popl ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -297,8 +306,8 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasNapr() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_napr ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_napr ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -308,7 +317,7 @@ public class LDSserver extends Server implements Iface {
 	public List<IntegerClassifier> GetKlasO00(int clpu) throws TException {
 		
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_o00.pcod, n_o00.name FROM n_o00 JOIN n_ot9 ON (n_ot9.cotd = n_o00.pcod) where n_ot9.clpu = ? ", clpu)) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -316,8 +325,8 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasN00() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_n00 ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_n00 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -325,8 +334,8 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasOpl() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_opl ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_opl ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -334,8 +343,8 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasArez() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_arez ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_arez ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -391,9 +400,9 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public List<StringClassifier> GetKlasNzl() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_nzl ")) {
-			return rsmstKlas.mapToList(acrs.getResultSet());
+	public List<StringClassifier> GetKlasNz1() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_nz1 ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -402,16 +411,16 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> GetKlasP0e1() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0e1 ")) {
-			return rsmKlas.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
 	}
 
 	@Override
-	public List<N_ldi> getN_ldi(String c_nzl, int c_p0e1)
+	public List<N_ldi> getN_ldi(String c_nz1, int c_p0e1)
 			throws LdiNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_ldi where (c_nzl = ?) and (c_p0e1 = ?) ", c_nzl, c_p0e1)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM n_ldi where (c_nz1 = ?) and (c_p0e1 = ?) ", c_nz1, c_p0e1)) {
 			return rmsnldi.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
