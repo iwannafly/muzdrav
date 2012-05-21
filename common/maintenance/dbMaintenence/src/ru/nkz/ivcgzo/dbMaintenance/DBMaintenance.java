@@ -1,8 +1,8 @@
-package ru.nkz.ivcgzo.maintenance;
+package ru.nkz.ivcgzo.dbMaintenance;
 
 import ru.nkz.ivcgzo.classifierImporter.ClassifierImporter;
 
-public class Maintenance {
+public class DBMaintenance {
 
 	/**
 	 * @param args
