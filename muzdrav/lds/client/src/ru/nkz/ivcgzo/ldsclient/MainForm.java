@@ -92,6 +92,22 @@ public class MainForm extends Client{
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Ввод значений показателей");
 		mnNewMenu.add(mntmNewMenuItem_1);
+		
+		JMenu mnNewMenu_1 = new JMenu("Сервис");
+		menuBar.add(mnNewMenu_1);
+		
+		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Настройка");
+		mntmNewMenuItem_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Option winOpt = new Option();
+				winOpt.frame.setVisible(true);
+				winOpt.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);				
+			}
+		});
+		mnNewMenu_1.add(mntmNewMenuItem_2);
+		
+		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Исправление ошибок");
+		mnNewMenu_1.add(mntmNewMenuItem_3);
 	}
 
 	@Override

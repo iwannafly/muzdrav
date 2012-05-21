@@ -24,11 +24,12 @@ import javax.swing.table.DefaultTableModel;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
+import ru.nkz.ivcgzo.ldsThrift.Patient;
 
 public class PIslForm {
 
 	public JFrame frame;
-	private JTable tpatient;
+	private CustomTable<Patient, Patient._Fields> tpatient;
 	private JTextField tFdatap;
 	private JTextField tFdatav;
 	private JTextField tFnprob;
@@ -96,7 +97,7 @@ public class PIslForm {
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane.setLeftComponent(scrollPane);
 		
-		tpatient = new JTable();
+		tpatient = new CustomTable<>(false, true, Patient.class, 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения");
 		scrollPane.setViewportView(tpatient);
 		
 		JSplitPane splitPane_1 = new JSplitPane();
@@ -106,7 +107,7 @@ public class PIslForm {
 		JScrollPane scrollPane_1 = new JScrollPane();
 		splitPane_1.setLeftComponent(scrollPane_1);
 		
-		table = new CustomTable<>(false, true, ObInfIsl.class, ObInfIsl._Fields.values(), 2, "Код отделения", 3, "№ пробы");
+		table = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 5, "Исследование", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16,"Код медсес.", 17, "Код санит.", 18, "Дата за полнения");
 		table.setFillsViewportHeight(true);
 		scrollPane_1.setViewportView(table);
 		
@@ -138,7 +139,7 @@ public class PIslForm {
 		
 		JLabel lblNewLabel_4 = new JLabel("Причина обращения");
 		
-		JLabel lblNewLabel_5 = new JLabel("<html>Обстоятельства обращения</html>");
+		JLabel lblNewLabel_5 = new JLabel("Обстоятельства обращения");
 		
 		JComboBox cBprichina = new JComboBox();
 		
@@ -203,20 +204,8 @@ public class PIslForm {
 							.addComponent(cBpcisl, GroupLayout.PREFERRED_SIZE, 297, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addContainerGap()
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-								.addGroup(Alignment.LEADING, gl_panel_1.createSequentialGroup()
-									.addComponent(lblNewLabel_1)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tFdatap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblNewLabel_2)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tFdatav, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(lblNewLabel_3)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tFnprob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel_1.createSequentialGroup()
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+								.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
 									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_panel_1.createSequentialGroup()
 											.addGap(98)
@@ -231,9 +220,22 @@ public class PIslForm {
 									.addComponent(tFkods, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnkods, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED, 144, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED, 251, Short.MAX_VALUE)
 									.addComponent(btnNewButton_3, GroupLayout.PREFERRED_SIZE, 0, GroupLayout.PREFERRED_SIZE)
-									.addGap(55))))
+									.addGap(55))
+								.addGroup(gl_panel_1.createSequentialGroup()
+									.addComponent(lblNewLabel_1)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tFdatap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblNewLabel_2)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tFdatav, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblNewLabel_3)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(tFnprob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addGap(70))))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addContainerGap()
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -244,32 +246,32 @@ public class PIslForm {
 										.addGroup(gl_panel_1.createSequentialGroup()
 											.addComponent(lblNewLabel_4)
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(cBprichina, 0, 127, Short.MAX_VALUE))
+											.addComponent(cBprichina, 0, 190, Short.MAX_VALUE))
 										.addGroup(gl_panel_1.createSequentialGroup()
 											.addGap(86)
-											.addComponent(cBnapravl, 0, 148, Short.MAX_VALUE))
+											.addComponent(cBnapravl, 0, 211, Short.MAX_VALUE))
 										.addGroup(gl_panel_1.createSequentialGroup()
 											.addGap(148)
-											.addComponent(tFfio, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+											.addComponent(tFfio, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)))
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_panel_1.createSequentialGroup()
-											.addComponent(lblNewLabel_5, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
-											.addPreferredGap(ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
-											.addComponent(cBpopl, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_panel_1.createSequentialGroup()
-											.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+											.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
 												.addGroup(gl_panel_1.createSequentialGroup()
 													.addComponent(lblNewLabel_7)
 													.addPreferredGap(ComponentPlacement.RELATED)
-													.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-													.addPreferredGap(ComponentPlacement.RELATED)
-													.addComponent(btnnaprotd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+													.addComponent(tFnaprotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 												.addGroup(gl_panel_1.createSequentialGroup()
 													.addComponent(lblNewLabel_9)
 													.addPreferredGap(ComponentPlacement.RELATED)
-													.addComponent(cBvopl, 0, 192, Short.MAX_VALUE)))
-											.addPreferredGap(ComponentPlacement.RELATED, 71, Short.MAX_VALUE))))
+													.addComponent(cBvopl, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+											.addPreferredGap(ComponentPlacement.RELATED)
+											.addComponent(btnnaprotd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+										.addGroup(gl_panel_1.createSequentialGroup()
+											.addGap(15)
+											.addComponent(lblNewLabel_5)
+											.addPreferredGap(ComponentPlacement.RELATED)
+											.addComponent(cBpopl, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addGap(139)
 									.addComponent(lblNewLabel_11, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)

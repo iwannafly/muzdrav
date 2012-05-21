@@ -54,6 +54,7 @@ struct PvizitAmb {
 	17: i32 pr_opl;
 	18: i32 pl_extr;
 	19: i32 vpom;
+	20: string fio_vr;
 }
 
 struct PdiagAmb {
@@ -151,6 +152,7 @@ struct Priem{
 	63: string t_chitov;
 	64: string t_st_localis;
 	65: string t_ocenka;
+	66: string t_jalob;
 }
 
 struct PdiagZ{
