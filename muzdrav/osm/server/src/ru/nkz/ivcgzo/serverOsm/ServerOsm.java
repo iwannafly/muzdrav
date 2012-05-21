@@ -298,7 +298,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public Priem getPriem(int obrId, int npasp, int posId) throws KmiacServerException, PriemNotFoundException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_priem WHERE id_obr = ?, npasp = ?, id_pos = ? ", obrId, npasp, posId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_priem WHERE id_obr = ? AND npasp = ? AND id_pos = ? ", obrId, npasp, posId)) {
 			if (acrs.getResultSet().next())
 				return rsmPriem.map(acrs.getResultSet());
 			else
@@ -326,7 +326,12 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<StringClassifier> getP0c() throws KmiacServerException, TException {
-		return null;
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0c ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
