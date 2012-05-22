@@ -269,6 +269,23 @@ struct RdDinStruct{
 	20:i32 serd1;
 }
 
+/*. Rd_Inf*/
+struct RdInfStruct{
+	1:i32 idDispb;
+	2:i32 npasp;
+	3:i32 obr;
+	4:i32 sem;
+	5:i32 oSocO;
+	6:i32 UslPr;
+	7:i32 vOtec;
+	8:i64 grOtec;
+	9:string phOtec;
+	10:string fioOtec;
+	11:string mrOtec;
+	12:string telOtec;
+	13:i32 vredOtec;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -352,4 +369,13 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	void UpdateRdSl(1:i32 npasp, 2:i32 lgota) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdateRdDin(1:i32 idDispb,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
+
+	list<RdInfStruct> getRdInfInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
+
+	void DeleteRdInf(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	void UpdateRdInf(1:i32 npasp, 2:i32 lgota) throws (1: kmiacServer.KmiacServerException kse);
+
 }
