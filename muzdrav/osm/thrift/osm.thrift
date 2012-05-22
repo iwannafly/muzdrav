@@ -84,6 +84,13 @@ struct Psign{
 	5: string farmkol;
 	6: string vitae;
 	7: string vred;
+	8: string razv;
+	9: string uslov;
+	10: string per_zab;
+	11: string per_oper;
+	12: string gemotr;
+	13: string nasl;
+	14: string ginek;
 }
 
 struct Priem{
