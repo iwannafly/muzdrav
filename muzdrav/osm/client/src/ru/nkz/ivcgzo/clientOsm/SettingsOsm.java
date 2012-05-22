@@ -34,11 +34,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JLabel;
 
 public class SettingsOsm extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JCheckBox jal;
 	private JCheckBox jal_d;
 	private JCheckBox jal_kr;
 	private JCheckBox jal_p;
@@ -601,14 +601,6 @@ public class SettingsOsm extends JFrame {
 				Mainelem.setAttribute("name", "Врач амбулаторного приема");
 				Mainelem.appendChild(doc.createTextNode("osm"));
 				doc.appendChild(Mainelem);
-				if (jal.isSelected()){
-					Element JalEl = doc.createElement("jalob");
-					JalEl.setAttributeNode(doc.createAttribute("name"));
-					JalEl.setAttribute("name", "jal");
-					JalEl.setAttributeNode(doc.createAttribute("id"));
-					JalEl.setAttribute("id", "1");
-					JalEl.appendChild(doc.createTextNode("Жалобы"));
-					Mainelem.appendChild(JalEl);}
 				if (jal_d.isSelected()){
 					Element JalDEl = doc.createElement("jalob_dyh");
 					JalDEl.setAttributeNode(doc.createAttribute("name"));
@@ -1265,8 +1257,6 @@ public class SettingsOsm extends JFrame {
 					.addContainerGap())
 		);
 		
-		jal = new JCheckBox("Жалобы");
-		
 		jal_kr = new JCheckBox("Система кровообращения");
 		
 		jal_d = new JCheckBox("Дыхательная система");
@@ -1286,6 +1276,8 @@ public class SettingsOsm extends JFrame {
 		jal_ob = new JCheckBox("Жалобы общего характера");
 		
 		jal_pr = new JCheckBox("Прочие жалобы");
+		
+		JLabel label = new JLabel("Жалобы:");
 		GroupLayout gl_pjalob = new GroupLayout(pjalob);
 		gl_pjalob.setHorizontalGroup(
 			gl_pjalob.createParallelGroup(Alignment.LEADING)
@@ -1293,13 +1285,15 @@ public class SettingsOsm extends JFrame {
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.LEADING)
 						.addComponent(jal_m)
 						.addComponent(jal_d)
-						.addComponent(jal))
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addGroup(gl_pjalob.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(label)))
+					.addPreferredGap(ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.LEADING)
 						.addComponent(jal_kr)
 						.addComponent(jal_p)
 						.addComponent(jal_en))
-					.addContainerGap(34, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
 				.addGroup(gl_pjalob.createSequentialGroup()
 					.addComponent(jal_ner)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1319,8 +1313,8 @@ public class SettingsOsm extends JFrame {
 				.addGroup(gl_pjalob.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.BASELINE)
-						.addComponent(jal)
-						.addComponent(jal_kr))
+						.addComponent(jal_kr)
+						.addComponent(label))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.BASELINE)
 						.addComponent(jal_d)
@@ -1339,7 +1333,7 @@ public class SettingsOsm extends JFrame {
 						.addComponent(jal_pr))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(jal_ob)
-					.addContainerGap(30, Short.MAX_VALUE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		pjalob.setLayout(gl_pjalob);
 		osn.setLayout(gl_osn);
@@ -1362,7 +1356,6 @@ public class SettingsOsm extends JFrame {
 			DOMResult res = new DOMResult();
 			TransformerFactory.newInstance().newTransformer().transform(src, res);
 			Document document = (Document) res.getNode();
-			jal.setSelected(getElement(document, "jalob") != null);
 			jal_d.setSelected(getElement(document, "jalob_dyh") != null);
 			jal_kr.setSelected(getElement(document, "jalob_kr") != null);
 			jal_p.setSelected(getElement(document, "jalob_op") != null);
