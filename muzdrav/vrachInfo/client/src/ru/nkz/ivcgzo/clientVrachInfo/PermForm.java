@@ -34,6 +34,7 @@ import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 
 public class PermForm extends JDialog {
 	private static final long serialVersionUID = 5320450245161207797L;
+	private static final String frameTitle = "Установка прав пользователя";
 	private ThriftServerVrachInfo.Client client;
 	private ConnectionManager conMan;
 	private VrachInfo vInf;
@@ -86,8 +87,10 @@ public class PermForm extends JDialog {
 		GroupLayout gl_gbPerm = new GroupLayout(gbPerm);
 		gl_gbPerm.setHorizontalGroup(
 			gl_gbPerm.createParallelGroup(Alignment.LEADING)
-				.addComponent(pnlPermChb, GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
-				.addComponent(pnlPermBtn, GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
+				.addComponent(pnlPermBtn, GroupLayout.DEFAULT_SIZE, 1049, Short.MAX_VALUE)
+				.addGroup(gl_gbPerm.createSequentialGroup()
+					.addComponent(pnlPermChb, GroupLayout.PREFERRED_SIZE, 724, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		gl_gbPerm.setVerticalGroup(
 			gl_gbPerm.createParallelGroup(Alignment.TRAILING)
@@ -143,6 +146,12 @@ public class PermForm extends JDialog {
 				
 		TaggedJCheckBox chbLds = new TaggedJCheckBox("Параотделение", 4);
 		pnlPermChb.add(chbLds);
+
+		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Информация о пациентах больницы1111", 5);
+		pnlPermChb.add(chbRegPat);
+
+		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6);
+		pnlPermChb.add(chbMss);
 
 		gbPerm.setLayout(gl_gbPerm);
 		
@@ -242,7 +251,7 @@ public class PermForm extends JDialog {
 					opened = true;
 					try {
 						tbPass.setText("");
-						setTitle(String.format("Установка прав пользователя %s %s %s, код подразделения %d", vInf.fam, vInf.im, vInf.ot, mRab.cpodr));
+						setTitle(String.format("%s %s %s %s, код подразделения %d", frameTitle, vInf.fam, vInf.im, vInf.ot, mRab.cpodr));
 						tbLog.setText(client.getLogin(mRab.pcod, mRab.clpu, mRab.cpodr));
 						setPermissions(client.getPermissions(mRab.pcod, mRab.clpu, mRab.cpodr));
 						setDelPassPermEnabled((tbLog.getText().length() == 0) ? false : true);

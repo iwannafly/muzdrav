@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -23,7 +25,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 public class PluginLoader {
 	private ConnectionManager conMan;
 	private UserAuthInfo authInfo;
-	private List<Plugin> plst;
+	private List<Plugin> pList;
+	private PluginComparator pComp;
 	
 	/**
 	 * Конструктор класса.
@@ -35,7 +38,8 @@ public class PluginLoader {
 		this.conMan = conMan;
 		this.authInfo = authInfo;
 		
-		plst = new ArrayList<>();
+		pList = new ArrayList<>();
+		pComp = new PluginComparator();
 	}
 	
 	/**
@@ -57,23 +61,25 @@ public class PluginLoader {
 			try {
 				Plugin plg = new Plugin(file.getAbsolutePath());
 				if (plg.getLaunchParam() != 0)
-					plst.add(plg);
+					pList.add(plg);
 			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
 			}
 		}
+		
+		Collections.sort(pList, pComp);
 	}
 	
 	/**
 	 * Получение списка доступных пользователю модулей.
 	 */
 	public List<Plugin> getPluginList() {
-		return plst;
+		return pList;
 	}
 	
 	public boolean hasPlugin(int id) {
-		for (Plugin plugin : plst) {
+		for (Plugin plugin : pList) {
 			if (plugin.getId() == id)
 				return true;
 		}
@@ -85,7 +91,7 @@ public class PluginLoader {
 	 * @param index - индекс модуля в списке
 	 */
 	public IClient loadPlugin(int index) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		return plst.get(index).load();
+		return pList.get(index).load();
 	}
 	
 	
@@ -137,5 +143,14 @@ public class PluginLoader {
 		protected int getLaunchParam() {
 			return launchParam;
 		}
+	}
+	
+	class PluginComparator implements Comparator<Plugin> {
+
+		@Override
+		public int compare(Plugin arg0, Plugin arg1) {
+			return arg0.getName().compareTo(arg1.getName());
+		}
+		
 	}
 }

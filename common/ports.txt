@@ -6,5 +6,6 @@ base port + 0	auth
 3	osm
 4	lds
 5	regPatient
+6	mss
 
 55201	libUpd
