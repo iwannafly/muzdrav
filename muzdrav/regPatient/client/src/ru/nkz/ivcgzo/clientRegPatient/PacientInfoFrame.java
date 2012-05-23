@@ -2669,7 +2669,7 @@ public class PacientInfoFrame extends JFrame {
 						newPatBr.setIm(PersonalInfo.getIm());
 						curPatientId = MainForm.tcl.addPatient(PersonalInfo);
 						tbl_patient.updateSelectedItem();
-						RefreshTablePatient();
+//						RefreshTablePatient();
 					}
 					else{
 						MainForm.tcl.updatePatient(PersonalInfo);
@@ -2785,6 +2785,9 @@ public class PacientInfoFrame extends JFrame {
 	// просмотр  информации о пациенте
 	private void changePatientPersonalInfo(int PatId){
 		try {
+			if (PatId == 0)
+				return;
+			
 			NewPatient();
 			PersonalInfo = MainForm.tcl.getPatientFullInfo(PatId);
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
@@ -3133,6 +3136,9 @@ public class PacientInfoFrame extends JFrame {
 	}
 	// просмотр информации о госпитализациях
 	private void changePatientPriemInfo(int PatId){
+		if (tbl_priem.getSelectedItem() == null)
+			return;
+		
 		try {
 			curId = tbl_priem.getSelectedItem().id;
 			curNgosp = tbl_priem.getSelectedItem().ngosp;
