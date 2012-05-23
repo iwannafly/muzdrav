@@ -34,6 +34,7 @@ import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
@@ -532,6 +533,34 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public void UpdateRdDin(int idDispb, int iD) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<RdInfStruct> getRdInfInfo(int idDispb, int npasp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void AddRdInf(RdInfStruct rdInf) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DeleteRdInf(int idDispb, int npasp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void UpdateRdInf(int npasp, int lgota) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
 		
