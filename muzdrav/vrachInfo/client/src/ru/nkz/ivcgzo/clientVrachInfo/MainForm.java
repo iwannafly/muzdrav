@@ -127,7 +127,7 @@ public class MainForm extends Client {
 		btnVrAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tblVrach.requestFocus();
+				tblVrach.requestFocusInWindow();
 				tblVrach.addItem();
 			}
 		});

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientAuth" default="main" basedir=".">
+<project name="clientAuth" default="main_d" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_client.dir" location="src" />

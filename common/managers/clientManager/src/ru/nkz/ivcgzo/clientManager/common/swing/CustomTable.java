@@ -484,7 +484,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			int row = getSelectedRow();
 			int col = getSelectedColumn();
 			if (!itemAdd) {
-				if (delSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel))) {
+				boolean res = (delSelRowLst != null) ? delSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)) : true;
+				if (res) {
 					lst.remove(copIdx);
 					itemUpd = false;
 					updateSelectedIndex(row, col, copIdx, 0);
@@ -560,13 +561,15 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			itemUpd = false;
 			if (!itemAdd) {
 				if (!deepEquals(sel, cop)) {
-					if (!updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)))
+					boolean res = (updSelRowLst != null) ? updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)) : true;
+					if (!res)
 						lst.set(copIdx, cop);
 					updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				}
 			} else {
 				if (!checkEmpty(sel)) {
-					addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
+					if (addRowLst != null)
+						addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
 				} else {
 					deleteSelectedRow();
 				}

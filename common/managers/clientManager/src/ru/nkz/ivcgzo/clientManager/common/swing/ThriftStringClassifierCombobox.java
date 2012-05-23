@@ -181,7 +181,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 							searching = true;
 							if (!lastSelTextLow.equals(editTextLow)) {
 								editor.setText(lastSelected.name);
-								editor.select(editTextLow.length(), lastSelTextLow.length());
+								editor.setCaretPosition(lastSelTextLow.length());
+								editor.moveCaretPosition(editTextLow.length());
 							}
 						} else							
 							for (StringClassifier item : cmb.items) {
@@ -191,7 +192,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 									lastSelTextLow = lastSelected.name.toLowerCase();
 									cmb.setSelectedItem(lastSelected);
 									editor.setText(lastSelected.name);
-									editor.select(editTextLow.length(), lastSelTextLow.length());
+									editor.setCaretPosition(lastSelTextLow.length());
+									editor.moveCaretPosition(editTextLow.length());
 									break;
 								}
 							}
@@ -205,10 +207,11 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 				}
 			});
 		}
+		
 		@Override
 		public void removeUpdate(DocumentEvent e) {
-			
 		}
+		
 		@Override
 		public void changedUpdate(DocumentEvent e) {
 		}
