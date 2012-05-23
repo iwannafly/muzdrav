@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -24,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
@@ -46,6 +49,7 @@ public class MainForm {
 	private JPanel pnlLogin;
 	private JTextField tbLogin;
 	private JTextField tbPass;
+	private JButton btnEnter;
 	
 	private JPanel pnlSysSelect;
 	private JLabel lblFio;
@@ -99,13 +103,13 @@ public class MainForm {
 		frame.setTitle("Аутентификация");
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainForm.class.getResource("/ru/nkz/ivcgzo/clientAuth/resources/icon_2_32x32.png")));
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 600, 378);
+		frame.setBounds(100, 100, 600, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		pnlLogin = new JPanel();
 		frame.getContentPane().add(pnlLogin, BorderLayout.CENTER);
-		JLabel lblLogo = new JLabel("New label");
+		JLabel lblLogo = new JLabel();
 		lblLogo.setHorizontalAlignment(SwingConstants.LEFT);
 		lblLogo.setVerticalAlignment(SwingConstants.TOP);
 		lblLogo.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientAuth/resources/kmiacLogo_small.png")));
@@ -121,16 +125,30 @@ public class MainForm {
 		tbLogin = new JTextField();
 		tbLogin.setText("log");
 		tbLogin.setColumns(10);
+		tbLogin.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					btnEnter.doClick();
+			}
+		});
 		
 		JLabel lblLogin = new JLabel("Логин");
 		
 		tbPass = new JTextField();
 		tbPass.setText("pas");
 		tbPass.setColumns(10);
+		tbPass.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					btnEnter.doClick();
+			}
+		});
 		
 		JLabel lblPass = new JLabel("Пароль");
 		
-		JButton btnEnter = new JButton("Вход");
+		btnEnter = new JButton("Вход");
 		btnEnter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -139,7 +157,7 @@ public class MainForm {
 				} catch (UserNotFoundException e1) {
 					JOptionPane.showMessageDialog(frame, "Пользователя с таким логином и паролем не существует");
 					tbLogin.selectAll();
-					tbLogin.requestFocus();
+					tbLogin.requestFocusInWindow();
 				} catch (TException e1) {
 					conMan.reconnect(e1);
 				}
@@ -204,8 +222,6 @@ public class MainForm {
 		JLabel lblAvailSys = new JLabel("Вам доступны следующие модули:");
 		lblAvailSys.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		
-		lbxAvailSys = new JList<>();
-		
 		btnLaunch = new JButton("Запуск");
 		btnLaunch.addActionListener(new ActionListener() {
 			@Override
@@ -249,19 +265,21 @@ public class MainForm {
 			}
 		});
 		
+		JScrollPane scrollPane = new JScrollPane();
+		
 		GroupLayout gl_pnlSysSelect = new GroupLayout(pnlSysSelect);
 		gl_pnlSysSelect.setHorizontalGroup(
-			gl_pnlSysSelect.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_pnlSysSelect.createSequentialGroup()
+			gl_pnlSysSelect.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_pnlSysSelect.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlSysSelect.createParallelGroup(Alignment.TRAILING)
-						.addComponent(lbxAvailSys, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblEnterAs, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblFio, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblLpu, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblPodr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblAvailSys, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
-						.addComponent(btnLaunch, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE))
+						.addComponent(btnLaunch, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_pnlSysSelect.setVerticalGroup(
@@ -278,11 +296,14 @@ public class MainForm {
 					.addGap(18)
 					.addComponent(lblAvailSys, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lbxAvailSys, GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnLaunch)
 					.addContainerGap())
 		);
+		
+		lbxAvailSys = new JList<>();
+		scrollPane.setViewportView(lbxAvailSys);
 		pnlSysSelect.setLayout(gl_pnlSysSelect);
 		
 		frame.addWindowListener(new WindowAdapter() {
@@ -358,6 +379,15 @@ public class MainForm {
 			btnLaunch.setText("Выход");
 		else {
 			lbxAvailSys.setSelectedIndex(0);
+			lbxAvailSys.requestFocusInWindow();
+			
+			lbxAvailSys.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyPressed(KeyEvent e) {
+					if (e.getKeyCode() == KeyEvent.VK_ENTER)
+						btnLaunch.doClick();
+				}
+			});
 			
 			lbxAvailSys.addMouseListener(new MouseAdapter() {
 				@Override

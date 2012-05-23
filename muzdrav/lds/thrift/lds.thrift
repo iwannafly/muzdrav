@@ -13,7 +13,7 @@ struct ObInfIsl {
 	 7: optional i64 datap;
 	 8: optional i64 datav;
 	 9: optional i32 prichina;
-                   10: optional i32 popl;
+        10: optional i32 popl;
 	11: optional i32 napravl;
 	12: optional i32 naprotd;
 	13: string fio;
@@ -35,7 +35,7 @@ struct DiagIsl {
 	 7: string model;
 	 8: i16 kol;
 	 9: string op_name;
-                   10: string rez_name;
+        10: string rez_name;
 	11: double stoim;
 	12: string pcod_m;
 }
@@ -50,11 +50,40 @@ struct LabIsl {
 	 7: i32 pvibor;
 }
 
-struct KlasM00 {
-	1: i32 pcod;
-	2: string name;
-	3: string pr;
-	}
+struct S_ot01{
+	1: i32 cotd;
+	2: string pcod;
+	3: string c_obst;
+	4: string c_nz1;	
+}
+
+
+struct Patient {
+	1: i32 npasp;
+	2: string fam;
+	3: string im;
+	4: string ot;
+	5: i64 datar;
+}
+
+
+struct Metod {
+	1: i32 c_p0e1;
+	2: string pcod;
+	3: string c_obst;
+	4: string nameobst;
+	5: double stoim;	
+}
+
+
+struct N_ldi {
+	1: string pcod;
+	2: string c_nz1;
+	3: string name_n;
+	4: string name;
+	5: string norma;
+	6: i32 c_p0e1;
+}
 
 
 /*
@@ -65,35 +94,56 @@ exception IslExistsException {
 
 
 /**
- * исследование с такими данными не найдено.
+ * Исследование с такими данными не найдено
  */
 exception IslNotFoundException {
 }
 
 /*
-*Диагностическое исследование уже существует
+* Диагностическое исследование уже существует
 */
 exception DIslExistsException {
 }
 
 
 /**
- * диагностическое исследование с такими данными не найдено.
+ * Диагностическое исследование с такими данными не найдено
  */
 exception DIslNotFoundException {
 }
 
 /*
-*Лабораторные исследование уже существует
+* Лабораторные исследование уже существует
 */
 exception LIslExistsException {
 }
 
 
 /**
- * Лабораторное исследование с такими данными не найдено.
+ * Лабораторные исследование с такими данными не найдено
  */
 exception LIslNotFoundException {
+}
+
+
+/**
+ * Пациент с такими данными не найден
+ */
+exception PatientNotFoundException {
+}
+
+
+/**
+ * Метод исследования ненайден
+ */
+exception MetodNotFoundException {
+}
+
+
+/**
+ * Исследование ненайдено
+ */
+exception LdiNotFoundException {
 }
 
 
@@ -116,12 +166,20 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
 
+    	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
+	
+	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod) throws (1: MetodNotFoundException mnfe);
+	
+	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
+
 	list <classifier.IntegerClassifier> GetKlasCpos2();
 	list <classifier.IntegerClassifier> GetKlasPopl();
 	list <classifier.IntegerClassifier> GetKlasNapr();
 	list <classifier.IntegerClassifier> GetKlasO00(1: i32 clpu);
 	list <classifier.IntegerClassifier> GetKlasN00();
-	list <KlasM00> GetKlasM00(1: string pr);
+	list <classifier.IntegerClassifier> GetKlasM00();
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
+	list <classifier.IntegerClassifier> GetKlasP0e1();
+	list <classifier.StringClassifier> GetKlasNz1();
 }

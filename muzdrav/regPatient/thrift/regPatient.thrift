@@ -69,14 +69,14 @@ struct PatientFullInfo{
 	24:i32 prizn,
 	25:i32 ter_liv,
 	26:i32 region_liv,
-	27:Nambk nambk
+	27:Nambk nambk,
 	28:Address adpAddress,
-	29:Address admAddress
+	29:Address admAddress,
 	30:Polis polis_oms,
-	31:Polis polis_dms,
+	31:Polis polis_dms
 }
 
-/*сведения о представителе табл. p_preds*/
+/*сведени о представителе табл. p_preds*/
 struct Agent{
 	1:i32 npasp,
 	2:string fam,
@@ -101,9 +101,7 @@ struct Lgota{
 	2:i32 npasp,
 	3:i32 lgota,
 	4:i64 datau,
-	5:string name,
-	6:string kov,
-	7:string pf
+	5:string name
 }
 
 /*pkonti*/
@@ -124,14 +122,6 @@ struct Sign{
 	5:string farmkol,
 	6:string vitae,
 	7:string vred
-}
-
-/*c_jalob*/
-struct Jalob{
-	1:i32 id,
-	2:i32 id_gosp,
-	3:i64 dataz,
-	4:string jalob
 }
 
 /*c_gosp*/
@@ -183,14 +173,11 @@ struct Gosp{
 	33:i32 cuser,
 	34:i64 dataosm,
 	35:string vremosm,
-	36:i64 dataz
+	36:i64 dataz,
+	37:string jalob,
+	38:string zap_vrach
 }
 
-/*справочники*/
-struct SpravStruct{
-	1:i32 pcod,
-	2:string name
-}
 
 /**
  * Пациент с такими данными не найден.
@@ -217,7 +204,7 @@ exception KontingentNotFoundException {
 }
 
 /**
- * Особая информация о пациенте с такими данными не найдены
+ * Особа информаци о пациенте с такими данными не найдены
  */
 exception SignNotFoundException {
 }
@@ -226,12 +213,6 @@ exception SignNotFoundException {
  * Запись госпитализации пациента с такими данными не найдена
  */
 exception GospNotFoundException {
-}
-
-/**
- * Жалобы пациента с такими данными не найдены
- */
-exception JalobNotFoundException {
 }
 
 /**
@@ -255,24 +236,6 @@ exception KontingentAlreadyExistException {
 /**
  * Пациент с такими данными уже существует
  */
-exception AgentAlreadyExistException {
-}
-
-/**
- * Пациент с такими данными уже существует
- */
-exception SignAlreadyExistException {
-}
-
-/**
- * Пациент с такими данными уже существует
- */
-exception JalobAlreadyExistException {
-}
-
-/**
- * Пациент с такими данными уже существует
- */
 exception GospAlreadyExistException {
 }
 
@@ -283,24 +246,72 @@ exception NambkAlreadyExistException {
 }
 
 service ThriftRegPatient extends kmiacServer.KmiacServer {
+    
+	/**
+     * Возвращает краткие сведения
+     * о всех пациентах, удовлетворяющих введенным данным.
+     * @param patient - информация о пациентах, по которой производится поиск
+     * @return список thrift-объектов, содержащих краткую информацию о пациентах
+     * @throws PatientNotFoundException
+     */
 	list<PatientBrief> getAllPatientBrief(1:PatientBrief patient) throws (1: PatientNotFoundException pnfe),
+	
+	/**
+     * Возвращает полные сведения о пациенте с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return thrift-объект, содержащий полную информацию о пациенте
+     * @throws PatientNotFoundException
+     */
 	PatientFullInfo getPatientFullInfo(1:i32 npasp) throws (1: PatientNotFoundException pnfe),
+	
+	/**
+     * Возвращает сведения о представителе пациента с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return thrift-объект, содержащий информацию о представителе пациента
+     * @throws AgentNotFoundException
+     */
 	Agent getAgent(1:i32 npasp) throws (1: AgentNotFoundException anfe),
+	
+	/**
+     * Возвращает сведения о льготах пациента с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return список thrift-объектов, содержащих информацию о льготах пациента
+     * @throws LgotaNotFoundException
+     */
 	list<Lgota> getLgota(1:i32 npasp) throws (1: LgotaNotFoundException lnfe),
+	
+	/**
+     * Возвращает сведения о категориях пациента с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return список thrift-объектов, содержащих информацию о категориях пациента
+     * @throws KontingentNotFoundException
+     */
 	list<Kontingent> getKontingent(1:i32 npasp) throws (1: KontingentNotFoundException knfe),
+	
+	/**
+     * Возвращает особую информацию о пациенте с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return thrift-объект, содержащий особую информацию о пациенте
+     * @throws SignNotFoundException
+     */
 	Sign getSign(1:i32 npasp) throws (1: SignNotFoundException snfe),
+	
+	/**
+     * Возвращает записи о всех госпитализациях пациента с указанным персональным номером
+     * @param npasp - персональный номер пациента
+     * @return список thrift-объектов, содержащих информацию о госпитализациях пациента
+     * @throws GospNotFoundException
+     */
 	list<AllGosp> getAllGosp(1:i32 npasp) throws (1: GospNotFoundException gnfe),
+	
+	/**
+     * Возвращает запись госпитализации пациента с указанным идентификатором
+     * госпитализации
+     * @param id - уникальный идентификатор госпитализации
+     * @return thrift-объект, содержащий особую информацию о госпитализации пациента
+     * @throws GospNotFoundException
+     */
 	Gosp getGosp(1:i32 id) throws (1: GospNotFoundException gnfe),
-	list<Jalob> getAllJalob(1:i32 idGosp) throws (1: JalobNotFoundException jnfe),
-
-	i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
-	i32 addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
-	i32 addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
-	void addAgent(1:Agent agent) throws (1:AgentAlreadyExistException aaee),
-	void addSign(1:Sign sign) throws (1:SignAlreadyExistException saee),
-	i32 addJalob(1:Jalob jalob) throws (1:JalobAlreadyExistException jaee),
-	i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
-	void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
 
 	void deletePatient(1:i32 npasp),
 	void deleteNambk(1:i32 npasp, 2:i32 cpol),
@@ -308,16 +319,64 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void deleteKont(1:i32 id),
 	void deleteAgent(1:i32 npasp),
 	void deleteSign(1:i32 npasp),
-	void deleteJalob(1:i32 npasp, 2:i32 ngosp),
 	void deleteGosp(1:i32 npasp, 2:i32 ngosp),
+
+	/**
+     * Добавляет информацию о пациенте в БД
+     * @param patinfo - thrift-объект с информацией о пациенте
+     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @throws PatientAlreadyExistException
+     */
+	i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
+	
+	/**
+     * Добавляет сведения о льготах пациента
+     * @param lgota - сведения о льготах пациента
+     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @throws LgotaAlreadyExistException
+     */
+	i32 addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
+	
+	/**
+     * Добавляет информацию о категории пациента в БД
+     * @param kont - информация о категории пациента
+     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @throws KontingentAlreadyExistException
+     */
+	i32 addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
+	
+	/**
+     * Добавляет или обновляет информацию о представителе пациента в БД,
+     * в зависимости от наличия данного представителя пациента в базе.
+     * @param agent - информация о представителе пациента
+     */
+	void addOrUpdateAgent(1:Agent agent),
+	
+	/**
+     * Добавляет или обновляет особую информацию о пациенте в БД,
+     * в зависимости от наличия в базе.
+     * @param sign - особая информация о пациенте
+     */
+	void addOrUpdateSign(1:Sign sign),
+	
+	/**
+     * Добавляет запись госпитализации в БД
+     * @param gosp - особая информация о представителе пациента
+     * @throws GospAlreadyExistException
+     */
+	i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
+	
+	/**
+     * Добавляет запись об амбулаторной карте в БД
+     * @param nambk - thrift-объект с информацией об амбулаторной карте
+     * @throws NambkAlreadyExistException
+     */
+	void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
 
 	void updatePatient(1:PatientFullInfo patinfo),
 	void updateNambk(1:Nambk nambk),
 	void updateLgota(1:Lgota lgota),
 	void updateKont(1:Kontingent kont),
-	void updateAgent(1:Agent agent),
-	void updateSign(1:Sign sign),
-	void updateJalob(1:Jalob jalob),
 	void updateGosp(1:Gosp gosp),
 	
 /*Классификаторы*/
@@ -373,19 +432,78 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getPomsTdoc(),
 	
 	/**
-	 * Классификатор поликлиники фактического прикрепления (N_n00 (pcod))
+	 * Классификатор поликлиники фактического прикреплени (N_n00 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getCpolPr(),
 	
 	/**
-	 * Классификатор типа документа, удостоверяющего личность (N_f008 (pcod))
+	 * Классификатор типа документа, удостоверющего личность (N_az0 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getTdoc(),
 	
 	/**
-	 * Классификатор территории проживания/прикрепления (N_l02 (pcod))
+	 * Классификатор территории проживани (N_l02 (pcod))
 	 */
-	list<classifier.IntegerClassifier> getTerCod(1:i32 pcod)	
+	list<classifier.IntegerClassifier> getTerCod(1:i32 pcod),
+
+	/**
+	 * Классификатор кем направлен (N_K02 (pcod))
+	 */
+	list<classifier.StringClassifier> getNaprav(),
+	
+	/**
+	 * Классификатор ЛПУ (N_M00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getM00(),
+
+	/**
+	 * Классификатор поликлиник (N_N00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getN00(),
+
+	/**
+	 * Классификатор отделений ЛПУ (N_O00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getO00(),
+
+	/**
+	 * Классификатор ведомственное подчинение (N_AL0 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAL0(),
+
+	/**
+	 * Классификатор военкоматы (N_W04 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getW04(),
+
+	/**
+	 * Классификатор отделений ЛПУ (N_O00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getOtdLpu(1:string codLpu),
+
+	/**
+	 * Классификатор вид травмы (N_AI0 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAI0(),
+
+	/**
+	 * Классификатор отказов в госпитализации (N_AF0 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAF0(),
+
+	/**
+	 * Классификатор состояние опьянения (N_ALK (pcod))
+	 */
+	list<classifier.IntegerClassifier> getALK(),
+
+	/**
+	 * Классификатор вид транспортировки (N_VTR (pcod))
+	 */
+	list<classifier.IntegerClassifier> getVTR(),
+
+	/**
+	 * Классификатор кода страховой организации (N_C00 (pcod,name))
+	 */
+	list<classifier.StringClassifier> getC00()
+
 }
-
-

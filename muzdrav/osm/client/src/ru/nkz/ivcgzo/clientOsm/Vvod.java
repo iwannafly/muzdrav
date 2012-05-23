@@ -1,23 +1,28 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.apache.thrift.TException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagAmbNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
+import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
@@ -42,12 +47,32 @@ import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextPane;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Rectangle;
+
 import javax.swing.JTable;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.UIManager;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
+
+import java.awt.Color;
+import java.io.StringReader;
+import javax.swing.JSeparator;
+import javax.swing.border.SoftBevelBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.JScrollBar;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.Dimension;
 
 
 public class Vvod extends JFrame {
@@ -56,13 +81,14 @@ public class Vvod extends JFrame {
 	public static ZapVr zapVrSave;
 	private FormSign sign;
 	private SettingsOsm settingsosm;
+	private FormPostBer postber;
 	private Pvizit pvizit;
 	private PvizitAmb pos;
 	private PdiagAmb diag;
 	private Priem pr;
+	private JPanel pzakl;
 	private PdiagZ dz;
-	private JTextField tfdiag;
-	private JTextField tfnamed;
+	private JPanel Jalob;
 	private JTextField tftemp;
 	private JTextField tfad;
 	private JTextField tfrost;
@@ -70,14 +96,6 @@ public class Vvod extends JFrame {
 	private JTextField tfchss;
 	private JTextField tfkodmkb;
 	private JTextField tfname;
-	private JTextPane tpzakl;
-	private JTextPane tprecom;
-	private JTextPane tpanamn;
-	private JTextPane tppalp;
-	private JTextPane tpperk;
-	private JTextPane tposm;
-	private JTextPane tpaus;
-	private JTextPane tpLocalis;
 	private JTextPane tpJalob;
 	private JTextPane tpJalobd;
 	private JTextPane tpJalobkrov;
@@ -86,55 +104,56 @@ public class Vvod extends JFrame {
 	private JTextPane tpJalobendo;
 	private JTextPane tpJalobnerv;
 	private JTextPane tpJalobopor;
-	private JTextPane tpJalobloh;
+	private JTextPane tpJaloblih;
 	private JTextPane tpJalobobh;
 	private JTextPane tpJalobproch;
-	private JTextPane tpNaczab;
-	private JTextPane tpSympt;
-	private JTextPane tpOtnbol;
-	private JTextPane tpPssyt;
-	private JTextPane tpObsost;
-	private JTextPane tpKoj;
-	private JTextPane tpSliz;
-	private JTextPane tpPodkkl;
-	private JTextPane tpLimf;
-	private JTextPane tpKostmysh;
-	private JTextPane tpNervnps;
-	private JTextPane tpTelo;
-	private JTextPane tpSust;
-	private JTextPane tpDyh;
-	private JTextPane tpGrkl;
-	private JTextPane tpPerkl;
-	private JTextPane tpAusl;
-	private JTextPane tpBronho;
-	private JTextPane tpArter;
-	private JTextPane tpObls;
-	private JTextPane tpPerks;
-	private JTextPane tpAuss;
-	private JTextPane tpPolrta;
-	private JTextPane tpJivot;
-	private JTextPane tpPalpjivot;
-	private JTextPane tpJelkish;
-	private JTextPane tpPalpjel;
-	private JTextPane tpPalppodjel;
-	private JTextPane tpPechen;
-	private JTextPane tpJech;
-	private JTextPane tpSelez;
-	private JTextPane tpOblzad;
-	private JTextPane tpPoyasn;
-	private JTextPane tpPochki;
-	private JTextPane tpMoch;
-	private JTextPane tpMoljel;
-	private JTextPane tpGrjel;
-	private JTextPane tpMatka;
-	private JTextPane tpNarpolov;
-	private JTextPane tpChitov;
-	private JTextPane tpOcenka;
+//	private JTextPane tpNaczab;
+//	private JTextPane tpSympt;
+//	private JTextPane tpOtnbol;
+//	private JTextPane tpPssyt;
+//	private JTextPane tpObsost;
+//	private JTextPane tpKoj;
+//	private JTextPane tpSliz;
+//	private JTextPane tpPodkkl;
+//	private JTextPane tpLimf;
+//	private JTextPane tpKostmysh;
+//	private JTextPane tpNervnps;
+//	private JTextPane tpTelo;
+//	private JTextPane tpSust;
+//	private JTextPane tpDyh;
+//	private JTextPane tpGrkl;
+//	private JTextPane tpPerkl;
+//	private JTextPane tpAusl;
+//	private JTextPane tpBronho;
+//	private JTextPane tpArter;
+//	private JTextPane tpObls;
+//	private JTextPane tpPerks;
+//	private JTextPane tpAuss;
+//	private JTextPane tpPolrta;
+//	private JTextPane tpJivot;
+//	private JTextPane tpPalpjivot;
+//	private JTextPane tpJelkish;
+//	private JTextPane tpPalpjel;
+//	private JTextPane tpPalppodjel;
+//	private JTextPane tpPechen;
+//	private JTextPane tpJech;
+//	private JTextPane tpSelez;
+//	private JTextPane tpOblzad;
+//	private JTextPane tpPoyasn;
+//	private JTextPane tpPochki;
+//	private JTextPane tpMoch;
+//	private JTextPane tpMoljel;
+//	private JTextPane tpGrjel;
+//	private JTextPane tpMatka;
+//	private JTextPane tpNarpolov;
+//	private JTextPane tpChitov;
+//	private JTextPane tpOcenka;
 	private CustomTable<PdiagAmb, PdiagAmb._Fields> tableDiag;
-	private ThriftIntegerClassifierCombobox<IntegerClassifier> c_obr;
+	private ThriftStringClassifierCombobox<StringClassifier> c_obr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbrez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbish;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> vid_opl;
+	private CustomTable<PvizitAmb, PvizitAmb._Fields> TabPos;
 	
 	/**
 	 * Launch the application.
@@ -148,16 +167,12 @@ public class Vvod extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
-			//создать таблицу Custom Table
-//				table_vizit = new CustomTable<>(false, true, .class, ZapVr._Fields.values(), 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
-//				table.setFillsViewportHeight(true);
-//				scrollPane.setViewportView(table);
-//				frame.getContentPane().setLayout(groupLayout);
-//
+				
 			}
 		});
 		 pvizit = new Pvizit();
 		 sign = new FormSign();
+		 postber = new FormPostBer();
 		 settingsosm = new SettingsOsm();
 		 pos = new PvizitAmb();
 		 diag = new PdiagAmb();
@@ -198,62 +213,62 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				diag.setDiag(tfkodmkb.getText());
 				diag.setNamed(tfname.getText());
-				pr.setT_ad(tfad.getText());
-				pr.setT_chss(tfchss.getText());
-				pr.setT_rost(tfrost.getText());
-				pr.setT_ves(tfves.getText());
-				pr.setT_st_localis(tpLocalis.getText());
-				pr.setT_jalob_d(tpJalobd.getText());
-				pr.setT_jalob_krov(tpJalobkrov.getText());
-				pr.setT_jalob_p(tpJalobp.getText());
-				pr.setT_jalob_moch(tpJalobmoch.getText());
-				pr.setT_jalob_endo(tpJalobendo.getText());
-				pr.setT_jalob_nerv(tpJalobnerv.getText());
-				pr.setT_jalob_opor(tpJalobopor.getText());
-				pr.setT_jalob_lih(tpJalobloh.getText());
-				pr.setT_jalob_obh(tpJalobobh.getText());
-				pr.setT_jalob_proch(tpJalobproch.getText());
-				pr.setT_nachalo_zab(tpNaczab.getText());
-				pr.setT_sympt(tpSympt.getText());
-				pr.setT_otn_bol(tpOtnbol.getText());
-				pr.setT_ps_syt(tpPssyt.getText());
-				pr.setT_ob_sost(tpObsost.getText());
-				pr.setT_koj_pokr(tpKoj.getText());
-				pr.setT_sliz(tpSliz.getText());
-				pr.setT_podk_kl(tpPodkkl.getText());
-				pr.setT_limf_uzl(tpLimf.getText());
-				pr.setT_kost_mysh(tpKostmysh.getText());
-				pr.setT_nervn_ps(tpNervnps.getText());
-				pr.setT_telo(tpTelo.getText());
-				pr.setT_sust(tpSust.getText());
-				pr.setT_dyh(tpDyh.getText());
-				pr.setT_gr_kl(tpGrkl.getText());
-				pr.setT_perk_l(tpPerkl.getText());
-				pr.setT_aus_l(tpAusl.getText());
-				pr.setT_bronho(tpBronho.getText());
-				pr.setT_arter(tpArter.getText());
-				pr.setT_obl_s(tpObls.getText());
-				pr.setT_perk_s(tpPerks.getText());
-				pr.setT_aus_s(tpAuss.getText());
-				pr.setT_pol_rta(tpPolrta.getText());
-				pr.setT_jivot(tpJivot.getText());
-				pr.setT_palp_jivot(tpPalpjivot.getText());
-				pr.setT_jel_kish(tpJelkish.getText());
-				pr.setT_palp_jel(tpPalpjel.getText());
-				pr.setT_palp_podjel(tpPalppodjel.getText());
-				pr.setT_pechen(tpPechen.getText());
-				pr.setT_jelch(tpJech.getText());
-				pr.setT_selez(tpSelez.getText());
-				pr.setT_obl_zad(tpOblzad.getText());
-				pr.setT_poyasn(tpPoyasn.getText());
-				pr.setT_pochk(tpPochki.getText());
-				pr.setT_moch(tpMoch.getText());
-				pr.setT_mol_jel(tpMoljel.getText());
-				pr.setT_gr_jel(tpGrjel.getText());
-				pr.setT_matka(tpMatka.getText());
-				pr.setT_nar_polov(tpNarpolov.getText());
-				pr.setT_chitov(tpChitov.getText());
-				pr.setT_ocenka(tpOcenka.getText());
+//				pr.setT_ad(tfad.getText());
+//				pr.setT_chss(tfchss.getText());
+//				pr.setT_rost(tfrost.getText());
+//				pr.setT_ves(tfves.getText());
+//				pr.setT_st_localis(tpLocalis.getText());
+//				pr.setT_jalob_d(tpJalobd.getText());
+//				pr.setT_jalob_krov(tpJalobkrov.getText());
+//				pr.setT_jalob_p(tpJalobp.getText());
+//				pr.setT_jalob_moch(tpJalobmoch.getText());
+//				pr.setT_jalob_endo(tpJalobendo.getText());
+//				pr.setT_jalob_nerv(tpJalobnerv.getText());
+//				pr.setT_jalob_opor(tpJalobopor.getText());
+//				pr.setT_jalob_lih(tpJaloblih.getText());
+//				pr.setT_jalob_obh(tpJalobobh.getText());
+//				pr.setT_jalob_proch(tpJalobproch.getText());
+//				pr.setT_nachalo_zab(tpNaczab.getText());
+//				pr.setT_sympt(tpSympt.getText());
+//				pr.setT_otn_bol(tpOtnbol.getText());
+//				pr.setT_ps_syt(tpPssyt.getText());
+//				pr.setT_ob_sost(tpObsost.getText());
+//				pr.setT_koj_pokr(tpKoj.getText());
+//				pr.setT_sliz(tpSliz.getText());
+//				pr.setT_podk_kl(tpPodkkl.getText());
+//				pr.setT_limf_uzl(tpLimf.getText());
+//				pr.setT_kost_mysh(tpKostmysh.getText());
+//				pr.setT_nervn_ps(tpNervnps.getText());
+//				pr.setT_telo(tpTelo.getText());
+//				pr.setT_sust(tpSust.getText());
+//				pr.setT_dyh(tpDyh.getText());
+//				pr.setT_gr_kl(tpGrkl.getText());
+//				pr.setT_perk_l(tpPerkl.getText());
+//				pr.setT_aus_l(tpAusl.getText());
+//				pr.setT_bronho(tpBronho.getText());
+//				pr.setT_arter(tpArter.getText());
+//				pr.setT_obl_s(tpObls.getText());
+//				pr.setT_perk_s(tpPerks.getText());
+//				pr.setT_aus_s(tpAuss.getText());
+//				pr.setT_pol_rta(tpPolrta.getText());
+//				pr.setT_jivot(tpJivot.getText());
+//				pr.setT_palp_jivot(tpPalpjivot.getText());
+//				pr.setT_jel_kish(tpJelkish.getText());
+//				pr.setT_palp_jel(tpPalpjel.getText());
+//				pr.setT_palp_podjel(tpPalppodjel.getText());
+//				pr.setT_pechen(tpPechen.getText());
+//				pr.setT_jelch(tpJech.getText());
+//				pr.setT_selez(tpSelez.getText());
+//				pr.setT_obl_zad(tpOblzad.getText());
+//				pr.setT_poyasn(tpPoyasn.getText());
+//				pr.setT_pochk(tpPochki.getText());
+//				pr.setT_moch(tpMoch.getText());
+//				pr.setT_mol_jel(tpMoljel.getText());
+//				pr.setT_gr_jel(tpGrjel.getText());
+//				pr.setT_matka(tpMatka.getText());
+//				pr.setT_nar_polov(tpNarpolov.getText());
+//				pr.setT_chitov(tpChitov.getText());
+//				pr.setT_ocenka(tpOcenka.getText());
 			 	
 				//pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
 //				pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
@@ -267,67 +282,169 @@ public class Vvod extends JFrame {
 		
 		JButton button_4 = new JButton("Печатные формы");
 		
-		JLabel lblTalon = new JLabel("Талон амбулаторного пациента");
-		
-		JCheckBox cbTalon = new JCheckBox("Скрыть/раскрыть");
-		cbTalon.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
-		
 		JPanel panel_Talon = new JPanel();
-				panel_Talon.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		
-		JLabel label_14 = new JLabel("Диагнозы");
-		
-		JCheckBox checkBox_7 = new JCheckBox("Скрыть/раскрыть");
-		
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+				panel_Talon.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0422\u0430\u043B\u043E\u043D \u0430\u043C\u0431.\u043F\u0430\u0446\u0438\u0435\u043D\u0442\u0430", TitledBorder.LEFT, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		
 		JButton button_5 = new JButton("Удалить");
 		
-		JPanel panel_7 = new JPanel();
-		panel_7.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		
-		JPanel Jalob = new JPanel();
+		 Jalob = new JPanel();
+		
+		 Jalob.setAutoscrolls(true);
 		tabbedPane.addTab("Жалобы", null, Jalob, null);
 		
-		JPanel panel_jalob = new JPanel();
-		
-		JTextPane tpJalob = new JTextPane();
-		GroupLayout gl_panel_jalob = new GroupLayout(panel_jalob);
-		gl_panel_jalob.setHorizontalGroup(
-			gl_panel_jalob.createParallelGroup(Alignment.LEADING)
-				.addComponent(tpJalob, GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
-		);
-		gl_panel_jalob.setVerticalGroup(
-			gl_panel_jalob.createParallelGroup(Alignment.LEADING)
-				.addComponent(tpJalob, GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-		);
-		panel_jalob.setLayout(gl_panel_jalob);
-		
-		JLabel lbljalob = new JLabel("Жалобы на:");
+		JScrollPane spJalob = new JScrollPane();
 		GroupLayout gl_Jalob = new GroupLayout(Jalob);
 		gl_Jalob.setHorizontalGroup(
-			gl_Jalob.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_Jalob.createSequentialGroup()
-					.addGap(10)
-					.addGroup(gl_Jalob.createParallelGroup(Alignment.LEADING)
-						.addComponent(lbljalob)
-						.addComponent(panel_jalob, GroupLayout.PREFERRED_SIZE, 663, GroupLayout.PREFERRED_SIZE)))
+			gl_Jalob.createParallelGroup(Alignment.TRAILING)
+				.addComponent(spJalob, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 841, Short.MAX_VALUE)
 		);
 		gl_Jalob.setVerticalGroup(
 			gl_Jalob.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_Jalob.createSequentialGroup()
-					.addGap(11)
-					.addComponent(lbljalob)
-					.addGap(7)
-					.addComponent(panel_jalob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addComponent(spJalob, GroupLayout.PREFERRED_SIZE, 474, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(83, Short.MAX_VALUE))
 		);
+		
+		JPanel panJalob = new JPanel();
+		spJalob.setViewportView(panJalob);
+		
+		final JLabel lbljalob = new JLabel("Жалобы на:");
+		
+		 tpJalob = new JTextPane();
+		tpJalob.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lbljald = new JLabel("Дыхательная система");
+		
+		 tpJalobd = new JTextPane();
+		tpJalobd.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		 tpJalobkrov = new JTextPane();
+		tpJalobkrov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lbljalp = new JLabel("Система пищеварения");
+		
+		final JLabel lbljalkr = new JLabel("Система кровообращения");
+		
+		 tpJalobp = new JTextPane();
+		tpJalobp.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lbljalm = new JLabel("Мочеполовая система");
+		
+		final JLabel lbljalendo = new JLabel("Эндокринная система");
+		
+		 tpJalobendo = new JTextPane();
+		
+		final JLabel lbljalnerv = new JLabel("Нервная система и органы чувств");
+		
+		 tpJalobnerv = new JTextPane();
+		tpJalobnerv.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lbljalop = new JLabel("Опорно-двигательная система");
+		
+		 tpJalobopor = new JTextPane();
+		tpJalobopor.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lbljallih = new JLabel("Лихорадка");
+		
+		 tpJaloblih = new JTextPane();
+		tpJaloblih.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lblja_lob = new JLabel("Жалобы общего характера");
+		
+		 tpJalobobh = new JTextPane();
+		tpJalobobh.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		final JLabel lbljalpr = new JLabel("Прочие жалобы");
+		
+		 tpJalobproch = new JTextPane();
+		tpJalobproch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		tpJalobendo.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		 tpJalobmoch = new JTextPane();
+		tpJalobmoch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		GroupLayout gl_panJalob = new GroupLayout(panJalob);
+		gl_panJalob.setHorizontalGroup(
+			gl_panJalob.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panJalob.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panJalob.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panJalob.createParallelGroup(Alignment.LEADING, false)
+							.addComponent(tpJalob, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+							.addComponent(lbljalob, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lbljald, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lbljalkr, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tpJalobd)
+							.addComponent(tpJalobkrov))
+						.addComponent(lbljalp, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobp, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbljalm, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobmoch, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbljalendo, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobendo, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbljalnerv, GroupLayout.PREFERRED_SIZE, 190, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobnerv, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbljalop, GroupLayout.PREFERRED_SIZE, 190, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobopor, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbljallih, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJaloblih, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblja_lob, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobobh, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbljalpr, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJalobproch, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(336, Short.MAX_VALUE))
+		);
+		gl_panJalob.setVerticalGroup(
+			gl_panJalob.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panJalob.createSequentialGroup()
+					.addComponent(lbljalob)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalob, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lbljald)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobd, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lbljalkr)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobkrov, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbljalp)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobp, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbljalm)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobmoch, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addComponent(lbljalendo)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobendo, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbljalnerv)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobnerv, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbljalop)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobopor, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbljallih)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJaloblih, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblja_lob)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobobh, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbljalpr)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpJalobproch, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addContainerGap(22, Short.MAX_VALUE))
+		);
+		panJalob.setLayout(gl_panJalob);
 		Jalob.setLayout(gl_Jalob);
 		
 		JPanel pAnanmnesis = new JPanel();
@@ -538,59 +655,13 @@ public class Vvod extends JFrame {
 		);
 		pfizikob.setLayout(gl_pfizikob);
 		
-		JLabel label_15 = new JLabel("Код");
-		
-		tfdiag = new JTextField();
-		tfdiag.setColumns(10);
-		
-		JLabel label_16 = new JLabel("Медицинское описание");
-		
-		tfnamed = new JTextField();
-		tfnamed.setColumns(10);
-		GroupLayout gl_panel_7 = new GroupLayout(panel_7);
-		gl_panel_7.setHorizontalGroup(
-			gl_panel_7.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_7.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(label_15)
-					.addGap(45)
-					.addComponent(tfdiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(109)
-					.addComponent(label_16)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tfnamed, GroupLayout.PREFERRED_SIZE, 284, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(173, Short.MAX_VALUE))
-		);
-		gl_panel_7.setVerticalGroup(
-			gl_panel_7.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_7.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_15)
-						.addComponent(tfdiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(label_16)
-						.addComponent(tfnamed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(24, Short.MAX_VALUE))
-		);
-		panel_7.setLayout(gl_panel_7);
-		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
-		gl_panel_6.setHorizontalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 847, Short.MAX_VALUE)
-		);
-		gl_panel_6.setVerticalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 75, Short.MAX_VALUE)
-		);
-		panel_6.setLayout(gl_panel_6);
-		
 		JLabel lblvid_opl = new JLabel("Вид оплаты");
 		
 		 vid_opl = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblcobr = new JLabel("Цель обращения");
 		
-		c_obr = new ThriftIntegerClassifierCombobox<>(true);
+		c_obr = new ThriftStringClassifierCombobox<>(true);
 		c_obr.addActionListener(new ActionListener() {
 			
 			@Override
@@ -666,87 +737,191 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				settingsosm.setVisible(true);}
 		});
+		
+		JScrollPane sPos = new JScrollPane();
+		
+		JButton button_7 = new JButton("Наблюдение за берем.");
+		button_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				postber.setVisible(true);
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
+			gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(btnAnamz)
-							.addGap(10)
-							.addComponent(button)
-							.addGap(10)
-							.addComponent(button_1)
-							.addGap(10)
-							.addComponent(button_2)
-							.addGap(10)
-							.addComponent(button_3)
-							.addGap(10)
-							.addComponent(button_4)
-							.addGap(6)
-							.addComponent(button_5)
-							.addGap(18)
-							.addComponent(button_6))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(lblTalon)
-							.addGap(6)
-							.addComponent(cbTalon))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 1864, GroupLayout.PREFERRED_SIZE)
-							.addGap(4)
-							.addComponent(label_14)
-							.addGap(6)
-							.addComponent(checkBox_7)
-							.addGap(2)
-							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 1859, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-								.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE))))
-					.addContainerGap(114, Short.MAX_VALUE))
+						.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+							.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 1004, Short.MAX_VALUE)))
+					.addContainerGap(3072, Short.MAX_VALUE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(button_7, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnAnamz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(10)
+					.addComponent(button)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(button_1)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(button_2)
+					.addGap(10)
+					.addComponent(button_3)
+					.addGap(10)
+					.addComponent(button_4)
+					.addGap(6)
+					.addComponent(button_5)
+					.addGap(18)
+					.addComponent(button_6)
+					.addGap(3076))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGap(11)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnAnamz)
-						.addComponent(button)
-						.addComponent(button_1)
-						.addComponent(button_2)
 						.addComponent(button_3)
 						.addComponent(button_4)
 						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 							.addComponent(button_5)
-							.addComponent(button_6)))
-					.addGap(18)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+							.addComponent(button_6))
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(4)
-							.addComponent(lblTalon))
-						.addComponent(cbTalon))
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+									.addComponent(btnAnamz)
+									.addComponent(button)
+									.addComponent(button_1))
+								.addComponent(button_2))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button_7)))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+					.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 561, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(30)
-							.addComponent(label_14))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(26)
-							.addComponent(checkBox_7))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(51)
-							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE))))
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 495, GroupLayout.PREFERRED_SIZE)
+					.addGap(198))
 		);
 		
+		TabPos = new CustomTable<>(false,true,PvizitAmb.class,3,"Дата",4,"ФИО врача",5,"Должность");
+		TabPos.setDateField(0);
+		sPos.setViewportView(TabPos);
+		TabPos.setFillsViewportHeight(true);
+			TabPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()){
+					if (TabPos.getSelectedItem()!=null){
+						try {
+							Priem pri = MainForm.tcl.getPriem(TabPos.getSelectedItem().id_obr,TabPos.getSelectedItem().npasp,TabPos.getSelectedItem().id);
+							if (pri.getT_jalob()!=null){
+							lbljalob.setVisible(true);
+							tpJalob.setVisible(true);
+							tpJalob.setText(pri.getT_jalob());	
+							}else{
+							tpJalob.setVisible(false);
+							lbljalob.setVisible(false);
+							}
+							if (pri.getT_jalob_d()!=null){
+							lbljald.setVisible(true);
+							tpJalobd.setVisible(true);
+							tpJalobd.setText(pri.getT_jalob_d());	
+							}else{
+							tpJalobd.setVisible(false);
+							lbljald.setVisible(false);
+							}
+							if (pri.getT_jalob_krov()!=null){
+							lbljalkr.setVisible(true);
+							tpJalobkrov.setVisible(true);
+							tpJalobkrov.setText(pri.getT_jalob_krov());	
+							}else{
+							tpJalobkrov.setVisible(false);
+							lbljalkr.setVisible(false);
+							}
+							if (pri.getT_jalob_p()!=null){
+							lbljalp.setVisible(true);
+							tpJalobp.setVisible(true);
+							tpJalobp.setText(pri.getT_jalob_p());	
+							}else{
+							tpJalobp.setVisible(false);
+							lbljalp.setVisible(false);
+							}
+							if (pri.getT_jalob_moch()!=null){
+							lbljalm.setVisible(true);
+							tpJalobmoch.setVisible(true);
+							tpJalobmoch.setText(pri.getT_jalob_moch());	
+							}else{
+							tpJalobmoch.setVisible(false);
+							lbljalm.setVisible(false);
+							}
+							if (pri.getT_jalob_endo()!=null){
+							lbljalendo.setVisible(true);
+							tpJalobendo.setVisible(true);
+							tpJalobendo.setText(pri.getT_jalob_endo());	
+							}else{
+							tpJalobendo.setVisible(false);
+							lbljalendo.setVisible(false);
+							}
+							if (pri.getT_jalob_nerv()!=null){
+							lbljalnerv.setVisible(true);
+							tpJalobnerv.setVisible(true);
+							tpJalobnerv.setText(pri.getT_jalob_nerv());	
+							}else{
+							tpJalobnerv.setVisible(false);
+							lbljalnerv.setVisible(false);
+							}
+							if (pri.getT_jalob_opor()!=null){
+							lbljalop.setVisible(true);
+							tpJalobopor.setVisible(true);
+							tpJalobopor.setText(pri.getT_jalob_opor());	
+							}else{
+							tpJalobopor.setVisible(false);
+							lbljalop.setVisible(false);
+							}
+							if (pri.getT_jalob_lih()!=null){
+							lbljallih.setVisible(true);
+							tpJaloblih.setVisible(true);
+							tpJaloblih.setText(pri.getT_jalob_lih());	
+							}else{
+							tpJaloblih.setVisible(false);
+							lbljallih.setVisible(false);
+							}
+							if (pri.getT_jalob_obh()!=null){
+							lblja_lob.setVisible(true);
+							tpJalobobh.setVisible(true);
+							tpJalobobh.setText(pri.getT_jalob_obh());	
+							}else{
+							tpJalobobh.setVisible(false);
+							lblja_lob.setVisible(false);
+							}
+							if (pri.getT_jalob_proch()!=null){
+							lbljalpr.setVisible(true);
+							tpJalobproch.setVisible(true);
+							tpJalobproch.setText(pri.getT_jalob_proch());	
+							}else{
+							tpJalobproch.setVisible(false);
+							lbljalpr.setVisible(false);
+							}
+							} catch (KmiacServerException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (PriemNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (TException e) {
+								// TODO Auto-generated catch block
+								MainForm.conMan.reconnect(e);
+							}
+						
+		
+					}
+				}
+			}
+		});
+			
 		JPanel plocst = new JPanel();
 		tabbedPane.addTab("Localis status", null, plocst, null);
 		
@@ -861,7 +1036,7 @@ public class Vvod extends JFrame {
 		);
 		pnazn.setLayout(gl_pnazn);
 		
-		JPanel pzakl = new JPanel();
+		pzakl = new JPanel();
 		tabbedPane.addTab("Заключение", null, pzakl, null);
 		
 		JLabel lblzakl = new JLabel("Заключение специалиста");
@@ -934,8 +1109,7 @@ public class Vvod extends JFrame {
 		pvizit.setDataz(System.currentTimeMillis());
 		pos.setDatap(System.currentTimeMillis());
 		diag.setDatap(System.currentTimeMillis());
-		
-		
+			
 		if (zapVr.vid_p == 1) {
 			try {
 				MainForm.tcl.AddPvizit(pvizit);
@@ -974,13 +1148,49 @@ public class Vvod extends JFrame {
 	
 	public void onConnect() {
 		try {
-			c_obr.setData(MainForm.tcl.getAp0());
+			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
+			c_obr.setData(MainForm.tcl.getP0c());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
-			//vid_opl.setData(MainForm.tcl.getOpl());потом убрать знак комментария
+			TabPos.setData(MainForm.tcl.getPvizitAmb(6));
+			vid_opl.setData(MainForm.tcl.getOpl());
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void loadConfig() {
+		try {
+			StringReader sr = new StringReader(MainForm.authInfo.config);
+			StreamSource src = new StreamSource(sr);
+			DOMResult res = new DOMResult();
+			TransformerFactory.newInstance().newTransformer().transform(src, res);
+			Document document = (Document) res.getNode();
+					if (getElement(document, "jalob_dyh")!=null){
+						JTextPane tpJalobd = new JTextPane();
+						Jalob.add(tpJalobd);
+											
+			}
+					else {
+						
+					}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private Element getElement(Document doc, String name){
+		NodeList nls;
+		nls = doc.getElementsByTagName(name);
+		if (nls.getLength()>0) {
+			return (Element) nls.item(0);
+		}
+		return null;
+	}
+	
+	public void loadData(){
+	if(pr.getT_jalob_d()!=null){
+		JOptionPane.showMessageDialog (getContentPane(),"1111");
+	}
 	}
 }

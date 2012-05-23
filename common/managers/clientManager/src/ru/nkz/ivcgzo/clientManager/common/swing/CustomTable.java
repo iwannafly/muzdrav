@@ -29,6 +29,7 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 
 /**
  * Параметризованный класс для работы с таблицами swing. В качестве параметра
@@ -206,6 +207,24 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		for (int i = 0; i < colCount; i++)
 			colOrder[i] = idx[i];
 		setModel();
+	}
+	
+	/**
+	 * Генерирует на основе списка <code>JComboBox</code> и заменяет им
+	 * указанный столбец. Номер столбца должен указываться без учета сортировки
+	 * методом {@link #sortColumns(int...)}.
+	 * @param colIdx
+	 * @param lst
+	 */
+	public void setStringClassifierSelector(int colIdx, final List<StringClassifier> lst) {
+		for (int i = 0; i < colCount; i++)
+			if (colOrder[i] == colIdx) {
+				colIdx = i;
+				break;
+			}
+		TableComboBoxStringEditor edt = new TableComboBoxStringEditor(lst);
+		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
+		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
 	}
 	
 	/**
@@ -465,7 +484,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			int row = getSelectedRow();
 			int col = getSelectedColumn();
 			if (!itemAdd) {
-				if (delSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel))) {
+				boolean res = (delSelRowLst != null) ? delSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)) : true;
+				if (res) {
 					lst.remove(copIdx);
 					itemUpd = false;
 					updateSelectedIndex(row, col, copIdx, 0);
@@ -541,13 +561,15 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			itemUpd = false;
 			if (!itemAdd) {
 				if (!deepEquals(sel, cop)) {
-					if (!updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)))
+					boolean res = (updSelRowLst != null) ? updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)) : true;
+					if (!res)
 						lst.set(copIdx, cop);
 					updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				}
 			} else {
 				if (!checkEmpty(sel)) {
-					addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
+					if (addRowLst != null)
+						addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
 				} else {
 					deleteSelectedRow();
 				}
@@ -596,5 +618,19 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			this.getCellEditor().stopCellEditing();
 		
 		return getSelectedItem();
+	}
+	
+	/**
+	 * Установка ширин столбцов и, как следствие, выключение автоматического ресайзинга.
+	 * @param wdt - массив ширин столбцов. Должен совпадать по размеру с количеством столбцов.
+	 */
+	public void setPreferredWidths(int... wdt) {
+		if (wdt.length != colOrder.length)
+			throw new RuntimeException("Width count doesn't match column count");
+		
+		this.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		for (int i = 0; i < colOrder.length; i++) {
+			this.getColumnModel().getColumn(colOrder[i]).setPreferredWidth(wdt[i]);
+		}
 	}
 }

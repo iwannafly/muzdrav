@@ -23,17 +23,14 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
-import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
 import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.Jalob;
-import ru.nkz.ivcgzo.thriftRegPatient.JalobAlreadyExistException;
-import ru.nkz.ivcgzo.thriftRegPatient.JalobNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
@@ -48,9 +45,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
-import ru.nkz.ivcgzo.thriftRegPatient.SignAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.SpravStruct;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 
@@ -72,7 +67,6 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<Sign, Sign._Fields> rsmSign;
     private TResultSetMapper<AllGosp, AllGosp._Fields> rsmAllGosp;
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
-    private TResultSetMapper<Jalob, Jalob._Fields> rsmJalob;
     private QueryGenerator<PatientBrief> qgPatientBrief;
     private static final Class<?>[] PATIENT_BRIEF_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
@@ -119,10 +113,10 @@ public class ServerRegPatient extends Server implements Iface {
         String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
-    //  id             npasp          kateg         datal
-        Integer.class, Integer.class, Integer.class, Date.class,
-    //  name
-        String.class
+    //  npasp          grup          ph            allerg
+        Integer.class, String.class, String.class, String.class,
+    //  farmkol       vitae         vred
+        String.class, String.class, String.class
     };
     private static final Class<?>[] GOSP_TYPES = new Class<?>[] {
     //  id             ngosp          npasp          nist
@@ -139,13 +133,9 @@ public class ServerRegPatient extends Server implements Iface {
         Boolean.class, Boolean.class, String.class, String.class, Date.class,
     //  vremcp      nomcp          kodotd         datagos     vremgos
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
-    //  cuser          dataosm     vremosm     dataz
-        Integer.class, Date.class, Time.class, Date.class
-    };
-    private static final Class<?>[] JALOB_TYPES = new Class<?>[] {
-    //  id             id_gosp        dataz       timez
-        Integer.class, Integer.class, Date.class, Time.class,
-    //  jalob
+    //  cuser          dataosm     vremosm     dataz       jalob
+        Integer.class, Date.class, Time.class, Date.class, String.class,
+    //  zap_vrach
         String.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
@@ -195,10 +185,7 @@ public class ServerRegPatient extends Server implements Iface {
         "cotd", "svoevr", "svoevrd", "ntalon", "vidtr", "pr_out", "alkg", "soobr",
         "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c",
         "ad", "datacp", "vremcp", "nomcp", "kodotd", "datagos", "vremgos", "cuser",
-        "dataosm", "vremosm", "dataz"
-    };
-    private static final String[] JALOB_FIELD_NAMES = {
-        "id", "id_gosp", "dataz", "jalob"
+        "dataosm", "vremosm", "dataz", "jalob", "zap_vrach"
     };
 
     /**
@@ -227,7 +214,6 @@ public class ServerRegPatient extends Server implements Iface {
         rsmSign = new TResultSetMapper<>(Sign.class, SIGN_FIELD_NAMES);
         rsmAllGosp = new TResultSetMapper<>(AllGosp.class, ALL_GOSP_FIELD_NAMES);
         rsmGosp = new TResultSetMapper<>(Gosp.class, GOSP_FIELD_NAMES);
-        rsmJalob = new TResultSetMapper<>(Jalob.class, JALOB_FIELD_NAMES);
     }
 
     /**
@@ -254,13 +240,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает краткие сведения
-     * о всех пациентах, удовлетворяющих введенным данным.
-     * @param patient - информация о пациентах, по которой производится поиск
-     * @return список thrift-объектов, содержащих краткую информацию о пациентах
-     * @throws PatientNotFoundException
-     */
     @Override
     public final List<PatientBrief> getAllPatientBrief(final PatientBrief patient)
             throws TException, PatientNotFoundException {
@@ -269,11 +248,10 @@ public class ServerRegPatient extends Server implements Iface {
                 + "adm_obl, adm_gorod, adm_ul, adm_dom, adm_kv "
                 + "FROM patient";
         InputData inData = qgPatientBrief.genSelect(patient, sqlQuery);
-        try {
-            sqlQuery = inData.getQueryText();
-            int[] indexes = inData.getIndexes();
-            AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
-                    PATIENT_BRIEF_TYPES, indexes);
+        sqlQuery = inData.getQueryText();
+        int[] indexes = inData.getIndexes();
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
+                PATIENT_BRIEF_TYPES, indexes)) {
             ResultSet rs = acrs.getResultSet();
             List<PatientBrief> patientsInfo = new ArrayList<PatientBrief>();
             if (rs.next()) {
@@ -292,12 +270,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает полные сведения о пациенте с указанным персональным номером
-     * @param npasp - персональный номер пациента
-     * @return thrift-объект, содержащий полную информацию о пациенте
-     * @throws PatientNotFoundException
-     */
     @Override
     public final PatientFullInfo getPatientFullInfo(final int npasp)
             throws TException, PatientNotFoundException {
@@ -317,8 +289,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "p_nambk.datapr, p_nambk.dataot, p_nambk.ishod "
                 + "FROM patient LEFT JOIN p_nambk ON "
                 + "patient.npasp = p_nambk.npasp WHERE patient.npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 PatientFullInfo patient = rsmPatientFullInfo.map(rs);
@@ -336,18 +307,12 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает сведения о представителе пациента с указанным персональным номером
-     * @param npasp - персональный номер пациента
-     * @return thrift-объект, содержащий информацию о представителе пациента
-     * @throws AgentNotFoundException
-     */
+
     @Override
     public final Agent getAgent(final int npasp)
             throws AgentNotFoundException, TException {
         String sqlQuery = "SELECT * FROM p_preds WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 Agent agent = rsmAgent.map(rs);
@@ -360,12 +325,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает сведения о льготах пациента с указанным персональным номером
-     * @param npasp - персональный номер пациента
-     * @return список thrift-объектов, содержащих информацию о льготах пациента
-     * @throws LgotaNotFoundException
-     */
     @Override
     public final List<Lgota> getLgota(final int npasp)
             throws LgotaNotFoundException, TException {
@@ -375,18 +334,11 @@ public class ServerRegPatient extends Server implements Iface {
         return null;
     }
 
-    /**
-     * Возвращает сведения о категориях пациента с указанным персональным номером
-     * @param npasp - персональный номер пациента
-     * @return список thrift-объектов, содержащих информацию о категориях пациента
-     * @throws KontingentNotFoundException
-     */
     @Override
     public final List<Kontingent> getKontingent(final int npasp)
             throws KontingentNotFoundException, TException {
         String sqlQuery = "SELECT * FROM p_konti WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<Kontingent> kontingent = rsmKontingent.mapToList(rs);
             if (kontingent.size() > 0) {
@@ -399,17 +351,10 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает особую информацию о пациенте с указанным персональным номером
-     * @param npasp - персональный номер пациента
-     * @return thrift-объект, содержащий особую информацию о пациенте
-     * @throws SignNotFoundException
-     */
     @Override
     public final Sign getSign(final int npasp) throws SignNotFoundException, TException {
         String sqlQuery = "SELECT * FROM p_sign WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmSign.map(rs);
@@ -421,19 +366,12 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает записи о всех госпитализациях пациента с указанным персональным номером
-     * @param npasp - персональный номер пациента
-     * @return список thrift-объектов, содержащих информацию о госпитализациях пациента
-     * @throws GospNotFoundException
-     */
     @Override
     public final List<AllGosp> getAllGosp(final int npasp)
             throws GospNotFoundException, TException {
         String sqlQuery = "SELECT id, ngosp, npasp, nist, datap, cotd, "
                 + "diag_p, named_p FROM c_gosp WHERE npasp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<AllGosp> allGosp = rsmAllGosp.mapToList(rs);
             if (allGosp.size() > 0) {
@@ -446,48 +384,15 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Возвращает запись госпитализации пациента с указанным идентификатором
-     * госпитализации
-     * @param id - уникальный идентификатор госпитализации
-     * @return thrift-объект, содержащий особую информацию о госпитализации пациента
-     * @throws GospNotFoundException
-     */
     @Override
     public final Gosp getGosp(final int id) throws GospNotFoundException, TException {
         String sqlQuery = "SELECT * FROM c_gosp WHERE id = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id);
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmGosp.map(rs);
             } else {
                 throw new GospNotFoundException();
-            }
-        } catch (SQLException e) {
-            throw new TException(e);
-        }
-    }
-
-    /**
-     * Возвращает все жалобы пациента с указанным идентификатором госпитализации
-     * @param idGosp - уникальный идентификатор госпитализации
-     * @return список thrift-объектов, содержащий все жалобы пациента
-     * @throws GospNotFoundException
-     */
-    @Override
-    public final List<Jalob> getAllJalob(final int idGosp)
-            throws JalobNotFoundException, TException {
-        String sqlQuery = "SELECT id, id_gosp, dataz, jalob "
-                + "FROM c_jalob WHERE id_gosp = ?;";
-        try {
-            AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp);
-            ResultSet rs = acrs.getResultSet();
-            List<Jalob> jalob = rsmJalob.mapToList(rs);
-            if (jalob.size() > 0) {
-                return jalob;
-            } else {
-                throw new JalobNotFoundException();
             }
         } catch (SQLException e) {
             throw new TException(e);
@@ -510,12 +415,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет информацию о пациенте в БД
-     * @param patinfo - thrift-объект с информацией о пациенте
-     * @return целочисленный первичный ключ id, сгенерированный при добавлении
-     * @throws PatientAlreadyExistException
-     */
     //Не нравится этот метод? Мне он тоже не нравится. Говно, а не метод.
     //TODO перепилить добавление объектов с вложенными пользовательскими типами
     //TODO сделать проверку дат до добавления, иначе вместо пустой даты
@@ -564,17 +463,11 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет сведения о льготах пациента
-     * @param lgota - сведения о льготах пациента
-     * @return целочисленный первичный ключ id, сгенерированный при добавлении
-     * @throws LgotaAlreadyExistException
-     */
     @Override
     public final int addLgota(final Lgota lgota)
             throws LgotaAlreadyExistException, TException {
         // TODO Реализовать метод
-        // Структура таблицы БД и трифт объекта не совпадают,
+        // Структура таблицы БД и thrift-объекта не совпадают,
         // поэтому непонятно что и куда
         return 0;
     }
@@ -594,21 +487,15 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет информацию о категории пациента в БД
-     * @param kont - информация о категории пациента
-     * @return целочисленный первичный ключ id, сгенерированный при добавлении
-     * @throws KontingentAlreadyExistException
-     */
     @Override
     public final int addKont(final Kontingent kont)
             throws KontingentAlreadyExistException, TException {
-        final int[] indexes = {1, 2, 3, 4};
+        final int[] indexes = {1, 2, 3};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isKontingentExist(kont)) {
                 sme.execPreparedT(
-                        "INSERT INTO p_konti (npasp, kateg, datal, name) "
-                        + "VALUES (?, ?, ?, ?);", true, kont,
+                        "INSERT INTO p_konti (npasp, kateg, datal) "
+                        + "VALUES (?, ?, ?);", true, kont,
                         KONTINGENT_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
@@ -635,19 +522,14 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет информацию о представителе пациента в БД
-     * @param agent - информация о представителе пациента
-     * @throws AgentAlreadyExistException
-     */
     @Override
-    public final void addAgent(final Agent agent)
-            throws AgentAlreadyExistException, TException {
-        final int[] indexes = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-        };
+    public final void addOrUpdateAgent(final Agent agent)
+            throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isAgentExist(agent)) {
+                final int[] indexes = {
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+                };
                 sme.execPreparedT(
                         "INSERT INTO p_preds (npasp, fam, im, ot, "
                         + "datar, pol, name_str, ogrn_str, vpolis, "
@@ -657,7 +539,16 @@ public class ServerRegPatient extends Server implements Iface {
                         AGENT_TYPES, indexes);
                 sme.setCommit();
             } else {
-                throw new AgentAlreadyExistException();
+                final int[] indexes = {
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
+                };
+                sme.execPreparedT("UPDATE p_preds SET "
+                        + "fam = ?, im = ?, ot = ?, "
+                        + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
+                        + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
+                        + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
+                        agent, AGENT_TYPES, indexes);
+                sme.setCommit();
             }
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -678,63 +569,23 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет особую информацию о пациенте в БД
-     * @param sign - особая информация о пациенте
-     * @throws SignAlreadyExistException
-     */
     @Override
-    public final void addSign(final Sign sign) throws SignAlreadyExistException, TException {
-        final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
+    public final void addOrUpdateSign(final Sign sign) throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isSignExist(sign)) {
+                final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
                 sme.execPreparedT(
                         "INSERT INTO p_sign (npasp, grup, ph, allerg, "
-                        + "farmkol, vitae, vred VALUES (?, ?, ?, ?, ?, ?, ?);",
+                        + "farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?);",
                         false, sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             } else {
-                throw new SignAlreadyExistException();
-            }
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    /**
-     * Проверяет, существует ли в БД жалоба пациента с такими данными
-     * @param jalob - thrift-объект с информацией о жалобе пациента
-     * @return true - если жалоба пациента с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isJalobExist(final Jalob jalob) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT id FROM c_jalob WHERE (id_gosp = ?) and (jalob = ?)",
-                jalob, JALOB_TYPES, 1, 2)) {
-            return acrs.getResultSet().next();
-        }
-    }
-
-    /**
-     * Добавляет жалобу пациента в БД
-     * @param jalob - thrift-объект с информацией о жалобе пациента
-     * @throws JalobAlreadyExistException
-     */
-    @Override
-    public final int addJalob(final Jalob jalob) throws JalobAlreadyExistException,
-            TException {
-        final int[] indexes = {1, 2, 3, 4};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            if (!isJalobExist(jalob)) {
-                sme.execPreparedT(
-                        "INSERT INTO c_jalob (id_gosp, dataz, timez, jalob) "
-                        + "VALUES (?, ?, ?, ?);", true, jalob,
-                        JALOB_TYPES, indexes);
-                int id = sme.getGeneratedKeys().getInt("id");
+                final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
+                sme.execPreparedT("UPDATE p_sign SET "
+                        + "grup = ?, ph = ?, allerg = ?, "
+                        + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
+                        sign, SIGN_TYPES, indexes);
                 sme.setCommit();
-                return id;
-            } else {
-                throw new JalobAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -755,15 +606,10 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет запись госпитализации в БД
-     * @param gosp - особая информация о представителе пациента
-     * @throws GospAlreadyExistException
-     */
     @Override
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException, TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35};
+                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
@@ -772,10 +618,10 @@ public class ServerRegPatient extends Server implements Iface {
                         + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
                         + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
                         + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
-                        + "dataosm, vremosm, dataz) "
+                        + "dataosm, vremosm, dataz, jalob, zap_vrach) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
+                        + "?, ?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
                 return id;
@@ -801,11 +647,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Добавляет запись об амбулаторной карте в БД
-     * @param nambk - thrift-объект с информацией об амбулаторной карте
-     * @throws NambkAlreadyExistException
-     */
     @Override
     public final void addNambk(final Nambk nambk) throws NambkAlreadyExistException,
             TException {
@@ -890,18 +731,6 @@ public class ServerRegPatient extends Server implements Iface {
 
     //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
-    public final void deleteJalob(final int npasp, final int ngosp) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_jalob WHERE npasp = ? AND ngosp = ?;",
-                    false, npasp, ngosp);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
-    @Override
     public final void deleteGosp(final int npasp, final int ngosp) throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM c_gosp WHERE npasp = ? AND ngosp = ?;",
@@ -972,57 +801,11 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final void updateKont(final Kontingent kont) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 0};
+        final int[] indexes = {1, 2, 3, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg =?, datal = ?, "
-                    + "name = ? WHERE id = ?", false,
+            sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg =?, datal = ? "
+                    + "WHERE id = ?", false,
                     kont, KONTINGENT_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateAgent(final Agent agent) throws TException {
-        final int[] indexes = {
-            1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
-        };
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_preds SET "
-                    + "fam = ?, im = ?, ot = ?, "
-                    + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                    + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
-                    + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
-                    agent, AGENT_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateSign(final Sign sign) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_sign SET "
-                    + "grup = ?, ph = ?, allerg = ?, "
-                    + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
-                    sign, SIGN_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateJalob(final Jalob jalob) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 0};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE c_jalob SET "
-                    + "id_gosp = ?, dataz = ?, timez = ?, jalob = ? "
-                    + "WHERE id = ?;", false,
-                    jalob, JALOB_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -1032,7 +815,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void updateGosp(final Gosp gosp) throws TException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 0
         };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE c_gosp SET "
@@ -1044,7 +827,7 @@ public class ServerRegPatient extends Server implements Iface {
                     + "nal_z = ?, nal_p = ?, t0c = ?, ad = ?, smp_data = ?, "
                     + "smp_time = ?, smp_num = ?, cotd_p = ?, datagos = ?, "
                     + "vremgos = ?, cuser = ?, dataosm = ?, vremosm = ?, "
-                    + "dataz = ? WHERE id = ?;", false,
+                    + "dataz = ?, jalob = ?, zap_vrach = ? WHERE id = ?;", false,
                     gosp, GOSP_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
@@ -1074,80 +857,271 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public List<IntegerClassifier> getPol() throws TException {
+    public final List<IntegerClassifier> getPol() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_z30";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmPol =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmPol.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getSgrp() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_az9";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmSgrp =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmSgrp.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getObl() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_l02";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmObl =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmObl.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+////////////////////////////////////////////////////////////////
+// Временно не реализовано из-за кривых классификаторов в БД  //
+////////////////////////////////////////////////////////////////
+
+    @Override
+    public final List<IntegerClassifier> getGorod(final int codObl) throws TException {
+//        final String sqlQuery = "SELECT pcod, name FROM n_l02";
+//        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmObl =
+//                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+//        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+//            return rsmObl.mapToList(acrs.getResultSet());
+//        } catch (SQLException e) {
+//            throw new TException(e);
+//        }
+        return null;
+    }
+
+    @Override
+    public final List<IntegerClassifier> getUl(final int codGorod) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getSgrp() throws TException {
+    public final List<IntegerClassifier> getDom(final int codUl) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getObl() throws TException {
+    public final List<IntegerClassifier> getKorp(final int codDom) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public final List<IntegerClassifier> getMrab() throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getGorod(int codObl) throws TException {
+    public final List<IntegerClassifier> getPomsTdoc() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    // А нужен ли он вообще, если уже есть выше метод с тем же классификатором?
+    @Override
+    public final List<IntegerClassifier> getTerCod(final int pcod) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+///////////////////////////////////////////////////////////////
+//////     Окончание участка нереализованного кода     ////////
+///////////////////////////////////////////////////////////////
+
+    @Override
+    public final List<IntegerClassifier> getMsStrg() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_kas";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmMsStrg =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmMsStrg.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getCpolPr() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_n00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmCpolPr =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmCpolPr.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getTdoc() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_az0";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmTdoc =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmTdoc.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<StringClassifier> getNaprav() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_k02";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmNaprav =
+                new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmNaprav.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getM00() throws TException {
+        final String sqlQuery = "SELECT pcod, name_s FROM n_m00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmM00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name_s");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmM00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getN00() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_n00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmN00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getO00() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_o00";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmO00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getAL0() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_al0";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAl0 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAl0.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getW04() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_w04";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmW04 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmW04.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getOtdLpu(final String codLpu) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<IntegerClassifier> getUl(int codGorod) throws TException {
-        // TODO Auto-generated method stub
-        return null;
+    public final List<IntegerClassifier> getAI0() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_ai0";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAi0 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAi0.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public List<IntegerClassifier> getDom(int codUl) throws TException {
-        // TODO Auto-generated method stub
-        return null;
+    public final List<IntegerClassifier> getAF0() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_af0";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAf0 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAf0.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public List<IntegerClassifier> getKorp(int codDom) throws TException {
-        // TODO Auto-generated method stub
-        return null;
+    public final List<IntegerClassifier> getALK() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_alk";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAlk =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAlk.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public List<IntegerClassifier> getMrab() throws TException {
-        // TODO Auto-generated method stub
-        return null;
+    public final List<IntegerClassifier> getVTR() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_vtr";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmVtr =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmVtr.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public List<IntegerClassifier> getMsStrg() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getPomsTdoc() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getCpolPr() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getTdoc() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<IntegerClassifier> getTerCod(int pcod) throws TException {
-        // TODO Auto-generated method stub
-        return null;
+    public final List<StringClassifier> getC00() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_с00";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmC00 =
+                new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmC00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
     }
 }

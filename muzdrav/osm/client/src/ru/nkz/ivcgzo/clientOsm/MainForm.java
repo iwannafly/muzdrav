@@ -28,11 +28,11 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class MainForm extends Client {
 	public static ThriftOsm.Client tcl;
-	public ConnectionManager conMan;
+	public static ConnectionManager conMan;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
-	private UserAuthInfo authInfo;
+	public static UserAuthInfo authInfo;
 	
 	private PatientInfoViewMainForm patInfoView;
 
@@ -70,8 +70,8 @@ public class MainForm extends Client {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setBounds(100, 100, 450, 300);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		

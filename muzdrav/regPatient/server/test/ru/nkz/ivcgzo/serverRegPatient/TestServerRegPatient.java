@@ -19,7 +19,6 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
-import ru.nkz.ivcgzo.thriftRegPatient.AgentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
@@ -28,6 +27,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 
 /**
  * @author Avdeev Alexander
@@ -296,22 +296,47 @@ public class TestServerRegPatient {
     }
 
     @Test
-    public final void isAgentExist_isThrowAlreadyExistException()
-            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+    public final void addSign_isSignActuallyAdded()
+            throws TException {
         int npasp = 2;
-        Agent agent = testServer.getAgent(npasp);
-        testException.expect(AgentAlreadyExistException.class);
-        testServer.addAgent(agent);
-        //assertEquals(afterAddId, 0);
+        Sign s =new Sign();
+        s.setNpasp(26006);
+        s.setGrup("9");
+        s.setPh("1");
+        s.setAllerg("9");
+        s.setFarmkol("9");
+        s.setVitae("9");
+        s.setVred("9");
+        testServer.addOrUpdateSign(s);
     }
 
     @Test
-    public final void addAgent_isAgentActuallyAdded()
-            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+    public final void updatePatient_isPatientActuallyUpdated()
+            throws TException, PatientNotFoundException, PatientAlreadyExistException {
         int npasp = 2;
-        Agent agent = testServer.getAgent(npasp);
-        agent.setNpasp(5);
-        testServer.addAgent(agent);
+        PatientFullInfo patientFullInfo =
+                testServer.getPatientFullInfo(npasp);
+        patientFullInfo.setFam("Уникальная_фамилия");
+        testServer.updatePatient(patientFullInfo);
+        //assertEquals(afterAddId, 0);
     }
+//    @Test
+//    public final void isAgentExist_isThrowAlreadyExistException()
+//            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+//        int npasp = 2;
+//        Agent agent = testServer.getAgent(npasp);
+//        testException.expect(AgentAlreadyExistException.class);
+//        testServer.addAgent(agent);
+//        //assertEquals(afterAddId, 0);
+//    }
+//
+//    @Test
+//    public final void addAgent_isAgentActuallyAdded()
+//            throws TException, AgentNotFoundException, AgentAlreadyExistException {
+//        int npasp = 2;
+//        Agent agent = testServer.getAgent(npasp);
+//        agent.setNpasp(5);
+//        testServer.addAgent(agent);
+//    }
 
 }

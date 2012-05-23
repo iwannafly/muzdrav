@@ -54,6 +54,7 @@ struct PvizitAmb {
 	17: i32 pr_opl;
 	18: i32 pl_extr;
 	19: i32 vpom;
+	20: string fio_vr;
 }
 
 struct PdiagAmb {
@@ -83,6 +84,13 @@ struct Psign{
 	5: string farmkol;
 	6: string vitae;
 	7: string vred;
+	8: string razv;
+	9: string uslov;
+	10: string per_zab;
+	11: string per_oper;
+	12: string gemotr;
+	13: string nasl;
+	14: string ginek;
 }
 
 struct Priem{
@@ -151,6 +159,7 @@ struct Priem{
 	63: string t_chitov;
 	64: string t_st_localis;
 	65: string t_ocenka;
+	66: string t_jalob;
 }
 
 struct PdiagZ{
@@ -267,6 +276,23 @@ struct RdDinStruct{
 	20:i32 serd1;
 }
 
+/*. Rd_Inf*/
+struct RdInfStruct{
+	1:i32 idDispb;
+	2:i32 npasp;
+	3:i32 obr;
+	4:i32 sem;
+	5:i32 oSocO;
+	6:i32 UslPr;
+	7:i32 vOtec;
+	8:i64 grOtec;
+	9:string phOtec;
+	10:string fioOtec;
+	11:string mrOtec;
+	12:string telOtec;
+	13:i32 vredOtec;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -333,6 +359,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getAp0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
@@ -349,4 +376,13 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	void UpdateRdSl(1:i32 npasp, 2:i32 lgota) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdateRdDin(1:i32 idDispb,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
+
+	list<RdInfStruct> getRdInfInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
+
+	void DeleteRdInf(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	void UpdateRdInf(1:i32 npasp, 2:i32 lgota) throws (1: kmiacServer.KmiacServerException kse);
+
 }

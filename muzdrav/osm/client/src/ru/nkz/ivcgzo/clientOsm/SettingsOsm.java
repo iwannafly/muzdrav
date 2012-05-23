@@ -1,9 +1,9 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,16 +23,22 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JLabel;
 
 public class SettingsOsm extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JCheckBox jal;
 	private JCheckBox jal_d;
 	private JCheckBox jal_kr;
 	private JCheckBox jal_p;
@@ -113,6 +119,11 @@ public class SettingsOsm extends JFrame {
 	 * Create the frame.
 	 */
 	public SettingsOsm() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+			loadConfig();}
+		});
 		setBounds(100, 100, 962, 629);
 		
 		JPanel osn = new JPanel();
@@ -590,457 +601,609 @@ public class SettingsOsm extends JFrame {
 				Mainelem.setAttribute("name", "Врач амбулаторного приема");
 				Mainelem.appendChild(doc.createTextNode("osm"));
 				doc.appendChild(Mainelem);
-				if (jal.isSelected()){
-				Element JalEl = doc.createElement("Jalob");
-				JalEl.setAttributeNode(doc.createAttribute("name"));
-				JalEl.setAttribute("name", "Жалобы");
-				JalEl.appendChild(doc.createTextNode("Jalob"));
-				Mainelem.appendChild(JalEl);}
 				if (jal_d.isSelected()){
-					Element JalDEl = doc.createElement("Jalob_dyh");
+					Element JalDEl = doc.createElement("jalob_dyh");
 					JalDEl.setAttributeNode(doc.createAttribute("name"));
-					JalDEl.setAttribute("name", "Жалобы.Дых.система");
-					JalDEl.appendChild(doc.createTextNode("Jalob_dyh"));
+					JalDEl.setAttribute("name", "jal_d");
+					JalDEl.setAttributeNode(doc.createAttribute("id"));
+					JalDEl.setAttribute("id", "2");
+					JalDEl.appendChild(doc.createTextNode("Дыхательная система"));
 					Mainelem.appendChild(JalDEl);}
 				if (jal_kr.isSelected()){
-					Element JalKrEl = doc.createElement("Jalob_kr");
+					Element JalKrEl = doc.createElement("jalob_kr");
 					JalKrEl.setAttributeNode(doc.createAttribute("name"));
-					JalKrEl.setAttribute("name", "Жалобы.Кровен.система");
-					JalKrEl.appendChild(doc.createTextNode("Jalob_kr"));
+					JalKrEl.setAttribute("name", "jal_kr");
+					JalKrEl.setAttributeNode(doc.createAttribute("id"));
+					JalKrEl.setAttribute("id", "3");
+					JalKrEl.appendChild(doc.createTextNode("Система кровообращения"));
 					Mainelem.appendChild(JalKrEl);}
 				if (jal_p.isSelected()){
-					Element JalPEl = doc.createElement("Jalob_p");
+					Element JalPEl = doc.createElement("jalob_p");
 					JalPEl.setAttributeNode(doc.createAttribute("name"));
-					JalPEl.setAttribute("name", "Жалобы.Система пищев.");
-					JalPEl.appendChild(doc.createTextNode("Jalob_p"));
+					JalPEl.setAttribute("name", "jal_p");
+					JalPEl.setAttributeNode(doc.createAttribute("id"));
+					JalPEl.setAttribute("id", "4");
+					JalPEl.appendChild(doc.createTextNode("Система пищеварения"));
 					Mainelem.appendChild(JalPEl);}
 				if (jal_m.isSelected()){
-					Element JalMEl = doc.createElement("Jalob_m");
+					Element JalMEl = doc.createElement("jalob_m");
 					JalMEl.setAttributeNode(doc.createAttribute("name"));
-					JalMEl.setAttribute("name", "Жалобы.Мочеполов.сист.");
-					JalMEl.appendChild(doc.createTextNode("Jalob_m"));
+					JalMEl.setAttribute("name", "jal_m");
+					JalMEl.setAttributeNode(doc.createAttribute("id"));
+					JalMEl.setAttribute("id", "5");
+					JalMEl.appendChild(doc.createTextNode("Мочеполовая система"));
 					Mainelem.appendChild(JalMEl);}
 				if (jal_en.isSelected()){
-					Element JalEnEl = doc.createElement("Jalob_en");
+					Element JalEnEl = doc.createElement("jalob_en");
 					JalEnEl.setAttributeNode(doc.createAttribute("name"));
-					JalEnEl.setAttribute("name", "Жалобы.Эндокрин.сист.");
-					JalEnEl.appendChild(doc.createTextNode("Jalob_en"));
+					JalEnEl.setAttribute("name", "jal_en");
+					JalEnEl.setAttributeNode(doc.createAttribute("id"));
+					JalEnEl.setAttribute("id", "6");
+					JalEnEl.appendChild(doc.createTextNode("Эндокринная система"));
 					Mainelem.appendChild(JalEnEl);}
 				if (jal_ner.isSelected()){
-					Element JalNerEl = doc.createElement("Jalob_nerv");
+					Element JalNerEl = doc.createElement("jalob_nerv");
 					JalNerEl.setAttributeNode(doc.createAttribute("name"));
-					JalNerEl.setAttribute("name", "Жалобы.Нервн.сист.");
-					JalNerEl.appendChild(doc.createTextNode("Jalob_nerv"));
+					JalNerEl.setAttribute("name", "jal_ner");
+					JalNerEl.setAttributeNode(doc.createAttribute("id"));
+					JalNerEl.setAttribute("id", "7");
+					JalNerEl.appendChild(doc.createTextNode("Нервная система и органы чувств"));
 					Mainelem.appendChild(JalNerEl);}
 				if (jal_op.isSelected()){
-					Element JalOpEl = doc.createElement("Jalob_opor");
+					Element JalOpEl = doc.createElement("jalob_opor");
 					JalOpEl.setAttributeNode(doc.createAttribute("name"));
-					JalOpEl.setAttribute("name", "Жалобы.Опорно-дв.сист.");
-					JalOpEl.appendChild(doc.createTextNode("Jalob_opor"));
+					JalOpEl.setAttribute("name", "jal_opor");
+					JalOpEl.setAttributeNode(doc.createAttribute("id"));
+					JalOpEl.setAttribute("id", "8");
+					JalOpEl.appendChild(doc.createTextNode("Опорно-двигательная система"));
 					Mainelem.appendChild(JalOpEl);}
 				if (jal_l.isSelected()){
-					Element JalLEl = doc.createElement("Jalob_lih");
+					Element JalLEl = doc.createElement("jalob_lih");
 					JalLEl.setAttributeNode(doc.createAttribute("name"));
-					JalLEl.setAttribute("name", "Жалобы.Лихорадка");
-					JalLEl.appendChild(doc.createTextNode("Jalob_lih"));
+					JalLEl.setAttribute("name", "jal_lih");
+					JalLEl.setAttributeNode(doc.createAttribute("id"));
+					JalLEl.setAttribute("id", "9");
+					JalLEl.appendChild(doc.createTextNode("Лихорадка"));
 					Mainelem.appendChild(JalLEl);}
 				if (jal_ob.isSelected()){
-					Element JalObEl = doc.createElement("Jalob_ob");
+					Element JalObEl = doc.createElement("jalob_ob");
 					JalObEl.setAttributeNode(doc.createAttribute("name"));
-					JalObEl.setAttribute("name", "Жалобы общего характера");
-					JalObEl.appendChild(doc.createTextNode("Jalob_ob"));
+					JalObEl.setAttribute("name", "jal_ob");
+					JalObEl.setAttributeNode(doc.createAttribute("id"));
+					JalObEl.setAttribute("id", "10");
+					JalObEl.appendChild(doc.createTextNode("Жалобы общего характера"));
 					Mainelem.appendChild(JalObEl);}
 				if (jal_pr.isSelected()){
-					Element JalPrEl = doc.createElement("Jalob_pr");
+					Element JalPrEl = doc.createElement("jalob_pr");
 					JalPrEl.setAttributeNode(doc.createAttribute("name"));
-					JalPrEl.setAttribute("name", "Прочие жалобы");
-					JalPrEl.appendChild(doc.createTextNode("Jalob_pr"));
+					JalPrEl.setAttribute("name", "jal_pr");
+					JalPrEl.setAttributeNode(doc.createAttribute("id"));
+					JalPrEl.setAttribute("id", "11");
+					JalPrEl.appendChild(doc.createTextNode("Прочие жалобы"));
 					Mainelem.appendChild(JalPrEl);}
 				if (istz.isSelected()){
-					Element IstzEl = doc.createElement("Ist_zab");
+					Element IstzEl = doc.createElement("ist_zab");
 					IstzEl.setAttributeNode(doc.createAttribute("name"));
-					IstzEl.setAttribute("name", "История заболевания");
-					IstzEl.appendChild(doc.createTextNode("Ist_zab"));
+					IstzEl.setAttribute("name", "istzab");
+					IstzEl.setAttributeNode(doc.createAttribute("id"));
+					IstzEl.setAttribute("id", "12");
+					IstzEl.appendChild(doc.createTextNode("История заболевания"));
 					Mainelem.appendChild(IstzEl);}
 				if (nach.isSelected()){
-					Element NachzEl = doc.createElement("Nach_zab");
+					Element NachzEl = doc.createElement("nach_zab");
 					NachzEl.setAttributeNode(doc.createAttribute("name"));
-					NachzEl.setAttribute("name", "Начало заболевания");
-					NachzEl.appendChild(doc.createTextNode("Nach_zab"));
+					NachzEl.setAttribute("name", "nachzab");
+					NachzEl.setAttributeNode(doc.createAttribute("id"));
+					NachzEl.setAttribute("id", "13");
+					NachzEl.appendChild(doc.createTextNode("Начало заболевания"));
 					Mainelem.appendChild(NachzEl);}
 				if (symp.isSelected()){
-					Element SymEl = doc.createElement("Sympt");
+					Element SymEl = doc.createElement("sympt");
 					SymEl.setAttributeNode(doc.createAttribute("name"));
-					SymEl.setAttribute("name", "Симптомы");
-					SymEl.appendChild(doc.createTextNode("Sympt"));
+					SymEl.setAttribute("name", "sympt");
+					SymEl.setAttributeNode(doc.createAttribute("id"));
+					SymEl.setAttribute("id", "14");
+					SymEl.appendChild(doc.createTextNode("Симптомы"));
 					Mainelem.appendChild(SymEl);}
 				if (otn.isSelected()){
-					Element OtnEl = doc.createElement("Otn_bol");
+					Element OtnEl = doc.createElement("otn_bol");
 					OtnEl.setAttributeNode(doc.createAttribute("name"));
-					OtnEl.setAttribute("name", "Отношение больного к болезни");
-					OtnEl.appendChild(doc.createTextNode("Otn_bol"));
+					OtnEl.setAttribute("name", "otnbol");
+					OtnEl.setAttributeNode(doc.createAttribute("id"));
+					OtnEl.setAttribute("id", "15");
+					OtnEl.appendChild(doc.createTextNode("Отношение больного к болезни"));
 					Mainelem.appendChild(OtnEl);}
 				if (ps.isSelected()){
-					Element PsEl = doc.createElement("Ps_sit");
+					Element PsEl = doc.createElement("ps_sit");
 					PsEl.setAttributeNode(doc.createAttribute("name"));
-					PsEl.setAttribute("name", "Психол.ситуация в связи с бол.");
-					PsEl.appendChild(doc.createTextNode("Ps_sit"));
+					PsEl.setAttribute("name", "pssit");
+					PsEl.setAttributeNode(doc.createAttribute("id"));
+					PsEl.setAttribute("id", "16");
+					PsEl.appendChild(doc.createTextNode("Психол.ситуаци в связи с болезнью"));
 					Mainelem.appendChild(PsEl);}
 				if (allerg.isSelected()){
-					Element AllerEl = doc.createElement("Allerg");
+					Element AllerEl = doc.createElement("allerg");
 					AllerEl.setAttributeNode(doc.createAttribute("name"));
-					AllerEl.setAttribute("name", "Аллергоанамнез");
-					AllerEl.appendChild(doc.createTextNode("Allerg"));
+					AllerEl.setAttribute("name", "allerg");
+					AllerEl.setAttributeNode(doc.createAttribute("id"));
+					AllerEl.setAttribute("id", "17");
+					AllerEl.appendChild(doc.createTextNode("Аллергоанамнез"));
 					Mainelem.appendChild(AllerEl);}
 				if (ist.isSelected()){
-					Element IstEl = doc.createElement("Vitae");
+					Element IstEl = doc.createElement("vitae");
 					IstEl.setAttributeNode(doc.createAttribute("name"));
-					IstEl.setAttribute("name", "История жизни");
-					IstEl.appendChild(doc.createTextNode("Vitae"));
+					IstEl.setAttribute("name", "vitae");
+					IstEl.setAttributeNode(doc.createAttribute("id"));
+					IstEl.setAttribute("id", "18");
+					IstEl.appendChild(doc.createTextNode("История жизни"));
 					Mainelem.appendChild(IstEl);}
 				if (razv.isSelected()){
-					Element RazvEl = doc.createElement("Razv");
+					Element RazvEl = doc.createElement("razv");
 					RazvEl.setAttributeNode(doc.createAttribute("name"));
-					RazvEl.setAttribute("name", "Развитие");
-					RazvEl.appendChild(doc.createTextNode("Razv"));
+					RazvEl.setAttribute("name", "razv");
+					RazvEl.setAttributeNode(doc.createAttribute("id"));
+					RazvEl.setAttribute("id", "19");
+					RazvEl.appendChild(doc.createTextNode("Развитие"));
 					Mainelem.appendChild(RazvEl);}
 				if (usl.isSelected()){
-					Element UslEl = doc.createElement("Uslov");
+					Element UslEl = doc.createElement("uslov");
 					UslEl.setAttributeNode(doc.createAttribute("name"));
-					UslEl.setAttribute("name", "Усл.проживания");
-					UslEl.appendChild(doc.createTextNode("Uslov"));
+					UslEl.setAttribute("name", "usl");
+					UslEl.setAttributeNode(doc.createAttribute("id"));
+					UslEl.setAttribute("id", "20");
+					UslEl.appendChild(doc.createTextNode("Условия проживания"));
 					Mainelem.appendChild(UslEl);}
 				if (perz.isSelected()){
-					Element PerzEl = doc.createElement("PerZab");
+					Element PerzEl = doc.createElement("per_zab");
 					PerzEl.setAttributeNode(doc.createAttribute("name"));
-					PerzEl.setAttribute("name", "Пер.заболевания");
-					PerzEl.appendChild(doc.createTextNode("PerZab"));
+					PerzEl.setAttribute("name", "perz");
+					PerzEl.setAttributeNode(doc.createAttribute("id"));
+					PerzEl.setAttribute("id", "21");
+					PerzEl.appendChild(doc.createTextNode("Перенесенные заболевания"));
 					Mainelem.appendChild(PerzEl);}
 				if (per_op.isSelected()){
-					Element PeropEl = doc.createElement("PerOp");
+					Element PeropEl = doc.createElement("per_op");
 					PeropEl.setAttributeNode(doc.createAttribute("name"));
-					PeropEl.setAttribute("name", "Пер.операции");
-					PeropEl.appendChild(doc.createTextNode("PerOp"));
+					PeropEl.setAttribute("name", "perop");
+					PeropEl.setAttributeNode(doc.createAttribute("id"));
+					PeropEl.setAttribute("id", "22");
+					PeropEl.appendChild(doc.createTextNode("Перенесенные операции"));
 					Mainelem.appendChild(PeropEl);}
 				if (gem.isSelected()){
-					Element GemEl = doc.createElement("GemTrans");
+					Element GemEl = doc.createElement("gem_trans");
 					GemEl.setAttributeNode(doc.createAttribute("name"));
-					GemEl.setAttribute("name", "Гемотрансфузия");
-					GemEl.appendChild(doc.createTextNode("GemTrans"));
+					GemEl.setAttribute("name", "gem");
+					GemEl.setAttributeNode(doc.createAttribute("id"));
+					GemEl.setAttribute("id", "23");
+					GemEl.appendChild(doc.createTextNode("Гемотрансфузия"));
 					Mainelem.appendChild(GemEl);}
 				if (nasl.isSelected()){
-					Element NAsEl = doc.createElement("Nasl");
+					Element NAsEl = doc.createElement("nasl");
 					NAsEl.setAttributeNode(doc.createAttribute("name"));
-					NAsEl.setAttribute("name", "Наследственность");
-					NAsEl.appendChild(doc.createTextNode("Nasl"));
+					NAsEl.setAttribute("name", "nasl");
+					NAsEl.setAttributeNode(doc.createAttribute("id"));
+					NAsEl.setAttribute("id", "24");
+					NAsEl.appendChild(doc.createTextNode("Наследственность"));
 					Mainelem.appendChild(NAsEl);}
 				if (gyn.isSelected()){
-					Element NAsEl = doc.createElement("GinAnamn");
-					NAsEl.setAttributeNode(doc.createAttribute("name"));
-					NAsEl.setAttribute("name", "Гинек.анамнез");
-					NAsEl.appendChild(doc.createTextNode("GinAnamn"));
-					Mainelem.appendChild(NAsEl);}
+					Element GynEl = doc.createElement("gin_anamn");
+					GynEl.setAttributeNode(doc.createAttribute("name"));
+					GynEl.setAttribute("name", "ginanam");
+					GynEl.setAttributeNode(doc.createAttribute("id"));
+					GynEl.setAttribute("id", "25");
+					GynEl.appendChild(doc.createTextNode("Гинекологич.анамнез"));
+					Mainelem.appendChild(GynEl);}
 				if (farm.isSelected()){
-					Element FarmEl = doc.createElement("FarmAnamn");
+					Element FarmEl = doc.createElement("farm_anamn");
 					FarmEl.setAttributeNode(doc.createAttribute("name"));
-					FarmEl.setAttribute("name", "Фарм.анамнез");
-					FarmEl.appendChild(doc.createTextNode("FarmAnamn"));
+					FarmEl.setAttribute("name", "farm");
+					FarmEl.setAttributeNode(doc.createAttribute("id"));
+					FarmEl.setAttribute("id", "26");
+					FarmEl.appendChild(doc.createTextNode("Фармакологический анамнез"));
 					Mainelem.appendChild(FarmEl);}
 				if (lek.isSelected()){
-					Element LekEl = doc.createElement("LekSr");
+					Element LekEl = doc.createElement("lek_sr");
 					LekEl.setAttributeNode(doc.createAttribute("name"));
-					LekEl.setAttribute("name", "Прием лек.средств");
-					LekEl.appendChild(doc.createTextNode("LekSr"));
+					LekEl.setAttribute("name", "lek");
+					LekEl.setAttributeNode(doc.createAttribute("id"));
+					LekEl.setAttribute("id", "27");
+					LekEl.appendChild(doc.createTextNode("Прием лек.средств"));
 					Mainelem.appendChild(LekEl);}
 				if (gorm.isSelected()){
-					Element GormEl = doc.createElement("GormonPrep");
+					Element GormEl = doc.createElement("gormon_prep");
 					GormEl.setAttributeNode(doc.createAttribute("name"));
-					GormEl.setAttribute("name", "Прием гормон.препаратов");
-					GormEl.appendChild(doc.createTextNode("GormonPrep"));
+					GormEl.setAttribute("name", "gorm");
+					GormEl.setAttributeNode(doc.createAttribute("id"));
+					GormEl.setAttribute("id", "28");
+					GormEl.appendChild(doc.createTextNode("Применение гормон.препаратов"));
 					Mainelem.appendChild(GormEl);}
 				if (st.isSelected()){
-					Element StPEl = doc.createElement("StPraesense");
+					Element StPEl = doc.createElement("st_praesense");
 					StPEl.setAttributeNode(doc.createAttribute("name"));
-					StPEl.setAttribute("name", "Status Praesense");
-					StPEl.appendChild(doc.createTextNode("StPraesense"));
+					StPEl.setAttribute("name", "status praesense");
+					StPEl.setAttributeNode(doc.createAttribute("id"));
+					StPEl.setAttribute("id", "29");
+					StPEl.appendChild(doc.createTextNode("Status Praesense"));
 					Mainelem.appendChild(StPEl);}
 				if (ob.isSelected()){
-					Element ObEl = doc.createElement("ObSost");
+					Element ObEl = doc.createElement("ob_sost");
 					ObEl.setAttributeNode(doc.createAttribute("name"));
-					ObEl.setAttribute("name", "Общ.состояние");
-					ObEl.appendChild(doc.createTextNode("ObSost"));
+					ObEl.setAttribute("name", "obs");
+					ObEl.setAttributeNode(doc.createAttribute("id"));
+					ObEl.setAttribute("id", "30");
+					ObEl.appendChild(doc.createTextNode("Общее состояние"));
 					Mainelem.appendChild(ObEl);}
 				if (koj.isSelected()){
-					Element KojEl = doc.createElement("KojPokr");
+					Element KojEl = doc.createElement("koj_pokr");
 					KojEl.setAttributeNode(doc.createAttribute("name"));
-					KojEl.setAttribute("name", "Кож.покровы");
-					KojEl.appendChild(doc.createTextNode("KojPokr"));
+					KojEl.setAttribute("name", "kojp");
+					KojEl.setAttributeNode(doc.createAttribute("id"));
+					KojEl.setAttribute("id", "31");
+					KojEl.appendChild(doc.createTextNode("Кожные покровы"));
 					Mainelem.appendChild(KojEl);}
 				if (sl.isSelected()){
-					Element SlEl = doc.createElement("Sliz");
+					Element SlEl = doc.createElement("sliz");
 					SlEl.setAttributeNode(doc.createAttribute("name"));
-					SlEl.setAttribute("name", "Видим.слизистые");
-					SlEl.appendChild(doc.createTextNode("Sliz"));
+					SlEl.setAttribute("name", "sliz");
+					SlEl.setAttributeNode(doc.createAttribute("id"));
+					SlEl.setAttribute("id", "32");
+					SlEl.appendChild(doc.createTextNode("Видимые слизистые"));
 					Mainelem.appendChild(SlEl);}
 				if (kl.isSelected()){
-					Element KlEl = doc.createElement("PodkKl");
+					Element KlEl = doc.createElement("podk_kl");
 					KlEl.setAttributeNode(doc.createAttribute("name"));
-					KlEl.setAttribute("name", "Подк.клетчатка");
-					KlEl.appendChild(doc.createTextNode("PodkKl"));
+					KlEl.setAttribute("name", "podkl");
+					KlEl.setAttributeNode(doc.createAttribute("id"));
+					KlEl.setAttribute("id", "33");
+					KlEl.appendChild(doc.createTextNode("Подкожная клетчатка"));
 					Mainelem.appendChild(KlEl);}
 				if (lim.isSelected()){
-					Element LimEl = doc.createElement("Limf");
+					Element LimEl = doc.createElement("limf");
 					LimEl.setAttributeNode(doc.createAttribute("name"));
-					LimEl.setAttribute("name", "Лимф.узлы");
-					LimEl.appendChild(doc.createTextNode("Limf"));
+					LimEl.setAttribute("name", "limf");
+					LimEl.setAttributeNode(doc.createAttribute("id"));
+					LimEl.setAttribute("id", "34");
+					LimEl.appendChild(doc.createTextNode("Лимф.узлы"));
 					Mainelem.appendChild(LimEl);}
 				if (kost.isSelected()){
-					Element KosEl = doc.createElement("Kost");
+					Element KosEl = doc.createElement("kost");
 					KosEl.setAttributeNode(doc.createAttribute("name"));
-					KosEl.setAttribute("name", "Костно-мышечная система");
-					KosEl.appendChild(doc.createTextNode("Kost"));
+					KosEl.setAttribute("name", "kost");
+					KosEl.setAttributeNode(doc.createAttribute("id"));
+					KosEl.setAttribute("id", "35");
+					KosEl.appendChild(doc.createTextNode("Костно-мышечная система"));
 					Mainelem.appendChild(KosEl);}
 				if (nerv.isSelected()){
-					Element NervEl = doc.createElement("NervPs");
+					Element NervEl = doc.createElement("nerv_ps");
 					NervEl.setAttributeNode(doc.createAttribute("name"));
-					NervEl.setAttribute("name", "Нервно-психич. статус");
-					NervEl.appendChild(doc.createTextNode("NervPs"));
+					NervEl.setAttribute("name", "nerv");
+					NervEl.setAttributeNode(doc.createAttribute("id"));
+					NervEl.setAttribute("id", "36");
+					NervEl.appendChild(doc.createTextNode("Нервно-психический статус"));
 					Mainelem.appendChild(NervEl);}
 				if (chss.isSelected()){
-					Element CHSSEl = doc.createElement("Chss");
+					Element CHSSEl = doc.createElement("chss");
 					CHSSEl.setAttributeNode(doc.createAttribute("name"));
-					CHSSEl.setAttribute("name", "ЧСС");
-					CHSSEl.appendChild(doc.createTextNode("Chss"));
+					CHSSEl.setAttribute("name", "chss");
+					CHSSEl.setAttributeNode(doc.createAttribute("id"));
+					CHSSEl.setAttribute("id", "37");
+					CHSSEl.appendChild(doc.createTextNode("ЧСС"));
 					Mainelem.appendChild(CHSSEl);}
+				if (temp.isSelected()){
+					Element TempEl = doc.createElement("temp");
+					TempEl.setAttributeNode(doc.createAttribute("name"));
+					TempEl.setAttribute("name", "temp");
+					TempEl.setAttributeNode(doc.createAttribute("id"));
+					TempEl.setAttribute("id", "38");
+					TempEl.appendChild(doc.createTextNode("Температура"));
+					Mainelem.appendChild(TempEl);}
 				if (art.isSelected()){
-					Element AdEl = doc.createElement("Ad");
+					Element AdEl = doc.createElement("ad");
 					AdEl.setAttributeNode(doc.createAttribute("name"));
-					AdEl.setAttribute("name", "АД");
-					AdEl.appendChild(doc.createTextNode("Ad"));
+					AdEl.setAttribute("name", "ad");
+					AdEl.setAttributeNode(doc.createAttribute("id"));
+					AdEl.setAttribute("id", "39");
+					AdEl.appendChild(doc.createTextNode("АД"));
 					Mainelem.appendChild(AdEl);}
 				if (rost.isSelected()){
-					Element RostEl = doc.createElement("Rost");
+					Element RostEl = doc.createElement("rost");
 					RostEl.setAttributeNode(doc.createAttribute("name"));
-					RostEl.setAttribute("name", "Рост");
-					RostEl.appendChild(doc.createTextNode("Rost"));
+					RostEl.setAttribute("name", "rost");
+					RostEl.setAttributeNode(doc.createAttribute("id"));
+					RostEl.setAttribute("id", "40");
+					RostEl.appendChild(doc.createTextNode("Рост"));
 					Mainelem.appendChild(RostEl);}	
 				if (ves.isSelected()){
-					Element VesEl = doc.createElement("Ves");
+					Element VesEl = doc.createElement("ves");
 					VesEl.setAttributeNode(doc.createAttribute("name"));
-					VesEl.setAttribute("name", "Вес");
-					VesEl.appendChild(doc.createTextNode("Ves"));
+					VesEl.setAttribute("name", "ves");
+					VesEl.setAttributeNode(doc.createAttribute("id"));
+					VesEl.setAttribute("id", "41");
+					VesEl.appendChild(doc.createTextNode("Вес"));
 					Mainelem.appendChild(VesEl);}
 				if (telo.isSelected()){
-					Element TeloEl = doc.createElement("Telosl");
+					Element TeloEl = doc.createElement("telosl");
 					TeloEl.setAttributeNode(doc.createAttribute("name"));
-					TeloEl.setAttribute("name", "Телосложение");
-					TeloEl.appendChild(doc.createTextNode("Telosl"));
+					TeloEl.setAttribute("name", "telo");
+					TeloEl.setAttributeNode(doc.createAttribute("id"));
+					TeloEl.setAttribute("id", "42");
+					TeloEl.appendChild(doc.createTextNode("Телосложение"));
 					Mainelem.appendChild(TeloEl);}
 				if (fiz.isSelected()){
-					Element FizEl = doc.createElement("FizObsl");
+					Element FizEl = doc.createElement("fiz_obsl");
 					FizEl.setAttributeNode(doc.createAttribute("name"));
-					FizEl.setAttribute("name", "Физик.обследование");
-					FizEl.appendChild(doc.createTextNode("FizObsl"));
+					FizEl.setAttribute("name", "fiz");
+					FizEl.setAttributeNode(doc.createAttribute("id"));
+					FizEl.setAttribute("id", "43");
+					FizEl.appendChild(doc.createTextNode("Физикальное обследование"));
 					Mainelem.appendChild(FizEl);}
 				if (sust.isSelected()){
-					Element SustEl = doc.createElement("Sust");
+					Element SustEl = doc.createElement("sust");
 					SustEl.setAttributeNode(doc.createAttribute("name"));
-					SustEl.setAttribute("name", "Суставы");
-					SustEl.appendChild(doc.createTextNode("Sust"));
+					SustEl.setAttribute("name", "sust");
+					SustEl.setAttributeNode(doc.createAttribute("id"));
+					SustEl.setAttribute("id", "44");
+					SustEl.appendChild(doc.createTextNode("Суставы"));
 					Mainelem.appendChild(SustEl);}
 				if (dyh.isSelected()){
-					Element DyhEl = doc.createElement("Dyh");
+					Element DyhEl = doc.createElement("dyh");
 					DyhEl.setAttributeNode(doc.createAttribute("name"));
-					DyhEl.setAttribute("name", "Дыхание");
-					DyhEl.appendChild(doc.createTextNode("Dyh"));
+					DyhEl.setAttribute("name", "dyh");
+					DyhEl.setAttributeNode(doc.createAttribute("id"));
+					DyhEl.setAttribute("id", "45");
+					DyhEl.appendChild(doc.createTextNode("Дыхание"));
 					Mainelem.appendChild(DyhEl);}
 				if (gr.isSelected()){
-					Element GrEl = doc.createElement("GrKl");
+					Element GrEl = doc.createElement("gr_kl");
 					GrEl.setAttributeNode(doc.createAttribute("name"));
-					GrEl.setAttribute("name", "Гр.клетка");
-					GrEl.appendChild(doc.createTextNode("GrKl"));
+					GrEl.setAttribute("name", "grk");
+					GrEl.setAttributeNode(doc.createAttribute("id"));
+					GrEl.setAttribute("id", "46");
+					GrEl.appendChild(doc.createTextNode("Грудная клетка"));
 					Mainelem.appendChild(GrEl);}
 				if (perl.isSelected()){
-					Element PerlEl = doc.createElement("PerkL");
+					Element PerlEl = doc.createElement("perk_l");
 					PerlEl.setAttributeNode(doc.createAttribute("name"));
-					PerlEl.setAttribute("name", "Перкуссия легких");
-					PerlEl.appendChild(doc.createTextNode("PerkL"));
+					PerlEl.setAttribute("name", "perl");
+					PerlEl.setAttributeNode(doc.createAttribute("id"));
+					PerlEl.setAttribute("id", "47");
+					PerlEl.appendChild(doc.createTextNode("Перкуссия легких"));
 					Mainelem.appendChild(PerlEl);}
 				if (ausl.isSelected()){
-					Element AuslEl = doc.createElement("AusL");
+					Element AuslEl = doc.createElement("aus_l");
 					AuslEl.setAttributeNode(doc.createAttribute("name"));
-					AuslEl.setAttribute("name", "Аускультация легких");
-					AuslEl.appendChild(doc.createTextNode("AusL"));
+					AuslEl.setAttribute("name", "ausl");
+					AuslEl.setAttributeNode(doc.createAttribute("id"));
+					AuslEl.setAttribute("id", "48");
+					AuslEl.appendChild(doc.createTextNode("Аускультация легких"));
 					Mainelem.appendChild(AuslEl);}
 				if (bronh.isSelected()){
-					Element BronhEl = doc.createElement("Bronho");
+					Element BronhEl = doc.createElement("bronho");
 					BronhEl.setAttributeNode(doc.createAttribute("name"));
-					BronhEl.setAttribute("name", "Бронхофония");
-					BronhEl.appendChild(doc.createTextNode("Bronho"));
+					BronhEl.setAttribute("name", "bronh");
+					BronhEl.setAttributeNode(doc.createAttribute("id"));
+					BronhEl.setAttribute("id", "49");
+					BronhEl.appendChild(doc.createTextNode("Бронхофония"));
 					Mainelem.appendChild(BronhEl);}
 				if (arter.isSelected()){
-					Element BronhEl = doc.createElement("Arter");
-					BronhEl.setAttributeNode(doc.createAttribute("name"));
-					BronhEl.setAttribute("name", "Артерии и шейные вены");
-					BronhEl.appendChild(doc.createTextNode("Arter"));
-					Mainelem.appendChild(BronhEl);}
+					Element ArterEl = doc.createElement("arter");
+					ArterEl.setAttributeNode(doc.createAttribute("name"));
+					ArterEl.setAttribute("name", "arter");
+					ArterEl.setAttributeNode(doc.createAttribute("id"));
+					ArterEl.setAttribute("id", "50");
+					ArterEl.appendChild(doc.createTextNode("Артерии и шейные вены"));
+					Mainelem.appendChild(ArterEl);}
 				if (obls.isSelected()){
-					Element OblSEl = doc.createElement("OblS");
+					Element OblSEl = doc.createElement("obl_s");
 					OblSEl.setAttributeNode(doc.createAttribute("name"));
-					OblSEl.setAttribute("name", "Область сердца");
-					OblSEl.appendChild(doc.createTextNode("OblS"));
+					OblSEl.setAttribute("name", "obls");
+					OblSEl.setAttributeNode(doc.createAttribute("id"));
+					OblSEl.setAttribute("id", "51");
+					OblSEl.appendChild(doc.createTextNode("Область сердца"));
 					Mainelem.appendChild(OblSEl);}
 				if (pers.isSelected()){
-					Element PerSEl = doc.createElement("PerkS");
+					Element PerSEl = doc.createElement("perk_s");
 					PerSEl.setAttributeNode(doc.createAttribute("name"));
-					PerSEl.setAttribute("name", "Перкуссия сердца");
-					PerSEl.appendChild(doc.createTextNode("PerkS"));
+					PerSEl.setAttribute("name", "pers");
+					PerSEl.setAttributeNode(doc.createAttribute("id"));
+					PerSEl.setAttribute("id", "52");
+					PerSEl.appendChild(doc.createTextNode("Перкуссия сердца"));
 					Mainelem.appendChild(PerSEl);}
 				if (auss.isSelected()){
-					Element AusSEl = doc.createElement("AuskS");
+					Element AusSEl = doc.createElement("ausk_s");
 					AusSEl.setAttributeNode(doc.createAttribute("name"));
-					AusSEl.setAttribute("name", "Аускультация сердца");
-					AusSEl.appendChild(doc.createTextNode("AuskS"));
+					AusSEl.setAttribute("name", "auss");
+					AusSEl.setAttributeNode(doc.createAttribute("id"));
+					AusSEl.setAttribute("id", "53");
+					AusSEl.appendChild(doc.createTextNode("Аускультация сердца"));
 					Mainelem.appendChild(AusSEl);}
 				if (polr.isSelected()){
-					Element PolrEl = doc.createElement("PolRta");
+					Element PolrEl = doc.createElement("pol_rta");
 					PolrEl.setAttributeNode(doc.createAttribute("name"));
-					PolrEl.setAttribute("name", "Полость рта");
-					PolrEl.appendChild(doc.createTextNode("PolRta"));
+					PolrEl.setAttribute("name", "polr");
+					PolrEl.setAttributeNode(doc.createAttribute("id"));
+					PolrEl.setAttribute("id", "54");
+					PolrEl.appendChild(doc.createTextNode("Полость рта"));
 					Mainelem.appendChild(PolrEl);}
 				if (jiv.isSelected()){
-					Element JivEl = doc.createElement("Jivot");
+					Element JivEl = doc.createElement("jivot");
 					JivEl.setAttributeNode(doc.createAttribute("name"));
-					JivEl.setAttribute("name", "Живот");
-					JivEl.appendChild(doc.createTextNode("Jivot"));
+					JivEl.setAttribute("name", "jiv");
+					JivEl.setAttributeNode(doc.createAttribute("id"));
+					JivEl.setAttribute("id", "55");
+					JivEl.appendChild(doc.createTextNode("Живот"));
 					Mainelem.appendChild(JivEl);}
 				if (palj.isSelected()){
-					Element PaljEl = doc.createElement("PalpJ");
+					Element PaljEl = doc.createElement("palp_j");
 					PaljEl.setAttributeNode(doc.createAttribute("name"));
-					PaljEl.setAttribute("name", "Пальпация живота");
-					PaljEl.appendChild(doc.createTextNode("PalpJ"));
+					PaljEl.setAttribute("name", "palj");
+					PaljEl.setAttributeNode(doc.createAttribute("id"));
+					PaljEl.setAttribute("id", "56");
+					PaljEl.appendChild(doc.createTextNode("Пальпация живота"));
 					Mainelem.appendChild(PaljEl);}
 				if (jkt.isSelected()){
-					Element JktEl = doc.createElement("JKT");
+					Element JktEl = doc.createElement("jkt");
 					JktEl.setAttributeNode(doc.createAttribute("name"));
-					JktEl.setAttribute("name", "Пальп.,перк. И ауск. жел.-кишечного тракта");
-					JktEl.appendChild(doc.createTextNode("JKT"));
+					JktEl.setAttribute("name", "jkt");
+					JktEl.setAttributeNode(doc.createAttribute("id"));
+					JktEl.setAttribute("id", "57");
+					JktEl.appendChild(doc.createTextNode("ЖКТ"));
 					Mainelem.appendChild(JktEl);}
 				if (palpj.isSelected()){
-					Element PalpjEl = doc.createElement("PalpJel");
+					Element PalpjEl = doc.createElement("palp_jel");
 					PalpjEl.setAttributeNode(doc.createAttribute("name"));
-					PalpjEl.setAttribute("name", "Пальп.желудка");
-					PalpjEl.appendChild(doc.createTextNode("PalpJel"));
+					PalpjEl.setAttribute("name", "palp_jel");
+					PalpjEl.setAttributeNode(doc.createAttribute("id"));
+					PalpjEl.setAttribute("id", "58");
+					PalpjEl.appendChild(doc.createTextNode("Пальпация желудка"));
 					Mainelem.appendChild(PalpjEl);}
 				if (palpod.isSelected()){
-					Element PalpodEl = doc.createElement("PalpPodjel");
+					Element PalpodEl = doc.createElement("palp_podjel");
 					PalpodEl.setAttributeNode(doc.createAttribute("name"));
-					PalpodEl.setAttribute("name", "Пальп.поджел.жлезы");
-					PalpodEl.appendChild(doc.createTextNode("PalpPodjel"));
+					PalpodEl.setAttribute("name", "palpod");
+					PalpodEl.setAttributeNode(doc.createAttribute("id"));
+					PalpodEl.setAttribute("id", "59");
+					PalpodEl.appendChild(doc.createTextNode("Пальпация поджел.железы"));
 					Mainelem.appendChild(PalpodEl);}
 				if (pech.isSelected()){
-					Element PechEl = doc.createElement("Pechen");
+					Element PechEl = doc.createElement("pechen");
 					PechEl.setAttributeNode(doc.createAttribute("name"));
-					PechEl.setAttribute("name", "Печень");
-					PechEl.appendChild(doc.createTextNode("Pechen"));
+					PechEl.setAttribute("name", "pech");
+					PechEl.setAttributeNode(doc.createAttribute("id"));
+					PechEl.setAttribute("id", "60");
+					PechEl.appendChild(doc.createTextNode("Печень"));
 					Mainelem.appendChild(PechEl);}
 				if (jelch.isSelected()){
-					Element JechEl = doc.createElement("JelchP");
+					Element JechEl = doc.createElement("jelch_p");
 					JechEl.setAttributeNode(doc.createAttribute("name"));
-					JechEl.setAttribute("name", "Желч.пузырь");
-					JechEl.appendChild(doc.createTextNode("JelchP"));
+					JechEl.setAttribute("name", "jelch");
+					JechEl.setAttributeNode(doc.createAttribute("id"));
+					JechEl.setAttribute("id", "61");
+					JechEl.appendChild(doc.createTextNode("Желчный пузырь"));
 					Mainelem.appendChild(JechEl);}
 				if (selez.isSelected()){
-					Element SelezEl = doc.createElement("Selez");
+					Element SelezEl = doc.createElement("selez");
 					SelezEl.setAttributeNode(doc.createAttribute("name"));
-					SelezEl.setAttribute("name", "Селезенка");
-					SelezEl.appendChild(doc.createTextNode("Selez"));
+					SelezEl.setAttribute("name", "selez");
+					SelezEl.setAttributeNode(doc.createAttribute("id"));
+					SelezEl.setAttribute("id", "62");
+					SelezEl.appendChild(doc.createTextNode("Селезенка"));
 					Mainelem.appendChild(SelezEl);}
 				if (oblz.isSelected()){
-					Element OblzEl = doc.createElement("OblZad");
+					Element OblzEl = doc.createElement("obl_zad");
 					OblzEl.setAttributeNode(doc.createAttribute("name"));
-					OblzEl.setAttribute("name", "Оюл.заднего прохода");
-					OblzEl.appendChild(doc.createTextNode("OblZad"));
+					OblzEl.setAttribute("name", "oblz");
+					OblzEl.setAttributeNode(doc.createAttribute("id"));
+					OblzEl.setAttribute("id", "63");
+					OblzEl.appendChild(doc.createTextNode("Обл.заднего прохода"));
 					Mainelem.appendChild(OblzEl);}
 				if (oblp.isSelected()){
-					Element OblPEl = doc.createElement("Poyasn");
+					Element OblPEl = doc.createElement("poyasn");
 					OblPEl.setAttributeNode(doc.createAttribute("name"));
-					OblPEl.setAttribute("name", "Поясн.область");
-					OblPEl.appendChild(doc.createTextNode("Poyasn"));
+					OblPEl.setAttribute("name", "oblp");
+					OblPEl.setAttributeNode(doc.createAttribute("id"));
+					OblPEl.setAttribute("id", "64");
+					OblPEl.appendChild(doc.createTextNode("Поясничная область"));
 					Mainelem.appendChild(OblPEl);}
 				if (pochk.isSelected()){
-					Element PochkEl = doc.createElement("Pochki");
+					Element PochkEl = doc.createElement("pochki");
 					PochkEl.setAttributeNode(doc.createAttribute("name"));
-					PochkEl.setAttribute("name", "Почки");
-					PochkEl.appendChild(doc.createTextNode("Pochki"));
+					PochkEl.setAttribute("name", "pochk");
+					PochkEl.setAttributeNode(doc.createAttribute("id"));
+					PochkEl.setAttribute("id", "65");
+					PochkEl.appendChild(doc.createTextNode("Почки"));
 					Mainelem.appendChild(PochkEl);}
 				if (moch.isSelected()){
-					Element MochEl = doc.createElement("MochP");
+					Element MochEl = doc.createElement("moch_p");
 					MochEl.setAttributeNode(doc.createAttribute("name"));
-					MochEl.setAttribute("name", "Мочев.пузырь");
-					MochEl.appendChild(doc.createTextNode("MochP"));
+					MochEl.setAttribute("name", "moch");
+					MochEl.setAttributeNode(doc.createAttribute("id"));
+					MochEl.setAttribute("id", "66");
+					MochEl.appendChild(doc.createTextNode("Мочевой пузырь"));
 					Mainelem.appendChild(MochEl);}
 				if (jelm.isSelected()){
-					Element JelmEl = doc.createElement("MolJel");
+					Element JelmEl = doc.createElement("mol_jel");
 					JelmEl.setAttributeNode(doc.createAttribute("name"));
-					JelmEl.setAttribute("name", "Молочные железы");
-					JelmEl.appendChild(doc.createTextNode("MolJel"));
+					JelmEl.setAttribute("name", "jelm");
+					JelmEl.setAttributeNode(doc.createAttribute("id"));
+					JelmEl.setAttribute("id", "67");
+					JelmEl.appendChild(doc.createTextNode("Молочные железы"));
 					Mainelem.appendChild(JelmEl);}
 				if (jelgr.isSelected()){
-					Element JelgrEl = doc.createElement("GrJel");
+					Element JelgrEl = doc.createElement("gr_jel");
 					JelgrEl.setAttributeNode(doc.createAttribute("name"));
-					JelgrEl.setAttribute("name", "Грудные железы мужчин");
-					JelgrEl.appendChild(doc.createTextNode("GrJel"));
+					JelgrEl.setAttribute("name", "jelgr");
+					JelgrEl.setAttributeNode(doc.createAttribute("id"));
+					JelgrEl.setAttribute("id", "68");
+					JelgrEl.appendChild(doc.createTextNode("Грудные железы мужчин"));
 					Mainelem.appendChild(JelgrEl);}
 				if (matka.isSelected()){
-					Element MatEl = doc.createElement("Matka");
+					Element MatEl = doc.createElement("matka");
 					MatEl.setAttributeNode(doc.createAttribute("name"));
-					MatEl.setAttribute("name", "Матка и ее придатки");
-					MatEl.appendChild(doc.createTextNode("Matka"));
+					MatEl.setAttribute("name", "matka");
+					MatEl.setAttributeNode(doc.createAttribute("id"));
+					MatEl.setAttribute("id", "69");
+					MatEl.appendChild(doc.createTextNode("Матка и ее придатки"));
 					Mainelem.appendChild(MatEl);}
 				if (polorg.isSelected()){
-					Element PolEl = doc.createElement("PolovOrg");
+					Element PolEl = doc.createElement("polov_org");
 					PolEl.setAttributeNode(doc.createAttribute("name"));
-					PolEl.setAttribute("name", "Наружные полов.органы у мужчин");
-					PolEl.appendChild(doc.createTextNode("PolOrg"));
+					PolEl.setAttribute("name", "polorg");
+					PolEl.setAttributeNode(doc.createAttribute("id"));
+					PolEl.setAttribute("id", "70");
+					PolEl.appendChild(doc.createTextNode("Полов.органы у мужчин"));
 					Mainelem.appendChild(PolEl);}
 				if (chit.isSelected()){
-					Element ChitEl = doc.createElement("Chitov");
+					Element ChitEl = doc.createElement("chitov");
 					ChitEl.setAttributeNode(doc.createAttribute("name"));
-					ChitEl.setAttribute("name", "Щитов.железа");
-					ChitEl.appendChild(doc.createTextNode("Chitov"));
+					ChitEl.setAttribute("name", "chit");
+					ChitEl.setAttributeNode(doc.createAttribute("id"));
+					ChitEl.setAttribute("id", "71");
+					ChitEl.appendChild(doc.createTextNode("Щитов.железа"));
 					Mainelem.appendChild(ChitEl);}
 				if (stloc.isSelected()){
-					Element StLocEl = doc.createElement("Stloc");
+					Element StLocEl = doc.createElement("stloc");
 					StLocEl.setAttributeNode(doc.createAttribute("name"));
-					StLocEl.setAttribute("name", "Status localis");
-					StLocEl.appendChild(doc.createTextNode("StLoc"));
+					StLocEl.setAttribute("name", "status localis");
+					StLocEl.setAttributeNode(doc.createAttribute("id"));
+					StLocEl.setAttribute("id", "72");
+					StLocEl.appendChild(doc.createTextNode("Status Localis"));
 					Mainelem.appendChild(StLocEl);}
 				if (ocen.isSelected()){
-					Element OcenEl = doc.createElement("Ocenka");
+					Element OcenEl = doc.createElement("ocenka");
 					OcenEl.setAttributeNode(doc.createAttribute("name"));
-					OcenEl.setAttribute("name", "Оценка данных анамнеза");
-					OcenEl.appendChild(doc.createTextNode("Ocenka"));
+					OcenEl.setAttribute("name", "ocen");
+					OcenEl.setAttributeNode(doc.createAttribute("id"));
+					OcenEl.setAttribute("id", "73");
+					OcenEl.appendChild(doc.createTextNode("Оценка данных анамнеза и объективного иссл."));
 					Mainelem.appendChild(OcenEl);}
 		 
-				javax.xml.transform.Result result = new StreamResult("SettingsOsm.xml");
-				Source source = new DOMSource(doc);
-				Transformer xformer;
+//				javax.xml.transform.Result result = new StreamResult("SettingsOsm.xml");
+//				Source source = new DOMSource(doc);
+//				Transformer xformer;
+//				try {
+//				xformer = TransformerFactory.newInstance().newTransformer();
+//				} catch (TransformerConfigurationException e) {
+//				e.printStackTrace();
+//				return;
+//				} catch (TransformerFactoryConfigurationError e) {
+//				e.printStackTrace();
+//				return;
+//				}
+//				xformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//				try {
+//				xformer.transform(source, result);
+//				} catch (TransformerException e) {
+//				e.printStackTrace();
+//				return;
+//				}
 				try {
-				xformer = TransformerFactory.newInstance().newTransformer();
-				} catch (TransformerConfigurationException e) {
-				e.printStackTrace();
-				return;
-				} catch (TransformerFactoryConfigurationError e) {
-				e.printStackTrace();
-				return;
-				}
-				xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-				try {
-				xformer.transform(source, result);
-				} catch (TransformerException e) {
-				e.printStackTrace();
-				return;
+					StringWriter sw = new StringWriter();
+					StreamResult sr = new StreamResult(sw);
+					TransformerFactory.newInstance().newTransformer().transform(new DOMSource(doc), sr);
+					MainForm.tcl.saveUserConfig(MainForm.authInfo.user_id, sw.toString());
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 		});
@@ -1094,8 +1257,6 @@ public class SettingsOsm extends JFrame {
 					.addContainerGap())
 		);
 		
-		jal = new JCheckBox("Жалобы");
-		
 		jal_kr = new JCheckBox("Система кровообращения");
 		
 		jal_d = new JCheckBox("Дыхательная система");
@@ -1115,6 +1276,8 @@ public class SettingsOsm extends JFrame {
 		jal_ob = new JCheckBox("Жалобы общего характера");
 		
 		jal_pr = new JCheckBox("Прочие жалобы");
+		
+		JLabel label = new JLabel("Жалобы:");
 		GroupLayout gl_pjalob = new GroupLayout(pjalob);
 		gl_pjalob.setHorizontalGroup(
 			gl_pjalob.createParallelGroup(Alignment.LEADING)
@@ -1122,13 +1285,15 @@ public class SettingsOsm extends JFrame {
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.LEADING)
 						.addComponent(jal_m)
 						.addComponent(jal_d)
-						.addComponent(jal))
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addGroup(gl_pjalob.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(label)))
+					.addPreferredGap(ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.LEADING)
 						.addComponent(jal_kr)
 						.addComponent(jal_p)
 						.addComponent(jal_en))
-					.addContainerGap(34, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap())
 				.addGroup(gl_pjalob.createSequentialGroup()
 					.addComponent(jal_ner)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1148,8 +1313,8 @@ public class SettingsOsm extends JFrame {
 				.addGroup(gl_pjalob.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.BASELINE)
-						.addComponent(jal)
-						.addComponent(jal_kr))
+						.addComponent(jal_kr)
+						.addComponent(label))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_pjalob.createParallelGroup(Alignment.BASELINE)
 						.addComponent(jal_d)
@@ -1168,7 +1333,7 @@ public class SettingsOsm extends JFrame {
 						.addComponent(jal_pr))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(jal_ob)
-					.addContainerGap(30, Short.MAX_VALUE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		pjalob.setLayout(gl_pjalob);
 		osn.setLayout(gl_osn);
@@ -1183,5 +1348,96 @@ public class SettingsOsm extends JFrame {
 				.addComponent(osn, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
 		);
 		getContentPane().setLayout(groupLayout);
+	}
+	public void loadConfig() {
+		try {
+			StringReader sr = new StringReader(MainForm.authInfo.config);
+			StreamSource src = new StreamSource(sr);
+			DOMResult res = new DOMResult();
+			TransformerFactory.newInstance().newTransformer().transform(src, res);
+			Document document = (Document) res.getNode();
+			jal_d.setSelected(getElement(document, "jalob_dyh") != null);
+			jal_kr.setSelected(getElement(document, "jalob_kr") != null);
+			jal_p.setSelected(getElement(document, "jalob_op") != null);
+			jal_m.setSelected(getElement(document, "jalob_m") != null);
+			jal_en.setSelected(getElement(document, "jalob_en") != null);
+			jal_ner.setSelected(getElement(document, "jalob_nerv") != null);
+			jal_op.setSelected(getElement(document, "jalob_opor") != null);
+			jal_l.setSelected(getElement(document, "jalob_lih") != null);
+			jal_ob.setSelected(getElement(document, "jalob_ob") != null);
+			jal_pr.setSelected(getElement(document, "jalob_pr") != null);
+			istz.setSelected(getElement(document, "ist_zab") != null);
+			nach.setSelected(getElement(document, "nach_zab") != null);
+			symp.setSelected(getElement(document, "sympt") != null);
+			otn.setSelected(getElement(document, "otn_bol") != null);
+			ps.setSelected(getElement(document, "ps_sit") != null);
+			allerg.setSelected(getElement(document, "allerg") != null);
+			ist.setSelected(getElement(document, "vitae") != null);
+			razv.setSelected(getElement(document, "razv") != null);
+			usl.setSelected(getElement(document, "uslov") != null);
+			perz.setSelected(getElement(document, "per_zab") != null);
+			per_op.setSelected(getElement(document, "per_op") != null);
+			gem.setSelected(getElement(document, "gem_trans") != null);
+			nasl.setSelected(getElement(document, "nasl") != null);
+			gyn.setSelected(getElement(document, "gin_anamn") != null);
+			farm.setSelected(getElement(document, "farm_anamn") != null);
+			lek.setSelected(getElement(document, "lek_sr") != null);
+			gorm.setSelected(getElement(document, "gormon_prep") != null);
+			st.setSelected(getElement(document, "st_praesense") != null);
+			ob.setSelected(getElement(document, "ob_sost") != null);
+			koj.setSelected(getElement(document, "koj_pokr") != null);
+			sl.setSelected(getElement(document, "sliz") != null);
+			kl.setSelected(getElement(document, "podk_kl") != null);
+			lim.setSelected(getElement(document, "limf") != null);
+			kost.setSelected(getElement(document, "kost") != null);
+			nerv.setSelected(getElement(document, "nerv_ps") != null);
+			chss.setSelected(getElement(document, "chss") != null);
+			temp.setSelected(getElement(document, "temp") != null);
+			art.setSelected(getElement(document, "ad") != null);
+			rost.setSelected(getElement(document, "rost") != null);
+			ves.setSelected(getElement(document, "ves") != null);
+			telo.setSelected(getElement(document, "telosl") != null);
+			fiz.setSelected(getElement(document, "fiz_obsl") != null);
+			sust.setSelected(getElement(document, "sust") != null);
+			dyh.setSelected(getElement(document, "dyh") != null);
+			gr.setSelected(getElement(document, "gr_kl") != null);
+			perl.setSelected(getElement(document, "perk_l") != null);
+			ausl.setSelected(getElement(document, "aus_l") != null);
+			bronh.setSelected(getElement(document, "bronho") != null);
+			arter.setSelected(getElement(document, "arter") != null);
+			obls.setSelected(getElement(document, "obl_s") != null);
+			pers.setSelected(getElement(document, "perk_s") != null);
+			auss.setSelected(getElement(document, "ausk_s") != null);
+			polr.setSelected(getElement(document, "pol_rta") != null);
+			jiv.setSelected(getElement(document, "jivot") != null);
+			palj.setSelected(getElement(document, "palp_j") != null);
+			jkt.setSelected(getElement(document, "jkt") != null);
+			palpj.setSelected(getElement(document, "palp_jel") != null);
+			palpod.setSelected(getElement(document, "palp_podjel") != null);
+			pech.setSelected(getElement(document, "pechen") != null);
+			jelch.setSelected(getElement(document, "jelch_p") != null);
+			selez.setSelected(getElement(document, "selez") != null);
+			oblz.setSelected(getElement(document, "obl_zad") != null);
+			oblp.setSelected(getElement(document, "poyasn") != null);
+			pochk.setSelected(getElement(document, "pochki") != null);
+			moch.setSelected(getElement(document, "moch_p") != null);
+			jelm.setSelected(getElement(document, "mol_jel") != null);
+			jelgr.setSelected(getElement(document, "gr_jel") != null);
+			matka.setSelected(getElement(document, "matka") != null);
+			polorg.setSelected(getElement(document, "polov_org") != null);
+			chit.setSelected(getElement(document, "chitov") != null);
+			stloc.setSelected(getElement(document, "stloc") != null);
+			ocen.setSelected(getElement(document, "ocenka") != null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private Element getElement(Document doc, String name){
+		NodeList nls;
+		nls = doc.getElementsByTagName(name);
+		if (nls.getLength()>0) {
+			return (Element) nls.item(0);
+		}
+		return null;
 	}
 }
