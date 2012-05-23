@@ -1,3 +1,4 @@
+package ru.nkz.ivcgzo.clientOsm;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
@@ -25,6 +26,7 @@ import javax.swing.JOptionPane;
 
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 
 import javax.swing.JScrollPane;
@@ -108,7 +110,7 @@ public class FormRdInf extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
 		rdinf = new RdInfStruct();
-		oslrod = rdinf.getoSocO;
+		oslrod = rdinf.getOSocO();
 		if ((oslrod-128)<0){
 		or8=0; iw1=oslrod;	
 		}else {
@@ -146,7 +148,7 @@ public class FormRdInf extends JFrame {
 		}
 		or1=iw1; 
 		
-		uslj = rdinf.getUslPr;
+		uslj = rdinf.getUslPr();
 		if ((uslj-8)<0){
 		or4=0; 	
 		}else {

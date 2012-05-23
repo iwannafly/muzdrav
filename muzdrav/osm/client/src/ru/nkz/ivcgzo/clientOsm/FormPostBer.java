@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.AbstractButton;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
@@ -27,7 +28,8 @@ import javax.swing.JOptionPane;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
-import ru.nkz.ivcgzo.thriftOsm.*;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JTextPane;
@@ -41,12 +43,28 @@ import javax.swing.border.LineBorder;
 import javax.swing.UIManager;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class FormPostBer extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField TNKart;
-
+    private RdSlStruct rdsl;
+    private int oslrod;
+    private int or1;
+    private int or2;
+    private int or3;
+    private int or4;
+    private int or5;
+    private int or6;
+    private int or7;
+    private int or8;
+    private int iw1;
+    private int iw2;
+    private int iw3;
+    private String oslname;
+    private String oslcode;
 	/**
 	 * Launch the application.
 	 */
@@ -67,9 +85,66 @@ public class FormPostBer extends JFrame {
 	 * Create the frame.
 	 */
 	public FormPostBer() {
-		setTitle("Постановка на ячет по беременности");
+		setTitle("Постановка на учет по беременности");
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+			}
+		});
+		rdsl = new RdSlStruct();
+		oslrod =rdsl.getOslrod();
+		if ((oslrod-128)<0){
+		or8=0; iw1=oslrod;	
+		}else {
+		or8=1; iw1=oslrod-128;	
+		}
+		if ((iw1-64)<0){
+		or7=0; 
+		}else {
+		or7=1; iw1=iw1-64;	
+		}
+		if ((iw1-32)<0){
+		or6=0; 
+		}else {
+		or6=1; iw1=iw1-32;	
+		}
+		if ((iw1-16)<0){
+		or5=0; 
+		}else {
+		or5=1; iw1=iw1-16;	
+		}
+		if ((iw1-8)<0){
+		or4=0; 	
+		}else {
+		or4=1; iw1=iw1-8;	
+		}
+		if ((iw1-4)<0){
+		or3=0; 
+		}else {
+		or3=1; iw1=iw1-4;	
+		}
+		if ((iw1-2)<0){
+		or2=0; 
+		}else {
+		or2=1; iw1=iw1-2;	
+		}
+		or1=iw1; 
+		oslcode = rdsl.getOslAb();
+		if (oslcode=="N70"){oslname = "Сальпингит и оофорит";}
+		if (oslcode=="N71"){oslname = "Воспалительные болезни матки";}
+		if (oslcode=="N72"){oslname = "Воспалительные болезни шейки матки";}
+		if (oslcode=="N76"){oslname = "Другие воспалительные болезни влагалища и вульвы";}
+		if (oslcode==null){oslname = "";}
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+//			rdsl.getAbort(SKolAb.value);
+	//	SKolAb.get(rdsl.abort);
+			}
+		});
+		setTitle("Постановка на учет по беременности");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 550);
+		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -85,8 +160,9 @@ public class FormPostBer extends JFrame {
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 617, Short.MAX_VALUE))
+					.addGap(55)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 617, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		
 		JLabel LNslu = new JLabel("Номер обменной карты");
@@ -121,7 +197,8 @@ public class FormPostBer extends JFrame {
 		
 		JLabel LpolJ = new JLabel("Половая жизнь со скольки лет");
 		
-		JCheckBox CBKontr = new JCheckBox("Контрацепция");
+		final JCheckBox CBKontr = new JCheckBox("Контрацепция");
+		CBKontr.setSelected(rdsl.kont == 1);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(212, 208, 200));
@@ -146,45 +223,61 @@ public class FormPostBer extends JFrame {
 		
 		JLabel LIndSol = new JLabel("Индекс Соловьева");
 		
-		JSpinner SRost = new JSpinner();
-		SRost.setModel(new SpinnerNumberModel(new Integer(160), new Integer(140), null, new Integer(1)));
+		final JSpinner SRost = new JSpinner();
+		SRost.setModel(new SpinnerNumberModel(new Integer(rdsl.rost), new Integer(140), null, new Integer(1)));
+		rdsl.setAbort((int) SRost.getModel().getValue());
 		
-		JSpinner SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(new Integer(50), null, null, new Integer(1)));
+		final JSpinner SVes = new JSpinner();
+		SVes.setModel(new SpinnerNumberModel(new Integer(rdsl.vesd), new Integer(40), null, new Integer(1)));
+		rdsl.setVesd((int) SVes.getModel().getValue());
 		
-		JSpinner SDsp = new JSpinner();
-		SDsp.setModel(new SpinnerNumberModel(25, 24, 27, 0));
+		final JSpinner SDsp = new JSpinner();
+		SDsp.setModel(new SpinnerNumberModel(new Integer(rdsl.dsp), new Integer(24), new Integer(27), new Integer(1)));
+		rdsl.setDsp((int) SDsp.getModel().getValue());
 		
-		JSpinner SDcr = new JSpinner();
-		SDcr.setModel(new SpinnerNumberModel(28, 27, 30, 0));
+		final JSpinner SDcr = new JSpinner();
+		SDcr.setModel(new SpinnerNumberModel(new Integer(rdsl.dsr), new Integer(27), new Integer(30), new Integer(1)));
+		rdsl.setDsr((int) SDsp.getModel().getValue());
 		
-		JSpinner SDtroch = new JSpinner();
-		SDtroch.setModel(new SpinnerNumberModel(31, 30, 33, 0));
+		final JSpinner SDtroch = new JSpinner();
+		SDtroch.setModel(new SpinnerNumberModel(new Integer(rdsl.dTroch),new Integer(30),new Integer(33),new Integer(1)));
+		rdsl.setDTroch((int) SDtroch.getModel().getValue());
 		
-		JSpinner SCext = new JSpinner();
-		SCext.setModel(new SpinnerNumberModel(25, 25, 35, 1));
+		final JSpinner SCext = new JSpinner();
+		SCext.setModel(new SpinnerNumberModel(new Integer(rdsl.cext),new Integer(25), new Integer(35), new Integer(1)));
+		rdsl.setCext((int) SCext.getModel().getValue());
 		
-		JSpinner SindSol = new JSpinner();
-		SindSol.setModel(new SpinnerNumberModel(15, 13, 20, 1));
+		final JSpinner SindSol = new JSpinner();
+		SindSol.setModel(new SpinnerNumberModel(new Integer(rdsl.indSol), new Integer(13), new Integer(20),new Integer(1)));
+		rdsl.setIndSol((int) SindSol.getModel().getValue());
 		
-		JCheckBox CBKrov = new JCheckBox("Кровотечение");
+		final JCheckBox CBKrov = new JCheckBox("Кровотечение");
+		CBKrov.setSelected(or1 == 1);
 		
 		JLabel LIshPoslB = new JLabel("Исход последней беременности");
 		LIshPoslB.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		JCheckBox CBEkl = new JCheckBox("Проэкламсия - экламсия");
+		final JCheckBox CBEkl = new JCheckBox("Проэкламсия - экламсия");
+		CBEkl.setSelected(or2 ==1);
 		
-		JCheckBox CBGnoin = new JCheckBox("Гнойно-септические осложнения");
+		final JCheckBox CBGnoin = new JCheckBox("Гнойно-септические осложнения");
+		CBGnoin.setSelected(or3 ==1);
 		
-		JCheckBox CBTromb = new JCheckBox("Тромбоэмболитические осложнения");
+		final JCheckBox CBTromb = new JCheckBox("Тромбоэмболитические осложнения");
+		CBTromb.setSelected(or4 ==1);
 		
-		JCheckBox CDKesar = new JCheckBox("Кесарево сечение");
+		final JCheckBox CDKesar = new JCheckBox("Кесарево сечение");
+		CDKesar.setSelected(or5 ==1);
 		
-		JCheckBox CBAkush = new JCheckBox("Акушерские щипцы");
+		final JCheckBox CBAkush = new JCheckBox("Акушерские щипцы");
+		CBAkush.setSelected(or6 ==1);
 		
-		JCheckBox CBIiiiv = new JCheckBox("Разрав промежности III-IV степени");
+		final JCheckBox CBIiiiv = new JCheckBox("Разрав промежности III-IV степени");
+		CBIiiiv.setSelected(or7 ==1);
 		
-		JCheckBox CBRazrProm = new JCheckBox("Разрав шейки матки III степени");
+		final JCheckBox CBRazrProm = new JCheckBox("Разрав шейки матки III степени");
+		CBRazrProm.setSelected(or8 ==1);
+		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -229,54 +322,121 @@ public class FormPostBer extends JFrame {
 		TNKart = new JTextField();
 		TNKart.setColumns(10);
 		
-		JSpinner SDataPos = new JSpinner();
-		SDataPos.setModel(new SpinnerDateModel(new Date(1335286800000L), null, null, Calendar.DAY_OF_YEAR));
+		final JSpinner SDataPos = new JSpinner();
+		SDataPos.setModel(new SpinnerDateModel(new Date(rdsl.datay), null, null, Calendar.DAY_OF_YEAR));
+		rdsl.setDatay((long) SDataPos.getModel().getValue());
 		
-		JSpinner SParRod = new JSpinner();
-		SParRod.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		final JSpinner SParRod = new JSpinner();
+		SParRod.setModel(new SpinnerNumberModel(new Integer(rdsl.kolRod), new Integer(0), null, new Integer(1)));
+		rdsl.setKolRod((int) SParRod.getModel().getValue());
 		
-		JSpinner SKolBer = new JSpinner();
-		SKolBer.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		final JSpinner SKolBer = new JSpinner();
+		SKolBer.setModel(new SpinnerNumberModel(new Integer(rdsl.kolpr), new Integer(0), null, new Integer(1)));
+		rdsl.setKolpr((int) SKolBer.getModel().getValue());
 		
-		JSpinner SDataOsl = new JSpinner();
-		SDataOsl.setModel(new SpinnerDateModel(new Date(1335286800000L), null, null, Calendar.DAY_OF_YEAR));
+		final JSpinner SDataOsl = new JSpinner();
+		SDataOsl.setModel(new SpinnerDateModel(new Date(rdsl.dataosl), null, null, Calendar.DAY_OF_YEAR));
+		rdsl.setDataosl((long) SDataOsl.getModel().getValue());
 		
-		JSpinner SYavka = new JSpinner();
-		SYavka.setModel(new SpinnerNumberModel(4, 2, 40, 1));
+		final JSpinner SYavka = new JSpinner();
+		SYavka.setModel(new SpinnerNumberModel(new Integer(rdsl.yavka1),new Integer(2), new Integer(40), new Integer(1)));
+		rdsl.setYavka1((int) SYavka.getModel().getValue());
 		
-		JSpinner SDataM = new JSpinner();
-		SDataM.setModel(new SpinnerDateModel(new Date(1335286800000L), null, null, Calendar.DAY_OF_YEAR));
+		final JSpinner SDataM = new JSpinner();
+		SDataM.setModel(new SpinnerDateModel(new Date(rdsl.dataM), null, null, Calendar.DAY_OF_YEAR));
+		rdsl.setDataM((long) SDataM.getModel().getValue());
 		
-		JSpinner SDataRod = new JSpinner();
-		SDataRod.setModel(new SpinnerDateModel(new Date(1335286800000L), null, null, Calendar.DAY_OF_YEAR));
+		final JSpinner SDataRod = new JSpinner();
+		SDataRod.setModel(new SpinnerDateModel(new Date(rdsl.datay+(40-rdsl.yavka1)*7), null, null, Calendar.DAY_OF_YEAR));
 		
-		JSpinner SKolAb = new JSpinner();
-		SKolAb.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
+		final JSpinner SKolAb = new JSpinner();
+		SKolAb.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		rdsl.setAbort((int) SKolAb.getModel().getValue());
 		
-		JSpinner SVozMen = new JSpinner();
-		SVozMen.setModel(new SpinnerNumberModel(new Integer(13), new Integer(10), null, new Integer(1)));
+		final JSpinner SVozMen = new JSpinner();
+		SVozMen.setModel(new SpinnerNumberModel(new Integer(rdsl.let), new Integer(8), null, new Integer(1)));
+		rdsl.setLet((int) SVozMen.getModel().getValue());
 		
-		JSpinner SMenC = new JSpinner();
-		SMenC.setModel(new SpinnerNumberModel(new Integer(3), new Integer(1), null, new Integer(1)));
+		final JSpinner SMenC = new JSpinner();
+		SMenC.setModel(new SpinnerNumberModel(new Integer(rdsl.prmen), new Integer(20),  new Integer(40), new Integer(1)));
+		rdsl.setPrmen((int) SMenC.getModel().getValue());
 		
-		JSpinner SKolDet = new JSpinner();
-		SKolDet.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
+		final JSpinner SKolDet = new JSpinner();
+		SKolDet.setModel(new SpinnerNumberModel(new Integer(rdsl.deti), null, null, new Integer(1)));
+		rdsl.setDeti((int) SKolDet.getModel().getValue());
 		
-		JSpinner SPolJ = new JSpinner();
-		SPolJ.setModel(new SpinnerNumberModel(new Integer(20), new Integer(10), null, new Integer(1)));
+		final JSpinner SPolJ = new JSpinner();
+		SPolJ.setModel(new SpinnerNumberModel(new Integer(rdsl.polj), new Integer(9), null, new Integer(1)));
+		rdsl.setPolj((int) SPolJ.getModel().getValue());
 		
-		JSpinner SDataSn = new JSpinner();
+		final JSpinner SDataSn = new JSpinner();
 		SDataSn.setBackground(new Color(212, 208, 200));
-		SDataSn.setModel(new SpinnerDateModel(new Date(1335286800000L), null, null, Calendar.DAY_OF_YEAR));
+		SDataSn.setModel(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_YEAR));
+		rdsl.setDatasn((long) SDataSn.getModel().getValue());
 		
 		JComboBox CBPrishSn = new JComboBox();
-		CBPrishSn.setModel(new DefaultComboBoxModel(new String[] {"", "Срочные роды", "Мед. аборт", "Выкидыш", "Выбыла"}));
+		CBPrishSn.setModel(new DefaultComboBoxModel(new String[] {" ", "Срочные роды", "Мед. аборт", "Выкидыш", "Выбыла"}));
 		
-		JComboBox CBRod = new JComboBox();
+		final JComboBox CBRod = new JComboBox();
 		CBRod.setModel(new DefaultComboBoxModel(new String[] {"", "Естественные роды", "Кесарево сечение"}));
+		CBRod.setSelectedItem(rdsl.getPlrod()); 
+		rdsl.setPlrod(CBRod.getSelectedItem().toString());
 		
-		JComboBox CBOslAb = new JComboBox();
-		CBOslAb.setModel(new DefaultComboBoxModel(new String[] {"", "N70     Сальпингит и оофорит", "N70.0   Острый сальпингит и оофорит", "N70.1   Хронический сальпингит и оофорит", "N70.9   Сальпингит и оофорит неуточненные", "N71     Воспалительные болезни матки, кроме шейки матки ", "N71.0   Острые воспалительные болезни матки", "N71.1   Хронические воспалительные болезни матки", "N71.9   Воспалительная болезнь матки неуточненная", "N72     Воспалительные болезни шейки матки", "N76     Другие воспалительные болезни влагалища и вульвы ", "N76.0   Острый вагинит", "N76.1   Подострый и хронический вагинит", "N76.2   Острый вульвит", "N76.3   Подострый и хронический вульвит", "N76.4   Абсцесс вульвы", "N76.5   Изъязвление влагалища", "N76.6   Изъязвление вульвы", "N76.8   Другие уточненные воспалительные болезни влагалища и вульвы  "}));
+		final JComboBox CBOslAb = new JComboBox();
+		CBOslAb.setModel(new DefaultComboBoxModel(new String[] {"", "Сальпингит и оофорит", "Воспалительные болезни матки", "Воспалительные болезни шейки матки", "Другие воспалительные болезни влагалища и вульвы " }));
+		CBOslAb.setSelectedItem(oslname);
+		
+		JButton ButSave = new JButton("Сохранить");
+		ButSave.addActionListener(new ActionListener() {
+			private AbstractButton sVozMen;
+            private int getoslrod(int oslrod){
+            	oslrod=0;
+            if (CBKrov.isSelected()){oslrod=oslrod+1;}
+            if (CBEkl.isSelected()){oslrod=oslrod+2;}
+            if (CBGnoin.isSelected()){oslrod=oslrod+4;}
+            if (CBTromb.isSelected()){oslrod=oslrod+8;}
+            if (CDKesar.isSelected()){oslrod=oslrod+16;}
+            if (CBAkush.isSelected()){oslrod=oslrod+32;}
+            if (CBIiiiv.isSelected()){oslrod=oslrod+64;}
+            if (CBRazrProm.isSelected()){oslrod=oslrod+128;}
+			return oslrod;	
+            };
+			private int kontrac(int iw3){
+				if (CBKontr.isSelected()){iw3 = 1;}
+				return iw3;
+			};
+			private String oslcode(String oslcode){
+				if (CBOslAb.getSelectedItem().equals("Сальпингит и оофорит")){oslcode = "N70";}
+				if (CBOslAb.getSelectedItem().equals("Воспалительные болезни матки")){oslcode = "N71";}
+				if (CBOslAb.getSelectedItem().equals("Воспалительные болезни шейки матки")){oslcode = "N72";}
+				if (CBOslAb.getSelectedItem().equals("Другие воспалительные болезни влагалища и вульвы")){oslcode = "N76";}
+				if (CBOslAb.getSelectedItem().equals("")){oslcode = null;}
+				return oslcode;
+			};
+			public void actionPerformed(ActionEvent arg0) {
+			rdsl.setAbort((int) SKolAb.getModel().getValue());
+			rdsl.setCext((int) SCext.getModel().getValue());
+			rdsl.setDataM((long) SDataM.getModel().getValue());
+			rdsl.setDataosl((long) SDataOsl.getModel().getValue());
+			rdsl.setDatasn((long) SDataSn.getModel().getValue());
+			rdsl.setDatay((long) SDataPos.getModel().getValue());
+			rdsl.setKont(iw3);
+			rdsl.setDeti((int) SKolDet.getModel().getValue());
+			rdsl.setDsp((int) SDsp.getModel().getValue());
+			rdsl.setDsr((int) SDcr.getModel().getValue());
+			rdsl.setDTroch((int) SDtroch.getModel().getValue());
+			rdsl.setIndSol((int) SindSol.getModel().getValue());
+			rdsl.setKolpr((int) SKolBer.getModel().getValue());
+			rdsl.setKolRod((int) SParRod.getModel().getValue());
+			rdsl.setPolj((int) SPolJ.getModel().getValue());
+			rdsl.setPrmen((int) SMenC.getModel().getValue());
+			rdsl.setRost((int) SRost.getModel().getValue());
+			rdsl.setVesd((int) SVes.getModel().getValue());
+			rdsl.setYavka1((int) SYavka.getModel().getValue());
+			rdsl.setOslrod(oslrod);
+			rdsl.setOslAb(oslcode);
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -295,7 +455,6 @@ public class FormPostBer extends JFrame {
 							.addGap(9)
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(SKolBer, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SYavka, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SDataM, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(TNKart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -303,7 +462,8 @@ public class FormPostBer extends JFrame {
 									.addGroup(gl_panel.createSequentialGroup()
 										.addPreferredGap(ComponentPlacement.RELATED)
 										.addComponent(SKolAb, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-									.addComponent(SParRod, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+									.addComponent(SParRod, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(SYavka, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)))
 						.addComponent(LPrish)
 						.addComponent(LOslAb)
 						.addComponent(CBOslAb, GroupLayout.PREFERRED_SIZE, 334, GroupLayout.PREFERRED_SIZE)
@@ -323,16 +483,18 @@ public class FormPostBer extends JFrame {
 								.addComponent(CBPrishSn, Alignment.TRAILING, 0, 136, Short.MAX_VALUE)
 								.addComponent(SDataSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(CBRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SPolJ, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SDataOsl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SKolDet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SVozMen, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SMenC, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(SPolJ, Alignment.LEADING)
+									.addComponent(SMenC, Alignment.LEADING)
+									.addComponent(SVozMen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)))))
 					.addGap(18)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 222, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE))
+						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE)
+						.addComponent(ButSave))
 					.addGap(139))
 		);
 		gl_panel.setVerticalGroup(
@@ -413,7 +575,9 @@ public class FormPostBer extends JFrame {
 							.addGap(16)
 							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 								.addComponent(LPrish)
-								.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+									.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addComponent(ButSave)))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(LDataSn, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
@@ -421,7 +585,7 @@ public class FormPostBer extends JFrame {
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(14)
 							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(124, Short.MAX_VALUE))
+					.addContainerGap(123, Short.MAX_VALUE))
 		);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(

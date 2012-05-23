@@ -74,7 +74,6 @@ import javax.swing.JScrollBar;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Dimension;
 
-
 public class Vvod extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -167,7 +166,6 @@ public class Vvod extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent arg0) {
-				
 			}
 		});
 		 pvizit = new Pvizit();
