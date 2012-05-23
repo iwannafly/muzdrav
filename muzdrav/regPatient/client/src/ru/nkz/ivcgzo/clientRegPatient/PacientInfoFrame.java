@@ -3047,33 +3047,39 @@ public class PacientInfoFrame extends JFrame {
 		try {
 			NewSign();
 			SignInfo = MainForm.tcl.getSign(PatId);
-			if (SignInfo.getGrup() != null){
-				switch (SignInfo.grup) {
-				case "1": 
-					rbtn_gk1.setSelected(true);
-					break;
-				case "2": 
-					rbtn_gk2.setSelected(true);
-					break;
-				case "3": 
-					rbtn_gk3.setSelected(true);
-					break;
-				case "4": 
-					rbtn_gk4.setSelected(true);
-					break;
-				default: System.out.println("Нет такой группы крови."); 
-				}
+			if (SignInfo.getGrup().trim() != null){
+				rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
+				rbtn_gk2.setSelected(SignInfo.grup.charAt(0) == '2');
+				rbtn_gk3.setSelected(SignInfo.grup.charAt(0) == '3');
+				rbtn_gk4.setSelected(SignInfo.grup.charAt(0) == '4');
+//				switch (SignInfo.grup) {
+//				case "1": 
+//					rbtn_gk1.setSelected(true);
+//					break;
+//				case "2": 
+//					rbtn_gk2.setSelected(true);
+//					break;
+//				case "3": 
+//					rbtn_gk3.setSelected(true);
+//					break;
+//				case "4": 
+//					rbtn_gk4.setSelected(true);
+//					break;
+//				default: System.out.println("Нет такой группы крови."); 
+//				}
 			}
 			if (SignInfo.getPh() != null){
-				switch (SignInfo.ph) {
-				case "+": 
-					rbtn_rf1.setSelected(true);
-					break;
-				case "-": 
-					rbtn_rf2.setSelected(true);
-					break;
-				default: System.out.println("Резус-фактор отсутствует."); 
-				}
+				rbtn_rf1.setSelected(SignInfo.ph.charAt(0) == '+');
+				rbtn_rf2.setSelected(SignInfo.ph.charAt(0) == '-');
+//				switch (SignInfo.ph) {
+//				case "+": 
+//					rbtn_rf1.setSelected(true);
+//					break;
+//				case "-": 
+//					rbtn_rf2.setSelected(true);
+//					break;
+//				default: System.out.println("Резус-фактор отсутствует."); 
+//				}
 			}
 			if (SignInfo.getVred() != null){
 				rbtn_vp1.setSelected(SignInfo.vred.charAt(0) == '1');
