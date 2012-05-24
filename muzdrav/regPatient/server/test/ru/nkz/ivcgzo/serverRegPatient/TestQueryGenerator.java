@@ -44,7 +44,7 @@ public class TestQueryGenerator {
         InputData inData = pqg.genSelect(testPatient2Field, sqlQuery);
         String testSqlQuery = inData.getQueryText();
         assertEquals("comparison of the query text",
-                sqlQuery + " WHERE im = ?;", testSqlQuery);
+                sqlQuery + " WHERE im = ?", testSqlQuery);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TestQueryGenerator {
         InputData inData = pqg.genSelect(testPatientEmpty, sqlQuery);
         String testSqlQuery = inData.getQueryText();
         assertEquals("comparison of the query text",
-                sqlQuery + ";", testSqlQuery);
+                sqlQuery, testSqlQuery);
     }
 
     @Test

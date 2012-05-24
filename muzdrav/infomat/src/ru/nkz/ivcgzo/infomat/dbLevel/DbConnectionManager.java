@@ -21,8 +21,9 @@ public final class DbConnectionManager {
      * Приватный конструктор Singleton'а.
      * При создании считываются настройки соединения с БД из properties файла.
      *
-     * <p><b>ВАЖНО:</b> При инициализации в пуле нет соединений (до вызова getConnection()).
+     * <p><b>ВАЖНО:</b> При инициализации устанавливается соединение.
      */
+    //TODO подумать над необходимостью установки соединения при инициализации
     private DbConnectionManager() {
         dbOptions = new DbOptions();
         loadDbDriver(dbOptions.getDriverClassName());
@@ -77,7 +78,7 @@ public final class DbConnectionManager {
      */
     public Connection getConnection() {
         if (isConnectionBusy) {
-           System.out.println("Соединение занято");
+            System.out.println("Соединение занято");
         }
         try {
             if (connection.isClosed()) {
