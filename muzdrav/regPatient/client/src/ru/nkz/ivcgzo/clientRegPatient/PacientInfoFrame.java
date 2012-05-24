@@ -219,6 +219,37 @@ public class PacientInfoFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public PacientInfoFrame(List<PatientBrief> pat) {
+		try {
+			cmb_ishod = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_status = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_tdoc = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_oms_doc = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_Tdoc_pr = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_Polis_doc_pr = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_cotd = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_travm = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_trans = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_otkaz = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_alk = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_naprav = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_org = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_status.setData(MainForm.tcl.getSgrp());
+			//cmb_oms_doc.setData(tcl.getPomsTdoc());
+			cmb_tdoc.setData(MainForm.tcl.getTdoc());
+//			cmb_ishod.setData(MainForm.tcl.getABB());
+			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
+			//cmb_Polis_doc_pr.setData(tcl.getPomsTdoc());
+//			cmb_cotd;
+//			cmb_travm;
+//			cmb_trans;
+//			cmb_otkaz;
+//			cmb_alk;
+//			cmb_naprav;
+//			cmb_org;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(1, 1, 954, 680); //ширина, высота
 		contentPane = new JPanel();
@@ -271,11 +302,6 @@ public class PacientInfoFrame extends JFrame {
 		);
 		
 		JPanel tpPersonal = new JPanel();
-		tpPersonal.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-			}
-		});
 		tpPersonal.setBorder(new EmptyBorder(0, 0, 0, 0));
 		tbMain.addTab("Пациент", null, tpPersonal, null);
 		
@@ -443,6 +469,7 @@ public class PacientInfoFrame extends JFrame {
 		JLabel lblNewLabel_26 = new JLabel("Причина");
 		
 //		cmb_ishod = new JComboBox<String>();
+
 		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
 		gl_panel_6.setHorizontalGroup(
 			gl_panel_6.createParallelGroup(Alignment.LEADING)
