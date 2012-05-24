@@ -175,7 +175,7 @@ public class Vvod extends JFrame {
 		});
 		 pvizit = new Pvizit();
 		 sign = new FormSign();
-		 postber = new FormPostBer();
+//		 postber = new FormPostBer();
 		 settingsosm = new SettingsOsm();
 		 pos = new PvizitAmb();
 		 diag = new PdiagAmb();
@@ -1837,7 +1837,6 @@ public class Vvod extends JFrame {
 	
 	public void onConnect() {
 		try {
-			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
 			c_obr.setData(MainForm.tcl.getP0c());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
