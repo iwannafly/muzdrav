@@ -11,6 +11,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
@@ -20,6 +21,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.PatientInfoViewMainForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -148,8 +150,13 @@ public class MainForm extends Client {
 		if (conn instanceof ThriftOsm.Client) {
 			tcl = (ThriftOsm.Client) conn;
 			try {
+				if (!Classifiers.load(tcl)) {
+					JOptionPane.showMessageDialog(frame, "Ошибка загрузки классификаторов", "Необработанная ошибка", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
 				vvod.onConnect();
+				Classifiers.load(tcl);
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
