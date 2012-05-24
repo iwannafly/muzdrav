@@ -1,6 +1,3 @@
-/**
- *
- */
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.sql.Date;
@@ -55,6 +52,11 @@ import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
  * @author Avdeev Alexander
  */
 public class ServerRegPatient extends Server implements Iface {
+
+////////////////////////////////////////////////////////////////////////
+//                          Fields                                    //
+////////////////////////////////////////////////////////////////////////
+
     private TServer thrServ;
     private TResultSetMapper<PatientBrief, PatientBrief._Fields> rsmPatientBrief;
     private TResultSetMapper<Address, Address._Fields> rsmAdpAdress;
@@ -200,6 +202,10 @@ public class ServerRegPatient extends Server implements Iface {
         "id", "npasp", "lgot", "datal", "name"
     };
 
+////////////////////////////////////////////////////////////////////////
+//                         Constructors                               //
+////////////////////////////////////////////////////////////////////////
+
     /**
      * Конструктор класса.
      * @param sse - Определяет методы для выполнения запросов
@@ -229,6 +235,161 @@ public class ServerRegPatient extends Server implements Iface {
         rsmLgota = new TResultSetMapper<>(Lgota.class, LGOTA_FIELD_NAMES);
     }
 
+////////////////////////////////////////////////////////////////////////
+//                       Private Methods                              //
+////////////////////////////////////////////////////////////////////////
+
+///////////////////// Is Exist Methods /////////////////////////////////
+
+    /**
+     * Проверяет, существует ли в БД запись амбулаторной карты с такими данными
+     * @param nambk - thrift-объект с информацией об амбулаторной карте
+     * @return true - если амбулаторная карта с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isNambkExist(final Nambk nambk) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT npasp FROM p_nambk WHERE (npasp = ?)",
+                nambk, NAMBK_TYPES, 0)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД запись госпитализации пациента с такими данными
+     * @param gosp - thrift-объект с информацией  госпитализации
+     * @return true - если особая информация о пациенте с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isGospExist(final Gosp gosp) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT id FROM c_gosp WHERE (npasp = ?) and (ngosp = ?)",
+                gosp, GOSP_TYPES, 0)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД пациент с такими данными
+     * @param patinfo - thrift-объект с информацией о пациенте
+     * @return true - если пациент с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isPatientExist(final PatientFullInfo patinfo) throws SQLException {
+        final int[] indexes = {1, 2, 3, 4};
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT npasp FROM patient WHERE (fam = ?) AND (im = ?) AND (ot = ?) "
+                + "AND (datar = ?);",
+                patinfo, PATIENT_FULL_TYPES, indexes)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД льгота пациента с такими данными
+     * @param lgota - thrift-объект с информацией о льготе
+     * @return true - если льгота с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isLgotaExist(final Lgota lgota) throws SQLException {
+        final int[] indexes = {1, 2};
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT id FROM p_kov WHERE (npasp = ?) AND (lgot = ?);",
+                lgota, LGOTA_TYPES, indexes)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД категория пациента с такими данными
+     * @param kontingent - thrift-объект с информацией о категории
+     * @return true - если категория с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isKontingentExist(final Kontingent kontingent) throws SQLException {
+        final int[] indexes = {1, 2};
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT id FROM p_konti WHERE (npasp = ?) AND (kateg = ?);",
+                kontingent, KONTINGENT_TYPES, indexes)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД представитель пациента с такими данными
+     * @param agent - thrift-объект с информацией о представителе пациента
+     * @return true - если категория с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isAgentExist(final Agent agent) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT npasp FROM p_preds WHERE (npasp = ?)",
+                agent, AGENT_TYPES, 0)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+    /**
+     * Проверяет, существует ли в БД особая информация о пациенте с такими данными
+     * @param sign - thrift-объект с особой информацией о пациенте
+     * @return true - если особая информация о пациенте с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isSignExist(final Sign sign) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+                "SELECT npasp FROM p_sign WHERE (npasp = ?)",
+                sign, SIGN_TYPES, 0)) {
+            return acrs.getResultSet().next();
+        }
+    }
+
+///////////////////// Get Transcription Methods /////////////////////////////////
+
+    /**
+     * Находит в БД текстовое представление контингента по его id.
+     * @param id - идентификатор контингента
+     * @return String - текстовое описание контингента
+     */
+    private String getStringTranscriptionForKontingent(final int kontId) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT name FROM n_lkr WHERE (pcod = ?)", kontId)) {
+            ResultSet rs = acrs.getResultSet();
+            String tmpName = null;
+            if (rs.next()) {
+                tmpName = rs.getString("name");
+            } else {
+                tmpName = "описание контингента не найдено";
+            }
+            return tmpName;
+        }
+    }
+
+    /**
+     * Находит в БД текстовое представление льготы по её id.
+     * @param id - идентификатор льгота
+     * @return String - текстовое описание вида льготы
+     */
+    // TODO поменять n_lkr на n_lkn
+    private String getStringTranscriptionForLgota(final int lgotaId) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT name FROM n_lkr WHERE (pcod = ?)", lgotaId)) {
+            ResultSet rs = acrs.getResultSet();
+            String tmpName = null;
+            if (rs.next()) {
+                tmpName = rs.getString("name");
+            } else {
+                tmpName = "описание льготы не найдено";
+            }
+            return tmpName;
+        }
+    }
+
+////////////////////////////////////////////////////////////////////////
+//                       Public Methods                               //
+////////////////////////////////////////////////////////////////////////
+
+//////////////////////// Start/Stop Methods ////////////////////////////////////
+
     /**
      * Запускает сервер.
      */
@@ -252,6 +413,8 @@ public class ServerRegPatient extends Server implements Iface {
             thrServ.stop();
         }
     }
+
+//////////////////////// Select Methods ////////////////////////////////////
 
     @Override
     public final List<PatientBrief> getAllPatientBrief(final PatientBrief patient)
@@ -425,21 +588,7 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Проверяет, существует ли в БД пациент с такими данными
-     * @param patinfo - thrift-объект с информацией о пациенте
-     * @return true - если пациент с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isPatientExist(final PatientFullInfo patinfo) throws SQLException {
-        final int[] indexes = {1, 2, 3, 4};
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT npasp FROM patient WHERE (fam = ?) AND (im = ?) AND (ot = ?) "
-                + "AND (datar = ?);",
-                patinfo, PATIENT_FULL_TYPES, indexes)) {
-            return acrs.getResultSet().next();
-        }
-    }
+//////////////////////// Add Methods ////////////////////////////////////
 
     //Не нравится этот метод? Мне он тоже не нравится. Говно, а не метод.
     //TODO перепилить добавление объектов с вложенными пользовательскими типами
@@ -489,35 +638,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Проверяет, существует ли в БД льгота пациента с такими данными
-     * @param lgota - thrift-объект с информацией о льготе
-     * @return true - если льгота с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isLgotaExist(final Lgota lgota) throws SQLException {
-        final int[] indexes = {1, 2};
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT id FROM p_kov WHERE (npasp = ?) AND (lgot = ?);",
-                lgota, LGOTA_TYPES, indexes)) {
-            return acrs.getResultSet().next();
-        }
-    }
-    // TODO поменять n_lkr на n_lkn
-    private String getStringTranscriptionForLgota(final int lgotaId) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT name FROM n_lkr WHERE (pcod = ?)", lgotaId)) {
-            ResultSet rs = acrs.getResultSet();
-            String tmpName = null;
-            if (rs.next()) {
-                tmpName = rs.getString("name");
-            } else {
-                tmpName = "описание льготы не найдено";
-            }
-            return tmpName;
-        }
-    }
-
     @Override
     public final Info addLgota(final Lgota lgota)
             throws LgotaAlreadyExistException, TException {
@@ -541,35 +661,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Проверяет, существует ли в БД категория пациента с такими данными
-     * @param kontingent - thrift-объект с информацией о категории
-     * @return true - если категория с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isKontingentExist(final Kontingent kontingent) throws SQLException {
-        final int[] indexes = {1, 2};
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT id FROM p_konti WHERE (npasp = ?) AND (kateg = ?);",
-                kontingent, KONTINGENT_TYPES, indexes)) {
-            return acrs.getResultSet().next();
-        }
-    }
-
-    private String getStringTranscriptionForKontingent(final int kontId) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT name FROM n_lkr WHERE (pcod = ?)", kontId)) {
-            ResultSet rs = acrs.getResultSet();
-            String tmpName = null;
-            if (rs.next()) {
-                tmpName = rs.getString("name");
-            } else {
-                tmpName = "описание контингента не найдено";
-            }
-            return tmpName;
-        }
-    }
-
     @Override
     public final Info addKont(final Kontingent kont)
             throws KontingentAlreadyExistException, TException {
@@ -590,20 +681,6 @@ public class ServerRegPatient extends Server implements Iface {
             }
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
-        }
-    }
-
-    /**
-     * Проверяет, существует ли в БД представитель пациента с такими данными
-     * @param agent - thrift-объект с информацией о представителе пациента
-     * @return true - если категория с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isAgentExist(final Agent agent) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT npasp FROM p_preds WHERE (npasp = ?)",
-                agent, AGENT_TYPES, 0)) {
-            return acrs.getResultSet().next();
         }
     }
 
@@ -640,20 +717,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Проверяет, существует ли в БД особая информация о пациенте с такими данными
-     * @param sign - thrift-объект с особой информацией о пациенте
-     * @return true - если особая информация о пациенте с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isSignExist(final Sign sign) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT npasp FROM p_sign WHERE (npasp = ?)",
-                sign, SIGN_TYPES, 0)) {
-            return acrs.getResultSet().next();
-        }
-    }
-
     @Override
     public final void addOrUpdateSign(final Sign sign) throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -674,20 +737,6 @@ public class ServerRegPatient extends Server implements Iface {
             }
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
-        }
-    }
-
-    /**
-     * Проверяет, существует ли в БД запись госпитализации пациента с такими данными
-     * @param gosp - thrift-объект с информацией  госпитализации
-     * @return true - если особая информация о пациенте с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isGospExist(final Gosp gosp) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT id FROM c_gosp WHERE (npasp = ?) and (ngosp = ?)",
-                gosp, GOSP_TYPES, 0)) {
-            return acrs.getResultSet().next();
         }
     }
 
@@ -718,20 +767,6 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    /**
-     * Проверяет, существует ли в БД запись амбулаторной карты с такими данными
-     * @param nambk - thrift-объект с информацией об амбулаторной карте
-     * @return true - если амбулаторная карта с такими данными уже существует,
-     * false - если не существует
-     */
-    private boolean isNambkExist(final Nambk nambk) throws SQLException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT npasp FROM p_nambk WHERE (npasp = ?)",
-                nambk, NAMBK_TYPES, 0)) {
-            return acrs.getResultSet().next();
-        }
-    }
-
     @Override
     public final void addNambk(final Nambk nambk) throws NambkAlreadyExistException,
             TException {
@@ -750,6 +785,8 @@ public class ServerRegPatient extends Server implements Iface {
             throw new TException(e);
         }
     }
+
+//////////////////////// Delete Methods ////////////////////////////////////
 
     @Override
     public final void deletePatient(final int npasp) throws TException {
@@ -825,6 +862,8 @@ public class ServerRegPatient extends Server implements Iface {
             throw new TException(e);
         }
     }
+
+//////////////////////// Update Methods ////////////////////////////////////
 
     @Override
     public final void updatePatient(final PatientFullInfo patinfo)
@@ -928,6 +967,8 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+//////////////////////// Configuration Methods ////////////////////////////////////
+
     @Override
     public final String getServerVersion() throws TException {
         return configuration.appVersion;
@@ -949,6 +990,8 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+////////////////////////// Classifiers ////////////////////////////////////
+
     @Override
     public final List<IntegerClassifier> getSgrp() throws TException {
         final String sqlQuery = "SELECT pcod, name FROM n_az9";
@@ -961,21 +1004,17 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-////////////////////////////////////////////////////////////////
-// Временно не реализовано из-за кривых классификаторов в БД  //
-////////////////////////////////////////////////////////////////
-
-//+
     @Override
     public final List<IntegerClassifier> getPomsTdoc() throws TException {
-        // TODO Auto-generated method stub
-        return null;
+        final String sqlQuery = "SELECT pcod, name FROM n_f008";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmTdoc =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmTdoc.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            throw new TException(e);
+        }
     }
-
-///////////////////////////////////////////////////////////////
-//////     Окончание участка нереализованного кода     ////////
-///////////////////////////////////////////////////////////////
-
 
     @Override
     public final List<IntegerClassifier> getTdoc() throws TException {
