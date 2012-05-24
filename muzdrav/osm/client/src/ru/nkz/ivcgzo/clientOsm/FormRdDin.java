@@ -8,25 +8,60 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JTable;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JCheckBox;
+import java.awt.Font;
+import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import java.util.Date;
 import java.util.Calendar;
 import javax.swing.SpinnerNumberModel;
-import java.awt.Color;
-import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import java.awt.Color;
+
+import javax.swing.JOptionPane;
+
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
+import javax.swing.JScrollPane;
+import javax.swing.JButton;
+import javax.swing.JTextPane;
+import javax.swing.border.BevelBorder;
+
+import org.apache.thrift.TException;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
+import javax.swing.border.LineBorder;
+import javax.swing.UIManager;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JTable;
 
 public class FormRdDin extends JFrame {
 
 	private JPanel contentPane;
-	private JTable table;
-
+	private RdDinStruct rddin;
+	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
+    private String oslname;
+    private String oslcode;
+    private int iw1;
+    private int iw2;
+    private int iw3;
+    private int iw4;
+    private int iw5;
+    private String otname;
+    private String polplname;
+    private String predname;
+    private String cerdname;
+    private String cerdname1;
 	/**
 	 * Launch the application.
 	 */
@@ -48,12 +83,58 @@ public class FormRdDin extends JFrame {
 	 */
 	public FormRdDin() {
 		setTitle("Динамика диспансерного наблюдения за беременной");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 600);
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent arg0) {
+			}
+		});
+				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 793, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		rddin = new RdDinStruct();
+		oslcode = rddin.getDspos();
+		if (oslcode=="O21"){oslname = "Чрезмерная рвота";}
+		if (oslcode=="O44"){oslname = "Предлежание плаценты";}
+		if (oslcode=="O45"){oslname = "Отслойка плаценты";}
+		if (oslcode=="O23.0"){oslname = "Инфекция почек";}
+		if (oslcode=="O24"){oslname = "Сахарный диабет";}
+		if (oslcode=="O30"){oslname = "Многоплодная беременность";}
+		if (oslcode=="O32"){oslname = "Неправильное предлежание плода";}
+		if (oslcode=="O36.0"){oslname = "Изоиммунизация";}
+		if (oslcode=="O99.0"){oslname = "Анемия";}
+		if (oslcode=="O48"){oslname = "Переношенная беременность";}
+		if (oslcode=="O11"){oslname = "Существовавшая ранее гипертензия с присоед.протеинурией";}
+		if (oslcode=="O12"){oslname = "Вызванные беременностью отеки и протеинурия без гипертензии";}
+		if (oslcode=="O13"){oslname = "Гипертензия без значительной протеинурии";}
+		if (oslcode=="O14"){oslname = "Гипертензия со значительной протеинурией";}
+		if (oslcode=="O15"){oslname = "Экламсия";}
+		if (oslcode==null){oslname = "";}
+        iw1 = rddin.getPolpl();
+		if (iw1 == 1){polplname ="Продольное";}
+		if (iw1 == 2){polplname ="Поперечное";}
+		if (iw1 == 3){polplname ="Косое";}
+        iw2 = rddin.getOteki();
+        if (iw2 == 1){otname ="Нижние конечности";}
+        if (iw2 == 2){otname ="Верхние конечности";}
+        if (iw2 == 3){otname ="Верхняя брюшная стенка";}
+        if (iw2 == 4){otname ="Генерализованные";}
+        if (iw2 == 0){otname ="Нет";}
+         iw3 = rddin.getSerd();
+		if (iw3==0){cerdname = "";}
+		if (iw3==1){cerdname = "Ясное";}
+		if (iw3==2){cerdname = "Приглушенное";}
+		if (iw3==3){cerdname = "Глухое";}
+		iw4 = rddin.getPredpl();
+		if (iw4==0){predname = "";}
+		if (iw4==1){predname = "Голова";}
+		if (iw4==2){predname = "Таз";}
+		iw5 = rddin.getSerd1();
+		if (iw5==0){cerdname1 = "";}
+		if (iw5==1){cerdname1 = "Ритмичное";}
+		if (iw5==2){cerdname1 = "Аритмичное";}
 		
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
@@ -61,22 +142,40 @@ public class FormRdDin extends JFrame {
 		JPanel panel_1 = new JPanel();
 		
 		JPanel panel_2 = new JPanel();
+		
+		JButton Nbutton = new JButton("Новое посещение");
+		
+		final JSpinner SPdad = new JSpinner();
+		SPdad.setModel(new SpinnerNumberModel(new Integer(rddin.art1), null,new Integer(220),new Integer(1)));
+		rddin.setArt1((int) SPdad.getModel().getValue());
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
 					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(18, Short.MAX_VALUE))
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(Nbutton)
+							.addGap(34))))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
+							.addGap(38)
+							.addComponent(Nbutton))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(19, Short.MAX_VALUE))
 		);
 		
 		JLabel LChcc = new JLabel("ЧСС плода");
@@ -87,20 +186,26 @@ public class FormRdDin extends JFrame {
 		
 		JLabel LSerd = new JLabel("Сердцебиение плода");
 		
-		JSpinner SChcc = new JSpinner();
-		SChcc.setModel(new SpinnerNumberModel(new Integer(100), new Integer(60), null, new Integer(1)));
+		final JSpinner SChcc = new JSpinner();
+		SChcc.setModel(new SpinnerNumberModel(new Integer(rddin.chcc), new Integer(60), null, new Integer(1)));
+        rddin.setChcc((int) SChcc.getModel().getValue());
 		
-		JComboBox CBPolPl = new JComboBox();
+		final JComboBox CBPolPl = new JComboBox();
 		CBPolPl.setModel(new DefaultComboBoxModel(new String[] {"", "Продольное", "Поперечное", "Косое"}));
+		CBPolPl.setSelectedItem(polplname);
 		
-		JComboBox CBPredPl = new JComboBox();
+		final JComboBox CBPredPl = new JComboBox();
 		CBPredPl.setModel(new DefaultComboBoxModel(new String[] {"", "Голова", "Таз"}));
+		CBPredPl.setSelectedItem(predname);
 		
-		JComboBox CBCerd = new JComboBox();
+		final JComboBox CBCerd = new JComboBox();
 		CBCerd.setModel(new DefaultComboBoxModel(new String[] {"", "Ритмичное", "Аритмичное"}));
+		CBCerd.setSelectedItem(cerdname);
 		
-		JComboBox CBSerd1 = new JComboBox();
+		final JComboBox CBSerd1 = new JComboBox();
 		CBSerd1.setModel(new DefaultComboBoxModel(new String[] {"", "Ясное", "Приглушенное", "Глухое"}));
+		CBSerd1.setSelectedItem(cerdname1);
+		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -166,13 +271,13 @@ public class FormRdDin extends JFrame {
 		
 		JLabel LDiag = new JLabel("Диагноз при наблюдении");
 		
-		JLabel LPdad = new JLabel("Правая ДАД");
+		JLabel LPdad = new JLabel("Правая          ДАД");
 		
-		JLabel LPsad = new JLabel("Правая САД");
+		JLabel LPsad = new JLabel(" САД");
 		
-		JLabel LLdad = new JLabel("Левая ДАД");
+		JLabel LLdad = new JLabel(" Левая           ДАД");
 		
-		JLabel LLsad = new JLabel("Правая САД");
+		JLabel LLsad = new JLabel(" САД");
 		
 		JLabel LtolPlac = new JLabel("Толщина плаценты");
 		
@@ -180,91 +285,199 @@ public class FormRdDin extends JFrame {
 		
 		JLabel LDataSl = new JLabel("Дата следующего посещения");
 		
-		JSpinner SDataPos = new JSpinner();
-		SDataPos.setModel(new SpinnerDateModel(new Date(1335373200000L), null, null, Calendar.DAY_OF_YEAR));
+		final JSpinner SDataPos = new JSpinner();
+		SDataPos.setModel(new SpinnerDateModel(new Date(rddin.datapos), null, null, Calendar.DAY_OF_YEAR));
+        rddin.setDatapos((int) SDataPos.getModel().getValue());
 		
-		JSpinner SSrok = new JSpinner();
-		SSrok.setModel(new SpinnerNumberModel(4, 2, 40, 1));
+        final JSpinner SSrok = new JSpinner();
+		SSrok.setModel(new SpinnerNumberModel(new Integer(rddin.srok),null, new Integer(40),new Integer(1)));
+		rddin.setSrok((int) SSrok.getModel().getValue());
 		
-		JSpinner SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(new Integer(60), new Integer(40), null, new Integer(1)));
+		final JSpinner SVes = new JSpinner();
+		SVes.setModel(new SpinnerNumberModel(new Integer(rddin.ves), null, null, new Integer(1)));
+		rddin.setVes((int) SVes.getModel().getValue());
 		
-		JSpinner SOkrj = new JSpinner();
-		SOkrj.setModel(new SpinnerNumberModel(new Integer(60), new Integer(45), null, new Integer(1)));
+		final JSpinner SOkrj = new JSpinner();
+		SOkrj.setModel(new SpinnerNumberModel(new Integer(rddin.oj), null, null, new Integer(1)));
+		rddin.setOj((int) SOkrj.getModel().getValue());
 		
-		JSpinner SVdm = new JSpinner();
-		SVdm.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
+		final JSpinner SVdm = new JSpinner();
+		SVdm.setModel(new SpinnerNumberModel(new Integer(rddin.hdm), null, null, new Integer(1)));
+		rddin.setHdm((int) SVdm.getModel().getValue());
 		
-		JComboBox CBDiag = new JComboBox();
+		final JComboBox CBDiag = new JComboBox();
+		CBDiag.setModel(new DefaultComboBoxModel(new String[] {"", "Чрезмерная рвота", "Предлежание плаценты","Отслойка плаценты" ,"Инфекция почек", "Сахарный диабет", "Многоплодная беременность", "Неправильное предлежание плода", "Изоиммунизация", "Анемия", "Переношенная беременность", "Существовавшая ранее гипертензия с присоед.протеинурией", "Вызванные беременностью отеки и протеинурия без гипертензии", "Гипертензия без значительной протеинурии", "Гипертензия со значительной протеинурией", "Экламсия"}));
+		CBDiag.setSelectedItem(oslname);
 		
-		JSpinner SPdad = new JSpinner();
-		SPdad.setModel(new SpinnerNumberModel(120, 50, 220, 1));
+		final JSpinner SPsad = new JSpinner();
+		SPsad.setModel(new SpinnerNumberModel(new Integer(rddin.art2), null ,new Integer(120),new Integer(1)));
+		rddin.setArt2((int) SPsad.getModel().getValue());
 		
-		JSpinner SPsad = new JSpinner();
-		SPsad.setModel(new SpinnerNumberModel(80, 40, 120, 1));
+		final JSpinner SLdad = new JSpinner();
+		SLdad.setModel(new SpinnerNumberModel(new Integer(rddin.art3), new Integer(50),new Integer(220),new Integer(1)));
+		rddin.setArt3((int) SLdad.getModel().getValue());
 		
-		JSpinner SLdad = new JSpinner();
-		SLdad.setModel(new SpinnerNumberModel(120, 40, 220, 1));
+		final JSpinner SLsad = new JSpinner();
+		SLsad.setModel(new SpinnerNumberModel(new Integer(rddin.art4), new Integer(30),new Integer(120),new Integer(1)));
+		rddin.setArt4((int) SLsad.getModel().getValue());
 		
-		JSpinner SLsad = new JSpinner();
-		SLsad.setModel(new SpinnerNumberModel(80, 30, 120, 1));
+		final JSpinner STolP = new JSpinner();
+		STolP.setModel(new SpinnerNumberModel(new Integer(rddin.spl), new Integer(1), null, new Integer(1)));
+		rddin.setSpl((int) STolP.getModel().getValue());
 		
-		JSpinner STolP = new JSpinner();
-		STolP.setModel(new SpinnerNumberModel(new Integer(2), new Integer(1), null, new Integer(1)));
+		final JComboBox CBOteki = new JComboBox();
+		CBOteki.setModel(new DefaultComboBoxModel(new String[] {"Нет", "Нижние конечности", "Верхние конечности", "Верхняя брюшная стенка", "Генерализованные"}));
+		CBOteki.setSelectedItem(otname);
 		
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Нет", "Нижние конечности", "Верхние конечности", "Верхняя брюшная стенка", "Генерализованные"}));
-		
-		JSpinner SDataSl = new JSpinner();
+		final JSpinner SDataSl = new JSpinner();
 		SDataSl.setModel(new SpinnerDateModel(new Date(1335373200000L), null, null, Calendar.DAY_OF_YEAR));
+
+		
+		JButton SButton = new JButton("Сохранить");
+		SButton.addActionListener(new ActionListener() {
+				private int iw1(int iw1){
+					if (CBDiag.getSelectedItem().equals("Продольное")){iw1 = 1;}
+					if (CBDiag.getSelectedItem().equals("Поперечное")){iw1 = 2;}
+					if (CBDiag.getSelectedItem().equals("Косое")){iw1 = 3;}
+					return iw1;
+				};
+				private String oslcode (String oslcode){
+								if (CBDiag.getSelectedItem().equals("Чрезмерная рвота")){oslcode="O21";}
+					if (CBDiag.getSelectedItem().equals("Предлежание плаценты")){oslcode="O44";}
+					if (CBDiag.getSelectedItem().equals("Отслойка плаценты")){oslcode="O45";}
+					if (CBDiag.getSelectedItem().equals("Инфекция почек")){oslcode="O23.0";}
+					if (CBDiag.getSelectedItem().equals("Сахарный диабет")){oslcode="O24";}
+					if (CBDiag.getSelectedItem().equals("Многоплодная беременность")){oslcode="O30";}
+					if (CBDiag.getSelectedItem().equals("Неправильное предлежание плода")){oslcode="O32";}
+					if (CBDiag.getSelectedItem().equals("Изоиммунизация")){oslcode="O32";}
+					if (CBDiag.getSelectedItem().equals("Анемия")){oslcode="O99.0";}
+					if (CBDiag.getSelectedItem().equals("Переношенная беременность")){oslcode="O48";}
+					if (CBDiag.getSelectedItem().equals("Существовавшая ранее гипертензия с присоед.протеинурией")){oslcode="O11";}
+					if (CBDiag.getSelectedItem().equals("Вызванные беременностью отеки и протеинурия без гипертензии")){oslcode="O12";}
+					if (CBDiag.getSelectedItem().equals("Гипертензия без значительной протеинурии")){oslcode="O13";}
+					if (CBDiag.getSelectedItem().equals("Гипертензия со значительной протеинурией")){oslcode="O14";}
+					if (CBDiag.getSelectedItem().equals("Экламсия")){oslcode="O15";}
+					if (CBDiag.getSelectedItem().equals("")){oslcode = null;}
+					return oslcode;
+				};
+				private int ppp1(int iw2){
+					if (CBOteki.getSelectedItem().equals("Нижние конечности")){iw2 = 1;}
+					if (CBOteki.getSelectedItem().equals("Верхние конечности")){iw2 = 2;}
+					if (CBOteki.getSelectedItem().equals("Верхняя брюшная стенка")){iw2 = 3;}
+					if (CBOteki.getSelectedItem().equals("Генерализованные")){iw2 = 2;}
+					if (CBOteki.getSelectedItem().equals("")){iw2 = 0;}
+					return iw2;
+				};
+				private int ppp2(int iw3){
+					if (CBCerd.getSelectedItem().equals("Ясное")){iw3 = 1;}
+					if (CBCerd.getSelectedItem().equals("Приглушенное")){iw3 = 2;}
+					if (CBCerd.getSelectedItem().equals("Глухое")){iw3 = 3;}
+					if (CBCerd.getSelectedItem().equals("")){iw3 = 0;}
+					return iw3;
+				};
+				private int ppp3(int iw4){
+					if (CBDiag.getSelectedItem().equals("Голова")){iw4 = 1;}
+					if (CBDiag.getSelectedItem().equals("Таз")){iw4 = 2;}
+					if (CBDiag.getSelectedItem().equals("")){iw4 = 0;}
+					return iw4;
+				};
+				private int ppp4(int iw5){
+					if (CBDiag.getSelectedItem().equals("Ритмичное")){iw5 = 1;}
+					if (CBDiag.getSelectedItem().equals("Аритмичное")){iw5 = 2;}
+					if (CBDiag.getSelectedItem().equals("")){iw5 = 0;}
+					return iw5;
+				};
+				
+	public void actionPerformed(ActionEvent e) {
+		rddin.setArt1((int) SPdad.getModel().getValue());
+		rddin.setArt2((int) SPsad.getModel().getValue());
+		rddin.setArt3((int) SLdad.getModel().getValue());
+		rddin.setArt4((int) SLsad.getModel().getValue());
+		rddin.setChcc((int) SChcc.getModel().getValue());
+		rddin.setDatapos((long) SDataPos.getModel().getValue());
+		rddin.setDatasl((long) SDataSl.getModel().getValue());
+		rddin.setHdm((int) SVdm.getModel().getValue());
+		rddin.setOj((int) SOkrj.getModel().getValue());
+		rddin.setSpl((int) STolP.getModel().getValue());
+		rddin.setSrok((int) SSrok.getModel().getValue());
+		rddin.setVes((int) SVes.getModel().getValue());
+		rddin.setDspos(oslcode);
+		rddin.setPolpl(iw1);
+		rddin.setOteki(iw2);
+		rddin.setPredpl(iw4);
+		rddin.setSerd1(iw5);
+		rddin.setSerd(iw3);
+			}
+		});
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addComponent(LOteki)
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(LDataSl)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(SDataSl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addComponent(LDataPos)
-								.addComponent(LSrok)
-								.addComponent(LVes)
-								.addComponent(LOkrJ)
-								.addComponent(LVdm)
-								.addComponent(LDiag)
-								.addComponent(LPdad)
-								.addComponent(LPsad)
-								.addComponent(LLdad)
-								.addComponent(LLsad)
-								.addComponent(LtolPlac))
-							.addGap(33)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addComponent(STolP, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SLsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SLdad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SPdad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(CBDiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SOkrj, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SSrok, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SVes, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(44, Short.MAX_VALUE))
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_panel_1.createSequentialGroup()
+								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+									.addComponent(LDataPos)
+									.addComponent(LSrok)
+									.addComponent(LVes)
+									.addComponent(LOkrJ)
+									.addComponent(LVdm)
+									.addComponent(LDiag)
+									.addGroup(gl_panel_1.createSequentialGroup()
+										.addComponent(LPdad)
+										.addGap(18)
+										.addComponent(SPdad, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE))
+									.addGroup(gl_panel_1.createSequentialGroup()
+										.addComponent(LLdad)
+										.addGap(18)
+										.addComponent(SLdad, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE))
+									.addComponent(LDataSl))
+								.addGap(18)
+								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_panel_1.createSequentialGroup()
+										.addComponent(LPsad)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+											.addComponent(SDataSl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+											.addGroup(gl_panel_1.createSequentialGroup()
+												.addGap(73)
+												.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+													.addComponent(CBOteki, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+													.addGroup(gl_panel_1.createSequentialGroup()
+														.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+															.addComponent(CBDiag, 0, 89, Short.MAX_VALUE)
+															.addComponent(SSrok, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
+															.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING, false)
+																.addComponent(SVdm, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+																.addComponent(SOkrj, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+																.addComponent(SVes, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE))
+															.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING, false)
+																.addComponent(STolP, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+																.addComponent(SLsad, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+																.addComponent(SPsad, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)))
+														.addGap(67))))
+											.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+									.addComponent(LLsad))
+								.addGap(44))
+							.addGroup(gl_panel_1.createSequentialGroup()
+								.addComponent(LtolPlac)
+								.addContainerGap(375, Short.MAX_VALUE))
+							.addGroup(gl_panel_1.createSequentialGroup()
+								.addComponent(LOteki)
+								.addContainerGap(441, Short.MAX_VALUE)))
+						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+							.addComponent(SButton)
+							.addContainerGap())))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addGap(19)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
 						.addComponent(LDataPos)
 						.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGap(15)
 							.addComponent(LSrok)
@@ -277,7 +490,7 @@ public class FormRdDin extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(LDiag))
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGap(6)
 							.addComponent(SSrok, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(SVes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -285,62 +498,53 @@ public class FormRdDin extends JFrame {
 							.addComponent(SOkrj, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(CBDiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(LPdad)
-						.addComponent(SPdad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(SPdad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(LPsad)
+						.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+						.addComponent(LLdad)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(SLdad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(LLsad)
+							.addComponent(SLsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addGap(18)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+						.addComponent(LtolPlac)
+						.addComponent(STolP, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addComponent(LOteki)
+						.addComponent(CBOteki, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(LPsad)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(LLdad)
+							.addGap(41)
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+								.addComponent(LDataSl)
+								.addComponent(SDataSl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(LLsad)
-								.addComponent(SLsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(LtolPlac)
-								.addComponent(STolP, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(LOteki)
-								.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(SLdad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-						.addComponent(LDataSl)
-						.addComponent(SDataSl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addComponent(SButton)
+							.addGap(19))))
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
 		
-		table = new JTable();
-		contentPane.add(table, BorderLayout.NORTH);
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-				{null, null, null, null, null, null, null, null, null, null, null, null, null},
-				{null, null, null, null, null, null, null, null, null, null, null, null, null},
-				{null, null, null, null, null, null, null, null, null, null, null, null, null},
-				{null, null, null, null, null, null, null, null, null, null, null, null, null},
-			},
-			new String[] {
-				"\u0414\u0430\u0442\u0430 \u043F\u043E\u0441\u0435\u0449\u0435\u043D\u0438\u044F", "\u0421\u0440\u043E\u043A \u0431\u0435\u0440\u0435\u043C\u0435\u043D\u043D\u043E\u0441\u0442\u0438", "\u0412\u0435\u0441", "\u041E\u043A\u0440\u0443\u0436\u043D\u043E\u0441\u0442\u044C \u0436\u0438\u0432\u043E\u0442\u0430", "\u0412\u0414\u041C", "\u0414\u0438\u0430\u0433\u043D\u043E\u0437", "\u041F\u0440\u0430\u0432\u0430\u044F \u0414\u0410\u0414", "\u041F\u0440\u0430\u0432\u0430\u044F \u0421\u0410\u0414", "\u041B\u0435\u0432\u0430\u044F \u0414\u0410\u0414", "\u041B\u0435\u0432\u0430\u044F \u0421\u0410\u0414", "\u0412\u044B\u0441\u043E\u0442\u0430 \u0441\u0442\u043E\u044F\u043D\u0438\u044F \u0434\u043D\u0430 \u043C\u0430\u0442\u043A\u0438", "\u0422\u043E\u043B\u0449\u0438\u043D\u0430 \u043F\u043B\u0430\u0446\u0435\u043D\u0442\u044B", "\u0414\u0430\u0442\u0430 \u0441\u043B\u0435\u0434\u0443\u0449\u0435\u0433\u043E \u043F\u043E\u0441\u0435\u0449\u0435\u043D\u0438\u044F"
-			}
-		));
-		table.getColumnModel().getColumn(0).setPreferredWidth(95);
-		table.getColumnModel().getColumn(1).setPreferredWidth(109);
-		table.getColumnModel().getColumn(3).setPreferredWidth(116);
-		table.getColumnModel().getColumn(10).setPreferredWidth(148);
-		table.getColumnModel().getColumn(11).setPreferredWidth(108);
-		table.getColumnModel().getColumn(12).setPreferredWidth(167);
-		table.getColumnModel().getColumn(12).setMinWidth(32);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		contentPane.add(scrollPane, BorderLayout.CENTER);
+		
+		tablePos = new CustomTable<>(true, true, RdDinStruct.class, 2, "Дата посещения", 3, "Срок",4, "Вес", 5, "Окружность живота",6 ,"ВДМ",7 , "Диагноз", 12, "Дата след. посещ.");
+		tablePos.setDateField(2);
+		tablePos.setFillsViewportHeight(true);
+		scrollPane.setViewportView(tablePos);
 	}
-}
+	};
+
+

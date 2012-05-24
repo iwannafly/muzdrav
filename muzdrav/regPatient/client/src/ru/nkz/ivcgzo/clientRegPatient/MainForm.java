@@ -120,12 +120,12 @@ public class MainForm extends Client {
 				cmb_alk = new ThriftIntegerClassifierCombobox<>(true);
 				cmb_naprav = new ThriftIntegerClassifierCombobox<>(true);
 				cmb_org = new ThriftIntegerClassifierCombobox<>(true);
-//				cmb_status.setData(tcl.getSgrp());
-//				cmb_oms_doc.setData(tcl.getPomsTdoc());
-//				cmb_tdoc.setData(tcl.getTdoc());
-//				//cmb_ishod.setData(tcl);
-//				cmb_Tdoc_pr.setData(tcl.getTdoc());
-//				cmb_Polis_doc_pr.setData(tcl.getPomsTdoc());
+				cmb_status.setData(tcl.getSgrp());
+				//cmb_oms_doc.setData(tcl.getPomsTdoc());
+				cmb_tdoc.setData(tcl.getTdoc());
+//				cmb_ishod.setData(tcl);
+				cmb_Tdoc_pr.setData(tcl.getTdoc());
+				//cmb_Polis_doc_pr.setData(tcl.getPomsTdoc());
 //				cmb_cotd;
 //				cmb_travm;
 //				cmb_trans;
@@ -135,13 +135,8 @@ public class MainForm extends Client {
 //				cmb_org;
 				
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} 
-//				catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 		}
 	}
 
