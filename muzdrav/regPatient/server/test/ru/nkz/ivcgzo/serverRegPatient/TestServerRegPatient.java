@@ -20,6 +20,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
@@ -52,7 +53,6 @@ public class TestServerRegPatient {
         testServer = new ServerRegPatient(sse, tse);
         testPatientFull = new PatientBrief();
         testPatientFull.setIm("СЕРГЕЙ");
-        testPatientFull.setFam("ИВАНОВ");
         testPatientEmpty = new PatientBrief();
         testPatientEmpty.setNpasp(-1);
     }
@@ -74,7 +74,7 @@ public class TestServerRegPatient {
     @Test
     public final void getAllPatientBrief_isListSizeCorrect()
             throws TException, PatientNotFoundException {
-        final int expectedListSize = 312;
+        final int expectedListSize = 308;
         java.util.List <PatientBrief> testPatientList =
                 testServer.getAllPatientBrief(testPatientFull);
         assertEquals("list size", expectedListSize, testPatientList.size());
@@ -281,7 +281,7 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         testException.expect(KontingentAlreadyExistException.class);
-        int afterAddId = testServer.addKont(kontingent.get(0));
+        Info afterAddId = testServer.addKont(kontingent.get(0));
         //assertEquals(afterAddId, 0);
     }
 
@@ -292,7 +292,7 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         kontingent.get(0).setKateg((short) 12);
-        int afterAddId = testServer.addKont(kontingent.get(0));
+        Info afterAddId = testServer.addKont(kontingent.get(0));
     }
 
     @Test

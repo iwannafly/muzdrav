@@ -86,11 +86,13 @@ public final class QueryGenerator<T> {
             i++;
         }
         if (definedFields.isEmpty()) {
-            resultQuery.replace(resultQuery.indexOf(" WHERE"), resultQuery.length(), ";");
+            //resultQuery.replace(resultQuery.indexOf(" WHERE"), resultQuery.length(), ";");
+            resultQuery.delete(
+                    resultQuery.length() - " WHERE".length(), resultQuery.length());
         } else {
             resultQuery.delete(
                     resultQuery.length() - " AND".length(), resultQuery.length());
-            resultQuery.append(";");
+            //resultQuery.append(";");
         }
         InputData inData = new InputData(resultQuery.toString(), indexes);
         return inData;
