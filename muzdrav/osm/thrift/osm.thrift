@@ -331,8 +331,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void DeletePvizitAmb(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
-	PdiagAmb getPdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagAmbNotFoundException dne);
-
+	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 
