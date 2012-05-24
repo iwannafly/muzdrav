@@ -591,19 +591,17 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * Добавление новой строки.
 	 */
 	public void addItem() {
-		if (editable) {
-			if (itemAdd && !itemUpd)
-				deleteSelectedRow();
-			else if (itemAdd)
-				updateSelectedItem();
-			
-			try {
-				lst.add(cls.newInstance());
-				updateSelectedIndex(lst.size(), getSelectedColumn(), lst.size(), 1);
-				itemUpd = false;
-				itemAdd = true;
-			} catch (Exception e) {
-			}
+		if (itemAdd && !itemUpd)
+			deleteSelectedRow();
+		else if (itemAdd)
+			updateSelectedItem();
+		
+		try {
+			lst.add(cls.newInstance());
+			updateSelectedIndex(lst.size(), getSelectedColumn(), lst.size(), 1);
+			itemUpd = false;
+			itemAdd = true;
+		} catch (Exception e) {
 		}
 	}
 	

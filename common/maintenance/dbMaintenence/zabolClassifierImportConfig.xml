@@ -4,6 +4,11 @@
 	<tableList>
 		<table srcName="ABB" dstName="n_abb" />
 		<table srcName="ABC" dstName="n_abc" />
+		<table srcName="ABS" dstName="n_abs" />
+		<table srcName="ABT" dstName="n_abt" />
+		<table srcName="ABV" dstName="n_abv" />
+		<table srcName="ABX" dstName="n_abx" />
+		<table srcName="ABY" dstName="n_aby" />
 		<table srcName="AF0" dstName="n_af0" />
 		<table srcName="AI0" dstName="n_ai0" />
 		<table srcName="AL0" dstName="n_al0" />
