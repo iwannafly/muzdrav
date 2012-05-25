@@ -44,6 +44,7 @@
 		<table srcName="P0E1" dstName="n_p0e1" />
 		<table srcName="P0S" dstName="n_p0s" />
 		<table srcName="R0C" dstName="n_r0c" />
+		<table srcName="R0Z" dstName="n_r0z" />
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
 		<table srcName="STOIM" dstName="n_stoim" />
