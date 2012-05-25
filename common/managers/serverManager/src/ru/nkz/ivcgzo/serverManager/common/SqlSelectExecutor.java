@@ -103,6 +103,8 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 					ps.setLong(i + 1, (Long)params[i]);
 				else if (cls == Double.class)
 					ps.setDouble(i + 1, (Double)params[i]);
+				else if (cls == Boolean.class)
+					ps.setBoolean(i + 1, (Boolean)params[i]);
 			}
 	}
 
@@ -151,6 +153,8 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 					ps.setLong(i + 1, (Long) obj.getFieldValue(fld));
 				else if (cls == Double.class)
 					ps.setDouble(i + 1, (Double) obj.getFieldValue(fld));
+				else if (cls == Boolean.class)
+					ps.setBoolean(i + 1, (Boolean) obj.getFieldValue(fld));
 			}
 		}
 	}
