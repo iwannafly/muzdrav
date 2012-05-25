@@ -57,6 +57,8 @@ import java.awt.event.WindowEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -157,6 +159,7 @@ public class Vvod extends JFrame {
 	private JTextPane tpStPraes;
 	private JTextPane tprecom;
 	private CustomTable<PdiagAmb,PdiagAmb._Fields> TabDiag;
+	private JTextField textField;
 	
 	
 	/**
@@ -210,12 +213,15 @@ public class Vvod extends JFrame {
 				
 		JButton button = new JButton("Аллергоанамнез");
 		
+		
 		JButton button_1 = new JButton("Сохранить");
 		button_1.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				diag.setDiag(tfkodmkb.getText());
 				diag.setNamed(tfname.getText());
+				/*прежде чем сохранить, проделать эту операцию : diag.setNamed(tfname.getText()); со всеми нужными полями*/
+				/*а потом вызывать метод из thrift,update*/
 //				pr.setT_ad(tfad.getText());
 //				pr.setT_chss(tfchss.getText());
 //				pr.setT_rost(tfrost.getText());
@@ -1190,13 +1196,28 @@ public class Vvod extends JFrame {
 				postber.setVisible(true);
 			}
 		});
+		
+		JButton button_8 = new JButton("+");
+		button_8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PvizitAmb pa = TabPos.addExternalItem();
+				pa.setCdol(MainForm.authInfo.getPdost());//TODO потом изменить на должность
+				pa.setDatap(System.currentTimeMillis());
+				pa.setFio_vr(MainForm.authInfo.getName());
+				TabPos.updateSelectedItem();
+				
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button_8))
 						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 							.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
 							.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 1004, Short.MAX_VALUE)))
@@ -1242,7 +1263,9 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(button_7)))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button_8))
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -1250,7 +1273,7 @@ public class Vvod extends JFrame {
 					.addGap(198))
 		);
 		
-		TabPos = new CustomTable<>(false,true,PvizitAmb.class,3,"Дата",4,"ФИО врача",5,"Должность");
+		TabPos = new CustomTable<>(false,true,PvizitAmb.class,3,"Дата",19,"ФИО врача",5,"Должность");
 		TabPos.setDateField(0);
 		sPos.setViewportView(TabPos);
 		TabPos.setFillsViewportHeight(true);
@@ -1669,6 +1692,10 @@ public class Vvod extends JFrame {
 		TabDiag.setDateField(0);
 		spDiag.setViewportView(TabDiag);
 		TabDiag.setFillsViewportHeight(true);		
+		
+		textField = new JTextField();
+		textField.setText(DateFormat.getDateInstance().format(new Date(111111111)));
+		textField.setColumns(10);
 		GroupLayout gl_pds = new GroupLayout(pds);
 		gl_pds.setHorizontalGroup(
 			gl_pds.createParallelGroup(Alignment.TRAILING)
@@ -1678,7 +1705,9 @@ public class Vvod extends JFrame {
 						.addGroup(gl_pds.createSequentialGroup()
 							.addComponent(lblkod)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE))
+							.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+							.addGap(54)
+							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pds.createSequentialGroup()
 							.addComponent(lblnamed)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -1700,7 +1729,8 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblkod)
-						.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblnamed)

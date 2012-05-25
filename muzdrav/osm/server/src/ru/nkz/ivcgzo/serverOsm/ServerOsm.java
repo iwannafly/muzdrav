@@ -249,8 +249,7 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public PdiagAmb getPdiagAmb(int diagId) throws KmiacServerException,
-			PdiagAmbNotFoundException, TException {
+	public List<PdiagAmb> getPdiagAmb(int obrId) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
