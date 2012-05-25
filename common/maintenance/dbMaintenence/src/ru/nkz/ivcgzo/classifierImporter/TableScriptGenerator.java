@@ -32,6 +32,8 @@ public class TableScriptGenerator {
 				throw new Exception(String.format("Table '%s' not found in source database.", tblParams.srcName));
 			String scr = String.format("CREATE TABLE %s (", tblParams.dstName);
 			while (rs.next()) {
+				if (rs.getString(1).equals("KOMM"))
+					continue;
 				switch (rs.getString(2)) {
 				case "NUMBER":
 					if (rs.getInt(5) == 0)

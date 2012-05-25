@@ -54,7 +54,12 @@ public class BinaryExporter {
 	}
 	
 	private void writeTurples(RandomAccessFile raf, Statement stm, String tableName) throws SQLException, IOException {
-		try (ResultSet data = conn.executeQuery(stm, String.format("SELECT * FROM %s.%s ", conn.databaseParams.name, tableName))) {
+		String fields = getFields(stm, tableName);
+		String sql = String.format("SELECT %s FROM %s.%s ", fields, conn.databaseParams.name, tableName);
+		if (!fields.equals("*"))
+			sql += "WHERE KOMM IS NULL ";
+		
+		try (ResultSet data = conn.executeQuery(stm, sql)) {
 			ResultSetMetaData meta = data.getMetaData();
 			while (data.next()) {
 				putTurple(raf, getTurple(data, meta));
@@ -62,6 +67,27 @@ public class BinaryExporter {
 		}
 	}
 	
+	private String getFields(Statement stm, String tableName) throws SQLException {
+		boolean KommIsSet = false;
+		String fields = "";
+		
+		try (ResultSet rs = conn.executeQuery(stm, String.format("SELECT column_name FROM sys.all_tab_columns WHERE (owner = '%s') AND (table_name = '%s') ORDER BY column_id ", conn.databaseParams.name, tableName))) {
+			while (rs.next()) {
+				if (rs.getString(1).equals("KOMM"))
+					KommIsSet = true;
+				else
+					fields += ", " + rs.getString(1);
+			}
+			if (fields.length() > 0)
+				fields = fields.substring(2);
+		}
+		
+		if (KommIsSet)
+			return fields;
+		else
+			return "*";
+	}
+
 	private byte[][] getTurple(ResultSet data, ResultSetMetaData meta) throws SQLException {
 		byte[][] turple = new byte[meta.getColumnCount()][];
 		
