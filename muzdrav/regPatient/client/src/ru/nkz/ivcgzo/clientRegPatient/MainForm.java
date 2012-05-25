@@ -26,19 +26,6 @@ public class MainForm extends Client {
     public static ThriftRegPatient.Client tcl;
 	private JFrame frame;
 	private UserAuthInfo authInfo;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_status;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_ishod;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_tdoc;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_oms_doc;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_Tdoc_pr;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_Polis_doc_pr;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_cotd;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_travm;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_trans;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_otkaz;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_alk;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_naprav;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_org;
 	
 	/**
 	 * Launch the application.
@@ -106,42 +93,6 @@ public class MainForm extends Client {
 	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
 		if (conn instanceof ThriftRegPatient.Client) {
 			tcl = (ThriftRegPatient.Client) conn;
-			try {
-				cmb_ishod = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_status = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_tdoc = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_oms_doc = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_Tdoc_pr = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_Polis_doc_pr = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_cotd = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_travm = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_trans = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_otkaz = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_alk = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_naprav = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_org = new ThriftIntegerClassifierCombobox<>(true);
-				cmb_status.setData(tcl.getSgrp());
-				cmb_oms_doc.setData(tcl.getPomsTdoc());
-				cmb_tdoc.setData(tcl.getTdoc());
-//				//cmb_ishod.setData(tcl);
-				cmb_Tdoc_pr.setData(tcl.getTdoc());
-				cmb_Polis_doc_pr.setData(tcl.getPomsTdoc());
-//				cmb_cotd;
-//				cmb_travm;
-//				cmb_trans;
-//				cmb_otkaz;
-//				cmb_alk;
-//				cmb_naprav;
-//				cmb_org;
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-//				catch (Exception e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 		}
 	}
 

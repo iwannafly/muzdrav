@@ -24,7 +24,6 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
-import ru.nkz.ivcgzo.thriftOsm.PdiagAmbNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
@@ -49,6 +48,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pvizitTypes; 
 	private final TResultSetMapper<PvizitAmb, PvizitAmb._Fields> rsmPvizitAmb;
 	private final Class<?>[] pvizitAmbTypes; 
+	private final TResultSetMapper<PdiagAmb, PdiagAmb._Fields> rsmPdiagAmb;
+	private final Class<?>[] pdiagAmbTypes; 
 	private final TResultSetMapper<Psign, Psign._Fields> rsmPsign;
 	private final Class<?>[] psignTypes; 
 	private final TResultSetMapper<Priem, Priem._Fields> rsmPriem;
@@ -74,6 +75,9 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr");
 		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
+		
+		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
+		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
 		
 		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred");
 		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class};
@@ -135,6 +139,15 @@ public class ServerOsm extends Server implements Iface {
 //		UpdatePvizitAmb(pos);
 //		DeletePvizitAmb(pos.id);
 		
+//		PdiagAmb diag = new PdiagAmb(-1, 21, 2, "3", "4", 5, true, 7, 8, 9, "10", 11, 12, 13, 14, "15", 16);
+//		diag.setId(AddPdiagAmb(diag));
+//		List<PdiagAmb> diag1 = getPdiagAmb(diag.id_obr);
+//		if (diag1.size() == 1) {
+//			diag = new PdiagAmb(diag1.get(0).id, 22, 3, "4", "5", 6, true, 8, 9, 10, "11", 12, 13, 14, 15, "16", 17);
+//			UpdatePdiagAmb(diag);
+//			DeletePdiagAmb(diag.id);
+//		}
+
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
@@ -242,31 +255,44 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public int AddPdiagAmb(PdiagAmb diag) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public int AddPdiagAmb(PdiagAmb diag) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_diag_amb (id_obr, npasp, diag, named, diag_stat, predv, datad, obstreg, cod_sp, cdol, datap, dataot, obstot, cod_spot, cdol_ot, vid_tr) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public PdiagAmb getPdiagAmb(int diagId) throws KmiacServerException,
-			PdiagAmbNotFoundException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PdiagAmb> getPdiagAmb(int obrId) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_obr = ? ", obrId)) {
+			return rsmPdiagAmb.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public void UpdatePdiagAmb(PdiagAmb diag) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		
+	public void UpdatePdiagAmb(PdiagAmb diag) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_diag_amb SET id_obr = ?, npasp = ?, diag = ?, named = ?, diag_stat = ?, predv = ?, datad = ?, obstreg = ?, cod_sp = ?, cdol = ?, datap = ?, dataot = ?, obstot = ?, cod_spot = ?, cdol_ot = ?, vid_tr = ? WHERE id = ? ", false, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
-	public void DeletePdiagAmb(int diagId) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		
+	public void DeletePdiagAmb(int diagId) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_diag_amb WHERE id = ? ", false, diagId);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override

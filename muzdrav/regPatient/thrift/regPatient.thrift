@@ -178,6 +178,19 @@ struct Gosp{
 	38:string zap_vrach
 }
 
+/**
+ * Объект, содержащий в первом поле - сгенированный ид записи
+ * <ul>
+ *     <li>id - сгенированный после добавления номер записи</l1>
+ *     <li>name - текстовое описание из классификатора</l1>
+ * </ul>
+ * Используется для добавления льгот и контингента
+ */
+struct Info{
+	1:i32 id,
+	2:string name 
+}
+
 
 /**
  * Пациент с такими данными не найден.
@@ -332,18 +345,26 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
      * Добавляет сведения о льготах пациента
      * @param lgota - сведения о льготах пациента
-     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @return объект класса Info, в котором:
+	 * <ul>
+	 *     <li>id - сгенированный после добавления номер записи</l1>
+	 *     <li>name - текстовое описание льготы из классификатора n_lkn</l1>
+	 * </ul>
      * @throws LgotaAlreadyExistException
      */
-	i32 addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
+	Info addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
 	
 	/**
      * Добавляет информацию о категории пациента в БД
      * @param kont - информация о категории пациента
-     * @return целочисленный первичный ключ id, сгенерированный при добавлении
+     * @return объект класса Info, в котором:
+	 * <ul>
+	 *     <li>id - сгенированный после добавления номер записи</l1>
+	 *     <li>name - текстовое описание категории из классификатора n_lkr</l1>
+	 * </ul>
      * @throws KontingentAlreadyExistException
      */
-	i32 addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
+	Info addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
 	
 	/**
      * Добавляет или обновляет информацию о представителе пациента в БД,
@@ -380,71 +401,21 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void updateGosp(1:Gosp gosp),
 	
 /*Классификаторы*/
-
-	/**
-	 * Классификатор пола (N_Z30(pcod))
-	 */
-	list<classifier.IntegerClassifier> getPol(),
 	
 	/**
 	 * Классификатор социального статуса (N_az9(pcod))
 	 */
 	list<classifier.IntegerClassifier> getSgrp(),
-	
-	/**
-	 * Классификатор областей  (N_l02 (name))
-	 */
-	list<classifier.IntegerClassifier> getObl(),
-	
-	/**
-	 * Классификатор городов (N_l00 (name))
-	 */
-	list<classifier.IntegerClassifier> getGorod(1:i32 codObl),
-	
-	/**
-	 * Классификатор улиц (N_u00 (name), N_u10 (name1))
-	 */
-	list<classifier.IntegerClassifier> getUl(1:i32 codGorod),
-	
-	/**
-	 * Классификатор домов (N_u10 (dom))
-	 */
-	list<classifier.IntegerClassifier> getDom(1:i32 codUl),
-	
-	/**
-	 * Классификатор корпусов (N_u10 (kor))
-	 */
-	list<classifier.IntegerClassifier> getKorp(1:i32 codDom),
-	
-	/**
-	 * Классификатор места работы (N_z43_gr, N_z42 (pcod))
-	 */
-	list<classifier.IntegerClassifier> getMrab(),
-	
-	/**
-	 * Классификатор кода страховой организации (N_kas (pcod))
-	 */
-	list<classifier.IntegerClassifier> getMsStrg(),
-	
+
 	/**
 	 * Классификатор типа документа, подтверждающего страхование (N_f008 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getPomsTdoc(),
-	
-	/**
-	 * Классификатор поликлиники фактического прикреплени (N_n00 (pcod))
-	 */
-	list<classifier.IntegerClassifier> getCpolPr(),
-	
+
 	/**
 	 * Классификатор типа документа, удостоверющего личность (N_az0 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getTdoc(),
-	
-	/**
-	 * Классификатор территории проживани (N_l02 (pcod))
-	 */
-	list<classifier.IntegerClassifier> getTerCod(1:i32 pcod),
 
 	/**
 	 * Классификатор кем направлен (N_K02 (pcod))
@@ -467,6 +438,11 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getO00(),
 
 	/**
+	 * Классификатор отделений для текущего ЛПУ (N_O00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getOtdForCurrentLpu(1:i32 lpuId),
+
+	/**
 	 * Классификатор ведомственное подчинение (N_AL0 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getAL0(),
@@ -475,12 +451,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	 * Классификатор военкоматы (N_W04 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getW04(),
-
-	/**
-	 * Классификатор отделений ЛПУ (N_O00 (pcod))
-	 */
-	list<classifier.IntegerClassifier> getOtdLpu(1:string codLpu),
-
+	
 	/**
 	 * Классификатор вид травмы (N_AI0 (pcod))
 	 */
@@ -502,8 +473,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getVTR(),
 
 	/**
-	 * Классификатор кода страховой организации (N_C00 (pcod,name))
+	 * Классификатор N_ABB (N_ABB(pcod))
 	 */
-	list<classifier.StringClassifier> getC00()
-
+	list<classifier.IntegerClassifier> getABB()
 }

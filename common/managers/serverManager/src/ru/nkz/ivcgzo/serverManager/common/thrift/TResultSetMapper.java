@@ -69,6 +69,9 @@ public final class TResultSetMapper<T extends TBase<?, F>, F extends TFieldIdEnu
 					case java.sql.Types.DOUBLE:
 						obj.setFieldValue(thrFld, rs.getDouble(i));
 						break;
+					case java.sql.Types.BIT:
+						obj.setFieldValue(thrFld, rs.getBoolean(i));
+						break;
 					}
 				if (rs.wasNull())
 					obj.setFieldValue(thrFld, null);

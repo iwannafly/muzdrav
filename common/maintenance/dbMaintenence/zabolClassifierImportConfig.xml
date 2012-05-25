@@ -4,6 +4,11 @@
 	<tableList>
 		<table srcName="ABB" dstName="n_abb" />
 		<table srcName="ABC" dstName="n_abc" />
+		<table srcName="ABS" dstName="n_abs" />
+		<table srcName="ABT" dstName="n_abt" />
+		<table srcName="ABV" dstName="n_abv" />
+		<table srcName="ABX" dstName="n_abx" />
+		<table srcName="ABY" dstName="n_aby" />
 		<table srcName="AF0" dstName="n_af0" />
 		<table srcName="AI0" dstName="n_ai0" />
 		<table srcName="AL0" dstName="n_al0" />
@@ -39,6 +44,7 @@
 		<table srcName="P0E1" dstName="n_p0e1" />
 		<table srcName="P0S" dstName="n_p0s" />
 		<table srcName="R0C" dstName="n_r0c" />
+		<table srcName="R0Z" dstName="n_r0z" />
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
 		<table srcName="STOIM" dstName="n_stoim" />

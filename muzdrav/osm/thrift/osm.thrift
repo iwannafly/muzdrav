@@ -58,22 +58,23 @@ struct PvizitAmb {
 }
 
 struct PdiagAmb {
-	1: i32 id;
-	2: i32 npasp;
-	3: i32 idzab;
-	4: i64 datrg;
-	5: string diag;
-	6: string named;/*медицинское описание д-за*/
-	7: i32 cod_sp;
-	8: i32 obstreg;
-	9: i64 datap;
-	10: i64 dataot;
-	11: i32 obstot;
-	12: i32 codsp_ot;
-	13: string cdol_ot;
-	14: i32 vid_tr;
-	15: i32 prizn;
-	16: i32 priznp; 
+	 1: i32 id;
+	 2: i32 id_obr;
+	 3: i32 npasp;
+	 4: string diag;
+	 5: string named;/*медицинское описание д-за*/
+	 6: i32 diag_stat;
+	 7: bool predv;
+	 8: i64 datad;
+	 9: i32 obstreg;
+	10: i32 cod_sp;
+	11: string cdol;
+	12: i64 datap;
+	13: i64 dataot;
+	14: i32 obstot;
+	15: i32 codsp_ot;
+	16: string cdol_ot;
+	17: i32 vid_tr;
 }
 
 struct Psign{
@@ -296,9 +297,6 @@ struct RdInfStruct{
 exception PvizitNotFoundException {
 }
 
-exception PdiagAmbNotFoundException {
-}
-
 exception PsignNotFoundException {
 }
 
@@ -331,8 +329,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void DeletePvizitAmb(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
-	PdiagAmb getPdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagAmbNotFoundException dne);
-
+	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 

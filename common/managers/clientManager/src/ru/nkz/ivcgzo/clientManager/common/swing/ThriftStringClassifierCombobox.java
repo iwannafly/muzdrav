@@ -1,14 +1,16 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -138,12 +140,15 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	
 	class Searcher implements DocumentListener {
 		private ThriftStringClassifierCombobox<T> cmb = ThriftStringClassifierCombobox.this;
-		private JTextField editor = (JTextField) getEditor().getEditorComponent();
+		private CustomComboBoxEditor editor;
 		private boolean searching = false;
 		private boolean enabled = false;
 		private StringClassifier lastSelected;
 		
 		public Searcher() {
+			editor = new CustomComboBoxEditor();
+			ThriftStringClassifierCombobox.this.setEditor(editor);
+
 			cmb.addActionListener(new ActionListener() {
 				
 				@Override
@@ -175,7 +180,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 				public void run() {
 					try {
 						lastSelected = cmb.getSelectedItem();
-						String editTextLow = editor.getText().toLowerCase();
+						String editText = editor.getText();
+						String editTextLow = editText.toLowerCase();
 						String lastSelTextLow = (lastSelected != null) ? lastSelected.name.toLowerCase() : "";
 						if ((lastSelected != null) && (lastSelTextLow.indexOf(editTextLow) == 0)) {
 							searching = true;
@@ -197,7 +203,12 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 									break;
 								}
 							}
-						if ((lastSelected == null))
+						if (!searching) {
+							searching = true;
+							cmb.setSelectedItem(null);
+							editor.setText(editText);
+							cmb.showPopup();
+						} else if ((lastSelected == null))
 							cmb.showPopup();
 						else if (!lastSelTextLow.equals(editTextLow))
 							cmb.showPopup();
@@ -214,6 +225,37 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		
 		@Override
 		public void changedUpdate(DocumentEvent e) {
+		}
+	}
+	
+	class CustomComboBoxEditor extends CustomTextField implements ComboBoxEditor{
+		private static final long serialVersionUID = -1173671126585172816L;
+		
+		public CustomComboBoxEditor() {
+			super();
+			
+			setBorder(new EmptyBorder(1, 2, 1, 1));
+		}
+		
+		@Override
+		public Component getEditorComponent() {
+			return this;
+		}
+
+		@Override
+		public Object getItem() {
+			StringClassifier selItem = ThriftStringClassifierCombobox.this.getSelectedItem();
+			
+			if (selItem == null)
+				setText(null);
+			
+			return selItem;
+		}
+
+		@Override
+		public void setItem(Object anObject) {
+			if (anObject != null)
+				setText(anObject.toString());
 		}
 	}
 }
