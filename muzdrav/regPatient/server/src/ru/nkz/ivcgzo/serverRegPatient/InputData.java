@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.serverRegPatient;
-
+/**
+ * Класс для передачи хранения сгенерированных запросов и массивов индексов
+ */
 public class InputData {
     private String queryText;
     private int[] indexes;

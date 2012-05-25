@@ -28,7 +28,6 @@ public final class DbConnectionManager {
         dbOptions = new DbOptions();
         loadDbDriver(dbOptions.getDriverClassName());
 
-        //always new the pool because pool is an instance variable
         this.connection = newConnection();
     }
 

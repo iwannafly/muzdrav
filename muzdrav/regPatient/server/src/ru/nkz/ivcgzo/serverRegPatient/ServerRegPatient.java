@@ -58,6 +58,9 @@ public class ServerRegPatient extends Server implements Iface {
 ////////////////////////////////////////////////////////////////////////
 
     private TServer thrServ;
+
+//////////////////////////////// Mappers /////////////////////////////////
+
     private TResultSetMapper<PatientBrief, PatientBrief._Fields> rsmPatientBrief;
     private TResultSetMapper<Address, Address._Fields> rsmAdpAdress;
     private TResultSetMapper<Address, Address._Fields> rsmAdmAdress;
@@ -72,6 +75,9 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<AllGosp, AllGosp._Fields> rsmAllGosp;
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
     private QueryGenerator<PatientBrief> qgPatientBrief;
+
+//////////////////////////////// Type Arrays /////////////////////////////////
+
     private static final Class<?>[] PATIENT_BRIEF_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
         Integer.class, String.class, String.class, String.class,
@@ -155,6 +161,9 @@ public class ServerRegPatient extends Server implements Iface {
     //  name
         String.class
     };
+
+//////////////////////////// Field Name Arrays ////////////////////////////
+
     private static final String[] POLIS_OMS_FIELD_NAMES = {
         "poms_strg", "poms_ser", "poms_nom", "poms_tdoc"
     };
