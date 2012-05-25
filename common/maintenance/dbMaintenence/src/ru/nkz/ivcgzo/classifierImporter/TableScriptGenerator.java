@@ -47,9 +47,9 @@ public class TableScriptGenerator {
 				case "VARCHAR2":
 					scr += String.format("%s character varying(%d)", rs.getString(1).toLowerCase(), rs.getInt(3));
 					break;
-//				case "DATE":
-//					scr += String.format("%s timestamp without time zone", rs.getString(1).toLowerCase());
-//					break;
+				case "DATE":
+					scr += String.format("%s date", rs.getString(1).toLowerCase());
+					break;
 				default:
 					throw new Exception(String.format("Unsupported data type '%s' in source table '%s'.", rs.getString(2), tblParams.srcName));
 				}

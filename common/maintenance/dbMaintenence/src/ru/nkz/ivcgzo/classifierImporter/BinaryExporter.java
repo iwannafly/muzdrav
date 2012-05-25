@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -15,6 +16,8 @@ import ru.nkz.ivcgzo.misc.Misc;
 
 public class BinaryExporter {
 	private DBConnection conn;
+	private final long mills2000Yrs = 946663200000L;
+	private final long millsOneDay = 86400000L;
 	
 	public BinaryExporter(DBConnection conn) {
 		this.conn = conn;
@@ -74,9 +77,9 @@ public class BinaryExporter {
 			case Types.VARCHAR:
 				turple[i] = varcharToUtf8(data.getString(i + 1));
 				break;
-//			case Types.TIMESTAMP:
-//				turple[i] = numericToBytes(data.getTimestamp(i + 1).getTime(), 14);
-//				break;
+			case Types.TIMESTAMP:
+				turple[i] = dateToBytes(data.getDate(i + 1));
+				break;
 			default:
 				throw new SQLException(String.format("Unsupportes data type: %d.", meta.getColumnType(i + 1)));
 			}
@@ -128,6 +131,10 @@ public class BinaryExporter {
 		} catch (UnsupportedEncodingException e) {
 			throw new SQLException(e);
 		}
+	}
+	
+	private byte[] dateToBytes(Date date) {
+		return numericToBytes((date.getTime() - mills2000Yrs) / millsOneDay, 10);
 	}
 	
 	private void putTurple(RandomAccessFile raf, byte[][] turple) throws IOException {
