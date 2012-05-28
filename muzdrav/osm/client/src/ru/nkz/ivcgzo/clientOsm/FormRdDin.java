@@ -96,21 +96,21 @@ public class FormRdDin extends JFrame {
 		setContentPane(contentPane);
 		rddin = new RdDinStruct();
 		oslcode = rddin.getDspos();
-		if (oslcode=="O21"){oslname = "Чрезмерная рвота";}
-		if (oslcode=="O44"){oslname = "Предлежание плаценты";}
-		if (oslcode=="O45"){oslname = "Отслойка плаценты";}
-		if (oslcode=="O23.0"){oslname = "Инфекция почек";}
-		if (oslcode=="O24"){oslname = "Сахарный диабет";}
-		if (oslcode=="O30"){oslname = "Многоплодная беременность";}
-		if (oslcode=="O32"){oslname = "Неправильное предлежание плода";}
-		if (oslcode=="O36.0"){oslname = "Изоиммунизация";}
-		if (oslcode=="O99.0"){oslname = "Анемия";}
-		if (oslcode=="O48"){oslname = "Переношенная беременность";}
-		if (oslcode=="O11"){oslname = "Существовавшая ранее гипертензия с присоед.протеинурией";}
-		if (oslcode=="O12"){oslname = "Вызванные беременностью отеки и протеинурия без гипертензии";}
-		if (oslcode=="O13"){oslname = "Гипертензия без значительной протеинурии";}
-		if (oslcode=="O14"){oslname = "Гипертензия со значительной протеинурией";}
-		if (oslcode=="O15"){oslname = "Экламсия";}
+		if (oslcode.equals("O21")){oslname = "Чрезмерная рвота";}
+		if (oslcode.equals("O44")){oslname = "Предлежание плаценты";}
+		if (oslcode.equals("O45")){oslname = "Отслойка плаценты";}
+		if (oslcode.equals("O23.0")){oslname = "Инфекция почек";}
+		if (oslcode.equals("O24")){oslname = "Сахарный диабет";}
+		if (oslcode.equals("O30")){oslname = "Многоплодная беременность";}
+		if (oslcode.equals("O32")){oslname = "Неправильное предлежание плода";}
+		if (oslcode.equals("O36.0")){oslname = "Изоиммунизация";}
+		if (oslcode.equals("O99.0")){oslname = "Анемия";}
+		if (oslcode.equals("O48")){oslname = "Переношенная беременность";}
+		if (oslcode.equals("O11")){oslname = "Существовавшая ранее гипертензия с присоед.протеинурией";}
+		if (oslcode.equals("O12")){oslname = "Вызванные беременностью отеки и протеинурия без гипертензии";}
+		if (oslcode.equals("O13")){oslname = "Гипертензия без значительной протеинурии";}
+		if (oslcode.equals("O14")){oslname = "Гипертензия со значительной протеинурией";}
+		if (oslcode.equals("O15")){oslname = "Экламсия";}
 		if (oslcode==null){oslname = "";}
         iw1 = rddin.getPolpl();
 		if (iw1 == 1){polplname ="Продольное";}
