@@ -39,6 +39,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 
 
 
+
 public class LDSserver extends Server implements Iface { 
 	private TServer	thrServ;
 	private TResultSetMapper<ObInfIsl, ObInfIsl._Fields> rsmObInIs;
@@ -51,6 +52,7 @@ public class LDSserver extends Server implements Iface {
 	private TResultSetMapper<Metod, Metod._Fields> rmsMetod;
 	private TResultSetMapper<N_ldi, N_ldi._Fields> rmsnldi;
 	private final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+	private QueryGenerator<Patient> qgPatient;
 	@SuppressWarnings("unused")
 	private final Class<?>[] intClasTypes; 
 	private final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
@@ -62,6 +64,8 @@ public class LDSserver extends Server implements Iface {
 		rsmObInIs = new TResultSetMapper<>(ObInfIsl.class, "npasp", "nisl", "kodotd", "nprob", "pcisl", "cisl", "datap", "datav", "prichina", "popl", "napravl", "naprotd", "fio", "vopl", "diag", "kodvr", "kodm", "kods", "dataz");
 		rsmDiIs = new TResultSetMapper<>(DiagIsl.class, "npasp", "nisl", "kodisl", "rez", "anamnez", "anastezi", "model", "kol", "op_name", "rez_name", "stoim", "pcod_m");
 		rsmLabIs = new TResultSetMapper<>(LabIsl.class, "npasp", "nisl", "cpok", "zpok", "stoim", "pcod_m", "pvibor");	
+		rmsnldi = new TResultSetMapper<>(N_ldi.class, "pcod", "c_nz1", "name_n", "name", "norma", "c_p0e1", "vibor");
+		rmsMetod = new TResultSetMapper<>(Metod.class, "c_p0e1", "pcod", "c_obst", "name", "stoim", "vibor");
 		
 		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod",        "name");
 		intClasTypes = new Class<?>[] {                              Integer.class, String.class};
@@ -69,6 +73,13 @@ public class LDSserver extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 	}
+	
+	private static final Class<?>[] PATIENT_BRIEF_TYPES = new Class<?>[] {
+	    //  npasp          fam           im            ot
+	        Integer.class, String.class, String.class, String.class,
+	    //  datar       poms_ser        poms_nom      
+	        Date.class, String.class, String.class
+	    };
 
 	@Override
 	public List<ObInfIsl> GetObInfIslt(int npasp) throws TException {
@@ -288,7 +299,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasCpos2() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_cpos2 ")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0c ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -297,7 +308,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasPopl() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_popl ")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_abt ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -306,7 +317,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasNapr() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_napr ")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0s ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -362,19 +373,19 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<Patient> getPatient(Patient pat)
 			throws PatientNotFoundException, TException {
-/*        String  sqlQuery = "SELECT npasp, fam, im, ot, datar"
+/*        String  sqlQuery = "SELECT npasp, fam, im, ot, datar, poms_ser, poms_nom"
                 + "FROM patient";
-        InputData inData = rmsPatient.genSelect(patient, sqlQuery);
+        InputData inData = qgPatient.genSelect(pat, sqlQuery);
         try {
             sqlQuery = inData.getQueryText();
             int[] indexes = inData.getIndexes();
-            AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
-                    PATIENT_BRIEF_TYPES, indexes);
+           try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, pat,
+                    PATIENT_BRIEF_TYPES, indexes)){
             ResultSet rs = acrs.getResultSet();
             List<Patient> patientsInfo = new ArrayList<Patient>();
             if (rs.next()) {
                 do {
-                    Patient curPatient = rsmPatientBrief.map(rs);
+                    Patient curPatient = rmsPatient.map(rs);
                     curPatient.setAdpAddress(new Address(rsmAdpAdress.map(rs)));
                     curPatient.setAdmAddress(new Address(rsmAdmAdress.map(rs)));
                     patientsInfo.add(curPatient);
@@ -392,7 +403,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<Metod> getMetod(int c_p0e1, String pcod)
 			throws MetodNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, nsi_obst.nameobst, n_stoim.stoim FROM n_stoim JOIN nsi_obst ON (n_stoim.c_obst = nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?)", c_p0e1, pcod)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?)", c_p0e1, pcod)) {
 			return rmsMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
