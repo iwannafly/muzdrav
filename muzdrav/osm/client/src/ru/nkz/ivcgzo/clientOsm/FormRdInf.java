@@ -76,6 +76,14 @@ public class FormRdInf extends JFrame {
     private int us2;
     private int us3;
     private int us4;
+    private int otec;
+    private int ot1;
+    private int ot2;
+    private int ot3;
+    private int codobr;
+    private String namobr;
+    private int codsem;
+    private String namsem;
 
 	/**
 	 * Launch the application.
@@ -150,29 +158,51 @@ public class FormRdInf extends JFrame {
 		
 		uslj = rdinf.getUslPr();
 		if ((uslj-8)<0){
-		or4=0; 	
+		us4=0; 	
 		}else {
-		or4=1; iw1=uslj-8;	
+		us4=1; iw2=uslj-8;	
 		}
-		if ((iw1-4)<0){
-		or3=0; 
+		if ((iw2-4)<0){
+		us3=0; 
 		}else {
-		or3=1; iw1=iw1-4;	
+		us3=1; iw2=iw2-4;	
 		}
-		if ((iw1-2)<0){
-		or2=0; 
+		if ((iw2-2)<0){
+		us2=0; 
 		}else {
-		or2=1; iw1=iw1-2;	
+		us2=1; iw2=iw2-2;	
 		}
-		or1=iw1; 
-
+		us1=iw2; 
+		otec = rdinf.getVredOtec();
+		if ((otec-4)<0){
+		ot3=0; 
+		}else {
+		ot3=1; iw2=otec-4;	
+		}
+		if ((iw2-2)<0){
+		ot2=0; 
+		}else {
+		ot2=1; iw2=iw2-2;	
+		}
+		ot1=iw2; 
+        if (rdinf.getObr()==1){namobr="Высшее";}
+        if (rdinf.getObr()==2){namobr="Незаконченное высшее";}
+        if (rdinf.getObr()==3){namobr="Среднее специальное";}
+        if (rdinf.getObr()==4){namobr="Среднее";}
+        if (rdinf.getObr()==5){namobr="Начальное";}
+        if (rdinf.getObr()==0){namobr="";}
+        if (rdinf.getSem()==1){namsem="Регистрированный";}
+        if (rdinf.getSem()==2){namsem="Не регистрированный";}
+        if (rdinf.getSem()==3){namsem="Одна";}
+        if (rdinf.getSem()==0){namsem="";}
 		JPanel panel = new JPanel();
 		contentPane.add(panel);
 		
 		JLabel LNkart = new JLabel("Номер обменной карты");
 		
 		TNkart = new JTextField();
-		TNkart.setColumns(10);
+		TNkart.setColumns(10);    //? на всех текстовых полях
+		TNkart.setText(Integer.toString(rdinf.idDispb));
 		
 		LObr = new JLabel("Образование");
 		
@@ -180,15 +210,18 @@ public class FormRdInf extends JFrame {
 		
 		JPanel panel_1 = new JPanel();
 		
-		JComboBox CBObr = new JComboBox();
+		final JComboBox CBObr = new JComboBox();
 		CBObr.setModel(new DefaultComboBoxModel(new String[] {"Начальное", "Среднее", "Среднее специальное", "Незаконченное высшее", "Высшее"}));
+		CBObr.setSelectedItem(namobr);
 		
-		JComboBox CBSem = new JComboBox();
+		final JComboBox CBSem = new JComboBox();
 		CBSem.setModel(new DefaultComboBoxModel(new String[] {"Регистрированный", "Не регистрированный", "Одна"}));
-		
+		CBSem.setSelectedItem(namsem);
 		JPanel panel_2 = new JPanel();
 		
 		JPanel panel_3 = new JPanel();
+		
+		JButton Sbutton = new JButton("Сохранить");
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -209,18 +242,23 @@ public class FormRdInf extends JFrame {
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(CBObr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(TNkart, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE))))
-					.addGap(100)
-					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(100)
+							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(113)
+							.addComponent(Sbutton)))
 					.addGap(77))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+							.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(17)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(LNkart)
@@ -235,8 +273,13 @@ public class FormRdInf extends JFrame {
 								.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGap(27)
+							.addComponent(Sbutton)))
 					.addContainerGap())
 		);
 		
@@ -255,29 +298,34 @@ public class FormRdInf extends JFrame {
 		
 		JLabel LTel = new JLabel("Телефон");
 		
-		JCheckBox ChBSmok = new JCheckBox("Курение");
+		final JCheckBox ChBSmok = new JCheckBox("Курение");
+		ChBSmok.setSelected(ot1 ==1);
 		
-		JCheckBox ChBAlk = new JCheckBox("Алкоголизм");
+		final JCheckBox ChBAlk = new JCheckBox("Алкоголизм");
+		ChBAlk.setSelected(ot2 ==1);
 		
-		JCheckBox ChBNark = new JCheckBox("Наркомания");
+		final JCheckBox ChBNark = new JCheckBox("Наркомания");
+		ChBNark.setSelected(ot3 ==1);
 		
 		TFio = new JTextField();
-		TFio.setColumns(10);
+		TFio.setText(rdinf.fioOtec);
 		
 		JSpinner SVozr = new JSpinner();
-		SVozr.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
+		SVozr.setModel(new SpinnerNumberModel(new Integer(rdinf.vOtec), null, null, new Integer(1)));
+		rdinf.setVOtec((int) SVozr.getModel().getValue());
 		
 		TMrab = new JTextField();
-		TMrab.setColumns(10);
+		TMrab.setText(rdinf.mrOtec);
 		
 		TTelef = new JTextField();
-		TTelef.setColumns(10);
+		TTelef.setText(rdinf.telOtec);
 		
 		TGrk = new JTextField();
-		TGrk.setColumns(10);
+//		TGrk.setText(rdinf.grOtec);
 		
 		TPhf = new JTextField();
-		TPhf.setColumns(10);
+		TPhf.setText(rdinf.phOtec);
+		
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -345,19 +393,19 @@ public class FormRdInf extends JFrame {
 		);
 		panel_3.setLayout(gl_panel_3);
 		
-		JLabel label = new JLabel("Условия проживания");
+		final JLabel label = new JLabel("Условия проживания");
 		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		JCheckBox ChBSelo = new JCheckBox("Сельская жительница");
+		final JCheckBox ChBSelo = new JCheckBox("Сельская жительница");
 		ChBSelo.setSelected(us1 ==1);
 		
-		JCheckBox ChBOtsB = new JCheckBox("Отсутствие благоустройства");
+		final JCheckBox ChBOtsB = new JCheckBox("Отсутствие благоустройства");
 		ChBOtsB.setSelected(us2 ==1);
 		
-		JCheckBox ChBGorod = new JCheckBox("Городская жительница");
+		final JCheckBox ChBGorod = new JCheckBox("Городская жительница");
 		ChBGorod.setSelected(us3 ==1);
 		
-		JCheckBox ChBBomg = new JCheckBox("БОМЖ");
+		final JCheckBox ChBBomg = new JCheckBox("БОМЖ");
 		ChBBomg.setSelected(us4 ==1);
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
@@ -459,5 +507,59 @@ public class FormRdInf extends JFrame {
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
+		Sbutton.addActionListener(new ActionListener() {
+			private int codobr (int codobr){
+				if (CBObr.getSelectedItem().equals("Высшее")){codobr = 1;}
+				if (CBObr.getSelectedItem().equals("Незаконченное высшее")){codobr = 2;}
+				if (CBObr.getSelectedItem().equals("Среднее специальное")){codobr = 3;}
+				if (CBObr.getSelectedItem().equals("Среднее")){codobr = 4;}
+				if (CBObr.getSelectedItem().equals("Начальное")){codobr = 5;}
+				if (CBObr.getSelectedItem().equals("")){codobr = 0;}
+							return codobr;
+			};
+ 		    private int codsem (int codsem){
+				if (CBObr.getSelectedItem().equals("Регистрированный")){codsem = 1;}
+				if (CBObr.getSelectedItem().equals("Не регистрированный")){codsem = 2;}
+				if (CBObr.getSelectedItem().equals("Одна")){codsem = 3;}
+				if (CBObr.getSelectedItem().equals("")){codsem = 0;}
+							return codsem;
+			};
+			private int oslrod (int oslrod){
+		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
+		            if (ChBots.isSelected()){oslrod=oslrod+2;}
+		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
+		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
+		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
+		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
+		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
+		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
+			return oslrod;	
+			};
+			private int uslj (int uslj){
+		           if (ChBSelo.isSelected()){uslj=uslj+1;}
+		            if (ChBots.isSelected()){uslj=uslj+2;}
+		            if (ChBGorod.isSelected()){uslj=uslj+4;}
+		            if (ChBBomg.isSelected()){uslj=uslj+8;}
+			return uslj;
+			};
+			private int otec (int otec){
+		           if (ChBSmok.isSelected()){otec=otec+1;}
+		            if (ChBAlk.isSelected()){otec=otec+2;}
+		            if (ChBNark.isSelected()){otec=otec+4;}
+			return otec;	
+			};
+			public void actionPerformed(ActionEvent arg0) {
+rdinf.setFioOtec(TFio.getText());
+rdinf.setMrOtec(TMrab.getText());
+rdinf.setObr(codobr);
+rdinf.setSem(codsem);
+rdinf.setOSocO(oslrod);
+rdinf.setUslPr(uslj);
+rdinf.setVredOtec(otec);
+rdinf.setTelOtec(TTelef.getText());
+//rdinf.setGrOtec(TGrk.getText());
+rdinf.setPhOtec(TPhf.getText());
+			}
+		});
 	}
 }

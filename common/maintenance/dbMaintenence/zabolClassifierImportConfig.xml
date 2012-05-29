@@ -17,6 +17,7 @@
 		<table srcName="AO0" dstName="n_ao0" />
 		<table srcName="AP0" dstName="n_ap0" />
 		<table srcName="AQ0" dstName="n_aq0" />
+		<table srcName="AREZ" dstName="n_arez" />
 		<table srcName="AZ0" dstName="n_az0" />
 		<table srcName="AZ9" dstName="n_az9" />
 		<table srcName="C00" dstName="n_c00" />
@@ -36,7 +37,9 @@
 		<table srcName="MED" dstName="n_med" />
 		<table srcName="MNN" dstName="n_mnn" />
 		<table srcName="N00" dstName="n_n00" />
+		<table srcName="NSI_OBST" dstName="n_nsi_obst" />
 		<table srcName="NZ1" dstName="n_nz1" />
+		<table srcName="OBST" dstName="n_obst" />
 		<table srcName="O00" dstName="n_o00" />
 		<table srcName="OPL" dstName="n_opl" />
 		<table srcName="OT9" dstName="n_ot9" />
@@ -44,6 +47,7 @@
 		<table srcName="P0E1" dstName="n_p0e1" />
 		<table srcName="P0S" dstName="n_p0s" />
 		<table srcName="R0C" dstName="n_r0c" />
+		<table srcName="R0Z" dstName="n_r0z" />
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
 		<table srcName="STOIM" dstName="n_stoim" />

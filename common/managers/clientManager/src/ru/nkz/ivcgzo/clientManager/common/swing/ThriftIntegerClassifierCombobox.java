@@ -148,6 +148,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
 			ThriftIntegerClassifierCombobox.this.setEditor(editor);
+			editor.putClientProperty("doNotCancelPopup", null);
 
 			
 			cmb.addActionListener(new ActionListener() {
