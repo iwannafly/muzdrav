@@ -202,7 +202,7 @@ public class FormRdInf extends JFrame {
 		
 		TNkart = new JTextField();
 		TNkart.setColumns(10);    //? на всех текстовых полях
-		TNkart.setText(rdinf.idDispb);
+		TNkart.setText(Integer.toString(rdinf.idDispb));
 		
 		LObr = new JLabel("Образование");
 		
