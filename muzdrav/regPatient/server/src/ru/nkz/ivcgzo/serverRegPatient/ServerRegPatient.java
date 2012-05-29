@@ -7,6 +7,8 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -56,6 +58,8 @@ public class ServerRegPatient extends Server implements Iface {
 ////////////////////////////////////////////////////////////////////////
 //                          Fields                                    //
 ////////////////////////////////////////////////////////////////////////
+
+    private static Logger log = Logger.getLogger(ServerRegPatient.class.getName());
 
     private TServer thrServ;
 
@@ -261,6 +265,9 @@ public class ServerRegPatient extends Server implements Iface {
                 "SELECT npasp FROM p_nambk WHERE (npasp = ?)",
                 nambk, NAMBK_TYPES, 0)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            return false;
         }
     }
 
@@ -275,6 +282,8 @@ public class ServerRegPatient extends Server implements Iface {
                 "SELECT id FROM c_gosp WHERE (npasp = ?) and (ngosp = ?)",
                 gosp, GOSP_TYPES, 0)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -291,6 +300,8 @@ public class ServerRegPatient extends Server implements Iface {
                 + "AND (datar = ?);",
                 patinfo, PATIENT_FULL_TYPES, indexes)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -306,6 +317,8 @@ public class ServerRegPatient extends Server implements Iface {
                 "SELECT id FROM p_kov WHERE (npasp = ?) AND (lgot = ?);",
                 lgota, LGOTA_TYPES, indexes)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -321,6 +334,8 @@ public class ServerRegPatient extends Server implements Iface {
                 "SELECT id FROM p_konti WHERE (npasp = ?) AND (kateg = ?);",
                 kontingent, KONTINGENT_TYPES, indexes)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -335,6 +350,8 @@ public class ServerRegPatient extends Server implements Iface {
                 "SELECT npasp FROM p_preds WHERE (npasp = ?)",
                 agent, AGENT_TYPES, 0)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -349,6 +366,8 @@ public class ServerRegPatient extends Server implements Iface {
                 "SELECT npasp FROM p_sign WHERE (npasp = ?)",
                 sign, SIGN_TYPES, 0)) {
             return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 
@@ -370,6 +389,8 @@ public class ServerRegPatient extends Server implements Iface {
                 tmpName = "описание контингента не найдено";
             }
             return tmpName;
+        } catch (SQLException e) {
+            return "описание контингента не найдено";
         }
     }
 
@@ -390,6 +411,8 @@ public class ServerRegPatient extends Server implements Iface {
                 tmpName = "описание льготы не найдено";
             }
             return tmpName;
+        } catch (SQLException e) {
+            return "описание льготы не найдено";
         }
     }
 
