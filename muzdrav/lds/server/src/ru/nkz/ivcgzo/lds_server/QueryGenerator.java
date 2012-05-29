@@ -1,6 +1,6 @@
 /**
  */
-package ru.nkz.ivcgzo.serverRegPatient;
+package ru.nkz.ivcgzo.lds_server;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
