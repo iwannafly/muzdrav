@@ -14,7 +14,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
-import ru.nkz.ivcgzo.thriftOsm.PdiagAmbNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
@@ -2064,7 +2063,7 @@ public class Vvod extends JFrame {
 			MainForm.tcl.AddPvizitAmb(pos);
 			MainForm.tcl.UpdatePvizit(pvizit);
 			MainForm.tcl.AddPdiagAmb(diag);
-			if (diag.prizn == 2){//присвоить значение полей данным.вписать в табл.
+			if (diag.diag_stat == 2){//присвоить значение полей данным.вписать в табл.
 			MainForm.tcl.AddPdiagZ(dz);	
 			}
 			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
