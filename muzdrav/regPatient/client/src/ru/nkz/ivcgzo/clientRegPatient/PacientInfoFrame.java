@@ -166,19 +166,6 @@ public class PacientInfoFrame extends JFrame {
 	private CustomTable<Lgota, Lgota._Fields> tbl_lgota;
 	private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
 	private CustomTable<AllGosp, AllGosp._Fields> tbl_priem;
-//	private JComboBox<String> cmb_tdoc;
-//	private JComboBox<String> cmb_ishod;
-//	private JComboBox<String> cmb_oms_doc;
-//	private JComboBox<String> cmb_status;
-//	private JComboBox<String> cmb_Tdoc_pr;
-//	private JComboBox<String> cmb_Polis_doc_pr;
-//	private JComboBox<String> cmb_cotd;
-//	private JComboBox<String> cmb_travm;
-//	private JComboBox<String> cmb_trans;
-//	private JComboBox<String> cmb_otkaz;
-//	private JComboBox<String> cmb_alk;
-//	private JComboBox<String> cmb_naprav;
-//	private JComboBox<String> cmb_org;
 	
 	private PatientBrief newPatBr;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_status;
@@ -1296,8 +1283,8 @@ public class PacientInfoFrame extends JFrame {
 					AgentInfo.setDocnum(tf_Nomdoc_pr.getText().trim());
 					if (rbtn_pol_pr_m.isSelected()) AgentInfo.setPol(1);
 					if (rbtn_pol_pr_j.isSelected()) AgentInfo.setPol(2);
-					AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
-					AgentInfo.setTdoc(cmb_Polis_doc_pr.getSelectedPcod());
+					if (cmb_Tdoc_pr.getSelectedItem() != null) AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
+					if (cmb_Polis_doc_pr.getSelectedItem() != null) AgentInfo.setTdoc(cmb_Polis_doc_pr.getSelectedPcod());
 					MainForm.tcl.addOrUpdateAgent(AgentInfo);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -1514,11 +1501,12 @@ public class PacientInfoFrame extends JFrame {
 							.addComponent(rbtn_pol_pr_m)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(rbtn_pol_pr_j))
-						.addComponent(tf_Ot_pr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_Im_pr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_Fam_pr, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_Mr_pr, GroupLayout.PREFERRED_SIZE, 441, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(84, Short.MAX_VALUE))
+						.addComponent(tf_Mr_pr, GroupLayout.PREFERRED_SIZE, 441, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_8.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(tf_Ot_pr, Alignment.LEADING)
+							.addComponent(tf_Im_pr, Alignment.LEADING)
+							.addComponent(tf_Fam_pr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)))
+					.addContainerGap(76, Short.MAX_VALUE))
 		);
 		gl_panel_8.setVerticalGroup(
 			gl_panel_8.createParallelGroup(Alignment.LEADING)
@@ -2556,7 +2544,7 @@ public class PacientInfoFrame extends JFrame {
 			public boolean doAction(CustomTableItemChangeEvent<PatientBrief> event) {
 		        try {
 					MainForm.tcl.deletePatient(curPatientId);
-					NewPatient();
+//					NewPatient();
 				} catch (TException e) {
 					e.printStackTrace();
 					return false;
@@ -2680,10 +2668,10 @@ public class PacientInfoFrame extends JFrame {
 					if (rbtn_pol_m.isSelected()) PersonalInfo.setPol(1);
 					if (rbtn_pol_j.isSelected()) PersonalInfo.setPol(2);
 					
-					PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
-					PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
-					PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
-					PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
+					if (cmb_status.getSelectedItem() != null) PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
+					if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
+					if (cmb_ishod.getSelectedItem() != null) PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
+					if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
 
 //7:i32 jitel, 11:i32 ncex,13:i32 terp,23:i64 dsv,24:i32 prizn,25:i32 ter_liv,26:i32 region_liv,
 					if (curPatientId == 0){
@@ -2691,6 +2679,7 @@ public class PacientInfoFrame extends JFrame {
 						newPatBr.setOt(PersonalInfo.getOt());
 						newPatBr.setIm(PersonalInfo.getIm());
 						curPatientId = MainForm.tcl.addPatient(PersonalInfo);
+						newPatBr.setNpasp(curPatientId);
 						tbl_patient.updateSelectedItem();
 //						RefreshTablePatient();
 					}
@@ -2982,7 +2971,6 @@ public class PacientInfoFrame extends JFrame {
 			cmb_oms_doc.setSelectedIndex(-1);
 			cmb_ishod.setSelectedIndex(-1);
 			cmb_tdoc.setSelectedIndex(-1);
-			cmb_status.setSelectedItem(null);
 		} catch (Exception e) {
 			e.printStackTrace();						
 		}
@@ -3333,13 +3321,13 @@ public class PacientInfoFrame extends JFrame {
 			Id_gosp.setNal_z(cbx_nalz.isSelected());
 			Id_gosp.setNal_p(cbx_nalp.isSelected());
 
-			Id_gosp.setVidtr(cmb_travm.getSelectedPcod());
-			Id_gosp.setPr_out(cmb_otkaz.getSelectedPcod());
-			Id_gosp.setAlkg(cmb_alk.getSelectedPcod());
-			Id_gosp.setVid_trans(cmb_trans.getSelectedPcod());
-			Id_gosp.setNaprav(cmb_naprav.getSelectedPcod());
-			Id_gosp.setN_org(cmb_org.getSelectedPcod());
-			Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
+			if (cmb_travm.getSelectedItem() != null) Id_gosp.setVidtr(cmb_travm.getSelectedPcod());
+			if (cmb_otkaz.getSelectedItem() != null) Id_gosp.setPr_out(cmb_otkaz.getSelectedPcod());
+			if (cmb_alk.getSelectedItem() != null) Id_gosp.setAlkg(cmb_alk.getSelectedPcod());
+			if (cmb_trans.getSelectedItem() != null) Id_gosp.setVid_trans(cmb_trans.getSelectedPcod());
+			if (cmb_naprav.getSelectedItem() != null) Id_gosp.setNaprav(cmb_naprav.getSelectedPcod());
+			if (cmb_org.getSelectedItem() != null) Id_gosp.setN_org(cmb_org.getSelectedPcod());
+			if (cmb_cotd.getSelectedItem() != null) Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
 			
 //			GospId GospId = MainForm.tcl.addGosp(Id_gosp);
 //			curId = GospId.id;
