@@ -294,6 +294,55 @@ struct RdInfStruct{
 	13:i32 vredOtec;
 }
 
+/*Список показателей исследований по выбранному методу*/
+struct PokazMet{
+	1: string pcod;/*код показателя*/
+	2: string name_n;/*наименование*/
+	3: double stoim;/*стоимость*/
+	4: bool vybor;
+}
+
+struct Metod{
+	1: string obst;/*код метода*/
+	2: string name_obst;/*наименование*/
+}
+
+/*Список показателей исследований по выбранной системе*/
+struct Pokaz{
+	1: string pcod;/*код показателя*/
+	2: string name_n;/*наименование*/
+	3: double stoim;/*стоимость*/
+	4: bool vybor;
+}
+
+
+struct P_isl_ld {
+	1: i32 npasp;
+	2: i32 nisl;
+	3: i32 cisl;
+	4: string pcisl;
+	5: i32 napravl;/*стационар или поликлиника, от врача всегда будет равно 1,т.к.с поликлиники*/
+	6: i32 naprotd;
+	7: i64 datan;/*дата направления*/
+	8: i32 vrach;/*скорее всего код врача, который произвел направление*/
+	9: string diag;
+}
+
+struct Prez_d {
+	1: i32 npasp;
+	2: i32 nisl;
+	3: string kodisl;
+	4: double stoim;
+}
+
+struct Prez_l {
+	1: i32 npasp;
+	2: i32 nisl;
+	3: string cpok;
+	4: double stoim;
+}
+
+
 exception PvizitNotFoundException {
 }
 
@@ -340,6 +389,14 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+
+	/*Исследования*/
+	list<Metod> getMetod(1: string vidissl) throws (1: kmiacServer.KmiacServerException kse);/*методы исследований по виду анализа*/
+	list<PokazMet> getPokazMet(1: string metod) throws (1: kmiacServer.KmiacServerException kse);/*по коду метода(n_nsi_obst) показатели из справочника n_stoim(стоимость, код показателя),наименование из n_ldi */
+	list<Pokaz> getPokaz(1: string metod) throws (1: kmiacServer.KmiacServerException kse);/*по коду метода(n_nsi_obst) показатели из справочника n_stoim(стоимость, код показателя),наименование из n_ldi */
+	void AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
+	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
+	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
 	
 
 //classifiers
@@ -357,6 +414,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_p0e1() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_nz1() throws (1: kmiacServer.KmiacServerException kse);
+
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
