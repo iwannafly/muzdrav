@@ -50,6 +50,7 @@ public class PIslForm {
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBpopl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBnapravl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBvopl;
+	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBrez;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
@@ -406,7 +407,7 @@ public class PIslForm {
 		
 		JLabel label_3 = new JLabel("Результат");
 		
-		JComboBox cBrez = new JComboBox();
+		cBrez = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel label_4 = new JLabel("Стоимость");
 		

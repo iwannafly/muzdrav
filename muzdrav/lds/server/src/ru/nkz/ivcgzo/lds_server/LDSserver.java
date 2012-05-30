@@ -401,9 +401,9 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public List<Metod> getMetod(int c_p0e1, String pcod)
+	public List<Metod> getMetod(int c_p0e1, String pcod, String pcod_m)
 			throws MetodNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?)", c_p0e1, pcod)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?) and((n_stoim.c_obst like ?)or(n_stoim.c_obst is null))", c_p0e1, pcod, pcod_m)) {
 			return rmsMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);

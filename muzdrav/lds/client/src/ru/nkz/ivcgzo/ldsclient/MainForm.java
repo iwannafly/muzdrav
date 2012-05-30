@@ -152,7 +152,7 @@ public class MainForm extends Client{
 				winPat.cBpopl.setData(ltc.GetKlasPopl());
 				winPat.cBnapravl.setData(ltc.GetKlasNapr());
 				winPat.cBvopl.setData(ltc.GetKlasOpl());
-				
+				winPat.cBrez.setData(ltc.GetKlasArez());
 				
 				winOpt.p0e1.setData(ltc.GetKlasP0e1());
 				winOpt.n_nz1.setData(ltc.GetKlasNz1());
