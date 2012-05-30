@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.serverOsm;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -21,10 +22,16 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.Metod;
+import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
+import ru.nkz.ivcgzo.thriftOsm.Pokaz;
+import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import ru.nkz.ivcgzo.thriftOsm.Prez_d;
+import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
@@ -509,6 +516,25 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
+	public List<IntegerClassifier> get_n_p0e1() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0e1 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_nz1() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_nz1 ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
 	public List<RdSlStruct> getRdSlInfo(int idDispb, int npasp)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
@@ -588,6 +614,42 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdateRdInf(int npasp, int lgota) throws KmiacServerException,
 			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<Metod> getMetod(String vidissl) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return new ArrayList<>();
+	}
+
+	@Override
+	public List<PokazMet> getPokazMet(String metod) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return new ArrayList<>();
+	}
+
+	@Override
+	public List<Pokaz> getPokaz(String metod) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return new ArrayList<>();
+	}
+
+	@Override
+	public void AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void AddPrezd(Prez_d di) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void AddPrezl(Prez_l li) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		
 	}
