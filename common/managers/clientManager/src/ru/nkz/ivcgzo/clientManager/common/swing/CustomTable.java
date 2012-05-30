@@ -536,7 +536,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow - 1;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsDeleted(updRow, updRow);
+			getModel().fireTableRowsDeleted(selRow, selRow);
 			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
@@ -592,6 +592,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				if (!checkEmpty(sel)) {
 					if (addRowLst != null)
 						addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
+					else
+						updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				} else {
 					deleteSelectedRow();
 				}
