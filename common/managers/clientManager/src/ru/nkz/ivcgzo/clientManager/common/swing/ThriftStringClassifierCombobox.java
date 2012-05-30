@@ -148,6 +148,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
 			ThriftStringClassifierCombobox.this.setEditor(editor);
+			editor.putClientProperty("doNotCancelPopup", null);
 
 			cmb.addActionListener(new ActionListener() {
 				
@@ -256,6 +257,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		public void setItem(Object anObject) {
 			if (anObject != null)
 				setText(anObject.toString());
+			else
+				setText(null);
 		}
 	}
 }
