@@ -317,7 +317,7 @@ public class Option {
 	private void filtN_stoim() {
 		try {
 			if ((p0e1.getSelectedItem() != null) && (tn_ldi.getSelectedItem() != null)) {
-				tmetod.setData(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod()));
+				tmetod.setData(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod(), String.format("%%.%02d.%%", p0e1.getSelectedPcod())));
 			}
 		} catch (MetodNotFoundException e) {
 			// TODO Auto-generated catch block

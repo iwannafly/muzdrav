@@ -172,7 +172,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 
     	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
 	
-	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod) throws (1: MetodNotFoundException mnfe);
+	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
 
