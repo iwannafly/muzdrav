@@ -43,8 +43,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 */
 	public ThriftIntegerClassifierCombobox(boolean searcheable, List<IntegerClassifier> list) {
 		if (searcheable) {
-			searcher = new Searcher();
 			setEditable(true);
+			searcher = new Searcher();
 		}
 		setModel();
 		setData(list);

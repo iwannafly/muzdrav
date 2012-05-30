@@ -43,8 +43,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 */
 	public ThriftStringClassifierCombobox(boolean searcheable, List<StringClassifier> list) {
 		if (searcheable) {
-			searcher = new Searcher();
 			setEditable(true);
+			searcher = new Searcher();
 		}
 		setModel();
 		setData(list);
