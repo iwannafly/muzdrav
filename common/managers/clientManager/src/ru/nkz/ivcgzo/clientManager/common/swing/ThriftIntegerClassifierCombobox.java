@@ -43,8 +43,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 */
 	public ThriftIntegerClassifierCombobox(boolean searcheable, List<IntegerClassifier> list) {
 		if (searcheable) {
-			setEditable(true);
 			searcher = new Searcher();
+			setEditable(true);
 		}
 		setModel();
 		setData(list);
@@ -258,6 +258,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		public void setItem(Object anObject) {
 			if (anObject != null)
 				setText(anObject.toString());
+			else
+				setText(null);
 		}
 	}
 }

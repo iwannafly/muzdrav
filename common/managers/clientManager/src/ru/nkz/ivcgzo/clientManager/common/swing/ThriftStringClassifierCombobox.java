@@ -43,8 +43,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 */
 	public ThriftStringClassifierCombobox(boolean searcheable, List<StringClassifier> list) {
 		if (searcheable) {
-			setEditable(true);
 			searcher = new Searcher();
+			setEditable(true);
 		}
 		setModel();
 		setData(list);
@@ -257,6 +257,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		public void setItem(Object anObject) {
 			if (anObject != null)
 				setText(anObject.toString());
+			else
+				setText(null);
 		}
 	}
 }
