@@ -174,8 +174,7 @@ struct Gosp{
 	34:i64 dataosm,
 	35:string vremosm,
 	36:i64 dataz,
-	37:string jalob,
-	38:string zap_vrach
+	37:string jalob
 }
 
 /**
