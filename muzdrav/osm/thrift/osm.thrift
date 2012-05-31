@@ -296,36 +296,42 @@ struct RdInfStruct{
 
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
-	1: string pcod;/*код показателя*/
-	2: string name_n;/*наименование*/
-	3: double stoim;/*стоимость*/
+	1: string pcod;
+	2: string name_n;
+	3: double stoim;
 	4: bool vybor;
+	5: string c_obst;
 }
 
+/*метод по виду исследования*/
 struct Metod{
-	1: string obst;/*код метода*/
-	2: string name_obst;/*наименование*/
+	1: string obst;
+	2: string name_obst;
+	3: i32 c_p0e1;
+	4: string pcod;
 }
 
 /*Список показателей исследований по выбранной системе*/
 struct Pokaz{
-	1: string pcod;/*код показателя*/
-	2: string name_n;/*наименование*/
-	3: double stoim;/*стоимость*/
+	1: string pcod;
+	2: string name_n;
+	3: double stoim;
 	4: bool vybor;
+	5: i32 c_p0e1;
+	6: string c_n_nz1;
 }
 
 
 struct P_isl_ld {
 	1: i32 npasp;
-	2: i32 nisl;
-	3: i32 cisl;
-	4: string pcisl;
-	5: i32 napravl;/*стационар или поликлиника, от врача всегда будет равно 1,т.к.с поликлиники*/
-	6: i32 naprotd;
-	7: i64 datan;/*дата направления*/
-	8: i32 vrach;/*скорее всего код врача, который произвел направление*/
-	9: string diag;
+	2: i32 cisl;
+	3: string pcisl;
+	4: i32 napravl;
+	5: i32 naprotd;
+	6: i64 datan;
+	7: i32 vrach;
+	8: string diag;
+	9: i64 dataz;
 }
 
 struct Prez_d {
@@ -391,9 +397,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
-	list<Metod> getMetod(1: string vidissl) throws (1: kmiacServer.KmiacServerException kse);/*методы исследований по виду анализа*/
-	list<PokazMet> getPokazMet(1: string metod) throws (1: kmiacServer.KmiacServerException kse);/*по коду метода(n_nsi_obst) показатели из справочника n_stoim(стоимость, код показателя),наименование из n_ldi */
-	list<Pokaz> getPokaz(1: string metod) throws (1: kmiacServer.KmiacServerException kse);/*по коду метода(n_nsi_obst) показатели из справочника n_stoim(стоимость, код показателя),наименование из n_ldi */
+	list<Metod> getMetod(1: i32 kodissl, 2: string pokaz) throws (1: kmiacServer.KmiacServerException kse);
+	list<PokazMet> getPokazMet(1: string metod) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
