@@ -8,7 +8,7 @@ struct Address{
 	2:string city,
 	3:string street,
 	4:string house,
-	5:string flat	
+	5:string flat
 }
 
 struct PatientBrief{
