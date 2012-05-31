@@ -422,7 +422,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_p0e1() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.StringClassifier> get_n_nz1() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_nz1(1: i32 c_p0e1) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info
