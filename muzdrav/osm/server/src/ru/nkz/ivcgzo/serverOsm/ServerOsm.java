@@ -195,7 +195,7 @@ public class ServerOsm extends Server implements Iface {
 //		AddPrezd(new Prez_d(1, pi.nisl, "3", 4));
 //		AddPrezl(new Prez_l(5, pi.nisl, "7", 8));
 		
-//		List<Metod> met = getMetod(1, "A09.05.063");
+//		List<Metod> met = getMetod(1);
 //		List<PokazMet> pokMet = getPokazMet("50.01.001");
 //		List<Pokaz> pok = getPokaz(1, "05");
 
@@ -663,12 +663,12 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<Metod> getMetod(int kodissl, String pokaz) throws KmiacServerException, TException {
+	public List<Metod> getMetod(int kodissl) throws KmiacServerException, TException {
 		String sql = "SELECT np.pcod AS c_p0e1, no.obst, no.nameobst AS name_obst, ns.pcod " +
 					"FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) JOIN n_p0e1 np ON (np.pcod = ns.c_p0e1) " +
-					"WHERE np.pcod = ? AND ns.pcod = ? " +
+					"WHERE np.pcod = ? " +
 					"ORDER BY np.pcod, no.obst ";
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, kodissl, pokaz)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, kodissl)) {
 			return rsmMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
