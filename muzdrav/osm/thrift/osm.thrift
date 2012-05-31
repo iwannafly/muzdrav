@@ -299,8 +299,8 @@ struct PokazMet{
 	1: string pcod;
 	2: string name_n;
 	3: double stoim;
-	4: bool vybor;
-	5: string c_obst;
+	4: string c_obst;
+	5: bool vybor;
 }
 
 /*метод по виду исследования*/
@@ -316,22 +316,23 @@ struct Pokaz{
 	1: string pcod;
 	2: string name_n;
 	3: double stoim;
-	4: bool vybor;
-	5: i32 c_p0e1;
-	6: string c_n_nz1;
+	4: i32 c_p0e1;
+	5: string c_n_nz1;
+	6: bool vybor;
 }
 
 
 struct P_isl_ld {
-	1: i32 npasp;
-	2: i32 cisl;
-	3: string pcisl;
-	4: i32 napravl;
-	5: i32 naprotd;
-	6: i64 datan;
-	7: i32 vrach;
-	8: string diag;
-	9: i64 dataz;
+	 1: i32 nisl;
+	 2: i32 npasp;
+	 3: i32 cisl;
+	 4: string pcisl;
+	 5: i32 napravl;
+	 6: i32 naprotd;
+	 7: i64 datan;
+	 8: i32 vrach;
+	 9: string diag;
+	10: i64 dataz;
 }
 
 struct Prez_d {
@@ -400,7 +401,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<Metod> getMetod(1: i32 kodissl, 2: string pokaz) throws (1: kmiacServer.KmiacServerException kse);
 	list<PokazMet> getPokazMet(1: string metod) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
-	void AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
 	
