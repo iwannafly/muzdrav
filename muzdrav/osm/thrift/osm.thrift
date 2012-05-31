@@ -398,7 +398,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
-	list<Metod> getMetod(1: i32 kodissl, 2: string pokaz) throws (1: kmiacServer.KmiacServerException kse);
+	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
 	list<PokazMet> getPokazMet(1: string metod) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
