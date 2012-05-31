@@ -69,7 +69,6 @@ public class MainForm extends Client {
 	 * @throws ClassNotFoundException 
 	 */
 	private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		PacientMainFrame pacientMainFrame = new PacientMainFrame();
 		pacientMainFrame.pack();
 		pacientMainFrame.setVisible(true);

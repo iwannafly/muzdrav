@@ -64,6 +64,8 @@ struct Patient {
 	3: string im;
 	4: string ot;
 	5: i64 datar;
+	6: string poms_ser;
+	7: string poms_nom;
 }
 
 
@@ -71,8 +73,9 @@ struct Metod {
 	1: i32 c_p0e1;
 	2: string pcod;
 	3: string c_obst;
-	4: string nameobst;
+	4: string name;
 	5: double stoim;	
+	6: bool vibor;
 }
 
 
@@ -83,6 +86,7 @@ struct N_ldi {
 	4: string name;
 	5: string norma;
 	6: i32 c_p0e1;
+	7: bool vibor;
 }
 
 
@@ -168,7 +172,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 
     	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
 	
-	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod) throws (1: MetodNotFoundException mnfe);
+	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
 

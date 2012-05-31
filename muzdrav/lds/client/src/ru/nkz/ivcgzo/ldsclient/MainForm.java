@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 
 public class MainForm extends Client{
 	Option winOpt;
+	PIslForm winPat;
 	public static LDSThrift.Client ltc;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) {
@@ -79,6 +80,7 @@ public class MainForm extends Client{
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		winOpt = new Option();		
+		winPat = new PIslForm();
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
@@ -89,7 +91,6 @@ public class MainForm extends Client{
 		JMenuItem mntmNewMenuItem = new JMenuItem("Данные");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {				
-				PIslForm winPat = new PIslForm();
 				winPat.frame.setVisible(true);
 				winPat.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			}
@@ -147,6 +148,12 @@ public class MainForm extends Client{
 				c_obr.setData(MainForm.tcl.getP0c());
 				cbrez.setData(MainForm.tcl.getAp0());
 				cbish.setData(MainForm.tcl.getAq0());*/
+				winPat.cBprichina.setData(ltc.GetKlasCpos2());
+				winPat.cBpopl.setData(ltc.GetKlasPopl());
+				winPat.cBnapravl.setData(ltc.GetKlasNapr());
+				winPat.cBvopl.setData(ltc.GetKlasOpl());
+				winPat.cBrez.setData(ltc.GetKlasArez());
+				
 				winOpt.p0e1.setData(ltc.GetKlasP0e1());
 				winOpt.n_nz1.setData(ltc.GetKlasNz1());
 			} catch (TException e) {
