@@ -144,7 +144,7 @@ public class Doctor {
         return "";
     }
 
-    public static List<Doctor> getAllDoctorsOfThisSpeciality(int specialityCod) {
+    public static List<Doctor> getAllDoctorsOfThisSpeciality(final int specialityCod) {
         String sqlQuery = "SELECT npasp FROM patient "
                 + "WHERE ((poms_ser || poms_nom) = ?) OR (poms_nom = ?);";
         Connection connection = DbConnectionManager.getInstance().getConnection();
