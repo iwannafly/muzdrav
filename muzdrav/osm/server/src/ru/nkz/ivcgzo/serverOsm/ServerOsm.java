@@ -664,7 +664,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<Metod> getMetod(int kodissl) throws KmiacServerException, TException {
-		String sql = "SELECT np.pcod AS c_p0e1, no.obst, no.nameobst AS name_obst, ns.pcod " +
+		String sql = "SELECT DISTINCT np.pcod AS c_p0e1, no.obst, no.nameobst AS name_obst " +
 					"FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) JOIN n_p0e1 np ON (np.pcod = ns.c_p0e1) " +
 					"WHERE np.pcod = ? " +
 					"ORDER BY np.pcod, no.obst ";
