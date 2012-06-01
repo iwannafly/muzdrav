@@ -1,6 +1,12 @@
 package ru.nkz.ivcgzo.infomat.model;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+
+import ru.nkz.ivcgzo.infomat.dbLevel.DbConnectionManager;
 
 /**
  * @version 1.0
@@ -94,28 +100,28 @@ public class Doctor {
 //                           Setters                                  //
 ////////////////////////////////////////////////////////////////////////
 
-    public void setPcod(int pcod) {
-        this.pcod = pcod;
+    public final void setPcod(final int inPcod) {
+        this.pcod = inPcod;
     }
 
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public final void setSurname(final String inSurname) {
+        this.surname = inSurname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public final void setName(final String inName) {
+        this.name = inName;
     }
 
-    public void setMiddlename(String middlename) {
-        this.middlename = middlename;
+    public final void setMiddlename(final String inMiddlename) {
+        this.middlename = inMiddlename;
     }
 
-    public void setSpeciality(String speciality) {
-        this.speciality = speciality;
+    public final void setSpeciality(final String inSpeciality) {
+        this.speciality = inSpeciality;
     }
 
-    public void setCabinet(int cabinet) {
-        this.cabinet = cabinet;
+    public final void setCabinet(final int inCabinet) {
+        this.cabinet = inCabinet;
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -138,8 +144,29 @@ public class Doctor {
         return "";
     }
 
-    public static List<Doctor> getAllDoctorsOfThisSpeciality() {
-        return null;
+    public static List<Doctor> getAllDoctorsOfThisSpeciality(int specialityCod) {
+        String sqlQuery = "SELECT npasp FROM patient "
+                + "WHERE ((poms_ser || poms_nom) = ?) OR (poms_nom = ?);";
+        Connection connection = DbConnectionManager.getInstance().getConnection();
+        PreparedStatement prepStatement = null;
+        ResultSet rs = null;
+        try {
+            prepStatement = connection.prepareStatement(sqlQuery);
+            prepStatement.setString(1, inputPomsFull);
+            prepStatement.setString(2, inputPomsFull);
+            rs = prepStatement.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (prepStatement != null) {
+                prepStatement.close();
+            }
+            if (rs != null) {
+                rs.close();
+            }
+        }
     }
 
 }

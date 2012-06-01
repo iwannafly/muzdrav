@@ -203,7 +203,7 @@ public class Patient {
                 return String.format("%s", surname);
             }
         }
-        return "";
+        return ""; // if surname == null
     }
 
     /**

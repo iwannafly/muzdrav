@@ -34,6 +34,7 @@ import javax.swing.UIManager;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.swing.JCheckBox;
+import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
 
@@ -46,10 +47,8 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftRegPatient.*;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 //import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-//import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -166,21 +165,9 @@ public class PacientInfoFrame extends JFrame {
 	private CustomTable<Lgota, Lgota._Fields> tbl_lgota;
 	private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
 	private CustomTable<AllGosp, AllGosp._Fields> tbl_priem;
-//	private JComboBox<String> cmb_tdoc;
-//	private JComboBox<String> cmb_ishod;
-//	private JComboBox<String> cmb_oms_doc;
-//	private JComboBox<String> cmb_status;
-//	private JComboBox<String> cmb_Tdoc_pr;
-//	private JComboBox<String> cmb_Polis_doc_pr;
-//	private JComboBox<String> cmb_cotd;
-//	private JComboBox<String> cmb_travm;
-//	private JComboBox<String> cmb_trans;
-//	private JComboBox<String> cmb_otkaz;
-//	private JComboBox<String> cmb_alk;
-//	private JComboBox<String> cmb_naprav;
-//	private JComboBox<String> cmb_org;
 	
 	private PatientBrief newPatBr;
+	private AllGosp newPriem;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_status;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_ishod;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_tdoc;
@@ -241,7 +228,7 @@ public class PacientInfoFrame extends JFrame {
 			cmb_tdoc.setData(MainForm.tcl.getTdoc());
 			cmb_ishod.setData(MainForm.tcl.getABB());
 			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
-			cmb_cotd.setData(MainForm.tcl.getO00());
+			cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
 			cmb_travm.setData(MainForm.tcl.getAI0());
 			cmb_trans.setData(MainForm.tcl.getVTR());
 			cmb_otkaz.setData(MainForm.tcl.getAF0());
@@ -253,7 +240,7 @@ public class PacientInfoFrame extends JFrame {
 		} 
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(1, 1, 954, 680); //ширина, высота
+		setBounds(1, 1, 954, 690); //ширина, высота
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -280,6 +267,7 @@ public class PacientInfoFrame extends JFrame {
 					changePatientSignInfo(curPatientId);
 				}
 				if (tbMain.getSelectedIndex() == 5) {
+					//tbl_priem.
 					changePatientPriemInfo(curPatientId);
 				}
 			}
@@ -1296,8 +1284,8 @@ public class PacientInfoFrame extends JFrame {
 					AgentInfo.setDocnum(tf_Nomdoc_pr.getText().trim());
 					if (rbtn_pol_pr_m.isSelected()) AgentInfo.setPol(1);
 					if (rbtn_pol_pr_j.isSelected()) AgentInfo.setPol(2);
-					AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
-					AgentInfo.setTdoc(cmb_Polis_doc_pr.getSelectedPcod());
+					if (cmb_Tdoc_pr.getSelectedItem() != null) AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
+					if (cmb_Polis_doc_pr.getSelectedItem() != null) AgentInfo.setTdoc(cmb_Polis_doc_pr.getSelectedPcod());
 					MainForm.tcl.addOrUpdateAgent(AgentInfo);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -1514,11 +1502,12 @@ public class PacientInfoFrame extends JFrame {
 							.addComponent(rbtn_pol_pr_m)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(rbtn_pol_pr_j))
-						.addComponent(tf_Ot_pr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_Im_pr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_Fam_pr, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tf_Mr_pr, GroupLayout.PREFERRED_SIZE, 441, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(84, Short.MAX_VALUE))
+						.addComponent(tf_Mr_pr, GroupLayout.PREFERRED_SIZE, 441, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_8.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(tf_Ot_pr, Alignment.LEADING)
+							.addComponent(tf_Im_pr, Alignment.LEADING)
+							.addComponent(tf_Fam_pr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)))
+					.addContainerGap(76, Short.MAX_VALUE))
 		);
 		gl_panel_8.setVerticalGroup(
 			gl_panel_8.createParallelGroup(Alignment.LEADING)
@@ -1811,6 +1800,7 @@ public class PacientInfoFrame extends JFrame {
 		
 		rbtn_gk4 = new JRadioButton("IV");
 		btnGroup_gk.add(rbtn_gk4);
+		
 		GroupLayout gl_panel_13 = new GroupLayout(panel_13);
 		gl_panel_13.setHorizontalGroup(
 			gl_panel_13.createParallelGroup(Alignment.LEADING)
@@ -1930,12 +1920,14 @@ public class PacientInfoFrame extends JFrame {
 		lblNewLabel_59.setFont(new Font("Tahoma", Font.PLAIN, 10));
 		
 		sp_sv_time = new JSpinner();
+		sp_sv_time.setModel(new SpinnerNumberModel(0, 0, 23, 1));
 		
 		JLabel lblNewLabel_60 = new JLabel("часов");
 		
 		JLabel lblNewLabel_61 = new JLabel("суток");
 		
 		sp_sv_day = new JSpinner();
+		sp_sv_day.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		GroupLayout gl_panel_36 = new GroupLayout(panel_36);
 		gl_panel_36.setHorizontalGroup(
 			gl_panel_36.createParallelGroup(Alignment.LEADING)
@@ -2394,7 +2386,10 @@ public class PacientInfoFrame extends JFrame {
 		JButton btnNew_priem = new JButton("Новое обращение");
 		btnNew_priem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tbl_priem.addItem();
+				newPriem = tbl_priem.addExternalItem();
+				rbtn_plan.requestFocus();
+				curId = 0;
+				curNgosp = 0;
 				NewPriemInfo();
 			}
 		});
@@ -2402,9 +2397,7 @@ public class PacientInfoFrame extends JFrame {
 		JButton btnSave_priem = new JButton("Сохранить");
 		btnSave_priem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			    //MainForm.tcl.updateLgota(RecLgota);
 			    SavePriemInfo();
-				tbl_priem.updateSelectedItem();
 			}
 		});
 		
@@ -2412,7 +2405,6 @@ public class PacientInfoFrame extends JFrame {
 		btnDel_priem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 		      try{
-				curNgosp = tbl_priem.getSelectedItem().ngosp;
 				MainForm.tcl.deleteGosp(curPatientId, curNgosp);
 				tbl_priem.requestFocus();
 			    tbl_priem.deleteSelectedRow();
@@ -2468,11 +2460,14 @@ public class PacientInfoFrame extends JFrame {
 		panel_23.setLayout(gl_panel_23);
 		tpPriem.setLayout(gl_tpPriem);
 
+
 		tbl_priem.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()) {
+				if (tbl_priem.getSelectedItem() !=  null) { 
 				changePatientPriemInfo(curPatientId);
+				}
 			}
 		}
 		});
@@ -2482,7 +2477,6 @@ public class PacientInfoFrame extends JFrame {
 		@Override
 		public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
 	        try {
-	        	curNgosp = tbl_priem.getSelectedItem().ngosp;
 			    MainForm.tcl.deleteGosp(curPatientId,curNgosp);
 			} catch (TException e) {
 				e.printStackTrace();
@@ -2528,6 +2522,7 @@ public class PacientInfoFrame extends JFrame {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
+					if (tbl_patient.getSelectedItem() != null) { 
 					curPatientId = tbl_patient.getSelectedItem().npasp;
 					if (tbMain.getSelectedIndex() == 0) {
 						changePatientPersonalInfo(curPatientId);
@@ -2547,6 +2542,7 @@ public class PacientInfoFrame extends JFrame {
 					if (tbMain.getSelectedIndex() == 5) {
 						changePatientPriemInfo(curPatientId);
 					}
+					}
 				}
 			}
 		});
@@ -2556,7 +2552,6 @@ public class PacientInfoFrame extends JFrame {
 			public boolean doAction(CustomTableItemChangeEvent<PatientBrief> event) {
 		        try {
 					MainForm.tcl.deletePatient(curPatientId);
-					NewPatient();
 				} catch (TException e) {
 					e.printStackTrace();
 					return false;
@@ -2626,6 +2621,7 @@ public class PacientInfoFrame extends JFrame {
 		JButton btnPoisk = new JButton("Поиск");
 		btnPoisk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tbMain.setSelectedIndex(0);
 				PacientMainFrame.getInstance().setVisible(true);
 			}
 		});
@@ -2680,10 +2676,10 @@ public class PacientInfoFrame extends JFrame {
 					if (rbtn_pol_m.isSelected()) PersonalInfo.setPol(1);
 					if (rbtn_pol_j.isSelected()) PersonalInfo.setPol(2);
 					
-					PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
-					PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
-					PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
-					PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
+					if (cmb_status.getSelectedItem() != null) PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
+					if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
+					if (cmb_ishod.getSelectedItem() != null) PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
+					if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
 
 //7:i32 jitel, 11:i32 ncex,13:i32 terp,23:i64 dsv,24:i32 prizn,25:i32 ter_liv,26:i32 region_liv,
 					if (curPatientId == 0){
@@ -2691,6 +2687,7 @@ public class PacientInfoFrame extends JFrame {
 						newPatBr.setOt(PersonalInfo.getOt());
 						newPatBr.setIm(PersonalInfo.getIm());
 						curPatientId = MainForm.tcl.addPatient(PersonalInfo);
+						newPatBr.setNpasp(curPatientId);
 						tbl_patient.updateSelectedItem();
 //						RefreshTablePatient();
 					}
@@ -2914,7 +2911,7 @@ public class PacientInfoFrame extends JFrame {
 				tf_Dataot.setText(sdf.format(new Date(PersonalInfo.nambk.dataot)));
 			}
 
-			if (PersonalInfo.isSetDatadoc()){
+			if (PersonalInfo.getDatadoc() != 0){
 				tf_datadoc.setText(sdf.format(new Date(PersonalInfo.datadoc)));
 			}
 			
@@ -2976,13 +2973,11 @@ public class PacientInfoFrame extends JFrame {
 			tf_oms_nom.setText(null);
 			tf_oms_smo.setText(null);
 			tf_dms_smo.setText(null);
-			rbtn_pol_m.setSelected(false);
-			rbtn_pol_j.setSelected(false);
+			btnGroup_pol.clearSelection();
 			cmb_status.setSelectedIndex(-1);
 			cmb_oms_doc.setSelectedIndex(-1);
 			cmb_ishod.setSelectedIndex(-1);
 			cmb_tdoc.setSelectedIndex(-1);
-			cmb_status.setSelectedItem(null);
 		} catch (Exception e) {
 			e.printStackTrace();						
 		}
@@ -3054,8 +3049,7 @@ public class PacientInfoFrame extends JFrame {
 			tf_Fam_pr.setText(null);
 			tf_Fam_pr.setText(null);
 			tf_Fam_pr.setText(null);
-			rbtn_pol_pr_m.setSelected(false);
-			rbtn_pol_pr_j.setSelected(false);
+			btnGroup_pol_pr.clearSelection();
 			cmb_Tdoc_pr.setSelectedItem(null);
 			cmb_Polis_doc_pr.setSelectedItem(null);
 		} catch (Exception e) {
@@ -3099,12 +3093,8 @@ public class PacientInfoFrame extends JFrame {
 	}
 	private void NewSign(){
 		try {
-			rbtn_gk1.setSelected(false);
-			rbtn_gk2.setSelected(false);
-			rbtn_gk3.setSelected(false);
-			rbtn_gk4.setSelected(false);
-			rbtn_rf1.setSelected(false);
-			rbtn_rf2.setSelected(false);
+			btnGroup_gk.clearSelection();
+			btnGroup_rf.clearSelection();
 			rbtn_vp1.setSelected(false);
 			rbtn_vp2.setSelected(false);
 			rbtn_vp3.setSelected(false);
@@ -3244,8 +3234,7 @@ public class PacientInfoFrame extends JFrame {
 	// новое обращение
 	private void NewPriemInfo(){
 		try {
-			rbtn_plan.setSelected(false);
-			rbtn_extr.setSelected(false);
+			btnGroup_plextr.clearSelection();
 			cbx_nalz.setSelected(false);
 			cbx_nalp.setSelected(false);
 			cbx_messr.setSelected(false);
@@ -3281,15 +3270,17 @@ public class PacientInfoFrame extends JFrame {
 	}
 	private void SavePriemInfo(){
 		try {
-			//SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+			SimpleDateFormat stf = new SimpleDateFormat("HH:mm");
 			Id_gosp = new Gosp();
 			Id_gosp.setNpasp(curPatientId);
 			Id_gosp.setNgosp(curNgosp);
 			Id_gosp.setId(curId);
-			Id_gosp.setJalob(ta_jal_pr.getText().trim());
+			Id_gosp.setDataz(new Date().getTime());
+
+			Id_gosp.setCotd_p(MainForm.authInfo.cpodr);
+			Id_gosp.setCuser(MainForm.authInfo.pcod);
 			//Id_gosp.nist ???
-			//Id_gosp.cotd_p ???
-			//Id_gosp.cuser ???
 
 //			Id_gosp.setDatap(Date.parse(sp_datap.getValue().toString()));
 //			Id_gosp.setSmp_data(Date.parse(sp_datasmp.getValue().toString()));
@@ -3301,49 +3292,66 @@ public class PacientInfoFrame extends JFrame {
 //			Id_gosp.setVremgos(sp_datagosp.getValue().toString().substring(9, 14));
 //			Id_gosp.setVremosm(sp_dataosm.getValue().toString().substring(9, 14));
 
-			Id_gosp.setDataz(new Date().getTime());
-			Id_gosp.setDatap(SimpleDateFormat.getDateTimeInstance().parse(sp_datap.getValue().toString()).getTime());
-			Id_gosp.setSmp_data(SimpleDateFormat.getDateTimeInstance().parse(sp_datasmp.getValue().toString()).getTime());
-			Id_gosp.setDatagos(SimpleDateFormat.getDateTimeInstance().parse(sp_datagosp.getValue().toString()).getTime());
-			Id_gosp.setDataosm(SimpleDateFormat.getDateTimeInstance().parse(sp_dataosm.getValue().toString()).getTime());
+			//PersonalInfo.nambk.setDatapr(sdf.parse(tf_Datapr.getText()).getTime());
 
-			Id_gosp.setVremp(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datap.getValue().toString()).getTime()));
-			Id_gosp.setSmp_time(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datasmp.getValue().toString()).getTime()));
-			Id_gosp.setVremgos(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datagosp.getValue().toString()).getTime()));
-			Id_gosp.setVremosm(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_dataosm.getValue().toString()).getTime()));
+			Id_gosp.setDatap(sdf.parse(sp_datap.getValue().toString()).getTime());
+			Id_gosp.setSmp_data(sdf.parse(sp_datasmp.getValue().toString()).getTime());
+			Id_gosp.setDatagos(sdf.parse(sp_datagosp.getValue().toString()).getTime());
+			Id_gosp.setDataosm(sdf.parse(sp_dataosm.getValue().toString()).getTime());
+//			Id_gosp.setDatap(SimpleDateFormat.getDateTimeInstance().parse(sp_datap.getValue().toString()).getTime());
+//			Id_gosp.setSmp_data(SimpleDateFormat.getDateTimeInstance().parse(sp_datasmp.getValue().toString()).getTime());
+//			Id_gosp.setDatagos(SimpleDateFormat.getDateTimeInstance().parse(sp_datagosp.getValue().toString()).getTime());
+//			Id_gosp.setDataosm(SimpleDateFormat.getDateTimeInstance().parse(sp_dataosm.getValue().toString()).getTime());
+
+			Id_gosp.setVremp(Long.toString(stf.parse(sp_datap.getValue().toString()).getTime()));
+			Id_gosp.setSmp_time(Long.toString(stf.parse(sp_datasmp.getValue().toString()).getTime()));
+			Id_gosp.setVremgos(Long.toString(stf.parse(sp_datagosp.getValue().toString()).getTime()));
+			Id_gosp.setVremosm(Long.toString(stf.parse(sp_dataosm.getValue().toString()).getTime()));
+
+//			Id_gosp.setVremp(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datap.getValue().toString()).getTime()));
+//			Id_gosp.setSmp_time(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datasmp.getValue().toString()).getTime()));
+//			Id_gosp.setVremgos(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datagosp.getValue().toString()).getTime()));
+//			Id_gosp.setVremosm(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_dataosm.getValue().toString()).getTime()));
 			
-			Id_gosp.setSv_time(Short.valueOf(sp_sv_time.getValue().toString()));
-			Id_gosp.setSv_day(Short.valueOf(sp_sv_day.getValue().toString()));
-			Id_gosp.setNtalon(Short.valueOf(tf_ntalon.getText()));
-			Id_gosp.setDiag_n(tf_diag_n.getText().trim());
-			Id_gosp.setDiag_p(tf_diag_p.getText().trim());
-			Id_gosp.setNamed_n(ta_diag_n.getText().trim()); 
-			Id_gosp.setNamed_p(ta_diag_p.getText().trim());
-			Id_gosp.setToc(tf_toc.getText().trim());
-			Id_gosp.setAd(tf_ad.getText().trim());
-			Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
+			if (Id_gosp.getSv_time() != 0) Id_gosp.setSv_time(Integer.valueOf(sp_sv_time.getValue().toString()));
+			if (Id_gosp.getSv_day() != 0)Id_gosp.setSv_day(Integer.valueOf(sp_sv_day.getValue().toString()));
+			if (Id_gosp.getNtalon() != 0) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
+			if (Id_gosp.getDiag_n()!= null) Id_gosp.setDiag_n(tf_diag_n.getText().trim());
+			if (Id_gosp.getDiag_p()!= null) Id_gosp.setDiag_p(tf_diag_p.getText().trim());
+			if (Id_gosp.getNamed_n()!= null) Id_gosp.setNamed_n(ta_diag_n.getText().trim()); 
+			if (Id_gosp.getNamed_p()!= null) Id_gosp.setNamed_p(ta_diag_p.getText().trim());
+			if (Id_gosp.getToc()!= null) Id_gosp.setToc(tf_toc.getText().trim());
+			if (Id_gosp.getAd()!= null) Id_gosp.setAd(tf_ad.getText().trim());
+			if (Id_gosp.getJalob()!= null) Id_gosp.setJalob(ta_jal_pr.getText().trim());
+			if (Id_gosp.getSmp_num() != 0) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
 
-			if (rbtn_plan.isSelected()) {
-				Id_gosp.setPl_extr(1);
-			}
-			if (rbtn_extr.isSelected()) {
-				Id_gosp.setPl_extr(2);
-			}
+			if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(1);
+			if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(2);
 			Id_gosp.setMessr(cbx_messr.isSelected());
 			Id_gosp.setNal_z(cbx_nalz.isSelected());
 			Id_gosp.setNal_p(cbx_nalp.isSelected());
 
-			Id_gosp.setVidtr(cmb_travm.getSelectedPcod());
-			Id_gosp.setPr_out(cmb_otkaz.getSelectedPcod());
-			Id_gosp.setAlkg(cmb_alk.getSelectedPcod());
-			Id_gosp.setVid_trans(cmb_trans.getSelectedPcod());
-			Id_gosp.setNaprav(cmb_naprav.getSelectedPcod());
-			Id_gosp.setN_org(cmb_org.getSelectedPcod());
-			Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
+			if (cmb_travm.getSelectedItem() != null) Id_gosp.setVidtr(cmb_travm.getSelectedPcod());
+			if (cmb_otkaz.getSelectedItem() != null) Id_gosp.setPr_out(cmb_otkaz.getSelectedPcod());
+			if (cmb_alk.getSelectedItem() != null) Id_gosp.setAlkg(cmb_alk.getSelectedPcod());
+			if (cmb_trans.getSelectedItem() != null) Id_gosp.setVid_trans(cmb_trans.getSelectedPcod());
+			if (cmb_naprav.getSelectedItem() != null) Id_gosp.setNaprav(cmb_naprav.getSelectedPcod());
+			if (cmb_org.getSelectedItem() != null) Id_gosp.setN_org(cmb_org.getSelectedPcod());
+			if (cmb_cotd.getSelectedItem() != null) Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
 			
-//			GospId GospId = MainForm.tcl.addGosp(Id_gosp);
-//			curId = GospId.id;
-//			curNgosp = GospId.ngosp;
+			if (curId == 0){
+				newPriem.setNist(Id_gosp.getNist());
+				newPriem.setDatap(Id_gosp.getDatap());
+				newPriem.setCotd(Id_gosp.getCotd());
+				newPriem.setDiag_p(Id_gosp.getDiag_p());
+				newPriem.setNamed_p(Id_gosp.getNamed_p());
+				curId = MainForm.tcl.addGosp(Id_gosp);
+				newPriem.setId(curId);
+				tbl_priem.updateSelectedItem();
+			}
+			else{
+				MainForm.tcl.updateGosp(Id_gosp);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();						
 		}

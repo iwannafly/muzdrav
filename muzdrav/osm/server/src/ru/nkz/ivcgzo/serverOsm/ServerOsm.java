@@ -21,10 +21,16 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.Metod;
+import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
+import ru.nkz.ivcgzo.thriftOsm.Pokaz;
+import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import ru.nkz.ivcgzo.thriftOsm.Prez_d;
+import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
@@ -63,6 +69,24 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
 	@SuppressWarnings("unused")
 	private final Class<?>[] strClasTypes; 
+	@SuppressWarnings("unused")
+	private final TResultSetMapper<P_isl_ld, P_isl_ld._Fields> rsmPislld;
+	private final Class<?>[] pislldTypes; 
+	@SuppressWarnings("unused")
+	private final TResultSetMapper<Prez_d, Prez_d._Fields> rsmPrezd;
+	private final Class<?>[] prezdTypes; 
+	@SuppressWarnings("unused")
+	private final TResultSetMapper<Prez_l, Prez_l._Fields> rsmPrezl;
+	private final Class<?>[] prezlTypes; 
+	private final TResultSetMapper<Metod, Metod._Fields> rsmMetod;
+	@SuppressWarnings("unused")
+	private final Class<?>[] metodTypes; 
+	private final TResultSetMapper<PokazMet, PokazMet._Fields> rsmPokazMet;
+	@SuppressWarnings("unused")
+	private final Class<?>[] pokazMetTypes; 
+	private final TResultSetMapper<Pokaz, Pokaz._Fields> rsmPokaz;
+	@SuppressWarnings("unused")
+	private final Class<?>[] pokazTypes; 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -93,6 +117,24 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
+		
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class};
+		
+		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "npasp",       "nisl",        "kodisl",     "stoim");
+		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, String.class, Double.class};
+		
+		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "npasp",       "nisl",        "cpok",       "stoim");
+		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, String.class, Double.class};
+		
+		rsmMetod = new TResultSetMapper<>(Metod.class, "obst",       "name_obst",  "c_p0e1",      "pcod");
+		metodTypes = new Class<?>[] {                  String.class, String.class, Integer.class, String.class};
+		
+		rsmPokazMet = new TResultSetMapper<>(PokazMet.class, "pcod",       "name_n",     "stoim",      "c_obst");
+		pokazMetTypes = new Class<?>[] {                     String.class, String.class, Double.class, String.class};
+		
+		rsmPokaz = new TResultSetMapper<>(Pokaz.class, "pcod",       "name_n",     "stoim",      "c_p0e1",      "c_n_nz1");
+		pokazTypes = new Class<?>[] {                  String.class, String.class, Double.class, Integer.class, String.class};
 	}
 
 	@Override
@@ -147,6 +189,15 @@ public class ServerOsm extends Server implements Iface {
 //			UpdatePdiagAmb(diag);
 //			DeletePdiagAmb(diag.id);
 //		}
+		
+//		P_isl_ld pi = new P_isl_ld(-1, 1, 2, "3", 4, 5, 6, 7, "8", 9);
+//		pi.nisl = AddPisl(pi);
+//		AddPrezd(new Prez_d(1, pi.nisl, "3", 4));
+//		AddPrezl(new Prez_l(5, pi.nisl, "7", 8));
+		
+//		List<Metod> met = getMetod(1);
+//		List<PokazMet> pokMet = getPokazMet("50.01.001");
+//		List<Pokaz> pok = getPokaz(1, "05");
 
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -398,7 +449,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_z30() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_z30 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z30 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -407,7 +458,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_am0() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_am0 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_am0 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -416,7 +467,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_az9() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_az9 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_az9 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -425,7 +476,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_z43() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_z43 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z43 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -434,7 +485,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_kas() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_kas ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_kas ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -443,7 +494,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_n00() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_n00 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_n00 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -452,7 +503,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_l01() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_l01 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_l01 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -461,7 +512,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_az0() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_az0 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_az0 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -470,7 +521,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_l02() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_l02 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_l02 ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -502,6 +553,25 @@ public class ServerOsm extends Server implements Iface {
 	public List<IntegerClassifier> getOpl() throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_opl ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_p0e1() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0e1 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_nz1(int c_p0e1) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT nz.pcod, nz.name FROM n_nz1 nz JOIN n_ldi nl ON (nl.c_nz1 = nz.pcod) WHERE nl.c_p0e1 = ? ", c_p0e1)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
@@ -590,5 +660,76 @@ public class ServerOsm extends Server implements Iface {
 			TException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<Metod> getMetod(int kodissl) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT np.pcod AS c_p0e1, no.obst, no.nameobst AS name_obst " +
+					"FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) JOIN n_p0e1 np ON (np.pcod = ns.c_p0e1) " +
+					"WHERE np.pcod = ? " +
+					"ORDER BY np.pcod, no.obst ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, kodissl)) {
+			return rsmMetod.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<PokazMet> getPokazMet(String metod) throws KmiacServerException, TException {
+		String sql = "SELECT no.obst AS c_obst, nl.name_n, ns.pcod, ns.stoim " + 
+					"FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) JOIN n_ldi nl ON (ns.pcod = nl.pcod) " +
+					"WHERE no.obst = ? " +
+					"ORDER BY no.obst, ns.pcod ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, metod)) {
+			return rsmPokazMet.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<Pokaz> getPokaz(int kodissl, String kodsyst) throws KmiacServerException, TException {
+		String sql = "SELECT np.pcod AS c_p0e1, nz.pcod AS c_n_nz1, nl.name_n, ns.pcod, ns.stoim " +  
+					"FROM n_stoim ns JOIN n_ldi nl ON (nl.pcod = ns.pcod) JOIN n_nz1 nz ON (nz.pcod = nl.c_nz1) JOIN n_p0e1 np ON (np.pcod = ns.c_p0e1) " + 
+					"WHERE np.pcod = ? AND nz.pcod = ? " + 
+					"ORDER BY np.pcod, nz.pcod ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, kodissl, kodsyst)) {
+			return rsmPokaz.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+			int id = sme.getGeneratedKeys().getInt("nisl");
+			sme.setCommit();
+			return id;
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public void AddPrezd(Prez_d di) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl, stoim) VALUES (?, ?, ?, ?) ", false, di, prezdTypes, 0, 1, 2, 3);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public void AddPrezl(Prez_l li) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok, stoim) VALUES (?, ?, ?, ?) ", false, li, prezlTypes, 0, 1, 2, 3);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 }
