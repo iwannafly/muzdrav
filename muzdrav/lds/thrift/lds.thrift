@@ -151,6 +151,20 @@ exception LdiNotFoundException {
 }
 
 
+/*
+* Исследование уже существует
+*/
+exception S_ot01ExistsException {
+}
+
+
+/**
+ * Исследование с такими данными не найдено
+ */
+exception S_ot01NotFoundException {
+}
+
+
 service LDSThrift extends kmiacServer.KmiacServer {
 	list<ObInfIsl> GetObInfIslt(1: i32 npasp);
 	ObInfIsl GetIsl(1: i32 npasp) throws (1: IslNotFoundException ine);
@@ -169,6 +183,14 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void AddLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
+
+
+	list<S_ot01> GetS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
+	S_ot01 GetSot01(1: i32 cotd, 2: string pcod, 3: string c_nz1) throws (1: S_ot01NotFoundException sone);
+	void AddS_ot01(1: S_ot01 so)throws (1: S_ot01ExistsException soee);
+	void UpdS_ot01(1: S_ot01 so)throws (1: S_ot01ExistsException soee);
+	void DelS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
+
 
     	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
 	
