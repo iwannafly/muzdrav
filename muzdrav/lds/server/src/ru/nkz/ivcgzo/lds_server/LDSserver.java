@@ -26,6 +26,9 @@ import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
 import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Iface;
 import ru.nkz.ivcgzo.ldsThrift.Patient;
 import ru.nkz.ivcgzo.ldsThrift.PatientNotFoundException;
+import ru.nkz.ivcgzo.ldsThrift.S_ot01;
+import ru.nkz.ivcgzo.ldsThrift.S_ot01ExistsException;
+import ru.nkz.ivcgzo.ldsThrift.S_ot01NotFoundException;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -48,6 +51,8 @@ public class LDSserver extends Server implements Iface {
 	private static final Class<?>[] dislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Short.class, String.class, String.class, Double.class, String.class};
 	private TResultSetMapper<LabIsl, LabIsl._Fields> rsmLabIs;	
 	private static final Class<?>[] lislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, String.class, Double.class, String.class, Integer.class};
+	private TResultSetMapper<S_ot01, S_ot01._Fields> rsmS_ot01;	
+	private static final Class<?>[] s_ot01Types = new Class<?>[] {Integer.class, String.class, String.class, String.class};
 	private TResultSetMapper<Patient, Patient._Fields> rmsPatient;
 	private TResultSetMapper<Metod, Metod._Fields> rmsMetod;
 	private TResultSetMapper<N_ldi, N_ldi._Fields> rmsnldi;
@@ -64,6 +69,7 @@ public class LDSserver extends Server implements Iface {
 		rsmObInIs = new TResultSetMapper<>(ObInfIsl.class, "npasp", "nisl", "kodotd", "nprob", "pcisl", "cisl", "datap", "datav", "prichina", "popl", "napravl", "naprotd", "fio", "vopl", "diag", "kodvr", "kodm", "kods", "dataz");
 		rsmDiIs = new TResultSetMapper<>(DiagIsl.class, "npasp", "nisl", "kodisl", "rez", "anamnez", "anastezi", "model", "kol", "op_name", "rez_name", "stoim", "pcod_m");
 		rsmLabIs = new TResultSetMapper<>(LabIsl.class, "npasp", "nisl", "cpok", "zpok", "stoim", "pcod_m", "pvibor");	
+		rsmS_ot01 = new TResultSetMapper<>(S_ot01.class, "cotd", "pcod", "c_obst", "c_nz1");
 		rmsnldi = new TResultSetMapper<>(N_ldi.class, "pcod", "c_nz1", "name_n", "name", "norma", "c_p0e1", "vibor");
 		rmsMetod = new TResultSetMapper<>(Metod.class, "c_p0e1", "pcod", "c_obst", "name", "stoim", "vibor");
 		
@@ -436,6 +442,48 @@ public class LDSserver extends Server implements Iface {
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
+	}
+
+	@Override
+	public List<S_ot01> GetS_ot01(int cotd, String pcod, String c_nz1)
+			throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM S_ot01 where (cotd = ?) and (pcod = ?)and(c_nz1 = ?) ", cotd, pcod, c_nz1)) {
+			return rsmS_ot01.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public S_ot01 GetSot01(int cotd, String pcod, String c_nz1)
+			throws S_ot01NotFoundException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM s_ot01 WHERE (cotd = ?) and (pcod = ?) and (c_nz1 = ?) ", cotd, pcod, c_nz1)) {
+			if (acrs.getResultSet().next())
+				return rsmS_ot01.map(acrs.getResultSet());
+			else
+				return new S_ot01();
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public void AddS_ot01(S_ot01 so) throws S_ot01ExistsException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void UpdS_ot01(S_ot01 so) throws S_ot01ExistsException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void DelS_ot01(int cotd, String pcod, String c_nz1)
+			throws TException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
