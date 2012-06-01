@@ -175,6 +175,7 @@ public class Option {
 		);
 		
 		tn_ldi = new CustomTable<>(false, true, N_ldi.class, 0, "Список анализов", 2, "Название", 6, "Выбор");
+		tn_ldi.setEditableFields(true, 2);
 		
 		tn_ldi.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
@@ -229,6 +230,7 @@ public class Option {
 		);
 		
 		tmetod = new CustomTable<>(false, true, Metod.class, 2, "Код", 3, "Наименование", 4, "Стоимость", 5, "Выбор");
+		tmetod.setEditableFields(true, 3);
 		tmetod.setFillsViewportHeight(true);
 		scrollPane_1.setViewportView(tmetod);
 		

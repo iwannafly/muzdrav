@@ -85,6 +85,7 @@ public class Vvod extends JFrame {
 	private static final long serialVersionUID = 1L;
 	public static ZapVr zapVrSave;
 	private FormSign sign;
+	private PrintForm printform;
 	private SettingsOsm settingsosm;
 	private FormPostBer postber;
 	private Pvizit pvizit;
@@ -188,6 +189,7 @@ public class Vvod extends JFrame {
 		 diag = new PdiagAmb();
 		 pr = new Priem();
 		 dz = new PdiagZ();
+		 printform = new PrintForm();
 		setBounds(100, 100, 1029, 747);
 		//JPanel JPanel = new JPanel();
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -216,6 +218,10 @@ public class Vvod extends JFrame {
 		});
 				
 		JButton bA = new JButton("Аллергоанамнез");
+		bA.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		
 		
 		JButton bS = new JButton("Сохранить");
@@ -296,59 +302,60 @@ public class Vvod extends JFrame {
 		final JButton bVD = new JButton("Печатные формы");
 		bVD.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			int x = bVD.getX();
-	                int y = bVD.getY() + bVD.getHeight();
-	                JPopupMenu jPopupMenu = new JPopupMenu();
-
-	                JMenuItem mi1 = new JMenuItem("Мед.карта амб.больного");
-	                jPopupMenu.add(mi1);
-	                mi1.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                JMenuItem mi2 = new JMenuItem("Протокол посещения");
-	                jPopupMenu.add(mi2);
-	                mi2.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                JMenuItem mi3 = new JMenuItem("Выписка из амб.карты");
-	                jPopupMenu.add(mi3);
-	                mi3.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                JMenuItem mi4 = new JMenuItem("Направление на госпитализацию");
-	                jPopupMenu.add(mi4);
-	                mi4.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                  JMenuItem mi5 = new JMenuItem("Направление на консультацию");
-	                jPopupMenu.add(mi5);
-	                mi5.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                JMenuItem mi6 = new JMenuItem("Направление на исследование");
-	                jPopupMenu.add(mi6);
-	                mi6.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                JMenuItem mi7 = new JMenuItem("Направление на МСЭК");
-	                jPopupMenu.add(mi7);
-	                mi7.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                JMenuItem mi8 = new JMenuItem("Заключение ВК");
-	                jPopupMenu.add(mi8);
-	                mi8.addActionListener(new ActionListener() {
-	        			public void actionPerformed(ActionEvent e) {
-	        			}
-	        		});
-	                jPopupMenu.show(panel, x, y);
+				printform.setVisible(true);
+//			int x = bVD.getX();
+//	                int y = bVD.getY() + bVD.getHeight();
+//	                JPopupMenu jPopupMenu = new JPopupMenu();
+//
+//	                JMenuItem mi1 = new JMenuItem("Мед.карта амб.больного");
+//	                jPopupMenu.add(mi1);
+//	                mi1.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi2 = new JMenuItem("Протокол посещения");
+//	                jPopupMenu.add(mi2);
+//	                mi2.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi3 = new JMenuItem("Выписка из амб.карты");
+//	                jPopupMenu.add(mi3);
+//	                mi3.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi4 = new JMenuItem("Направление на госпитализацию");
+//	                jPopupMenu.add(mi4);
+//	                mi4.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                  JMenuItem mi5 = new JMenuItem("Направление на консультацию");
+//	                jPopupMenu.add(mi5);
+//	                mi5.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi6 = new JMenuItem("Направление на исследование");
+//	                jPopupMenu.add(mi6);
+//	                mi6.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi7 = new JMenuItem("Направление на МСЭК");
+//	                jPopupMenu.add(mi7);
+//	                mi7.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi8 = new JMenuItem("Заключение ВК");
+//	                jPopupMenu.add(mi8);
+//	                mi8.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                jPopupMenu.show(panel, x, y);
 }
 		});
 		
@@ -1348,6 +1355,7 @@ public class Vvod extends JFrame {
 		
 		JMenuItem mi1 = new JMenuItem("Печать протокола посещения");
 		pmvizit.add(mi1);
+		
 			TabPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
@@ -2090,6 +2098,8 @@ public class Vvod extends JFrame {
 			TabPos.setData(MainForm.tcl.getPvizitAmb(6));
 			//TabDiag.setData(MainForm.tcl.getPdiagAmb(6));потом откомментарить
 			vid_opl.setData(MainForm.tcl.getOpl());
+			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
+			
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

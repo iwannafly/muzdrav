@@ -18,7 +18,7 @@ public class Classifiers {
 	public static List<IntegerClassifier> n_l02;
 	public static List<StringClassifier> n_s00;
 	public static List<IntegerClassifier> n_p0e1;
-	public static List<StringClassifier> n_nz1;
+	/*public static List<StringClassifier> n_nz1;*/
 	
 	public static boolean load(ThriftOsm.Client tcl) {
 		try {
@@ -44,8 +44,8 @@ public class Classifiers {
 				n_s00 = tcl.get_n_s00();
 			if (n_p0e1 == null)
 				n_p0e1 = tcl.get_n_p0e1();
-			if (n_nz1 == null)
-				n_nz1 = tcl.get_n_nz1();
+/*			if (n_nz1 == null)
+				n_nz1 = tcl.get_n_nz1();*/
 			return true;
 		} catch (Exception e) {
 		}
