@@ -1,32 +1,27 @@
 package ru.nkz.ivcgzo.clientRegPatient;
 
-import java.awt.EventQueue;
-import org.apache.thrift.TException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
-import javax.swing.JTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+
+import org.apache.thrift.TException;
+
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 
 public class PacientMainFrame extends JFrame {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 8528181014663112901L;
 	public static PacientMainFrame instance;
 	private JPanel contentPane;
 	private JTextField tfFam;
@@ -37,22 +32,6 @@ public class PacientMainFrame extends JFrame {
 	private JTextField tfNom;
 	private PacientInfoFrame pacientInfoFrame;
 	public List<PatientBrief> pat;
-
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					PacientMainFrame frame = new PacientMainFrame();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
 
 	public static PacientMainFrame getInstance() {
 		return instance;

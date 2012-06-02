@@ -25,7 +25,6 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	private static int appId;
 	private static int thrPort;
 	public T thrClient;
-	private static ThriftClientWrapper<?> thrCliWrapper;
 	private JFrame frame;
 	
 	public Client(ConnectionManager conMan, UserAuthInfo authInfo, Class<T> thrClass, int appId, int thrPort, int accessParam, String... params) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -104,10 +103,8 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	
 	@Override
 	public void onConnect(KmiacServer.Client conn) {
-		if (conn.getClass() == thrClass) {
+		if (conn.getClass() == thrClass)
 			thrClient = thrClass.cast(conn);
-			thrCliWrapper = new ThriftClientWrapper<>(thrClient);
-		}
 	}
 	
 	@Override
@@ -118,18 +115,5 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	@Override
 	public int getPort() {
 		return thrPort;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static <T> T getThriftClient() {
-		return (T) thrCliWrapper.thrClient;
-	}
-	
-	private static class ThriftClientWrapper <E extends KmiacServer.Client> {
-		private E thrClient;
-		
-		private ThriftClientWrapper(E thrClient) {
-			this.thrClient = thrClient;
-		}
 	}
 }

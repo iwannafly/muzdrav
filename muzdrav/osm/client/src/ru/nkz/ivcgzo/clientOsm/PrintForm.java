@@ -2,8 +2,6 @@ package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -30,9 +28,7 @@ import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 
 public class PrintForm extends JFrame{
-
-
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -9078314618826266514L;
 	private JRadioButton rbMethods;
 	private JRadioButton rbPokaz;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cbVidIssl;
@@ -138,7 +134,7 @@ public class PrintForm extends JFrame{
 		
 		
 		
-		 cbSys = new ThriftStringClassifierCombobox<StringClassifier>(true);
+		 cbSys = new ThriftStringClassifierCombobox<>(false);
 		 cbSys.addActionListener(new ActionListener() {
 		 	public void actionPerformed(ActionEvent e) {
 				try {

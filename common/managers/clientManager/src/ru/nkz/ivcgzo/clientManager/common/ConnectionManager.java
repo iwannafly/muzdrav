@@ -213,11 +213,11 @@ public class ConnectionManager {
 					
 					if (!transport.isOpen()) {
 							transport.open();
-							connection.getServerVersion();
+							connection.testConnection();
 							if (client != null)
 								client.onConnect(connection);
 					} else
-						connection.getServerVersion();
+						connection.testConnection();
 			} catch (TException e) {
 				transports.get(key).close();
 				return false;

@@ -1,9 +1,7 @@
 	package ru.nkz.ivcgzo.lds_server;
 
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.crypto.Data;
@@ -11,19 +9,19 @@ import javax.xml.crypto.Data;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
+import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
-import org.apache.thrift.server.TThreadedSelectorServer.Args; 
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.ldsThrift.DiagIsl;
 import ru.nkz.ivcgzo.ldsThrift.LDSThrift;
+import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Iface;
 import ru.nkz.ivcgzo.ldsThrift.LabIsl;
 import ru.nkz.ivcgzo.ldsThrift.LdiNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.Metod;
 import ru.nkz.ivcgzo.ldsThrift.MetodNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.N_ldi;
 import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
-import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Iface;
 import ru.nkz.ivcgzo.ldsThrift.Patient;
 import ru.nkz.ivcgzo.ldsThrift.PatientNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
@@ -86,6 +84,10 @@ public class LDSserver extends Server implements Iface {
 	    //  datar       poms_ser        poms_nom      
 	        Date.class, String.class, String.class
 	    };
+
+	@Override
+	public void testConnection() throws TException {
+	}
 
 	@Override
 	public List<ObInfIsl> GetObInfIslt(int npasp) throws TException {
@@ -283,18 +285,6 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public String getServerVersion() throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getClientVersion() throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<IntegerClassifier> GetKlasM00() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod,name FROM n_m00 where pr = 'Л' ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
@@ -485,5 +475,4 @@ public class LDSserver extends Server implements Iface {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

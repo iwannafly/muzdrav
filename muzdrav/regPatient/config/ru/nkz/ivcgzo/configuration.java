@@ -8,5 +8,4 @@ public class configuration {
     public static final int thrPort = 55005;
     public static final int appId = 5;
     public static final String appName = "Информация о пациентах больницы1111";
-    public static final String appVersion = "0.0.0.0";
 }

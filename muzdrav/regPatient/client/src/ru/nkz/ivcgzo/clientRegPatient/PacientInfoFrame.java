@@ -1,55 +1,70 @@
 package ru.nkz.ivcgzo.clientRegPatient;
 
-import java.text.SimpleDateFormat;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Calendar;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JTabbedPane;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JScrollPane;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.border.TitledBorder;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.JTextArea;
-import javax.swing.UIManager;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-import javax.swing.JCheckBox;
-import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.thriftRegPatient.*;
-
-//import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftRegPatient.Address;
+import ru.nkz.ivcgzo.thriftRegPatient.Agent;
+import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
+import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
+import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
+import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Lgota;
+import ru.nkz.ivcgzo.thriftRegPatient.LgotaAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.LgotaNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Polis;
+import ru.nkz.ivcgzo.thriftRegPatient.Sign;
+import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -161,7 +176,6 @@ public class PacientInfoFrame extends JFrame {
 	private Sign SignInfo;
 	private Gosp Id_gosp;
 	private List<AllGosp> AllGospInfo;
-	private Info Id_name;
 	private CustomTable<PatientBrief, PatientBrief._Fields> tbl_patient;
 	private CustomTable<Lgota, Lgota._Fields> tbl_lgota;
 	private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
@@ -970,7 +984,7 @@ public class PacientInfoFrame extends JFrame {
 				    item.setLgota(tbl_lgota.getSelectedItem().lgota);
 				    item.setDatau(tbl_lgota.getSelectedItem().datau);
 				    item.setName(tbl_lgota.getSelectedItem().name);
-				    Id_name = MainForm.tcl.addLgota(event.getItem());
+				    MainForm.tcl.addLgota(event.getItem());
 				    
 				} catch (LgotaAlreadyExistException laee) {
 					laee.printStackTrace();
@@ -1140,7 +1154,7 @@ public class PacientInfoFrame extends JFrame {
 				    item.setKateg(tbl_kateg.getSelectedItem().kateg);
 				    item.setDatau(tbl_kateg.getSelectedItem().datau);
 				    item.setName(tbl_kateg.getSelectedItem().name);
-				    Id_name = MainForm.tcl.addKont(event.getItem());
+				    MainForm.tcl.addKont(event.getItem());
 				} catch (KontingentAlreadyExistException kaee) {
 					kaee.printStackTrace();
 					return false;
@@ -3293,8 +3307,8 @@ private JTextField tf_nist;
 	}
 	private void SavePriemInfo(){
 		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-			SimpleDateFormat stf = new SimpleDateFormat("HH:mm");
+			new SimpleDateFormat("dd.MM.yyyy");
+			new SimpleDateFormat("HH:mm");
 			Id_gosp = new Gosp();
 			Id_gosp.setNpasp(curPatientId);
 			Id_gosp.setNgosp(curNgosp);

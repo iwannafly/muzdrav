@@ -95,14 +95,7 @@ public class ServerAuth extends Server implements Iface {
 	}
 
 	@Override
-	public String getServerVersion() throws TException {
-		return configuration.appVersion;
-	}
-
-	@Override
-	public String getClientVersion() throws TException {
-		// TODO Auto-generated method stub
-		return null;
+	public void testConnection() throws TException {
 	}
 
 	@Override

@@ -1,27 +1,29 @@
 package ru.nkz.ivcgzo.clientMss;
 
+import java.awt.Color;
+import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import javax.swing.JButton;
-import java.awt.BorderLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JSeparator;
-import javax.swing.border.TitledBorder;
-import javax.swing.UIManager;
-import java.awt.Color;
+import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 
-public class MainForm extends Client {
+public class MainForm extends Client<ThriftMss.Client> {
 	private JFrame frame;
 	private JTextField textField;
 	private JTextField textField_1;
@@ -67,13 +69,12 @@ public class MainForm extends Client {
 	private JTextField textField_41;
 	private JTextField textField_42;
 	
-	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) {
-		super(conMan, authInfo, lncPrm);
-		// TODO Auto-generated constructor stub
+	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
 		initialize();
 		
-		frame.setVisible(true);
+		setFrame(frame);
 	}
 	
 	/**
@@ -112,7 +113,7 @@ public class MainForm extends Client {
 		textField_2 = new JTextField();
 		textField_2.setColumns(10);
 		
-		JComboBox comboBox = new JComboBox();
+		JComboBox<String> comboBox = new JComboBox<>();
 		
 		textField_3 = new JTextField();
 		textField_3.setColumns(10);
@@ -139,7 +140,7 @@ public class MainForm extends Client {
 		
 		JLabel label = new JLabel("Пол");
 		
-		JComboBox comboBox_1 = new JComboBox();
+		JComboBox<String> comboBox_1 = new JComboBox<>();
 		
 		JLabel lblNewLabel_9 = new JLabel("Место постоянного жительства");
 		
@@ -208,11 +209,11 @@ public class MainForm extends Client {
 		
 		JLabel lblNewLabel_20 = new JLabel("Занятость");
 		
-		JComboBox comboBox_2 = new JComboBox();
+		JComboBox<String> comboBox_2 = new JComboBox<>();
 		
-		JComboBox comboBox_3 = new JComboBox();
+		JComboBox<String> comboBox_3 = new JComboBox<>();
 		
-		JComboBox comboBox_4 = new JComboBox();
+		JComboBox<String> comboBox_4 = new JComboBox<>();
 		
 		JSeparator separator = new JSeparator();
 		
@@ -565,11 +566,11 @@ public class MainForm extends Client {
 		
 		JLabel label_3 = new JLabel("Смерть наступила");
 		
-		JComboBox comboBox_5 = new JComboBox();
+		JComboBox<String> comboBox_5 = new JComboBox<>();
 		
 		JLabel label_4 = new JLabel("Смерть произошла от");
 		
-		JComboBox comboBox_6 = new JComboBox();
+		JComboBox<String> comboBox_6 = new JComboBox<>();
 		
 		JLabel lblNewLabel_28 = new JLabel("Дата травмы");
 		
@@ -578,7 +579,7 @@ public class MainForm extends Client {
 		
 		JLabel lblNewLabel_29 = new JLabel("Вид травмы");
 		
-		JComboBox comboBox_7 = new JComboBox();
+		JComboBox<String> comboBox_7 = new JComboBox<>();
 		
 		JLabel lblNewLabel_30 = new JLabel("Обстоятельства травмы");
 		
@@ -587,11 +588,11 @@ public class MainForm extends Client {
 		
 		JLabel label_5 = new JLabel("Причины смерти установлены");
 		
-		JComboBox comboBox_8 = new JComboBox();
+		JComboBox<String> comboBox_8 = new JComboBox<>();
 		
 		JLabel lblNewLabel_31 = new JLabel("На основании");
 		
-		JComboBox comboBox_9 = new JComboBox();
+		JComboBox<String> comboBox_9 = new JComboBox<>();
 		
 		JLabel lblNewLabel_32 = new JLabel("Код врача, установившего смерть");
 		
@@ -884,16 +885,6 @@ public class MainForm extends Client {
 		frame.getContentPane().setLayout(groupLayout);
 	}
 	
-	@Override
-	public String getVersion() {
-		return "0.1";
-	}
-
-	@Override
-	public int getId() {
-		return configuration.appId;
-	}
-
 	@Override
 	public String getName() {
 		return configuration.appName;

@@ -25,15 +25,9 @@ exception KmiacServerException {
 
 service KmiacServer {
 	/**
-	 * Получает версию сервера.
-	 * Так же может использоваться для проверки соединения.
+	 * Проверка соединения клиента с сервером.
 	 */
-	string getServerVersion();
-
-	/**
-	 * Получает версию клиента (для обновления).
-	 */
-	string getClientVersion();
+	void testConnection();
 	
 	/**
 	 * Сохранение настроек.

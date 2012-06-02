@@ -997,18 +997,11 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    @Override
+    public final void testConnection() throws TException {
+    }
+
 //////////////////////// Configuration Methods ////////////////////////////////////
-
-    @Override
-    public final String getServerVersion() throws TException {
-        return configuration.appVersion;
-    }
-
-    @Override
-    public final String getClientVersion() throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public final void saveUserConfig(final int id, final String config) throws TException {

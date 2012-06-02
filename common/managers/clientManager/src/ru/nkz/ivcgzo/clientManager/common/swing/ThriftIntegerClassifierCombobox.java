@@ -27,6 +27,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	private static final long serialVersionUID = 8540397050277967316L;
 	private List<IntegerClassifier> items;
 	private Searcher searcher;
+	private StringComboBoxModel model;
 	
 	/**
 	 * Конструктор комбобокса.
@@ -51,19 +52,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	}
 	
 	private void setModel() {
-		DefaultComboBoxModel<IntegerClassifier> model = new DefaultComboBoxModel<IntegerClassifier>() {
-			private static final long serialVersionUID = 8684385138292155382L;
-			
-			@Override
-			public IntegerClassifier getElementAt(int index) {
-				return items.get(index);
-			}
-			
-			@Override
-			public int getSize() {
-				return items.size();
-			}
-		};
+		model = new StringComboBoxModel();
 		this.setModel(model);
 	}
 	
@@ -75,6 +64,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		for (IntegerClassifier item : list) {
 			items.add(new IntegerClassifierItem(item));
 		}
+		model.fireContentsChanged();
 	}
 	
 	/**
@@ -123,6 +113,24 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		
 		if (selItem == null)
 			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
+	}
+	
+	class StringComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
+		private static final long serialVersionUID = 1612989647638575239L;
+
+		@Override
+		public IntegerClassifier getElementAt(int index) {
+			return items.get(index);
+		}
+		
+		@Override
+		public int getSize() {
+			return items.size();
+		}
+		
+		public void fireContentsChanged() {
+			super.fireContentsChanged(ThriftIntegerClassifierCombobox.this, 0, getSize() - 1);
+		}
 	}
 	
 	class IntegerClassifierItem extends IntegerClassifier {

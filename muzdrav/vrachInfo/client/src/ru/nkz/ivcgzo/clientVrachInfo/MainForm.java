@@ -31,24 +31,22 @@ import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 
-public class MainForm extends Client {
+public class MainForm extends Client<ThriftServerVrachInfo.Client> {
 	private final boolean adminMode;
-	private final UserAuthInfo authInfo;
-	private ThriftServerVrachInfo.Client tcl;
+	public static ThriftServerVrachInfo.Client tcl;
 	private JFrame frame;
 	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
 	private CustomTable<MestoRab, MestoRab._Fields> tblMrab;
 	private PermForm permForm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		super(conMan, authInfo, lncPrm);
+		super(conMan, authInfo, ThriftServerVrachInfo.Client.class, configuration.appId, configuration.thrPort, lncPrm);
+		
 		adminMode = lncPrm == 2;
-		this.authInfo = authInfo;
+		
 		initialize();
-		conMan.add(ThriftServerVrachInfo.Client.class, configuration.thrPort);
-		conMan.setLocalForm(frame);
-		permForm.setConnectionManager(conMan);
-		frame.setVisible(true);
+		
+		setFrame(frame);
 	}
 
 	/**
@@ -201,7 +199,7 @@ public class MainForm extends Client {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					tcl.getServerVersion();
+					tcl.testConnection();
 					permForm.setLocationRelativeTo(frame);
 					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem(), ((tblVrach.getSelectedItem().pcod == authInfo.pcod) && (tblMrab.getSelectedItem().cpodr == authInfo.cpodr) && (tblMrab.getSelectedItem().clpu == authInfo.clpu)));
 				} catch (TTransportException e1) {
@@ -278,17 +276,6 @@ public class MainForm extends Client {
 		spMrab.setViewportView(tblMrab);
 		spVrach.setViewportView(tblVrach);
 		frame.getContentPane().setLayout(groupLayout);
-		
-		frame.addWindowListener(new WindowAdapter() {
-			
-			@Override
-			public void windowClosing(WindowEvent e) {
-				if (conMan != null)
-					conMan.remove();
-				super.windowClosing(e);
-			}
-		});
-		
 		frame.setLocationRelativeTo(null);
 		
 		permForm = new PermForm();
@@ -298,31 +285,21 @@ public class MainForm extends Client {
 	}
 
 	@Override
-	public String getVersion() {
-		return "0.1";
-	}
-
-	@Override
-	public int getId() {
-		return configuration.appId;
-	}
-
-	@Override
 	public String getName() {
 		return configuration.appName;
 	}
 
 	@Override
 	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
+		super.onConnect(conn);
 		if (conn instanceof ThriftServerVrachInfo.Client) {
-			tcl = (ThriftServerVrachInfo.Client) conn;
-			permForm.setClient(tcl);
+			tcl = thrClient;
 			try {
 				tblVrach.setData(tcl.GetVrachList());
 				tblMrab.setIntegerClassifierSelector(4, tcl.getPrizndList());
 			} catch (TException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				conMan.reconnect(e);
 			}
 		}
 	}
