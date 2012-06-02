@@ -16,8 +16,6 @@ import org.apache.thrift.transport.TTransportException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
@@ -25,7 +23,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 public class MainForm extends Client {
     public static ThriftRegPatient.Client tcl;
 	private JFrame frame;
-	private UserAuthInfo authInfo;
+	public static UserAuthInfo authInfo;
 	
 	/**
 	 * Launch the application.

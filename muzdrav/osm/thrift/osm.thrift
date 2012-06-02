@@ -308,7 +308,7 @@ struct Metod{
 	1: string obst;
 	2: string name_obst;
 	3: i32 c_p0e1;
-	4: string pcod;
+	//4: string pcod;
 }
 
 /*Список показателей исследований по выбранной системе*/

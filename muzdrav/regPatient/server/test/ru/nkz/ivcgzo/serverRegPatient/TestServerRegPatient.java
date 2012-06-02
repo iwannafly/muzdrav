@@ -20,6 +20,8 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
+import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
@@ -119,7 +121,7 @@ public class TestServerRegPatient {
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
         assertEquals("npasp value", 2, patientFullInfo.getNpasp());
-        assertEquals("fam value", "БЕЛОГОРОДЦЕВА", patientFullInfo.getFam());
+        assertEquals("fam value", "Уникальная_фамилия", patientFullInfo.getFam());
         assertEquals("im value", "ДИАНА", patientFullInfo.getIm());
         assertEquals("ot value", "АЛЕКСЕЕВНА", patientFullInfo.getOt());
         assertEquals("datar value", birthDate,
@@ -218,7 +220,7 @@ public class TestServerRegPatient {
         int npasp = 2;
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
-        assertEquals("list size", 2, kontingent.size());
+        assertEquals("list size", 4, kontingent.size());
     }
 
     @SuppressWarnings("deprecation")
@@ -230,9 +232,9 @@ public class TestServerRegPatient {
         final Date birthDate2 = new Date(102, 1, 2);
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
-        assertEquals("id value", 1, kontingent.get(0).getId());
+        assertEquals("id value", 2, kontingent.get(0).getId());
         assertEquals("npasp value", npasp, kontingent.get(0).getNpasp());
-        assertEquals("kateg value", 1, kontingent.get(0).getKateg());
+        assertEquals("kateg value", 2, kontingent.get(0).getKateg());
         assertEquals("datau value", birthDate1, new Date(kontingent.get(0).getDatau()));
         assertEquals("name value", "нэйм1", kontingent.get(0).getName());
         assertEquals("id value", 2, kontingent.get(1).getId());
@@ -251,6 +253,24 @@ public class TestServerRegPatient {
                 testServer.getKontingent(npasp);
         kontingent.clear();
     }
+
+    @Test
+    public final void getGosp_isFieldValueCorrect()
+            throws TException, GospNotFoundException {
+        final int ngosp = 1;
+        Gosp testGosp =
+                testServer.getGosp(ngosp);
+        assertEquals("npasp value", 2, testGosp.getNpasp());
+    }
+
+//    @Test
+//    public final void addGosp_isGospActuallyAdded()
+//            throws TException, GospNotFoundException {
+//        final int ngosp = 1;
+//        Gosp testGosp = new Gosp();
+//        testGosp.ngosp = 3;
+//        assertEquals("npasp value", 2, testGosp.getNpasp());
+//    }
 
     @Test
     public final void isPatientExist_isThrowAlreadyExistException()

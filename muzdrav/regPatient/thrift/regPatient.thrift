@@ -8,7 +8,7 @@ struct Address{
 	2:string city,
 	3:string street,
 	4:string house,
-	5:string flat	
+	5:string flat
 }
 
 struct PatientBrief{
@@ -174,8 +174,7 @@ struct Gosp{
 	34:i64 dataosm,
 	35:string vremosm,
 	36:i64 dataz,
-	37:string jalob,
-	38:string zap_vrach
+	37:string jalob
 }
 
 /**
