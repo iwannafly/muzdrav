@@ -12,8 +12,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.util.Locale;
 
 import javax.swing.DefaultListModel;
@@ -43,8 +41,6 @@ import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Client;
 import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 
 public class MainForm {
-	private static JFrame instance;
-	
 	private JFrame frame;
 	private JPanel pnlLogin;
 	private JTextField tbLogin;
@@ -62,7 +58,6 @@ public class MainForm {
 	private static ThriftServerAuth.Client client; 
 	private UserAuthInfo authInfo;
 	private IClient plug;
-	private PluginLoader pldr;
 //	private ModulesUpdater modUpd;
 
 	/**
@@ -77,7 +72,7 @@ public class MainForm {
 					window.frame.getInputContext().selectInputMethod(new Locale("ru", "RU"));
 					window.frame.setVisible(true);
 					
-					conMan = new ConnectionManager(instance, ThriftServerAuth.Client.class, configuration.thrPort);
+					conMan = new ConnectionManager(window.frame, ThriftServerAuth.Client.class, configuration.thrPort);
 					client = (Client) conMan.get(configuration.thrPort);
 					conMan.connect();
 				} catch (Exception e) {
@@ -92,7 +87,6 @@ public class MainForm {
 	 */
 	public MainForm() {
 		initialize();
-		instance = frame;
 	}
 
 	/**
@@ -153,6 +147,7 @@ public class MainForm {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					authInfo = client.auth(tbLogin.getText(), tbPass.getText());
+					conMan.createPluginLoader(authInfo);
 					showSelectionPane();
 				} catch (UserNotFoundException e1) {
 					JOptionPane.showMessageDialog(frame, "Пользователя с таким логином и паролем не существует");
@@ -230,37 +225,14 @@ public class MainForm {
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				else
 					try {
-						plug = pldr.loadPlugin(lbxAvailSys.getSelectedIndex());
-						frame.setVisible(false);
+						plug = conMan.getPluginLoader().loadPluginByIndex(lbxAvailSys.getSelectedIndex());
 						conMan.setClient(plug);
+						plug.showNormal();
 						conMan.connect();
-					} catch (MalformedURLException e1) {
-						// TODO Auto-generated catch block
+						frame.setVisible(false);
+					} catch (Exception e1) {
 						e1.printStackTrace();
-					} catch (ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (NoSuchMethodException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (SecurityException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (InstantiationException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IllegalAccessException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IllegalArgumentException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (InvocationTargetException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (TException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						JOptionPane.showMessageDialog(frame, e1.getLocalizedMessage(), "Ошибка загрузки модуля", JOptionPane.ERROR_MESSAGE);
 					}
 			}
 		});
@@ -311,15 +283,12 @@ public class MainForm {
 			public void windowClosing(WindowEvent e) {
 				if (conMan != null)
 					conMan.remove();
+				
 				super.windowClosing(e);
 			}
 		});
 		
 		frame.setLocationRelativeTo(null);
-	}
-	
-	public static JFrame getInstance() {
-		return instance;
 	}
 	
 	private void showSelectionPane() {
@@ -336,16 +305,13 @@ public class MainForm {
 	}
 	
 	private void showPluginList() {
-		try {
-			
 //			modUpd = new ModulesUpdater(conMan);
-			pldr = new PluginLoader(conMan, authInfo);
 			while (true) {
 				try {
 					
 //					TODO На этапе разработки апдейтер будет только мешать
 //					modUpd.checkAndUpdate(authInfo.pdost);
-					pldr.loadPluginList();
+					conMan.getPluginLoader().loadPluginList(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					break;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -359,21 +325,17 @@ public class MainForm {
 				
 				@Override
 				public int getSize() {
-					if (pldr != null)
-						return pldr.getPluginList().size();
+					if (conMan.getPluginLoader() != null)
+						return conMan.getPluginLoader().getPluginList().size();
 					else
 						return 0;
 				}
 				
 				@Override
 				public String getElementAt(int index) {
-					return pldr.getPluginList().get(index).getName();
+					return conMan.getPluginLoader().getPluginList().get(index).getName();
 				}
 			});
-		} catch (java.io.FileNotFoundException e1) {
-			btnLaunch.setText("Выход");
-			JOptionPane.showMessageDialog(frame, e1.getMessage(), "Ошибка загрузки модуля", JOptionPane.ERROR_MESSAGE);
-		}
 
 		if (lbxAvailSys.getModel().getSize() == 0)
 			btnLaunch.setText("Выход");

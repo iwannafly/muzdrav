@@ -50,10 +50,10 @@ public class ConnectionManager {
 	private Map<Integer, TTransport> transports;
 	private Map<Integer, KmiacServer.Client> connections;
 	private FileTransfer.Client filTrans;
+	private PluginLoader pLdr;
 	
 	private IClient client;
 	private JFrame mainForm;
-	private JFrame localForm;
 	private boolean connecting;
 	private JDialog reconnectForm;
 	private Thread reconnectThread;
@@ -85,14 +85,16 @@ public class ConnectionManager {
 	 */
 	public void setClient(IClient client) {
 		this.client = client;
+		this.mainForm = client.getFrame();
 	}
 	
-	/**
-	 * Установка формы модуля.
-	 * @param localForm
-	 */
-	public void setLocalForm(JFrame localForm) {
-		this.localForm = localForm;
+	public PluginLoader createPluginLoader(UserAuthInfo authInfo) {
+		pLdr = new PluginLoader(this, authInfo);
+		return getPluginLoader();
+	}
+	
+	public PluginLoader getPluginLoader() {
+		return pLdr;
 	}
 	
 	/**
@@ -141,7 +143,7 @@ public class ConnectionManager {
 	}
 	
 	/**
-	 * Подключение к трифт-серверам.
+	 * Подключение ко всем трифт-серверам.
 	 */
 	public void connect() throws TException {
 		try {
@@ -160,6 +162,24 @@ public class ConnectionManager {
 		}
 	}
 	
+	/**
+	 * Подключение к трифт-серверу.
+	 */
+	public void connect(int port) throws TException {
+		try {
+			TTransport transport = transports.get(port);
+			KmiacServer.Client connection = connections.get(port);
+			
+			if (!transport.isOpen()) {
+				transport.open();
+				if (client != null)
+					client.onConnect(connection);
+			}
+		} catch (TTransportException e) {
+			throw new ConnectionException(e);
+		}
+	}
+
 	/**
 	 * Отключение от всех трифт-серверов.
 	 */
@@ -226,8 +246,6 @@ public class ConnectionManager {
 								try {
 									if (!connecting) {
 										notify();
-										if (localForm != null)
-											localForm.dispatchEvent(new WindowEvent(localForm, WindowEvent.WINDOW_CLOSING));
 										mainForm.dispatchEvent(new WindowEvent(mainForm, WindowEvent.WINDOW_CLOSING));
 										break;
 									}
@@ -304,7 +322,7 @@ public class ConnectionManager {
 	}
 	
 	private void showReconnectForm() {
-		reconnectForm.setLocationRelativeTo((localForm == null) ? mainForm : localForm);
+		reconnectForm.setLocationRelativeTo(mainForm);
 		reconnectForm.setVisible(true);
 	}
 	
