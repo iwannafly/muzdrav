@@ -724,4 +724,10 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
+
+	@Override
+	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -404,6 +404,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+
+	string printIsslMetod(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodMetod, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
 	
 
 //classifiers
