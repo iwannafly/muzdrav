@@ -406,6 +406,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
 
 	string printIsslMetod(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodMetod, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
+	string printIsslPokaz(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodSyst, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
 	
 
 //classifiers
@@ -425,6 +426,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_p0e1() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_nz1(1: i32 c_p0e1) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_m00 throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info
