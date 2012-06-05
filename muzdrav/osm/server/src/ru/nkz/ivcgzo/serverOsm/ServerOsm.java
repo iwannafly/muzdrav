@@ -106,11 +106,11 @@ public class ServerOsm extends Server implements Iface {
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
 		
-		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred");
-		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class};
+		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred",       "razv",       "uslov",      "per_zab",    "per_oper",   "gemotr",     "nasl",       "ginek",      "priem_lek",  "prim_gorm");
+		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class};
 		
-		rsmPriem = new TResultSetMapper<>(Priem.class, "id_obr",      "npasp",       "id_pos",      "sl_ob",       "n_is",        "n_kons",      "n_proc",      "n_lek",       "t_jalob_d",  "t_jalob_krov", "t_jalob_p",  "t_jalob_moch", "t_jalob_endo", "t_jalob_nerv", "t_jalob_opor", "t_jalob_lih", "t_jalob_obh", "t_jalob_proch", "t_nachalo_zab", "t_sympt",    "t_otn_bol",  "t_ps_syt",   "t_ob_sost",  "t_koj_pokr", "t_sliz",     "t_podk_kl",  "t_limf_uzl", "t_kost_mysh", "t_nervn_ps", "t_chss",     "t_temp",     "t_ad",       "t_rost",     "t_ves",      "t_telo",     "t_sust",     "t_dyh",      "t_gr_kl",    "t_perk_l",   "t_aus_l",    "t_bronho",   "t_arter",    "t_obl_s",    "t_perk_s",   "t_aus_s",    "t_pol_rta",  "t_jivot",    "t_palp_jivot", "t_jel_kish", "t_palp_jel", "t_palp_podjel", "t_pechen",   "t_jelch",    "t_selez",    "t_obl_zad",  "t_poyasn",   "t_pochk",    "t_moch",     "t_mol_jel", "t_gr_jel",    "t_matka",    "t_nar_polov", "t_chitov",   "t_st_localis", "t_ocenka",   "t_jalob");
-		priemTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class,   String.class, String.class,   String.class,   String.class,   String.class,   String.class,  String.class,  String.class,    String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,   String.class, String.class, String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class,   String.class, String.class};
+		rsmPriem = new TResultSetMapper<>(Priem.class, "id_obr",      "npasp",       "id_pos",      "sl_ob",       "n_is",        "n_kons",      "n_proc",      "n_lek",       "t_jalob_d",  "t_jalob_krov", "t_jalob_p",  "t_jalob_moch", "t_jalob_endo", "t_jalob_nerv", "t_jalob_opor", "t_jalob_lih", "t_jalob_obh", "t_jalob_proch", "t_nachalo_zab", "t_sympt",    "t_otn_bol",  "t_ps_syt",   "t_ob_sost",  "t_koj_pokr", "t_sliz",     "t_podk_kl",  "t_limf_uzl", "t_kost_mysh", "t_nervn_ps", "t_chss",     "t_temp",     "t_ad",       "t_rost",     "t_ves",      "t_telo",     "t_sust",     "t_dyh",      "t_gr_kl",    "t_perk_l",   "t_aus_l",    "t_bronho",   "t_arter",    "t_obl_s",    "t_perk_s",   "t_aus_s",    "t_pol_rta",  "t_jivot",    "t_palp_jivot", "t_jel_kish", "t_palp_jel", "t_palp_podjel", "t_pechen",   "t_jelch",    "t_selez",    "t_obl_zad",  "t_poyasn",   "t_pochk",    "t_moch",     "t_mol_jel", "t_gr_jel",    "t_matka",    "t_nar_polov", "t_chitov",   "t_st_localis", "t_ocenka",   "t_jalob",    "t_ist_zab",  "t_status_praesense", "t_fiz_obsl");
+		priemTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class,   String.class, String.class,   String.class,   String.class,   String.class,   String.class,  String.class,  String.class,    String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,   String.class, String.class, String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class,   String.class, String.class, String.class, String.class,         String.class};
 		
 		rsmPatComInfo = new TResultSetMapper<>(PatientCommonInfo.class, "npasp",       "fam",        "im",         "ot",         "datar",    "poms_ser",   "poms_nom",   "pol",         "jitel",       "sgrp",        "adp_obl",    "adp_gorod",  "adp_ul",     "adp_dom",    "adp_korp",   "adp_kv",     "adm_obl",    "adm_gorod",  "adm_ul",     "adm_dom",    "adm_korp",   "adm_kv",     "mrab",       "name_mr",    "ncex",        "poms_strg",   "poms_tdoc",   "poms_ndog",  "pdms_strg",   "pdms_ser",   "pdms_nom",   "pdms_ndog",  "cpol_pr",     "terp",        "datapr",   "tdoc",        "docser",     "docnum",     "datadoc",  "odoc",       "snils",      "dataz",    "prof",       "tel",        "dsv",      "prizn",       "ter_liv",     "region_liv");
 		patComInfoTypes = new Class<?>[] {                              Integer.class, String.class, String.class, String.class, Date.class, String.class, String.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, Date.class, String.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
@@ -729,7 +729,7 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws TException {
+	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws KmiacServerException, TException {
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\111.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -741,52 +741,56 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("<title>Направление на…</title>");
 				sb.append("<style type=\"text/css\">");
 					sb.append("table, td { border:1px solid black; border-collapse:collapse; }");
+					sb.append("td.c1 { width:40%; }");
+					sb.append("td.c2 { width:60%; }");
 				sb.append("</style>");
 			sb.append("</head>");
 			sb.append("<body>");
 			sb.append("<div>");
 			
-			sb.append("<table border=\"1\">");
-			sb.append("<tr>");
-				sb.append("<td>");
-					sb.append("<h1>Информация для пациента<p></h1>");
-					sb.append("Место:<p>");
-					sb.append("Каб. №:<p>");
-					sb.append("Дата:<p>");
-					sb.append("Время:<p>");
-					sb.append("Подготовка:<p>");
+			sb.append("<table cellpadding=\"5\">");
+			sb.append("<tr valign=\"top\">");
+				sb.append("<td class=\"c1\">");
+					sb.append("<h3>Информация для пациента:</h3>");
+					sb.append("<b>Место:</b><br />");
+					sb.append("<b>Каб. №:</b><br />");
+					sb.append("<b>Дата:</b><br />");
+					sb.append("<b>Время:</b><br />");
+					sb.append("<b>Подготовка:</b><br />");
 				sb.append("</td>");
 				acrs = sse.execPreparedQuery("SELECT n.name, m.name, v.fam, v.im, v.ot FROM s_users u JOIN n_n00 n ON (n.pcod = u.cpodr) JOIN n_m00 m ON (m.pcod = n.clpu) JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", userId);
 				if (!acrs.getResultSet().next())
 					throw new KmiacServerException("Logged user info not found.");
-				sb.append("<td>");
-					sb.append(String.format("<h1>%s<p>", acrs.getResultSet().getString(1)));
-					sb.append(String.format("%s<p></h1>", acrs.getResultSet().getString(2)));
+				sb.append("<td class=\"c2\">");
+					sb.append(String.format("<h3>%s<br />", acrs.getResultSet().getString(1)));
+					sb.append(String.format("%s<br />", acrs.getResultSet().getString(2)));
 					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), acrs.getResultSet().getString(5));
 					acrs.close();
 					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", kodVidIssl);
 					if (!acrs.getResultSet().next())
 						throw new KmiacServerException("Exam info info not found.");
-					sb.append(String.format("Направление на: %s<p>", acrs.getResultSet().getString(1)));
+					sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
 					acrs.close();
 					acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", npasp);
 					if (!acrs.getResultSet().next())
 						throw new KmiacServerException("Logged user info not found.");
-					sb.append(String.format("ФИО пациента: %s %s %s<p>", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-					sb.append(String.format("Дата рождения: %1$td.%1$tm.%1$tY<p>", acrs.getResultSet().getDate(4)));
-					sb.append(String.format("Адрес: %s, %s<p>", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
-					sb.append("Диагноз:<p>");
-					sb.append(String.format("Врач: %s<p>", vrInfo));
-					sb.append("Наименование показателей<p>");
+					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
+					sb.append("<b>Диагноз:</b><br />");
+					sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
+					sb.append("<h3>Наименование показателей</h3>");
+					sb.append("<p>");
 					for (int i = 0; i < pokaz.size(); i++) {
 						acrs.close();
 						acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", pokaz.get(i));
 						if (!acrs.getResultSet().next())
 							throw new KmiacServerException("Mark info info not found.");
-						sb.append(String.format("%d: %s<p>", i + 1, acrs.getResultSet().getString(1)));
+						sb.append(String.format("%d. %s<br />", i + 1, acrs.getResultSet().getString(1)));
 					}
-					sb.append(String.format("Дата направления: %1$td.%1$tm.%1$tY<p>", new Date(System.currentTimeMillis())));
-					sb.append("Подпись врача:<p>");
+					sb.append("<p>");
+					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+					sb.append("<b>Подпись врача:</b><br />");
 				sb.append("</td>");
 			sb.append("</tr>");
 			sb.append("</table>");
@@ -799,8 +803,7 @@ public class ServerOsm extends Server implements Iface {
 			osw.write(sb.toString());
 			return "e:\\111.htm";
 		} catch (SQLException | IOException | KmiacServerException e) {
-			throw new TException();
-//			throw new KmiacServerException();
+			throw new KmiacServerException();
 		}
 	}
 
