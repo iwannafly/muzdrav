@@ -237,6 +237,19 @@ public class PacientInfoFrame extends JFrame {
 			cmb_alk = new ThriftIntegerClassifierCombobox<>(true);
 			cmb_org = new ThriftIntegerClassifierCombobox<>(true);
 			cmb_naprav = new ThriftStringClassifierCombobox<>(true);
+			cmb_naprav.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					try {
+						if (cmb_naprav.getSelectedPcod() == "Г")cmb_org.setData(MainForm.tcl.getAL0());
+						if (cmb_naprav.getSelectedPcod() == "К")cmb_org.setData(MainForm.tcl.getN00());
+						if (cmb_naprav.getSelectedPcod() == "Л")cmb_org.setData(MainForm.tcl.getM00());
+						if (cmb_naprav.getSelectedPcod() == "Р")cmb_org.setData(MainForm.tcl.getW04());
+						if (cmb_naprav.getSelectedPcod() == "Т")cmb_org.setData(MainForm.tcl.getO00());
+					} catch (TException e) {
+						e.printStackTrace();
+					} 
+				}
+			});
 			cmb_Polis_doc_pr.setData(MainForm.tcl.getPomsTdoc());
 			cmb_oms_doc.setData(MainForm.tcl.getPomsTdoc());
 			cmb_status.setData(MainForm.tcl.getSgrp());
@@ -365,8 +378,6 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap())
 		);
 		
-//		cmb_tdoc = new JComboBox<String>();
-		
 		JLabel lblNewLabel_27 = new JLabel("Документ");
 		
 		JLabel lblNewLabel_28 = new JLabel("Серия");
@@ -473,8 +484,6 @@ public class PacientInfoFrame extends JFrame {
 		
 		JLabel lblNewLabel_26 = new JLabel("Причина");
 		
-//		cmb_ishod = new JComboBox<String>();
-
 		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
 		gl_panel_6.setHorizontalGroup(
 			gl_panel_6.createParallelGroup(Alignment.LEADING)
@@ -606,8 +615,6 @@ public class PacientInfoFrame extends JFrame {
 		
 		tf_dms_smo = new JTextField();
 		tf_dms_smo.setColumns(10);
-		
-//		cmb_oms_doc = new JComboBox<String>();
 		
 		JLabel lblNewLabel_13 = new JLabel("ОМС");
 		lblNewLabel_13.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -822,8 +829,6 @@ public class PacientInfoFrame extends JFrame {
 		JLabel lblNewLabel_3 = new JLabel("Отчество");
 		
 		JLabel lblNewLabel_4 = new JLabel("Социальный статус");
-		
-//		cmb_status = new JComboBox<String>();
 		
 		JLabel lblPol = new JLabel("Пол");
 		
@@ -1341,8 +1346,6 @@ public class PacientInfoFrame extends JFrame {
 		
 		JLabel lblNewLabel_45 = new JLabel("Документ");
 		
-//		cmb_Tdoc_pr = new JComboBox<String>();
-		
 		JLabel lblNewLabel_46 = new JLabel("Серия");
 		
 		tf_Ser_doc_pr = new JTextField();
@@ -1396,8 +1399,6 @@ public class PacientInfoFrame extends JFrame {
 		
 		tf_Polis_nom_pr = new JTextField();
 		tf_Polis_nom_pr.setColumns(10);
-		
-//		cmb_Polis_doc_pr = new JComboBox<String>();
 		
 		JLabel lblNewLabel_42 = new JLabel("Документ");
 		
@@ -1884,8 +1885,6 @@ public class PacientInfoFrame extends JFrame {
 		JPanel panel_36 = new JPanel();
 		panel_36.setBorder(new TitledBorder(null, "Своевременность", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-//		cmb_cotd = new JComboBox<String>();
-		
 		JLabel lblNewLabel_62 = new JLabel("Отделение");
 		
 		cbx_messr = new JCheckBox("сообщение родственникам");
@@ -2022,16 +2021,10 @@ public class PacientInfoFrame extends JFrame {
 		
 		JLabel lblNewLabel_56 = new JLabel("Вид травмы");
 		
-//		cmb_travm = new JComboBox<String>();
-		
 		JLabel lblNewLabel_57 = new JLabel("Вид транспортировки");
-		
-//		cmb_trans = new JComboBox<String>();
 		
 		JPanel panel_33 = new JPanel();
 		panel_33.setBorder(new TitledBorder(null, "\u0416\u0430\u043B\u043E\u0431\u044B", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-//		cmb_otkaz = new JComboBox<String>();
 		
 		JLabel lblNewLabel_58 = new JLabel("Причина отказа в госпитализации");
 		
@@ -2156,7 +2149,7 @@ public class PacientInfoFrame extends JFrame {
 		
 		sp_datasmp = new JSpinner();
 		sp_datasmp.setEnabled(false);
-		sp_datasmp.setModel(new SpinnerDateModel(new Date(), new Date(1334772000000L), null, Calendar.DAY_OF_YEAR));
+		sp_datasmp.setModel(new SpinnerDateModel(new Date(), new Date(), null, Calendar.DAY_OF_YEAR));
 		
 		JLabel lblNewLabel_55 = new JLabel("Номер");
 		
@@ -2330,7 +2323,6 @@ public class PacientInfoFrame extends JFrame {
 		);
 		panel_28.setLayout(gl_panel_28);
 		
-       // String curDate = ((new SimpleDateFormat("dd.MM.yyyy")).format(new Date(System.currentTimeMillis()))).toString();
 		sp_dataosm = new JSpinner();
 		sp_dataosm.setEnabled(false);
 		sp_dataosm.setModel(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_YEAR));
