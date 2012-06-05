@@ -93,6 +93,8 @@ struct Psign{
 	12: string gemotr;
 	13: string nasl;
 	14: string ginek;
+	15: string priem_lek;
+	16: string prim_gorm;
 }
 
 struct Priem{
@@ -162,6 +164,9 @@ struct Priem{
 	64: string t_st_localis;
 	65: string t_ocenka;
 	66: string t_jalob;
+	67: string t_ist_zab;
+	68: string t_status_praesense;
+	69: string t_fiz_obsl;
 }
 
 struct PdiagZ{
