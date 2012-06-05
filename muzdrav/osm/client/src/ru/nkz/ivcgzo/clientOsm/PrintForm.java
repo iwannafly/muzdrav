@@ -30,6 +30,9 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JTextField;
 
 public class PrintForm extends JFrame{
 	private static final long serialVersionUID = -9078314618826266514L;
@@ -40,11 +43,19 @@ public class PrintForm extends JFrame{
 	public CustomTable<Metod, Metod._Fields> tabMet;
 	private CustomTable<PokazMet, PokazMet._Fields> tabPokazMet;
 	private CustomTable<Pokaz, Pokaz._Fields> tabPokaz;
+	public ThriftIntegerClassifierCombobox<IntegerClassifier> cbMesto;
+	private JTextField tfkab;
+//	private IsslMet isslmet;
+
 
 	
 	public PrintForm() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);}
+		});
 
-		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -166,13 +177,21 @@ public class PrintForm extends JFrame{
 								selItems.add(pokazMet.getPcod());
 						}
 						if (selItems.size() != 0) {
-							String servPath = MainForm.tcl.printIsslMetod(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), tabMet.getSelectedItem().getObst(), selItems);
+							 isslmet = new IsslMet();
+							 isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().pcod);
+							 isslmet.setUserId(MainForm.authInfo.user_id);
+							 isslmet.setNpasp(Vvod.zapVrSave.getNpasp());
+							 isslmet.setKodMetod(cbSys.getSelectedItem().pcod);
+							 isslmet.setPokaz(selItems);
+							 isslmet.setMesto(cbMesto.getSelectedItem().name);
+							 isslmet.setKab(tfkab.getText());
+							String servPath = MainForm.tcl.printIsslMetod();
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						}
 					}
 				}
-				/*if (rbPokaz.isSelected()){
+				if (rbPokaz.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) && (cbSys.getSelectedItem() != null)) {
 						List<String> selItems = new ArrayList<>();
 						for (Pokaz pokaz : tabPokaz.getData()) {
@@ -181,11 +200,11 @@ public class PrintForm extends JFrame{
 						}
 						if (selItems.size() != 0) {
 							String servPath = MainForm.tcl.printIsslPokaz(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), cbSys.getSelectedItem().pcod, selItems);
-							String cliPath = File.createTempFile(null, null).getAbsolutePath();
+							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						}
 					}
-				}*/	
+				}
 				}
 					catch (TException e1) {
 					e1.printStackTrace();
@@ -197,6 +216,15 @@ public class PrintForm extends JFrame{
 			}
 		});
 		
+		JLabel lblMesto = new JLabel("Место");
+		
+		cbMesto = new ThriftIntegerClassifierCombobox<>(true);
+		
+		JLabel lblkab = new JLabel("Каб.");
+		
+		tfkab = new JTextField();
+		tfkab.setColumns(10);
+		//cbVidIssl = new ThriftIntegerClassifierCombobox<>(true);
 		
 		
 		
@@ -237,7 +265,17 @@ public class PrintForm extends JFrame{
 							.addContainerGap())
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
 							.addComponent(btnNewButton)
-							.addContainerGap(791, Short.MAX_VALUE))))
+							.addContainerGap(811, Short.MAX_VALUE))
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(lblMesto)
+							.addGap(18)
+							.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(lblkab)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tfkab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap(767, Short.MAX_VALUE))))
 		);
 		gl_pNaprIssl.setVerticalGroup(
 			gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
@@ -266,9 +304,17 @@ public class PrintForm extends JFrame{
 							.addGap(8)
 							.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
 						.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblMesto)
+						.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblkab)
+						.addComponent(tfkab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(115)
 					.addComponent(btnNewButton)
-					.addGap(181))
+					.addGap(22))
 		);
 		
 		tabPokaz = new CustomTable<>(false, true, Pokaz.class, 0,"Код показателя",1,"Наименование",2,"Стоимость",5,"Выбор");
