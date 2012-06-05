@@ -27,6 +27,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
@@ -177,34 +178,34 @@ public class PrintForm extends JFrame{
 								selItems.add(pokazMet.getPcod());
 						}
 						if (selItems.size() != 0) {
-							 isslmet = new IsslMet();
-							 isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().pcod);
-							 isslmet.setUserId(MainForm.authInfo.user_id);
-							 isslmet.setNpasp(Vvod.zapVrSave.getNpasp());
-							 isslmet.setKodMetod(cbSys.getSelectedItem().pcod);
-							 isslmet.setPokaz(selItems);
-							 isslmet.setMesto(cbMesto.getSelectedItem().name);
-							 isslmet.setKab(tfkab.getText());
-							String servPath = MainForm.tcl.printIsslMetod();
+							IsslMet isslmet = new IsslMet();
+							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
+							isslmet.setUserId(MainForm.authInfo.getUser_id());
+							isslmet.setNpasp(Vvod.zapVrSave.getNpasp());
+							isslmet.setKodMetod(tabMet.getSelectedItem().getObst());
+							isslmet.setPokaz(selItems);
+							isslmet.setMesto(cbMesto.getSelectedItem().getName());
+							isslmet.setKab(tfkab.getText());
+							String servPath = MainForm.tcl.printIsslMetod(isslmet);
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						}
 					}
 				}
-				if (rbPokaz.isSelected()){
-					if ((cbVidIssl.getSelectedItem() != null) && (cbSys.getSelectedItem() != null)) {
-						List<String> selItems = new ArrayList<>();
-						for (Pokaz pokaz : tabPokaz.getData()) {
-							if (pokaz.vybor)
-								selItems.add(pokaz.getPcod());
-						}
-						if (selItems.size() != 0) {
-							String servPath = MainForm.tcl.printIsslPokaz(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), cbSys.getSelectedItem().pcod, selItems);
-							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
-						}
-					}
-				}
+//				if (rbPokaz.isSelected()){
+//					if ((cbVidIssl.getSelectedItem() != null) && (cbSys.getSelectedItem() != null)) {
+//						List<String> selItems = new ArrayList<>();
+//						for (Pokaz pokaz : tabPokaz.getData()) {
+//							if (pokaz.vybor)
+//								selItems.add(pokaz.getPcod());
+//						}
+//						if (selItems.size() != 0) {
+//							String servPath = MainForm.tcl.printIsslPokaz(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), cbSys.getSelectedItem().pcod, selItems);
+//							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+//							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+//						}
+//					}
+//				}
 				}
 					catch (TException e1) {
 					e1.printStackTrace();
