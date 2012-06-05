@@ -357,6 +357,40 @@ struct Prez_l {
 }
 
 
+struct IsslMet {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct IsslPokaz {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct Napr{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 clpu;
+}
+
+struct NaprKons{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 cpol;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -412,10 +446,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
 
-	string printIsslMetod(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodMetod, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
-	string printIsslPokaz(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodSyst, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
-	string printNapr(1: i32 npasp, 2: i32 userId, 3: string obosnov, 4: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
-	string printNaprKons(1: i32 npasp, 2: i32 userId, 3: string obosnov, 4: i32 cpol) throws (1: kmiacServer.KmiacServerException kse);//консультация
+	
+	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
+	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
+	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
+	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
 	string printVypis(1: i32 npasp, 2: i32 pvizitAmbId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
 
