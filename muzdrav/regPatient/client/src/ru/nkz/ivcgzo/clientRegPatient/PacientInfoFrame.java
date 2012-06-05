@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientRegPatient;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -137,6 +138,7 @@ public class PacientInfoFrame extends JFrame {
 	private JTextField tf_toc;
 	private JTextField tf_ad;
 	private JTextField tf_smpn;
+	private JTextField tf_nist;
 	private JRadioButton rbtn_pol_m;
 	private JRadioButton rbtn_pol_j;
 	private JRadioButton rbtn_pol_pr_m;
@@ -215,8 +217,6 @@ public class PacientInfoFrame extends JFrame {
 	public void refresh(List<PatientBrief> pat) {
 		tbl_patient.requestFocus();
 		tbl_patient.setData(pat);
-		//tbl_patient.updateSelectedItem();
-		//curPatientId =(int) tbl_patient.getSelectedItem().npasp;
 	    //changePatientPersonalInfo(curPatientId);
 	}
 	/**
@@ -1667,13 +1667,6 @@ public class PacientInfoFrame extends JFrame {
 					SignInfo.setAllerg(ta_allerg.getText().trim());
 					SignInfo.setFarmkol(ta_farm.getText().trim());
 					SignInfo.setVitae(ta_vitae.getText().trim());
-//					System.out.println(SignInfo.getNpasp());
-//					System.out.println(SignInfo.getAllerg());
-//					System.out.println(SignInfo.getFarmkol());
-//					System.out.println(SignInfo.getGrup());
-//					System.out.println(SignInfo.getPh());
-//					System.out.println(SignInfo.getVitae());
-//					System.out.println(SignInfo.getVred());
 					MainForm.tcl.addOrUpdateSign(SignInfo);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -2337,6 +2330,7 @@ public class PacientInfoFrame extends JFrame {
 		);
 		panel_28.setLayout(gl_panel_28);
 		
+       // String curDate = ((new SimpleDateFormat("dd.MM.yyyy")).format(new Date(System.currentTimeMillis()))).toString();
 		sp_dataosm = new JSpinner();
 		sp_dataosm.setEnabled(false);
 		sp_dataosm.setModel(new SpinnerDateModel(new Date(), null, null, Calendar.DAY_OF_YEAR));
@@ -2690,7 +2684,6 @@ public class PacientInfoFrame extends JFrame {
 					PersonalInfo.setMrab(tfMr.getText().trim());
 					PersonalInfo.setProf(tfDolj.getText().trim());
 					PersonalInfo.setTel(tfTel.getText().trim());
-					if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
 					PersonalInfo.setSnils(tf_Snils.getText().trim());
 					PersonalInfo.setOdoc(tf_Odoc.getText().trim());
 					PersonalInfo.setDocser(tf_serdoc.getText().trim());
@@ -2703,6 +2696,7 @@ public class PacientInfoFrame extends JFrame {
 					if (!tf_dms_smo.getText().isEmpty()) PersonalInfo.polis_dms.setStrg(Integer.valueOf(tf_dms_smo.getText()));
 					PersonalInfo.nambk.setNambk(tf_Nambk.getText());
 					if (!tf_Nuch.getText().isEmpty()) PersonalInfo.nambk.setNuch(Integer.valueOf(tf_Nuch.getText()));
+					if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
 					if (!tfDr.getText().isEmpty()) PersonalInfo.setDatar(sdf.parse(tfDr.getText()).getTime());
 					if (!tf_datadoc.getText().isEmpty()) PersonalInfo.setDatadoc(sdf.parse(tf_datadoc.getText()).getTime());
 					if (!tf_Datapr.getText().isEmpty()) PersonalInfo.nambk.setDatapr(sdf.parse(tf_Datapr.getText()).getTime());
@@ -2835,9 +2829,7 @@ public class PacientInfoFrame extends JFrame {
 		  	  }
 	      }
 	};
-private String strerr;
-private JTextField tf_nist;
-	
+
 	// просмотр  информации о пациенте
 	private void changePatientPersonalInfo(int PatId){
 		try {
@@ -3307,8 +3299,8 @@ private JTextField tf_nist;
 	}
 	private void SavePriemInfo(){
 		try {
-			new SimpleDateFormat("dd.MM.yyyy");
-			new SimpleDateFormat("HH:mm");
+			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+			SimpleDateFormat stf = new SimpleDateFormat("HH:mm");
 			Id_gosp = new Gosp();
 			Id_gosp.setNpasp(curPatientId);
 			Id_gosp.setNgosp(curNgosp);
@@ -3319,48 +3311,32 @@ private JTextField tf_nist;
 			Id_gosp.setCuser(MainForm.authInfo.pcod);
 			Id_gosp.setNist(1); //подумать
 
-//			Id_gosp.setDatap(Date.parse(sp_datap.getValue().toString()));
-//			Id_gosp.setSmp_data(Date.parse(sp_datasmp.getValue().toString()));
-//			Id_gosp.setDatagos(Date.parse(sp_sdatagop.getValue().toString()));
-//			Id_gosp.setDataosm(sdf.parse(sp_dataosm.getValue().toString()).getTime());
-
-//			Id_gosp.setVremp(sp_datap.getValue().toString().substring(9, 14));
-//			Id_gosp.setSmp_time(sp_datasmp.getValue().toString().substring(9, 14));
-//			Id_gosp.setVremgos(sp_datagosp.getValue().toString().substring(9, 14));
-//			Id_gosp.setVremosm(sp_dataosm.getValue().toString().substring(9, 14));
-
-			//PersonalInfo.nambk.setDatapr(sdf.parse(tf_Datapr.getText()).getTime());
-
-//			Id_gosp.setDatap(sdf.parse(sp_datap.getValue().toString()).getTime());
-//			Id_gosp.setSmp_data(sdf.parse(sp_datasmp.getValue().toString()).getTime());
-//			Id_gosp.setDatagos(sdf.parse(sp_datagosp.getValue().toString()).getTime());
-//			Id_gosp.setDataosm(sdf.parse(sp_dataosm.getValue().toString()).getTime());
-//			Id_gosp.setDatap(SimpleDateFormat.getDateTimeInstance().parse(sp_datap.getValue().toString()).getTime());
-//			Id_gosp.setSmp_data(SimpleDateFormat.getDateTimeInstance().parse(sp_datasmp.getValue().toString()).getTime());
-//			Id_gosp.setDatagos(SimpleDateFormat.getDateTimeInstance().parse(sp_datagosp.getValue().toString()).getTime());
-			Id_gosp.setDataosm(SimpleDateFormat.getDateTimeInstance().parse(sp_dataosm.getValue().toString()).getTime());
-//
-//			Id_gosp.setVremp(Long.toString(stf.parse(sp_datap.getValue().toString()).getTime()));
-//			Id_gosp.setSmp_time(Long.toString(stf.parse(sp_datasmp.getValue().toString()).getTime()));
-//			Id_gosp.setVremgos(Long.toString(stf.parse(sp_datagosp.getValue().toString()).getTime()));
-//			Id_gosp.setVremosm(Long.toString(stf.parse(sp_dataosm.getValue().toString()).getTime()));
-
-//			Id_gosp.setVremp(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datap.getValue().toString()).getTime()));
-//			Id_gosp.setSmp_time(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datasmp.getValue().toString()).getTime()));
-//			Id_gosp.setVremgos(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_datagosp.getValue().toString()).getTime()));
-//			Id_gosp.setVremosm(Long.toString(SimpleDateFormat.getTimeInstance().parse(sp_dataosm.getValue().toString()).getTime()));
+//		    System.out.println(((Date) sp_dataosm.getValue()).getTime());
+//		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
+			Id_gosp.setDatap(((Date) sp_datap.getValue()).getTime());
+			Id_gosp.setDataosm(((Date) sp_dataosm.getValue()).getTime());
+			Id_gosp.setVremosm(stf.format((Date) sp_dataosm.getValue()));
+			Id_gosp.setVremp(stf.format((Date) sp_datap.getValue()));
+			if (cbx_smp.isSelected()){
+				Id_gosp.setSmp_data(((Date) sp_datasmp.getValue()).getTime());
+				Id_gosp.setSmp_time(stf.format((Date) sp_datasmp.getValue()));
+			}
+			if (cbx_gosp.isSelected()){
+				Id_gosp.setDatagos(((Date) sp_datagosp.getValue()).getTime());
+				Id_gosp.setVremgos(stf.format((Date) sp_datagosp.getValue()));
+			}
 			
-			if (Id_gosp.getSv_time() != 0) Id_gosp.setSv_time(Integer.valueOf(sp_sv_time.getValue().toString()));
-			if (Id_gosp.getSv_day() != 0)Id_gosp.setSv_day(Integer.valueOf(sp_sv_day.getValue().toString()));
-			if (Id_gosp.getNtalon() != 0) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
-			if (Id_gosp.getDiag_n()!= null) Id_gosp.setDiag_n(tf_diag_n.getText().trim());
-			if (Id_gosp.getDiag_p()!= null) Id_gosp.setDiag_p(tf_diag_p.getText().trim());
-			if (Id_gosp.getNamed_n()!= null) Id_gosp.setNamed_n(ta_diag_n.getText().trim()); 
-			if (Id_gosp.getNamed_p()!= null) Id_gosp.setNamed_p(ta_diag_p.getText().trim());
-			if (Id_gosp.getToc()!= null) Id_gosp.setToc(tf_toc.getText().trim());
-			if (Id_gosp.getAd()!= null) Id_gosp.setAd(tf_ad.getText().trim());
-			if (Id_gosp.getJalob()!= null) Id_gosp.setJalob(ta_jal_pr.getText().trim());
-			if (Id_gosp.getSmp_num() != 0) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
+			if (sp_sv_time.getValue() != null) Id_gosp.setSv_time(Integer.valueOf(sp_sv_time.getValue().toString()));
+			if (sp_sv_day.getValue() != null)Id_gosp.setSv_day(Integer.valueOf(sp_sv_day.getValue().toString()));
+			if (tf_diag_n.getText().trim() != null) Id_gosp.setDiag_n(tf_diag_n.getText().trim());
+			if (tf_diag_p.getText().trim() != null) Id_gosp.setDiag_p(tf_diag_p.getText().trim());
+			if (ta_diag_n.getText().trim() != null) Id_gosp.setNamed_n(ta_diag_n.getText().trim()); 
+			if (ta_diag_p.getText().trim() != null) Id_gosp.setNamed_p(ta_diag_p.getText().trim());
+			if (tf_toc.getText().trim() != null) Id_gosp.setToc(tf_toc.getText().trim());
+			if (tf_ad.getText().trim() != null) Id_gosp.setAd(tf_ad.getText().trim());
+			if (ta_jal_pr.getText().trim() != null) Id_gosp.setJalob(ta_jal_pr.getText().trim());
+		    if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
+			if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
 
 			if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(1);
 			if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(2);
@@ -3379,7 +3355,7 @@ private JTextField tf_nist;
 			
 			if (curId == 0){
 				CheckNotNullTableCgosp();
-				curId = MainForm.tcl.addGosp(Id_gosp);
+				MainForm.tcl.addGosp(Id_gosp);
 				newPriem.setId(curId);
 				newPriem.setNist(Id_gosp.getNist());
 				newPriem.setDatap(Id_gosp.getDatap());
@@ -3419,7 +3395,7 @@ private JTextField tf_nist;
 	}
 	private void CheckNotNullTableCgosp(){
 		try {
-			strerr = "";
+			String strerr = "";
 			if (Id_gosp.getPl_extr() == 0) 
 				strerr += "плановое/экстренное; \n\r";
 			if (Id_gosp.getNaprav() == null) 
