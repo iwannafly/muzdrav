@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -135,17 +136,17 @@ public class ServerRegPatient extends Server implements Iface {
     private static final Class<?>[] GOSP_TYPES = new Class<?>[] {
     //  id             ngosp          npasp          nist
         Integer.class, Integer.class, Integer.class, Integer.class,
-    //  datap       timep       s_napr       naprav        ush_n
+    //  datap       vremp       pl_extr       naprav         n_org
         Date.class, Time.class, Integer.class, String.class, Integer.class,
-    //  cotd           svoevr         svoevrd        ntalon
+    //  cotd           sv_time        sv_day         ntalon
         Integer.class, Integer.class, Integer.class, Integer.class,
-    //  vidtr          pr_out         alkg         soobr
+    //  vidtr          pr_out         alkg           meesr
         Integer.class, Integer.class, Integer.class, Boolean.class,
     //  vid_tran       diag_n        diag_p        named_n       named_p
         Integer.class, String.class, String.class, String.class, String.class,
-    //  nal_z          nal_p          t0c           ad            datacp
+    //  nal_z          nal_p          t0c           ad            smp_data
         Boolean.class, Boolean.class, String.class, String.class, Date.class,
-    //  vremcp      nomcp          kodotd         datagos     vremgos
+    //  smp_time    smp_num        cotd_p         datagos     vremgos
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
     //  cuser          dataosm     vremosm     dataz       jalob
         Integer.class, Date.class, Time.class, Date.class, String.class
@@ -203,10 +204,10 @@ public class ServerRegPatient extends Server implements Iface {
         "id", "ngosp", "npasp", "nist", "datap", "cotd", "diag_p", "named_p"
     };
     private static final String[] GOSP_FIELD_NAMES = {
-        "id", "ngosp", "npasp", "nist", "datap", "vremp", "s_napr", "naprav", "ush_n",
-        "cotd", "svoevr", "svoevrd", "ntalon", "vidtr", "pr_out", "alkg", "soobr",
+        "id", "ngosp", "npasp", "nist", "datap", "vremp", "pl_extr", "naprav", "n_org",
+        "cotd", "sv_time", "sv_day", "ntalon", "vidtr", "pr_out", "alkg", "meesr",
         "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c",
-        "ad", "datacp", "vremcp", "nomcp", "kodotd", "datagos", "vremgos", "cuser",
+        "ad", "smp_data", "smp_time", "smp_num", "cotd_p", "datagos", "vremgos", "cuser",
         "dataosm", "vremosm", "dataz", "jalob"
     };
     private static final String[] LGOTA_FIELD_NAMES = {
@@ -226,6 +227,9 @@ public class ServerRegPatient extends Server implements Iface {
     public ServerRegPatient(final ISqlSelectExecutor sse,
             final ITransactedSqlExecutor tse) {
         super(sse, tse);
+
+        //Инициализация логгера с конфигом из файла ../../manager/log4j.xml;
+        DOMConfigurator.configure("log4j.xml");
 
         rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
@@ -429,8 +433,7 @@ public class ServerRegPatient extends Server implements Iface {
                 new ThriftRegPatient.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(
                 new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-        System.out.println("12132123132123123132");
-
+        log.info("Start serverReg Patient");
         thrServ.serve();
     }
 
@@ -441,6 +444,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final void stop() {
         if (thrServ != null) {
             thrServ.stop();
+            log.info("Stop serverReg Patient");
         }
     }
 
@@ -474,6 +478,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -784,15 +789,17 @@ public class ServerRegPatient extends Server implements Iface {
                         + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
                         + "dataosm, vremosm, dataz, jalob) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
+                        + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                        + "?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
                 return id;
             } else {
+                log.log(Level.INFO, "Запись госпитализации с такими данными уже существует");
                 throw new GospAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитадизации: ", e);
             throw new TException(e);
         }
     }

@@ -3307,15 +3307,15 @@ public class PacientInfoFrame extends JFrame {
 //		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
 			Id_gosp.setDatap(((Date) sp_datap.getValue()).getTime());
 			Id_gosp.setDataosm(((Date) sp_dataosm.getValue()).getTime());
-			Id_gosp.setVremosm(stf.format((Date) sp_dataosm.getValue()));
-			Id_gosp.setVremp(stf.format((Date) sp_datap.getValue()));
+			Id_gosp.setVremosm(((Date) sp_dataosm.getValue()).getTime());
+			Id_gosp.setVremp(((Date) sp_datap.getValue()).getTime());
 			if (cbx_smp.isSelected()){
 				Id_gosp.setSmp_data(((Date) sp_datasmp.getValue()).getTime());
-				Id_gosp.setSmp_time(stf.format((Date) sp_datasmp.getValue()));
+				Id_gosp.setSmp_time(((Date) sp_datasmp.getValue()).getTime());
 			}
 			if (cbx_gosp.isSelected()){
 				Id_gosp.setDatagos(((Date) sp_datagosp.getValue()).getTime());
-				Id_gosp.setVremgos(stf.format((Date) sp_datagosp.getValue()));
+				Id_gosp.setVremgos(((Date) sp_datagosp.getValue()).getTime());
 			}
 			
 			if (sp_sv_time.getValue() != null) Id_gosp.setSv_time(Integer.valueOf(sp_sv_time.getValue().toString()));
@@ -3347,7 +3347,7 @@ public class PacientInfoFrame extends JFrame {
 			
 			if (curId == 0){
 				CheckNotNullTableCgosp();
-				MainForm.tcl.addGosp(Id_gosp);
+				int i = MainForm.tcl.addGosp(Id_gosp);
 				newPriem.setId(curId);
 				newPriem.setNist(Id_gosp.getNist());
 				newPriem.setDatap(Id_gosp.getDatap());
@@ -3392,11 +3392,11 @@ public class PacientInfoFrame extends JFrame {
 				strerr += "плановое/экстренное; \n\r";
 			if (Id_gosp.getNaprav() == null) 
 				strerr += "кем направлен; \n\r";
-			if (Id_gosp.getDiag_p() == null || Id_gosp.getNamed_p() == null) 
+			if ((Id_gosp.getDiag_p() == null) || (Id_gosp.getNamed_p() == null)) 
 				strerr += "диагноз приемного отделения; \n\r";
-			if (Id_gosp.getCuser() == 0 || Id_gosp.getCotd_p() == 0) 
+			if ((Id_gosp.getCuser() == 0) || (Id_gosp.getCotd_p() == 0)) 
 				strerr += "нет информации о пользователе; \n\r";
-			if (Id_gosp.getDataosm() == 0 || Id_gosp.getVremosm() == null) 
+			if ((Id_gosp.getDataosm() == 0) || (Id_gosp.getVremosm() == 0)) 
 				strerr += "дата и время осмотра; \n\r";
 			if  (!strerr.isEmpty()){
 				JOptionPane.showMessageDialog(tbl_priem, "Данные поля обязательно надо заполнить: \n\r"+ strerr);
