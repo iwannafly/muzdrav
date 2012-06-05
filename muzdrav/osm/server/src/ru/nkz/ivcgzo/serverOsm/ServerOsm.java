@@ -1,5 +1,8 @@
 package ru.nkz.ivcgzo.serverOsm;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
@@ -94,8 +97,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "vidp",        "timepn",   "fam",        "im",         "ot",         "poms_ser",   "poms_nom");
 		zapVrTypes = new Class<?>[] {                  Integer.class, Integer.class, Time.class, String.class, String.class, String.class, String.class, String.class};
 		
-		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "ztext",      "dataz",    "id_etal");
-		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, Integer.class};
+		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "id_etal",     "recomend");
+		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, Integer.class, String.class};
 		
 		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr");
 		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
@@ -118,8 +121,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class};
 		
 		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "npasp",       "nisl",        "kodisl",     "stoim");
 		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, String.class, Double.class};
@@ -723,5 +726,140 @@ public class ServerOsm extends Server implements Iface {
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
 		}
+	}
+
+	@Override
+	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws TException {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\111.htm"), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+				sb.append("<title>Направление на…</title>");
+				sb.append("<style type=\"text/css\">");
+					sb.append("table, td { border:1px solid black; border-collapse:collapse; }");
+				sb.append("</style>");
+			sb.append("</head>");
+			sb.append("<body>");
+			sb.append("<div>");
+			
+			sb.append("<table border=\"1\">");
+			sb.append("<tr>");
+				sb.append("<td>");
+					sb.append("<h1>Информация для пациента<p></h1>");
+					sb.append("Место:<p>");
+					sb.append("Каб. №:<p>");
+					sb.append("Дата:<p>");
+					sb.append("Время:<p>");
+					sb.append("Подготовка:<p>");
+				sb.append("</td>");
+				acrs = sse.execPreparedQuery("SELECT n.name, m.name, v.fam, v.im, v.ot FROM s_users u JOIN n_n00 n ON (n.pcod = u.cpodr) JOIN n_m00 m ON (m.pcod = n.clpu) JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", userId);
+				if (!acrs.getResultSet().next())
+					throw new KmiacServerException("Logged user info not found.");
+				sb.append("<td>");
+					sb.append(String.format("<h1>%s<p>", acrs.getResultSet().getString(1)));
+					sb.append(String.format("%s<p></h1>", acrs.getResultSet().getString(2)));
+					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), acrs.getResultSet().getString(5));
+					acrs.close();
+					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", kodVidIssl);
+					if (!acrs.getResultSet().next())
+						throw new KmiacServerException("Exam info info not found.");
+					sb.append(String.format("Направление на: %s<p>", acrs.getResultSet().getString(1)));
+					acrs.close();
+					acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", npasp);
+					if (!acrs.getResultSet().next())
+						throw new KmiacServerException("Logged user info not found.");
+					sb.append(String.format("ФИО пациента: %s %s %s<p>", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("Дата рождения: %1$td.%1$tm.%1$tY<p>", acrs.getResultSet().getDate(4)));
+					sb.append(String.format("Адрес: %s, %s<p>", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
+					sb.append("Диагноз:<p>");
+					sb.append(String.format("Врач: %s<p>", vrInfo));
+					sb.append("Наименование показателей<p>");
+					for (int i = 0; i < pokaz.size(); i++) {
+						acrs.close();
+						acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", pokaz.get(i));
+						if (!acrs.getResultSet().next())
+							throw new KmiacServerException("Mark info info not found.");
+						sb.append(String.format("%d: %s<p>", i + 1, acrs.getResultSet().getString(1)));
+					}
+					sb.append(String.format("Дата направления: %1$td.%1$tm.%1$tY<p>", new Date(System.currentTimeMillis())));
+					sb.append("Подпись врача:<p>");
+				sb.append("</td>");
+			sb.append("</tr>");
+			sb.append("</table>");
+			
+			sb.append("</div>");
+			sb.append("</body>");
+			sb.append("</html>");
+			
+			acrs.close();
+			osw.write(sb.toString());
+			return "e:\\111.htm";
+		} catch (SQLException | IOException | KmiacServerException e) {
+			throw new TException();
+//			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public String printIsslPokaz(int kodVidIssl, int userId, int npasp,
+			String kodSyst, List<String> pokaz) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_lds(int clpu) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_lds WHERE clpu = ? ", clpu)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_m00(int clpu) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT m.pcod, m.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod != ? ", clpu)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_lds_n_m00(int clpu) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT l.pcod,l.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod = ? ", clpu)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public String printNapr(int npasp, int userId, String obosnov, int clpu) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String printNaprKons(int npasp, int userId, String obosnov, int cpol) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String printVypis(int npasp, int pvizitAmbId, int userId) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String printKek(int npasp, int pvizitAmbId) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

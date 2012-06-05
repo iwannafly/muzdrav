@@ -380,6 +380,13 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
+	 * Получае список данных. 
+	 */
+	public List<T> getData() {
+		return lst;
+	}
+	
+	/**
 	 * Генерирует модель.
 	 */
 	private void setModel() {

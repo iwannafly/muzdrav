@@ -2,9 +2,13 @@ package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -134,7 +138,7 @@ public class PrintForm extends JFrame{
 		
 		
 		
-		 cbSys = new ThriftStringClassifierCombobox<>(false);
+		 cbSys = new ThriftStringClassifierCombobox<>(true);
 		 cbSys.addActionListener(new ActionListener() {
 		 	public void actionPerformed(ActionEvent e) {
 				try {
@@ -149,6 +153,49 @@ public class PrintForm extends JFrame{
 				}	
 }
 		 });
+		
+		JButton btnNewButton = new JButton("Печать");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if (rbMethods.isSelected()){
+					if ((cbVidIssl.getSelectedItem() != null) && (tabMet.getSelectedItem() != null)) {
+						List<String> selItems = new ArrayList<>();
+						for (PokazMet pokazMet : tabPokazMet.getData()) {
+							if (pokazMet.vybor)
+								selItems.add(pokazMet.getPcod());
+						}
+						if (selItems.size() != 0) {
+							String servPath = MainForm.tcl.printIsslMetod(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), tabMet.getSelectedItem().getObst(), selItems);
+							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+						}
+					}
+				}
+				/*if (rbPokaz.isSelected()){
+					if ((cbVidIssl.getSelectedItem() != null) && (cbSys.getSelectedItem() != null)) {
+						List<String> selItems = new ArrayList<>();
+						for (Pokaz pokaz : tabPokaz.getData()) {
+							if (pokaz.vybor)
+								selItems.add(pokaz.getPcod());
+						}
+						if (selItems.size() != 0) {
+							String servPath = MainForm.tcl.printIsslPokaz(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), cbSys.getSelectedItem().pcod, selItems);
+							String cliPath = File.createTempFile(null, null).getAbsolutePath();
+							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+						}
+					}
+				}*/	
+				}
+					catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		
 		
 		
@@ -187,7 +234,10 @@ public class PrintForm extends JFrame{
 										.addComponent(lblSys, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(cbSys, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())))
+							.addContainerGap())
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(btnNewButton)
+							.addContainerGap(791, Short.MAX_VALUE))))
 		);
 		gl_pNaprIssl.setVerticalGroup(
 			gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
@@ -216,7 +266,9 @@ public class PrintForm extends JFrame{
 							.addGap(8)
 							.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
 						.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
-					.addGap(200))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnNewButton)
+					.addGap(181))
 		);
 		
 		tabPokaz = new CustomTable<>(false, true, Pokaz.class, 0,"Код показателя",1,"Наименование",2,"Стоимость",5,"Выбор");
@@ -255,6 +307,6 @@ public class PrintForm extends JFrame{
 		pNaprIssl.setLayout(gl_pNaprIssl);
 		getContentPane().setLayout(groupLayout);
 		
-		rbMethods.setSelected(true);
+		rbMethods.doClick();
 	}
 }
