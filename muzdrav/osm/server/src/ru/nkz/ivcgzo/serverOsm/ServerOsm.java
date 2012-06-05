@@ -729,7 +729,7 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws TException {
+	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws KmiacServerException, TException {
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\111.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -741,52 +741,56 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("<title>Направление на…</title>");
 				sb.append("<style type=\"text/css\">");
 					sb.append("table, td { border:1px solid black; border-collapse:collapse; }");
+					sb.append("td.c1 { width:40%; }");
+					sb.append("td.c2 { width:60%; }");
 				sb.append("</style>");
 			sb.append("</head>");
 			sb.append("<body>");
 			sb.append("<div>");
 			
-			sb.append("<table border=\"1\">");
-			sb.append("<tr>");
-				sb.append("<td>");
-					sb.append("<h1>Информация для пациента<p></h1>");
-					sb.append("Место:<p>");
-					sb.append("Каб. №:<p>");
-					sb.append("Дата:<p>");
-					sb.append("Время:<p>");
-					sb.append("Подготовка:<p>");
+			sb.append("<table cellpadding=\"5\">");
+			sb.append("<tr valign=\"top\">");
+				sb.append("<td class=\"c1\">");
+					sb.append("<h3>Информация для пациента:</h3>");
+					sb.append("<b>Место:</b><br />");
+					sb.append("<b>Каб. №:</b><br />");
+					sb.append("<b>Дата:</b><br />");
+					sb.append("<b>Время:</b><br />");
+					sb.append("<b>Подготовка:</b><br />");
 				sb.append("</td>");
 				acrs = sse.execPreparedQuery("SELECT n.name, m.name, v.fam, v.im, v.ot FROM s_users u JOIN n_n00 n ON (n.pcod = u.cpodr) JOIN n_m00 m ON (m.pcod = n.clpu) JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", userId);
 				if (!acrs.getResultSet().next())
 					throw new KmiacServerException("Logged user info not found.");
-				sb.append("<td>");
-					sb.append(String.format("<h1>%s<p>", acrs.getResultSet().getString(1)));
-					sb.append(String.format("%s<p></h1>", acrs.getResultSet().getString(2)));
+				sb.append("<td class=\"c2\">");
+					sb.append(String.format("<h3>%s<br />", acrs.getResultSet().getString(1)));
+					sb.append(String.format("%s<br />", acrs.getResultSet().getString(2)));
 					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), acrs.getResultSet().getString(5));
 					acrs.close();
 					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", kodVidIssl);
 					if (!acrs.getResultSet().next())
 						throw new KmiacServerException("Exam info info not found.");
-					sb.append(String.format("Направление на: %s<p>", acrs.getResultSet().getString(1)));
+					sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
 					acrs.close();
 					acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", npasp);
 					if (!acrs.getResultSet().next())
 						throw new KmiacServerException("Logged user info not found.");
-					sb.append(String.format("ФИО пациента: %s %s %s<p>", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-					sb.append(String.format("Дата рождения: %1$td.%1$tm.%1$tY<p>", acrs.getResultSet().getDate(4)));
-					sb.append(String.format("Адрес: %s, %s<p>", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
-					sb.append("Диагноз:<p>");
-					sb.append(String.format("Врач: %s<p>", vrInfo));
-					sb.append("Наименование показателей<p>");
+					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
+					sb.append("<b>Диагноз:</b><br />");
+					sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
+					sb.append("<h3>Наименование показателей</h3>");
+					sb.append("<p>");
 					for (int i = 0; i < pokaz.size(); i++) {
 						acrs.close();
 						acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", pokaz.get(i));
 						if (!acrs.getResultSet().next())
 							throw new KmiacServerException("Mark info info not found.");
-						sb.append(String.format("%d: %s<p>", i + 1, acrs.getResultSet().getString(1)));
+						sb.append(String.format("%d. %s<br />", i + 1, acrs.getResultSet().getString(1)));
 					}
-					sb.append(String.format("Дата направления: %1$td.%1$tm.%1$tY<p>", new Date(System.currentTimeMillis())));
-					sb.append("Подпись врача:<p>");
+					sb.append("<p>");
+					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+					sb.append("<b>Подпись врача:</b><br />");
 				sb.append("</td>");
 			sb.append("</tr>");
 			sb.append("</table>");
@@ -799,8 +803,7 @@ public class ServerOsm extends Server implements Iface {
 			osw.write(sb.toString());
 			return "e:\\111.htm";
 		} catch (SQLException | IOException | KmiacServerException e) {
-			throw new TException();
-//			throw new KmiacServerException();
+			throw new KmiacServerException();
 		}
 	}
 
