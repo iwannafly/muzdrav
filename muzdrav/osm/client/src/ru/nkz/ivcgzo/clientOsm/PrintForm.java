@@ -166,7 +166,7 @@ public class PrintForm extends JFrame{
 						}
 						if (selItems.size() != 0) {
 							String servPath = MainForm.tcl.printIsslMetod(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), tabMet.getSelectedItem().getObst(), selItems);
-							String cliPath = File.createTempFile(null, null).getAbsolutePath();
+							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						}
 					}
@@ -291,9 +291,5 @@ public class PrintForm extends JFrame{
 		getContentPane().setLayout(groupLayout);
 		
 		rbMethods.doClick();
-	}
-
-
-	private void ttttt() {
 	}
 }

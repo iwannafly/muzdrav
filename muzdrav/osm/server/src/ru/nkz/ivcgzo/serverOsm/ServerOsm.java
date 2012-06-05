@@ -97,8 +97,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "vidp",        "timepn",   "fam",        "im",         "ot",         "poms_ser",   "poms_nom");
 		zapVrTypes = new Class<?>[] {                  Integer.class, Integer.class, Time.class, String.class, String.class, String.class, String.class, String.class};
 		
-		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "ztext",      "dataz",    "id_etal");
-		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, Integer.class};
+		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "id_etal",     "recomend");
+		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, Integer.class, String.class};
 		
 		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr");
 		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
@@ -121,8 +121,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class};
 		
 		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "npasp",       "nisl",        "kodisl",     "stoim");
 		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, String.class, Double.class};
@@ -822,8 +822,8 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<IntegerClassifier> get_n_m00() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT m.pcod, m.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod != ? ", 20)) {
+	public List<IntegerClassifier> get_n_m00(int clpu) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT m.pcod, m.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod != ? ", clpu)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -837,5 +837,29 @@ public class ServerOsm extends Server implements Iface {
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
+	}
+
+	@Override
+	public String printNapr(int npasp, int userId, String obosnov, int clpu) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String printNaprKons(int npasp, int userId, String obosnov, int cpol) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String printVypis(int npasp, int pvizitAmbId, int userId) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String printKek(int npasp, int pvizitAmbId) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
