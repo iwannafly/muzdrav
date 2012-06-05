@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -227,6 +228,9 @@ public class ServerRegPatient extends Server implements Iface {
             final ITransactedSqlExecutor tse) {
         super(sse, tse);
 
+        //Инициализация логгера с конфигом из файла ../../manager/log4j.xml;
+        DOMConfigurator.configure("log4j.xml");
+
         rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
         qgPatientBrief = new QueryGenerator<PatientBrief>(PatientBrief.class,
@@ -429,8 +433,7 @@ public class ServerRegPatient extends Server implements Iface {
                 new ThriftRegPatient.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(
                 new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-        System.out.println("12132123132123123132");
-
+        log.info("Start serverReg Patient");
         thrServ.serve();
     }
 
@@ -441,6 +444,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final void stop() {
         if (thrServ != null) {
             thrServ.stop();
+            log.info("Stop serverReg Patient");
         }
     }
 
@@ -454,7 +458,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "adm_obl, adm_gorod, adm_ul, adm_dom, adm_kv "
                 + "FROM patient";
         InputData inData = qgPatientBrief.genSelect(patient, sqlQuery);
-        sqlQuery = inData.getQueryText() + " ORDER BY fam, im, ot";
+        sqlQuery = inData.getQueryText() + " ORDER11 BY fam, im, ot";
         int[] indexes = inData.getIndexes();
         try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(sqlQuery, patient,
                 PATIENT_BRIEF_TYPES, indexes)) {
@@ -474,6 +478,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
