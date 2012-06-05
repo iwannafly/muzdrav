@@ -154,10 +154,11 @@ public class PrintForm extends JFrame{
 }
 		 });
 		
-		JButton btnNewButton = new JButton("New button");
+		JButton btnNewButton = new JButton("Печать");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (rbMethods.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) && (tabMet.getSelectedItem() != null)) {
 						List<String> selItems = new ArrayList<>();
 						for (PokazMet pokazMet : tabPokazMet.getData()) {
@@ -170,7 +171,23 @@ public class PrintForm extends JFrame{
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						}
 					}
-				} catch (TException e1) {
+				}
+				/*if (rbPokaz.isSelected()){
+					if ((cbVidIssl.getSelectedItem() != null) && (cbSys.getSelectedItem() != null)) {
+						List<String> selItems = new ArrayList<>();
+						for (Pokaz pokaz : tabPokaz.getData()) {
+							if (pokaz.vybor)
+								selItems.add(pokaz.getPcod());
+						}
+						if (selItems.size() != 0) {
+							String servPath = MainForm.tcl.printIsslPokaz(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), cbSys.getSelectedItem().pcod, selItems);
+							String cliPath = File.createTempFile(null, null).getAbsolutePath();
+							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+						}
+					}
+				}*/	
+				}
+					catch (TException e1) {
 					e1.printStackTrace();
 					MainForm.conMan.reconnect(e1);
 				} catch (Exception e1) {
