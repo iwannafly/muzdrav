@@ -24,7 +24,11 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.IsslMet;
+import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
+import ru.nkz.ivcgzo.thriftOsm.Napr;
+import ru.nkz.ivcgzo.thriftOsm.NaprKons;
 import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
@@ -193,6 +197,11 @@ public class ServerOsm extends Server implements Iface {
 //		List<Metod> met = getMetod(1);
 //		List<PokazMet> pokMet = getPokazMet("50.01.001");
 //		List<Pokaz> pok = getPokaz(1, "05");
+		
+//		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//		List<Pvizit> pvl = getPvizitInfo(2, sdf.parse("01.01.2012").getTime(), sdf.parse("02.02.2012").getTime());
+//		List<PvizitAmb> pal = getPvizitAmb(6);
+		
 
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -729,7 +738,7 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public String printIsslMetod(int kodVidIssl, int userId, int npasp, String kodMetod, List<String> pokaz) throws KmiacServerException, TException {
+	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\111.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -739,39 +748,34 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<head>");
 				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
 				sb.append("<title>Направление на…</title>");
-				sb.append("<style type=\"text/css\">");
-					sb.append("table, td { border:1px solid black; border-collapse:collapse; }");
-					sb.append("td.c1 { width:40%; }");
-					sb.append("td.c2 { width:60%; }");
-				sb.append("</style>");
 			sb.append("</head>");
 			sb.append("<body>");
 			sb.append("<div>");
 			
-			sb.append("<table cellpadding=\"5\">");
+			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
 			sb.append("<tr valign=\"top\">");
-				sb.append("<td class=\"c1\">");
+				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
 					sb.append("<h3>Информация для пациента:</h3>");
-					sb.append("<b>Место:</b><br />");
-					sb.append("<b>Каб. №:</b><br />");
+					sb.append(String.format("<b>Место: </b>%s<br />", im.getMesto()));
+					sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
 					sb.append("<b>Дата:</b><br />");
 					sb.append("<b>Время:</b><br />");
 					sb.append("<b>Подготовка:</b><br />");
 				sb.append("</td>");
-				acrs = sse.execPreparedQuery("SELECT n.name, m.name, v.fam, v.im, v.ot FROM s_users u JOIN n_n00 n ON (n.pcod = u.cpodr) JOIN n_m00 m ON (m.pcod = n.clpu) JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", userId);
+				acrs = sse.execPreparedQuery("SELECT n.name, m.name, v.fam, v.im, v.ot FROM s_users u JOIN n_n00 n ON (n.pcod = u.cpodr) JOIN n_m00 m ON (m.pcod = n.clpu) JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", im.getUserId());
 				if (!acrs.getResultSet().next())
 					throw new KmiacServerException("Logged user info not found.");
-				sb.append("<td class=\"c2\">");
+				sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
 					sb.append(String.format("<h3>%s<br />", acrs.getResultSet().getString(1)));
 					sb.append(String.format("%s<br />", acrs.getResultSet().getString(2)));
 					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), acrs.getResultSet().getString(5));
 					acrs.close();
-					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", kodVidIssl);
+					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", im.getKodVidIssl());
 					if (!acrs.getResultSet().next())
 						throw new KmiacServerException("Exam info info not found.");
 					sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
 					acrs.close();
-					acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", npasp);
+					acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", im.getNpasp());
 					if (!acrs.getResultSet().next())
 						throw new KmiacServerException("Logged user info not found.");
 					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
@@ -779,16 +783,16 @@ public class ServerOsm extends Server implements Iface {
 					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
 					sb.append("<b>Диагноз:</b><br />");
 					sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
-					sb.append("<h3>Наименование показателей</h3>");
-					sb.append("<p>");
-					for (int i = 0; i < pokaz.size(); i++) {
+					sb.append("<h3>Наименование показателей:</h3>");
+					sb.append("<ol>");
+					for (String str : im.getPokaz()) {
 						acrs.close();
-						acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", pokaz.get(i));
+						acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", str);
 						if (!acrs.getResultSet().next())
 							throw new KmiacServerException("Mark info info not found.");
-						sb.append(String.format("%d. %s<br />", i + 1, acrs.getResultSet().getString(1)));
+						sb.append(String.format("<li>%s</li>", acrs.getResultSet().getString(1)));
 					}
-					sb.append("<p>");
+					sb.append("</ol>");
 					sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 					sb.append("<b>Подпись врача:</b><br />");
 				sb.append("</td>");
@@ -808,9 +812,7 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public String printIsslPokaz(int kodVidIssl, int userId, int npasp,
-			String kodSyst, List<String> pokaz) throws KmiacServerException,
-			TException {
+	public String printIsslPokaz(IsslPokaz ip) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -843,13 +845,13 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public String printNapr(int npasp, int userId, String obosnov, int clpu) throws KmiacServerException, TException {
+	public String printNapr(Napr na) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public String printNaprKons(int npasp, int userId, String obosnov, int cpol) throws KmiacServerException, TException {
+	public String printNaprKons(NaprKons nk) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -864,5 +866,20 @@ public class ServerOsm extends Server implements Iface {
 	public String printKek(int npasp, int pvizitAmbId) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<PdiagZ> getPdiagZ(int id_diag) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Pvizit> getPvizitInfo(int npasp, long datan, long datak) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE npasp = ? AND datao BETWEEN ? AND ? ", npasp, new Date(datan), new Date(datak))) {
+			return rsmPvizit.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 }

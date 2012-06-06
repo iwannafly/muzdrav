@@ -175,7 +175,16 @@ struct PdiagZ{
 	3: string diag;
 	4: string named;
 	5: i64 datad;
-	6: i32 nmvd;
+	6: i32 cpodr;
+	7: i64 d_post;
+	8: i32 d_grup;
+	9: i32 d_ish;
+	10: i64 dataish;
+	11: i64 datag;
+	12: string diag_s;
+	13: i32 d_grup_s;
+	14: i32 cod_sp;
+	15: string cdol_ot;
 }
 
 struct PatientCommonInfo {
@@ -357,6 +366,42 @@ struct Prez_l {
 }
 
 
+struct IsslMet {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct IsslPokaz {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct Napr{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 clpu;
+}
+
+struct NaprKons{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 cpol;
+}
+
+
+
 exception PvizitNotFoundException {
 }
 
@@ -396,13 +441,14 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 
-	Psign getPsign(1: i32 signId) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
+	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
 	void setPsign(1: Psign sign) throws (1: kmiacServer.KmiacServerException kse);
 
 	Priem getPriem(1: i32 obrId, 2: i32 npasp, 3: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	list<PdiagZ> getPdiagZ(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
@@ -412,10 +458,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
 
-	string printIsslMetod(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodMetod, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
-	string printIsslPokaz(1: i32 kodVidIssl, 2: i32 userId, 3: i32 npasp, 4: string kodSyst, 5: list<string> pokaz) throws (1: kmiacServer.KmiacServerException kse);
-	string printNapr(1: i32 npasp, 2: i32 userId, 3: string obosnov, 4: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
-	string printNaprKons(1: i32 npasp, 2: i32 userId, 3: string obosnov, 4: i32 cpol) throws (1: kmiacServer.KmiacServerException kse);//консультация
+	
+	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
+	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
+	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
+	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
 	string printVypis(1: i32 npasp, 2: i32 pvizitAmbId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -445,6 +492,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
+	list<Pvizit> getPvizitInfo(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	list<RdSlStruct> getRdSlInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
