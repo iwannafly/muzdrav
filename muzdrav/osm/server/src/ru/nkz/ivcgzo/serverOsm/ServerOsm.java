@@ -197,6 +197,11 @@ public class ServerOsm extends Server implements Iface {
 //		List<Metod> met = getMetod(1);
 //		List<PokazMet> pokMet = getPokazMet("50.01.001");
 //		List<Pokaz> pok = getPokaz(1, "05");
+		
+//		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//		List<Pvizit> pvl = getPvizitInfo(2, sdf.parse("01.01.2012").getTime(), sdf.parse("02.02.2012").getTime());
+//		List<PvizitAmb> pal = getPvizitAmb(6);
+		
 
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -861,5 +866,20 @@ public class ServerOsm extends Server implements Iface {
 	public String printKek(int npasp, int pvizitAmbId) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<PdiagZ> getPdiagZ(int id_diag) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Pvizit> getPvizitInfo(int npasp, long datan, long datak) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE npasp = ? AND datao BETWEEN ? AND ? ", npasp, new Date(datan), new Date(datak))) {
+			return rsmPvizit.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 }
