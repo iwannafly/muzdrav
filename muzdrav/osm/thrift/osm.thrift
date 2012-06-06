@@ -29,9 +29,10 @@ struct Pvizit {
 	9: i32 cod_sp;
 	10: string cdol;
 	11: i32 cuser;
-	12: string ztext;
+	12: string zakl;
 	13: i64 dataz;
 	14: i32 idzab;
+	15: string recomend;
 }
 
 struct PvizitAmb {
@@ -92,6 +93,8 @@ struct Psign{
 	12: string gemotr;
 	13: string nasl;
 	14: string ginek;
+	15: string priem_lek;
+	16: string prim_gorm;
 }
 
 struct Priem{
@@ -161,6 +164,9 @@ struct Priem{
 	64: string t_st_localis;
 	65: string t_ocenka;
 	66: string t_jalob;
+	67: string t_ist_zab;
+	68: string t_status_praesense;
+	69: string t_fiz_obsl;
 }
 
 struct PdiagZ{
@@ -333,6 +339,7 @@ struct P_isl_ld {
 	 8: i32 vrach;
 	 9: string diag;
 	10: i64 dataz;
+	11: i32 pvizit_id;
 }
 
 struct Prez_d {
@@ -349,6 +356,40 @@ struct Prez_l {
 	4: double stoim;
 }
 
+
+struct IsslMet {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct IsslPokaz {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct Napr{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 clpu;
+}
+
+struct NaprKons{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 cpol;
+}
 
 exception PvizitNotFoundException {
 }
@@ -404,7 +445,15 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+
 	
+	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
+	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
+	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
+	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
+	string printVypis(1: i32 npasp, 2: i32 pvizitAmbId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
+	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
+
 
 //classifiers
 	list<classifier.IntegerClassifier> get_n_z30() throws (1: kmiacServer.KmiacServerException kse);
@@ -423,6 +472,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_p0e1() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_nz1(1: i32 c_p0e1) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info

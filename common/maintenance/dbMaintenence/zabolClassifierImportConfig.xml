@@ -2,6 +2,7 @@
 	<srcBase type="oracle" host="oracle.ivcgzo.nkz.ru" port="1521" schema="ORCL" name="NSF" login="talon" password="xtalon" tempDir="\\10.0.0.186\SomeSharedResource" />
 	<dstBase host="10.0.0.66" port="5432" schema="public" name="zabol" login="postgres" password="postgres" tempDir="\\10.0.0.186\SomeSharedResource" />
 	<tableList>
+		<table srcName="A00" dstName="n_a00" />
 		<table srcName="ABB" dstName="n_abb" />
 		<table srcName="ABC" dstName="n_abc" />
 		<table srcName="ABS" dstName="n_abs" />
@@ -20,6 +21,7 @@
 		<table srcName="AREZ" dstName="n_arez" />
 		<table srcName="AZ0" dstName="n_az0" />
 		<table srcName="AZ9" dstName="n_az9" />
+		<table srcName="B00" dstName="n_b00" />
 		<table srcName="C00" dstName="n_c00" />
 		<table srcName="EDD" dstName="n_edd" />
 		<table srcName="FRM" dstName="n_frm" />

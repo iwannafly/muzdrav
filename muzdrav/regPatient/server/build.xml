@@ -16,7 +16,7 @@
 		</fileset>
 		<pathelement path="${bin_server_manager.dir}" />
 	</path>
-
+	
 	<property name="build.classpath" refid="build.classpath" />
 
 	<!-- Очистка директорий -->
@@ -40,7 +40,8 @@
 
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description="Создание jar">
-		<jar destfile="${export.dir}" basedir="${build.dir}" />
+		<jar destfile="${export.dir}" basedir="${build.dir}" > 
+		</jar>
 	</target>
 
 	<target name="main" depends="jar">

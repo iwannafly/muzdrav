@@ -21,6 +21,7 @@ import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
+import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
@@ -257,20 +258,26 @@ public class TestServerRegPatient {
     @Test
     public final void getGosp_isFieldValueCorrect()
             throws TException, GospNotFoundException {
-        final int ngosp = 1;
+        final int id = 1;
         Gosp testGosp =
-                testServer.getGosp(ngosp);
+                testServer.getGosp(id);
         assertEquals("npasp value", 2, testGosp.getNpasp());
     }
 
-//    @Test
-//    public final void addGosp_isGospActuallyAdded()
-//            throws TException, GospNotFoundException {
-//        final int ngosp = 1;
-//        Gosp testGosp = new Gosp();
-//        testGosp.ngosp = 3;
-//        assertEquals("npasp value", 2, testGosp.getNpasp());
-//    }
+    @Test
+    public final void addGosp_isGospActuallyAdded()
+            throws TException, GospNotFoundException, GospAlreadyExistException {
+        final int id = 1;
+        Gosp testGosp = testServer.getGosp(id);
+        testGosp.ngosp = 3;
+        System.out.println(testGosp.npasp);
+        System.out.println(testGosp.nist);
+        System.out.println(testGosp.datap);
+        System.out.println(testGosp.vremp);
+        System.out.println(testGosp.naprav);
+        System.out.println(testGosp.pl_extr);
+        int i = testServer.addGosp(testGosp);
+    }
 
     @Test
     public final void isPatientExist_isThrowAlreadyExistException()
