@@ -65,6 +65,37 @@ public class FormPostBer extends JFrame {
     private int iw3;
     private String oslname;
     private String oslcode;
+    private FormRdInf inform;
+    JSpinner SRost;
+    JSpinner SVes;
+    JSpinner SDcp;
+    JSpinner SDcr;
+    JSpinner SDtroch;
+    JSpinner SCext;
+    JSpinner SindSol;
+    JSpinner SDataPos;
+    JSpinner SParRod;
+    JSpinner SKolBer;
+    JSpinner SDataOsl;
+    JSpinner SYavka;
+    JSpinner SDataM;
+    JSpinner SKolAb;
+    JSpinner SVozMen;
+    JSpinner SMenC;
+    JSpinner SKolDet;
+    JSpinner SPolJ;
+    JSpinner SDataSn;
+    JComboBox CBPrishSn;
+    JComboBox CBRod;
+    JComboBox CBOslAb;
+    JCheckBox CBKrov; 
+    JCheckBox CBEkl; 
+    JCheckBox CBGnoin; 
+    JCheckBox CBTromb; 
+    JCheckBox CBKesar; 
+    JCheckBox CBAkush; 
+    JCheckBox CBIiiiv; 
+    JCheckBox CBRazrProm; 
 	/**
 	 * Launch the application.
 	 */
@@ -175,7 +206,7 @@ public class FormPostBer extends JFrame {
 		
 		JLabel LOslAb = new JLabel("Осложнение после предыдущего аборта");
 		
-		JLabel LDataOsl = new JLabel("Дата осложнения");
+		JLabel LDataOsl = new JLabel("Дата первого шевеления плода");
 		
 		JLabel LDataMes = new JLabel("Дата последних месячных");
 		
@@ -223,7 +254,7 @@ public class FormPostBer extends JFrame {
 		
 		JLabel LIndSol = new JLabel("Индекс Соловьева");
 		
-		final JSpinner SRost = new JSpinner();
+		SRost = new JSpinner();
 		SRost.setModel(new SpinnerNumberModel(new Integer(rdsl.rost), new Integer(140), null, new Integer(1)));
 		rdsl.setAbort((int) SRost.getModel().getValue());
 		
@@ -437,6 +468,50 @@ public class FormPostBer extends JFrame {
 			rdsl.setOslAb(oslcode);
 			}
 		});
+		
+		JButton btnNewButton = new JButton("Постановка на учет");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					RdSlStruct rdsl = new RdSlStruct();
+					rdsl.setCext(11);
+					rdsl.setDsp(25);
+					rdsl.setDsr(28);
+					rdsl.setDTroch(31);
+					rdsl.setIndSol(15);
+					rdsl.setKolRod(0);
+					rdsl.setKolpr(0);
+					rdsl.setAbort(0);
+					rdsl.setDeti(0);
+					rdsl.setYavka1(4);
+					rdsl.setVozMen(11);
+					rdsl.setPrmen(28);
+					rdsl.setPolj(18);
+					rdsl.setRost(160);
+					rdsl.setVesd(60);
+					rdsl.setDataM(System.currentTimeMillis());
+					rdsl.setDatay(System.currentTimeMillis());
+					rdsl.setDataosl(System.currentTimeMillis());
+					rdsl.setDatasn(System.currentTimeMillis());
+					MainForm.tcl.AddRdSl(rdsl);
+					setPostBerData(rdsl);
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				}
+			}
+		});
+//		inform = new FormRdInf;
+		JButton button = new JButton("Дополнительная информация");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				inform.setVisible(true);
+			}
+		});
+
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -487,14 +562,18 @@ public class FormPostBer extends JFrame {
 								.addComponent(SKolDet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-									.addComponent(SPolJ, Alignment.LEADING)
-									.addComponent(SMenC, Alignment.LEADING)
+									.addComponent(SPolJ, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addComponent(SMenC, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addComponent(SVozMen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 47, Short.MAX_VALUE)))))
 					.addGap(18)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 222, GroupLayout.PREFERRED_SIZE)
 						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE)
-						.addComponent(ButSave))
+						.addComponent(ButSave)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(btnNewButton)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button)))
 					.addGap(139))
 		);
 		gl_panel.setVerticalGroup(
@@ -575,16 +654,19 @@ public class FormPostBer extends JFrame {
 							.addGap(16)
 							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 								.addComponent(LPrish)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-									.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addComponent(ButSave)))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(LDataSn, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SDataSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(14)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnNewButton)
+								.addComponent(button))))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(LDataSn, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+						.addComponent(SDataSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(ButSave))
 					.addContainerGap(123, Short.MAX_VALUE))
 		);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
@@ -688,5 +770,26 @@ public class FormPostBer extends JFrame {
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);
+	}
+	
+	private void setPostBerData(RdSlStruct rdsl) {
+		SRost.setValue(rdsl.getRost());
+		SVes.setValue(rdsl.getVesd());
+		SDcp.setValue(rdsl.getDsp());
+		SDcr.setValue(rdsl.getDsr());
+		SDtroch.setValue(rdsl.getDTroch());
+		SCext.setValue(rdsl.getCext());
+		SindSol.setValue(rdsl.getIndSol());
+		SDataPos.setValue(rdsl.getDatay());
+		SParRod.setValue(rdsl.getKolRod());
+		SKolBer.setValue(rdsl.getKolpr());
+		SDataOsl.setValue(rdsl.getDataosl());
+		SYavka.setValue(rdsl.getYavka1());
+		SDataM.setValue(rdsl.getDataM());
+		SKolAb.setValue(rdsl.getAbort());
+		SVozMen.setValue(rdsl.getVozMen());
+		SMenC.setValue(rdsl.getPrmen());
+		SKolDet.setValue(rdsl.getDeti());
+		SPolJ.setValue(rdsl.getPolj());
 	}
 }

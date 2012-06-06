@@ -144,6 +144,11 @@ public class FormRdDin extends JFrame {
 		JPanel panel_2 = new JPanel();
 		
 		JButton Nbutton = new JButton("Новое посещение");
+		Nbutton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		
 		final JSpinner SPdad = new JSpinner();
 		SPdad.setModel(new SpinnerNumberModel(new Integer(rddin.art1), null,new Integer(220),new Integer(1)));

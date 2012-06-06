@@ -25,9 +25,14 @@ import java.awt.Color;
 import javax.swing.JOptionPane;
 
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-//import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
@@ -84,6 +89,8 @@ public class FormRdInf extends JFrame {
     private String namobr;
     private int codsem;
     private String namsem;
+	private int npasp;
+//	private ThriftStringClassifierCombobox<StringClassifier> namobr;
 
 	/**
 	 * Launch the application.
@@ -210,6 +217,7 @@ public class FormRdInf extends JFrame {
 		
 		JPanel panel_1 = new JPanel();
 		
+///		namobr = new ThriftIntegerClassifierCombobox<>(true);
 		final JComboBox CBObr = new JComboBox();
 		CBObr.setModel(new DefaultComboBoxModel(new String[] {"Начальное", "Среднее", "Среднее специальное", "Незаконченное высшее", "Высшее"}));
 		CBObr.setSelectedItem(namobr);
@@ -222,6 +230,25 @@ public class FormRdInf extends JFrame {
 		JPanel panel_3 = new JPanel();
 		
 		JButton Sbutton = new JButton("Сохранить");
+		
+		JButton btnNewButton = new JButton("Новая запись");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					RdInfStruct rdinf = new RdInfStruct();
+					rdinf.setNpasp(npasp);
+					MainForm.tcl.AddRdInf(rdinf);
+					setRdInfData(rdinf);
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(FormRdInf.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				}
+			}
+
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -247,8 +274,10 @@ public class FormRdInf extends JFrame {
 							.addGap(100)
 							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(113)
-							.addComponent(Sbutton)))
+							.addGap(111)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnNewButton)
+								.addComponent(Sbutton))))
 					.addGap(77))
 		);
 		gl_panel.setVerticalGroup(
@@ -273,14 +302,16 @@ public class FormRdInf extends JFrame {
 								.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+							.addComponent(btnNewButton)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(27)
-							.addComponent(Sbutton)))
-					.addContainerGap())
+							.addComponent(Sbutton)
+							.addGap(48))))
 		);
 		
 		JLabel lblNewLabel_1 = new JLabel("Информация об отце ребенка");
@@ -557,9 +588,47 @@ rdinf.setOSocO(oslrod);
 rdinf.setUslPr(uslj);
 rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
-//rdinf.setGrOtec(TGrk.getText());
+//rdinf.setGrOtec(TGrk.getText());//классификатор
 rdinf.setPhOtec(TPhf.getText());
 			}
 		});
 	}
+
+	protected void setRdInfData(RdInfStruct rdinf2) {
+		// TODO Auto-generated method stub
+		
+	}
+/*
+	public void onConnect() {
+		try {
+//			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
+			namobr.setData(MainForm.tcl.getZ00());
+			cbrez.setData(MainForm.tcl.getR0Z());
+//			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
+			
+		} catch (KmiacServerException | TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadConfig() {
+		try {
+			StringReader sr = new StringReader(MainForm.authInfo.config);
+			StreamSource src = new StreamSource(sr);
+			DOMResult res = new DOMResult();
+			TransformerFactory.newInstance().newTransformer().transform(src, res);
+			Document document = (Document) res.getNode();
+					if (getElement(document, "jalob_dyh")!=null){
+						JEditorPane tpJalobd = new JEditorPane();
+						Jalob.add(tpJalobd);
+											
+			}
+					else {
+						
+					}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}*/
 }
