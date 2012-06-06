@@ -175,7 +175,16 @@ struct PdiagZ{
 	3: string diag;
 	4: string named;
 	5: i64 datad;
-	6: i32 nmvd;
+	6: i32 cpodr;
+	7: i64 d_post;
+	8: i32 d_grup;
+	9: i32 d_ish;
+	10: i64 dataish;
+	11: i64 datag;
+	12: string diag_s;
+	13: i32 d_grup_s;
+	14: i32 cod_sp;
+	15: string cdol_ot;
 }
 
 struct PatientCommonInfo {
@@ -391,6 +400,8 @@ struct NaprKons{
 	4: i32 cpol;
 }
 
+
+
 exception PvizitNotFoundException {
 }
 
@@ -430,13 +441,14 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 
-	Psign getPsign(1: i32 signId) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
+	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
 	void setPsign(1: Psign sign) throws (1: kmiacServer.KmiacServerException kse);
 
 	Priem getPriem(1: i32 obrId, 2: i32 npasp, 3: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	list<PdiagZ> getPdiagZ(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
@@ -480,6 +492,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
+	list<Pvizit> getPvizitInfo(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
+	list<PvizitAmb> getPvizitAmbInfo(1: i32 id_obr) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	list<RdSlStruct> getRdSlInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);

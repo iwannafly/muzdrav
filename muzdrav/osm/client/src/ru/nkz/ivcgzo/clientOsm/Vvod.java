@@ -2066,7 +2066,7 @@ public class Vvod extends JFrame {
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
 			TabPos.setData(MainForm.tcl.getPvizitAmb(6));
-			//TabDiag.setData(MainForm.tcl.getPdiagAmb(6));потом откомментарить
+			TabDiag.setData(MainForm.tcl.getPdiagAmb(6));
 			vid_opl.setData(MainForm.tcl.getOpl());
 			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
 			printform.cbMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
