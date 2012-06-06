@@ -52,6 +52,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
@@ -183,8 +184,6 @@ public class PacientInfoFrame extends JFrame {
 	private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
 	private CustomTable<AllGosp, AllGosp._Fields> tbl_priem;
 	
-	private PatientBrief newPatBr;
-	private AllGosp newPriem;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_status;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_ishod;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_tdoc;
@@ -198,6 +197,10 @@ public class PacientInfoFrame extends JFrame {
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_alk;
 	private ThriftStringClassifierCombobox <StringClassifier> cmb_naprav;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_org;
+	private PatientBrief newPatBr;
+	private AllGosp newPriem;
+	private Info pInfo;
+
 	/**
 	 * Launch the application.
 	 */
@@ -240,11 +243,29 @@ public class PacientInfoFrame extends JFrame {
 			cmb_naprav.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					try {
-						if (cmb_naprav.getSelectedPcod() == "Г")cmb_org.setData(MainForm.tcl.getAL0());
-						if (cmb_naprav.getSelectedPcod() == "К")cmb_org.setData(MainForm.tcl.getN00());
-						if (cmb_naprav.getSelectedPcod() == "Л")cmb_org.setData(MainForm.tcl.getM00());
-						if (cmb_naprav.getSelectedPcod() == "Р")cmb_org.setData(MainForm.tcl.getW04());
-						if (cmb_naprav.getSelectedPcod() == "Т")cmb_org.setData(MainForm.tcl.getO00());
+						if (cmb_naprav.getSelectedItem() != null) {
+//							if (cmb_naprav.getSelectedPcod().equals("Г"))cmb_org.setData(MainForm.tcl.getAL0());
+							switch (cmb_naprav.getSelectedPcod()) {
+							case "Г":
+								cmb_org.setData(MainForm.tcl.getAL0());
+								break;
+							case "К":
+								cmb_org.setData(MainForm.tcl.getN00());
+								break;
+							case "Л":
+								cmb_org.setData(MainForm.tcl.getM00());
+								break;
+							case "Р":
+								cmb_org.setData(MainForm.tcl.getW04());
+								break;
+							case "Т":
+								cmb_org.setData(MainForm.tcl.getO00());
+								break;
+							default:
+								cmb_org.setSelectedItem(null);
+								break;
+							}
+						}
 					} catch (TException e) {
 						e.printStackTrace();
 					} 
@@ -295,8 +316,7 @@ public class PacientInfoFrame extends JFrame {
 					changePatientSignInfo(curPatientId);
 				}
 				if (tbMain.getSelectedIndex() == 5) {
-					//tbl_priem.
-					changePatientPriemInfo(curPatientId);
+					selectAllPatientPriemInfo(curPatientId);
 				}
 			}
 		});
@@ -946,7 +966,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap())
 		);
 		
-		tbl_lgota =new CustomTable<>(true, false, Lgota.class, 3,"Дата",2,"Льгота",4,"Наименование");
+		tbl_lgota =new CustomTable<>(true, true, Lgota.class, 3,"Дата",2,"Льгота",4,"Наименование");
 		tbl_lgota.setDateField(0);
 		tbl_lgota.setFillsViewportHeight(true);
 		tbl_lgota.setPreferredWidths(75,75,490);
@@ -958,7 +978,6 @@ public class PacientInfoFrame extends JFrame {
 //			@Override
 //			public void valueChanged(ListSelectionEvent e) {
 //				if (!e.getValueIsAdjusting()) {
-//					  curPatientId = tbl_patient.getSelectedItem().npasp;
 //					  changePatientLgotaInfo(curPatientId);
 //				}
 //			}
@@ -988,9 +1007,10 @@ public class PacientInfoFrame extends JFrame {
 				    item.setNpasp(curPatientId);
 				    item.setLgota(tbl_lgota.getSelectedItem().lgota);
 				    item.setDatau(tbl_lgota.getSelectedItem().datau);
-				    item.setName(tbl_lgota.getSelectedItem().name);
-				    MainForm.tcl.addLgota(event.getItem());
-				    
+				    //item.setName(tbl_lgota.getSelectedItem().name);
+				    Info pInfo = MainForm.tcl.addLgota(event.getItem());
+				    tbl_lgota.getSelectedItem().setName(pInfo.getName());
+				    curId = pInfo.getId();
 				} catch (LgotaAlreadyExistException laee) {
 					laee.printStackTrace();
 					return false;
@@ -1117,7 +1137,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap())
 		);
 		
-		tbl_kateg =new CustomTable<>(true, false, Kontingent.class, 3,"Дата",2,"Категория",4,"Наименование");
+		tbl_kateg =new CustomTable<>(true, true, Kontingent.class, 3,"Дата",2,"Категория",4,"Наименование");
 		tbl_kateg.setDateField(0);
 		tbl_kateg.setPreferredWidths(75,75,490);
 		tbl_kateg.setFillsViewportHeight(true);
@@ -1158,8 +1178,10 @@ public class PacientInfoFrame extends JFrame {
 				    item.setNpasp(curPatientId);
 				    item.setKateg(tbl_kateg.getSelectedItem().kateg);
 				    item.setDatau(tbl_kateg.getSelectedItem().datau);
-				    item.setName(tbl_kateg.getSelectedItem().name);
-				    MainForm.tcl.addKont(event.getItem());
+//				    item.setName(tbl_kateg.getSelectedItem().name);
+				    Info pInfo = MainForm.tcl.addKont(event.getItem());
+				    tbl_kateg.getSelectedItem().setName(pInfo.getName());
+				    curId = pInfo.getId();
 				} catch (KontingentAlreadyExistException kaee) {
 					kaee.printStackTrace();
 					return false;
@@ -1858,9 +1880,9 @@ public class PacientInfoFrame extends JFrame {
 							.addContainerGap()
 							.addGroup(gl_tpPriem.createParallelGroup(Alignment.LEADING)
 								.addComponent(panel_24, GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
-								.addComponent(panel_23, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(panel_23, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)))
 						.addComponent(panel_25, GroupLayout.PREFERRED_SIZE, 689, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_tpPriem.createSequentialGroup()
+						.addGroup(Alignment.TRAILING, gl_tpPriem.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(panel_34, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
@@ -1899,11 +1921,11 @@ public class PacientInfoFrame extends JFrame {
 						.addGroup(gl_panel_34.createSequentialGroup()
 							.addGap(18)
 							.addComponent(lblNewLabel_62)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 103, Short.MAX_VALUE)
 							.addComponent(cbx_messr))
-						.addGroup(gl_panel_34.createSequentialGroup()
+						.addGroup(Alignment.TRAILING, gl_panel_34.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmb_cotd, 0, 335, Short.MAX_VALUE)))
+							.addComponent(cmb_cotd, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_34.setVerticalGroup(
@@ -1920,7 +1942,7 @@ public class PacientInfoFrame extends JFrame {
 								.addComponent(cbx_messr))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(cmb_cotd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(11, Short.MAX_VALUE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		
 		JLabel lblNewLabel_59 = new JLabel("от начала заболевания");
@@ -2057,7 +2079,7 @@ public class PacientInfoFrame extends JFrame {
 							.addComponent(panel_29, GroupLayout.PREFERRED_SIZE, 331, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_30, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addGroup(gl_panel_25.createSequentialGroup()
+						.addGroup(Alignment.TRAILING, gl_panel_25.createSequentialGroup()
 							.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(panel_33, 0, 0, Short.MAX_VALUE)
 								.addGroup(gl_panel_25.createSequentialGroup()
@@ -2065,26 +2087,26 @@ public class PacientInfoFrame extends JFrame {
 									.addComponent(panel_31, GroupLayout.PREFERRED_SIZE, 255, GroupLayout.PREFERRED_SIZE)
 									.addGap(18)
 									.addComponent(panel_32, GroupLayout.PREFERRED_SIZE, 145, GroupLayout.PREFERRED_SIZE)))
-							.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panel_25.createSequentialGroup()
 									.addGap(16)
 									.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING, false)
 										.addComponent(lblNewLabel_56)
 										.addComponent(lblNewLabel_57))
 									.addGap(113))
+								.addGroup(Alignment.TRAILING, gl_panel_25.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(cmb_trans, GroupLayout.PREFERRED_SIZE, 234, GroupLayout.PREFERRED_SIZE)
+										.addComponent(cmb_travm, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 234, GroupLayout.PREFERRED_SIZE)))
 								.addGroup(gl_panel_25.createSequentialGroup()
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING)
-										.addComponent(cmb_trans, 0, 234, Short.MAX_VALUE)
-										.addComponent(cmb_travm, 0, 234, Short.MAX_VALUE)))
-								.addGroup(gl_panel_25.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_panel_25.createParallelGroup(Alignment.LEADING, false)
 										.addGroup(gl_panel_25.createSequentialGroup()
 											.addGap(10)
 											.addComponent(lblNewLabel_58)
 											.addGap(50))
-										.addComponent(cmb_otkaz, 0, 234, Short.MAX_VALUE))))))
+										.addComponent(cmb_otkaz, GroupLayout.PREFERRED_SIZE, 234, GroupLayout.PREFERRED_SIZE))))))
 					.addContainerGap())
 		);
 		gl_panel_25.setVerticalGroup(
@@ -2195,8 +2217,6 @@ public class PacientInfoFrame extends JFrame {
 		);
 		panel_32.setLayout(gl_panel_32);
 		
-//		cmb_alk = new JComboBox<String>();
-
 		cbx_nalz = new JCheckBox("чесотка");
 		
 		cbx_nalp = new JCheckBox("педикулез");
@@ -2305,9 +2325,6 @@ public class PacientInfoFrame extends JFrame {
 		);
 		panel_29.setLayout(gl_panel_29);
 		
-//		cmb_naprav = new JComboBox<String>();
-//		cmb_org = new JComboBox<String>();
-
 		GroupLayout gl_panel_28 = new GroupLayout(panel_28);
 		gl_panel_28.setHorizontalGroup(
 			gl_panel_28.createParallelGroup(Alignment.LEADING)
@@ -2318,7 +2335,7 @@ public class PacientInfoFrame extends JFrame {
 			gl_panel_28.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_28.createSequentialGroup()
 					.addComponent(cmb_naprav, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
 					.addComponent(cmb_org, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		);
 		panel_28.setLayout(gl_panel_28);
@@ -2391,18 +2408,6 @@ public class PacientInfoFrame extends JFrame {
 		panel_26.setLayout(gl_panel_26);
 		panel_25.setLayout(gl_panel_25);
 		
-		JButton btnBrowse_priem = new JButton("Просмотр обращений");
-		btnBrowse_priem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-		      try{
-				selectAllPatientPriemInfo(curPatientId);
-				//changePatientPriemInfo(curPatientId);
-		      } catch (Exception e) {
-				e.printStackTrace();
-			  }
-			}
-		});
-		
 		JButton btnNew_priem = new JButton("Новое обращение");
 		btnNew_priem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -2437,24 +2442,21 @@ public class PacientInfoFrame extends JFrame {
 		gl_panel_24.setHorizontalGroup(
 			gl_panel_24.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_24.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(btnBrowse_priem)
-					.addGap(18)
+					.addGap(90)
 					.addComponent(btnNew_priem)
-					.addGap(18)
+					.addGap(54)
 					.addComponent(btnSave_priem)
-					.addGap(176)
+					.addGap(219)
 					.addComponent(btnDel_priem)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(29, Short.MAX_VALUE))
 		);
 		gl_panel_24.setVerticalGroup(
 			gl_panel_24.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_24.createSequentialGroup()
 					.addGroup(gl_panel_24.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnBrowse_priem)
+						.addComponent(btnDel_priem)
 						.addComponent(btnNew_priem)
-						.addComponent(btnSave_priem)
-						.addComponent(btnDel_priem))
+						.addComponent(btnSave_priem))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_24.setLayout(gl_panel_24);
@@ -2463,11 +2465,11 @@ public class PacientInfoFrame extends JFrame {
 		GroupLayout gl_panel_23 = new GroupLayout(panel_23);
 		gl_panel_23.setHorizontalGroup(
 			gl_panel_23.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane_3, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 672, Short.MAX_VALUE)
+				.addComponent(scrollPane_3, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 663, GroupLayout.PREFERRED_SIZE)
 		);
 		gl_panel_23.setVerticalGroup(
 			gl_panel_23.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane_3, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+				.addComponent(scrollPane_3, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
 		);
 		
 		tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"DS прием", 7, "Наименование");
@@ -2560,7 +2562,8 @@ public class PacientInfoFrame extends JFrame {
 						changePatientSignInfo(curPatientId);
 					}
 					if (tbMain.getSelectedIndex() == 5) {
-						changePatientPriemInfo(curPatientId);
+						selectAllPatientPriemInfo(curPatientId);
+						//changePatientPriemInfo(curPatientId);
 					}
 					}
 				}
@@ -2750,6 +2753,7 @@ public class PacientInfoFrame extends JFrame {
 	final ChangeListener  tpPersonalChangeListener= new ChangeListener() {
 	    public void stateChanged(ChangeEvent changeEvent) {  
 			curPatientId = tbl_patient.getSelectedItem().npasp;
+//			selectAllPatientPriemInfo(curPatientId);
 			changePatientPersonalInfo(curPatientId);
 	    }
 	};
@@ -2785,7 +2789,8 @@ public class PacientInfoFrame extends JFrame {
 	//слушатель таб контрола о приемн отд
 	final ChangeListener  tpPriemChangeListener= new ChangeListener() {
 	    public void stateChanged(ChangeEvent changeEvent) {  
-			changePatientPriemInfo(curPatientId);
+//			changePatientPriemInfo(curPatientId);
+			selectAllPatientPriemInfo(curPatientId);
 	    }
 	};
 	
@@ -3141,7 +3146,6 @@ public class PacientInfoFrame extends JFrame {
 	private void changePatientPriemInfo(int PatId){
 		if (tbl_priem.getSelectedItem() == null)
 			return;
-		
 		try {
 			curId = tbl_priem.getSelectedItem().id;
 			curNgosp = tbl_priem.getSelectedItem().ngosp;
@@ -3187,25 +3191,28 @@ public class PacientInfoFrame extends JFrame {
 				tf_smpn.setText(Integer.toString(Id_gosp.smp_num));
 				tf_smpn.setEnabled(true);
 			}
-
-			if (Id_gosp.isSetDatap()) {
-				sp_datap.setValue(sdf.format(new Date(Id_gosp.datap)));
-			}
-			if (Id_gosp.isSetDataosm()) {
-				sp_dataosm.setValue(sdf.format(new Date(Id_gosp.dataosm)));
-			}
-			if (Id_gosp.isSetSmp_data()) {
-				sp_datasmp.setValue(sdf.format(new Date(Id_gosp.smp_data)));
+			if (Id_gosp.getSmp_data() != 0) {
+//				sp_datasmp.setValue(sdf.format(new Date(Id_gosp.smp_data)));
 				sp_datasmp.setEnabled(true);
 				cbx_smp.setSelected(true);
 			}
-			if (Id_gosp.isSetDatagos()) {
-				sp_datagosp.setValue(sdf.format(new Date(Id_gosp.datagos)));
+
+			if (Id_gosp.getDatap() != 0) {
+//				sp_datap.setValue(sdf.format(new Date(Id_gosp.datap)));
+			}
+			if (Id_gosp.getDataosm() != 0) {
+//				sp_dataosm.setValue(sdf.format(new Date(Id_gosp.dataosm)));
+			}
+			if (Id_gosp.getDatagos()!= 0) {
+//				sp_datagosp.setValue(sdf.format(new Date(Id_gosp.datagos)));
 				sp_datagosp.setEnabled(true);
 				cbx_gosp.setSelected(true);
 			}
 			if (Id_gosp.isSetNtalon()) {
 				tf_ntalon.setText(Integer.toString(Id_gosp.ntalon));
+			}
+			if (Id_gosp.isSetNist()) {
+				tf_nist.setText(Integer.toString(Id_gosp.nist));
 			}
 			if (Id_gosp.isSetSv_time()) {
 				sp_sv_time.setValue(Id_gosp.sv_time);
@@ -3232,9 +3239,9 @@ public class PacientInfoFrame extends JFrame {
 
 			if (Id_gosp.getNaprav() != null) {
 				cmb_naprav.setSelectedPcod(Id_gosp.naprav);
-			}
-			if (Id_gosp.getN_org() != 0) {
-				cmb_org.setSelectedPcod(Id_gosp.n_org);
+				if (Id_gosp.getN_org() != 0) {
+					cmb_org.setSelectedPcod(Id_gosp.n_org);
+				}
 			}
 		} catch (GospNotFoundException gnfe) {
 		    System.out.println("Информации нет.");
@@ -3275,6 +3282,7 @@ public class PacientInfoFrame extends JFrame {
 			ta_jal_pr.setText(null);
 			tf_toc.setText(null);
 			tf_ad.setText(null);
+			tf_smpn.setText(null);
 			sp_sv_time.setValue(0);
 			sp_sv_day.setValue(0);
 			
@@ -3345,9 +3353,9 @@ public class PacientInfoFrame extends JFrame {
 			if (cmb_org.getSelectedItem() != null) Id_gosp.setN_org(cmb_org.getSelectedPcod());
 			if (cmb_cotd.getSelectedItem() != null) Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
 			
+			CheckNotNullTableCgosp();
 			if (curId == 0){
-				CheckNotNullTableCgosp();
-				int i = MainForm.tcl.addGosp(Id_gosp);
+				curId = MainForm.tcl.addGosp(Id_gosp);
 				newPriem.setId(curId);
 				newPriem.setNist(Id_gosp.getNist());
 				newPriem.setDatap(Id_gosp.getDatap());

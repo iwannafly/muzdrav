@@ -36,8 +36,8 @@ struct Nambk{
 	2:string nambk,
 	3:i32 nuch,
 	4:i32 cpol,
-	5:i64 datapr,
-	6:i64 dataot,
+	5:optional i64 datapr,
+	6:optional i64 dataot,
 	7:i32 ishod
 }
 
@@ -82,7 +82,7 @@ struct Agent{
 	2:string fam,
 	3:string im,
 	4:string ot,
-	5:i64 datar,
+	5:optional i64 datar,
 	6:i32 pol,
 	7:string name_str,
 	8:string ogrn_str,
@@ -100,7 +100,7 @@ struct Lgota{
 	1:i32 id,
 	2:i32 npasp,
 	3:i32 lgota,
-	4:i64 datau,
+	4:optional i64 datau,
 	5:string name
 }
 
@@ -109,7 +109,7 @@ struct Kontingent{
 	1:i32 id,
 	2:i32 npasp,
 	3:i32 kateg,
-	4:i64 datau,
+	4:optional i64 datau,
 	5:string name
 }
 
@@ -130,7 +130,7 @@ struct AllGosp{
 	2:i32 ngosp,
 	3:i32 npasp,
 	4:i32 nist,
-	5:i64 datap,
+	5:optional i64 datap,
 	6:i32 cotd,
 	7:string diag_p,
 	8:string named_p
@@ -142,8 +142,8 @@ struct Gosp{
 	2:i32 ngosp,
 	3:i32 npasp,
 	4:i32 nist,
-	5:i64 datap,
-	6:i64 vremp,
+	5:optional i64 datap,
+	6:optional i64 vremp,
 	7:i32 pl_extr,
 	8:string naprav,
 	9:i32 n_org,
@@ -164,15 +164,15 @@ struct Gosp{
 	24:bool nal_p,
 	25:string toc,
 	26:string ad,
-	27:i64 smp_data,
-	28:i64 smp_time,
-	29:i32 smp_num,
+	27:optional i64 smp_data,
+	28:optional i64 smp_time,
+	29:optional i32 smp_num,
 	30:i32 cotd_p,
-	31:i64 datagos,
-	32:i64 vremgos,
+	31:optional i64 datagos,
+	32:optional i64 vremgos,
 	33:i32 cuser,
-	34:i64 dataosm,
-	35:i64 vremosm,
+	34:optional i64 dataosm,
+	35:optional i64 vremosm,
 	36:i64 dataz,
 	37:string jalob
 }
