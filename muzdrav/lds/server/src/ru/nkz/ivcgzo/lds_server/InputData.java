@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.serverRegPatient;
+package ru.nkz.ivcgzo.lds_server;
 /**
  * Класс для передачи хранения сгенерированных запросов и массивов индексов
  */

@@ -80,6 +80,9 @@ public class ResultSetMapper<T> {
 					case java.sql.Types.DOUBLE:
 						fld.set(obj, rs.getDouble(i));
 						break;
+					case java.sql.Types.BIT:
+						fld.set(obj, rs.getBoolean(i));
+						break;
 					}
 				}
 			}
@@ -135,6 +138,9 @@ public class ResultSetMapper<T> {
 		else if (cls == Double.class)
 			while (rs.next())
 				lst.add(cls.cast(rs.getDouble(1)));
+		else if (cls == Boolean.class)
+			while (rs.next())
+				lst.add(cls.cast(rs.getBoolean(1)));
 
 		return lst;
 		

@@ -1,17 +1,19 @@
 package ru.nkz.ivcgzo.ldsclient;
 
-import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.thrift.TException;
 
@@ -19,37 +21,21 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.ldsThrift.LdiNotFoundException;
+import ru.nkz.ivcgzo.ldsThrift.Metod;
+import ru.nkz.ivcgzo.ldsThrift.MetodNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.N_ldi;
+import ru.nkz.ivcgzo.ldsThrift.S_ot01;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class Option {
 
 	public JFrame frame;
-	private CustomTable<N_ldi, N_ldi._Fields> table;
-	private JTable table_1;
-	private JTable table_2;
+	private CustomTable<N_ldi, N_ldi._Fields> tn_ldi;
+	private CustomTable<Metod, Metod._Fields> tmetod;
+	private CustomTable<S_ot01, S_ot01._Fields> ts_ot01;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> p0e1;
 	public ThriftStringClassifierCombobox<StringClassifier> n_nz1;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Option window = new Option();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	/**
 	 * Create the application.
@@ -162,14 +148,26 @@ public class Option {
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
-					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
 		);
 		
-		table = new CustomTable<>(false, true, N_ldi.class, 1, "Список анализов", 2, "Название");
-		table.setFillsViewportHeight(true);
-		scrollPane.setViewportView(table);
+		tn_ldi = new CustomTable<>(false, true, N_ldi.class, 0, "Список анализов", 2, "Название", 6, "Выбор");
+		tn_ldi.setEditableFields(true, 2);
+		
+		tn_ldi.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting())
+					filtN_stoim();
+			}
+		});
+		
+		
+		tn_ldi.setFillsViewportHeight(true);
+		scrollPane.setViewportView(tn_ldi);
 		
 		JLabel lblNewLabel_1 = new JLabel("Список исследований");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -203,15 +201,17 @@ public class Option {
 				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
 		);
 		gl_panel_3.setVerticalGroup(
-			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_3.createSequentialGroup()
-					.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE)
+			gl_panel_3.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_3.createSequentialGroup()
+					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE))
 		);
 		
-		table_1 = new JTable();
-		scrollPane_1.setViewportView(table_1);
+		tmetod = new CustomTable<>(false, true, Metod.class, 2, "Код", 3, "Наименование", 4, "Стоимость", 5, "Выбор");
+		tmetod.setEditableFields(true, 3);
+		tmetod.setFillsViewportHeight(true);
+		scrollPane_1.setViewportView(tmetod);
 		
 		JLabel lblNewLabel_2 = new JLabel("Методы исследования");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -258,11 +258,11 @@ public class Option {
 		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 12));
 		GroupLayout gl_panel_7 = new GroupLayout(panel_7);
 		gl_panel_7.setHorizontalGroup(
-			gl_panel_7.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_panel_7.createSequentialGroup()
-					.addGap(206)
+			gl_panel_7.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addGap(243)
 					.addComponent(lblNewLabel_3)
-					.addContainerGap(218, Short.MAX_VALUE))
+					.addContainerGap(287, Short.MAX_VALUE))
 		);
 		gl_panel_7.setVerticalGroup(
 			gl_panel_7.createParallelGroup(Alignment.LEADING)
@@ -273,8 +273,9 @@ public class Option {
 		);
 		panel_7.setLayout(gl_panel_7);
 		
-		table_2 = new JTable();
-		scrollPane_2.setViewportView(table_2);
+		ts_ot01 = new CustomTable<>(false, true, S_ot01.class, 0, "Код отделения", 1, "Код исследования", 2, "Код метода ис-ия", 3, "Код органов и систем");
+		ts_ot01.setFillsViewportHeight(true);
+		scrollPane_2.setViewportView(ts_ot01);
 		panel_6.setLayout(gl_panel_6);
 		frame.getContentPane().setLayout(groupLayout);
 	}
@@ -282,7 +283,7 @@ public class Option {
 	private void filtN_ldi() {
 		try {
 			if ((p0e1.getSelectedItem() != null) && (n_nz1.getSelectedItem() != null)){
-				table.setData(MainForm.ltc.getN_ldi(n_nz1.getSelectedPcod(), p0e1.getSelectedPcod()));
+				tn_ldi.setData(MainForm.ltc.getN_ldi(n_nz1.getSelectedPcod(), p0e1.getSelectedPcod()));
 			}
 		} catch (LdiNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -292,5 +293,22 @@ public class Option {
 			e.printStackTrace();
 		}
 	}
+
+	
+	private void filtN_stoim() {
+		try {
+			if ((p0e1.getSelectedItem() != null) && (tn_ldi.getSelectedItem() != null)) {
+				tmetod.setData(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod(), String.format("%%.%02d.%%", p0e1.getSelectedPcod())));
+			}
+		} catch (MetodNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 	
 }

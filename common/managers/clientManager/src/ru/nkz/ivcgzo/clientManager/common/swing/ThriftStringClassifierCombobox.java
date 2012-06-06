@@ -27,6 +27,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	private static final long serialVersionUID = -8720200365221036747L;
 	private List<StringClassifier> items;
 	private Searcher searcher;
+	private StringComboBoxModel model;
 	
 	/**
 	 * Конструктор комбобокса.
@@ -51,19 +52,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	}
 	
 	private void setModel() {
-		DefaultComboBoxModel<StringClassifier> model = new DefaultComboBoxModel<StringClassifier>() {
-			private static final long serialVersionUID = 8684385138292155382L;
-			
-			@Override
-			public StringClassifier getElementAt(int index) {
-				return items.get(index);
-			}
-			
-			@Override
-			public int getSize() {
-				return items.size();
-			}
-		};
+		model = new StringComboBoxModel();
 		this.setModel(model);
 	}
 	
@@ -75,6 +64,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		for (StringClassifier item : list) {
 			items.add(new StringClassifierItem(item));
 		}
+		model.fireContentsChanged();
 	}
 	
 	/**
@@ -125,6 +115,24 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			throw new RuntimeException(String.format("Unknown pcod '%s'.", pcod));
 	}
 	
+	class StringComboBoxModel extends DefaultComboBoxModel<StringClassifier> {
+		private static final long serialVersionUID = 3897339719447445357L;
+
+		@Override
+		public StringClassifier getElementAt(int index) {
+			return items.get(index);
+		}
+		
+		@Override
+		public int getSize() {
+			return items.size();
+		}
+		
+		public void fireContentsChanged() {
+			super.fireContentsChanged(ThriftStringClassifierCombobox.this, 0, getSize() - 1);
+		}
+	}
+	
 	class StringClassifierItem extends StringClassifier {
 		private static final long serialVersionUID = -2948760587239238424L;
 
@@ -148,6 +156,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
 			ThriftStringClassifierCombobox.this.setEditor(editor);
+			editor.putClientProperty("doNotCancelPopup", null);
 
 			cmb.addActionListener(new ActionListener() {
 				
@@ -256,6 +265,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		public void setItem(Object anObject) {
 			if (anObject != null)
 				setText(anObject.toString());
+			else
+				setText(null);
 		}
 	}
 }

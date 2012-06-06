@@ -1,6 +1,5 @@
 package ru.nkz.ivcgzo.clientOsm.patientInfo;
 
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.sql.Date;
 import java.util.List;
@@ -26,6 +25,7 @@ import javax.swing.tree.TreePath;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -36,8 +36,6 @@ import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 
 public class PatientInfoViewMainForm {
 	private static final String lineSep = System.lineSeparator();
-	private ConnectionManager conMan;
-	private UserAuthInfo authInfo;
 	private ThriftOsm.Client tcl;
 	private int npasp;
 	
@@ -46,26 +44,10 @@ public class PatientInfoViewMainForm {
 	private JTable table;
 	private JTextArea tbDetailInfo;
 	
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					new PatientInfoViewMainForm(null, null, 0);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
 	/**
 	 * @wbp.parser.entryPoint
 	 */
-	public PatientInfoViewMainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) {
-		this.conMan = conMan;
-		this.authInfo = authInfo;
-		
+	public PatientInfoViewMainForm(ConnectionManager conMan, UserAuthInfo authInfo) {
 		initForm();
 	}
 	
@@ -252,7 +234,7 @@ public class PatientInfoViewMainForm {
 		} catch (PatientNotFoundException e) {
 			throw new Exception(String.format("Patient with npasp '%d' not found.", nodeIdx), e);
 		} catch (TException e) {
-			conMan.reconnect(e);
+			MainForm.conMan.reconnect(e);
 		}
 	}
 	

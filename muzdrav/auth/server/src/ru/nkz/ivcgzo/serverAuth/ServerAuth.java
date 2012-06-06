@@ -38,7 +38,7 @@ public class ServerAuth extends Server implements Iface {
 	public ServerAuth(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config");
+		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config", "cdol", "cdol_name", "name_short");
 		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size");
 		
 		scMan = new SocketManager(5, Constants.bufSize);
@@ -73,7 +73,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public UserAuthInfo auth(String login, String password) throws UserNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config FROM s_users u join s_vrach v ON (v.pcod = u.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config, m.cdol, s.name AS cdol_name, get_short_fio(v.fam, v.im, v.ot) AS name_short FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab m ON (m.pcod = u.pcod AND m.cpodr = u.cpodr) JOIN n_s00 s ON (s.pcod = m.cdol) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
 			if (acrs.getResultSet().next())
 				return rsmAuth.map(acrs.getResultSet());
 			else
@@ -95,14 +95,7 @@ public class ServerAuth extends Server implements Iface {
 	}
 
 	@Override
-	public String getServerVersion() throws TException {
-		return configuration.appVersion;
-	}
-
-	@Override
-	public String getClientVersion() throws TException {
-		// TODO Auto-generated method stub
-		return null;
+	public void testConnection() throws TException {
 	}
 
 	@Override

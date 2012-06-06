@@ -29,9 +29,10 @@ struct Pvizit {
 	9: i32 cod_sp;
 	10: string cdol;
 	11: i32 cuser;
-	12: string ztext;
+	12: string zakl;
 	13: i64 dataz;
 	14: i32 idzab;
+	15: string recomend;
 }
 
 struct PvizitAmb {
@@ -58,22 +59,23 @@ struct PvizitAmb {
 }
 
 struct PdiagAmb {
-	1: i32 id;
-	2: i32 npasp;
-	3: i32 idzab;
-	4: i64 datrg;
-	5: string diag;
-	6: string named;/*медицинское описание д-за*/
-	7: i32 cod_sp;
-	8: i32 obstreg;
-	9: i64 datap;
-	10: i64 dataot;
-	11: i32 obstot;
-	12: i32 codsp_ot;
-	13: string cdol_ot;
-	14: i32 vid_tr;
-	15: i32 prizn;
-	16: i32 priznp; 
+	 1: i32 id;
+	 2: i32 id_obr;
+	 3: i32 npasp;
+	 4: string diag;
+	 5: string named;/*медицинское описание д-за*/
+	 6: i32 diag_stat;
+	 7: bool predv;
+	 8: i64 datad;
+	 9: i32 obstreg;
+	10: i32 cod_sp;
+	11: string cdol;
+	12: i64 datap;
+	13: i64 dataot;
+	14: i32 obstot;
+	15: i32 codsp_ot;
+	16: string cdol_ot;
+	17: i32 vid_tr;
 }
 
 struct Psign{
@@ -91,6 +93,8 @@ struct Psign{
 	12: string gemotr;
 	13: string nasl;
 	14: string ginek;
+	15: string priem_lek;
+	16: string prim_gorm;
 }
 
 struct Priem{
@@ -160,6 +164,9 @@ struct Priem{
 	64: string t_st_localis;
 	65: string t_ocenka;
 	66: string t_jalob;
+	67: string t_ist_zab;
+	68: string t_status_praesense;
+	69: string t_fiz_obsl;
 }
 
 struct PdiagZ{
@@ -168,7 +175,16 @@ struct PdiagZ{
 	3: string diag;
 	4: string named;
 	5: i64 datad;
-	6: i32 nmvd;
+	6: i32 cpodr;
+	7: i64 d_post;
+	8: i32 d_grup;
+	9: i32 d_ish;
+	10: i64 dataish;
+	11: i64 datag;
+	12: string diag_s;
+	13: i32 d_grup_s;
+	14: i32 cod_sp;
+	15: string cdol_ot;
 }
 
 struct PatientCommonInfo {
@@ -293,10 +309,100 @@ struct RdInfStruct{
 	13:i32 vredOtec;
 }
 
-exception PvizitNotFoundException {
+/*Список показателей исследований по выбранному методу*/
+struct PokazMet{
+	1: string pcod;
+	2: string name_n;
+	3: double stoim;
+	4: string c_obst;
+	5: bool vybor;
 }
 
-exception PdiagAmbNotFoundException {
+/*метод по виду исследования*/
+struct Metod{
+	1: string obst;
+	2: string name_obst;
+	3: i32 c_p0e1;
+	//4: string pcod;
+}
+
+/*Список показателей исследований по выбранной системе*/
+struct Pokaz{
+	1: string pcod;
+	2: string name_n;
+	3: double stoim;
+	4: i32 c_p0e1;
+	5: string c_n_nz1;
+	6: bool vybor;
+}
+
+
+struct P_isl_ld {
+	 1: i32 nisl;
+	 2: i32 npasp;
+	 3: i32 cisl;
+	 4: string pcisl;
+	 5: i32 napravl;
+	 6: i32 naprotd;
+	 7: i64 datan;
+	 8: i32 vrach;
+	 9: string diag;
+	10: i64 dataz;
+	11: i32 pvizit_id;
+}
+
+struct Prez_d {
+	1: i32 npasp;
+	2: i32 nisl;
+	3: string kodisl;
+	4: double stoim;
+}
+
+struct Prez_l {
+	1: i32 npasp;
+	2: i32 nisl;
+	3: string cpok;
+	4: double stoim;
+}
+
+
+struct IsslMet {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct IsslPokaz {
+	1: i32 kodVidIssl;
+	2: i32 userId;
+	3: i32 npasp;
+	4: string kodMetod;
+	5: list<string> pokaz;
+	6: string mesto;
+	7: string kab;
+}
+
+struct Napr{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 clpu;
+}
+
+struct NaprKons{
+	1: i32 npasp;
+	2: i32 userId;
+	3: string obosnov;
+	4: i32 cpol;
+}
+
+
+
+exception PvizitNotFoundException {
 }
 
 exception PsignNotFoundException {
@@ -331,19 +437,35 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void DeletePvizitAmb(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
-	PdiagAmb getPdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagAmbNotFoundException dne);
-
+	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 
-	Psign getPsign(1: i32 signId) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
+	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
 	void setPsign(1: Psign sign) throws (1: kmiacServer.KmiacServerException kse);
 
 	Priem getPriem(1: i32 obrId, 2: i32 npasp, 3: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	list<PdiagZ> getPdiagZ(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
+
+	/*Исследования*/
+	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
+	list<PokazMet> getPokazMet(1: string metod) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
+	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
+	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+
 	
+	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
+	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
+	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
+	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
+	string printVypis(1: i32 npasp, 2: i32 pvizitAmbId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
+	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
+
 
 //classifiers
 	list<classifier.IntegerClassifier> get_n_z30() throws (1: kmiacServer.KmiacServerException kse);
@@ -360,10 +482,17 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getAq0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getOpl() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_s00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_p0e1() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_nz1(1: i32 c_p0e1) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
+	list<Pvizit> getPvizitInfo(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	list<RdSlStruct> getRdSlInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);

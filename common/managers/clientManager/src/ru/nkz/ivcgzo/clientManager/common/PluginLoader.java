@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientAuth;
+package ru.nkz.ivcgzo.clientManager.common;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,8 +14,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarFile;
 
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
 /**
@@ -34,7 +32,7 @@ public class PluginLoader {
 	 * @param pdost - строка с правами доступа, на основе которой будет строиться
 	 * список доступных данному пользователю модулей
 	 */
-	public PluginLoader(ConnectionManager conMan, UserAuthInfo authInfo) throws FileNotFoundException {
+	protected PluginLoader(ConnectionManager conMan, UserAuthInfo authInfo) {
 		this.conMan = conMan;
 		this.authInfo = authInfo;
 		
@@ -45,8 +43,8 @@ public class PluginLoader {
 	/**
 	 * Построение списка доступных пользователю модулей.
 	 */
-	public void loadPluginList() throws FileNotFoundException {
-		String exePath = new File(MainForm.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
+	public void loadPluginList(String path) throws FileNotFoundException {
+		String exePath = new File(path).getParentFile().getAbsolutePath();
 		File plgDir = new File(exePath, "plugin");
 		if (!plgDir.exists())
 			throw new FileNotFoundException("Не найдена папка с модулями. Обратитесь в отдел по работе с клиентами КМИАЦ.");
@@ -87,15 +85,27 @@ public class PluginLoader {
 	}
 	
 	/**
-	 * Загрузка модуля.
+	 * Загрузка модуля по индексу.
 	 * @param index - индекс модуля в списке
 	 */
-	public IClient loadPlugin(int index) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public IClient loadPluginByIndex(int index) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		return pList.get(index).load();
 	}
 	
+	/**
+	 * Загрузка модуля по уникальному идентификатору.
+	 * @param appId - идентификатор модуля
+	 */
+	public IClient loadPluginByAppId(int appId) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		for (Plugin plugin : pList) {
+			if (plugin.getId() == appId)
+				return plugin.load();
+		}
+		
+		throw new IllegalArgumentException(String.format("Module with id %d not found.", appId));
+	}
 	
-	class Plugin {
+	public class Plugin {
 		private String path;
 		private String className;
 		private String name;

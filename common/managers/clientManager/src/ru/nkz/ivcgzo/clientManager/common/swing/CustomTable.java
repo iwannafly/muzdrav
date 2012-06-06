@@ -50,7 +50,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	private final Class<?>[] colTypes;
 	private final int[] colOrder;
 	private final int[] colIdx;
-	private final boolean editable;
+	private boolean editable;
+	private boolean editableCols[];
 	private final boolean sortable;
 	private List<T> lst;
 	private T cop, sel;
@@ -81,6 +82,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * @see TableComboBoxIntegerEditor
 	 */
 	public CustomTable(boolean editable, boolean sortable, Class<T> thrCls, Object... fldIdName) {
+		this.editable = editable;
+		this.sortable = sortable;
 		this.cls = thrCls;
 		this.thrFields = getThriftFields(thrCls);
 		colCount = fldIdName.length / 2;
@@ -88,6 +91,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		colTypes = new Class<?>[colCount];
 		colOrder = new int[colCount];
 		colIdx = new int[colCount];
+		editableCols = new boolean[colCount];
 		for (int i = 0; i < colCount; i++)
 			colOrder[i] = i;
 		Field[] fld = thrCls.getFields();
@@ -95,9 +99,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			colIdx[i] = (int)fldIdName[i * 2];
 			colTypes[i] = getClassFromField(fld[colIdx[i]]);
 			colNames[i] = (String)fldIdName[i * 2 + 1];
+			editableCols[i] = editable;
 		}
-		this.editable = editable;
-		this.sortable = sortable;
 		
 		setModel();
 		if (editable) {
@@ -193,6 +196,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			return Long.class;
 		else if (typ == short.class)
 			return Short.class;
+		else if (typ == boolean.class)
+			return Boolean.class;
 		else
 			return typ;
 	}
@@ -253,6 +258,23 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 */
 	public void setDateField(int colIdx) {
 		colTypes[colOrder[colIdx]] = Date.class;
+	}
+	
+	/**
+	 * Определяет, какие поля можно изменять. Переопределяет настройку <b>editable</b> для
+	 * всей таблицы, указанную в конструкторе.
+	 * @param value - доступность для изменения указанных далее полей
+	 * @param idx - индексы полей
+	 */
+	public void setEditableFields(boolean value, int...idx) {
+		int i;
+		
+		for (i = 0; i < idx.length; i++)
+			editableCols[idx[i]] = value;
+		
+		editable = false;
+		for (i = 0; i < colCount; i++)
+			editable |= editableCols[i];
 	}
 	
 	/**
@@ -358,6 +380,13 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
+	 * Получае список данных. 
+	 */
+	public List<T> getData() {
+		return lst;
+	}
+	
+	/**
 	 * Генерирует модель.
 	 */
 	private void setModel() {
@@ -385,7 +414,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			
 			@Override
 			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return editable;
+				return editableCols[colOrder[columnIndex]];
 			}
 			
 			@Override
@@ -514,7 +543,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow - 1;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsDeleted(updRow, updRow);
+			getModel().fireTableRowsDeleted(selRow, selRow);
 			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
@@ -570,6 +599,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				if (!checkEmpty(sel)) {
 					if (addRowLst != null)
 						addRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel));
+					else
+						updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				} else {
 					deleteSelectedRow();
 				}

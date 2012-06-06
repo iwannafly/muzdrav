@@ -1,8 +1,42 @@
 package ru.nkz.ivcgzo.clientOsm;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.thrift.TException;
 import org.w3c.dom.Document;
@@ -13,73 +47,23 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
-import ru.nkz.ivcgzo.thriftOsm.PdiagAmbNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
-import ru.nkz.ivcgzo.thriftOsm.PvizitAmb._Fields;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
-
-import javax.swing.ButtonGroup;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JCheckBox;
-import javax.swing.border.BevelBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JRadioButton;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Rectangle;
-
-import javax.swing.JTable;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.UIManager;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.stream.StreamSource;
-
-import java.awt.Color;
-import java.io.StringReader;
-import javax.swing.JSeparator;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.JScrollBar;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.Dimension;
 
 public class Vvod extends JFrame {
-
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 4579259944135540676L;
 	public static ZapVr zapVrSave;
 	private FormSign sign;
+	private PrintForm printform;
 	private SettingsOsm settingsosm;
 	private FormPostBer postber;
 	private Pvizit pvizit;
@@ -96,67 +80,69 @@ public class Vvod extends JFrame {
 	private JTextField tfchss;
 	private JTextField tfkodmkb;
 	private JTextField tfname;
-	private JTextPane tpJalob;
-	private JTextPane tpJalobd;
-	private JTextPane tpJalobkrov;
-	private JTextPane tpJalobp;
-	private JTextPane tpJalobmoch;
-	private JTextPane tpJalobendo;
-	private JTextPane tpJalobnerv;
-	private JTextPane tpJalobopor;
-	private JTextPane tpJaloblih;
-	private JTextPane tpJalobobh;
-	private JTextPane tpJalobproch;
-	private JTextPane tpNachzab;
-	private JTextPane tpSympt;
-	private JTextPane tpOtnbol;
-	private JTextPane tpPssit;
-	private JTextPane tpObsost;
-	private JTextPane tpKoj;
-	private JTextPane tpSliz;
-	private JTextPane tpPodkkl;
-	private JTextPane tpLimf;
-	private JTextPane tpKostmysh;
-	private JTextPane tpNervnps;
-	private JTextPane tpTelo;
-	private JTextPane tpSust;
-	private JTextPane tpDyh;
-	private JTextPane tpGrkl;
-	private JTextPane tpPerkl;
-	private JTextPane tpAusl;
-	private JTextPane tpBronho;
-	private JTextPane tpArter;
-	private JTextPane tpObls;
-	private JTextPane tpPerks;
-	private JTextPane tpAuss;
-	private JTextPane tpPolrta;
-	private JTextPane tpJivot;
-	private JTextPane tpPalpjivot;
-	private JTextPane tpJkt;
-	private JTextPane tpPalpjel;
-	private JTextPane tpPalppodjel;
-	private JTextPane tpPechen;
-	private JTextPane tpJelch;
-	private JTextPane tpSelez;
-	private JTextPane tpOblzad;
-	private JTextPane tpPoyasn;
-	private JTextPane tpPochki;
-	private JTextPane tpMoch;
-	private JTextPane tpMoljel;
-	private JTextPane tpGrjel;
-	private JTextPane tpMatka;
-	private JTextPane tpNarpolov;
-	private JTextPane tpChitov;
-	private JTextPane tpFizObsl;
-	private JTextPane tpOcenka;
+	private JEditorPane tpJalob;
+	private JEditorPane tpJalobd;
+	private JEditorPane tpJalobkrov;
+	private JEditorPane tpJalobp;
+	private JEditorPane tpJalobmoch;
+	private JEditorPane tpJalobendo;
+	private JEditorPane tpJalobnerv;
+	private JEditorPane tpJalobopor;
+	private JEditorPane tpJaloblih;
+	private JEditorPane tpJalobobh;
+	private JEditorPane tpJalobproch;
+	private JEditorPane tpNachzab;
+	private JEditorPane tpSympt;
+	private JEditorPane tpOtnbol;
+	private JEditorPane tpPssit;
+	private JEditorPane tpObsost;
+	private JEditorPane tpKoj;
+	private JEditorPane tpSliz;
+	private JEditorPane tpPodkkl;
+	private JEditorPane tpLimf;
+	private JEditorPane tpKostmysh;
+	private JEditorPane tpNervnps;
+	private JEditorPane tpTelo;
+	private JEditorPane tpSust;
+	private JEditorPane tpDyh;
+	private JEditorPane tpGrkl;
+	private JEditorPane tpPerkl;
+	private JEditorPane tpAusl;
+	private JEditorPane tpBronho;
+	private JEditorPane tpArter;
+	private JEditorPane tpObls;
+	private JEditorPane tpPerks;
+	private JEditorPane tpAuss;
+	private JEditorPane tpPolrta;
+	private JEditorPane tpJivot;
+	private JEditorPane tpPalpjivot;
+	private JEditorPane tpJkt;
+	private JEditorPane tpPalpjel;
+	private JEditorPane tpPalppodjel;
+	private JEditorPane tpPechen;
+	private JEditorPane tpJelch;
+	private JEditorPane tpSelez;
+	private JEditorPane tpOblzad;
+	private JEditorPane tpPoyasn;
+	private JEditorPane tpPochki;
+	private JEditorPane tpMoch;
+	private JEditorPane tpMoljel;
+	private JEditorPane tpGrjel;
+	private JEditorPane tpMatka;
+	private JEditorPane tpNarpolov;
+	private JEditorPane tpChitov;
+	private JEditorPane tpFizObsl;
+	private JEditorPane tpLocalis;
+	private JEditorPane tpOcenka;
 	private ThriftStringClassifierCombobox<StringClassifier> c_obr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbrez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbish;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> vid_opl;
 	private CustomTable<PvizitAmb, PvizitAmb._Fields> TabPos;
-	private JTextPane tpStPraes;
-	private JTextPane tprecom;
+	private JEditorPane tpStPraes;
+	private JEditorPane tprecom;
 	private CustomTable<PdiagAmb,PdiagAmb._Fields> TabDiag;
+	private JTextField textField;
 	
 	
 	/**
@@ -181,6 +167,7 @@ public class Vvod extends JFrame {
 		 diag = new PdiagAmb();
 		 pr = new Priem();
 		 dz = new PdiagZ();
+		 printform = new PrintForm();
 		setBounds(100, 100, 1029, 747);
 		//JPanel JPanel = new JPanel();
 		setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -197,7 +184,7 @@ public class Vvod extends JFrame {
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
 		);
 		
-		JPanel panel = new JPanel();
+		final JPanel panel = new JPanel();
 		panel.setAlignmentY(Component.TOP_ALIGNMENT);
 		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollPane.setRowHeaderView(panel);
@@ -208,14 +195,21 @@ public class Vvod extends JFrame {
 			sign.setVisible(true);}
 		});
 				
-		JButton button = new JButton("Аллергоанамнез");
+		JButton bA = new JButton("Аллергоанамнез");
+		bA.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		
-		JButton button_1 = new JButton("Сохранить");
-		button_1.addActionListener(new ActionListener() {
+		
+		JButton bS = new JButton("Сохранить");
+		bS.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				diag.setDiag(tfkodmkb.getText());
 				diag.setNamed(tfname.getText());
+				/*прежде чем сохранить, проделать эту операцию : diag.setNamed(tfname.getText()); со всеми нужными полями*/
+				/*а потом вызывать метод из thrift,update*/
 //				pr.setT_ad(tfad.getText());
 //				pr.setT_chss(tfchss.getText());
 //				pr.setT_rost(tfrost.getText());
@@ -279,16 +273,74 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-		JButton button_2 = new JButton("Сохранить как шаблон");
+		JButton bSSh = new JButton("Сохранить как шаблон");
 		
-		JButton button_3 = new JButton("Загрузить из шаблона");
+		JButton bZSh = new JButton("Загрузить из шаблона");
 		
-		JButton button_4 = new JButton("Печатные формы");
+		final JButton bVD = new JButton("Печатные формы");
+		bVD.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				printform.setVisible(true);
+//			int x = bVD.getX();
+//	                int y = bVD.getY() + bVD.getHeight();
+//	                JPopupMenu jPopupMenu = new JPopupMenu();
+//
+//	                JMenuItem mi1 = new JMenuItem("Мед.карта амб.больного");
+//	                jPopupMenu.add(mi1);
+//	                mi1.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi2 = new JMenuItem("Протокол посещения");
+//	                jPopupMenu.add(mi2);
+//	                mi2.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi3 = new JMenuItem("Выписка из амб.карты");
+//	                jPopupMenu.add(mi3);
+//	                mi3.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi4 = new JMenuItem("Направление на госпитализацию");
+//	                jPopupMenu.add(mi4);
+//	                mi4.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                  JMenuItem mi5 = new JMenuItem("Направление на консультацию");
+//	                jPopupMenu.add(mi5);
+//	                mi5.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi6 = new JMenuItem("Направление на исследование");
+//	                jPopupMenu.add(mi6);
+//	                mi6.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi7 = new JMenuItem("Направление на МСЭК");
+//	                jPopupMenu.add(mi7);
+//	                mi7.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                JMenuItem mi8 = new JMenuItem("Заключение ВК");
+//	                jPopupMenu.add(mi8);
+//	                mi8.addActionListener(new ActionListener() {
+//	        			public void actionPerformed(ActionEvent e) {
+//	        			}
+//	        		});
+//	                jPopupMenu.show(panel, x, y);
+}
+		});
 		
 		JPanel panel_Talon = new JPanel();
 				panel_Talon.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0422\u0430\u043B\u043E\u043D \u0430\u043C\u0431.\u043F\u0430\u0446\u0438\u0435\u043D\u0442\u0430", TitledBorder.LEFT, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		
-		JButton button_5 = new JButton("Удалить");
+		JButton bDelet = new JButton("Удалить");
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		
@@ -315,58 +367,58 @@ public class Vvod extends JFrame {
 		
 		final JLabel lbljalob = new JLabel("Жалобы на:");
 		
-		 tpJalob = new JTextPane();
+		 tpJalob = new JEditorPane();
 		tpJalob.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljald = new JLabel("Дыхательная система");
 		
-		 tpJalobd = new JTextPane();
+		 tpJalobd = new JEditorPane();
 		tpJalobd.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
-		 tpJalobkrov = new JTextPane();
+		 tpJalobkrov = new JEditorPane();
 		tpJalobkrov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljalp = new JLabel("Система пищеварения");
 		
 		final JLabel lbljalkr = new JLabel("Система кровообращения");
 		
-		 tpJalobp = new JTextPane();
+		 tpJalobp = new JEditorPane();
 		tpJalobp.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljalm = new JLabel("Мочеполовая система");
 		
 		final JLabel lbljalendo = new JLabel("Эндокринная система");
 		
-		 tpJalobendo = new JTextPane();
+		 tpJalobendo = new JEditorPane();
 		
 		final JLabel lbljalnerv = new JLabel("Нервная система и органы чувств");
 		
-		 tpJalobnerv = new JTextPane();
+		 tpJalobnerv = new JEditorPane();
 		tpJalobnerv.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljalop = new JLabel("Опорно-двигательная система");
 		
-		 tpJalobopor = new JTextPane();
+		 tpJalobopor = new JEditorPane();
 		tpJalobopor.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljallih = new JLabel("Лихорадка");
 		
-		 tpJaloblih = new JTextPane();
+		 tpJaloblih = new JEditorPane();
 		tpJaloblih.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblja_lob = new JLabel("Жалобы общего характера");
 		
-		 tpJalobobh = new JTextPane();
+		 tpJalobobh = new JEditorPane();
 		tpJalobobh.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljalpr = new JLabel("Прочие жалобы");
 		
-		 tpJalobproch = new JTextPane();
+		 tpJalobproch = new JEditorPane();
 		tpJalobproch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		tpJalobendo.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
-		 tpJalobmoch = new JTextPane();
+		 tpJalobmoch = new JEditorPane();
 		tpJalobmoch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GroupLayout gl_panJalob = new GroupLayout(panJalob);
 		gl_panJalob.setHorizontalGroup(
@@ -471,22 +523,22 @@ public class Vvod extends JFrame {
 		
 		final JLabel lblNacZab = new JLabel("Начало заболевания");
 		
-		 tpNachzab = new JTextPane();
+		 tpNachzab = new JEditorPane();
 		tpNachzab.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblSympt = new JLabel("Симптомы");
 		
 		final JLabel lblotnbol = new JLabel("Отношение больного к болезни");
 		
-		 tpOtnbol = new JTextPane();
+		 tpOtnbol = new JEditorPane();
 		tpOtnbol.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
-		 tpSympt = new JTextPane();
+		 tpSympt = new JEditorPane();
 		tpSympt.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpssit = new JLabel("Психологическая ситуация в связи с болезнью");
 		
-		 tpPssit = new JTextPane();
+		 tpPssit = new JEditorPane();
 		tpPssit.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GroupLayout gl_panAnamnes = new GroupLayout(panAnamnes);
 		gl_panAnamnes.setHorizontalGroup(
@@ -628,47 +680,47 @@ public class Vvod extends JFrame {
 		
 		final JLabel lblStPraes = new JLabel("Status praesense");
 		
-		 tpStPraes = new JTextPane();
+		 tpStPraes = new JEditorPane();
 		tpStPraes.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblobsost = new JLabel("Общее состояние");
 		
-		 tpObsost = new JTextPane();
+		 tpObsost = new JEditorPane();
 		tpObsost.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblkoj = new JLabel("Кожные покровы");
 		
-		 tpKoj = new JTextPane();
+		 tpKoj = new JEditorPane();
 		tpKoj.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblsl = new JLabel("Видимые слизистые");
 		
-		 tpSliz = new JTextPane();
+		 tpSliz = new JEditorPane();
 		tpSliz.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpodkkl = new JLabel("Подкожная клетчатка");
 		
-		 tpPodkkl = new JTextPane();
+		 tpPodkkl = new JEditorPane();
 		tpPodkkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbllimf = new JLabel("Лимфатические узлы");
 		
-		 tpLimf = new JTextPane();
+		 tpLimf = new JEditorPane();
 		tpPodkkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblkostm = new JLabel("Костно-мышечная система");
 		
-		 tpKostmysh = new JTextPane();
+		 tpKostmysh = new JEditorPane();
 		tpPodkkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblnervps = new JLabel("Нервно-психический статус");
 		
-		 tpNervnps = new JTextPane();
+		 tpNervnps = new JEditorPane();
 		 tpNervnps.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbltelo = new JLabel("Телосложение");
 		
-		 tpTelo = new JTextPane();
+		 tpTelo = new JEditorPane();
 		tpTelo.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		GroupLayout gl_panPraesense = new GroupLayout(panPraesense);
@@ -765,147 +817,147 @@ public class Vvod extends JFrame {
 		
 		final JLabel lblfizik = new JLabel("Физикальное обследование");
 		
-		tpFizObsl = new JTextPane();
+		tpFizObsl = new JEditorPane();
 		tpFizObsl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblsust = new JLabel("Суставы");
 		
-		 tpSust = new JTextPane();
+		 tpSust = new JEditorPane();
 		tpSust.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbldyh = new JLabel("Дыхание");
 		
-		 tpDyh = new JTextPane();
+		 tpDyh = new JEditorPane();
 		tpDyh.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblgrkl = new JLabel("Грудная клетка");
 		
-		 tpGrkl = new JTextPane();
+		 tpGrkl = new JEditorPane();
 		tpGrkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblperl = new JLabel("Перкуссия легких");
 		
-		 tpPerkl = new JTextPane();
+		 tpPerkl = new JEditorPane();
 		tpPerkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblausl = new JLabel("Аускультация легких");
 		
-		 tpAusl = new JTextPane();
+		 tpAusl = new JEditorPane();
 		tpAusl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblbronh = new JLabel("Бронхофония");
 		
-		 tpBronho = new JTextPane();
+		 tpBronho = new JEditorPane();
 		tpBronho.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblarter = new JLabel("Артерии и шейные вены");
 		
-		 tpArter = new JTextPane();
+		 tpArter = new JEditorPane();
 		tpArter.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblobls = new JLabel("Область сердца");
 		
-		 tpObls = new JTextPane();
+		 tpObls = new JEditorPane();
 		tpObls.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpers = new JLabel("Перкуссия сердца");
 		
-		 tpPerks = new JTextPane();
+		 tpPerks = new JEditorPane();
 		tpPerks.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblauss = new JLabel("Аускультация сердца");
 		
-		 tpAuss = new JTextPane();
+		 tpAuss = new JEditorPane();
 		tpAuss.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpolrta = new JLabel("Полость рта");
 		
-		 tpPolrta = new JTextPane();
+		 tpPolrta = new JEditorPane();
 		tpPolrta.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljivot = new JLabel("Живот");
 		
-		 tpJivot = new JTextPane();
+		 tpJivot = new JEditorPane();
 		tpJivot.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpalpjiv = new JLabel("Пальпация живота");
 		
-		 tpPalpjivot = new JTextPane();
+		 tpPalpjivot = new JEditorPane();
 		tpPalpjivot.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljkt = new JLabel("Пальпация, перкуссия и аускультация желудочно-кишечного тракта");
 		
-		 tpJkt = new JTextPane();
+		 tpJkt = new JEditorPane();
 		tpJkt.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpalpjel = new JLabel("Пальпация желудка");
 		
-		 tpPalpjel = new JTextPane();
+		 tpPalpjel = new JEditorPane();
 		tpPalpjel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpalppodjel = new JLabel("Пальпация поджелудочной железы");
 		
-		 tpPalppodjel = new JTextPane();
+		 tpPalppodjel = new JEditorPane();
 		tpPalppodjel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpech = new JLabel("Печень");
 		
-		 tpPechen = new JTextPane();
+		 tpPechen = new JEditorPane();
 		tpPechen.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbljelch = new JLabel("Желчный пузырь");
 		
-		 tpJelch = new JTextPane();
+		 tpJelch = new JEditorPane();
 		tpJelch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblselez = new JLabel("Селезенка");
 		
-		 tpSelez = new JTextPane();
+		 tpSelez = new JEditorPane();
 		tpSelez.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lbloblzad = new JLabel("Область заднего прохода");
 		
-		 tpOblzad = new JTextPane();
+		 tpOblzad = new JEditorPane();
 		tpOblzad.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 				
 		final JLabel lblpoyasn = new JLabel("Поясничная область");
 		
-		 tpPoyasn = new JTextPane();
+		 tpPoyasn = new JEditorPane();
 		tpPoyasn.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblpochk = new JLabel("Почки");
 		
-		 tpPochki = new JTextPane();
+		 tpPochki = new JEditorPane();
 		tpPochki.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblmoch = new JLabel("Мочевой пузырь");
 		
-		 tpMoch = new JTextPane();
+		 tpMoch = new JEditorPane();
 		tpMoch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblmoljel = new JLabel("Молочные железы");
 		
-		 tpMoljel = new JTextPane();
+		 tpMoljel = new JEditorPane();
 		tpMoljel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblgrjel = new JLabel("Грудные железы мужчин");
 		
-		 tpGrjel = new JTextPane();
+		 tpGrjel = new JEditorPane();
 		tpGrjel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblmatka = new JLabel("Матка и ее придатки");
 		
-		 tpMatka = new JTextPane();
+		 tpMatka = new JEditorPane();
 		tpMatka.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblnarpolov = new JLabel("Наружные половые органы у мужчин");
 		
-		 tpNarpolov = new JTextPane();
+		 tpNarpolov = new JEditorPane();
 		tpNarpolov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblchitov = new JLabel("Щитовидная железа");
 		
-		 tpChitov = new JTextPane();
+		 tpChitov = new JEditorPane();
 		tpChitov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		GroupLayout gl_panFiz = new GroupLayout(panFiz);
@@ -1106,14 +1158,6 @@ public class Vvod extends JFrame {
 		JLabel lblcobr = new JLabel("Цель обращения");
 		
 		c_obr = new ThriftStringClassifierCombobox<>(true);
-		c_obr.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(Vvod.this, c_obr.getSelectedItem().pcod);
-			}
-		});
-		
 		JLabel lblrez = new JLabel("Результат");
 		
 		cbrez = new ThriftIntegerClassifierCombobox<>(true);
@@ -1176,18 +1220,30 @@ public class Vvod extends JFrame {
 		);
 		panel_Talon.setLayout(gl_panel_Talon);
 		
-		JButton button_6 = new JButton("Настройка");
-		button_6.addActionListener(new ActionListener() {
+		JButton bSet = new JButton("Настройка");
+		bSet.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				settingsosm.setVisible(true);}
 		});
 		
 		JScrollPane sPos = new JScrollPane();
 		
-		JButton button_7 = new JButton("Наблюдение за берем.");
-		button_7.addActionListener(new ActionListener() {
+		JButton bDB = new JButton("Наблюдение за берем.");
+		bDB.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				postber.setVisible(true);
+			}
+		});
+		
+		JButton button_8 = new JButton("+");
+		button_8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PvizitAmb pa = TabPos.addExternalItem();
+				pa.setCdol(MainForm.authInfo.getPdost());//TODO потом изменить на должность
+				pa.setDatap(System.currentTimeMillis());
+				pa.setFio_vr(MainForm.authInfo.getName());
+				TabPos.updateSelectedItem();
+				
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -1196,7 +1252,10 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button_8))
 						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 							.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
 							.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 1004, Short.MAX_VALUE)))
@@ -1204,22 +1263,22 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(button_7, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(bDB, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(btnAnamz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addGap(10)
-					.addComponent(button)
+					.addComponent(bA)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(button_1)
+					.addComponent(bS)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(button_2)
+					.addComponent(bSSh)
 					.addGap(10)
-					.addComponent(button_3)
+					.addComponent(bZSh)
 					.addGap(10)
-					.addComponent(button_4)
+					.addComponent(bVD)
 					.addGap(6)
-					.addComponent(button_5)
+					.addComponent(bDelet)
 					.addGap(18)
-					.addComponent(button_6)
+					.addComponent(bSet)
 					.addGap(3076))
 		);
 		gl_panel.setVerticalGroup(
@@ -1227,22 +1286,28 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGap(11)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(button_3)
-						.addComponent(button_4)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-							.addComponent(button_5)
-							.addComponent(button_6))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-									.addComponent(btnAnamz)
-									.addComponent(button)
-									.addComponent(button_1))
-								.addComponent(button_2))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+											.addComponent(btnAnamz)
+											.addComponent(bA)
+											.addComponent(bS))
+										.addComponent(bSSh))
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(bDB)))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_7)))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+								.addComponent(button_8)))
+						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(bDelet)
+								.addComponent(bSet))
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(bZSh)
+								.addComponent(bVD))))
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -1250,10 +1315,17 @@ public class Vvod extends JFrame {
 					.addGap(198))
 		);
 		
-		TabPos = new CustomTable<>(false,true,PvizitAmb.class,3,"Дата",4,"ФИО врача",5,"Должность");
+		TabPos = new CustomTable<>(false,true,PvizitAmb.class,3,"Дата",19,"ФИО врача",5,"Должность");
 		TabPos.setDateField(0);
 		sPos.setViewportView(TabPos);
 		TabPos.setFillsViewportHeight(true);
+		
+		JPopupMenu pmvizit = new JPopupMenu();
+		//addPopup(TabPos, pmvizit);
+		
+		JMenuItem mi1 = new JMenuItem("Печать протокола посещения");
+		pmvizit.add(mi1);
+		
 			TabPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
@@ -1584,10 +1656,134 @@ public class Vvod extends JFrame {
 							if (pri.getT_jel_kish()!=null){
 							lbljkt.setVisible(true);
 							tpJkt.setVisible(true);
-							tpJkt.setText(pri.getT_palp_jivot());	
+							tpJkt.setText(pri.getT_jel_kish());	
 							}else{
 							tpJkt.setVisible(false);
 							lbljkt.setVisible(false);
+							}
+							if (pri.getT_palp_jel()!=null){
+							lblpalpjel.setVisible(true);
+							tpPalpjel.setVisible(true);
+							tpPalpjel.setText(pri.getT_palp_jel());	
+							}else{
+							tpPalpjel.setVisible(false);
+							lblpalpjel.setVisible(false);
+							}
+							if (pri.getT_palp_podjel()!=null){
+							lblpalppodjel.setVisible(true);
+							tpPalppodjel.setVisible(true);
+							tpPalppodjel.setText(pri.getT_palp_podjel());	
+							}else{
+							tpPalppodjel.setVisible(false);
+							lblpalppodjel.setVisible(false);
+							}
+							if (pri.getT_pechen()!=null){
+							lblpech.setVisible(true);
+							tpPechen.setVisible(true);
+							tpPechen.setText(pri.getT_pechen());	
+							}else{
+							tpPechen.setVisible(false);
+							lblpech.setVisible(false);
+							}
+							if (pri.getT_jelch()!=null){
+							lbljelch.setVisible(true);
+							tpJelch.setVisible(true);
+							tpJelch.setText(pri.getT_jelch());	
+							}else{
+							tpJelch.setVisible(false);
+							lbljelch.setVisible(false);
+							}
+							if (pri.getT_selez()!=null){
+							lblselez.setVisible(true);
+							tpSelez.setVisible(true);
+							tpSelez.setText(pri.getT_selez());	
+							}else{
+							tpSelez.setVisible(false);
+							lblselez.setVisible(false);
+							}
+							if (pri.getT_obl_zad()!=null){
+							lbloblzad.setVisible(true);
+							tpOblzad.setVisible(true);
+							tpOblzad.setText(pri.getT_obl_zad());	
+							}else{
+							tpOblzad.setVisible(false);
+							lbloblzad.setVisible(false);
+							}
+							if (pri.getT_poyasn()!=null){
+							lblpoyasn.setVisible(true);
+							tpPoyasn.setVisible(true);
+							tpPoyasn.setText(pri.getT_poyasn());	
+							}else{
+							tpPoyasn.setVisible(false);
+							lblpoyasn.setVisible(false);
+							}
+							if (pri.getT_pochk() !=null){
+							lblpochk.setVisible(true);
+							tpPochki.setVisible(true);
+							tpPochki.setText(pri.getT_pochk());	
+							}else{
+							tpPochki.setVisible(false);
+							lblpochk.setVisible(false);
+							}
+							if (pri.getT_moch() !=null){
+							lblmoch.setVisible(true);
+							tpMoch.setVisible(true);
+							tpMoch.setText(pri.getT_moch());	
+							}else{
+							tpMoch.setVisible(false);
+							lblmoch.setVisible(false);
+							}
+							if (pri.getT_mol_jel() !=null){
+							lblmoljel.setVisible(true);
+							tpMoljel.setVisible(true);
+							tpMoljel.setText(pri.getT_mol_jel());	
+							}else{
+							tpMoljel.setVisible(false);
+							lblmoljel.setVisible(false);
+							}
+							if (pri.getT_gr_jel() !=null){
+							lblgrjel.setVisible(true);
+							tpGrjel.setVisible(true);
+							tpGrjel.setText(pri.getT_gr_jel());	
+							}else{
+							tpGrjel.setVisible(false);
+							lblgrjel.setVisible(false);
+							}
+							if (pri.getT_matka() !=null){
+							lblmatka.setVisible(true);
+							tpMatka.setVisible(true);
+							tpMatka.setText(pri.getT_matka());	
+							}else{
+							tpMatka.setVisible(false);
+							lblmatka.setVisible(false);
+							}
+							if (pri.getT_nar_polov() !=null){
+							lblnarpolov.setVisible(true);
+							tpNarpolov.setVisible(true);
+							tpNarpolov.setText(pri.getT_nar_polov());	
+							}else{
+							tpNarpolov.setVisible(false);
+							lblnarpolov.setVisible(false);
+							}
+							if (pri.getT_chitov() !=null){
+							lblchitov.setVisible(true);
+							tpChitov.setVisible(true);
+							tpChitov.setText(pri.getT_chitov());	
+							}else{
+							tpChitov.setVisible(false);
+							lblchitov.setVisible(false);
+							}
+							if (pri.getT_st_localis() !=null){
+							tpLocalis.setVisible(true);
+							tpLocalis.setText(pri.getT_st_localis());	
+							}else{
+							tpLocalis.setVisible(false);
+							}
+							if (pri.getT_ocenka() !=null){
+							tpOcenka.setVisible(true);
+							tpOcenka.setText(pri.getT_ocenka());	
+							}else{
+							tpOcenka.setVisible(false);
 							}
 							} catch (KmiacServerException e) {
 								// TODO Auto-generated catch block
@@ -1609,7 +1805,7 @@ public class Vvod extends JFrame {
 		JPanel plocst = new JPanel();
 		tabbedPane.addTab("Localis status", null, plocst, null);
 		
-		JTextPane tpLocalis = new JTextPane();
+		 tpLocalis = new JEditorPane();
 		tpLocalis.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GroupLayout gl_plocst = new GroupLayout(plocst);
 		gl_plocst.setHorizontalGroup(
@@ -1669,6 +1865,10 @@ public class Vvod extends JFrame {
 		TabDiag.setDateField(0);
 		spDiag.setViewportView(TabDiag);
 		TabDiag.setFillsViewportHeight(true);		
+		
+		textField = new JTextField();
+		textField.setText(DateFormat.getDateInstance().format(new Date(111111111)));
+		textField.setColumns(10);
 		GroupLayout gl_pds = new GroupLayout(pds);
 		gl_pds.setHorizontalGroup(
 			gl_pds.createParallelGroup(Alignment.TRAILING)
@@ -1678,7 +1878,9 @@ public class Vvod extends JFrame {
 						.addGroup(gl_pds.createSequentialGroup()
 							.addComponent(lblkod)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE))
+							.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+							.addGap(54)
+							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pds.createSequentialGroup()
 							.addComponent(lblnamed)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -1700,7 +1902,8 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblkod)
-						.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblnamed)
@@ -1726,17 +1929,38 @@ public class Vvod extends JFrame {
 		);
 		pnazn.setLayout(gl_pnazn);
 		
+		JPanel pOcenka = new JPanel();
+		tabbedPane.addTab("Оценка данных анамнеза", null, pOcenka, null);
+		
+		 tpOcenka = new JEditorPane();
+		GroupLayout gl_pOcenka = new GroupLayout(pOcenka);
+		gl_pOcenka.setHorizontalGroup(
+			gl_pOcenka.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pOcenka.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(tpOcenka, GroupLayout.PREFERRED_SIZE, 592, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(239, Short.MAX_VALUE))
+		);
+		gl_pOcenka.setVerticalGroup(
+			gl_pOcenka.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pOcenka.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(tpOcenka, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(389, Short.MAX_VALUE))
+		);
+		pOcenka.setLayout(gl_pOcenka);
+		
 		pzakl = new JPanel();
 		tabbedPane.addTab("Заключение", null, pzakl, null);
 		
 		final JLabel lblzakl = new JLabel("Заключение специалиста");
 		
-		JTextPane tpzakl = new JTextPane();
+		JEditorPane tpzakl = new JEditorPane();
 		tpzakl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		
 		final JLabel lblrecom = new JLabel("Медицинские рекомендации");
 		
-		 tprecom = new JTextPane();
+		 tprecom = new JEditorPane();
 		tprecom.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GroupLayout gl_pzakl = new GroupLayout(pzakl);
 		gl_pzakl.setHorizontalGroup(
@@ -1817,7 +2041,7 @@ public class Vvod extends JFrame {
 			MainForm.tcl.AddPvizitAmb(pos);
 			MainForm.tcl.UpdatePvizit(pvizit);
 			MainForm.tcl.AddPdiagAmb(diag);
-			if (diag.prizn == 2){//присвоить значение полей данным.вписать в табл.
+			if (diag.diag_stat == 2){//присвоить значение полей данным.вписать в табл.
 			MainForm.tcl.AddPdiagZ(dz);	
 			}
 			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
@@ -1837,12 +2061,16 @@ public class Vvod extends JFrame {
 	
 	public void onConnect() {
 		try {
+			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
 			c_obr.setData(MainForm.tcl.getP0c());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
 			TabPos.setData(MainForm.tcl.getPvizitAmb(6));
-			//TabDiag.setData(MainForm.tcl.getPdiagAmb(6));потом откомментарить
+			TabDiag.setData(MainForm.tcl.getPdiagAmb(6));
 			vid_opl.setData(MainForm.tcl.getOpl());
+			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
+			printform.cbMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
+			
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1857,7 +2085,7 @@ public class Vvod extends JFrame {
 			TransformerFactory.newInstance().newTransformer().transform(src, res);
 			Document document = (Document) res.getNode();
 					if (getElement(document, "jalob_dyh")!=null){
-						JTextPane tpJalobd = new JTextPane();
+						JEditorPane tpJalobd = new JEditorPane();
 						Jalob.add(tpJalobd);
 											
 			}
@@ -1875,11 +2103,5 @@ public class Vvod extends JFrame {
 			return (Element) nls.item(0);
 		}
 		return null;
-	}
-	
-	public void loadData(){
-	if(pr.getT_jalob_d()!=null){
-		JOptionPane.showMessageDialog (getContentPane(),"1111");
-	}
 	}
 }

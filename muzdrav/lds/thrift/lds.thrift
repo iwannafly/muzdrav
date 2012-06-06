@@ -64,6 +64,8 @@ struct Patient {
 	3: string im;
 	4: string ot;
 	5: i64 datar;
+	6: string poms_ser;
+	7: string poms_nom;
 }
 
 
@@ -71,8 +73,9 @@ struct Metod {
 	1: i32 c_p0e1;
 	2: string pcod;
 	3: string c_obst;
-	4: string nameobst;
+	4: string name;
 	5: double stoim;	
+	6: bool vibor;
 }
 
 
@@ -83,6 +86,7 @@ struct N_ldi {
 	4: string name;
 	5: string norma;
 	6: i32 c_p0e1;
+	7: bool vibor;
 }
 
 
@@ -147,6 +151,20 @@ exception LdiNotFoundException {
 }
 
 
+/*
+* Исследование уже существует
+*/
+exception S_ot01ExistsException {
+}
+
+
+/**
+ * Исследование с такими данными не найдено
+ */
+exception S_ot01NotFoundException {
+}
+
+
 service LDSThrift extends kmiacServer.KmiacServer {
 	list<ObInfIsl> GetObInfIslt(1: i32 npasp);
 	ObInfIsl GetIsl(1: i32 npasp) throws (1: IslNotFoundException ine);
@@ -166,9 +184,17 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
 
+
+	list<S_ot01> GetS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
+	S_ot01 GetSot01(1: i32 cotd, 2: string pcod, 3: string c_nz1) throws (1: S_ot01NotFoundException sone);
+	void AddS_ot01(1: S_ot01 so)throws (1: S_ot01ExistsException soee);
+	void UpdS_ot01(1: S_ot01 so)throws (1: S_ot01ExistsException soee);
+	void DelS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
+
+
     	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
 	
-	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod) throws (1: MetodNotFoundException mnfe);
+	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
 

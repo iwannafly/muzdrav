@@ -1,21 +1,22 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -27,24 +28,23 @@ import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 
 public class FormSign extends JFrame {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -5267798845014525253L;
 	private JTextField tfgrup;
 	private JTextField tfrezus;
-	private JTextPane tpallerg;
-	private JTextPane tpfarm;
-	private JTextPane tpanamnz;
+	private JEditorPane tpallerg;
+	private JEditorPane tpfarm;
+	private JEditorPane tpanamnz;
 	private Psign psign;
 	private JCheckBox cbk;
 	private JCheckBox cba;
 	private JCheckBox cbn;
-	private String v1;
-	private String v2;
-	private String v3;
+	private JRadioButton rb1g;
+	private JRadioButton rb2g;
+	private JRadioButton rb3g;
+	private JRadioButton rb4g;
+	private JRadioButton rbpol;
+	private JRadioButton rbotr;
 	private String vrp;
-	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -60,8 +60,16 @@ public class FormSign extends JFrame {
 			public void windowActivated(WindowEvent e) {
 			try {
 				psign = MainForm.tcl.getPsign(Vvod.zapVrSave.npasp);
-				tfgrup.setText(psign.grup);
-				tfrezus.setText(psign.ph);
+				if (psign.getGrup().trim() != null){
+					rb1g.setSelected(psign.grup.charAt(0) == '1');
+					rb2g.setSelected(psign.grup.charAt(0) == '2');
+					rb3g.setSelected(psign.grup.charAt(0) == '3');
+					rb4g.setSelected(psign.grup.charAt(0) == '4');
+				}
+				if (psign.getPh().trim() != null){
+					rbpol.setSelected(psign.grup.charAt(0) == '+');
+					rbotr.setSelected(psign.grup.charAt(0) == '-');
+				}
 				tpallerg.setText(psign.allerg);
 				tpanamnz.setText(psign.vitae);
 				tpfarm.setText(psign.farmkol);
@@ -103,8 +111,25 @@ public class FormSign extends JFrame {
 		JButton button = new JButton("Сохранить");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				psign.setGrup(tfgrup.getText());
-				psign.setPh(tfrezus.getText());
+				if (rb1g.isSelected()) {
+					psign.setGrup("1");
+				}
+				if (rb2g.isSelected()) {
+					psign.setGrup("2");
+				}
+				if (rb3g.isSelected()) {
+					psign.setGrup("3");
+				}
+				if (rb4g.isSelected()) {
+					psign.setGrup("4");
+				}
+				if (rbpol.isSelected()) {
+					psign.setPh("+");
+				}
+				if (rbotr.isSelected()) {
+					psign.setPh("-");
+				}
+
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
@@ -122,100 +147,134 @@ public class FormSign extends JFrame {
 			}
 		});
 		
-		tpallerg = new JTextPane();
+		tpallerg = new JEditorPane();
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		
-		tpfarm = new JTextPane();
+		tpfarm = new JEditorPane();
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
-		tpanamnz = new JTextPane();
+		tpanamnz = new JEditorPane();
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JLabel label_5 = new JLabel("Вредные привычки");
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-				
-		textField = new JTextField();
-		textField.setVisible(false);
-		textField.setColumns(10);
+		
+		JPanel pgrk = new JPanel();
+		pgrk.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		ButtonGroup BGgrk = new ButtonGroup();
+		 rb1g = new JRadioButton("I", true);
+		pgrk.add(rb1g);
+		 rb2g = new JRadioButton("II", true);
+		pgrk.add(rb2g);
+		 rb3g = new JRadioButton("III", true);
+		pgrk.add(rb3g);
+		 rb4g = new JRadioButton("IV", true);
+		pgrk.add(rb4g);
+		BGgrk.add(rb1g);
+		BGgrk.add(rb2g);
+		BGgrk.add(rb3g);
+		BGgrk.add(rb4g);
+		
+		JPanel prezus = new JPanel();
+		prezus.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		ButtonGroup BGRez = new ButtonGroup();		
+		 rbpol = new JRadioButton("+", true);
+		prezus.add(rbpol);
+		 rbotr = new JRadioButton("-", true);
+		prezus.add(rbotr);
+		BGRez.add(rbpol);
+		BGRez.add(rbotr);
+		
+		
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(label_1)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(pgrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(label_2)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(prezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(label_3)
+							.addGap(45)
+							.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 360, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(label, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
-										.addComponent(label_4)
-										.addComponent(label_2)
-										.addComponent(label_1))
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(tpfarm, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-										.addComponent(tpanamnz, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
-										.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-											.addComponent(tfrezus, Alignment.LEADING)
-											.addComponent(tfgrup, Alignment.LEADING))))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addComponent(label_3)
-									.addGap(45)
-									.addComponent(tpallerg, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(label_5)
-										.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-									.addGap(30)
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))))
-							.addContainerGap())
+								.addComponent(label_4)
+								.addComponent(label, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(tpfarm)
+								.addComponent(tpanamnz, GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)))
 						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(button)
-							.addGap(22))))
+							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+								.addComponent(button)
+								.addComponent(label_5))
+							.addGap(30)
+							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)))
+					.addGap(420)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(tfrezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tfgrup, 183, 183, 183))
+					.addContainerGap())
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_1)
-						.addComponent(tfgrup, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_2)
-						.addComponent(tfrezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(40)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
-						.addComponent(label_3))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-						.addComponent(label))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(label_4)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(label_5)
-							.addGap(20))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-							.addGap(26)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)))
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(25)
-							.addComponent(button))
+							.addGap(13)
+							.addComponent(label_1))
+						.addComponent(pgrk, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+					.addGap(13)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(18)
-							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-					.addGap(61))
+							.addGap(30)
+							.addComponent(tfgrup, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(2)
+							.addComponent(tfrezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+								.addComponent(label_2)
+								.addComponent(prezus, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(49)
+									.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(40)
+									.addComponent(label_3)))
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(23)
+									.addComponent(label)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+									.addComponent(label_4)
+									.addGap(66)
+									.addComponent(label_5)
+									.addGap(14))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(8)
+									.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)))))
+					.addGap(15)
+					.addComponent(button)
+					.addGap(115))
 		);
 		
 		cbk = new JCheckBox("Курение");

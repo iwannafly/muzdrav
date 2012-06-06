@@ -27,16 +27,12 @@ import javax.swing.border.TitledBorder;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
-import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 
 public class PermForm extends JDialog {
 	private static final long serialVersionUID = 5320450245161207797L;
 	private static final String frameTitle = "Установка прав пользователя";
-	private ThriftServerVrachInfo.Client client;
-	private ConnectionManager conMan;
 	private VrachInfo vInf;
 	private MestoRab mRab;
 	private JTextField tbLog;
@@ -107,10 +103,10 @@ public class PermForm extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					client.setPermissions(mRab.pcod, mRab.clpu, mRab.cpodr, getPermissions());
+					MainForm.tcl.setPermissions(mRab.pcod, mRab.clpu, mRab.cpodr, getPermissions());
 					dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
 				} catch (TTransportException e1) {
-					conMan.reconnect(e1);
+					MainForm.conMan.reconnect(e1);
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -166,10 +162,10 @@ public class PermForm extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					tbPass.setText(client.setPassword(mRab.pcod, mRab.clpu, mRab.cpodr, tbLog.getText()));
+					tbPass.setText(MainForm.tcl.setPassword(mRab.pcod, mRab.clpu, mRab.cpodr, tbLog.getText()));
 					setDelPassPermEnabled(true);
 				} catch (TTransportException e1) {
-					conMan.reconnect(e1);
+					MainForm.conMan.reconnect(e1);
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -189,10 +185,10 @@ public class PermForm extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					client.remPassword(mRab.pcod, mRab.clpu, mRab.cpodr);
+					MainForm.tcl.remPassword(mRab.pcod, mRab.clpu, mRab.cpodr);
 					dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
 				} catch (TTransportException e1) {
-					conMan.reconnect(e1);
+					MainForm.conMan.reconnect(e1);
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -252,11 +248,11 @@ public class PermForm extends JDialog {
 					try {
 						tbPass.setText("");
 						setTitle(String.format("%s %s %s %s, код подразделения %d", frameTitle, vInf.fam, vInf.im, vInf.ot, mRab.cpodr));
-						tbLog.setText(client.getLogin(mRab.pcod, mRab.clpu, mRab.cpodr));
-						setPermissions(client.getPermissions(mRab.pcod, mRab.clpu, mRab.cpodr));
+						tbLog.setText(MainForm.tcl.getLogin(mRab.pcod, mRab.clpu, mRab.cpodr));
+						setPermissions(MainForm.tcl.getPermissions(mRab.pcod, mRab.clpu, mRab.cpodr));
 						setDelPassPermEnabled((tbLog.getText().length() == 0) ? false : true);
 					} catch (TTransportException e1) {
-						conMan.reconnect(e1);
+						MainForm.conMan.reconnect(e1);
 					} catch (TException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -271,14 +267,6 @@ public class PermForm extends JDialog {
 				super.windowClosing(e);
 			}
 		});
-	}
-	
-	public void setClient(ThriftServerVrachInfo.Client client) {
-		this.client = client;
-	}
-	
-	public void setConnectionManager(ConnectionManager conMan) {
-		this.conMan = conMan;
 	}
 	
 	public void showWindow(VrachInfo vi, MestoRab mr, boolean ownRecord) {

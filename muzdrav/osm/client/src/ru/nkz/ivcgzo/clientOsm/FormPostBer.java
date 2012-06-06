@@ -130,10 +130,10 @@ public class FormPostBer extends JFrame {
 		}
 		or1=iw1; 
 		oslcode = rdsl.getOslAb();
-		if (oslcode=="N70"){oslname = "Сальпингит и оофорит";}
-		if (oslcode=="N71"){oslname = "Воспалительные болезни матки";}
-		if (oslcode=="N72"){oslname = "Воспалительные болезни шейки матки";}
-		if (oslcode=="N76"){oslname = "Другие воспалительные болезни влагалища и вульвы";}
+		if (oslcode.equals("N70")){oslname = "Сальпингит и оофорит";}
+		if (oslcode.equals("N71")){oslname = "Воспалительные болезни матки";}
+		if (oslcode.equals("N72")){oslname = "Воспалительные болезни шейки матки";}
+		if (oslcode.equals("N76")){oslname = "Другие воспалительные болезни влагалища и вульвы";}
 		if (oslcode==null){oslname = "";}
 		addWindowListener(new WindowAdapter() {
 			@Override

@@ -6,5 +6,4 @@ public class configuration {
 	public static final int thrPort = 55006;
 	public static final int appId = 6;
 	public static final String appName = "Медицинское свидетельство о смерти";
-	public static final String appVersion = "0.0.0.0";
 }

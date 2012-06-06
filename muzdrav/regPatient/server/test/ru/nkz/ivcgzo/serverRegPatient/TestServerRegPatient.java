@@ -20,6 +20,10 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
+import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
@@ -52,7 +56,6 @@ public class TestServerRegPatient {
         testServer = new ServerRegPatient(sse, tse);
         testPatientFull = new PatientBrief();
         testPatientFull.setIm("СЕРГЕЙ");
-        testPatientFull.setFam("ИВАНОВ");
         testPatientEmpty = new PatientBrief();
         testPatientEmpty.setNpasp(-1);
     }
@@ -74,7 +77,7 @@ public class TestServerRegPatient {
     @Test
     public final void getAllPatientBrief_isListSizeCorrect()
             throws TException, PatientNotFoundException {
-        final int expectedListSize = 312;
+        final int expectedListSize = 308;
         java.util.List <PatientBrief> testPatientList =
                 testServer.getAllPatientBrief(testPatientFull);
         assertEquals("list size", expectedListSize, testPatientList.size());
@@ -119,7 +122,7 @@ public class TestServerRegPatient {
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
         assertEquals("npasp value", 2, patientFullInfo.getNpasp());
-        assertEquals("fam value", "БЕЛОГОРОДЦЕВА", patientFullInfo.getFam());
+        assertEquals("fam value", "Уникальная_фамилия", patientFullInfo.getFam());
         assertEquals("im value", "ДИАНА", patientFullInfo.getIm());
         assertEquals("ot value", "АЛЕКСЕЕВНА", patientFullInfo.getOt());
         assertEquals("datar value", birthDate,
@@ -218,7 +221,7 @@ public class TestServerRegPatient {
         int npasp = 2;
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
-        assertEquals("list size", 2, kontingent.size());
+        assertEquals("list size", 4, kontingent.size());
     }
 
     @SuppressWarnings("deprecation")
@@ -230,9 +233,9 @@ public class TestServerRegPatient {
         final Date birthDate2 = new Date(102, 1, 2);
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
-        assertEquals("id value", 1, kontingent.get(0).getId());
+        assertEquals("id value", 2, kontingent.get(0).getId());
         assertEquals("npasp value", npasp, kontingent.get(0).getNpasp());
-        assertEquals("kateg value", 1, kontingent.get(0).getKateg());
+        assertEquals("kateg value", 2, kontingent.get(0).getKateg());
         assertEquals("datau value", birthDate1, new Date(kontingent.get(0).getDatau()));
         assertEquals("name value", "нэйм1", kontingent.get(0).getName());
         assertEquals("id value", 2, kontingent.get(1).getId());
@@ -250,6 +253,30 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         kontingent.clear();
+    }
+
+    @Test
+    public final void getGosp_isFieldValueCorrect()
+            throws TException, GospNotFoundException {
+        final int id = 1;
+        Gosp testGosp =
+                testServer.getGosp(id);
+        assertEquals("npasp value", 2, testGosp.getNpasp());
+    }
+
+    @Test
+    public final void addGosp_isGospActuallyAdded()
+            throws TException, GospNotFoundException, GospAlreadyExistException {
+        final int id = 1;
+        Gosp testGosp = testServer.getGosp(id);
+        testGosp.ngosp = 3;
+        System.out.println(testGosp.npasp);
+        System.out.println(testGosp.nist);
+        System.out.println(testGosp.datap);
+        System.out.println(testGosp.vremp);
+        System.out.println(testGosp.naprav);
+        System.out.println(testGosp.pl_extr);
+        int i = testServer.addGosp(testGosp);
     }
 
     @Test
@@ -281,7 +308,7 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         testException.expect(KontingentAlreadyExistException.class);
-        int afterAddId = testServer.addKont(kontingent.get(0));
+        Info afterAddId = testServer.addKont(kontingent.get(0));
         //assertEquals(afterAddId, 0);
     }
 
@@ -292,7 +319,7 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         kontingent.get(0).setKateg((short) 12);
-        int afterAddId = testServer.addKont(kontingent.get(0));
+        Info afterAddId = testServer.addKont(kontingent.get(0));
     }
 
     @Test
