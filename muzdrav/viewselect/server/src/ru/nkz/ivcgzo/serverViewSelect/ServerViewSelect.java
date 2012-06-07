@@ -1,6 +1,5 @@
 package ru.nkz.ivcgzo.serverViewSelect;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -11,23 +10,15 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
-import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
-import ru.nkz.ivcgzo.serverManager.common.Server;
-import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
-import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
-import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
+import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
 
 public class ServerViewSelect extends Server implements Iface {
 	
@@ -38,17 +29,13 @@ public class ServerViewSelect extends Server implements Iface {
 	}
 
 	@Override
-	public String getServerVersion() throws TException {
-		return configuration.appVersion;
-	}
-
-	@Override
-	public String getClientVersion() throws TException {
-		return null;
+	public void testConnection() throws TException {
+		
 	}
 
 	@Override
 	public void saveUserConfig(int id, String config) throws TException {
+		
 	}
 
     @Override
