@@ -2483,7 +2483,6 @@ public class PacientInfoFrame extends JFrame {
 				e.printStackTrace();
 				return false;
 			}
-            System.out.println("delete");
 			return true;
 			}
 		});
