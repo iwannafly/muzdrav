@@ -338,6 +338,13 @@ public class TestServerRegPatient {
     }
 
     @Test
+    public final void deleteGosp_isGospActuallyDeleted()
+            throws TException {
+        int id = 2;
+        testServer.deleteGosp(id);
+    }
+
+    @Test
     public final void updatePatient_isPatientActuallyUpdated()
             throws TException, PatientNotFoundException, PatientAlreadyExistException {
         int npasp = 2;
