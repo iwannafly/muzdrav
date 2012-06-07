@@ -1,19 +1,15 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
-import java.lang.reflect.InvocationTargetException;
 import javax.swing.JScrollPane;
-
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.transport.TFramedTransport;
-import org.apache.thrift.transport.TSocket;
-import org.apache.thrift.transport.TTransport;
-import org.apache.thrift.transport.TTransportException;
+import javax.swing.JTextField;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
@@ -22,71 +18,25 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class MainForm extends Client {
+public class MainForm extends Client<ThriftViewSelect.Client> {
 	public static ThriftViewSelect.Client tcl;
-	public static UserAuthInfo authInfo;
-	public static ConnectionManager conMan;
 	public JFrame frame;
 	public JTextField tfSearch;
 	public JScrollPane spClassifier;
 	private CustomTable<IntegerClassifier, IntegerClassifier._Fields> table;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
-		super(conMan, authInfo, lncPrm);
-		
-		this.authInfo = authInfo;
-		
-		if (conMan != null) {
-			conMan.add(ThriftViewSelect.Client.class, configuration.thrPort);
-			conMan.setLocalForm(frame);
-		} else 
-			try {
-				TTransport transport = new TFramedTransport(new TSocket("localhost", configuration.thrPort));
-				transport.open();
-				onConnect(new ThriftViewSelect.Client(new TBinaryProtocol(transport)));
-			} catch (TTransportException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
+		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
+
 		initialize();
-		frame.setVisible(true);
-	}
-
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					new MainForm(null, null, 0);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		
+		setFrame(frame);
 	}
 
 	/**
 	 * Create the application.
 	 */
-
-	@Override
-	public String getVersion() {
-		return configuration.appVersion;
-	}
-
-	@Override
-	public int getId() {
-		return configuration.appId;
-	}
 
 	@Override
 	public String getName() {
@@ -138,8 +88,9 @@ public class MainForm extends Client {
 
 	@Override
 	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
+		super.onConnect(conn);
 		if (conn instanceof ThriftViewSelect.Client) {
-			tcl = (ThriftViewSelect.Client) conn;
+			tcl = thrClient;
 			try { 
 				table.setData(tcl.getVSIntegerClassifierView());
 				frame.setTitle( table.getModel().getColumnClass(1).toString());

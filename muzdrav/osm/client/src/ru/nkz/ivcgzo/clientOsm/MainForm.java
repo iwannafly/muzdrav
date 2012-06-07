@@ -21,6 +21,7 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
+import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.PatientInfoViewMainForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -32,6 +33,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
+	private PInfo pinfo;
 	
 	private PatientInfoViewMainForm patInfoView;
 
@@ -66,7 +68,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					tcl.testConnection();
-					patInfoView.showForm(tcl, table.getSelectedItem().npasp);
+					//patInfoView.showForm(tcl, table.getSelectedItem().npasp);
+					pinfo.setVisible(true);
 				} catch (TException e1) {
 					conMan.reconnect(e1);
 				}
@@ -103,6 +106,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame.getContentPane().setLayout(groupLayout);
 		
 		vvod = new Vvod();
+		pinfo = new PInfo();
 		patInfoView = new PatientInfoViewMainForm(conMan, authInfo);
 	}
 

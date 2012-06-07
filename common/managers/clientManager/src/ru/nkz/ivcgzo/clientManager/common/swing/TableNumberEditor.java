@@ -7,48 +7,53 @@ import java.text.ParseException;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 /**
- * Класс, представляющий собой компонент для редактирования дат, заменяющий
+ * Класс, представляющий собой компонент для редактирования чисел, заменяющий
  * стандартное поле в {@link CustomTable}.
  * @author bsv798
  */
-public class TableDateEditor extends DefaultCellEditor {
+public class TableNumberEditor extends DefaultCellEditor {
 	private static final long serialVersionUID = -6671230063586063616L;
-	private CustomDateEditor txt;
-	private TableDateRenderer renderer;
+	private CustomNumberEditor txt;
+	private TableNumberRenderer renderer;
+	private Class<?> editorClass;
 	private static Border blackBorder = new LineBorder(Color.black);
 	private static Border redBorder = new LineBorder(Color.red);
 	
-	public TableDateEditor() {
-		super(new CustomDateEditor());
+	public TableNumberEditor() {
+		super(new CustomNumberEditor());
 		
-		txt = (CustomDateEditor) this.getComponent();
-		renderer = new TableDateRenderer();
+		txt = (CustomNumberEditor) this.getComponent();
+		txt.setHorizontalAlignment(JTextField.RIGHT);
+		renderer = new TableNumberRenderer();
 	}
 	
 	@Override
 	public Object getCellEditorValue() {
-		return txt.getDate();
+		return txt.getNumber(editorClass);
 	}
 
 	@Override
 	public Component getTableCellEditorComponent(JTable arg0, Object arg1, boolean arg2, int arg3, int arg4) {
+		editorClass = arg0.getColumnClass(arg4);
+		
 		txt.setBorder(blackBorder);
-		txt.setValue((arg1 == null) ? null : txt.dateFormatter.format(arg1));
+		txt.setText((arg1 == null) ? null : arg1.toString());
+		
 		return txt;
 	}
 	
 	@Override
 	public boolean stopCellEditing() {
 			try {
-				if (txt.getText().equals(txt.placeHolder))
-					txt.setValue(null);	
-				else if (txt.getDate() == null)
-					throw new ParseException(null, 0);
+				if (txt.getText().length() > 0)
+					if (txt.getNumber(editorClass) == null)
+						throw new ParseException(null, 0);
 				txt.setBorder(blackBorder);
 				return super.stopCellEditing();
 			} catch (ParseException e) {
@@ -57,18 +62,19 @@ public class TableDateEditor extends DefaultCellEditor {
 		return false;
 	}
 	
-	public TableDateRenderer getRenderer() {
+	public TableNumberRenderer getRenderer() {
 		return renderer;
 	}
 	
-	class TableDateRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = -6219585518858657636L;
-
+	class TableNumberRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 4372440185602130078L;
+		
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 			JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			
-			lbl.setText((value == null) ? null : txt.dateFormatter.format(value));
+			lbl.setHorizontalAlignment(JLabel.RIGHT);
+			lbl.setText((value == null) ? null : value.toString().replace(',', '.'));
 			
 			return lbl;
 		}
