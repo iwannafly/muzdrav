@@ -1156,7 +1156,6 @@ public class PacientInfoFrame extends JFrame {
 					e.printStackTrace();
 					return false;
 				}
-	            System.out.println("delete");
 				return true;
 			}
 		});
@@ -1181,7 +1180,6 @@ public class PacientInfoFrame extends JFrame {
 					e.printStackTrace();
 					return false;
 				}
-	            System.out.println("add" );
 				return true;
 			}
 		});
@@ -1195,7 +1193,6 @@ public class PacientInfoFrame extends JFrame {
 					e.printStackTrace();
 					return false;
 				}
-	            System.out.println("update" );
 				return true;
 			}
 		});
