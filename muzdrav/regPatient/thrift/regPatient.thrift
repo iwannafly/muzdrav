@@ -190,7 +190,6 @@ struct Info{
 	2:string name 
 }
 
-
 /**
  * Пациент с такими данными не найден.
  */
@@ -331,7 +330,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void deleteKont(1:i32 id),
 	void deleteAgent(1:i32 npasp),
 	void deleteSign(1:i32 npasp),
-	void deleteGosp(1:i32 npasp, 2:i32 ngosp),
+	void deleteGosp(1:i32 id),
 
 	/**
      * Добавляет информацию о пациенте в БД
