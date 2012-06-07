@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -10,11 +11,13 @@ import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.RowSorterEvent;
@@ -105,6 +108,14 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		setModel();
 		if (editable) {
 //			this.setSurrendersFocusOnKeystroke(true);
+			CustomTextField ctf = new CustomTextField();
+			ctf.setBorder(new LineBorder(Color.black));
+			this.setDefaultEditor(Object.class, new DefaultCellEditor(ctf));
+			
+			TableNumberEditor tne = new TableNumberEditor();
+			this.setDefaultEditor(Number.class, tne);
+			this.setDefaultRenderer(Double.class, tne.getRenderer());
+			
 			TableDateEditor tde = new TableDateEditor();
 			this.setDefaultEditor(Date.class, tde);
 			this.setDefaultRenderer(Date.class, tde.getRenderer());
@@ -198,6 +209,10 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			return Short.class;
 		else if (typ == boolean.class)
 			return Boolean.class;
+		else if (typ == float.class)
+			return Float.class;
+		else if (typ == double.class)
+			return Double.class;
 		else
 			return typ;
 	}
