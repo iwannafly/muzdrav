@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>clientViewSelect</name>
+	<name>clientGenTalons</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -18,12 +18,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/viewselect/config</locationURI>
+			<location>D:/kmiac_repos/gitrep/muzdrav/genTalons/config</location>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/viewselect/thrift/gen-java</locationURI>
+			<location>D:/kmiac_repos/gitrep/muzdrav/genTalons/thrift/gen-java</location>
 		</link>
 	</linkedResources>
 </projectDescription>
