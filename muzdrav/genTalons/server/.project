@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>serverGenTalons</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>config</name>
+			<type>2</type>
+			<location>D:/kmiac_repos/gitrep/muzdrav/genTalons/config</location>
+		</link>
+		<link>
+			<name>gen-java</name>
+			<type>2</type>
+			<location>D:/kmiac_repos/gitrep/muzdrav/genTalons/thrift/gen-java</location>
+		</link>
+	</linkedResources>
+</projectDescription>
