@@ -27,6 +27,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.getPvizitInfo_result;
 
@@ -39,8 +40,6 @@ public class PInfo extends JFrame {
 	private JEditorPane eptxt;
 	private JTree treeinfo;
 	protected IndexedTreeNode slzab;
-	private Pvizit pviz;
-
 
 	public PInfo() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,9 +76,23 @@ public class PInfo extends JFrame {
 		 	public void treeCollapsed(TreeExpansionEvent event) {
 		 	}
 		 	public void treeExpanded(TreeExpansionEvent event) {
-		 		slzab.add(new IndexedTreeNode(1, "555"));
-				slzab.add(new IndexedTreeNode(2, "666"));
-				slzab.add(new IndexedTreeNode(3, "777"));
+		 		Object lastPath = event.getPath().getLastPathComponent();
+		 		if (lastPath instanceof PvizitTreeNode) {
+		 			try {
+						PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
+						pvizitNode.removeAllChildren();
+						for (PvizitAmb pvizAmbChild : MainForm.tcl.getPvizitAmb(pvizitNode.pvizit.getId())) {
+							pvizitNode.add(new PvizitAmbNode(pvizAmbChild));
+						}
+						treeinfo.repaint();
+					} catch (KmiacServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						e.printStackTrace();
+						MainForm.conMan.reconnect(e);
+					}
+		 		}
 		 	}
 		 });
 		sptree.setViewportView(treeinfo);
@@ -117,16 +130,31 @@ public class PInfo extends JFrame {
 
 	
 	private IndexedTreeNode createNodes() {
-		IndexedTreeNode root = new IndexedTreeNode(0, "1");
+		IndexedTreeNode root = new IndexedTreeNode(0, "Корень зла");
 		
-		root.add(new IndexedTreeNode(1, "Личная информация"));
-		root.add(new IndexedTreeNode(2, "Сигнальная информация"));
-		 slzab = new IndexedTreeNode(3, "Сл.заб");
-		root.add(slzab);
-		IndexedTreeNode pos = new IndexedTreeNode(4, "");
-		slzab.add(pos);
-		ArrayList<String> list = new ArrayList<String>();
-		list.set(0, MainForm.tcl.getPvizitInfo(2, SimpleDateFormat.getDateInstance().parse("01.02.2012").getTime(), SimpleDateFormat.getDateInstance().parse("01.06.2012").getTime()).toString());
+//		root.add(new IndexedTreeNode(1, "Личная информация"));
+//		root.add(new IndexedTreeNode(2, "Сигнальная информация"));
+//		slzab = new IndexedTreeNode(3, "Сл.заб");
+//		root.add(slzab);
+//		slzab1 = new IndexedTreeNode(4, "");
+//		slzab.add
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.02.2012").getTime(), sdf.parse("02.06.2012").getTime())) {
+				root.add(new PvizitTreeNode(pvizit));
+				
+			}
+		} catch (KmiacServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		list.set(0, MainForm.tcl.getPvizitInfo(2, SimpleDateFormat.getDateInstance().parse("01.02.2012").getTime(), SimpleDateFormat.getDateInstance().parse("01.06.2012").getTime()).toString());
 		
 		//slzab.add(new IndexedTreeNode(5, list.toString()));
 //		slzab.add(new IndexedTreeNode(6, "666"));
@@ -159,6 +187,36 @@ public class PInfo extends JFrame {
 		@Override
 		public String toString() {
 			return getName();
+		}
+	}
+	
+	class PvizitTreeNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = 4212592425962984738L;
+		private Pvizit pvizit;
+		
+		public PvizitTreeNode(Pvizit pvizit) {
+			this.pvizit = pvizit;
+			this.add(new PvizitAmbNode(new PvizitAmb()));
+			
+		}
+		
+		@Override
+		public String toString() {
+			return Integer.toString(pvizit.getId());
+		}
+	}
+	
+	class PvizitAmbNode extends DefaultMutableTreeNode{
+		private static final long serialVersionUID = -4684514837066276873L;
+		private PvizitAmb pam;
+		
+		public PvizitAmbNode(PvizitAmb pam) {
+			this.pam = pam;
+		}
+		
+		@Override
+		public String toString() {
+			return Integer.toString(pam.getId());
 		}
 	}
 }

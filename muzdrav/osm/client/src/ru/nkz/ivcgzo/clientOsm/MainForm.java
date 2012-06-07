@@ -69,6 +69,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				try {
 					tcl.testConnection();
 					//patInfoView.showForm(tcl, table.getSelectedItem().npasp);
+					pinfo = new PInfo();
 					pinfo.setVisible(true);
 				} catch (TException e1) {
 					conMan.reconnect(e1);
@@ -106,7 +107,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame.getContentPane().setLayout(groupLayout);
 		
 		vvod = new Vvod();
-		pinfo = new PInfo();
 		patInfoView = new PatientInfoViewMainForm(conMan, authInfo);
 	}
 
