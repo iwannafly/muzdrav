@@ -1861,7 +1861,7 @@ public class Vvod extends JFrame {
 		GroupBox2.add(jbzakl);
 		
 		JScrollPane spDiag = new JScrollPane();
-		TabDiag = new CustomTable<>(false,true,PdiagAmb.class,3,"Дата",4,"Код МКБ",5,"Описание");
+		TabDiag = new CustomTable<>(false,true,PdiagAmb.class,7,"Дата",3,"Код МКБ",4,"Описание");
 		TabDiag.setDateField(0);
 		spDiag.setViewportView(TabDiag);
 		TabDiag.setFillsViewportHeight(true);		
