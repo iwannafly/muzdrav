@@ -890,10 +890,10 @@ public class ServerRegPatient extends Server implements Iface {
 
     //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
-    public final void deleteGosp(final int npasp, final int ngosp) throws TException {
+    public final void deleteGosp(final int id) throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_gosp WHERE npasp = ? AND ngosp = ?;",
-                    false, npasp, ngosp);
+            sme.execPrepared("DELETE FROM c_gosp WHERE id = ?;",
+                    false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
