@@ -78,7 +78,7 @@ public class PInfo extends JFrame {
 		 		if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
-		 			Priem priem =  MainForm.tcl.getPriem(pvizit.getId(),pvizit.getNpasp(),pvizit.getId());
+//		 			Priem priem =  MainForm.tcl.getPriem(pvizit.getId(),pvizit.getNpasp(),pvizit.getId());
 		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
 					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
