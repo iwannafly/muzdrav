@@ -40,6 +40,7 @@ public class TalonMainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public TalonMainFrame() {
+		setTitle("Электронная регистратура");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 423);
 		contentPane = new JPanel();
