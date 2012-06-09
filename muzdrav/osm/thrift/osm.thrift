@@ -22,7 +22,7 @@ struct Pvizit {
 	1: i32 id;
 	2: i32 npasp;
 	3: i32 cpol;
-	4: i32 cobr;
+	4: string cobr;
 	5: i64 datao;
 	6: i32 ishod;
 	7: i32 rezult;

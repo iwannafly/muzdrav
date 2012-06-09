@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 
@@ -72,20 +73,42 @@ public class PInfo extends JFrame {
 		 treeinfo.addTreeSelectionListener(new TreeSelectionListener() {
 		 	public void valueChanged(TreeSelectionEvent e) {
 		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
-		 		sb = new StringBuilder();
+		 		sb = new StringBuilder();	
+		 		try {
 		 		if (lastPath instanceof PvizitTreeNode) {
-		 			PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
+		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
+		 			Priem priem =  MainForm.tcl.getPriem(pvizit.getId(),pvizit.getNpasp(),pvizit.getId());
 		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
-		 			addLineToDetailInfo("cdol", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
-		 			eptxt.setText(sb.toString());
-		 		} else if (lastPath instanceof PvizitAmbNode) {
+					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
+					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
+		 			addLineToDetailInfo("Врач", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
+					addLineToDetailInfo("Исход", getValueFromClassifier(MainForm.tcl.getAq0(), pvizit.isSetIshod(), pvizit.getIshod()));
+					addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pvizit.isSetRezult(), pvizit.getRezult()));
+					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
+		 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
+					addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
+					addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
+
+					eptxt.setText(sb.toString());
+		 			} 
+		 		else if (lastPath instanceof PvizitAmbNode) {
 		 			PvizitAmbNode pvizitAmbNode = (PvizitAmbNode) lastPath;
 		 			PvizitAmb pam = pvizitAmbNode.pam;
 		 			addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
-		 			addLineToDetailInfo("cdol", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
+		 			addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
 		 			eptxt.setText(sb.toString());
 		 		}
+		 			}
+		 			catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		 			
+		 		
 		 	}
 		 });
 		 treeinfo.addTreeExpansionListener(new TreeExpansionListener() {
