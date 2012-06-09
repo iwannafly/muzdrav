@@ -15,6 +15,7 @@ struct ZapVr{
 	6: string oth;
 	7: string serpolis;
 	8: string nompolis;
+	9: i32 id_pvizit;
 }
 
 struct Pvizit {
@@ -101,22 +102,22 @@ struct Priem{
 	1: i32 id;
 	2: i32 npasp;
 	3: i32 idpos;
-	4: i32 sl_ob;
-	5: i32 n_is;
-	6: i32 n_kons;
-	7: i32 n_proc;
-	8: i32 n_lek;
-	9: string t_jalob_d;
-	10: string t_jalob_krov;
-	11: string t_jalob_p;
-	12: string t_jalob_moch;
-	13: string t_jalob_endo;
-	14: string t_jalob_nerv;
-	15: string t_jalob_opor;
-	16: string t_jalob_lih;
-	17: string t_jalob_obh;
-	18: string t_jalob_proch;
-	19: string t_nachalo_zab;
+	4: optional i32 sl_ob;
+	5: optional i32 n_is;
+	6: optional i32 n_kons;
+	7: optional i32 n_proc;
+	8: optional i32 n_lek;
+	9: optional string t_jalob_d;
+	10: optional string t_jalob_krov;
+	11: optional string t_jalob_p;
+	12: optional string t_jalob_moch;
+	13: optional string t_jalob_endo;
+	14: optional string t_jalob_nerv;
+	15: optional string t_jalob_opor;
+	16: optional string t_jalob_lih;
+	17: optional string t_jalob_obh;
+	18: optional string t_jalob_proch;
+	19: optional string t_nachalo_zab;
 	20: string t_sympt;
 	21: string t_otn_bol;
 	22: string t_ps_syt;
@@ -127,8 +128,8 @@ struct Priem{
 	27: string t_limf_uzl;
 	28: string t_kost_mysh;
 	29: string t_nervn_ps;
-	30: string t_chss;
-	31: string t_temp;
+	30: optional string t_chss;
+	31: optional string t_temp;
 	32: string t_ad;
 	33: string t_rost;
 	34: string t_ves;
@@ -148,7 +149,7 @@ struct Priem{
 	48: string t_palp_jivot;
 	49: string t_jel_kish;
 	50: string t_palp_jel;
-	51: string t_palp_podjel;
+	51: string t_palp_podjjel;
 	52: string t_pechen;
 	53: string t_jelch;
 	54: string t_selez;
@@ -426,7 +427,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
 	
-	i32 AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
+	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);

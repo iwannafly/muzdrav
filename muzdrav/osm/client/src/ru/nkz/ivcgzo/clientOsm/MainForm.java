@@ -59,7 +59,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				vvod.showVvod(authInfo, table.getSelectedItem());
+				if (table.getSelectedItem() != null)
+					vvod.showVvod(table.getSelectedItem());
 			}
 		});
 		
@@ -69,6 +70,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				try {
 					tcl.testConnection();
 					//patInfoView.showForm(tcl, table.getSelectedItem().npasp);
+					pinfo = new PInfo();
 					pinfo.setVisible(true);
 				} catch (TException e1) {
 					conMan.reconnect(e1);
@@ -106,7 +108,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame.getContentPane().setLayout(groupLayout);
 		
 		vvod = new Vvod();
-		pinfo = new PInfo();
 		patInfoView = new PatientInfoViewMainForm(conMan, authInfo);
 	}
 
@@ -125,7 +126,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					JOptionPane.showMessageDialog(frame, "Ошибка загрузки классификаторов", "Необработанная ошибка", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
 				vvod.onConnect();
 				Classifiers.load(tcl);
 			} catch (KmiacServerException | ParseException e) {
