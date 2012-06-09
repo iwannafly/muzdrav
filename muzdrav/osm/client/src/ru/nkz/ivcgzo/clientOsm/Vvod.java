@@ -4,12 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.StringReader;
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
@@ -20,7 +16,6 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
@@ -30,7 +25,6 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -50,26 +44,25 @@ import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
-import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
-	public static ZapVr zapVrSave;
+	public static ZapVr zapVr;
+	private static Pvizit pvizit;
+	private static PvizitAmb pvizitAmb;
+	private static PdiagAmb diag;
+	private static Priem priem;
 	private FormSign sign;
 	private PrintForm printform;
 	private SettingsOsm settingsosm;
 	private FormPostBer postber;
-	private Pvizit pvizit;
-	private PvizitAmb pos;
-	private PdiagAmb diag;
-	private Priem pr;
 	private JPanel pzakl;
 	private PdiagZ dz;
 	private JPanel Jalob;
@@ -154,24 +147,12 @@ public class Vvod extends JFrame {
 	 * Create the frame.
 	 */
 	public Vvod() {
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowActivated(WindowEvent arg0) {
-			}
-		});
-		 pvizit = new Pvizit();
 		 sign = new FormSign();
 //		 postber = new FormPostBer();
 		 settingsosm = new SettingsOsm();
-		 pos = new PvizitAmb();
-		 diag = new PdiagAmb();
-		 pr = new Priem();
 		 dz = new PdiagZ();
 		 printform = new PrintForm();
 		setBounds(100, 100, 1029, 747);
-		//JPanel JPanel = new JPanel();
-		setBorder(new EmptyBorder(5, 5, 5, 5));
-		//setContentPane();
 		
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_contentPane = new GroupLayout(getContentPane());
@@ -206,67 +187,85 @@ public class Vvod extends JFrame {
 		bS.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
-				diag.setDiag(tfkodmkb.getText());
-				diag.setNamed(tfname.getText());
+//				diag.setDiag(tfkodmkb.getText());
+//				diag.setNamed(tfname.getText());
 				/*прежде чем сохранить, проделать эту операцию : diag.setNamed(tfname.getText()); со всеми нужными полями*/
 				/*а потом вызывать метод из thrift,update*/
-//				pr.setT_ad(tfad.getText());
-//				pr.setT_chss(tfchss.getText());
-//				pr.setT_rost(tfrost.getText());
-//				pr.setT_ves(tfves.getText());
-//				pr.setT_st_localis(tpLocalis.getText());
-//				pr.setT_jalob_d(tpJalobd.getText());
-//				pr.setT_jalob_krov(tpJalobkrov.getText());
-//				pr.setT_jalob_p(tpJalobp.getText());
-//				pr.setT_jalob_moch(tpJalobmoch.getText());
-//				pr.setT_jalob_endo(tpJalobendo.getText());
-//				pr.setT_jalob_nerv(tpJalobnerv.getText());
-//				pr.setT_jalob_opor(tpJalobopor.getText());
-//				pr.setT_jalob_lih(tpJaloblih.getText());
-//				pr.setT_jalob_obh(tpJalobobh.getText());
-//				pr.setT_jalob_proch(tpJalobproch.getText());
-//				pr.setT_nachalo_zab(tpNaczab.getText());
-//				pr.setT_sympt(tpSympt.getText());
-//				pr.setT_otn_bol(tpOtnbol.getText());
-//				pr.setT_ps_syt(tpPssyt.getText());
-//				pr.setT_ob_sost(tpObsost.getText());
-//				pr.setT_koj_pokr(tpKoj.getText());
-//				pr.setT_sliz(tpSliz.getText());
-//				pr.setT_podk_kl(tpPodkkl.getText());
-//				pr.setT_limf_uzl(tpLimf.getText());
-//				pr.setT_kost_mysh(tpKostmysh.getText());
-//				pr.setT_nervn_ps(tpNervnps.getText());
-//				pr.setT_telo(tpTelo.getText());
-//				pr.setT_sust(tpSust.getText());
-//				pr.setT_dyh(tpDyh.getText());
-//				pr.setT_gr_kl(tpGrkl.getText());
-//				pr.setT_perk_l(tpPerkl.getText());
-//				pr.setT_aus_l(tpAusl.getText());
-//				pr.setT_bronho(tpBronho.getText());
-//				pr.setT_arter(tpArter.getText());
-//				pr.setT_obl_s(tpObls.getText());
-//				pr.setT_perk_s(tpPerks.getText());
-//				pr.setT_aus_s(tpAuss.getText());
-//				pr.setT_pol_rta(tpPolrta.getText());
-//				pr.setT_jivot(tpJivot.getText());
-//				pr.setT_palp_jivot(tpPalpjivot.getText());
-//				pr.setT_jel_kish(tpJelkish.getText());
-//				pr.setT_palp_jel(tpPalpjel.getText());
-//				pr.setT_palp_podjel(tpPalppodjel.getText());
-//				pr.setT_pechen(tpPechen.getText());
-//				pr.setT_jelch(tpJech.getText());
-//				pr.setT_selez(tpSelez.getText());
-//				pr.setT_obl_zad(tpOblzad.getText());
-//				pr.setT_poyasn(tpPoyasn.getText());
-//				pr.setT_pochk(tpPochki.getText());
-//				pr.setT_moch(tpMoch.getText());
-//				pr.setT_mol_jel(tpMoljel.getText());
-//				pr.setT_gr_jel(tpGrjel.getText());
-//				pr.setT_matka(tpMatka.getText());
-//				pr.setT_nar_polov(tpNarpolov.getText());
-//				pr.setT_chitov(tpChitov.getText());
-//				pr.setT_ocenka(tpOcenka.getText());
-			 	
+				
+				try {
+					priem = new Priem();
+					priem.setId(zapVr.getId_pvizit());
+					priem.setNpasp(zapVr.getNpasp());
+					priem.setIdpos(pvizitAmb.getId());
+					priem.setT_ad(getTextOrNull(tfad.getText()));
+					priem.setT_chss(getTextOrNull(tfchss.getText()));
+					priem.setT_rost(getTextOrNull(tfrost.getText()));
+					priem.setT_ves(getTextOrNull(tfves.getText()));
+					priem.setT_st_localis(getTextOrNull(tpLocalis.getText()));
+					priem.setT_jalob_d(getTextOrNull(tpJalobd.getText()));
+					priem.setT_jalob_krov(getTextOrNull(tpJalobkrov.getText()));
+					priem.setT_jalob_p(getTextOrNull(tpJalobp.getText()));
+					priem.setT_jalob_moch(getTextOrNull(tpJalobmoch.getText()));
+					priem.setT_jalob_endo(getTextOrNull(tpJalobendo.getText()));
+					priem.setT_jalob_nerv(getTextOrNull(tpJalobnerv.getText()));
+					priem.setT_jalob_opor(getTextOrNull(tpJalobopor.getText()));
+					priem.setT_jalob_lih(getTextOrNull(tpJaloblih.getText()));
+					priem.setT_jalob_obh(getTextOrNull(tpJalobobh.getText()));
+					priem.setT_jalob_proch(getTextOrNull(tpJalobproch.getText()));
+					priem.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
+					priem.setT_sympt(getTextOrNull(tpSympt.getText()));
+					priem.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));
+					priem.setT_ps_syt(getTextOrNull(tpPssit.getText()));
+					priem.setT_ob_sost(getTextOrNull(tpObsost.getText()));
+					priem.setT_koj_pokr(getTextOrNull(tpKoj.getText()));
+					priem.setT_sliz(getTextOrNull(tpSliz.getText()));
+					priem.setT_podk_kl(getTextOrNull(tpPodkkl.getText()));
+					priem.setT_limf_uzl(getTextOrNull(tpLimf.getText()));
+					priem.setT_kost_mysh(getTextOrNull(tpKostmysh.getText()));
+					priem.setT_nervn_ps(getTextOrNull(tpNervnps.getText()));
+					priem.setT_telo(getTextOrNull(tpTelo.getText()));
+					priem.setT_sust(getTextOrNull(tpSust.getText()));
+					priem.setT_dyh(getTextOrNull(tpDyh.getText()));
+					priem.setT_gr_kl(getTextOrNull(tpGrkl.getText()));
+					priem.setT_perk_l(getTextOrNull(tpPerkl.getText()));
+					priem.setT_aus_l(getTextOrNull(tpAusl.getText()));
+					priem.setT_bronho(getTextOrNull(tpBronho.getText()));
+					priem.setT_arter(getTextOrNull(tpArter.getText()));
+					priem.setT_obl_s(getTextOrNull(tpObls.getText()));
+					priem.setT_perk_s(getTextOrNull(tpPerks.getText()));
+					priem.setT_aus_s(getTextOrNull(tpAuss.getText()));
+					priem.setT_pol_rta(getTextOrNull(tpPolrta.getText()));
+					priem.setT_jivot(getTextOrNull(tpJivot.getText()));
+					priem.setT_palp_jivot(getTextOrNull(tpPalpjivot.getText()));
+					priem.setT_jel_kish(getTextOrNull(tpJkt.getText()));
+					priem.setT_palp_jel(getTextOrNull(tpPalpjel.getText()));
+					priem.setT_palp_podjjel(getTextOrNull(tpPalppodjel.getText()));
+					priem.setT_pechen(getTextOrNull(tpPechen.getText()));
+					priem.setT_jelch(getTextOrNull(tpJelch.getText()));
+					priem.setT_selez(getTextOrNull(tpSelez.getText()));
+					priem.setT_obl_zad(getTextOrNull(tpOblzad.getText()));
+					priem.setT_poyasn(getTextOrNull(tpPoyasn.getText()));
+					priem.setT_pochk(getTextOrNull(tpPochki.getText()));
+					priem.setT_moch(getTextOrNull(tpMoch.getText()));
+					priem.setT_mol_jel(getTextOrNull(tpMoljel.getText()));
+					priem.setT_gr_jel(getTextOrNull(tpGrjel.getText()));
+					priem.setT_matka(getTextOrNull(tpMatka.getText()));
+					priem.setT_nar_polov(getTextOrNull(tpNarpolov.getText()));
+					priem.setT_chitov(getTextOrNull(tpChitov.getText()));
+					priem.setT_ocenka(getTextOrNull(tpOcenka.getText()));
+//					priem.setT_matka(getTextOrNull(tpMatka.getText()));
+//					priem.setT_nar_polov(getTextOrNull(tpNarpolov.getText()));
+//					priem.setT_chitov(getTextOrNull(tpChitov.getText()));
+//					priem.setT_ocenka(getTextOrNull(tpOcenka.getText()));
+					
+					MainForm.tcl.setPriem(priem);
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				}
 				//pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
 //				pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
 
@@ -1330,473 +1329,471 @@ public class Vvod extends JFrame {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()){
-					if (TabPos.getSelectedItem()!=null){
-						try {
-							Priem pri = MainForm.tcl.getPriem(TabPos.getSelectedItem().id_obr,TabPos.getSelectedItem().npasp,TabPos.getSelectedItem().id);
-							if (pri.getT_jalob()!=null){
-							lbljalob.setVisible(true);
-							tpJalob.setVisible(true);
-							tpJalob.setText(pri.getT_jalob());	
-							}else{
-							tpJalob.setVisible(false);
-							lbljalob.setVisible(false);
-							}
-							if (pri.getT_jalob_d()!=null){
-							lbljald.setVisible(true);
-							tpJalobd.setVisible(true);
-							tpJalobd.setText(pri.getT_jalob_d());	
-							}else{
-							tpJalobd.setVisible(false);
-							lbljald.setVisible(false);
-							}
-							if (pri.getT_jalob_krov()!=null){
-							lbljalkr.setVisible(true);
-							tpJalobkrov.setVisible(true);
-							tpJalobkrov.setText(pri.getT_jalob_krov());	
-							}else{
-							tpJalobkrov.setVisible(false);
-							lbljalkr.setVisible(false);
-							}
-							if (pri.getT_jalob_p()!=null){
-							lbljalp.setVisible(true);
-							tpJalobp.setVisible(true);
-							tpJalobp.setText(pri.getT_jalob_p());	
-							}else{
-							tpJalobp.setVisible(false);
-							lbljalp.setVisible(false);
-							}
-							if (pri.getT_jalob_moch()!=null){
-							lbljalm.setVisible(true);
-							tpJalobmoch.setVisible(true);
-							tpJalobmoch.setText(pri.getT_jalob_moch());	
-							}else{
-							tpJalobmoch.setVisible(false);
-							lbljalm.setVisible(false);
-							}
-							if (pri.getT_jalob_endo()!=null){
-							lbljalendo.setVisible(true);
-							tpJalobendo.setVisible(true);
-							tpJalobendo.setText(pri.getT_jalob_endo());	
-							}else{
-							tpJalobendo.setVisible(false);
-							lbljalendo.setVisible(false);
-							}
-							if (pri.getT_jalob_nerv()!=null){
-							lbljalnerv.setVisible(true);
-							tpJalobnerv.setVisible(true);
-							tpJalobnerv.setText(pri.getT_jalob_nerv());	
-							}else{
-							tpJalobnerv.setVisible(false);
-							lbljalnerv.setVisible(false);
-							}
-							if (pri.getT_jalob_opor()!=null){
-							lbljalop.setVisible(true);
-							tpJalobopor.setVisible(true);
-							tpJalobopor.setText(pri.getT_jalob_opor());	
-							}else{
-							tpJalobopor.setVisible(false);
-							lbljalop.setVisible(false);
-							}
-							if (pri.getT_jalob_lih()!=null){
-							lbljallih.setVisible(true);
-							tpJaloblih.setVisible(true);
-							tpJaloblih.setText(pri.getT_jalob_lih());	
-							}else{
-							tpJaloblih.setVisible(false);
-							lbljallih.setVisible(false);
-							}
-							if (pri.getT_jalob_obh()!=null){
-							lblja_lob.setVisible(true);
-							tpJalobobh.setVisible(true);
-							tpJalobobh.setText(pri.getT_jalob_obh());	
-							}else{
-							tpJalobobh.setVisible(false);
-							lblja_lob.setVisible(false);
-							}
-							if (pri.getT_jalob_proch()!=null){
-							lbljalpr.setVisible(true);
-							tpJalobproch.setVisible(true);
-							tpJalobproch.setText(pri.getT_jalob_proch());	
-							}else{
-							tpJalobproch.setVisible(false);
-							lbljalpr.setVisible(false);
-							}
-							if (pri.getT_nachalo_zab()!=null){
-							lblNacZab.setVisible(true);
-							tpNachzab.setVisible(true);
-							tpNachzab.setText(pri.getT_nachalo_zab());	
-							}else{
-							tpNachzab.setVisible(false);
-							lblNacZab.setVisible(false);
-							}
-							if (pri.getT_sympt()!=null){
-							lblSympt.setVisible(true);
-							tpSympt.setVisible(true);
-							tpSympt.setText(pri.getT_sympt());	
-							}else{
-							tpSympt.setVisible(false);
-							lblSympt.setVisible(false);
-							}
-							if (pri.getT_otn_bol()!=null){
-							lblotnbol.setVisible(true);
-							tpOtnbol.setVisible(true);
-							tpOtnbol.setText(pri.getT_sympt());	
-							}else{
-							tpOtnbol.setVisible(false);
-							lblotnbol.setVisible(false);
-							}
-							if (pri.getT_ps_syt()!=null){
-							lblpssit.setVisible(true);
-							tpPssit.setVisible(true);
-							tpPssit.setText(pri.getT_ps_syt());	
-							}else{
-							tpPssit.setVisible(false);
-							lblpssit.setVisible(false);
-							}
-							if (pri.getT_ad()!=null){
-							lblad.setVisible(true);
-							tfad.setVisible(true);
-							tfad.setText(pri.getT_ad());	
-							}else{
-							tfad.setVisible(false);
-							lblad.setVisible(false);
-							}
-							if (pri.getT_temp()!=null){
-							lbltemp.setVisible(true);
-							tftemp.setVisible(true);
-							tftemp.setText(pri.getT_temp());	
-							}else{
-							tftemp.setVisible(false);
-							lbltemp.setVisible(false);
-							}
-							if (pri.getT_chss()!=null){
-							lblchss.setVisible(true);
-							tfchss.setVisible(true);
-							tfchss.setText(pri.getT_chss());	
-							}else{
-							tfchss.setVisible(false);
-							lblchss.setVisible(false);
-							}
-							if (pri.getT_rost()!=null){
-							lblrost.setVisible(true);
-							tfrost.setVisible(true);
-							tfrost.setText(pri.getT_rost());	
-							}else{
-							tfrost.setVisible(false);
-							lblrost.setVisible(false);
-							}
-							if (pri.getT_ves()!=null){
-							lblves.setVisible(true);
-							tfves.setVisible(true);
-							tfves.setText(pri.getT_ves());	
-							}else{
-							tfves.setVisible(false);
-							lblves.setVisible(false);
-							}
-							if (pri.getT_ob_sost()!=null){
-							lblobsost.setVisible(true);
-							tpObsost.setVisible(true);
-							tpObsost.setText(pri.getT_ob_sost());	
-							}else{
-							tpObsost.setVisible(false);
-							lblobsost.setVisible(false);
-							}
-							if (pri.getT_koj_pokr()!=null){
-							lblkoj.setVisible(true);
-							tpKoj.setVisible(true);
-							tpKoj.setText(pri.getT_koj_pokr());	
-							}else{
-							tpKoj.setVisible(false);
-							lblkoj.setVisible(false);
-							}
-							if (pri.getT_sliz()!=null){
-							lblsl.setVisible(true);
-							tpSliz.setVisible(true);
-							tpSliz.setText(pri.getT_sliz());	
-							}else{
-							tpSliz.setVisible(false);
-							lblsl.setVisible(false);
-							}
-							if (pri.getT_podk_kl()!=null){
-							lblpodkkl.setVisible(true);
-							tpPodkkl.setVisible(true);
-							tpPodkkl.setText(pri.getT_podk_kl());	
-							}else{
-							tpPodkkl.setVisible(false);
-							lblpodkkl.setVisible(false);
-							}
-							if (pri.getT_limf_uzl()!=null){
-							lbllimf.setVisible(true);
-							tpLimf.setVisible(true);
-							tpLimf.setText(pri.getT_limf_uzl());	
-							}else{
-							tpLimf.setVisible(false);
-							lbllimf.setVisible(false);
-							}
-							if (pri.getT_kost_mysh()!=null){
-							lblkostm.setVisible(true);
-							tpKostmysh.setVisible(true);
-							tpKostmysh.setText(pri.getT_kost_mysh());	
-							}else{
-							tpKostmysh.setVisible(false);
-							lblkostm.setVisible(false);
-							}
-							if (pri.getT_nervn_ps()!=null){
-							lblnervps.setVisible(true);
-							tpNervnps.setVisible(true);
-							tpNervnps.setText(pri.getT_nervn_ps());	
-							}else{
-							tpNervnps.setVisible(false);
-							lblnervps.setVisible(false);
-							}
-							if (pri.getT_sust()!=null){
-							lblsust.setVisible(true);
-							tpSust.setVisible(true);
-							tpSust.setText(pri.getT_sust());	
-							}else{
-							tpSust.setVisible(false);
-							lblsust.setVisible(false);
-							}
-							if (pri.getT_dyh()!=null){
-							lbldyh.setVisible(true);
-							tpDyh.setVisible(true);
-							tpDyh.setText(pri.getT_sust());	
-							}else{
-							tpDyh.setVisible(false);
-							lbldyh.setVisible(false);
-							}
-							if (pri.getT_gr_kl()!=null){
-							lblgrkl.setVisible(true);
-							tpGrkl.setVisible(true);
-							tpGrkl.setText(pri.getT_sust());	
-							}else{
-							tpGrkl.setVisible(false);
-							lblgrkl.setVisible(false);
-							}
-							if (pri.getT_perk_l()!=null){
-							lblperl.setVisible(true);
-							tpPerkl.setVisible(true);
-							tpPerkl.setText(pri.getT_perk_l());	
-							}else{
-							tpPerkl.setVisible(false);
-							lblperl.setVisible(false);
-							}
-							if (pri.getT_aus_l()!=null){
-							lblausl.setVisible(true);
-							tpAusl.setVisible(true);
-							tpAusl.setText(pri.getT_aus_l());	
-							}else{
-							tpAusl.setVisible(false);
-							lblausl.setVisible(false);
-							}
-							if (pri.getT_bronho()!=null){
-							lblbronh.setVisible(true);
-							tpBronho.setVisible(true);
-							tpBronho.setText(pri.getT_bronho());	
-							}else{
-							tpBronho.setVisible(false);
-							lblbronh.setVisible(false);
-							}
-							if (pri.getT_arter()!=null){
-							lblarter.setVisible(true);
-							tpArter.setVisible(true);
-							tpArter.setText(pri.getT_arter());	
-							}else{
-							tpArter.setVisible(false);
-							lblarter.setVisible(false);
-							}
-							if (pri.getT_obl_s()!=null){
-							lblobls.setVisible(true);
-							tpObls.setVisible(true);
-							tpObls.setText(pri.getT_obl_s());	
-							}else{
-							tpObls.setVisible(false);
-							lblobls.setVisible(false);
-							}
-							if (pri.getT_perk_s()!=null){
-							lblpers.setVisible(true);
-							tpPerks.setVisible(true);
-							tpPerks.setText(pri.getT_perk_s());	
-							}else{
-							tpPerks.setVisible(false);
-							lblpers.setVisible(false);
-							}
-							if (pri.getT_aus_s()!=null){
-							lblauss.setVisible(true);
-							tpAuss.setVisible(true);
-							tpAuss.setText(pri.getT_aus_s());	
-							}else{
-							tpAuss.setVisible(false);
-							lblauss.setVisible(false);
-							}
-							if (pri.getT_pol_rta()!=null){
-							lblpolrta.setVisible(true);
-							tpPolrta.setVisible(true);
-							tpPolrta.setText(pri.getT_pol_rta());	
-							}else{
-							tpPolrta.setVisible(false);
-							lblpolrta.setVisible(false);
-							}
-							if (pri.getT_jivot()!=null){
-							lbljivot.setVisible(true);
-							tpJivot.setVisible(true);
-							tpJivot.setText(pri.getT_jivot());	
-							}else{
-							tpJivot.setVisible(false);
-							lbljivot.setVisible(false);
-							}
-							if (pri.getT_palp_jivot()!=null){
-							lblpalpjiv.setVisible(true);
-							tpPalpjivot.setVisible(true);
-							tpPalpjivot.setText(pri.getT_palp_jivot());	
-							}else{
-							tpPalpjivot.setVisible(false);
-							lblpalpjiv.setVisible(false);
-							}
-							if (pri.getT_jel_kish()!=null){
-							lbljkt.setVisible(true);
-							tpJkt.setVisible(true);
-							tpJkt.setText(pri.getT_jel_kish());	
-							}else{
-							tpJkt.setVisible(false);
-							lbljkt.setVisible(false);
-							}
-							if (pri.getT_palp_jel()!=null){
-							lblpalpjel.setVisible(true);
-							tpPalpjel.setVisible(true);
-							tpPalpjel.setText(pri.getT_palp_jel());	
-							}else{
-							tpPalpjel.setVisible(false);
-							lblpalpjel.setVisible(false);
-							}
-							if (pri.getT_palp_podjel()!=null){
-							lblpalppodjel.setVisible(true);
-							tpPalppodjel.setVisible(true);
-							tpPalppodjel.setText(pri.getT_palp_podjel());	
-							}else{
-							tpPalppodjel.setVisible(false);
-							lblpalppodjel.setVisible(false);
-							}
-							if (pri.getT_pechen()!=null){
-							lblpech.setVisible(true);
-							tpPechen.setVisible(true);
-							tpPechen.setText(pri.getT_pechen());	
-							}else{
-							tpPechen.setVisible(false);
-							lblpech.setVisible(false);
-							}
-							if (pri.getT_jelch()!=null){
-							lbljelch.setVisible(true);
-							tpJelch.setVisible(true);
-							tpJelch.setText(pri.getT_jelch());	
-							}else{
-							tpJelch.setVisible(false);
-							lbljelch.setVisible(false);
-							}
-							if (pri.getT_selez()!=null){
-							lblselez.setVisible(true);
-							tpSelez.setVisible(true);
-							tpSelez.setText(pri.getT_selez());	
-							}else{
-							tpSelez.setVisible(false);
-							lblselez.setVisible(false);
-							}
-							if (pri.getT_obl_zad()!=null){
-							lbloblzad.setVisible(true);
-							tpOblzad.setVisible(true);
-							tpOblzad.setText(pri.getT_obl_zad());	
-							}else{
-							tpOblzad.setVisible(false);
-							lbloblzad.setVisible(false);
-							}
-							if (pri.getT_poyasn()!=null){
-							lblpoyasn.setVisible(true);
-							tpPoyasn.setVisible(true);
-							tpPoyasn.setText(pri.getT_poyasn());	
-							}else{
-							tpPoyasn.setVisible(false);
-							lblpoyasn.setVisible(false);
-							}
-							if (pri.getT_pochk() !=null){
-							lblpochk.setVisible(true);
-							tpPochki.setVisible(true);
-							tpPochki.setText(pri.getT_pochk());	
-							}else{
-							tpPochki.setVisible(false);
-							lblpochk.setVisible(false);
-							}
-							if (pri.getT_moch() !=null){
-							lblmoch.setVisible(true);
-							tpMoch.setVisible(true);
-							tpMoch.setText(pri.getT_moch());	
-							}else{
-							tpMoch.setVisible(false);
-							lblmoch.setVisible(false);
-							}
-							if (pri.getT_mol_jel() !=null){
-							lblmoljel.setVisible(true);
-							tpMoljel.setVisible(true);
-							tpMoljel.setText(pri.getT_mol_jel());	
-							}else{
-							tpMoljel.setVisible(false);
-							lblmoljel.setVisible(false);
-							}
-							if (pri.getT_gr_jel() !=null){
-							lblgrjel.setVisible(true);
-							tpGrjel.setVisible(true);
-							tpGrjel.setText(pri.getT_gr_jel());	
-							}else{
-							tpGrjel.setVisible(false);
-							lblgrjel.setVisible(false);
-							}
-							if (pri.getT_matka() !=null){
-							lblmatka.setVisible(true);
-							tpMatka.setVisible(true);
-							tpMatka.setText(pri.getT_matka());	
-							}else{
-							tpMatka.setVisible(false);
-							lblmatka.setVisible(false);
-							}
-							if (pri.getT_nar_polov() !=null){
-							lblnarpolov.setVisible(true);
-							tpNarpolov.setVisible(true);
-							tpNarpolov.setText(pri.getT_nar_polov());	
-							}else{
-							tpNarpolov.setVisible(false);
-							lblnarpolov.setVisible(false);
-							}
-							if (pri.getT_chitov() !=null){
-							lblchitov.setVisible(true);
-							tpChitov.setVisible(true);
-							tpChitov.setText(pri.getT_chitov());	
-							}else{
-							tpChitov.setVisible(false);
-							lblchitov.setVisible(false);
-							}
-							if (pri.getT_st_localis() !=null){
-							tpLocalis.setVisible(true);
-							tpLocalis.setText(pri.getT_st_localis());	
-							}else{
-							tpLocalis.setVisible(false);
-							}
-							if (pri.getT_ocenka() !=null){
-							tpOcenka.setVisible(true);
-							tpOcenka.setText(pri.getT_ocenka());	
-							}else{
-							tpOcenka.setVisible(false);
-							}
-							} catch (KmiacServerException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (PriemNotFoundException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (TException e) {
-								// TODO Auto-generated catch block
-								MainForm.conMan.reconnect(e);
-							}
-						
-		
+					if (TabPos.getSelectedItem()!= null) {
+//						try {
+//							Priem pri = MainForm.tcl.getPriem(TabPos.getSelectedItem().id_obr,TabPos.getSelectedItem().npasp,TabPos.getSelectedItem().id);
+//							if (pri.getT_jalob()!=null){
+//							lbljalob.setVisible(true);
+//							tpJalob.setVisible(true);
+//							tpJalob.setText(pri.getT_jalob());	
+//							}else{
+//							tpJalob.setVisible(false);
+//							lbljalob.setVisible(false);
+//							}
+//							if (pri.getT_jalob_d()!=null){
+//							lbljald.setVisible(true);
+//							tpJalobd.setVisible(true);
+//							tpJalobd.setText(pri.getT_jalob_d());	
+//							}else{
+//							tpJalobd.setVisible(false);
+//							lbljald.setVisible(false);
+//							}
+//							if (pri.getT_jalob_krov()!=null){
+//							lbljalkr.setVisible(true);
+//							tpJalobkrov.setVisible(true);
+//							tpJalobkrov.setText(pri.getT_jalob_krov());	
+//							}else{
+//							tpJalobkrov.setVisible(false);
+//							lbljalkr.setVisible(false);
+//							}
+//							if (pri.getT_jalob_p()!=null){
+//							lbljalp.setVisible(true);
+//							tpJalobp.setVisible(true);
+//							tpJalobp.setText(pri.getT_jalob_p());	
+//							}else{
+//							tpJalobp.setVisible(false);
+//							lbljalp.setVisible(false);
+//							}
+//							if (pri.getT_jalob_moch()!=null){
+//							lbljalm.setVisible(true);
+//							tpJalobmoch.setVisible(true);
+//							tpJalobmoch.setText(pri.getT_jalob_moch());	
+//							}else{
+//							tpJalobmoch.setVisible(false);
+//							lbljalm.setVisible(false);
+//							}
+//							if (pri.getT_jalob_endo()!=null){
+//							lbljalendo.setVisible(true);
+//							tpJalobendo.setVisible(true);
+//							tpJalobendo.setText(pri.getT_jalob_endo());	
+//							}else{
+//							tpJalobendo.setVisible(false);
+//							lbljalendo.setVisible(false);
+//							}
+//							if (pri.getT_jalob_nerv()!=null){
+//							lbljalnerv.setVisible(true);
+//							tpJalobnerv.setVisible(true);
+//							tpJalobnerv.setText(pri.getT_jalob_nerv());	
+//							}else{
+//							tpJalobnerv.setVisible(false);
+//							lbljalnerv.setVisible(false);
+//							}
+//							if (pri.getT_jalob_opor()!=null){
+//							lbljalop.setVisible(true);
+//							tpJalobopor.setVisible(true);
+//							tpJalobopor.setText(pri.getT_jalob_opor());	
+//							}else{
+//							tpJalobopor.setVisible(false);
+//							lbljalop.setVisible(false);
+//							}
+//							if (pri.getT_jalob_lih()!=null){
+//							lbljallih.setVisible(true);
+//							tpJaloblih.setVisible(true);
+//							tpJaloblih.setText(pri.getT_jalob_lih());	
+//							}else{
+//							tpJaloblih.setVisible(false);
+//							lbljallih.setVisible(false);
+//							}
+//							if (pri.getT_jalob_obh()!=null){
+//							lblja_lob.setVisible(true);
+//							tpJalobobh.setVisible(true);
+//							tpJalobobh.setText(pri.getT_jalob_obh());	
+//							}else{
+//							tpJalobobh.setVisible(false);
+//							lblja_lob.setVisible(false);
+//							}
+//							if (pri.getT_jalob_proch()!=null){
+//							lbljalpr.setVisible(true);
+//							tpJalobproch.setVisible(true);
+//							tpJalobproch.setText(pri.getT_jalob_proch());	
+//							}else{
+//							tpJalobproch.setVisible(false);
+//							lbljalpr.setVisible(false);
+//							}
+//							if (pri.getT_nachalo_zab()!=null){
+//							lblNacZab.setVisible(true);
+//							tpNachzab.setVisible(true);
+//							tpNachzab.setText(pri.getT_nachalo_zab());	
+//							}else{
+//							tpNachzab.setVisible(false);
+//							lblNacZab.setVisible(false);
+//							}
+//							if (pri.getT_sympt()!=null){
+//							lblSympt.setVisible(true);
+//							tpSympt.setVisible(true);
+//							tpSympt.setText(pri.getT_sympt());	
+//							}else{
+//							tpSympt.setVisible(false);
+//							lblSympt.setVisible(false);
+//							}
+//							if (pri.getT_otn_bol()!=null){
+//							lblotnbol.setVisible(true);
+//							tpOtnbol.setVisible(true);
+//							tpOtnbol.setText(pri.getT_sympt());	
+//							}else{
+//							tpOtnbol.setVisible(false);
+//							lblotnbol.setVisible(false);
+//							}
+//							if (pri.getT_ps_syt()!=null){
+//							lblpssit.setVisible(true);
+//							tpPssit.setVisible(true);
+//							tpPssit.setText(pri.getT_ps_syt());	
+//							}else{
+//							tpPssit.setVisible(false);
+//							lblpssit.setVisible(false);
+//							}
+//							if (pri.getT_ad()!=null){
+//							lblad.setVisible(true);
+//							tfad.setVisible(true);
+//							tfad.setText(pri.getT_ad());	
+//							}else{
+//							tfad.setVisible(false);
+//							lblad.setVisible(false);
+//							}
+//							if (pri.getT_temp()!=null){
+//							lbltemp.setVisible(true);
+//							tftemp.setVisible(true);
+//							tftemp.setText(pri.getT_temp());	
+//							}else{
+//							tftemp.setVisible(false);
+//							lbltemp.setVisible(false);
+//							}
+//							if (pri.getT_chss()!=null){
+//							lblchss.setVisible(true);
+//							tfchss.setVisible(true);
+//							tfchss.setText(pri.getT_chss());	
+//							}else{
+//							tfchss.setVisible(false);
+//							lblchss.setVisible(false);
+//							}
+//							if (pri.getT_rost()!=null){
+//							lblrost.setVisible(true);
+//							tfrost.setVisible(true);
+//							tfrost.setText(pri.getT_rost());	
+//							}else{
+//							tfrost.setVisible(false);
+//							lblrost.setVisible(false);
+//							}
+//							if (pri.getT_ves()!=null){
+//							lblves.setVisible(true);
+//							tfves.setVisible(true);
+//							tfves.setText(pri.getT_ves());	
+//							}else{
+//							tfves.setVisible(false);
+//							lblves.setVisible(false);
+//							}
+//							if (pri.getT_ob_sost()!=null){
+//							lblobsost.setVisible(true);
+//							tpObsost.setVisible(true);
+//							tpObsost.setText(pri.getT_ob_sost());	
+//							}else{
+//							tpObsost.setVisible(false);
+//							lblobsost.setVisible(false);
+//							}
+//							if (pri.getT_koj_pokr()!=null){
+//							lblkoj.setVisible(true);
+//							tpKoj.setVisible(true);
+//							tpKoj.setText(pri.getT_koj_pokr());	
+//							}else{
+//							tpKoj.setVisible(false);
+//							lblkoj.setVisible(false);
+//							}
+//							if (pri.getT_sliz()!=null){
+//							lblsl.setVisible(true);
+//							tpSliz.setVisible(true);
+//							tpSliz.setText(pri.getT_sliz());	
+//							}else{
+//							tpSliz.setVisible(false);
+//							lblsl.setVisible(false);
+//							}
+//							if (pri.getT_podk_kl()!=null){
+//							lblpodkkl.setVisible(true);
+//							tpPodkkl.setVisible(true);
+//							tpPodkkl.setText(pri.getT_podk_kl());	
+//							}else{
+//							tpPodkkl.setVisible(false);
+//							lblpodkkl.setVisible(false);
+//							}
+//							if (pri.getT_limf_uzl()!=null){
+//							lbllimf.setVisible(true);
+//							tpLimf.setVisible(true);
+//							tpLimf.setText(pri.getT_limf_uzl());	
+//							}else{
+//							tpLimf.setVisible(false);
+//							lbllimf.setVisible(false);
+//							}
+//							if (pri.getT_kost_mysh()!=null){
+//							lblkostm.setVisible(true);
+//							tpKostmysh.setVisible(true);
+//							tpKostmysh.setText(pri.getT_kost_mysh());	
+//							}else{
+//							tpKostmysh.setVisible(false);
+//							lblkostm.setVisible(false);
+//							}
+//							if (pri.getT_nervn_ps()!=null){
+//							lblnervps.setVisible(true);
+//							tpNervnps.setVisible(true);
+//							tpNervnps.setText(pri.getT_nervn_ps());	
+//							}else{
+//							tpNervnps.setVisible(false);
+//							lblnervps.setVisible(false);
+//							}
+//							if (pri.getT_sust()!=null){
+//							lblsust.setVisible(true);
+//							tpSust.setVisible(true);
+//							tpSust.setText(pri.getT_sust());	
+//							}else{
+//							tpSust.setVisible(false);
+//							lblsust.setVisible(false);
+//							}
+//							if (pri.getT_dyh()!=null){
+//							lbldyh.setVisible(true);
+//							tpDyh.setVisible(true);
+//							tpDyh.setText(pri.getT_sust());	
+//							}else{
+//							tpDyh.setVisible(false);
+//							lbldyh.setVisible(false);
+//							}
+//							if (pri.getT_gr_kl()!=null){
+//							lblgrkl.setVisible(true);
+//							tpGrkl.setVisible(true);
+//							tpGrkl.setText(pri.getT_sust());	
+//							}else{
+//							tpGrkl.setVisible(false);
+//							lblgrkl.setVisible(false);
+//							}
+//							if (pri.getT_perk_l()!=null){
+//							lblperl.setVisible(true);
+//							tpPerkl.setVisible(true);
+//							tpPerkl.setText(pri.getT_perk_l());	
+//							}else{
+//							tpPerkl.setVisible(false);
+//							lblperl.setVisible(false);
+//							}
+//							if (pri.getT_aus_l()!=null){
+//							lblausl.setVisible(true);
+//							tpAusl.setVisible(true);
+//							tpAusl.setText(pri.getT_aus_l());	
+//							}else{
+//							tpAusl.setVisible(false);
+//							lblausl.setVisible(false);
+//							}
+//							if (pri.getT_bronho()!=null){
+//							lblbronh.setVisible(true);
+//							tpBronho.setVisible(true);
+//							tpBronho.setText(pri.getT_bronho());	
+//							}else{
+//							tpBronho.setVisible(false);
+//							lblbronh.setVisible(false);
+//							}
+//							if (pri.getT_arter()!=null){
+//							lblarter.setVisible(true);
+//							tpArter.setVisible(true);
+//							tpArter.setText(pri.getT_arter());	
+//							}else{
+//							tpArter.setVisible(false);
+//							lblarter.setVisible(false);
+//							}
+//							if (pri.getT_obl_s()!=null){
+//							lblobls.setVisible(true);
+//							tpObls.setVisible(true);
+//							tpObls.setText(pri.getT_obl_s());	
+//							}else{
+//							tpObls.setVisible(false);
+//							lblobls.setVisible(false);
+//							}
+//							if (pri.getT_perk_s()!=null){
+//							lblpers.setVisible(true);
+//							tpPerks.setVisible(true);
+//							tpPerks.setText(pri.getT_perk_s());	
+//							}else{
+//							tpPerks.setVisible(false);
+//							lblpers.setVisible(false);
+//							}
+//							if (pri.getT_aus_s()!=null){
+//							lblauss.setVisible(true);
+//							tpAuss.setVisible(true);
+//							tpAuss.setText(pri.getT_aus_s());	
+//							}else{
+//							tpAuss.setVisible(false);
+//							lblauss.setVisible(false);
+//							}
+//							if (pri.getT_pol_rta()!=null){
+//							lblpolrta.setVisible(true);
+//							tpPolrta.setVisible(true);
+//							tpPolrta.setText(pri.getT_pol_rta());	
+//							}else{
+//							tpPolrta.setVisible(false);
+//							lblpolrta.setVisible(false);
+//							}
+//							if (pri.getT_jivot()!=null){
+//							lbljivot.setVisible(true);
+//							tpJivot.setVisible(true);
+//							tpJivot.setText(pri.getT_jivot());	
+//							}else{
+//							tpJivot.setVisible(false);
+//							lbljivot.setVisible(false);
+//							}
+//							if (pri.getT_palp_jivot()!=null){
+//							lblpalpjiv.setVisible(true);
+//							tpPalpjivot.setVisible(true);
+//							tpPalpjivot.setText(pri.getT_palp_jivot());	
+//							}else{
+//							tpPalpjivot.setVisible(false);
+//							lblpalpjiv.setVisible(false);
+//							}
+//							if (pri.getT_jel_kish()!=null){
+//							lbljkt.setVisible(true);
+//							tpJkt.setVisible(true);
+//							tpJkt.setText(pri.getT_jel_kish());	
+//							}else{
+//							tpJkt.setVisible(false);
+//							lbljkt.setVisible(false);
+//							}
+//							if (pri.getT_palp_jel()!=null){
+//							lblpalpjel.setVisible(true);
+//							tpPalpjel.setVisible(true);
+//							tpPalpjel.setText(pri.getT_palp_jel());	
+//							}else{
+//							tpPalpjel.setVisible(false);
+//							lblpalpjel.setVisible(false);
+//							}
+//							if (pri.getT_palp_podjel()!=null){
+//							lblpalppodjel.setVisible(true);
+//							tpPalppodjel.setVisible(true);
+//							tpPalppodjel.setText(pri.getT_palp_podjel());	
+//							}else{
+//							tpPalppodjel.setVisible(false);
+//							lblpalppodjel.setVisible(false);
+//							}
+//							if (pri.getT_pechen()!=null){
+//							lblpech.setVisible(true);
+//							tpPechen.setVisible(true);
+//							tpPechen.setText(pri.getT_pechen());	
+//							}else{
+//							tpPechen.setVisible(false);
+//							lblpech.setVisible(false);
+//							}
+//							if (pri.getT_jelch()!=null){
+//							lbljelch.setVisible(true);
+//							tpJelch.setVisible(true);
+//							tpJelch.setText(pri.getT_jelch());	
+//							}else{
+//							tpJelch.setVisible(false);
+//							lbljelch.setVisible(false);
+//							}
+//							if (pri.getT_selez()!=null){
+//							lblselez.setVisible(true);
+//							tpSelez.setVisible(true);
+//							tpSelez.setText(pri.getT_selez());	
+//							}else{
+//							tpSelez.setVisible(false);
+//							lblselez.setVisible(false);
+//							}
+//							if (pri.getT_obl_zad()!=null){
+//							lbloblzad.setVisible(true);
+//							tpOblzad.setVisible(true);
+//							tpOblzad.setText(pri.getT_obl_zad());	
+//							}else{
+//							tpOblzad.setVisible(false);
+//							lbloblzad.setVisible(false);
+//							}
+//							if (pri.getT_poyasn()!=null){
+//							lblpoyasn.setVisible(true);
+//							tpPoyasn.setVisible(true);
+//							tpPoyasn.setText(pri.getT_poyasn());	
+//							}else{
+//							tpPoyasn.setVisible(false);
+//							lblpoyasn.setVisible(false);
+//							}
+//							if (pri.getT_pochk() !=null){
+//							lblpochk.setVisible(true);
+//							tpPochki.setVisible(true);
+//							tpPochki.setText(pri.getT_pochk());	
+//							}else{
+//							tpPochki.setVisible(false);
+//							lblpochk.setVisible(false);
+//							}
+//							if (pri.getT_moch() !=null){
+//							lblmoch.setVisible(true);
+//							tpMoch.setVisible(true);
+//							tpMoch.setText(pri.getT_moch());	
+//							}else{
+//							tpMoch.setVisible(false);
+//							lblmoch.setVisible(false);
+//							}
+//							if (pri.getT_mol_jel() !=null){
+//							lblmoljel.setVisible(true);
+//							tpMoljel.setVisible(true);
+//							tpMoljel.setText(pri.getT_mol_jel());	
+//							}else{
+//							tpMoljel.setVisible(false);
+//							lblmoljel.setVisible(false);
+//							}
+//							if (pri.getT_gr_jel() !=null){
+//							lblgrjel.setVisible(true);
+//							tpGrjel.setVisible(true);
+//							tpGrjel.setText(pri.getT_gr_jel());	
+//							}else{
+//							tpGrjel.setVisible(false);
+//							lblgrjel.setVisible(false);
+//							}
+//							if (pri.getT_matka() !=null){
+//							lblmatka.setVisible(true);
+//							tpMatka.setVisible(true);
+//							tpMatka.setText(pri.getT_matka());	
+//							}else{
+//							tpMatka.setVisible(false);
+//							lblmatka.setVisible(false);
+//							}
+//							if (pri.getT_nar_polov() !=null){
+//							lblnarpolov.setVisible(true);
+//							tpNarpolov.setVisible(true);
+//							tpNarpolov.setText(pri.getT_nar_polov());	
+//							}else{
+//							tpNarpolov.setVisible(false);
+//							lblnarpolov.setVisible(false);
+//							}
+//							if (pri.getT_chitov() !=null){
+//							lblchitov.setVisible(true);
+//							tpChitov.setVisible(true);
+//							tpChitov.setText(pri.getT_chitov());	
+//							}else{
+//							tpChitov.setVisible(false);
+//							lblchitov.setVisible(false);
+//							}
+//							if (pri.getT_st_localis() !=null){
+//							tpLocalis.setVisible(true);
+//							tpLocalis.setText(pri.getT_st_localis());	
+//							}else{
+//							tpLocalis.setVisible(false);
+//							}
+//							if (pri.getT_ocenka() !=null){
+//							tpOcenka.setVisible(true);
+//							tpOcenka.setText(pri.getT_ocenka());	
+//							}else{
+//							tpOcenka.setVisible(false);
+//							}
+//							} catch (KmiacServerException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							} catch (PriemNotFoundException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							} catch (TException e) {
+//								// TODO Auto-generated catch block
+//								MainForm.conMan.reconnect(e);
+//							}
 					}
 				}
 			}
@@ -1998,36 +1995,39 @@ public class Vvod extends JFrame {
 		panel.setLayout(gl_panel);
 		getContentPane().setLayout(gl_contentPane);
 	}
-	private void setBorder(EmptyBorder emptyBorder) {
-		// TODO Auto-generated method stub
+	
+	public void showVvod(ZapVr zapVr) {
+		Vvod.zapVr = zapVr;
 		
-	}
-	public void showVvod(UserAuthInfo authInfo, ZapVr zapVr) {
-		zapVrSave = zapVr;
 		pvizit = new Pvizit();
-		pvizit.setNpasp(zapVr.npasp);
-		pos.setNpasp(zapVr.npasp);
-		diag.setNpasp(zapVr.npasp);
-		pr.setNpasp(zapVr.npasp);
-		pvizit.setCod_sp(authInfo.pcod);
-		pvizit.setCdol("11");
-		pos.setCod_sp(authInfo.pcod);
-		diag.setCod_sp(authInfo.pcod);
-		try {
-			pvizit.setDatao(SimpleDateFormat.getDateInstance().parse("01.02.2012").getTime());
-		} catch (ParseException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		pvizit.setId(zapVr.getId_pvizit());
+		pvizit.setNpasp(zapVr.getNpasp());
+		pvizit.setCpol(MainForm.authInfo.getClpu()); //FIXME cpol
+		pvizit.setDatao(System.currentTimeMillis());
+		pvizit.setCod_sp(MainForm.authInfo.getPcod());
+		pvizit.setCdol(MainForm.authInfo.getCdol());
+		pvizit.setCuser(MainForm.authInfo.getUser_id());
 		pvizit.setDataz(System.currentTimeMillis());
-		pos.setDatap(System.currentTimeMillis());
-		diag.setDatap(System.currentTimeMillis());
-			
-		if (zapVr.vid_p == 1) {
+		
+		pvizitAmb = new PvizitAmb();
+		pvizitAmb.setId_obr(pvizit.getId());
+		pvizitAmb.setNpasp(zapVr.getNpasp());
+		pvizitAmb.setDatap(System.currentTimeMillis());
+		pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
+		pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+		
+		try {
+			Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
+			pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
+			TabPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
+		} catch (KmiacServerException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (PvizitNotFoundException e2) {
 			try {
 				MainForm.tcl.AddPvizit(pvizit);
-				MainForm.tcl.AddPvizitAmb(pos);
-				MainForm.tcl.AddPdiagAmb(diag);
+				pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
+				TabPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -2035,26 +2035,64 @@ public class Vvod extends JFrame {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-		} else {
-		try {
-			MainForm.tcl.AddPvizitAmb(pos);
-			MainForm.tcl.UpdatePvizit(pvizit);
-			MainForm.tcl.AddPdiagAmb(diag);
-			if (diag.diag_stat == 2){//присвоить значение полей данным.вписать в табл.
-			MainForm.tcl.AddPdiagZ(dz);	
-			}
-			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
-		} catch (KmiacServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (TException e2) {
+			MainForm.conMan.reconnect(e2);
+			e2.printStackTrace();
 		}
 		
-			
-		}
+////		TabDiag.setData(MainForm.tcl.getPdiagAmb(40));
+//		zapVr = zapVr;
+//		pvizit = new Pvizit();
+//		pvizit.setNpasp(zapVr.npasp);
+//		pvizitAmb.setNpasp(zapVr.npasp);
+//		diag.setNpasp(zapVr.npasp);
+//		pr.setNpasp(zapVr.npasp);
+////		pvizit.setCod_sp(authInfo.pcod);
+////		pvizit.setCdol("11");
+////		pos.setCod_sp(authInfo.pcod);
+////		diag.setCod_sp(authInfo.pcod);
+//		try {
+//			pvizit.setDatao(SimpleDateFormat.getDateInstance().parse("01.02.2012").getTime());
+//		} catch (ParseException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
+//		pvizitAmb.setDatap(System.currentTimeMillis());
+//		diag.setDatap(System.currentTimeMillis());
+//			
+//		if (zapVr.vid_p == 1) {
+//			try {
+//				MainForm.tcl.AddPvizit(pvizit);
+//				MainForm.tcl.AddPvizitAmb(pvizitAmb);
+//				MainForm.tcl.AddPdiagAmb(diag);
+//			} catch (KmiacServerException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (TException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			
+//		} else {
+//		try {
+//			MainForm.tcl.AddPvizitAmb(pvizitAmb);
+//			MainForm.tcl.UpdatePvizit(pvizit);
+//			MainForm.tcl.AddPdiagAmb(diag);
+//			if (diag.diag_stat == 2){//присвоить значение полей данным.вписать в табл.
+//			MainForm.tcl.AddPdiagZ(dz);	
+//			}
+//			//Addpdiagamb может не быть.может и быть update.то же самое и с осмотром
+//		} catch (KmiacServerException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (TException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//			
+//		}
 		
 		setVisible(true);
 	}
@@ -2065,15 +2103,16 @@ public class Vvod extends JFrame {
 			c_obr.setData(MainForm.tcl.getP0c());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
-			TabPos.setData(MainForm.tcl.getPvizitAmb(6));
-			TabDiag.setData(MainForm.tcl.getPdiagAmb(6));
 			vid_opl.setData(MainForm.tcl.getOpl());
 			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
 			printform.cbMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
 			
-		} catch (KmiacServerException | TException e) {
+		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
 		}
 	}
 	
@@ -2096,12 +2135,21 @@ public class Vvod extends JFrame {
 			e.printStackTrace();
 		}
 	}
+	
 	private Element getElement(Document doc, String name){
 		NodeList nls;
 		nls = doc.getElementsByTagName(name);
 		if (nls.getLength()>0) {
 			return (Element) nls.item(0);
 		}
+		return null;
+	}
+	
+	private String getTextOrNull(String str) {
+		if (str != null)
+			if (str.length() > 0)
+				return str;
+		
 		return null;
 	}
 }

@@ -1,45 +1,42 @@
 package ru.nkz.ivcgzo.clientOsm.patientInfo;
 
-import java.awt.Container;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.JScrollPane;
-import javax.swing.JEditorPane;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientOsm.MainForm;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
-import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
-import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.getPvizitInfo_result;
-
-import javax.swing.event.TreeExpansionListener;
-import javax.swing.event.TreeExpansionEvent;
 
 public class PInfo extends JFrame {
-
 	private static final long serialVersionUID = 7025194439882492263L;
+	private static final String lineSep = System.lineSeparator();
 	private JEditorPane eptxt;
 	private JTree treeinfo;
-	protected IndexedTreeNode slzab;
+	private StringBuilder sb;
 
 	public PInfo() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,6 +69,25 @@ public class PInfo extends JFrame {
 		);
 		
 		 treeinfo = new JTree(createNodes());
+		 treeinfo.addTreeSelectionListener(new TreeSelectionListener() {
+		 	public void valueChanged(TreeSelectionEvent e) {
+		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
+		 		sb = new StringBuilder();
+		 		if (lastPath instanceof PvizitTreeNode) {
+		 			PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
+		 			Pvizit pvizit = pvizitNode.pvizit;
+		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
+		 			addLineToDetailInfo("cdol", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
+		 			eptxt.setText(sb.toString());
+		 		} else if (lastPath instanceof PvizitAmbNode) {
+		 			PvizitAmbNode pvizitAmbNode = (PvizitAmbNode) lastPath;
+		 			PvizitAmb pam = pvizitAmbNode.pam;
+		 			addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
+		 			addLineToDetailInfo("cdol", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
+		 			eptxt.setText(sb.toString());
+		 		}
+		 	}
+		 });
 		 treeinfo.addTreeExpansionListener(new TreeExpansionListener() {
 		 	public void treeCollapsed(TreeExpansionEvent event) {
 		 	}
@@ -84,7 +100,7 @@ public class PInfo extends JFrame {
 						for (PvizitAmb pvizAmbChild : MainForm.tcl.getPvizitAmb(pvizitNode.pvizit.getId())) {
 							pvizitNode.add(new PvizitAmbNode(pvizAmbChild));
 						}
-						treeinfo.repaint();
+						((DefaultTreeModel) treeinfo.getModel()).reload(pvizitNode);
 					} catch (KmiacServerException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -103,7 +119,6 @@ public class PInfo extends JFrame {
 		renderer.setClosedIcon(null);
 		renderer.setOpenIcon(null);
 		
-
 		pl.setLayout(gl_pl);
 		
 		JPanel pr = new JPanel();
@@ -129,21 +144,14 @@ public class PInfo extends JFrame {
 
 
 	
-	private IndexedTreeNode createNodes() {
-		IndexedTreeNode root = new IndexedTreeNode(0, "Корень зла");
+	private DefaultMutableTreeNode createNodes() {
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень зла");
 		
-//		root.add(new IndexedTreeNode(1, "Личная информация"));
-//		root.add(new IndexedTreeNode(2, "Сигнальная информация"));
-//		slzab = new IndexedTreeNode(3, "Сл.заб");
-//		root.add(slzab);
-//		slzab1 = new IndexedTreeNode(4, "");
-//		slzab.add
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.02.2012").getTime(), sdf.parse("02.06.2012").getTime())) {
+			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
 				root.add(new PvizitTreeNode(pvizit));
-				
-			}
+
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,40 +162,8 @@ public class PInfo extends JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		list.set(0, MainForm.tcl.getPvizitInfo(2, SimpleDateFormat.getDateInstance().parse("01.02.2012").getTime(), SimpleDateFormat.getDateInstance().parse("01.06.2012").getTime()).toString());
-		
-		//slzab.add(new IndexedTreeNode(5, list.toString()));
-//		slzab.add(new IndexedTreeNode(6, "666"));
-//		slzab.add(new IndexedTreeNode(7, "777"));
 
-		
-		
 		return root;
-	}
-	
-	class IndexedTreeNode extends DefaultMutableTreeNode {
-	
-		private static final long serialVersionUID = 2143788492556249212L;
-		private int index;
-		private String name;
-		
-		public IndexedTreeNode(int index, String name) {
-			this.index = index;
-			this.name = name;
-		}
-		
-		public int getIndex() {
-			return index;
-		}
-
-		public String getName() {
-			return name;
-		}
-		
-		@Override
-		public String toString() {
-			return getName();
-		}
 	}
 	
 	class PvizitTreeNode extends DefaultMutableTreeNode {
@@ -202,7 +178,8 @@ public class PInfo extends JFrame {
 		
 		@Override
 		public String toString() {
-			return Integer.toString(pvizit.getId());
+			return DateFormat.getDateInstance().format(new Date(pvizit.getDatao()));
+			//return Integer.toString(pvizit.getId());
 		}
 	}
 	
@@ -216,7 +193,40 @@ public class PInfo extends JFrame {
 		
 		@Override
 		public String toString() {
-			return Integer.toString(pam.getId());
+			return DateFormat.getDateInstance().format(new Date(pam.getDatap()));
 		}
+	}
+	private void addLineToDetailInfo(String name, boolean isSet, Object value) {
+		if (isSet)
+			if ((name != null) && (value != null))
+				if ((name.length() > 0) && (value.toString().length() > 0))
+					sb.append(String.format("%s: %s%s", name, value, lineSep));
+	}
+	
+	private void addLineToDetailInfo(String name, Object value) {
+		addLineToDetailInfo(name, true, value);
+	}
+	
+	private String getValueFromClassifier(List<IntegerClassifier> list, boolean isSet, int pcod) {
+		if (isSet)
+			if (pcod != 0)
+				for (IntegerClassifier item : list) {
+					if (item.getPcod() == pcod)
+						return item.getName();
+				}
+		
+		return null;
+	}
+	
+	private String getValueFromClassifier(List<StringClassifier> list, boolean isSet, String pcod) {
+		if (isSet)
+			if (pcod != null)
+				if (!pcod.equals(""))
+					for (StringClassifier item : list) {
+						if (item.getPcod().equals(pcod))
+							return item.getName();
+					}
+		
+		return null;
 	}
 }

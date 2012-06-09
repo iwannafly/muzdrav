@@ -181,7 +181,7 @@ public class PrintForm extends JFrame{
 							IsslMet isslmet = new IsslMet();
 							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
-							isslmet.setNpasp(Vvod.zapVrSave.getNpasp());
+							isslmet.setNpasp(Vvod.zapVr.getNpasp());
 							isslmet.setKodMetod(tabMet.getSelectedItem().getObst());
 							isslmet.setPokaz(selItems);
 							isslmet.setMesto(cbMesto.getSelectedItem().getName());
