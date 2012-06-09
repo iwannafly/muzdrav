@@ -24,7 +24,9 @@ public class MainForm extends Client<ThriftGenTalons.Client> {
     }
 
     private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-
+		TalonMainFrame talonMainFrame = new TalonMainFrame();
+		talonMainFrame.pack();
+		setFrame(talonMainFrame);
     }
 
     @Override

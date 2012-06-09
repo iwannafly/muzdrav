@@ -69,7 +69,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 
 public class PacientInfoFrame extends JFrame {
 
-	public List<PatientBrief> pat;
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTabbedPane tbMain;
@@ -171,6 +170,7 @@ public class PacientInfoFrame extends JFrame {
 	private JSpinner sp_datasmp;
 	private JSpinner sp_dataosm;
 	private JSpinner sp_datap;
+	public List<PatientBrief> pat;
 	private PatientFullInfo PersonalInfo;
 	private Agent AgentInfo;
 	private List<Lgota> LgotaInfo;
