@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.serverGenTalons;
 
+import java.util.List;
+
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -10,8 +12,17 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
+import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
+import ru.nkz.ivcgzo.thriftGenTalon.Norm;
+import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
+import ru.nkz.ivcgzo.thriftGenTalon.Rasp;
+import ru.nkz.ivcgzo.thriftGenTalon.Spec;
+import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons.Iface;
+import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
+import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 
 public class ServerGenTalons extends Server implements Iface {
     private TServer thrServ;
@@ -47,5 +58,61 @@ public class ServerGenTalons extends Server implements Iface {
             thrServ.stop();
         }
     }
+
+	@Override
+	public List<Spec> getAllSpecForPolikliniki(int cpol) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Vrach> getVrachForCurrentSpec(String cdol) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Calendar> getCalendar(int cyear) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Ndv> getNdv(int pcodvrach, int cpol) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Norm> getNorm(int pcodvrach, int cpol) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Nrasp> getNrasp(int pcodvrach, int cpol, int cxema)
+			throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Rasp> getRasp(int pcodvrach, int cpol) throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Talon> getTalon(int pcodvrach, int cpol, long datap)
+			throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Vidp> getVidp() throws TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
