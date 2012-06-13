@@ -5,7 +5,7 @@ include "../../../common/thrift/kmiacServer.thrift"
 
 /*s_mrab, n_s00*/
 struct Spec{
-	1:i32 cdol,
+	1:string cdol,
 	2:string name 
 }
 
@@ -85,12 +85,12 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
 	*Возвращает информацию о врачебных специальностях (datau пусто)
 	*/
-	list<Spec> getAllSpecForPolikliniki(1:i32 cpol);
+	list<Spec> getAllSpecForPolikliniki(1:i32 cpol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает код и ФИО врачей по врачебной должности
 	*/
-	list<Vrach> getVrachForCurrentSpec(1:string cdol);
+	list<Vrach> getVrachForCurrentSpec(1:i32 cpol, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает календарь на текущий год

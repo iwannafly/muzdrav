@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="gen-java"/>
 	<classpathentry kind="src" path="config"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -10,5 +11,6 @@
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.5.8.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/serverManager"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
