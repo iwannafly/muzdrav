@@ -38,7 +38,7 @@ public class ServerGenTalons extends Server implements Iface {
         "pcod", "name"
     };
     private static final String[] VRACH_FIELD_NAMES = {
-        "pcod", "fam", "im", "ot"
+        "pcod", "fam", "im", "ot", "cdol"
     };
     public ServerGenTalons(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
         super(sse, tse);
@@ -73,7 +73,7 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
-    //дописать NotFoundException
+    //TODO дописать NotFoundException
     @Override
     public final List<Spec> getAllSpecForPolikliniki(final int cpol)
             throws KmiacServerException {
@@ -88,14 +88,14 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
-    //дописать NotFoundException
+    //TODO дописать NotFoundException
     @Override
     public final List<Vrach> getVrachForCurrentSpec(final int cpol, final String cdol)
             throws KmiacServerException {
-            String  sqlQuery = "SELECT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
-                + "FROM s_vrach INNER JOIN s_mrab ON s_vrach.pcod=s_mrab.pcod "
-                + "WHERE s_mrab.clpu=? AND s_mrab.cdol=? AND s_mrab.datau is null "
-                + "ORDER BY fam, im, ot";
+        String  sqlQuery = "SELECT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot, "
+            + "s_mrab.cdol FROM s_vrach INNER JOIN s_mrab ON s_vrach.pcod=s_mrab.pcod "
+            + "WHERE s_mrab.clpu=? AND s_mrab.cdol=? AND s_mrab.datau is null "
+            + "ORDER BY fam, im, ot";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, cdol)) {
             return rsmVrach.mapToList(acrs.getResultSet());
         } catch (SQLException e) {

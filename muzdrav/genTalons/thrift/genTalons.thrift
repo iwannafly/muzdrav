@@ -14,7 +14,8 @@ struct Vrach{
 	1:i32 pcod,
 	2:string fam,
 	3:string im,
-	4:string ot
+	4:string ot,
+	5:string cdol
 }
 
 struct Calendar{
