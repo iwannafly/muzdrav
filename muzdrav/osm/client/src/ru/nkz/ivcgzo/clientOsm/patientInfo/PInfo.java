@@ -111,11 +111,12 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 		 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
 					addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
-					addLineToDetailInfo("Начало заболевания", anamnez.isSetT_nachalo_zab(), anamnez.getT_nachalo_zab());
-					addLineToDetailInfo("Симптомы", anamnez.isSetT_sympt(), anamnez.getT_sympt());
-					addLineToDetailInfo("Отношение больного", anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
-					addLineToDetailInfo("Психологическая ситуация в связи с болезнью", anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
-
+					addDetailInfo(anamnez.isSetT_nachalo_zab(), anamnez.getT_nachalo_zab());
+					addDetailInfo(anamnez.isSetT_sympt(), anamnez.getT_sympt());
+					addDetailInfo(anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
+					addDetailInfo(anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
+					
+					
 					eptxt.setText(sb.toString());
 		 			} 
 		 		else if (lastPath instanceof PvizitAmbNode) {
@@ -125,10 +126,9 @@ public class PInfo extends JFrame {
 						Priem priem =  MainForm.tcl.getPriem(pam.getId(),pam.getNpasp());
 						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
 						addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
-						addLineToDetailInfo("Жалобы: ", pam.isSetId(), pam.getId());
-						addLineToDetailInfo("Жалобы, дыхательная система: ", pam.isSetId(), pam.getId());
-						addLineToDetailInfo("Жалобы, система кровообращения: ", pam.isSetId(), pam.getId());
-						addLineToDetailInfo("Жалобы, дыхательная система: ", pam.isSetId(), pam.getId());
+						addLineToDetailInfo("Жалобы: ", priem.isSetT_jalob(), priem.getT_jalob());
+						addLineToDetailInfo("Жалобы, дыхательная система: ", priem.isSetT_jalob_d(), priem.getT_jalob_d());
+						addLineToDetailInfo("Жалобы, система кровообращения: ", priem.isSetT_jalob_krov(), priem.getT_jalob_krov());
 						eptxt.setText(sb.toString());
 					} catch (PriemNotFoundException e1) {
 						// TODO Auto-generated catch block
@@ -267,6 +267,14 @@ public class PInfo extends JFrame {
 	private void addLineToDetailInfo(String name, Object value) {
 		addLineToDetailInfo(name, true, value);
 	}
+	
+	private void addDetailInfo(boolean isSet, Object value) {
+		if (isSet)
+			if (value != null)
+				if (value.toString().length() > 0)
+					sb.append(value + " ");
+	}
+
 	
 	private String getValueFromClassifier(List<IntegerClassifier> list, boolean isSet, int pcod) {
 		if (isSet)
