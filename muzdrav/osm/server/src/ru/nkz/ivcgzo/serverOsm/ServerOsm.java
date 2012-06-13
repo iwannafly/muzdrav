@@ -389,7 +389,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public Priem getPriem(int npasp, int posId) throws KmiacServerException, PriemNotFoundException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_priem WHERE AND npasp = ? AND id_pos = ? ", npasp, posId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_priem WHERE npasp = ? AND id_pos = ? ", npasp, posId)) {
 			if (acrs.getResultSet().next())
 				return rsmPriem.map(acrs.getResultSet());
 			else
@@ -895,7 +895,10 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public AnamZab getAnamZab(int id_pvizit, int npasp) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_anam_zab WHERE id_pvizit = ? AND npasp = ? ", id_pvizit, npasp)) {
-			return rsmAnamZab.map(acrs.getResultSet());
+			if (acrs.getResultSet().next())
+				return rsmAnamZab.map(acrs.getResultSet());
+			else
+				return new AnamZab();
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}

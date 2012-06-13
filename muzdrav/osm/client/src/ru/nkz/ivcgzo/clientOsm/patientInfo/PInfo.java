@@ -28,9 +28,14 @@ import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
+import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import javax.swing.JLabel;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JTextField;
 
 public class PInfo extends JFrame {
 	private static final long serialVersionUID = 7025194439882492263L;
@@ -38,20 +43,38 @@ public class PInfo extends JFrame {
 	private JEditorPane eptxt;
 	private JTree treeinfo;
 	private StringBuilder sb;
+	private JTextField tfdat;
 
 	public PInfo() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 822, 732);
 		
 		JSplitPane splitpinfo = new JSplitPane();
+		
+		JLabel lblperiod = new JLabel("Период ");
+		
+		tfdat = new JTextField();
+		tfdat.setColumns(10);
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitpinfo, GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
+				.addComponent(splitpinfo)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblperiod)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tfdat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(673, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitpinfo, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblperiod)
+						.addComponent(tfdat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(splitpinfo, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE))
 		);
 		
 		JPanel pl = new JPanel();
@@ -78,7 +101,7 @@ public class PInfo extends JFrame {
 		 		if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
-//		 			Priem priem =  MainForm.tcl.getPriem(pvizit.getId(),pvizit.getNpasp(),pvizit.getId());
+		 			AnamZab anamnez =  MainForm.tcl.getAnamZab(pvizit.getId(),pvizit.getNpasp());
 		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
 					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
@@ -88,16 +111,30 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 		 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
 					addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
-					addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
-
+					addDetailInfo(anamnez.isSetT_nachalo_zab(), anamnez.getT_nachalo_zab());
+					addDetailInfo(anamnez.isSetT_sympt(), anamnez.getT_sympt());
+					addDetailInfo(anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
+					addDetailInfo(anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
+					
+					
 					eptxt.setText(sb.toString());
 		 			} 
 		 		else if (lastPath instanceof PvizitAmbNode) {
 		 			PvizitAmbNode pvizitAmbNode = (PvizitAmbNode) lastPath;
 		 			PvizitAmb pam = pvizitAmbNode.pam;
-		 			addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
-		 			addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
-		 			eptxt.setText(sb.toString());
+		 			try {
+						Priem priem =  MainForm.tcl.getPriem(pam.getId(),pam.getNpasp());
+						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
+						addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
+						addLineToDetailInfo("Жалобы: ", priem.isSetT_jalob(), priem.getT_jalob());
+						addLineToDetailInfo("Жалобы, дыхательная система: ", priem.isSetT_jalob_d(), priem.getT_jalob_d());
+						addLineToDetailInfo("Жалобы, система кровообращения: ", priem.isSetT_jalob_krov(), priem.getT_jalob_krov());
+						eptxt.setText(sb.toString());
+					} catch (PriemNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		 			
 		 		}
 		 			}
 		 			catch (KmiacServerException e1) {
@@ -106,6 +143,7 @@ public class PInfo extends JFrame {
 					} catch (TException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
 					}
 		 			
 		 		
@@ -229,6 +267,14 @@ public class PInfo extends JFrame {
 	private void addLineToDetailInfo(String name, Object value) {
 		addLineToDetailInfo(name, true, value);
 	}
+	
+	private void addDetailInfo(boolean isSet, Object value) {
+		if (isSet)
+			if (value != null)
+				if (value.toString().length() > 0)
+					sb.append(value + " ");
+	}
+
 	
 	private String getValueFromClassifier(List<IntegerClassifier> list, boolean isSet, int pcod) {
 		if (isSet)
