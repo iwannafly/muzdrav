@@ -212,10 +212,10 @@ public class Vvod extends JFrame {
 					priem.setT_jalob_lih(getTextOrNull(tpJaloblih.getText()));
 					priem.setT_jalob_obh(getTextOrNull(tpJalobobh.getText()));
 					priem.setT_jalob_proch(getTextOrNull(tpJalobproch.getText()));
-					priem.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
-					priem.setT_sympt(getTextOrNull(tpSympt.getText()));
-					priem.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));
-					priem.setT_ps_syt(getTextOrNull(tpPssit.getText()));
+//					priem.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
+//					priem.setT_sympt(getTextOrNull(tpSympt.getText()));
+//					priem.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));
+//					priem.setT_ps_syt(getTextOrNull(tpPssit.getText()));
 					priem.setT_ob_sost(getTextOrNull(tpObsost.getText()));
 					priem.setT_koj_pokr(getTextOrNull(tpKoj.getText()));
 					priem.setT_sliz(getTextOrNull(tpSliz.getText()));
