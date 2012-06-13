@@ -20,6 +20,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTabbedPane;
 
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
@@ -40,7 +41,8 @@ public class TalonMainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTree treevrach;
-	private int curSpec = null;
+	private String curSpec = null;
+	private int curVrach = 0;
 
 	/**
 	 * Launch the application.
@@ -161,13 +163,13 @@ public class TalonMainFrame extends JFrame {
 			 			SpecTreeNode specNode = (SpecTreeNode) lastPath;
 			 			Spec spec = specNode.spec;
 			 			curSpec = spec.getCdol();
+			 			curVrach = 0;
 		 			} 
 			 		else if (lastPath instanceof VrachTreeNode) {
-		 			PvizitAmbNode pvizitAmbNode = (PvizitAmbNode) lastPath;
-		 			PvizitAmb pam = pvizitAmbNode.pam;
-		 			addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
-		 			addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
-		 			eptxt.setText(sb.toString());
+			 			VrachTreeNode vrachNode = (VrachTreeNode) lastPath;
+			 			Vrach vrach = vrachNode.vrach;
+			 			//curSpec = vrach.getCdol();
+			 			curVrach = vrach.getPcod();
 			 		}
 					} catch (Exception e1) {
 						e1.printStackTrace();
@@ -183,8 +185,7 @@ public class TalonMainFrame extends JFrame {
 		 			try {
 						SpecTreeNode specNode = (SpecTreeNode) lastPath;
 						specNode.removeAllChildren();
-//						for (Vrach vrachChild : MainForm.tcl.getVrachForCurrentSpec(MainForm.authInfo.cpodr,specNode.spec.getCdol())) {
-						for (Vrach vrachChild : MainForm.tcl.getVrachForCurrentSpec(specNode.spec.getCdol())) {
+						for (Vrach vrachChild : MainForm.tcl.getVrachForCurrentSpec(MainForm.authInfo.cpodr,specNode.spec.getCdol())) {
 							specNode.add(new VrachTreeNode(vrachChild));
 						}
 						((DefaultTreeModel) treevrach.getModel()).reload(specNode);
@@ -212,9 +213,9 @@ public class TalonMainFrame extends JFrame {
 			for (Spec spec : MainForm.tcl.getAllSpecForPolikliniki(MainForm.authInfo.cpodr))
 				root.add(new SpecTreeNode(spec));
 		} catch (Exception e) {
+		    System.out.println("Нет данных в табл. s_mrab по данному подразделению.");
 			e.printStackTrace();
 		}
-
 		return root;
 	}
 
