@@ -38,10 +38,9 @@ public class TalonMainFrame extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final String lineSep = System.lineSeparator();
 	private JPanel contentPane;
 	private JTree treevrach;
-	private StringBuilder sb;
+	private int curSpec = null;
 
 	/**
 	 * Launch the application.
@@ -154,20 +153,64 @@ public class TalonMainFrame extends JFrame {
 		);
 		
 		treevrach = new JTree(createNodes());
+		treevrach.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
+		 		try {
+			 		if (lastPath instanceof SpecTreeNode) {
+			 			SpecTreeNode specNode = (SpecTreeNode) lastPath;
+			 			Spec spec = specNode.spec;
+			 			curSpec = spec.getCdol();
+		 			} 
+			 		else if (lastPath instanceof VrachTreeNode) {
+		 			PvizitAmbNode pvizitAmbNode = (PvizitAmbNode) lastPath;
+		 			PvizitAmb pam = pvizitAmbNode.pam;
+		 			addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
+		 			addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
+		 			eptxt.setText(sb.toString());
+			 		}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+			}
+		});
+		treevrach.addTreeExpansionListener(new TreeExpansionListener() {
+			public void treeCollapsed(TreeExpansionEvent event) {
+			}
+			public void treeExpanded(TreeExpansionEvent event) {
+		 		Object lastPath = event.getPath().getLastPathComponent();
+		 		if (lastPath instanceof SpecTreeNode) {
+		 			try {
+						SpecTreeNode specNode = (SpecTreeNode) lastPath;
+						specNode.removeAllChildren();
+//						for (Vrach vrachChild : MainForm.tcl.getVrachForCurrentSpec(MainForm.authInfo.cpodr,specNode.spec.getCdol())) {
+						for (Vrach vrachChild : MainForm.tcl.getVrachForCurrentSpec(specNode.spec.getCdol())) {
+							specNode.add(new VrachTreeNode(vrachChild));
+						}
+						((DefaultTreeModel) treevrach.getModel()).reload(specNode);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+		 		}
+			}
+		});
 		scrollPane.setViewportView(treevrach);
 		treevrach.setShowsRootHandles(true);
 		treevrach.setRootVisible(false);
 		DefaultTreeCellRenderer renderer =  (DefaultTreeCellRenderer) treevrach.getCellRenderer();
+		renderer.setLeafIcon(null);
+		renderer.setClosedIcon(null);
+		renderer.setOpenIcon(null);
 		panel.setLayout(gl_panel);
-		contentPane.setLayout(gl_contentPane);
-	}
+		contentPane.setLayout(gl_contentPane);	
+	}		
 
 	private DefaultMutableTreeNode createNodes() {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень зла");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень дерева");
 		
 		try {
 			for (Spec spec : MainForm.tcl.getAllSpecForPolikliniki(MainForm.authInfo.cpodr))
-				root.add(new VrachTreeNode(spec));
+				root.add(new SpecTreeNode(spec));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -175,17 +218,31 @@ public class TalonMainFrame extends JFrame {
 		return root;
 	}
 
-	class VrachTreeNode extends DefaultMutableTreeNode {
+	class SpecTreeNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = 4212592425962984738L;
 		private Spec spec;
 		
-		public VrachTreeNode(Spec spec) {
+		public SpecTreeNode(Spec spec) {
 			this.spec = spec;
+			this.add(new VrachTreeNode(new Vrach()));
 		}
 		
 		@Override
 		public String toString() {
 			return spec.getName();
+		}
+	}
+	class VrachTreeNode extends DefaultMutableTreeNode{
+		private static final long serialVersionUID = -4684514837066276873L;
+		private Vrach vrach;
+		
+		public VrachTreeNode(Vrach vrach) {
+			this.vrach = vrach;
+		}
+		
+		@Override
+		public String toString() {
+			return vrach.getFam()+" "+vrach.getIm()+" "+vrach.getOt();
 		}
 	}
 }
