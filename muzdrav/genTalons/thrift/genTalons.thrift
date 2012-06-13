@@ -14,7 +14,8 @@ struct Vrach{
 	1:i32 pcod,
 	2:string fam,
 	3:string im,
-	4:string ot
+	4:string ot,
+	5:string cdol
 }
 
 struct Calendar{
@@ -85,12 +86,12 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
 	*Возвращает информацию о врачебных специальностях (datau пусто)
 	*/
-	list<Spec> getAllSpecForPolikliniki(1:i32 cpol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Spec> getAllSpecForPolikliniki(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает код и ФИО врачей по врачебной должности
 	*/
-	list<Vrach> getVrachForCurrentSpec(1:i32 cpol, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Vrach> getVrachForCurrentSpec(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает календарь на текущий год
