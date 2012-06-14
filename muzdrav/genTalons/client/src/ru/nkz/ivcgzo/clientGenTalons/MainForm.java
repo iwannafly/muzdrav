@@ -12,6 +12,7 @@ import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons;
 
 public class MainForm extends Client<ThriftGenTalons.Client> {
     public static ThriftGenTalons.Client tcl;
+    private TalonMainFrame talonMainFrame;
 
     public MainForm(ConnectionManager conMan, UserAuthInfo authInfo,
             int accessParam) throws NoSuchMethodException, SecurityException,
@@ -24,7 +25,7 @@ public class MainForm extends Client<ThriftGenTalons.Client> {
     }
 
     private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-		TalonMainFrame talonMainFrame = new TalonMainFrame();
+		talonMainFrame = new TalonMainFrame();
 		talonMainFrame.pack();
 		setFrame(talonMainFrame);
     }
@@ -39,6 +40,7 @@ public class MainForm extends Client<ThriftGenTalons.Client> {
         super.onConnect(conn);
         if (conn instanceof ThriftGenTalons.Client) {
             tcl = thrClient;
+            talonMainFrame.onConnect();
         }
     }
 

@@ -5,7 +5,7 @@ include "../../../common/thrift/kmiacServer.thrift"
 
 /*s_mrab, n_s00*/
 struct Spec{
-	1:string cdol,
+	1:string pcod,
 	2:string name 
 }
 
@@ -102,29 +102,29 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	list<Calendar> getCalendar(1:i32 cyear);
 
 	/**
-	*Возвращает неприемные дни врача
-	*/
-	list<Ndv> getNdv(1:i32 pcodvrach, 2:i32 cpol);
-
-	/**
 	*Возвращает длительность приема специалистом в поликлинике
 	*/
-	list<Norm> getNorm(1:i32 pcodvrach, 2:i32 cpol);
+	list<Norm> getNorm(1:i32 cpodr, 2:string cdol);
+
+	/**
+	*Возвращает неприемные дни врача
+	*/
+	list<Ndv> getNdv(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol);
 
 	/**
 	*Возвращает график приема врача в поликлинике
 	*/
-	list<Nrasp> getNrasp(1:i32 pcodvrach, 2:i32 cpol, 3:i32 cxema);
+	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema);
 
 	/**
 	*Возвращает расписание работы врача в поликлинике
 	*/
-	list<Rasp> getRasp(1:i32 pcodvrach, 2:i32 cpol);
+	list<Rasp> getRasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol);
 
 	/**
 	*Возвращает талоны на прием в поликлинике
 	*/
-	list<Talon> getTalon(1:i32 pcodvrach, 2:i32 cpol, 3:i64 datap);
+	list<Talon> getTalon(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i64 datap);
 
 	/**
 	*Возвращает виды приема
