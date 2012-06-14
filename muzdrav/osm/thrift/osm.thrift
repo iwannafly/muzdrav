@@ -408,15 +408,13 @@ struct NaprKons{
 }
 
 struct IsslInfo{
-	1: i32 npasp;
-	2: i32 nisl;
-	3: i32 cisl;
-	4: string name_cisl;
-	5: string pokaz;
-	6: string pokaz_name;
-	7: string rez;
-	8: i32 pvizit_id;
-	9: i64 datav;
+	1: i32 nisl;
+	2: i32 cisl;
+	3: string name_cisl;
+	4: string pokaz;
+	5: string pokaz_name;
+	6: string rez;
+	7: i64 datav;
 }
 
 exception PvizitNotFoundException {

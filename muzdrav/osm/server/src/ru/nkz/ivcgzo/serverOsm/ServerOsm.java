@@ -25,6 +25,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
@@ -96,8 +97,10 @@ public class ServerOsm extends Server implements Iface {
 	@SuppressWarnings("unused")
 	private final Class<?>[] pokazTypes;
 	private final TResultSetMapper<AnamZab, AnamZab._Fields> rsmAnamZab;
-	@SuppressWarnings("unused")
 	private final Class<?>[] anamZabTypes; 
+	private final TResultSetMapper<IsslInfo, IsslInfo._Fields> rsmIsslInfo;
+	@SuppressWarnings("unused")
+	private final Class<?>[] isslInfoTypes; 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -148,7 +151,10 @@ public class ServerOsm extends Server implements Iface {
 		pokazTypes = new Class<?>[] {                  String.class, String.class, Double.class, Integer.class, String.class};
 		
 		rsmAnamZab = new TResultSetMapper<>(AnamZab.class, "id_pvizit",   "npasp",       "t_nachalo_zab", "t_sympt",    "t_otn_bol", "t_ps_syt");
-		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class,    String.class, String.class};
+		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class,    String.class, String.class, String.class};
+		
+		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cp0e1",       "np0e1",      "cldi",       "nldi",       "zpok",       "datav");
+		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class};
 	}
 
 	@Override
@@ -212,7 +218,10 @@ public class ServerOsm extends Server implements Iface {
 //		List<Pvizit> pvl = getPvizitInfo(2, sdf.parse("01.01.2012").getTime(), sdf.parse("02.02.2012").getTime());
 //		List<PvizitAmb> pal = getPvizitAmb(6);
 		
-
+//		List<IsslInfo> lii = getIsslInfo(377);
+//		AnamZab az = new AnamZab(377, 2, "начало заболевания", "симптом", "отношение больного к заболеванию", "посттравматические синдромы");
+//		setAnamZab(az);
+		
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
@@ -717,7 +726,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 			int id = sme.getGeneratedKeys().getInt("nisl");
 			sme.setCommit();
 			return id;
@@ -906,7 +915,27 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public void setAnamZab(AnamZab anam) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_anam_zab SET t_nachalo_zab = ?, t_sympt = ?, t_otn_bol = ?, t_ps_syt = ? WHERE id_pvizit = ? ", false, anam, anamZabTypes, 2, 3, 4, 5, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IsslInfo> getIsslInfo(int pvizit_id) throws KmiacServerException, TException {
+		String sql = "SELECT il.nisl, p0.pcod AS cp0e1, p0.name AS np0e1, ld.pcod AS cldi, ld.name_n AS nldi, rl.zpok, il.datav " + 
+					"FROM p_isl_ld il JOIN p_rez_l rl ON (rl.nisl = il.nisl) JOIN n_ldi ld ON (ld.pcod = rl.cpok) JOIN n_p0e1 p0 ON (p0.pcod = il.cisl) " +
+					"WHERE il.pvizit_id = ? " +
+					"UNION " +
+					"SELECT il.nisl, p0.pcod AS cp0e1, p0.name AS np0e1, ld.pcod AS cldi, ld.name_n AS nldi, rz.name, il.datav " +
+					"FROM p_isl_ld il JOIN p_rez_d rd ON (rd.nisl = il.nisl) JOIN n_ldi ld ON (ld.pcod = rd.kodisl) JOIN n_arez rz ON (rz.pcod = rd.rez) JOIN n_p0e1 p0 ON (p0.pcod = il.cisl) " +
+					"WHERE il.pvizit_id = ? ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, pvizit_id, pvizit_id)) {
+			return rsmIsslInfo.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 }
