@@ -256,7 +256,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public Pvizit getPvizit(int obrId) throws PvizitNotFoundException, KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE id = ? ", obrId)) {
-			if (acrs.getResultSet().next())
+		if (acrs.getResultSet().next())
 				return rsmPvizit.map(acrs.getResultSet());
 			else
 				throw new PvizitNotFoundException();

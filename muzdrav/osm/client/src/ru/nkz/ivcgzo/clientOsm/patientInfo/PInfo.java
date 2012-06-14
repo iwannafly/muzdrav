@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientOsm.patientInfo;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +30,8 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
+import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
@@ -105,7 +108,7 @@ public class PInfo extends JFrame {
 		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
 					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
-		 			//addLineToDetailInfo("Врач", pvizit.isSetFio_vr(),pvizit.getFio_vr());
+		 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
 					addLineToDetailInfo("Исход", getValueFromClassifier(MainForm.tcl.getAq0(), pvizit.isSetIshod(), pvizit.getIshod()));
 					addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pvizit.isSetRezult(), pvizit.getRezult()));
 					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
@@ -116,7 +119,18 @@ public class PInfo extends JFrame {
 					addDetailInfo(anamnez.isSetT_sympt(), anamnez.getT_sympt());
 					addDetailInfo(anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
 					addDetailInfo(anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
-					eptxt.setText(sb.toString());
+		 			addHeader("Назначенные иссл.");
+	 				for (IsslInfo issl : MainForm.tcl.getIsslInfo(pvizit.getId())) {
+	 	 				addLineToDetailInfo("Показатель",issl.isSetPokaz_name(),issl.getPokaz_name());
+	 					addLineToDetailInfo("Результат",issl.isSetRez(),issl.getRez());
+	 					addLineToDetailInfo("Дата",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+	 				}
+	 				addHeader("Поставленные д-зы");
+	 				for (PdiagAmb pdiagamb : MainForm.tcl.getPdiagAmb(pvizit.getId())) {
+	 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
+	 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
+	 					addLineToDetailInfo("Статус",getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
+	 				}
 		 			} 
 		 		else if (lastPath instanceof PvizitAmbNode) {
 		 			
@@ -127,7 +141,6 @@ public class PInfo extends JFrame {
 						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
 						addLineToDetailInfo("Должность",getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
 						addLineToDetailInfo("Врач",pam.isSetFio_vr(),pam.getFio_vr());
-						
 						addHeader("Жалобы");
 						addDetailInfo(priem.isSetT_jalob(), priem.getT_jalob());
 						addDetailInfo(priem.isSetT_jalob_d(), priem.getT_jalob_d());
@@ -207,6 +220,10 @@ public class PInfo extends JFrame {
 		 			
 		 		
 		 	}
+
+			
+
+			
 		 });
 		 treeinfo.addTreeExpansionListener(new TreeExpansionListener() {
 		 	public void treeCollapsed(TreeExpansionEvent event) {
@@ -265,7 +282,7 @@ public class PInfo extends JFrame {
 
 	
 	private DefaultMutableTreeNode createNodes() {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень зла");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
 		
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
@@ -363,4 +380,7 @@ public class PInfo extends JFrame {
 	private void addHeader(String name) {
 		sb.append(name + lineSep);
 	}
+	
+
+	
 }
