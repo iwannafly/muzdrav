@@ -34,6 +34,7 @@ struct Pvizit {
 	13: i64 dataz;
 	14: i32 idzab;
 	15: string recomend;
+	16: string vrach_fio;
 }
 
 struct PvizitAmb {
@@ -406,7 +407,15 @@ struct NaprKons{
 	4: i32 cpol;
 }
 
-
+struct IsslInfo{
+	1: i32 nisl;
+	2: i32 cisl;
+	3: string name_cisl;
+	4: string pokaz;
+	5: string pokaz_name;
+	6: string rez;
+	7: i64 datav;
+}
 
 exception PvizitNotFoundException {
 }
@@ -466,6 +475,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+	list<IsslInfo> getIsslInfo(1: i32 pvizit_id) throws (1: kmiacServer.KmiacServerException kse);
 
 	
 	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
