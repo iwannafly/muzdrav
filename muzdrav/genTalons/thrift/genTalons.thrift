@@ -32,7 +32,8 @@ struct Calendar{
 struct Ndv{
 	1:i32 pcod,
 	2:i64 datan,
-	3:i64 datak
+	3:i64 datak,
+	4:string cdol
 }
 
 struct Norm{
@@ -47,7 +48,8 @@ struct Nrasp{
 	3:i32 vidp,
 	4:i64 time_n,
 	5:i64 time_k,
-	6:i32 cxema
+	6:i32 cxema,
+	7:string cdol
 }
 
 struct Rasp{
@@ -58,7 +60,8 @@ struct Rasp{
 	5:i64 datap,
 	6:i64 time_n,
 	7:i64 time_k,
-	8:i32 vidp
+	8:i32 vidp,
+	9:string cdol
 }
 
 struct Vidp{
