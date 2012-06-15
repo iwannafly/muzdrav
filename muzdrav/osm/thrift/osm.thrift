@@ -15,13 +15,14 @@ struct ZapVr{
 	6: string oth;
 	7: string serpolis;
 	8: string nompolis;
+	9: i32 id_pvizit;
 }
 
 struct Pvizit {
 	1: i32 id;
 	2: i32 npasp;
 	3: i32 cpol;
-	4: i32 cobr;
+	4: string cobr;
 	5: i64 datao;
 	6: i32 ishod;
 	7: i32 rezult;
@@ -33,6 +34,7 @@ struct Pvizit {
 	13: i64 dataz;
 	14: i32 idzab;
 	15: string recomend;
+	16: string vrach_fio;
 }
 
 struct PvizitAmb {
@@ -101,72 +103,77 @@ struct Priem{
 	1: i32 id;
 	2: i32 npasp;
 	3: i32 idpos;
-	4: i32 sl_ob;
-	5: i32 n_is;
-	6: i32 n_kons;
-	7: i32 n_proc;
-	8: i32 n_lek;
-	9: string t_jalob_d;
-	10: string t_jalob_krov;
-	11: string t_jalob_p;
-	12: string t_jalob_moch;
-	13: string t_jalob_endo;
-	14: string t_jalob_nerv;
-	15: string t_jalob_opor;
-	16: string t_jalob_lih;
-	17: string t_jalob_obh;
-	18: string t_jalob_proch;
-	19: string t_nachalo_zab;
-	20: string t_sympt;
-	21: string t_otn_bol;
-	22: string t_ps_syt;
-	23: string t_ob_sost;
-	24: string t_koj_pokr;
-	25: string t_sliz;
-	26: string t_podk_kl;
-	27: string t_limf_uzl;
-	28: string t_kost_mysh;
-	29: string t_nervn_ps;
-	30: string t_chss;
-	31: string t_temp;
-	32: string t_ad;
-	33: string t_rost;
-	34: string t_ves;
-	35: string t_telo;
-	36: string t_sust;
-	37: string t_dyh;
-	38: string t_gr_kl;
-	39: string t_perk_l;
-	40: string t_aus_l;
-	41: string t_bronho;
-	42: string t_arter;
-	43: string t_obl_s;
-	44: string t_perk_s;
-	45: string t_aus_s;
-	46: string t_pol_rta;
-	47: string t_jivot;
-	48: string t_palp_jivot;
-	49: string t_jel_kish;
-	50: string t_palp_jel;
-	51: string t_palp_podjel;
-	52: string t_pechen;
-	53: string t_jelch;
-	54: string t_selez;
-	55: string t_obl_zad;
-	56: string t_poyasn;
-	57: string t_pochk;
-	58: string t_moch;
-	59: string t_mol_jel;
-	60: string t_gr_jel;
-	61: string t_matka;
-	62: string t_nar_polov;
-	63: string t_chitov;
-	64: string t_st_localis;
-	65: string t_ocenka;
-	66: string t_jalob;
-	67: string t_ist_zab;
-	68: string t_status_praesense;
-	69: string t_fiz_obsl;
+	4: optional i32 sl_ob;
+	5: optional i32 n_is;
+	6: optional i32 n_kons;
+	7: optional i32 n_proc;
+	8: optional i32 n_lek;
+	9: optional string t_jalob_d;
+	10: optional string t_jalob_krov;
+	11: optional string t_jalob_p;
+	12: optional string t_jalob_moch;
+	13: optional string t_jalob_endo;
+	14: optional string t_jalob_nerv;
+	15: optional string t_jalob_opor;
+	16: optional string t_jalob_lih;
+	17: optional string t_jalob_obh;
+	18: optional string t_jalob_proch;
+	19: string t_ob_sost;
+	20: string t_koj_pokr;
+	21: string t_sliz;
+	22: string t_podk_kl;
+	23: string t_limf_uzl;
+	24: string t_kost_mysh;
+	25: string t_nervn_ps;
+	26: optional string t_chss;
+	27: optional string t_temp;
+	28: string t_ad;
+	29: string t_rost;
+	30: string t_ves;
+	31: string t_telo;
+	32: string t_sust;
+	33: string t_dyh;
+	34: string t_gr_kl;
+	35: string t_perk_l;
+	36: string t_aus_l;
+	37: string t_bronho;
+	38: string t_arter;
+	39: string t_obl_s;
+	40: string t_perk_s;
+	41: string t_aus_s;
+	42: string t_pol_rta;
+	43: string t_jivot;
+	44: string t_palp_jivot;
+	45: string t_jel_kish;
+	46: string t_palp_jel;
+	47: string t_palp_podjjel;
+	48: string t_pechen;
+	49: string t_jelch;
+	50: string t_selez;
+	51: string t_obl_zad;
+	52: string t_poyasn;
+	53: string t_pochk;
+	54: string t_moch;
+	55: string t_mol_jel;
+	56: string t_gr_jel;
+	57: string t_matka;
+	58: string t_nar_polov;
+	59: string t_chitov;
+	60: string t_st_localis;
+	61: string t_ocenka;
+	62: string t_jalob;
+	63: string t_ist_zab;
+	64: string t_status_praesense;
+	65: string t_fiz_obsl;
+}
+
+struct AnamZab{
+	1: i32 id_pvizit;
+	2: i32 npasp;
+	3: string t_nachalo_zab;
+	4: string t_sympt;
+	5: string t_otn_bol;
+	6: string t_ps_syt;
 }
 
 struct PdiagZ{
@@ -175,7 +182,16 @@ struct PdiagZ{
 	3: string diag;
 	4: string named;
 	5: i64 datad;
-	6: i32 nmvd;
+	6: i32 cpodr;
+	7: i64 d_post;
+	8: i32 d_grup;
+	9: i32 d_ish;
+	10: i64 dataish;
+	11: i64 datag;
+	12: string diag_s;
+	13: i32 d_grup_s;
+	14: i32 cod_sp;
+	15: string cdol_ot;
 }
 
 struct PatientCommonInfo {
@@ -391,6 +407,16 @@ struct NaprKons{
 	4: i32 cpol;
 }
 
+struct IsslInfo{
+	1: i32 nisl;
+	2: i32 cisl;
+	3: string name_cisl;
+	4: string pokaz;
+	5: string pokaz_name;
+	6: string rez;
+	7: i64 datav;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -415,7 +441,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
 	
-	i32 AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
+	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
@@ -430,13 +456,17 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
 
-	Psign getPsign(1: i32 signId) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
+	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
 	void setPsign(1: Psign sign) throws (1: kmiacServer.KmiacServerException kse);
 
-	Priem getPriem(1: i32 obrId, 2: i32 npasp, 3: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
+	AnamZab getAnamZab(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void setAnamZab(1: AnamZab anam) throws (1: kmiacServer.KmiacServerException kse);
+
+	Priem getPriem(1: i32 npasp, 2: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	list<PdiagZ> getPdiagZ(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
@@ -445,6 +475,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+	list<IsslInfo> getIsslInfo(1: i32 pvizit_id) throws (1: kmiacServer.KmiacServerException kse);
 
 	
 	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
@@ -475,11 +506,13 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getVdi() throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
+	list<Pvizit> getPvizitInfo(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	list<RdSlStruct> getRdSlInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);

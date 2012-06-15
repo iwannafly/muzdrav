@@ -152,8 +152,8 @@ public class Doctor {
         ResultSet rs = null;
         try {
             prepStatement = connection.prepareStatement(sqlQuery);
-            prepStatement.setString(1, inputPomsFull);
-            prepStatement.setString(2, inputPomsFull);
+            prepStatement.setString(1, ,);
+            prepStatement.setString(2, i,nputPomsFull);
             rs = prepStatement.executeQuery();
             return rs.next();
         } catch (SQLException e) {

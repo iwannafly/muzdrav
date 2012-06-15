@@ -21,6 +21,7 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
+import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.PatientInfoViewMainForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -32,6 +33,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
+	private PInfo pinfo;
 	
 	private PatientInfoViewMainForm patInfoView;
 
@@ -57,7 +59,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnNewButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				vvod.showVvod(authInfo, table.getSelectedItem());
+				if (table.getSelectedItem() != null)
+					vvod.showVvod(table.getSelectedItem());
 			}
 		});
 		
@@ -66,7 +69,9 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					tcl.testConnection();
-					patInfoView.showForm(tcl, table.getSelectedItem().npasp);
+					//patInfoView.showForm(tcl, table.getSelectedItem().npasp);
+					pinfo = new PInfo();
+					pinfo.setVisible(true);
 				} catch (TException e1) {
 					conMan.reconnect(e1);
 				}
@@ -121,7 +126,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					JOptionPane.showMessageDialog(frame, "Ошибка загрузки классификаторов", "Необработанная ошибка", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				table.setData(tcl.getZapVr(6, "3", SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
 				vvod.onConnect();
 				Classifiers.load(tcl);
 			} catch (KmiacServerException | ParseException e) {

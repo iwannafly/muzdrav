@@ -7,5 +7,7 @@ base port + 0	auth
 4	lds
 5	regPatient
 6	mss
+7	viewSelect
+8	genTalons
 
 55201	libUpd

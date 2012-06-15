@@ -42,7 +42,7 @@ public class PacientMainFrame extends JFrame {
 	public PacientMainFrame() {
 		setTitle("Поиск пациента");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 264, 279);
+		setBounds(200, 200, 264, 279);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);

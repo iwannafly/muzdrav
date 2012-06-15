@@ -777,18 +777,18 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException, TException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
                 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
-                        "INSERT INTO c_gosp(ngosp, npasp, nist, datap, vremp, "
+                        "INSERT INTO c_gosp(npasp, nist, datap, vremp, "
                         + "pl_extr, naprav, n_org, cotd, sv_time, sv_day, ntalon, "
                         + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
                         + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
                         + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
                         + "dataosm, vremosm, dataz, jalob) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
@@ -890,10 +890,10 @@ public class ServerRegPatient extends Server implements Iface {
 
     //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
-    public final void deleteGosp(final int npasp, final int ngosp) throws TException {
+    public final void deleteGosp(final int id) throws TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_gosp WHERE npasp = ? AND ngosp = ?;",
-                    false, npasp, ngosp);
+            sme.execPrepared("DELETE FROM c_gosp WHERE id = ?;",
+                    false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -983,12 +983,12 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final void updateGosp(final Gosp gosp) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
             18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 0
         };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE c_gosp SET "
-                    + "ngosp = ?, npasp = ?, nist = ?, datap = ?, vremp = ?, "
+                    + "npasp = ?, nist = ?, datap = ?, vremp = ?, "
                     + "pl_extr = ?, naprav = ?, n_org = ?, cotd = ?, "
                     + "sv_time = ?, sv_day = ?, ntalon = ?, vidtr = ?, "
                     + "pr_out = ?, alkg = ?, meesr = ?, vid_tran = ?, "

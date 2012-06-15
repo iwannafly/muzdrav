@@ -59,7 +59,7 @@ public class FormSign extends JFrame {
 			@Override
 			public void windowActivated(WindowEvent e) {
 			try {
-				psign = MainForm.tcl.getPsign(Vvod.zapVrSave.npasp);
+				psign = MainForm.tcl.getPsign(Vvod.zapVr.npasp);
 				if (psign.getGrup().trim() != null){
 					rb1g.setSelected(psign.grup.charAt(0) == '1');
 					rb2g.setSelected(psign.grup.charAt(0) == '2');
