@@ -61,7 +61,6 @@ public class FormRdInf extends JFrame {
 	private JTextField TFio;
 	private JTextField TMrab;
 	private JTextField TTelef;
-	private JTextField TGrk;
 	private JTextField TPhf;
     private RdInfStruct rdinf;
     private int oslrod;
@@ -90,7 +89,9 @@ public class FormRdInf extends JFrame {
     private int codsem;
     private String namsem;
 	private int npasp;
-//	private ThriftStringClassifierCombobox<StringClassifier> namobr;
+	private ThriftStringClassifierCombobox<StringClassifier> CBGrOtec;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBObr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSem;
 
 	/**
 	 * Launch the application.
@@ -125,6 +126,7 @@ public class FormRdInf extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
 		rdinf = new RdInfStruct();
+		
 		oslrod = rdinf.getOSocO();
 		if ((oslrod-128)<0){
 		or8=0; iw1=oslrod;	
@@ -192,16 +194,6 @@ public class FormRdInf extends JFrame {
 		ot2=1; iw2=iw2-2;	
 		}
 		ot1=iw2; 
-        if (rdinf.getObr()==1){namobr="Высшее";}
-        if (rdinf.getObr()==2){namobr="Незаконченное высшее";}
-        if (rdinf.getObr()==3){namobr="Среднее специальное";}
-        if (rdinf.getObr()==4){namobr="Среднее";}
-        if (rdinf.getObr()==5){namobr="Начальное";}
-        if (rdinf.getObr()==0){namobr="";}
-        if (rdinf.getSem()==1){namsem="Регистрированный";}
-        if (rdinf.getSem()==2){namsem="Не регистрированный";}
-        if (rdinf.getSem()==3){namsem="Одна";}
-        if (rdinf.getSem()==0){namsem="";}
 		JPanel panel = new JPanel();
 		contentPane.add(panel);
 		
@@ -212,19 +204,12 @@ public class FormRdInf extends JFrame {
 		TNkart.setText(Integer.toString(rdinf.idDispb));
 		
 		LObr = new JLabel("Образование");
+		CBObr = new ThriftIntegerClassifierCombobox<>(true);
 		
 		LSem = new JLabel("Семейное положение");
-		
+		CBSem = new ThriftIntegerClassifierCombobox<>(true);		
 		JPanel panel_1 = new JPanel();
 		
-///		namobr = new ThriftIntegerClassifierCombobox<>(true);
-		final JComboBox CBObr = new JComboBox();
-		CBObr.setModel(new DefaultComboBoxModel(new String[] {"Начальное", "Среднее", "Среднее специальное", "Незаконченное высшее", "Высшее"}));
-		CBObr.setSelectedItem(namobr);
-		
-		final JComboBox CBSem = new JComboBox();
-		CBSem.setModel(new DefaultComboBoxModel(new String[] {"Регистрированный", "Не регистрированный", "Одна"}));
-		CBSem.setSelectedItem(namsem);
 		JPanel panel_2 = new JPanel();
 		
 		JPanel panel_3 = new JPanel();
@@ -350,12 +335,12 @@ public class FormRdInf extends JFrame {
 		
 		TTelef = new JTextField();
 		TTelef.setText(rdinf.telOtec);
-		
-		TGrk = new JTextField();
 //		TGrk.setText(rdinf.grOtec);
 		
 		TPhf = new JTextField();
 		TPhf.setText(rdinf.phOtec);
+		
+		CBGrOtec = new ThriftStringClassifierCombobox<>(true);
 		
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
@@ -373,17 +358,19 @@ public class FormRdInf extends JFrame {
 								.addComponent(LVoz)
 								.addComponent(LMrab)
 								.addComponent(LTel)
-								.addComponent(LGrk)
 								.addComponent(Lph))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addComponent(TTelef, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TMrab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TPhf, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TGrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SVozr, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(48, Short.MAX_VALUE))
+								.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING)
+									.addComponent(TPhf, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+									.addComponent(TMrab, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
+									.addComponent(TTelef, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(CBGrOtec, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(SVozr, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))))
+						.addComponent(LGrk))
+					.addContainerGap(37, Short.MAX_VALUE))
 		);
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -401,7 +388,7 @@ public class FormRdInf extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 						.addComponent(LGrk)
-						.addComponent(TGrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(CBGrOtec, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 						.addComponent(Lph)
@@ -582,13 +569,13 @@ public class FormRdInf extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
-rdinf.setObr(codobr);
-rdinf.setSem(codsem);
+rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
+rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
 rdinf.setOSocO(oslrod);
 rdinf.setUslPr(uslj);
 rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
-//rdinf.setGrOtec(TGrk.getText());//классификатор
+rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
 rdinf.setPhOtec(TPhf.getText());
 			}
 		});
@@ -598,37 +585,4 @@ rdinf.setPhOtec(TPhf.getText());
 		// TODO Auto-generated method stub
 		
 	}
-/*
-	public void onConnect() {
-		try {
-//			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
-			namobr.setData(MainForm.tcl.getZ00());
-			cbrez.setData(MainForm.tcl.getR0Z());
-//			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
-			
-		} catch (KmiacServerException | TException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public void loadConfig() {
-		try {
-			StringReader sr = new StringReader(MainForm.authInfo.config);
-			StreamSource src = new StreamSource(sr);
-			DOMResult res = new DOMResult();
-			TransformerFactory.newInstance().newTransformer().transform(src, res);
-			Document document = (Document) res.getNode();
-					if (getElement(document, "jalob_dyh")!=null){
-						JEditorPane tpJalobd = new JEditorPane();
-						Jalob.add(tpJalobd);
-											
-			}
-					else {
-						
-					}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
 }
