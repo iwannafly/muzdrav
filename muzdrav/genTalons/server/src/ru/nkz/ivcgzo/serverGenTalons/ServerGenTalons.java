@@ -105,47 +105,51 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final List<Calendar> getCalendar(final int cyear) throws TException {
+    public List<Calendar> getCalendar(int cyear) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<Ndv> getNdv(final int pcodvrach, final int cpol) throws TException {
+    public List<Norm> getNorm(int cpodr, String cdol) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<Norm> getNorm(final int pcodvrach, final int cpol) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public final List<Nrasp> getNrasp(final int pcodvrach, final int cpol, final int cxema)
+    public List<Ndv> getNdv(int cpodr, int pcodvrach, String cdol)
             throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<Rasp> getRasp(final int pcodvrach, final int cpol) throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public final List<Talon> getTalon(final int pcodvrach, final int cpol, final long datap)
+    public List<Nrasp> getNrasp(int cpodr, int pcodvrach, String cdol, int cxema)
             throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public final List<Vidp> getVidp() throws TException {
+    public List<Rasp> getRasp(int cpodr, int pcodvrach, String cdol)
+            throws TException {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public List<Talon> getTalon(int cpodr, int pcodvrach, String cdol,
+            long datap) throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Vidp> getVidp() throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
 
 }
