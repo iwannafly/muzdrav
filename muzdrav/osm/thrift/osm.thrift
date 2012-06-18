@@ -200,8 +200,8 @@ struct PatientCommonInfo {
 	 3: optional string im;
 	 4: optional string ot;
 	 5: optional i64 datar;
-	 6: string poms_ser;
-	 7: string poms_nom;
+	 6: optional string poms_ser;
+	 7: optional string poms_nom;
 	 8: optional i32 pol;
 	 9: optional i32 jitel;
 	10: optional i32 sgrp;

@@ -35,6 +35,7 @@ import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
@@ -186,11 +187,30 @@ public class PInfo extends JFrame {
 								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
 								eptxt.setText(sb.toString());
 							} catch (PatientNotFoundException e1) {
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 		 				}
 		 				else
+		 		if (lastPath instanceof PdiagTreeNode) {
+		 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
+		 			PdiagZ pdiag = pdiagNode.pdiag;
+					addLineToDetailInfo("Поликлиника",getValueFromClassifier(MainForm.tcl.get_n_n00(),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
+					addLineToDetailInfo("Диагноз", pdiag.isSetDiag(),pdiag.getDiag());
+					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_post(), DateFormat.getDateInstance().format(new Date(pdiag.getD_post())));
+					addLineToDetailInfo("Группа д/у", pdiag.isSetD_grup(), pdiag.getD_grup());
+					addLineToDetailInfo("Исход д/у ",pdiag.isSetD_ish(),pdiag.getD_ish());
+		 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
+					addLineToDetailInfo("Дата установления/изменения группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
+	 				addLineToDetailInfo("Дата установления/изменения диагноза д/у", pdiag.isSetDatad(), DateFormat.getDateInstance().format(new Date(pdiag.getDatad())));
+		 			addLineToDetailInfo("Старый диагноз (до изменения)", pdiag.isSetRecomend(),pdiag.getRecomend());
+					addLineToDetailInfo("Старая группа д/у", pdiag.isSetDataz(), pdiag.getDataz());
+	 				addLineToDetailInfo("Код врача, ведущего д/у", pvizit.isSetRecomend(),pvizit.getRecomend());
+					addLineToDetailInfo("Должность врача, ведущего д/у", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
+
+					eptxt.setText(sb.toString());
+		 			} 			
+		 				else
+		 					
 		 		if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
@@ -377,14 +397,18 @@ public class PInfo extends JFrame {
 		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
 		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
 		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
+		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
 		root.add(patinfo);
 		root.add(signinfo);
 		root.add(posinfo);
+		root.add(diaginfo);
 		
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
 				posinfo.add(new PvizitTreeNode(pvizit));
+			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(2));
+				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
@@ -400,17 +424,7 @@ public class PInfo extends JFrame {
 		return root;
 	}
 	
-	class PatInfoTree extends DefaultMutableTreeNode {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -6679393843400997083L;
-		private PatientCommonInfo patientcommoninfo;
-		
-		public PatInfoTree(PatientCommonInfo patientcommoninfo) {
-			this.patientcommoninfo = patientcommoninfo;
-	}
-	}
+
 	
 	class PvizitTreeNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = 4212592425962984738L;
@@ -442,6 +456,23 @@ public class PInfo extends JFrame {
 			return DateFormat.getDateInstance().format(new Date(pam.getDatap()));
 		}
 	}
+	
+	class PdiagTreeNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = 4212592425962984738L;
+		private PdiagZ pdiag;
+		
+		public PdiagTreeNode(PdiagZ pdiag) {
+			this.pdiag = pdiag;
+			
+		}
+		
+		@Override
+		public String toString() {
+			return pdiag.getDiag();
+			//return Integer.toString(pvizit.getId());
+		}
+	}
+	
 	private void addLineToDetailInfo(String name, boolean isSet, Object value) {
 		if (isSet)
 			if ((name != null) && (value != null))
