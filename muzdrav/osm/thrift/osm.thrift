@@ -92,7 +92,7 @@ struct Psign{
 	9: optional string uslov;
 	10: optional string per_zab;
 	11: optional string per_oper;
-	12: optional string gemotr;
+	12: optional string gemotrans;
 	13: optional string nasl;
 	14: optional string ginek;
 	15: optional string priem_lek;
@@ -177,17 +177,17 @@ struct AnamZab{
 }
 
 struct PdiagZ{
-	1: optional i32 id;
-	2: optional i32 npasp;
-	3: optional string diag;
-	4: optional string named;
-	5: optional i64 datad;
-	6: optional i32 cpodr;
-	7: optional i64 d_post;
-	8: optional i32 d_grup;
-	9: optional i32 d_ish;
-	10: optional i64 dataish;
-	11: optional i64 datag;
+	 1: optional i32 id;
+	 2: optional i32 id_diag_amb;
+	 3: optional i32 npasp;
+	 4: optional string diag;
+	 5: optional i32 cpodr;
+	 6: optional i64 d_post;
+	 7: optional i32 d_grup;
+	 8: optional i32 ishod;
+	 9: optional i64 dataish;
+	10: optional i64 datag;
+	11: optional i64 datad;
 	12: optional string diag_s;
 	13: optional i32 d_grup_s;
 	14: optional i32 cod_sp;
@@ -455,7 +455,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
-	list <PdiagAmb> get_diagAmb(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list <PdiagAmb> getPdiagAmbProsm(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
 	void setPsign(1: Psign sign) throws (1: kmiacServer.KmiacServerException kse);
@@ -466,7 +466,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Priem getPriem(1: i32 npasp, 2: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
-	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagZ> getPdiagZ(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/

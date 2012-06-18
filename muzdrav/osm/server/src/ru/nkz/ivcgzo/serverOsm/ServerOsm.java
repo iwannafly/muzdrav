@@ -65,6 +65,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pvizitAmbTypes; 
 	private final TResultSetMapper<PdiagAmb, PdiagAmb._Fields> rsmPdiagAmb;
 	private final Class<?>[] pdiagAmbTypes; 
+	private final TResultSetMapper<PdiagZ, PdiagZ._Fields> rsmPdiagZ;
+	private final Class<?>[] pdiagZTypes; 
 	private final TResultSetMapper<Psign, Psign._Fields> rsmPsign;
 	private final Class<?>[] psignTypes; 
 	private final TResultSetMapper<Priem, Priem._Fields> rsmPriem;
@@ -117,7 +119,10 @@ public class ServerOsm extends Server implements Iface {
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
 		
-		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred",       "razv",       "uslov",      "per_zab",    "per_oper",   "gemotr",     "nasl",       "ginek",      "priem_lek",  "prim_gorm");
+		rsmPdiagZ = new TResultSetMapper<>(PdiagZ.class, "id",          "id_diag_amb", "npasp",       "diag",       "cpodr",       "d_post",   "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot");
+		pdiagZTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class};
+		
+		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred",       "razv",       "uslov",      "per_zab",    "per_oper",   "gemotrans",     "nasl",       "ginek",      "priem_lek",  "prim_gorm");
 		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class};
 		
 		rsmPriem = new TResultSetMapper<>(Priem.class, "id_obr",      "npasp",       "id_pos",      "sl_ob",       "n_is",        "n_kons",      "n_proc",      "n_lek",       "t_jalob_d",  "t_jalob_krov", "t_jalob_p",  "t_jalob_moch", "t_jalob_endo", "t_jalob_nerv", "t_jalob_opor", "t_jalob_lih", "t_jalob_obh", "t_jalob_proch", "t_ob_sost",  "t_koj_pokr", "t_sliz",     "t_podk_kl",  "t_limf_uzl", "t_kost_mysh", "t_nervn_ps", "t_chss",     "t_temp",     "t_ad",       "t_rost",     "t_ves",      "t_telo",     "t_sust",     "t_dyh",      "t_gr_kl",    "t_perk_l",   "t_aus_l",    "t_bronho",   "t_arter",    "t_obl_s",    "t_perk_s",   "t_aus_s",    "t_pol_rta",  "t_jivot",    "t_palp_jivot", "t_jel_kish", "t_palp_jel", "t_palp_podjel", "t_pechen",   "t_jelch",    "t_selez",    "t_obl_zad",  "t_poyasn",   "t_pochk",    "t_moch",     "t_mol_jel", "t_gr_jel",    "t_matka",    "t_nar_polov", "t_chitov",   "t_st_localis", "t_ocenka",   "t_jalob",    "t_status_praesense", "t_fiz_obsl");
@@ -184,7 +189,8 @@ public class ServerOsm extends Server implements Iface {
 //		UpdatePvizit(obr);
 //		DeletePvizit(obr.id);
 		
-//		Psign psign = new Psign(1, "2", "3", "4", "5", "6", "7");
+//		Psign psign = new Psign(1, "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16");
+//		Psign psign = new Psign().setNpasp(5).setPrim_gorm("11");
 //		setPsign(psign);
 //		psign = getPsign(psign.npasp);
 		
@@ -221,6 +227,10 @@ public class ServerOsm extends Server implements Iface {
 //		List<IsslInfo> lii = getIsslInfo(377);
 //		AnamZab az = new AnamZab(377, 2, "начало заболевания", "симптом", "отношение больного к заболеванию", "посттравматические синдромы");
 //		setAnamZab(az);
+		
+//		PdiagZ pdz = new PdiagZ().setId_diag_amb(172).setNpasp(2).setDiag("3").setCpodr(4).setD_post(5).setD_grup(6).setIshod(7).setDataish(8).setDatag(9).setDatad(10).setDiag_s("11").setD_grup_s(12).setCod_sp(13).setCdol_ot("14");
+//		AddPdiagZ(pdz);
+//		List<PdiagZ> ldz = getPdiagZ(pdz.getNpasp());
 		
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -385,10 +395,10 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
 				getPsign(sign.npasp);
-				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ? WHERE npasp = ? ", false, sign, psignTypes, 1, 2, 3, 4, 5, 6, 0);
+				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ?, razv = ?, uslov = ?, per_zab = ?, per_oper = ?, gemotrans = ?, nasl = ?, ginek = ?, priem_lek = ?, prim_gorm = ? WHERE npasp = ? ", false, sign, psignTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0);
 				sme.setCommit();
 			} catch (PsignNotFoundException e) {
-				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6);
+				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred, razv, uslov, per_zab, per_oper, gemotrans, nasl, ginek, priem_lek, prim_gorm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 				sme.setCommit();
 			}
 		} catch (SQLException | InterruptedException e) {
@@ -419,9 +429,15 @@ public class ServerOsm extends Server implements Iface {
 	}
 	
 	@Override
-	public void AddPdiagZ(PdiagZ dz) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
+	public int AddPdiagZ(PdiagZ dz) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_diag (id_diag_amb, npasp, diag, cpodr, d_post, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, dz, pdiagZTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
@@ -897,9 +913,12 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<PdiagZ> getPdiagZ(int id_diag) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PdiagZ> getPdiagZ(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_diag WHERE npasp = ? ", npasp)) {
+			return rsmPdiagZ.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
@@ -962,6 +981,15 @@ public class ServerOsm extends Server implements Iface {
 	public List<IntegerClassifier> get_n_abs() throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_abs ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<PdiagAmb> getPdiagAmbProsm(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE npasp = ? ", npasp)) {
+			return rsmPdiagAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
