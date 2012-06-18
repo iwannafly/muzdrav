@@ -84,7 +84,10 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 * Получает выбранный пользовательский код. 
 	 */
 	public String getSelectedPcod() {
-		return getSelectedItem().pcod;
+		if (getSelectedItem() != null)
+			return getSelectedItem().getPcod();
+		else
+			return null;
 	}
 	
 	/**

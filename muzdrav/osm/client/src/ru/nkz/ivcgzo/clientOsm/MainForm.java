@@ -128,7 +128,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				}
 				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
 				vvod.onConnect();
-				Classifiers.load(tcl);
 			} catch (KmiacServerException | ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
