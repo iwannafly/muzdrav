@@ -7,43 +7,43 @@ include "../../../common/thrift/classifier.thrift"
  * Запись на пациента в регистратуре
  */
 struct ZapVr{
-	1: i32 npasp;
-	2: i32 vid_p; /*вид приема-первичность*/
-	3: i64 timepn; /*время начала приема*/
-	4: string fam;
-	5: string im;
-	6: string oth;
-	7: string serpolis;
-	8: string nompolis;
-	9: i32 id_pvizit;
+	1: optional i32 npasp;
+	2: optional i32 vid_p; /*вид приема-первичность*/
+	3: optional i64 timepn; /*время начала приема*/
+	4: optional string fam;
+	5: optional string im;
+	6: optional string oth;
+	7: optional string serpolis;
+	8: optional string nompolis;
+	9: optional i32 id_pvizit;
 }
 
 struct Pvizit {
-	1: i32 id;
-	2: i32 npasp;
-	3: i32 cpol;
-	4: string cobr;
-	5: i64 datao;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional i32 cpol;
+	4: optional string cobr;
+	5: optional i64 datao;
 	6: optional i32 ishod;
 	7: optional i32 rezult;
 	8: optional i32 talon;
-	9: i32 cod_sp;
-	10: string cdol;
-	11: i32 cuser;
+	9: optional i32 cod_sp;
+	10: optional string cdol;
+	11: optional i32 cuser;
 	12: optional string zakl;
-	13: i64 dataz;
+	13: optional i64 dataz;
 	14: optional i32 idzab;
 	15: optional string recomend;
-	16: string vrach_fio;
+	16: optional string vrach_fio;
 }
 
 struct PvizitAmb {
-	1: i32 id;
-	2: i32 id_obr;
-	3: i32 npasp;
-	4: i64 datap;
-	5: i32 cod_sp;
-	6: string cdol;
+	1: optional i32 id;
+	2: optional i32 id_obr;
+	3: optional i32 npasp;
+	4: optional i64 datap;
+	5: optional i32 cod_sp;
+	6: optional string cdol;
 	7: optional string diag; 
 	8: optional i32 mobs;
 	9: optional i32 rezult;
@@ -57,21 +57,21 @@ struct PvizitAmb {
 	17: optional i32 pr_opl;
 	18: optional i32 pl_extr;
 	19: optional i32 vpom;
-	20: string fio_vr;
+	20: optional string fio_vr;
 }
 
 struct PdiagAmb {
-	 1: i32 id;
-	 2: i32 id_obr;
-	 3: i32 npasp;
-	 4: string diag;
-	 5: string named;/*медицинское описание д-за*/
-	 6: i32 diag_stat;
-	 7: bool predv;
-	 8: i64 datad;
+	 1: optional i32 id;
+	 2: optional i32 id_obr;
+	 3: optional i32 npasp;
+	 4: optional string diag;
+	 5: optional string named;/*медицинское описание д-за*/
+	 6: optional i32 diag_stat;
+	 7: optional bool predv;
+	 8: optional i64 datad;
 	 9: optional i32 obstreg;
-	10: i32 cod_sp;
-	11: string cdol;
+	10: optional i32 cod_sp;
+	11: optional string cdol;
 	12: optional i64 datap;
 	13: optional i64 dataot;
 	14: optional i32 obstot;
@@ -81,7 +81,7 @@ struct PdiagAmb {
 }
 
 struct Psign{
-	1: i32 npasp;
+	1: optional i32 npasp;
 	2: optional string grup;
 	3: optional string ph;
 	4: optional string allerg;
@@ -100,9 +100,9 @@ struct Psign{
 }
 
 struct Priem{
-	1: i32 id;
-	2: i32 npasp;
-	3: i32 idpos;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional i32 idpos;
 	4: optional i32 sl_ob;
 	5: optional i32 n_is;
 	6: optional i32 n_kons;
@@ -167,8 +167,8 @@ struct Priem{
 }
 
 struct AnamZab{
-	1: i32 id_pvizit;
-	2: i32 npasp;
+	1: optional i32 id_pvizit;
+	2: optional i32 npasp;
 	3: optional string t_nachalo_zab;
 	4: optional string t_sympt;
 	5: optional string t_otn_bol;
@@ -177,12 +177,12 @@ struct AnamZab{
 }
 
 struct PdiagZ{
-	1: i32 id;
-	2: i32 npasp;
-	3: string diag;
-	4: string named;
-	5: i64 datad;
-	6: i32 cpodr;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional string diag;
+	4: optional string named;
+	5: optional i64 datad;
+	6: optional i32 cpodr;
 	7: optional i64 d_post;
 	8: optional i32 d_grup;
 	9: optional i32 d_ish;
@@ -205,40 +205,40 @@ struct PatientCommonInfo {
 	 8: optional i32 pol;
 	 9: optional i32 jitel;
 	10: optional i32 sgrp;
-	11: string adp_obl;
-	12: string adp_gorod;
-	13: string adp_ul;
-	14: string adp_dom;
-	15: string adp_korp;
-	16: string adp_kv;
-	17: string adm_obl;
-	18: string adm_gorod;
-	19: string adm_ul;
-	20: string adm_dom;
-	21: string adm_korp;
-	22: string adm_kv;
-	23: string mrab;
-	24: string name_mr;
+	11: optional string adp_obl;
+	12: optional string adp_gorod;
+	13: optional string adp_ul;
+	14: optional string adp_dom;
+	15: optional string adp_korp;
+	16: optional string adp_kv;
+	17: optional string adm_obl;
+	18: optional string adm_gorod;
+	19: optional string adm_ul;
+	20: optional string adm_dom;
+	21: optional string adm_korp;
+	22: optional string adm_kv;
+	23: optional string mrab;
+	24: optional string name_mr;
 	25: optional i32 ncex;
 	26: optional i32 poms_strg;
 	27: optional i32 poms_tdoc;
-	28: string poms_ndog;
+	28: optional string poms_ndog;
 	29: optional i32 pdms_strg;
-	30: string pdms_ser;
-	31: string pdms_nom;
-	32: string pdms_ndog;
+	30: optional string pdms_ser;
+	31: optional string pdms_nom;
+	32: optional string pdms_ndog;
 	33: optional i32 cpol_pr;
 	34: optional i32 terp;
 	35: optional i64 datapr;
 	36: optional i32 tdoc;
-	37: string docser;
-	38: string docnum;
+	37: optional string docser;
+	38: optional string docnum;
 	39: optional i64 datadoc;
-	40: string odoc;
-	41: string snils;
+	40: optional string odoc;
+	41: optional string snils;
 	42: optional i64 dataz;
-	43: string prof;
-	44: string tel;
+	43: optional string prof;
+	44: optional string tel;
 	45: optional i64 dsv;
 	46: optional i32 prizn;
 	47: optional i32 ter_liv;
@@ -246,175 +246,175 @@ struct PatientCommonInfo {
 }
 
 struct RdSlStruct{
-        1:i32 idDispb;
-        2:i32 npasp;
-        3:i64 datay;
-        4:i32 kolpr;
-        5:i32 abort;
-        6:string oslAb;
-        7:i64 dataosl;
-        8:i64 dataM;
-        9:i32 yavka1;
-	10:string plrod;
-	11:string prRod;
-	12:i64 DataZs;
-	13:i32 kolRod;
-	14:i32 let;
-	15:i32 prmen;
-	16:i32 deti;
-	17:i32 polj;
-	18:i32 kont;
-	19:i32 oslrod
-	20:i32 rost;
-	21:i32 vesd;
-	22:i32 dsp;
-	23:i32 dsr;
-	24:i32 dTroch;
-	25:i32 cext;
-	26:i32 indSol;
-	27:i64 Datasn; 
-	28:i32 VozMen;
+        1: optional  i32 idDispb;
+        2: optional i32 npasp;
+        3: optional i64 datay;
+        4: optional i32 kolpr;
+        5: optional i32 abort;
+        6: optional string oslAb;
+        7: optional i64 dataosl;
+        8: optional i64 dataM;
+        9: optional i32 yavka1;
+	10: optional string plrod;
+	11: optional string prRod;
+	12: optional i64 DataZs;
+	13: optional i32 kolRod;
+	14: optional i32 let;
+	15: optional i32 prmen;
+	16: optional i32 deti;
+	17: optional i32 polj;
+	18: optional i32 kont;
+	19: optional i32 oslrod
+	20: optional i32 rost;
+	21: optional i32 vesd;
+	22: optional i32 dsp;
+	23: optional i32 dsr;
+	24: optional i32 dTroch;
+	25: optional i32 cext;
+	26: optional i32 indSol;
+	27: optional i64 Datasn; 
+	28: optional i32 VozMen;
 }
 
 struct RdDinStruct{
-	1:i32 idDispb;
-	2:i32 id;
-	3:i64 datapos;
-	4:i32 srok;
-	5:i32 ves;
-	6:i32 oj;
-	7:i32 hdm;
-	8:string dspos;
-	9:i32 art1;
-	10:i32 art2;
-	11:i32 art3;
-	12:i32 art4;
-	13:i64 datasl;
-	14:i32 spl;
-	15:i32 oteki;
-	16:i32 chcc;
-	17:i32 polpl;
-	18:i32 predpl;
-	19:i32 serd;
-	20:i32 serd1;
+	1: optional i32 idDispb;
+	2: optional i32 id;
+	3: optional i64 datapos;
+	4: optional i32 srok;
+	5: optional i32 ves;
+	6: optional i32 oj;
+	7: optional i32 hdm;
+	8: optional string dspos;
+	9: optional i32 art1;
+	10: optional i32 art2;
+	11: optional i32 art3;
+	12: optional i32 art4;
+	13: optional i64 datasl;
+	14: optional i32 spl;
+	15: optional i32 oteki;
+	16: optional i32 chcc;
+	17: optional i32 polpl;
+	18: optional i32 predpl;
+	19: optional i32 serd;
+	20: optional i32 serd1;
 }
 
 /*. Rd_Inf*/
 struct RdInfStruct{
-	1:i32 idDispb;
-	2:i32 npasp;
-	3:i32 obr;
-	4:i32 sem;
-	5:i32 oSocO;
-	6:i32 UslPr;
-	7:i32 vOtec;
-	8:i64 grOtec;
-	9:string phOtec;
-	10:string fioOtec;
-	11:string mrOtec;
-	12:string telOtec;
-	13:i32 vredOtec;
+	1: optional i32 idDispb;
+	2: optional i32 npasp;
+	3: optional i32 obr;
+	4: optional i32 sem;
+	5: optional i32 oSocO;
+	6: optional i32 UslPr;
+	7: optional i32 vOtec;
+	8: optional i64 grOtec;
+	9: optional string phOtec;
+	10: optional string fioOtec;
+	11: optional string mrOtec;
+	12: optional string telOtec;
+	13: optional i32 vredOtec;
 }
 
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
-	1: string pcod;
-	2: string name_n;
+	1: optional string pcod;
+	2: optional string name_n;
 	3: optional double stoim;
-	4: string c_obst;
+	4: optional string c_obst;
 	5: optional bool vybor;
 }
 
 /*метод по виду исследования*/
 struct Metod{
-	1: string obst;
-	2: string name_obst;
-	3: i32 c_p0e1;
+	1: optional string obst;
+	2: optional string name_obst;
+	3: optional i32 c_p0e1;
 	//4: string pcod;
 }
 
 /*Список показателей исследований по выбранной системе*/
 struct Pokaz{
-	1: string pcod;
-	2: string name_n;
+	1: optional string pcod;
+	2: optional string name_n;
 	3: optional double stoim;
-	4: i32 c_p0e1;
-	5: string c_n_nz1;
+	4: optional i32 c_p0e1;
+	5: optional string c_n_nz1;
 	6: optional bool vybor;
 }
 
 
 struct P_isl_ld {
-	 1: i32 nisl;
-	 2: i32 npasp;
-	 3: i32 cisl;
-	 4: string pcisl;
-	 5: i32 napravl;
-	 6: i32 naprotd;
-	 7: i64 datan;
-	 8: i32 vrach;
+	 1: optional i32 nisl;
+	 2: optional i32 npasp;
+	 3: optional i32 cisl;
+	 4: optional string pcisl;
+	 5: optional i32 napravl;
+	 6: optional i32 naprotd;
+	 7: optional i64 datan;
+	 8: optional i32 vrach;
 	 9: optional string diag;
-	10: i64 dataz;
-	11: i32 pvizit_id;
+	10: optional i64 dataz;
+	11: optional i32 pvizit_id;
 }
 
 struct Prez_d {
-	1: i32 npasp;
-	2: i32 nisl;
-	3: string kodisl;
+	1: optional i32 npasp;
+	2: optional i32 nisl;
+	3: optional string kodisl;
 	4: optional double stoim;
 }
 
 struct Prez_l {
-	1: i32 npasp;
-	2: i32 nisl;
-	3: string cpok;
+	1: optional i32 npasp;
+	2: optional i32 nisl;
+	3: optional string cpok;
 	4: optional double stoim;
 }
 
 
 struct IsslMet {
-	1: i32 kodVidIssl;
-	2: i32 userId;
-	3: i32 npasp;
-	4: string kodMetod;
-	5: list<string> pokaz;
+	1: optional i32 kodVidIssl;
+	2: optional i32 userId;
+	3: optional i32 npasp;
+	4: optional string kodMetod;
+	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
 }
 
 struct IsslPokaz {
-	1: i32 kodVidIssl;
-	2: i32 userId;
-	3: i32 npasp;
-	4: string kodMetod;
-	5: list<string> pokaz;
+	1: optional i32 kodVidIssl;
+	2: optional i32 userId;
+	3: optional i32 npasp;
+	4: optional string kodMetod;
+	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
 }
 
 struct Napr{
-	1: i32 npasp;
-	2: i32 userId;
+	1: optional i32 npasp;
+	2: optional i32 userId;
 	3: optional string obosnov;
-	4: i32 clpu;
+	4: optional i32 clpu;
 }
 
 struct NaprKons{
-	1: i32 npasp;
-	2: i32 userId;
+	1: optional i32 npasp;
+	2: optional i32 userId;
 	3: optional string obosnov;
-	4: i32 cpol;
+	4: optional i32 cpol;
 }
 
 struct IsslInfo{
-	1: i32 nisl;
-	2: i32 cisl;
-	3: string name_cisl;
-	4: string pokaz;
-	5: string pokaz_name;
-	6: string rez;
-	7: i64 datav;
+	1: optional i32 nisl;
+	2: optional i32 cisl;
+	3: optional string name_cisl;
+	4: optional string pokaz;
+	5: optional string pokaz_name;
+	6: optional string rez;
+	7: optional i64 datav;
 }
 
 exception PvizitNotFoundException {
@@ -455,6 +455,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
+	list <PdiagAmb> get_diagAmb(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
 	void setPsign(1: Psign sign) throws (1: kmiacServer.KmiacServerException kse);
@@ -466,7 +467,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
-	list<PdiagZ> getPdiagZ(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	list<PdiagZ> getPdiagZ(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
@@ -508,6 +509,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getVdi() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_ai0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_abs() throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info

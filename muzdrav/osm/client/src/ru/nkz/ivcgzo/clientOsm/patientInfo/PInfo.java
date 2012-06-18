@@ -33,9 +33,11 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
@@ -51,6 +53,7 @@ public class PInfo extends JFrame {
 	private JTree treeinfo;
 	private StringBuilder sb;
 	private JTextField tfdat;
+	public static ZapVr zapVr;
 
 	public PInfo() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -106,56 +109,88 @@ public class PInfo extends JFrame {
 		 		sb = new StringBuilder();	
 		 		try {
 		 			if (lastPath.toString() ==  "Личная информация"){
-//		 				PatientCommonInfo info =  MainForm.tcl.getPatientCommonInfo();
-//		 				addLineToDetailInfo("Уникальный номер", info.isSetNpasp(), info.getNpasp());
-//		 				addLineToDetailInfo("Фамилия", info.getFam());
-//		 				addLineToDetailInfo("Имя", info.getIm());
-//		 				addLineToDetailInfo("Отчество", info.getOt());
-//		 				addLineToDetailInfo("Дата рождения", getDate(info.isSetDatar(), info.getDatar()));
-//		 				addLineToDetailInfo("Серия полиса ОМС", info.getPoms_ser());
-//		 				addLineToDetailInfo("Номер полиса ОМС", info.getPoms_nom());
-//		 				addLineToDetailInfo("Пол", getValueFromClassifier(Classifiers.n_z30, info.isSetPol(), info.getPol()));
-//		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(Classifiers.n_am0, info.isSetJitel(), info.getJitel()));
-//		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(Classifiers.n_az9, info.isSetSgrp(), info.getSgrp()));
-//		 				addLineToDetailInfo("Область (прописка)", info.getAdp_obl());
-//		 				addLineToDetailInfo("Город (прописка)", info.getAdp_gorod());
-//		 				addLineToDetailInfo("Улица (прописка)", info.getAdp_ul());
-//		 				addLineToDetailInfo("Дом (прописка)", info.getAdp_dom());
-//		 				addLineToDetailInfo("Корпус (прописка)", info.getAdp_korp());
-//		 				addLineToDetailInfo("Квартира (прописка)", info.getAdp_kv());
-//		 				addLineToDetailInfo("Область (проживание)", info.getAdm_obl());
-//		 				addLineToDetailInfo("Город (проживание)", info.getAdm_gorod());
-//		 				addLineToDetailInfo("Улица (проживание)", info.getAdm_ul());
-//		 				addLineToDetailInfo("Дом (проживание)", info.getAdm_dom());
-//		 				addLineToDetailInfo("Корпус (проживание)", info.getAdm_korp());
-//		 				addLineToDetailInfo("Квартира (проживание)", info.getAdm_kv());
-////		 				addLineToDetailInfo("Место работы", getValueFromClassifier(Classifiers.n_z43, info.isSetMrab(), info.getMrab()));
-//		 				addLineToDetailInfo("Место работы (иногородние)", info.getName_mr());
-////		 				addLineToDetailInfo("Тип места работы", info.getNcex());
-//		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPoms_strg(), info.getPoms_strg()));
-////		 				addLineToDetailInfo("Тип документа ОМС", info.getPoms_tdoc());
-//		 				addLineToDetailInfo("Номер договора ОМС", info.getPoms_ndog());
-//		 				addLineToDetailInfo("Страховая организация ДМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPdms_strg(), info.getPdms_strg()));
-//		 				addLineToDetailInfo("Серия полиса ДМС", info.getPdms_ser());
-//		 				addLineToDetailInfo("Номер полиса ДМС", info.getPdms_nom());
-//		 				addLineToDetailInfo("Номер договора ДМС", info.getPdms_ndog());
-//		 				addLineToDetailInfo("Поликлиника прикрепления", getValueFromClassifier(Classifiers.n_n00, info.isSetCpol_pr(), info.getCpol_pr()));
-//		 				addLineToDetailInfo("Территория прикрепления", getValueFromClassifier(Classifiers.n_l01, info.isSetTerp(), info.getTerp()));
-//		 				addLineToDetailInfo("Дата прикрепления", getDate(info.isSetDatapr(), info.getDatapr()));
-//		 				addLineToDetailInfo("Тип удостоверения личности", getValueFromClassifier(Classifiers.n_az0, info.isSetTdoc(), info.getTdoc()));
-//		 				addLineToDetailInfo("Серия документа", info.getDocser());
-//		 				addLineToDetailInfo("Номер документа", info.getDocnum());
-//		 				addLineToDetailInfo("Дата выдачи документа", getDate(info.isSetDatadoc(), info.getDatadoc()));
-//		 				addLineToDetailInfo("Дата сверки данных", getDate(info.isSetDsv(), info.getDsv()));
-//		 				addLineToDetailInfo("Кем выдан документ", info.getOdoc());
-//		 				addLineToDetailInfo("СНИЛС", info.getSnils());
-//		 				addLineToDetailInfo("Профессия", info.getProf());
-//		 				addLineToDetailInfo("Телефон", info.getTel());
-//		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(Classifiers.n_l02, info.isSetRegion_liv(), info.getRegion_liv()));
-//		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(Classifiers.n_l01, info.isSetTer_liv(), info.getTer_liv()));
-	
-		 			}
+		 				PatientCommonInfo info;
+						try {
+							info = MainForm.tcl.getPatientCommonInfo(MainForm.table.getSelectedItem().npasp);
+							addLineToDetailInfo("Уникальный номер", info.isSetNpasp(), info.getNpasp());
+		 				addLineToDetailInfo("Фамилия", info.getFam());
+		 				addLineToDetailInfo("Имя", info.getIm());
+		 				addLineToDetailInfo("Отчество", info.getOt());
+		 				addLineToDetailInfo("Дата рождения", info.isSetDatar(), DateFormat.getDateInstance().format(new Date(info.getDatar())));
+		 				addLineToDetailInfo("Серия полиса ОМС", info.getPoms_ser());
+		 				addLineToDetailInfo("Номер полиса ОМС", info.getPoms_nom());
+		 				addLineToDetailInfo("Пол", getValueFromClassifier(Classifiers.n_z30, info.isSetPol(), info.getPol()));
+		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(Classifiers.n_am0, info.isSetJitel(), info.getJitel()));
+		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(Classifiers.n_az9, info.isSetSgrp(), info.getSgrp()));
+		 				addLineToDetailInfo("Область (прописка)", info.getAdp_obl());
+		 				addLineToDetailInfo("Город (прописка)", info.getAdp_gorod());
+		 				addLineToDetailInfo("Улица (прописка)", info.getAdp_ul());
+		 				addLineToDetailInfo("Дом (прописка)", info.getAdp_dom());
+		 				addLineToDetailInfo("Корпус (прописка)", info.getAdp_korp());
+		 				addLineToDetailInfo("Квартира (прописка)", info.getAdp_kv());
+		 				addLineToDetailInfo("Область (проживание)", info.getAdm_obl());
+		 				addLineToDetailInfo("Город (проживание)", info.getAdm_gorod());
+		 				addLineToDetailInfo("Улица (проживание)", info.getAdm_ul());
+		 				addLineToDetailInfo("Дом (проживание)", info.getAdm_dom());
+		 				addLineToDetailInfo("Корпус (проживание)", info.getAdm_korp());
+		 				addLineToDetailInfo("Квартира (проживание)", info.getAdm_kv());
+		 				//addLineToDetailInfo("Место работы", getValueFromClassifier(Classifiers.n_z43, info.isSetMrab()(), info.getName_mr());
+		 				addLineToDetailInfo("Тип места работы", info.getNcex());
+		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPoms_strg(), info.getPoms_strg()));
+		 				addLineToDetailInfo("Тип документа ОМС", info.getPoms_tdoc());
+		 				addLineToDetailInfo("Номер договора ОМС", info.getPoms_ndog());
+		 				addLineToDetailInfo("Страховая организация ДМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPdms_strg(), info.getPdms_strg()));
+		 				addLineToDetailInfo("Серия полиса ДМС", info.getPdms_ser());
+		 				addLineToDetailInfo("Номер полиса ДМС", info.getPdms_nom());
+		 				addLineToDetailInfo("Номер договора ДМС", info.getPdms_ndog());
+		 				addLineToDetailInfo("Поликлиника прикрепления", getValueFromClassifier(Classifiers.n_n00, info.isSetCpol_pr(), info.getCpol_pr()));
+		 				addLineToDetailInfo("Территория прикрепления", getValueFromClassifier(Classifiers.n_l01, info.isSetTerp(), info.getTerp()));
+		 				addLineToDetailInfo("Дата прикрепления", info.isSetDatapr(), DateFormat.getDateInstance().format(new Date(info.getDatapr())));
+		 				addLineToDetailInfo("Тип удостоверения личности", getValueFromClassifier(Classifiers.n_az0, info.isSetTdoc(), info.getTdoc()));
+		 				addLineToDetailInfo("Серия документа", info.getDocser());
+		 				addLineToDetailInfo("Номер документа", info.getDocnum());
+		 				addLineToDetailInfo("Дата выдачи документа", info.isSetDatadoc(), DateFormat.getDateInstance().format(new Date(info.getDatadoc())));
+		 				addLineToDetailInfo("Дата сверки данных", info.isSetDsv(), DateFormat.getDateInstance().format(new Date(info.getDsv())));
+		 				addLineToDetailInfo("Кем выдан документ", info.getOdoc());
+		 				addLineToDetailInfo("СНИЛС", info.getSnils());
+		 				addLineToDetailInfo("Профессия", info.getProf());
+		 				addLineToDetailInfo("Телефон", info.getTel());
+		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(Classifiers.n_l02, info.isSetRegion_liv(), info.getRegion_liv()));
+		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(Classifiers.n_l01, info.isSetTer_liv(), info.getTer_liv()));
+		 				eptxt.setText(sb.toString());
+
+						} catch (PatientNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+		 						 			}
 		 			else
+		 				if (lastPath.toString() ==  "Анамнез жизни"){
+		 					Psign psign;
+		 					try {
+								psign = MainForm.tcl.getPatientMiscInfo(MainForm.table.getSelectedItem().npasp);
+								addLineToDetailInfo("Группа крови", psign.getGrup());
+								addLineToDetailInfo("Резус-фактор", psign.getPh());
+								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
+								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
+								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
+								addLineToDetailInfo("Вредные привычки", psign.getVred());
+								addLineToDetailInfo("Развитие", psign.getRazv());
+								addLineToDetailInfo("Условия проживания", psign.getUslov());
+								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
+								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
+								addLineToDetailInfo("Гемотрансфузия", psign.getGemotr());
+								addLineToDetailInfo("Наследственность", psign.getNasl());
+								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
+								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
+								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
+								eptxt.setText(sb.toString());
+							} catch (PatientNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+		 				}
+		 				else
 		 		if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
@@ -341,13 +376,15 @@ public class PInfo extends JFrame {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
 		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
 		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
+		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
 		root.add(patinfo);
 		root.add(signinfo);
+		root.add(posinfo);
 		
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
-				root.add(new PvizitTreeNode(pvizit));
+				posinfo.add(new PvizitTreeNode(pvizit));
 
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
