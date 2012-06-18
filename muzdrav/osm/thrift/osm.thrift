@@ -24,16 +24,16 @@ struct Pvizit {
 	3: i32 cpol;
 	4: string cobr;
 	5: i64 datao;
-	6: i32 ishod;
-	7: i32 rezult;
-	8: i32 talon;
+	6: optional i32 ishod;
+	7: optional i32 rezult;
+	8: optional i32 talon;
 	9: i32 cod_sp;
 	10: string cdol;
 	11: i32 cuser;
-	12: string zakl;
+	12: optional string zakl;
 	13: i64 dataz;
-	14: i32 idzab;
-	15: string recomend;
+	14: optional i32 idzab;
+	15: optional string recomend;
 	16: string vrach_fio;
 }
 
@@ -44,19 +44,19 @@ struct PvizitAmb {
 	4: i64 datap;
 	5: i32 cod_sp;
 	6: string cdol;
-	7: string diag; 
-	8: i32 mobs;
-	9: i32 rezult;
-	10: i32 opl;
-	11: double stoim;
-	12: i32 uet;
-	13: i64 datak;
-	14: i32 kod_rez;
-	15: i32 k_lr;
-	16: i32 n_sp;
-	17: i32 pr_opl;
-	18: i32 pl_extr;
-	19: i32 vpom;
+	7: optional string diag; 
+	8: optional i32 mobs;
+	9: optional i32 rezult;
+	10: optional i32 opl;
+	11: optional double stoim;
+	12: optional i32 uet;
+	13: optional i64 datak;
+	14: optional i32 kod_rez;
+	15: optional i32 k_lr;
+	16: optional i32 n_sp;
+	17: optional i32 pr_opl;
+	18: optional i32 pl_extr;
+	19: optional i32 vpom;
 	20: string fio_vr;
 }
 
@@ -69,34 +69,34 @@ struct PdiagAmb {
 	 6: i32 diag_stat;
 	 7: bool predv;
 	 8: i64 datad;
-	 9: i32 obstreg;
+	 9: optional i32 obstreg;
 	10: i32 cod_sp;
 	11: string cdol;
-	12: i64 datap;
-	13: i64 dataot;
-	14: i32 obstot;
-	15: i32 codsp_ot;
-	16: string cdol_ot;
-	17: i32 vid_tr;
+	12: optional i64 datap;
+	13: optional i64 dataot;
+	14: optional i32 obstot;
+	15: optional i32 codsp_ot;
+	16: optional string cdol_ot;
+	17: optional i32 vid_tr;
 }
 
 struct Psign{
 	1: i32 npasp;
-	2: string grup;
-	3: string ph;
-	4: string allerg;
-	5: string farmkol;
-	6: string vitae;
-	7: string vred;
-	8: string razv;
-	9: string uslov;
-	10: string per_zab;
-	11: string per_oper;
-	12: string gemotr;
-	13: string nasl;
-	14: string ginek;
-	15: string priem_lek;
-	16: string prim_gorm;
+	2: optional string grup;
+	3: optional string ph;
+	4: optional string allerg;
+	5: optional string farmkol;
+	6: optional string vitae;
+	7: optional string vred;
+	8: optional string razv;
+	9: optional string uslov;
+	10: optional string per_zab;
+	11: optional string per_oper;
+	12: optional string gemotr;
+	13: optional string nasl;
+	14: optional string ginek;
+	15: optional string priem_lek;
+	16: optional string prim_gorm;
 }
 
 struct Priem{
@@ -118,62 +118,62 @@ struct Priem{
 	16: optional string t_jalob_lih;
 	17: optional string t_jalob_obh;
 	18: optional string t_jalob_proch;
-	19: string t_ob_sost;
-	20: string t_koj_pokr;
-	21: string t_sliz;
-	22: string t_podk_kl;
-	23: string t_limf_uzl;
-	24: string t_kost_mysh;
-	25: string t_nervn_ps;
+	19: optional string t_ob_sost;
+	20: optional string t_koj_pokr;
+	21: optional string t_sliz;
+	22: optional string t_podk_kl;
+	23: optional string t_limf_uzl;
+	24: optional string t_kost_mysh;
+	25: optional string t_nervn_ps;
 	26: optional string t_chss;
 	27: optional string t_temp;
-	28: string t_ad;
-	29: string t_rost;
-	30: string t_ves;
-	31: string t_telo;
-	32: string t_sust;
-	33: string t_dyh;
-	34: string t_gr_kl;
-	35: string t_perk_l;
-	36: string t_aus_l;
-	37: string t_bronho;
-	38: string t_arter;
-	39: string t_obl_s;
-	40: string t_perk_s;
-	41: string t_aus_s;
-	42: string t_pol_rta;
-	43: string t_jivot;
-	44: string t_palp_jivot;
-	45: string t_jel_kish;
-	46: string t_palp_jel;
-	47: string t_palp_podjjel;
-	48: string t_pechen;
-	49: string t_jelch;
-	50: string t_selez;
-	51: string t_obl_zad;
-	52: string t_poyasn;
-	53: string t_pochk;
-	54: string t_moch;
-	55: string t_mol_jel;
-	56: string t_gr_jel;
-	57: string t_matka;
-	58: string t_nar_polov;
-	59: string t_chitov;
-	60: string t_st_localis;
-	61: string t_ocenka;
-	62: string t_jalob;
-	63: string t_ist_zab;
-	64: string t_status_praesense;
-	65: string t_fiz_obsl;
+	28: optional string t_ad;
+	29: optional string t_rost;
+	30: optional string t_ves;
+	31: optional string t_telo;
+	32: optional string t_sust;
+	33: optional string t_dyh;
+	34: optional string t_gr_kl;
+	35: optional string t_perk_l;
+	36: optional string t_aus_l;
+	37: optional string t_bronho;
+	38: optional string t_arter;
+	39: optional string t_obl_s;
+	40: optional string t_perk_s;
+	41: optional string t_aus_s;
+	42: optional string t_pol_rta;
+	43: optional string t_jivot;
+	44: optional string t_palp_jivot;
+	45: optional string t_jel_kish;
+	46: optional string t_palp_jel;
+	47: optional string t_palp_podjjel;
+	48: optional string t_pechen;
+	49: optional string t_jelch;
+	50: optional string t_selez;
+	51: optional string t_obl_zad;
+	52: optional string t_poyasn;
+	53: optional string t_pochk;
+	54: optional string t_moch;
+	55: optional string t_mol_jel;
+	56: optional string t_gr_jel;
+	57: optional string t_matka;
+	58: optional string t_nar_polov;
+	59: optional string t_chitov;
+	60: optional string t_st_localis;
+	61: optional string t_ocenka;
+	62: optional string t_jalob;
+	63: optional string t_status_praesense;
+	64: optional string t_fiz_obsl;
 }
 
 struct AnamZab{
 	1: i32 id_pvizit;
 	2: i32 npasp;
-	3: string t_nachalo_zab;
-	4: string t_sympt;
-	5: string t_otn_bol;
-	6: string t_ps_syt;
+	3: optional string t_nachalo_zab;
+	4: optional string t_sympt;
+	5: optional string t_otn_bol;
+	6: optional string t_ps_syt;
+	7: optional string t_ist_zab;
 }
 
 struct PdiagZ{
@@ -183,15 +183,15 @@ struct PdiagZ{
 	4: string named;
 	5: i64 datad;
 	6: i32 cpodr;
-	7: i64 d_post;
-	8: i32 d_grup;
-	9: i32 d_ish;
-	10: i64 dataish;
-	11: i64 datag;
-	12: string diag_s;
-	13: i32 d_grup_s;
-	14: i32 cod_sp;
-	15: string cdol_ot;
+	7: optional i64 d_post;
+	8: optional i32 d_grup;
+	9: optional i32 d_ish;
+	10: optional i64 dataish;
+	11: optional i64 datag;
+	12: optional string diag_s;
+	13: optional i32 d_grup_s;
+	14: optional i32 cod_sp;
+	15: optional string cdol_ot;
 }
 
 struct PatientCommonInfo {
@@ -320,9 +320,9 @@ struct RdInfStruct{
 struct PokazMet{
 	1: string pcod;
 	2: string name_n;
-	3: double stoim;
+	3: optional double stoim;
 	4: string c_obst;
-	5: bool vybor;
+	5: optional bool vybor;
 }
 
 /*метод по виду исследования*/
@@ -337,10 +337,10 @@ struct Metod{
 struct Pokaz{
 	1: string pcod;
 	2: string name_n;
-	3: double stoim;
+	3: optional double stoim;
 	4: i32 c_p0e1;
 	5: string c_n_nz1;
-	6: bool vybor;
+	6: optional bool vybor;
 }
 
 
@@ -353,7 +353,7 @@ struct P_isl_ld {
 	 6: i32 naprotd;
 	 7: i64 datan;
 	 8: i32 vrach;
-	 9: string diag;
+	 9: optional string diag;
 	10: i64 dataz;
 	11: i32 pvizit_id;
 }
@@ -362,14 +362,14 @@ struct Prez_d {
 	1: i32 npasp;
 	2: i32 nisl;
 	3: string kodisl;
-	4: double stoim;
+	4: optional double stoim;
 }
 
 struct Prez_l {
 	1: i32 npasp;
 	2: i32 nisl;
 	3: string cpok;
-	4: double stoim;
+	4: optional double stoim;
 }
 
 
@@ -379,8 +379,8 @@ struct IsslMet {
 	3: i32 npasp;
 	4: string kodMetod;
 	5: list<string> pokaz;
-	6: string mesto;
-	7: string kab;
+	6: optional string mesto;
+	7: optional string kab;
 }
 
 struct IsslPokaz {
@@ -389,21 +389,21 @@ struct IsslPokaz {
 	3: i32 npasp;
 	4: string kodMetod;
 	5: list<string> pokaz;
-	6: string mesto;
-	7: string kab;
+	6: optional string mesto;
+	7: optional string kab;
 }
 
 struct Napr{
 	1: i32 npasp;
 	2: i32 userId;
-	3: string obosnov;
+	3: optional string obosnov;
 	4: i32 clpu;
 }
 
 struct NaprKons{
 	1: i32 npasp;
 	2: i32 userId;
-	3: string obosnov;
+	3: optional string obosnov;
 	4: i32 cpol;
 }
 
@@ -507,6 +507,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getVdi() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_ai0() throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info
