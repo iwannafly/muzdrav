@@ -278,8 +278,10 @@ public class Vvod extends JFrame {
 					if (cbish.getSelectedPcod() != null)
 						pvizit.setIshod(cbish.getSelectedPcod());
 					
-//					if (cbMobsp.getSelectedPcod() != null)
-//						pvizitAmb.setMobs(cbMobsp.getSelectedPcod());
+					if (cbMobsp.getSelectedPcod() != null)
+						pvizitAmb.setMobs(cbMobsp.getSelectedPcod());
+					if (vid_opl.getSelectedPcod() != null)
+						pvizitAmb.setOpl(vid_opl.getSelectedPcod());
 					
 					MainForm.tcl.setPriem(priem);
 					MainForm.tcl.setAnamZab(anamZab);
@@ -1200,7 +1202,7 @@ public class Vvod extends JFrame {
 		
 		 cbish = new ThriftIntegerClassifierCombobox<>(true);
 		
-		cbMobsp = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+		cbMobsp = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblmobs = new JLabel("Место");
 		 
@@ -2120,6 +2122,7 @@ public class Vvod extends JFrame {
 			c_obr.setData(MainForm.tcl.getP0c());
 			cbrez.setData(MainForm.tcl.getAp0());
 			cbish.setData(MainForm.tcl.getAq0());
+			cbMobsp.setData(MainForm.tcl.get_n_abs());
 			vid_opl.setData(MainForm.tcl.getOpl());
 			vid_travm.setData(MainForm.tcl.get_n_ai0());
 			printform.cbVidIssl.setData(MainForm.tcl.get_n_p0e1());

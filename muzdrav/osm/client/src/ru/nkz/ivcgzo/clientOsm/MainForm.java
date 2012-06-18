@@ -31,7 +31,7 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
 	private JFrame frame;
-	private CustomTable<ZapVr, ZapVr._Fields> table;
+	public static  CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
 	private PInfo pinfo;
 	
