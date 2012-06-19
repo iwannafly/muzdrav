@@ -99,37 +99,37 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
 	*Возвращает календарь на текущий год
 	*/
-	list<Calendar> getCalendar(1:i32 cyear);
+	list<Calendar> getCalendar(1:i32 cyear) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает длительность приема специалистом в поликлинике
 	*/
-	list<Norm> getNorm(1:i32 cpodr, 2:string cdol);
+	list<Norm> getNorm(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает неприемные дни врача
 	*/
-	list<Ndv> getNdv(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol);
+	list<Ndv> getNdv(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает график приема врача в поликлинике
 	*/
-	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema);
+	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает расписание работы врача в поликлинике
 	*/
-	list<Rasp> getRasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol);
+	list<Rasp> getRasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает талоны на прием в поликлинике
 	*/
-	list<Talon> getTalon(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i64 datap);
+	list<Talon> getTalon(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i64 datap) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает виды приема
 	*/
-	list<Vidp> getVidp();
+	list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse);
 
 
 

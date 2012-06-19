@@ -69,6 +69,18 @@ public class CustomDateEditor extends JFormattedTextField {
 			ctcWrapper.setPopupMenu();
 	}
 	
+	public CustomDateEditor(Date date) {
+		this();
+		
+		setDate(date);
+	}
+	
+	public CustomDateEditor(long mills) {
+		this();
+		
+		setDate(mills);
+	}
+
 	private String convertDatePattern(String pattern)
 	{
 		if (pattern.indexOf('/') > -1)
@@ -155,6 +167,15 @@ public class CustomDateEditor extends JFormattedTextField {
 				return dateFormatter.parse(txt.getText());
 		} catch (ParseException e) {
 		}
+		
 		return null;
+	}
+	
+	public void setDate(Date date) {
+		setValue(dateFormatter.format(date));
+	}
+	
+	public void setDate(long mills) {
+		setDate(new Date(mills));
 	}
 }
