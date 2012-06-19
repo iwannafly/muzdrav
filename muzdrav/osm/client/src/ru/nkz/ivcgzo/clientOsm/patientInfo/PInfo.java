@@ -407,8 +407,8 @@ public class PInfo extends JFrame {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
 				posinfo.add(new PvizitTreeNode(pvizit));
-//			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(2));
-//				diaginfo.add(new PdiagTreeNode(pdiag));
+			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(2))
+				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
@@ -444,7 +444,7 @@ public class PInfo extends JFrame {
 	}
 	
 	class PvizitAmbNode extends DefaultMutableTreeNode{
-		private static final long serialVersionUID = -4684514837066276873L;
+		private static final long serialVersionUID = -5215124870459111226L;
 		private PvizitAmb pam;
 		
 		public PvizitAmbNode(PvizitAmb pam) {
@@ -458,7 +458,7 @@ public class PInfo extends JFrame {
 	}
 	
 	class PdiagTreeNode extends DefaultMutableTreeNode {
-		private static final long serialVersionUID = 4212592425962984738L;
+		private static final long serialVersionUID = -46003968655861926L;
 		private PdiagZ pdiag;
 		
 		public PdiagTreeNode(PdiagZ pdiag) {

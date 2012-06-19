@@ -988,7 +988,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<PdiagAmb> getPdiagAmbProsm(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE npasp = ? AND predv = FALSE ", npasp)) {
 			return rsmPdiagAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
