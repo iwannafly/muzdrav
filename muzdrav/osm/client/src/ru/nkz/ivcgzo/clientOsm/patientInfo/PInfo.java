@@ -180,7 +180,7 @@ public class PInfo extends JFrame {
 								addLineToDetailInfo("Условия проживания", psign.getUslov());
 								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
 								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
-								addLineToDetailInfo("Гемотрансфузия", psign.getGemotr());
+								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
 								addLineToDetailInfo("Наследственность", psign.getNasl());
 								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
 								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
@@ -198,14 +198,14 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Диагноз", pdiag.isSetDiag(),pdiag.getDiag());
 					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_post(), DateFormat.getDateInstance().format(new Date(pdiag.getD_post())));
 					addLineToDetailInfo("Группа д/у", pdiag.isSetD_grup(), pdiag.getD_grup());
-					addLineToDetailInfo("Исход д/у ",pdiag.isSetD_ish(),pdiag.getD_ish());
+					addLineToDetailInfo("Исход д/у ",pdiag.isSetD_grup(),pdiag.getD_grup());
 		 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
 					addLineToDetailInfo("Дата установления/изменения группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
 	 				addLineToDetailInfo("Дата установления/изменения диагноза д/у", pdiag.isSetDatad(), DateFormat.getDateInstance().format(new Date(pdiag.getDatad())));
-		 			addLineToDetailInfo("Старый диагноз (до изменения)", pdiag.isSetRecomend(),pdiag.getRecomend());
-					addLineToDetailInfo("Старая группа д/у", pdiag.isSetDataz(), pdiag.getDataz());
-	 				addLineToDetailInfo("Код врача, ведущего д/у", pvizit.isSetRecomend(),pvizit.getRecomend());
-					addLineToDetailInfo("Должность врача, ведущего д/у", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
+		 			addLineToDetailInfo("Старый диагноз (до изменения)", pdiag.isSetDiag_s(),pdiag.getDiag_s());
+					addLineToDetailInfo("Старая группа д/у", pdiag.isSetD_grup_s(), pdiag.getD_grup_s());
+	 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
+					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(MainForm.tcl.get_n_s00(),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
 
 					eptxt.setText(sb.toString());
 		 			} 			
@@ -407,8 +407,8 @@ public class PInfo extends JFrame {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
 				posinfo.add(new PvizitTreeNode(pvizit));
-			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(2));
-				diaginfo.add(new PdiagTreeNode(pdiag));
+//			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(2));
+//				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
@@ -469,7 +469,6 @@ public class PInfo extends JFrame {
 		@Override
 		public String toString() {
 			return pdiag.getDiag();
-			//return Integer.toString(pvizit.getId());
 		}
 	}
 	

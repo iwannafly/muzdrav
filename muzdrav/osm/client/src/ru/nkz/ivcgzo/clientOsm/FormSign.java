@@ -82,6 +82,15 @@ public class FormSign extends JFrame {
 				tpallerg.setText(psign.allerg);
 				tpanamnz.setText(psign.vitae);
 				tpfarm.setText(psign.farmkol);
+				tpgemotrans.setText(psign.gemotrans);
+				tpginek.setText(psign.ginek);
+				tpnasl.setText(psign.nasl);
+				tpper_oper.setText(psign.per_oper);
+				tpper_zab.setText(psign.per_zab);
+				tppriem_lek.setText(psign.priem_lek);
+				tpprim_gorm.setText(psign.prim_gorm);
+				tprazv.setText(psign.razv);
+				tpuslov.setText(psign.uslov);
 				
 				vrp = psign.getVred();
 				cbk.setSelected(vrp.charAt(0) == '1');
@@ -196,7 +205,7 @@ public class FormSign extends JFrame {
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
-				psign.setGemotr(tpgemotrans.getText());
+				psign.setGemotrans(tpgemotrans.getText());
 				psign.setGinek(tpginek.getText());
 				psign.setNasl(tpnasl.getText());
 				psign.setPer_oper(tpper_oper.getText());
