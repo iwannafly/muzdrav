@@ -24,6 +24,7 @@ import java.awt.Color;
 
 import javax.swing.JOptionPane;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
@@ -62,6 +63,8 @@ public class FormRdDin extends JFrame {
     private String predname;
     private String cerdname;
     private String cerdname1;
+    CustomDateEditor SDataPos;
+    CustomDateEditor SDataSl;
 	/**
 	 * Launch the application.
 	 */
@@ -290,9 +293,10 @@ public class FormRdDin extends JFrame {
 		
 		JLabel LDataSl = new JLabel("Дата следующего посещения");
 		
-		final JSpinner SDataPos = new JSpinner();
-		SDataPos.setModel(new SpinnerDateModel(new Date(rddin.datapos), null, null, Calendar.DAY_OF_YEAR));
-        rddin.setDatapos((int) SDataPos.getModel().getValue());
+//		final JSpinner SDataPos = new JSpinner();
+//		SDataPos.setModel(new SpinnerDateModel(new Date(rddin.datapos), null, null, Calendar.DAY_OF_YEAR));
+//        rddin.setDatapos((int) SDataPos.getModel().getValue());
+		SDataPos = new CustomDateEditor();
 		
         final JSpinner SSrok = new JSpinner();
 		SSrok.setModel(new SpinnerNumberModel(new Integer(rddin.srok),null, new Integer(40),new Integer(1)));
@@ -334,8 +338,9 @@ public class FormRdDin extends JFrame {
 		CBOteki.setModel(new DefaultComboBoxModel(new String[] {"Нет", "Нижние конечности", "Верхние конечности", "Верхняя брюшная стенка", "Генерализованные"}));
 		CBOteki.setSelectedItem(otname);
 		
-		final JSpinner SDataSl = new JSpinner();
-		SDataSl.setModel(new SpinnerDateModel(new Date(1335373200000L), null, null, Calendar.DAY_OF_YEAR));
+//		final JSpinner SDataSl = new JSpinner();
+//		SDataSl.setModel(new SpinnerDateModel(new Date(1335373200000L), null, null, Calendar.DAY_OF_YEAR));
+		SDataSl = new CustomDateEditor();
 
 		
 		JButton SButton = new JButton("Сохранить");
@@ -399,8 +404,8 @@ public class FormRdDin extends JFrame {
 		rddin.setArt3((int) SLdad.getModel().getValue());
 		rddin.setArt4((int) SLsad.getModel().getValue());
 		rddin.setChcc((int) SChcc.getModel().getValue());
-		rddin.setDatapos((long) SDataPos.getModel().getValue());
-		rddin.setDatasl((long) SDataSl.getModel().getValue());
+		rddin.setDatapos(SDataPos.getDate().getTime());
+		rddin.setDatasl(SDataSl.getDate().getTime());
 		rddin.setHdm((int) SVdm.getModel().getValue());
 		rddin.setOj((int) SOkrj.getModel().getValue());
 		rddin.setSpl((int) STolP.getModel().getValue());

@@ -569,13 +569,13 @@ public class FormRdInf extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
-rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
-rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
+//rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
+//rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
 rdinf.setOSocO(oslrod);
 rdinf.setUslPr(uslj);
 rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
-rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
+//rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
 rdinf.setPhOtec(TPhf.getText());
 			}
 		});

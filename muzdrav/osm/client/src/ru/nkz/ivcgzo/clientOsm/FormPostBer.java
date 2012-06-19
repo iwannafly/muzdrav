@@ -27,6 +27,7 @@ import java.awt.Color;
 
 import javax.swing.JOptionPane;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
@@ -75,18 +76,19 @@ public class FormPostBer extends JFrame {
     JSpinner SDtroch;
     JSpinner SCext;
     JSpinner SindSol;
-    JSpinner SDataPos;
+    CustomDateEditor SDataPos;
     JSpinner SParRod;
     JSpinner SKolBer;
-    JSpinner SDataOsl;
+    CustomDateEditor SDataOsl;
+    CustomDateEditor SDataM;
+    CustomDateEditor SDataSn;
+    CustomDateEditor SDataRod;
     JSpinner SYavka;
-    JSpinner SDataM;
     JSpinner SKolAb;
     JSpinner SVozMen;
     JSpinner SMenC;
     JSpinner SKolDet;
     JSpinner SPolJ;
-    JSpinner SDataSn;
     JComboBox CBPrishSn;
     JComboBox CBRod;
     JComboBox CBOslAb;
@@ -361,9 +363,10 @@ public class FormPostBer extends JFrame {
 		TNKart = new JTextField();
 		TNKart.setColumns(10);
 		
-		final JSpinner SDataPos = new JSpinner();
-		SDataPos.setModel(new SpinnerDateModel(new Date(rdsl.datay),new Date(), new Date(), Calendar.DAY_OF_YEAR));
-		rdsl.setDatay((long) SDataPos.getModel().getValue());
+//		final JSpinner SDataPos = new JSpinner();
+//		SDataPos.setModel(new SpinnerDateModel(new Date(rdsl.datay),new Date(), new Date(), Calendar.DAY_OF_YEAR));
+//		rdsl.setDatay((long) SDataPos.getModel().getValue());
+		SDataPos = new CustomDateEditor();
 		
 		final JSpinner SParRod = new JSpinner();
 		SParRod.setModel(new SpinnerNumberModel(rdsl.kolRod, 0, 0, 1));
@@ -373,20 +376,22 @@ public class FormPostBer extends JFrame {
 		SKolBer.setModel(new SpinnerNumberModel(rdsl.kolpr, 0, 0, 1));
 		rdsl.setKolpr((int) SKolBer.getModel().getValue());
 		
-		final JSpinner SDataOsl = new JSpinner();
-		SDataOsl.setModel(new SpinnerDateModel(new Date(rdsl.dataosl), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
-		rdsl.setDataosl((long) SDataOsl.getModel().getValue());
+//		final JSpinner SDataOsl = new JSpinner();
+//		SDataOsl.setModel(new SpinnerDateModel(new Date(rdsl.dataosl), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
+//		rdsl.setDataosl((long) SDataOsl.getModel().getValue());
+		SDataOsl = new CustomDateEditor();
 		
 		final JSpinner SYavka = new JSpinner();
 		SYavka.setModel(new SpinnerNumberModel(rdsl.yavka1,2, 40,1));
 		rdsl.setYavka1((int) SYavka.getModel().getValue());
 		
-		final JSpinner SDataM = new JSpinner();
-		SDataM.setModel(new SpinnerDateModel(new Date(rdsl.dataM), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
-		rdsl.setDataM((long) SDataM.getModel().getValue());
+//		final JSpinner SDataM = new JSpinner();
+//		SDataM.setModel(new SpinnerDateModel(new Date(rdsl.dataM), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
+//		rdsl.setDataM((long) SDataM.getModel().getValue());
+		SDataM = new CustomDateEditor();
 		
-		final JSpinner SDataRod = new JSpinner();
-		SDataRod.setModel(new SpinnerDateModel(new Date(rdsl.datay+(40-rdsl.yavka1)*7), System.currentTimeMillis(),(System.currentTimeMillis()+280), Calendar.DAY_OF_YEAR));
+//		final JSpinner SDataRod = new JSpinner();
+//		SDataRod.setModel(new SpinnerDateModel(new Date(rdsl.datay+(40-rdsl.yavka1)*7), System.currentTimeMillis(),(System.currentTimeMillis()+280), Calendar.DAY_OF_YEAR));
 		
 		final JSpinner SKolAb = new JSpinner();
 		SKolAb.setModel(new SpinnerNumberModel(rdsl.abort, 0, 50, 1));
@@ -408,10 +413,11 @@ public class FormPostBer extends JFrame {
 		SPolJ.setModel(new SpinnerNumberModel(rdsl.polj, 9, 40, 1));
 		rdsl.setPolj((int) SPolJ.getModel().getValue());
 		
-		final JSpinner SDataSn = new JSpinner();
-		SDataSn.setBackground(new Color(212, 208, 200));
-		SDataSn.setModel(new SpinnerDateModel(new Date(rdsl.Datasn), System.currentTimeMillis(),(System.currentTimeMillis()+280), Calendar.DAY_OF_YEAR));
-		rdsl.setDatasn((long) SDataSn.getModel().getValue());
+//		final JSpinner SDataSn = new JSpinner();
+//		SDataSn.setBackground(new Color(212, 208, 200));
+//		SDataSn.setModel(new SpinnerDateModel(new Date(rdsl.Datasn), System.currentTimeMillis(),(System.currentTimeMillis()+280), Calendar.DAY_OF_YEAR));
+//		rdsl.setDatasn((long) SDataSn.getModel().getValue());
+		SDataSn = new CustomDateEditor();
 		
 		JComboBox CBPrishSn = new JComboBox();
 		CBPrishSn.setModel(new DefaultComboBoxModel(new String[] {" ", "Срочные роды", "Мед. аборт", "Выкидыш", "Выбыла"}));
@@ -455,10 +461,10 @@ public class FormPostBer extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 			rdsl.setAbort((int) SKolAb.getModel().getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
-			rdsl.setDataM((long) SDataM.getModel().getValue());
-			rdsl.setDataosl((long) SDataOsl.getModel().getValue());
-			rdsl.setDatasn((long) SDataSn.getModel().getValue());
-			rdsl.setDatay((long) SDataPos.getModel().getValue());
+			rdsl.setDataM( SDataM.getDate().getTime());
+			rdsl.setDataosl( SDataOsl.getDate().getTime());
+			rdsl.setDatasn( SDataSn.getDate().getTime());
+			rdsl.setDatay(SDataPos.getDate().getTime());
 //			rdsl.setDatay(DateFormat.Field.);
 			rdsl.setKont(iw3);
 			rdsl.setDeti((int) SKolDet.getModel().getValue());
