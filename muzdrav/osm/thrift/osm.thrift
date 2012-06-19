@@ -510,6 +510,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getVdi() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_ai0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_abs() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_abv() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_abx() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_aby() throws (1: kmiacServer.KmiacServerException kse);
 
 
 //patient info

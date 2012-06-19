@@ -27,6 +27,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientOsm.MainForm;
+import ru.nkz.ivcgzo.clientOsm.Vvod;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -46,6 +47,7 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
+import java.awt.Font;
 
 public class PInfo extends JFrame {
 	private static final long serialVersionUID = 7025194439882492263L;
@@ -104,6 +106,7 @@ public class PInfo extends JFrame {
 		);
 		
 		 treeinfo = new JTree(createNodes());
+		 treeinfo.setFont(new Font("Arial", Font.PLAIN, 12));
 		 treeinfo.addTreeSelectionListener(new TreeSelectionListener() {
 		 	public void valueChanged(TreeSelectionEvent e) {
 		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
@@ -112,7 +115,7 @@ public class PInfo extends JFrame {
 		 			if (lastPath.toString() ==  "Личная информация"){
 		 				PatientCommonInfo info;
 						try {
-							info = MainForm.tcl.getPatientCommonInfo(MainForm.table.getSelectedItem().npasp);
+							info = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
 							addLineToDetailInfo("Уникальный номер", info.isSetNpasp(), info.getNpasp());
 		 				addLineToDetailInfo("Фамилия", info.getFam());
 		 				addLineToDetailInfo("Имя", info.getIm());
@@ -166,31 +169,31 @@ public class PInfo extends JFrame {
 						}
 		 						 			}
 		 			else
-		 				if (lastPath.toString() ==  "Анамнез жизни"){
-		 					Psign psign;
-		 					try {
-								psign = MainForm.tcl.getPatientMiscInfo(MainForm.table.getSelectedItem().npasp);
-								addLineToDetailInfo("Группа крови", psign.getGrup());
-								addLineToDetailInfo("Резус-фактор", psign.getPh());
-								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
-								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
-								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-								addLineToDetailInfo("Вредные привычки", psign.getVred());
-								addLineToDetailInfo("Развитие", psign.getRazv());
-								addLineToDetailInfo("Условия проживания", psign.getUslov());
-								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
-								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
-								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
-								addLineToDetailInfo("Наследственность", psign.getNasl());
-								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
-								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
-								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
-								eptxt.setText(sb.toString());
-							} catch (PatientNotFoundException e1) {
-								e1.printStackTrace();
-							}
-		 				}
-		 				else
+//		 				if (lastPath.toString() ==  "Анамнез жизни"){
+//		 					Psign psign;
+//		 					try {
+//								psign = MainForm.tcl.getPatientMiscInfo(MainForm.table.getSelectedItem().npasp);
+//								addLineToDetailInfo("Группа крови", psign.getGrup());
+//								addLineToDetailInfo("Резус-фактор", psign.getPh());
+//								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
+//								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
+//								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
+//								addLineToDetailInfo("Вредные привычки", psign.getVred());
+//								addLineToDetailInfo("Развитие", psign.getRazv());
+//								addLineToDetailInfo("Условия проживания", psign.getUslov());
+//								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
+//								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
+//								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
+//								addLineToDetailInfo("Наследственность", psign.getNasl());
+//								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
+//								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
+//								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
+//								eptxt.setText(sb.toString());
+//							} catch (PatientNotFoundException e1) {
+//								e1.printStackTrace();
+//							}
+//		 				}
+//		 				else
 		 		if (lastPath instanceof PdiagTreeNode) {
 		 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
 		 			PdiagZ pdiag = pdiagNode.pdiag;
@@ -384,6 +387,7 @@ public class PInfo extends JFrame {
 		);
 		
 		 eptxt = new JEditorPane();
+		 eptxt.setFont(new Font("Arial", Font.PLAIN, 12));
 		sptxt.setViewportView(eptxt);
 		eptxt.setEditable(false);
 		pr.setLayout(gl_pr);
