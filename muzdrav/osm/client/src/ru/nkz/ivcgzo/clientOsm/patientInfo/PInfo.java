@@ -399,19 +399,19 @@ public class PInfo extends JFrame {
 	private DefaultMutableTreeNode createNodes() {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
 		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
-		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
+//		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
 		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
 		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
 		root.add(patinfo);
-		root.add(signinfo);
+//		root.add(signinfo);
 		root.add(posinfo);
 		root.add(diaginfo);
 		
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
+			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(Vvod.zapVr.getNpasp(), sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
 				posinfo.add(new PvizitTreeNode(pvizit));
-			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(2))
+			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(Vvod.zapVr.getNpasp()))
 				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {

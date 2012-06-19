@@ -54,13 +54,15 @@ import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import javax.swing.JComboBox;
+import javax.swing.ScrollPaneConstants;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
 	public static ZapVr zapVr;
 	private static Pvizit pvizit;
 	private static PvizitAmb pvizitAmb;
-	private static PdiagAmb diag;
+	private static PdiagAmb diagamb;
+	private static PdiagZ pdiagz;
 	private static Priem priem;
 	private static AnamZab anamZab;
 	private FormSign sign;
@@ -184,12 +186,6 @@ public class Vvod extends JFrame {
 		btnAnamz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			sign.setVisible(true);}
-		});
-				
-		JButton bA = new JButton("Аллергоанамнез");
-		bA.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
 		});
 		
 		
@@ -397,22 +393,22 @@ public class Vvod extends JFrame {
 		final JLabel lbljalob = new JLabel("Жалобы на:");
 		
 		 tpJalob = new JEditorPane();
-		tpJalob.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalob.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljald = new JLabel("Дыхательная система");
 		
 		 tpJalobd = new JEditorPane();
-		tpJalobd.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobd.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobkrov = new JEditorPane();
-		tpJalobkrov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobkrov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljalp = new JLabel("Система пищеварения");
 		
 		final JLabel lbljalkr = new JLabel("Система кровообращения");
 		
 		 tpJalobp = new JEditorPane();
-		tpJalobp.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobp.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljalm = new JLabel("Мочеполовая система");
 		
@@ -423,32 +419,33 @@ public class Vvod extends JFrame {
 		final JLabel lbljalnerv = new JLabel("Нервная система и органы чувств");
 		
 		 tpJalobnerv = new JEditorPane();
-		tpJalobnerv.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobnerv.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljalop = new JLabel("Опорно-двигательная система");
 		
 		 tpJalobopor = new JEditorPane();
-		tpJalobopor.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobopor.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljallih = new JLabel("Лихорадка");
 		
 		 tpJaloblih = new JEditorPane();
-		tpJaloblih.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJaloblih.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblja_lob = new JLabel("Жалобы общего характера");
 		
 		 tpJalobobh = new JEditorPane();
-		tpJalobobh.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobobh.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljalpr = new JLabel("Прочие жалобы");
 		
 		 tpJalobproch = new JEditorPane();
-		tpJalobproch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobproch.setBorder(UIManager.getBorder("TextField.border"));
 		
-		tpJalobendo.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobendo.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobmoch = new JEditorPane();
-		tpJalobmoch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJalobmoch.setBorder(UIManager.getBorder("TextField.border"));
+		
 		GroupLayout gl_panJalob = new GroupLayout(panJalob);
 		gl_panJalob.setHorizontalGroup(
 			gl_panJalob.createParallelGroup(Alignment.LEADING)
@@ -478,7 +475,7 @@ public class Vvod extends JFrame {
 						.addComponent(tpJalobobh, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lbljalpr, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpJalobproch, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(336, Short.MAX_VALUE))
+					.addContainerGap(315, Short.MAX_VALUE))
 		);
 		gl_panJalob.setVerticalGroup(
 			gl_panJalob.createParallelGroup(Alignment.LEADING)
@@ -543,8 +540,8 @@ public class Vvod extends JFrame {
 		gl_pAnanmnesis.setVerticalGroup(
 			gl_pAnanmnesis.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pAnanmnesis.createSequentialGroup()
-					.addComponent(spAnamnesis, GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(spAnamnesis, GroupLayout.PREFERRED_SIZE, 482, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(56, Short.MAX_VALUE))
 		);
 		
 		JPanel panAnamnes = new JPanel();
@@ -553,27 +550,27 @@ public class Vvod extends JFrame {
 		final JLabel lblNacZab = new JLabel("Начало заболевания");
 		
 		 tpNachzab = new JEditorPane();
-		tpNachzab.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpNachzab.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblSympt = new JLabel("Симптомы");
 		
 		final JLabel lblotnbol = new JLabel("Отношение больного к болезни");
 		
 		 tpOtnbol = new JEditorPane();
-		tpOtnbol.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpOtnbol.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpSympt = new JEditorPane();
-		tpSympt.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpSympt.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpssit = new JLabel("Психологическая ситуация в связи с болезнью");
 		
 		 tpPssit = new JEditorPane();
-		tpPssit.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPssit.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JLabel lblIstZab = new JLabel("История заболевания");
 		
 		 tpIstZab = new JEditorPane();
-		tpIstZab.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpIstZab.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_panAnamnes = new GroupLayout(panAnamnes);
 		gl_panAnamnes.setHorizontalGroup(
 			gl_panAnamnes.createParallelGroup(Alignment.LEADING)
@@ -589,7 +586,8 @@ public class Vvod extends JFrame {
 						.addComponent(lblNacZab, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblpssit, GroupLayout.PREFERRED_SIZE, 271, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblIstZab, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 542, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 542, GroupLayout.PREFERRED_SIZE))
+						.addContainerGap(315, Short.MAX_VALUE))
 		);
 		gl_panAnamnes.setVerticalGroup(
 			gl_panAnamnes.createParallelGroup(Alignment.LEADING)
@@ -688,7 +686,7 @@ public class Vvod extends JFrame {
 						.addComponent(tfves, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblchss)
 						.addComponent(tfchss, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(69, Short.MAX_VALUE))
+					.addContainerGap(15, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);
 		
@@ -719,47 +717,47 @@ public class Vvod extends JFrame {
 		final JLabel lblStPraes = new JLabel("Status praesense");
 		
 		 tpStPraes = new JEditorPane();
-		tpStPraes.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpStPraes.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblobsost = new JLabel("Общее состояние");
 		
 		 tpObsost = new JEditorPane();
-		tpObsost.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpObsost.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblkoj = new JLabel("Кожные покровы");
 		
 		 tpKoj = new JEditorPane();
-		tpKoj.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpKoj.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblsl = new JLabel("Видимые слизистые");
 		
 		 tpSliz = new JEditorPane();
-		tpSliz.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpSliz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpodkkl = new JLabel("Подкожная клетчатка");
 		
 		 tpPodkkl = new JEditorPane();
-		tpPodkkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPodkkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbllimf = new JLabel("Лимфатические узлы");
 		
 		 tpLimf = new JEditorPane();
-		tpPodkkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPodkkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblkostm = new JLabel("Костно-мышечная система");
 		
 		 tpKostmysh = new JEditorPane();
-		tpPodkkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPodkkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblnervps = new JLabel("Нервно-психический статус");
 		
 		 tpNervnps = new JEditorPane();
-		 tpNervnps.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		 tpNervnps.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbltelo = new JLabel("Телосложение");
 		
 		 tpTelo = new JEditorPane();
-		tpTelo.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpTelo.setBorder(UIManager.getBorder("TextField.border"));
 		
 		GroupLayout gl_panPraesense = new GroupLayout(panPraesense);
 		gl_panPraesense.setHorizontalGroup(
@@ -827,7 +825,7 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpTelo, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addContainerGap(367, Short.MAX_VALUE))
+					.addContainerGap(15, Short.MAX_VALUE))
 		);
 		panPraesense.setLayout(gl_panPraesense);
 		pStatuspr.setLayout(gl_pStatuspr);
@@ -856,147 +854,147 @@ public class Vvod extends JFrame {
 		final JLabel lblfizik = new JLabel("Физикальное обследование");
 		
 		tpFizObsl = new JEditorPane();
-		tpFizObsl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpFizObsl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblsust = new JLabel("Суставы");
 		
 		 tpSust = new JEditorPane();
-		tpSust.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpSust.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbldyh = new JLabel("Дыхание");
 		
 		 tpDyh = new JEditorPane();
-		tpDyh.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpDyh.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblgrkl = new JLabel("Грудная клетка");
 		
 		 tpGrkl = new JEditorPane();
-		tpGrkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpGrkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblperl = new JLabel("Перкуссия легких");
 		
 		 tpPerkl = new JEditorPane();
-		tpPerkl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPerkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblausl = new JLabel("Аускультация легких");
 		
 		 tpAusl = new JEditorPane();
-		tpAusl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpAusl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblbronh = new JLabel("Бронхофония");
 		
 		 tpBronho = new JEditorPane();
-		tpBronho.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpBronho.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblarter = new JLabel("Артерии и шейные вены");
 		
 		 tpArter = new JEditorPane();
-		tpArter.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpArter.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblobls = new JLabel("Область сердца");
 		
 		 tpObls = new JEditorPane();
-		tpObls.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpObls.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpers = new JLabel("Перкуссия сердца");
 		
 		 tpPerks = new JEditorPane();
-		tpPerks.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPerks.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblauss = new JLabel("Аускультация сердца");
 		
 		 tpAuss = new JEditorPane();
-		tpAuss.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpAuss.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpolrta = new JLabel("Полость рта");
 		
 		 tpPolrta = new JEditorPane();
-		tpPolrta.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPolrta.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljivot = new JLabel("Живот");
 		
 		 tpJivot = new JEditorPane();
-		tpJivot.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJivot.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpalpjiv = new JLabel("Пальпация живота");
 		
 		 tpPalpjivot = new JEditorPane();
-		tpPalpjivot.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPalpjivot.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljkt = new JLabel("Пальпация, перкуссия и аускультация желудочно-кишечного тракта");
 		
 		 tpJkt = new JEditorPane();
-		tpJkt.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJkt.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpalpjel = new JLabel("Пальпация желудка");
 		
 		 tpPalpjel = new JEditorPane();
-		tpPalpjel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPalpjel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpalppodjel = new JLabel("Пальпация поджелудочной железы");
 		
 		 tpPalppodjel = new JEditorPane();
-		tpPalppodjel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPalppodjel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpech = new JLabel("Печень");
 		
 		 tpPechen = new JEditorPane();
-		tpPechen.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPechen.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbljelch = new JLabel("Желчный пузырь");
 		
 		 tpJelch = new JEditorPane();
-		tpJelch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpJelch.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblselez = new JLabel("Селезенка");
 		
 		 tpSelez = new JEditorPane();
-		tpSelez.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpSelez.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lbloblzad = new JLabel("Область заднего прохода");
 		
 		 tpOblzad = new JEditorPane();
-		tpOblzad.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpOblzad.setBorder(UIManager.getBorder("TextField.border"));
 				
 		final JLabel lblpoyasn = new JLabel("Поясничная область");
 		
 		 tpPoyasn = new JEditorPane();
-		tpPoyasn.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPoyasn.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblpochk = new JLabel("Почки");
 		
 		 tpPochki = new JEditorPane();
-		tpPochki.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpPochki.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblmoch = new JLabel("Мочевой пузырь");
 		
 		 tpMoch = new JEditorPane();
-		tpMoch.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpMoch.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblmoljel = new JLabel("Молочные железы");
 		
 		 tpMoljel = new JEditorPane();
-		tpMoljel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpMoljel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblgrjel = new JLabel("Грудные железы мужчин");
 		
 		 tpGrjel = new JEditorPane();
-		tpGrjel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpGrjel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblmatka = new JLabel("Матка и ее придатки");
 		
 		 tpMatka = new JEditorPane();
-		tpMatka.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpMatka.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblnarpolov = new JLabel("Наружные половые органы у мужчин");
 		
 		 tpNarpolov = new JEditorPane();
-		tpNarpolov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpNarpolov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblchitov = new JLabel("Щитовидная железа");
 		
 		 tpChitov = new JEditorPane();
-		tpChitov.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpChitov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		GroupLayout gl_panFiz = new GroupLayout(panFiz);
 		gl_panFiz.setHorizontalGroup(
@@ -1062,7 +1060,7 @@ public class Vvod extends JFrame {
 						.addComponent(lblchitov, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpChitov, GroupLayout.PREFERRED_SIZE, 492, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblfizik, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(423, Short.MAX_VALUE))
+					.addContainerGap(325, Short.MAX_VALUE))
 		);
 		gl_panFiz.setVerticalGroup(
 			gl_panFiz.createParallelGroup(Alignment.LEADING)
@@ -1183,7 +1181,7 @@ public class Vvod extends JFrame {
 					.addComponent(lblchitov)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpChitov, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(243, Short.MAX_VALUE))
+					.addContainerGap(15, Short.MAX_VALUE))
 		);
 		panFiz.setLayout(gl_panFiz);
 		pfizikob.setLayout(gl_pfizikob);
@@ -1284,8 +1282,8 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-		JButton button_8 = new JButton("+");
-		button_8.addActionListener(new ActionListener() {
+		JButton AddVizit = new JButton("+");
+		AddVizit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				pvizit = new Pvizit();
 				pvizit.setId(zapVr.getId_pvizit());
@@ -1352,7 +1350,7 @@ public class Vvod extends JFrame {
 						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_8))
+							.addComponent(AddVizit))
 						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 							.addComponent(panel_Talon, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
 							.addComponent(tabbedPane, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 1004, Short.MAX_VALUE)))
@@ -1362,25 +1360,20 @@ public class Vvod extends JFrame {
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(bDB, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(btnAnamz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(10)
-							.addComponent(bA)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(bS)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(bSSh)
-							.addGap(10)
-							.addComponent(bZSh)
-							.addGap(10)
-							.addComponent(bVD)
-							.addGap(6)
-							.addComponent(bDelet)
-							.addGap(18)
-							.addComponent(bSet))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(18)
-							.addComponent(bInfo, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(bInfo, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
+					.addGap(10)
+					.addComponent(bS)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(bSSh)
+					.addGap(10)
+					.addComponent(bZSh)
+					.addGap(10)
+					.addComponent(bVD)
+					.addGap(6)
+					.addComponent(bDelet)
+					.addGap(18)
+					.addComponent(bSet)
 					.addGap(3076))
 		);
 		gl_panel.setVerticalGroup(
@@ -1392,17 +1385,15 @@ public class Vvod extends JFrame {
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 									.addComponent(btnAnamz)
-									.addComponent(bA)
-									.addComponent(bS))
+									.addComponent(bS)
+									.addComponent(bInfo))
 								.addComponent(bSSh))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(bDB)
-								.addComponent(bInfo))
+							.addComponent(bDB)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button_8)))
+								.addComponent(AddVizit)))
 						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 							.addComponent(bDelet)
 							.addComponent(bSet))
@@ -1973,12 +1964,33 @@ public class Vvod extends JFrame {
 		 vid_travm = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblvidtravm = new JLabel("Вид травмы");
+		
+		JButton button = new JButton("+");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+			}
+		});
 		GroupLayout gl_pds = new GroupLayout(pds);
 		gl_pds.setHorizontalGroup(
 			gl_pds.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_pds.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pds.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pds.createSequentialGroup()
+							.addComponent(spDiag, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+							.addGap(322))
+						.addGroup(gl_pds.createSequentialGroup()
+							.addGroup(gl_pds.createParallelGroup(Alignment.TRAILING, false)
+								.addGroup(gl_pds.createSequentialGroup()
+									.addComponent(lblvidtravm)
+									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(vid_travm, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE))
+								.addComponent(pvidd, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE))
+							.addGap(18)
+							.addComponent(ppredv, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pds.createSequentialGroup()
 							.addComponent(lblkod)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -1988,27 +2000,25 @@ public class Vvod extends JFrame {
 						.addGroup(gl_pds.createSequentialGroup()
 							.addComponent(lblnamed)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfname, GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE))
-						.addGroup(gl_pds.createSequentialGroup()
-							.addComponent(spDiag, GroupLayout.DEFAULT_SIZE, 452, Short.MAX_VALUE)
-							.addGap(369))
-						.addGroup(gl_pds.createSequentialGroup()
-							.addGroup(gl_pds.createParallelGroup(Alignment.TRAILING, false)
-								.addGroup(gl_pds.createSequentialGroup()
-									.addComponent(lblvidtravm)
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(vid_travm, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE))
-								.addComponent(pvidd, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE))
-							.addGap(18)
-							.addComponent(ppredv, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(tfname, GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_pds.setVerticalGroup(
 			gl_pds.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pds.createSequentialGroup()
 					.addGap(5)
-					.addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
+						.addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button))
+					.addGap(91)
+					.addGroup(gl_pds.createParallelGroup(Alignment.LEADING)
+						.addComponent(ppredv, 0, 0, Short.MAX_VALUE)
+						.addComponent(pvidd, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
+						.addComponent(vid_travm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblvidtravm))
+					.addGap(31)
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblkod)
 						.addComponent(tfkodmkb, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2017,15 +2027,7 @@ public class Vvod extends JFrame {
 					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblnamed)
 						.addComponent(tfname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(27)
-					.addGroup(gl_pds.createParallelGroup(Alignment.LEADING)
-						.addComponent(ppredv, 0, 0, Short.MAX_VALUE)
-						.addComponent(pvidd, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_pds.createParallelGroup(Alignment.BASELINE)
-						.addComponent(vid_travm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblvidtravm))
-					.addGap(259))
+					.addGap(170))
 		);
 		pds.setLayout(gl_pds);
 		
@@ -2069,12 +2071,12 @@ public class Vvod extends JFrame {
 		final JLabel lblzakl = new JLabel("Заключение специалиста");
 		
 		tpzakl = new JEditorPane();
-		tpzakl.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tpzakl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		final JLabel lblrecom = new JLabel("Медицинские рекомендации");
 		
 		 tprecom = new JEditorPane();
-		tprecom.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tprecom.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_pzakl = new GroupLayout(pzakl);
 		gl_pzakl.setHorizontalGroup(
 			gl_pzakl.createParallelGroup(Alignment.LEADING)
@@ -2085,13 +2087,12 @@ public class Vvod extends JFrame {
 							.addComponent(lblzakl)
 							.addContainerGap(701, Short.MAX_VALUE))
 						.addGroup(gl_pzakl.createSequentialGroup()
-							.addComponent(tpzakl, GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE)
-							.addGap(144))
-						.addGroup(gl_pzakl.createSequentialGroup()
 							.addComponent(lblrecom)
 							.addContainerGap(687, Short.MAX_VALUE))
-						.addGroup(gl_pzakl.createSequentialGroup()
-							.addComponent(tprecom, GroupLayout.DEFAULT_SIZE, 659, Short.MAX_VALUE)
+						.addGroup(Alignment.TRAILING, gl_pzakl.createSequentialGroup()
+							.addGroup(gl_pzakl.createParallelGroup(Alignment.TRAILING)
+								.addComponent(tpzakl, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+								.addComponent(tprecom))
 							.addContainerGap())))
 		);
 		gl_pzakl.setVerticalGroup(
