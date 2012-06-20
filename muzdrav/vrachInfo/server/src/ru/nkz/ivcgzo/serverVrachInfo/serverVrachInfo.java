@@ -23,9 +23,13 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRabExistsException;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRabNotFoundException;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ShablonPok;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ShablonRazd;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.ShablonText;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachExistsException;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachNotFoundException;
@@ -38,7 +42,12 @@ public class serverVrachInfo extends Server implements Iface {
 	private static final Class<?>[] vrachTypes = new Class<?>[] {Integer.class, String.class, String.class, String.class, Short.class, Date.class, Short.class, String.class, String.class}; 
 	private static final Class<?>[] mrabTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class}; 
 	private TResultSetMapper<MestoRab, MestoRab._Fields> rsmMrab;
-	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmClf;
+	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+	private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
+	private TResultSetMapper<ShablonRazd, ShablonRazd._Fields> rsmShabRazd;
+	private TResultSetMapper<ShablonPok, ShablonPok._Fields> rsmShabPok;
+	private TResultSetMapper<ShablonText, ShablonText._Fields> rsmShabText;
+	private static final Class<?>[] shabTextTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, String.class, String.class}; 
 	
 	@Override
 	public void start() throws Exception {
@@ -59,7 +68,11 @@ public class serverVrachInfo extends Server implements Iface {
 
 		rsmVrach = new TResultSetMapper<>(VrachInfo.class, "pcod", "fam", "im", "ot", "pol", "datar", "obr", "snils", "idv");
 		rsmMrab = new TResultSetMapper<>(MestoRab.class, "id", "pcod", "clpu", "cslu", "cpodr", "cdol", "datau", "priznd");
-		rsmClf = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
+		rsmShabRazd = new TResultSetMapper<>(ShablonRazd.class, "id", "name");
+		rsmShabPok = new TResultSetMapper<>(ShablonPok.class, "id", "id_razd", "name", "checked");
+		rsmShabText = new TResultSetMapper<>(ShablonText.class, "id", "id_razd", "id_pok", "pcod_s00", "text");
 	}
 
 	@Override
@@ -310,7 +323,7 @@ public class serverVrachInfo extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> getPrizndList() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT * FROM n_priznd ")) {
-			return rsmClf.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -327,6 +340,95 @@ public class serverVrachInfo extends Server implements Iface {
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new TException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_s00() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_s00 ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<ShablonRazd> getShabRazd() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name FROM sh_n_razd ")) {
+			return rsmShabRazd.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<ShablonPok> getShabPok(int id_razd, String cdol) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT p.*, COALESCE(c.checked, FALSE) AS checked FROM sh_n_pok p LEFT JOIN sh_s_cdol c ON (c.id_razd = p.id_razd AND c.id_pok = p.id AND c.pcod_s00 = ?) WHERE p.id_razd = ? ", cdol, id_razd)) {
+			return rsmShabPok.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public void setShabPok(ShablonPok shPok, String cdol) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT checked FROM sh_s_cdol WHERE (id_razd = ?) AND (id_pok = ?) AND (pcod_s00 = ?) ", shPok.getId_razd(), shPok.getId(), cdol)) {
+			if (!acrs.getResultSet().next())
+				sme.execPrepared("INSERT INTO sh_s_cdol VALUES (?, ?, ?, ?) ", false, shPok.getId_razd(), shPok.getId(), cdol, shPok.checked);
+			else
+				sme.execPrepared("UPDATE sh_s_cdol SET checked = ? WHERE (id_razd = ?) AND (id_pok = ?) AND (pcod_s00 = ?) ", false, shPok.checked, shPok.getId_razd(), shPok.getId(), cdol);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
+	}
+	
+	@Override
+	public List<ShablonText> getShablonTexts(ShablonPok shPok, String cdol) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT t.* FROM sh_s_text t JOIN sh_s_cdol c ON (c.id_razd = t.id_razd AND c.id_pok = t.id_pok AND c.pcod_s00 = t.pcod_s00) WHERE c.checked = true AND c.id_razd = ? AND c.id_pok = ? AND c.pcod_s00 = ? ", shPok.getId_razd(), shPok.getId(), cdol)) {
+			return rsmShabText.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<ShablonText> getShablonTextsEdit(ShablonPok shPok, String cdol) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM sh_s_text WHERE id_razd = ? AND id_pok = ? AND pcod_s00 = ? ", shPok.getId_razd(), shPok.getId(), cdol)) {
+			return rsmShabText.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public int addShablonText(ShablonText shText) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+				sme.execPreparedT("INSERT INTO sh_s_text (id_razd, id_pok, pcod_s00, text) VALUES (?, ?, ?, ?) ", true, shText, shabTextTypes, 1, 2, 3, 4);
+				int id = sme.getGeneratedKeys().getInt("id");
+				sme.setCommit();
+				return id;
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public void updateShablonText(ShablonText shText) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("UPDATE sh_s_text SET text = ? WHERE (id = ?) ", false, shText.getText(), shText.getId());
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new TException();
+		}
+	}
+
+	@Override
+	public void setShabPokGrup(ShablonRazd shRazd, String cdol, boolean value) throws TException {
+		for (ShablonPok shPok : getShabPok(shRazd.getId(), cdol)) {
+			shPok.setChecked(value);
+			setShabPok(shPok, cdol);
 		}
 	}
 
