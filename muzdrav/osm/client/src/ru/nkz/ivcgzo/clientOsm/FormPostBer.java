@@ -100,7 +100,6 @@ public class FormPostBer extends JFrame {
     JCheckBox CBAkush; 
     JCheckBox CBIiiiv; 
     JCheckBox CBRazrProm; 
-    private JTextField tdatapos;
 	/**
 	 * Launch the application.
 	 */
@@ -465,7 +464,6 @@ public class FormPostBer extends JFrame {
 			rdsl.setDataosl( SDataOsl.getDate().getTime());
 			rdsl.setDatasn( SDataSn.getDate().getTime());
 			rdsl.setDatay(SDataPos.getDate().getTime());
-//			rdsl.setDatay(DateFormat.Field.);
 			rdsl.setKont(iw3);
 			rdsl.setDeti((int) SKolDet.getModel().getValue());
 			rdsl.setDsp((int) SDsp.getModel().getValue());
@@ -510,8 +508,6 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-		tdatapos = new JTextField();
-		tdatapos.setText(DateFormat.getDateInstance().format(new Date(111111111)));
 
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
@@ -535,7 +531,7 @@ public class FormPostBer extends JFrame {
 								.addGroup(gl_panel.createSequentialGroup()
 									.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tdatapos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							/*		.addComponent(tdatapos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)*/)
 								.addComponent(TNKart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 									.addGroup(gl_panel.createSequentialGroup()
@@ -591,8 +587,7 @@ public class FormPostBer extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(LDatap)
-								.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(tdatapos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(LDataMes)
@@ -811,17 +806,18 @@ public class FormPostBer extends JFrame {
 		SDtroch.setValue(rdsl.getDTroch());
 		SCext.setValue(rdsl.getCext());
 		SindSol.setValue(rdsl.getIndSol());
-		SDataPos.setValue(rdsl.getDatay());
+		SDataPos.setDate(rdsl.getDatay());
+		SDataSn.setDate(rdsl.getDatasn());
+//		SDataRod.setDate(rdsl.getDataRod());
 		SParRod.setValue(rdsl.getKolRod());
 		SKolBer.setValue(rdsl.getKolpr());
-		SDataOsl.setValue(rdsl.getDataosl());
+		SDataOsl.setDate(rdsl.getDataosl());
 		SYavka.setValue(rdsl.getYavka1());
-		SDataM.setValue(rdsl.getDataM());
+		SDataM.setDate(rdsl.getDataM());
 		SKolAb.setValue(rdsl.getAbort());
 		SVozMen.setValue(rdsl.getVozMen());
 		SMenC.setValue(rdsl.getPrmen());
 		SKolDet.setValue(rdsl.getDeti());
 		SPolJ.setValue(rdsl.getPolj());
-//		tdatapos.Text(rdsl.getDatay());
 	}
 }

@@ -526,7 +526,7 @@ public class FormRdInf extends JFrame {
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
 		Sbutton.addActionListener(new ActionListener() {
-			private int codobr (int codobr){
+/*			private int codobr (int codobr){
 				if (CBObr.getSelectedItem().equals("Высшее")){codobr = 1;}
 				if (CBObr.getSelectedItem().equals("Незаконченное высшее")){codobr = 2;}
 				if (CBObr.getSelectedItem().equals("Среднее специальное")){codobr = 3;}
@@ -541,7 +541,7 @@ public class FormRdInf extends JFrame {
 				if (CBObr.getSelectedItem().equals("Одна")){codsem = 3;}
 				if (CBObr.getSelectedItem().equals("")){codsem = 0;}
 							return codsem;
-			};
+			};*/
 			private int oslrod (int oslrod){
 		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
 		            if (ChBots.isSelected()){oslrod=oslrod+2;}
