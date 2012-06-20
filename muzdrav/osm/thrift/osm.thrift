@@ -182,7 +182,7 @@ struct PdiagZ{
 	 3: optional i32 npasp;
 	 4: optional string diag;
 	 5: optional i32 cpodr;
-	 6: optional i64 d_post;
+	 6: optional i64 d_vz;
 	 7: optional i32 d_grup;
 	 8: optional i32 ishod;
 	 9: optional i64 dataish;
@@ -192,6 +192,13 @@ struct PdiagZ{
 	13: optional i32 d_grup_s;
 	14: optional i32 cod_sp;
 	15: optional string cdol_ot;
+	16: optional string named;
+	17: optional i32 nmvd;
+	18: optional i32 xzab;
+	19: optional i32 stady;
+	20: optional i32 pat;
+	21: optional i32 prizb;
+	22: optional i32 prizi;
 }
 
 struct PatientCommonInfo {
@@ -418,6 +425,26 @@ struct IsslInfo{
 }
 
 
+struct Pdisp{
+	1: optional i32 id_diag;
+	2: optional i32 npasp;
+	3: optional i32 id;
+	4: optional string diag;
+	5: optional i32 pcod;
+	6: optional i64 d_vz;
+	7: optional i32 d_grup;
+	8: optional i32 ishod;
+	9: optional i64 dataish;
+	10: optional i64 datag;
+	11: optional i64 datad; date,
+	12: optional string diag_s;
+	13: optional i32 d_grup_s;
+	14: optional i32 cod_sp;
+	15: optional string cdol_ot;
+	16: optional bool sob;
+	17: optional bool sxoch;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -469,6 +496,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagZ> getPdiagZ(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdateDiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+
+	i32 AddPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
+	
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
