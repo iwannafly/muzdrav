@@ -48,9 +48,10 @@ public class PermForm extends JDialog {
 	 * Create the dialog.
 	 */
 	public PermForm() {
+		setTitle("Доступ к компонентам системы");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/icon_2_32x32.png")));
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		setBounds(100, 100, 778, 300);
+		setBounds(100, 100, 778, 419);
 		
 		JPanel gbPass = new JPanel();
 		gbPass.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Управление паролями к системе", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -63,7 +64,7 @@ public class PermForm extends JDialog {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(gbPerm, GroupLayout.PREFERRED_SIZE, 750, Short.MAX_VALUE)
+						.addComponent(gbPerm, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 750, Short.MAX_VALUE)
 						.addComponent(gbPass, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE))
 					.addContainerGap())
 		);
@@ -71,9 +72,9 @@ public class PermForm extends JDialog {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(gbPass, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+					.addComponent(gbPass, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(gbPerm, GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)
+					.addComponent(gbPerm, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
@@ -83,18 +84,21 @@ public class PermForm extends JDialog {
 		GroupLayout gl_gbPerm = new GroupLayout(gbPerm);
 		gl_gbPerm.setHorizontalGroup(
 			gl_gbPerm.createParallelGroup(Alignment.LEADING)
-				.addComponent(pnlPermBtn, GroupLayout.DEFAULT_SIZE, 1049, Short.MAX_VALUE)
 				.addGroup(gl_gbPerm.createSequentialGroup()
-					.addComponent(pnlPermChb, GroupLayout.PREFERRED_SIZE, 724, Short.MAX_VALUE)
+					.addContainerGap()
+					.addGroup(gl_gbPerm.createParallelGroup(Alignment.LEADING)
+						.addComponent(pnlPermBtn, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
+						.addComponent(pnlPermChb, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 714, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_gbPerm.setVerticalGroup(
-			gl_gbPerm.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_gbPerm.createSequentialGroup()
+			gl_gbPerm.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_gbPerm.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(pnlPermChb, GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlPermBtn, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE))
+					.addComponent(pnlPermChb, GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(pnlPermBtn, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
 		);
 		
 		JButton btnSetPerm = new JButton("Изменить доступ");
@@ -117,15 +121,15 @@ public class PermForm extends JDialog {
 		gl_pnlPermBtn.setHorizontalGroup(
 			gl_pnlPermBtn.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, gl_pnlPermBtn.createSequentialGroup()
-					.addContainerGap(535, Short.MAX_VALUE)
+					.addContainerGap(545, Short.MAX_VALUE)
 					.addComponent(btnSetPerm, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		gl_pnlPermBtn.setVerticalGroup(
 			gl_pnlPermBtn.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_pnlPermBtn.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(btnSetPerm)
+				.addGroup(gl_pnlPermBtn.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(btnSetPerm, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		pnlPermBtn.setLayout(gl_pnlPermBtn);
@@ -144,10 +148,17 @@ public class PermForm extends JDialog {
 		pnlPermChb.add(chbLds);
 
 		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Информация о пациентах больницы1111", 5);
+		chbRegPat.setText("Регистрация пациентов больницы");
 		pnlPermChb.add(chbRegPat);
 
 		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6);
 		pnlPermChb.add(chbMss);
+
+		TaggedJCheckBox chbClasVIew = new TaggedJCheckBox("Просмотр и выбор из классификатора", 7);
+		pnlPermChb.add(chbClasVIew);
+
+		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8);
+		pnlPermChb.add(chbGenTal);
 
 		gbPerm.setLayout(gl_gbPerm);
 		
@@ -211,18 +222,25 @@ public class PermForm extends JDialog {
 					.addGap(18)
 					.addComponent(btnPassReq, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(btnPassDel, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
-					.addGap(12))
+					.addComponent(btnPassDel, GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		gl_gbPass.setVerticalGroup(
 			gl_gbPass.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_gbPass.createParallelGroup(Alignment.BASELINE)
-					.addComponent(lblLog)
-					.addComponent(tbLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addComponent(lblPass)
-					.addComponent(tbPass, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addComponent(btnPassReq)
-					.addComponent(btnPassDel))
+				.addGroup(gl_gbPass.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_gbPass.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnPassDel, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+						.addComponent(btnPassReq, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addGroup(gl_gbPass.createSequentialGroup()
+							.addGap(3)
+							.addComponent(tbPass))
+						.addComponent(lblPass)
+						.addGroup(gl_gbPass.createSequentialGroup()
+							.addGap(3)
+							.addComponent(tbLog))
+						.addComponent(lblLog))
+					.addGap(12))
 		);
 		gbPass.setLayout(gl_gbPass);
 		getContentPane().setLayout(groupLayout);

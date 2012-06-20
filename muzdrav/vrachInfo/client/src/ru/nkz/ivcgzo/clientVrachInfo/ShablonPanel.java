@@ -179,7 +179,7 @@ public class ShablonPanel extends JPanel {
 		}
 		
 		treeShablon.setModel(new DefaultTreeModel(root));
-		treeShablon.setSelectionPath(new TreePath(root.getPath()));
+		treeShablon.setSelectionPath(new TreePath(((DefaultMutableTreeNode) root.getFirstChild()).getPath()));
 	}
 	
 	private void showShablonTextNodes(ShabonPokTreeItem shPokNode) {
@@ -505,7 +505,7 @@ public class ShablonPanel extends JPanel {
 				
 				if (cmp instanceof JTextComponent) {
 					Rectangle r = tree.getPathBounds(new TreePath(((DefaultMutableTreeNode) value).getPath()));
-					cmp.setPreferredSize(new Dimension(tree.getWidth() - r.x, cmp.getHeight()));
+					cmp.setPreferredSize(new Dimension(tree.getWidth() - r.x, cmp.getPreferredSize().height));
 					tree.revalidate();
 				}
 				return cmp;
