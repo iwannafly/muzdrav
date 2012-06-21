@@ -169,47 +169,51 @@ public class PInfo extends JFrame {
 						}
 		 						 			}
 		 			else
-//		 				if (lastPath.toString() ==  "Анамнез жизни"){
-//		 					Psign psign;
-//		 					try {
-//								psign = MainForm.tcl.getPatientMiscInfo(MainForm.table.getSelectedItem().npasp);
-//								addLineToDetailInfo("Группа крови", psign.getGrup());
-//								addLineToDetailInfo("Резус-фактор", psign.getPh());
-//								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
-//								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
-//								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-//								addLineToDetailInfo("Вредные привычки", psign.getVred());
-//								addLineToDetailInfo("Развитие", psign.getRazv());
-//								addLineToDetailInfo("Условия проживания", psign.getUslov());
-//								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
-//								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
-//								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
-//								addLineToDetailInfo("Наследственность", psign.getNasl());
-//								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
-//								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
-//								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
-//								eptxt.setText(sb.toString());
-//							} catch (PatientNotFoundException e1) {
-//								e1.printStackTrace();
-//							}
-//		 				}
-//		 				else
+		 				if (lastPath.toString() ==  "Анамнез жизни"){
+		 					Psign psign;
+		 					try {
+								psign = MainForm.tcl.getPatientMiscInfo(MainForm.table.getSelectedItem().npasp);
+								addLineToDetailInfo("Группа крови", psign.getGrup());
+								addLineToDetailInfo("Резус-фактор", psign.getPh());
+								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
+								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
+								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
+								addLineToDetailInfo("Вредные привычки", psign.getVred());
+								addLineToDetailInfo("Развитие", psign.getRazv());
+								addLineToDetailInfo("Условия проживания", psign.getUslov());
+								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
+								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
+								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
+								addLineToDetailInfo("Наследственность", psign.getNasl());
+								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
+								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
+								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
+								eptxt.setText(sb.toString());
+							} catch (PatientNotFoundException e1) {
+								e1.printStackTrace();
+							}
+		 				}
+		 				else
 		 		if (lastPath instanceof PdiagTreeNode) {
 		 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
 		 			PdiagZ pdiag = pdiagNode.pdiag;
 					addLineToDetailInfo("Поликлиника",getValueFromClassifier(MainForm.tcl.get_n_n00(),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
-					addLineToDetailInfo("Диагноз", pdiag.isSetDiag(),pdiag.getDiag());
-					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_post(), DateFormat.getDateInstance().format(new Date(pdiag.getD_post())));
-					addLineToDetailInfo("Группа д/у", pdiag.isSetD_grup(), pdiag.getD_grup());
-					addLineToDetailInfo("Исход д/у ",pdiag.isSetD_grup(),pdiag.getD_grup());
+					addLineToDetailInfo("Медицинское описание", pdiag.isSetNamed(),pdiag.getNamed());
+					addLineToDetailInfo("Дата регистрации", pdiag.isSetDatad(),pdiag.getDatad());
+					addLineToDetailInfo("Обстоятельства регистрации", getValueFromClassifier(MainForm.tcl.get_n_abv(),pdiag.isSetNmvd(),pdiag.getNmvd()));
+					addLineToDetailInfo("Характер заболевания", getValueFromClassifier(MainForm.tcl.get_n_abx(),pdiag.isSetXzab(),pdiag.getXzab()));
+					addLineToDetailInfo("Стадия заболевания", getValueFromClassifier(MainForm.tcl.get_n_aby(),pdiag.isSetStady(),pdiag.getStady()));
+					addLineIf("Состоит на д.учете: состоит", pdiag.isSetDisp(), pdiag.getDisp());
+					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_vz(), DateFormat.getDateInstance().format(new Date(pdiag.getD_vz())));
+					addLineToDetailInfo("Группа д/у", getValueFromClassifier(MainForm.tcl.get_n_abc(),pdiag.isSetD_grup(),pdiag.getD_grup()));
+					addLineToDetailInfo("Исход д/у", getValueFromClassifier(MainForm.tcl.get_n_abb(),pdiag.isSetIshod(),pdiag.getIshod()));
 		 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
-					addLineToDetailInfo("Дата установления/изменения группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
-	 				addLineToDetailInfo("Дата установления/изменения диагноза д/у", pdiag.isSetDatad(), DateFormat.getDateInstance().format(new Date(pdiag.getDatad())));
-		 			addLineToDetailInfo("Старый диагноз (до изменения)", pdiag.isSetDiag_s(),pdiag.getDiag_s());
-					addLineToDetailInfo("Старая группа д/у", pdiag.isSetD_grup_s(), pdiag.getD_grup_s());
+					addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
 	 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
 					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(MainForm.tcl.get_n_s00(),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
-
+					addLineIf("Противопоказания к вынашиванию беременности: имеются", pdiag.isSetPat(), pdiag.getPat());
+					addLineIf("Участие в боевых действиях: +", pdiag.isSetPrizb(), pdiag.getPrizb());
+					addLineIf("Инвалидизующий диагноз: +", pdiag.isSetPrizi(), pdiag.getPrizi());
 					eptxt.setText(sb.toString());
 		 			} 			
 		 				else
@@ -399,11 +403,11 @@ public class PInfo extends JFrame {
 	private DefaultMutableTreeNode createNodes() {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
 		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
-//		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
+		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
 		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
 		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
 		root.add(patinfo);
-//		root.add(signinfo);
+		root.add(signinfo);
 		root.add(posinfo);
 		root.add(diaginfo);
 		
@@ -524,6 +528,12 @@ public class PInfo extends JFrame {
 		sb.append(name + lineSep);
 	}
 	
+	private void addLineIf(String name, boolean isSet, Object value) {
+		if (isSet)
+			if ((name != null) && (value != null))
+				if ((name.length() > 0) && (value.toString().length() > 0))
+					sb.append(String.format("%s: %s%s", name, lineSep));
+	}
 
 	
 }
