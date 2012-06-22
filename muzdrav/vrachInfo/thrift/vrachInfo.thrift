@@ -117,7 +117,7 @@ service ThriftServerVrachInfo extends kmiacServer.KmiacServer {
 /**
  * Обновление информации о месте работы.
  */
-	void UpdMrab(1: MestoRab mr) throws (1: MestoRabExistsException mee);
+	void UpdMrab(1: MestoRab mr, 2: i32 user_id) throws (1: MestoRabExistsException mee);
 
 /**
  * Удаление места работы.

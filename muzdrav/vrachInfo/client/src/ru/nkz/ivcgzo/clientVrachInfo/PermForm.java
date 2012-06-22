@@ -27,11 +27,13 @@ import javax.swing.border.TitledBorder;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 
 public class PermForm extends JDialog {
 	private static final long serialVersionUID = 5320450245161207797L;
+	
 	private static final String frameTitle = "Установка прав пользователя";
 	private VrachInfo vInf;
 	private MestoRab mRab;
@@ -43,6 +45,7 @@ public class PermForm extends JDialog {
 	private JButton btnPassDel;
 	private boolean opened;
 	private boolean ownRecord;
+	private CsluPdost csluPdost;
 
 	/**
 	 * Create the dialog.
@@ -135,34 +138,34 @@ public class PermForm extends JDialog {
 		pnlPermBtn.setLayout(gl_pnlPermBtn);
 		pnlPermChb.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		
-		TaggedJCheckBox chbVrachinfo = new TaggedJCheckBox("Информация о персонале больницы", 1);
+		TaggedJCheckBox chbVrachinfo = new TaggedJCheckBox("Информация о персонале больницы", 1, CsluPdost.CsluAll);
 		pnlPermChb.add(chbVrachinfo);
 		
-		TaggedJCheckBox chbStationar = new TaggedJCheckBox("Стационар", 2);
+		TaggedJCheckBox chbStationar = new TaggedJCheckBox("Стационар", 2, CsluPdost.CsluStat);
 		pnlPermChb.add(chbStationar);
 				
-		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3);
+		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3, CsluPdost.CsluPol);
 		pnlPermChb.add(chbOsm);
 				
-		TaggedJCheckBox chbLds = new TaggedJCheckBox("Параотделение", 4);
+		TaggedJCheckBox chbLds = new TaggedJCheckBox("Параотделение", 4, CsluPdost.CsluAll);
 		pnlPermChb.add(chbLds);
 
-		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Информация о пациентах больницы1111", 5);
+		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Регистрация пациентов больницы", 5, CsluPdost.CsluAll);
 		chbRegPat.setText("Регистрация пациентов больницы");
 		pnlPermChb.add(chbRegPat);
 
-		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6);
+		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluStat | CsluPdost.CsluPol);
 		pnlPermChb.add(chbMss);
 
-		TaggedJCheckBox chbClasVIew = new TaggedJCheckBox("Просмотр и выбор из классификатора", 7);
+		TaggedJCheckBox chbClasVIew = new TaggedJCheckBox("Просмотр и выбор из классификатора", 7, CsluPdost.CsluNone);
 		pnlPermChb.add(chbClasVIew);
 
-		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8);
+		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8, CsluPdost.CsluPol);
 		pnlPermChb.add(chbGenTal);
 
 		gbPerm.setLayout(gl_gbPerm);
 		
-		tbLog = new JTextField();
+		tbLog = new CustomTextField();
 		tbLog.setColumns(10);
 		
 		JLabel lblLog = new JLabel("Логин");
@@ -184,7 +187,7 @@ public class PermForm extends JDialog {
 			}
 		});
 		
-		tbPass = new JTextField();
+		tbPass = new CustomTextField();
 		tbPass.setEditable(false);
 		tbPass.setColumns(10);
 		
@@ -292,6 +295,8 @@ public class PermForm extends JDialog {
 		vInf = vi;
 		mRab = mr;
 		this.ownRecord = ownRecord;
+		csluPdost = new CsluPdost(mRab.getCslu());
+		
 		setVisible(true);
 	}
 	
@@ -316,7 +321,7 @@ public class PermForm extends JDialog {
 		for (Component cmp : pnlPermChb.getComponents()) {
 			TaggedJCheckBox chb = (TaggedJCheckBox) cmp;
 			
-			perm[chb.getTag()] = (chb.isSelected()) ? '1' : '0';
+			perm[chb.getTag()] = (chb.isSelected() & chb.isEnabled()) ? '1' : '0';
 		}
 		
 		if (ownRecord)
@@ -344,7 +349,17 @@ public class PermForm extends JDialog {
 		for (Component cmp : pnlPermBtn.getComponents()) {
 			cmp.setEnabled(enabled);
 		}
-
+		
+		if (enabled) {
+			for (Component cmp : pnlPermChb.getComponents()) {
+				TaggedJCheckBox chb = (TaggedJCheckBox) cmp;
+				
+				chb.setEnabled(csluPdost.check(chb.getSlu()));
+				if (!chb.isEnabled())
+					chb.setSelected(false);
+			}
+		}
+		
 		if (ownRecord)
 			pnlPermChb.getComponents()[0].setEnabled(false);
 	}
@@ -353,13 +368,37 @@ public class PermForm extends JDialog {
 class TaggedJCheckBox extends JCheckBox {
 	private static final long serialVersionUID = -3972936204425398459L;
 	private final int tag;
+	private final int slu;
 	
-	TaggedJCheckBox(String text, int tag) {
+	TaggedJCheckBox(String text, int tag, int slu) {
 		super(text);
+		
 		this.tag = tag;
+		this.slu = slu;
 	}
 	
 	public int getTag() {
 		return tag;
+	}
+	
+	public int getSlu() {
+		return slu;
+	}
+}
+
+class CsluPdost {
+	public static final int CsluNone = 0;
+	public static final int CsluStat = 1;
+	public static final int CsluPol = 2;
+	public static final int CsluLds = 4;
+	public static final int CsluAll = -1;
+	private int curCslu;
+	
+	public CsluPdost(int curCslu) {
+		this.curCslu = (int) Math.pow(2, curCslu - 1);
+	}
+	
+	public boolean check(int cslu) {
+		return (cslu & curCslu) == curCslu;
 	}
 }

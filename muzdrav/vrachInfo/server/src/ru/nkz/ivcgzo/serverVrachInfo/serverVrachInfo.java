@@ -172,10 +172,11 @@ public class serverVrachInfo extends Server implements Iface {
 	}
 	
 	@Override
-	public void UpdMrab(MestoRab mr) throws MestoRabExistsException, TException {
+	public void UpdMrab(MestoRab mr, int user_id) throws MestoRabExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isMrabExists(mr)) {
 				sme.execPreparedT("UPDATE s_mrab SET cslu = ?, cpodr = ?, cdol = ?, datau = ?, priznd = ? WHERE id = ? ", false, mr, mrabTypes, 3, 4, 5, 6, 7, 0);
+				sme.execPrepared("UPDATE s_users SET cpodr = ? WHERE id = ?", false, mr.getCpodr(), user_id);
 				sme.setCommit();
 			} else
 				throw new MestoRabExistsException();

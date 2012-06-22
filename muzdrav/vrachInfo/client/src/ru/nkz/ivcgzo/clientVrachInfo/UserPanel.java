@@ -139,7 +139,7 @@ public class UserPanel extends JPanel {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<MestoRab> event) {
 				try {
-					MainForm.tcl.UpdMrab(event.getItem());
+					MainForm.tcl.UpdMrab(event.getItem(), MainForm.authInfo.getUser_id());
 					return true;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
