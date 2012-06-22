@@ -35,6 +35,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Client;
@@ -116,7 +117,7 @@ public class MainForm {
 		lblName.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		lblName.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		tbLogin = new JTextField();
+		tbLogin = new CustomTextField();
 		tbLogin.setText("log");
 		tbLogin.setColumns(10);
 		tbLogin.addKeyListener(new KeyAdapter() {
@@ -129,7 +130,7 @@ public class MainForm {
 		
 		JLabel lblLogin = new JLabel("Логин");
 		
-		tbPass = new JTextField();
+		tbPass = new CustomTextField();
 		tbPass.setText("pas");
 		tbPass.setColumns(10);
 		tbPass.addKeyListener(new KeyAdapter() {
@@ -206,7 +207,7 @@ public class MainForm {
 //		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);
 		
 		JLabel lblEnterAs = new JLabel("Вы вошли как:");
-		lblEnterAs.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblEnterAs.setFont(new Font(lblEnterAs.getFont().getFontName(), lblEnterAs.getFont().getStyle(), 16));
 		
 		lblFio = new JLabel("ФИО:");
 		
@@ -215,7 +216,7 @@ public class MainForm {
 		lblPodr = new JLabel("Подр:");
 		
 		JLabel lblAvailSys = new JLabel("Вам доступны следующие модули:");
-		lblAvailSys.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lblAvailSys.setFont(new Font(lblAvailSys.getFont().getFontName(), lblAvailSys.getFont().getStyle(), 16));
 		
 		btnLaunch = new JButton("Запуск");
 		btnLaunch.addActionListener(new ActionListener() {
@@ -245,13 +246,17 @@ public class MainForm {
 				.addGroup(gl_pnlSysSelect.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlSysSelect.createParallelGroup(Alignment.TRAILING)
-						.addComponent(lblEnterAs, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblFio, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblLpu, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(lblPodr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
-						.addComponent(lblAvailSys, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
 						.addComponent(btnLaunch, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
-						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE))
+						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+						.addGroup(gl_pnlSysSelect.createSequentialGroup()
+							.addGap(24)
+							.addComponent(lblEnterAs, GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE))
+						.addGroup(gl_pnlSysSelect.createSequentialGroup()
+							.addGap(24)
+							.addComponent(lblAvailSys, GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_pnlSysSelect.setVerticalGroup(
@@ -268,7 +273,7 @@ public class MainForm {
 					.addGap(18)
 					.addComponent(lblAvailSys, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 171, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnLaunch)
 					.addContainerGap())
@@ -293,9 +298,9 @@ public class MainForm {
 	
 	private void showSelectionPane() {
 		frame.setTitle("Выбор модуля");
-		lblFio.setText(String.format("%s %s", lblFio.getText(), authInfo.name));
-		lblLpu.setText(String.format("%s %d", lblLpu.getText(), authInfo.clpu));
-		lblPodr.setText(String.format("%s %d", lblPodr.getText(), authInfo.cpodr));
+		lblFio.setText(String.format("%s, %s", authInfo.getName(), authInfo.getCdol_name()));
+		lblLpu.setText(authInfo.getClpu_name());
+		lblPodr.setText(authInfo.getCpodr_name());
 		
 		frame.getContentPane().remove(pnlLogin);
 		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);
