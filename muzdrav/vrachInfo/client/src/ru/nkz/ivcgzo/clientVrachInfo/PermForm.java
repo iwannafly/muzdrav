@@ -64,15 +64,15 @@ public class PermForm extends JDialog {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(gbPerm, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 750, Short.MAX_VALUE)
-						.addComponent(gbPass, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE))
+						.addComponent(gbPass, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)
+						.addComponent(gbPerm, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 750, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(gbPass, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+					.addComponent(gbPass, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(gbPerm, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
 					.addContainerGap())
@@ -222,7 +222,7 @@ public class PermForm extends JDialog {
 					.addGap(18)
 					.addComponent(btnPassReq, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(btnPassDel, GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+					.addComponent(btnPassDel, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		gl_gbPass.setVerticalGroup(
@@ -232,15 +232,16 @@ public class PermForm extends JDialog {
 					.addGroup(gl_gbPass.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnPassDel, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
 						.addComponent(btnPassReq, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addGroup(gl_gbPass.createSequentialGroup()
-							.addGap(3)
-							.addComponent(tbPass))
 						.addComponent(lblPass)
 						.addGroup(gl_gbPass.createSequentialGroup()
 							.addGap(3)
-							.addComponent(tbLog))
+							.addComponent(tbLog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addComponent(lblLog))
 					.addGap(12))
+				.addGroup(gl_gbPass.createSequentialGroup()
+					.addGap(14)
+					.addComponent(tbPass, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(12, Short.MAX_VALUE))
 		);
 		gbPass.setLayout(gl_gbPass);
 		getContentPane().setLayout(groupLayout);

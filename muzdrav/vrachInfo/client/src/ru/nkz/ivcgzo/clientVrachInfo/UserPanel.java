@@ -27,6 +27,9 @@ public class UserPanel extends JPanel {
 	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
 	private CustomTable<MestoRab, MestoRab._Fields> tblMrab;
 	private PermForm permForm;
+	private JButton btnVrPerm;
+	private JButton btnMrAdd;
+	private JButton btnMrDel;
 	
 	public UserPanel(boolean adminMode) {
 		super();
@@ -39,8 +42,11 @@ public class UserPanel extends JPanel {
 			public void valueChanged(ListSelectionEvent arg0) {
 				try {
 					if (!arg0.getValueIsAdjusting()) {
-						if (tblVrach.getSelectedItem() != null)
+						if (tblVrach.getSelectedItem() != null) {
 							tblMrab.setData(MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod));
+							btnVrPerm.setEnabled(tblMrab.getRowCount() > 0);
+							btnMrDel.setEnabled(btnVrPerm.isEnabled());
+						}
 					}
 				} catch (TException e) {
 					e.printStackTrace();
@@ -162,7 +168,7 @@ public class UserPanel extends JPanel {
 		});
 		tblMrab.setFillsViewportHeight(true);
 		
-		JButton btnVrPerm = new JButton();
+		btnVrPerm = new JButton();
 		btnVrPerm.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789257_User.png")));
 		btnVrPerm.addActionListener(new ActionListener() {
 			@Override
@@ -180,7 +186,7 @@ public class UserPanel extends JPanel {
 			}
 		});
 
-		JButton btnMrAdd = new JButton();
+		btnMrAdd = new JButton();
 		btnMrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789242_Add.png")));
 		btnMrAdd.addActionListener(new ActionListener() {
 			@Override
@@ -191,7 +197,7 @@ public class UserPanel extends JPanel {
 		});
 		btnMrAdd.setEnabled(tblMrab.isEditable());
 		
-		JButton btnMrDel = new JButton();
+		btnMrDel = new JButton();
 		btnMrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789259_Delete.png")));
 		btnMrDel.addActionListener(new ActionListener() {
 			@Override
