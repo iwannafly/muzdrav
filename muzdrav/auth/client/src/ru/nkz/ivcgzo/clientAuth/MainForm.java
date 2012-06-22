@@ -300,7 +300,7 @@ public class MainForm {
 		frame.setTitle("Выбор модуля");
 		lblFio.setText(String.format("%s, %s", authInfo.getName(), authInfo.getCdol_name()));
 		lblLpu.setText(authInfo.getClpu_name());
-		lblPodr.setText(authInfo.getCpodr_name());
+		lblPodr.setText(String.format("%s, %s", authInfo.getCpodr_name(), authInfo.getCslu_name()));
 		
 		frame.getContentPane().remove(pnlLogin);
 		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);

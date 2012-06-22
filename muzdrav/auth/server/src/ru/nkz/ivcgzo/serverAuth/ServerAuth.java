@@ -38,7 +38,7 @@ public class ServerAuth extends Server implements Iface {
 	public ServerAuth(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config", "cdol", "cdol_name", "name_short", "cpodr_name", "clpu_name");
+		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config", "cdol", "cdol_name", "name_short", "cpodr_name", "clpu_name", "cslu", "cslu_name");
 		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size");
 		
 		scMan = new SocketManager(5, Constants.bufSize);
@@ -73,7 +73,32 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public UserAuthInfo auth(String login, String password) throws UserNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config, r.cdol, s.name AS cdol_name, get_short_fio(v.fam, v.im, v.ot) AS name_short, n.name AS cpodr_name, m.name AS clpu_name FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr) JOIN n_s00 s ON (s.pcod = r.cdol) JOIN n_m00 m ON (m.pcod = u.clpu) JOIN n_n00 n ON (n.pcod = u.cpodr) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
+		String cpodrTableName;
+		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT p.pcod FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr)  JOIN n_p0s p ON (r.cslu = p.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
+			if (acrs.getResultSet().next())
+				switch (acrs.getResultSet().getInt(1)) {
+				case 1:
+					cpodrTableName = "n_o00";
+					break;
+				case 2:
+					cpodrTableName = "n_n00";
+					break;
+				case 3:
+					cpodrTableName = "n_lds";
+					break;
+				default:
+					throw new UserNotFoundException();
+				}
+			else
+				throw new UserNotFoundException();
+		} catch (SQLException e) {
+			// TODO: handle exception
+			throw new TException(e);
+		}
+		
+		String sql = String.format("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config, r.cdol, s.name AS cdol_name, get_short_fio(v.fam, v.im, v.ot) AS name_short, cpn.name AS cpodr_name, m.name AS clpu_name, p.pcod AS cslu, p.name AS cslu_name FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr) JOIN n_s00 s ON (s.pcod = r.cdol) JOIN n_m00 m ON (m.pcod = u.clpu) JOIN %s cpn ON (cpn.pcod = u.cpodr) JOIN n_p0s p ON (r.cslu = p.pcod) WHERE (u.login = ?) AND (u.password = ?) ", cpodrTableName);
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, login, password)) {
 			if (acrs.getResultSet().next())
 				return rsmAuth.map(acrs.getResultSet());
 			else

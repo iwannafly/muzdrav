@@ -16,6 +16,8 @@ struct UserAuthInfo {
 	10: string name_short;
 	11: string cpodr_name;
 	12: string clpu_name;
+	13: i32 cslu;
+	14: string cslu_name;
 }
 
 /**
