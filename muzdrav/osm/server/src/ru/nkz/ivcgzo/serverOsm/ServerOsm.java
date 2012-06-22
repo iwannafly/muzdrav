@@ -18,6 +18,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
+import ru.nkz.ivcgzo.serverManager.common.ResultSetMapper;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
@@ -36,6 +37,7 @@ import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
+import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
@@ -102,7 +104,9 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] anamZabTypes; 
 	private final TResultSetMapper<IsslInfo, IsslInfo._Fields> rsmIsslInfo;
 	@SuppressWarnings("unused")
-	private final Class<?>[] isslInfoTypes; 
+	private final Class<?>[] isslInfoTypes;
+	private final ResultSetMapper<Integer> rsmInt;
+	
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -160,6 +164,8 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cp0e1",       "np0e1",      "cldi",       "nldi",       "zpok",       "datav");
 		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class};
+		
+		rsmInt = new ResultSetMapper<>(Integer.class);
 	}
 
 	@Override
@@ -1037,6 +1043,51 @@ public class ServerOsm extends Server implements Iface {
 			return rsmPdiagAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public void UpdateDiagZ(PdiagZ dz) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int AddPdisp(Pdisp disp) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void UpdatePdisp(Pdisp disp) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<IntegerClassifier> getShablonTexts(int id_razd, int id_pok, String pcod_s00) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT t.id AS pcod, t.text AS name FROM sh_s_text t JOIN sh_s_cdol c ON (c.id_razd = t.id_razd AND c.id_pok = t.id_pok AND c.pcod_s00 = t.pcod_s00) WHERE c.checked = true AND c.id_razd = ? AND c.id_pok = ? AND c.pcod_s00 = ? ", id_razd, id_pok, pcod_s00)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShablonCdol(int id_razd, String pcod_s00) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id_pok AS pcod, pcod_s00 AS name FROM sh_s_cdol WHERE checked = true AND id_razd = ? AND pcod_s00 = ? ", id_razd, pcod_s00)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getPokNames() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id AS pcod, name FROM sh_n_pok ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
 		}
 	}
 }

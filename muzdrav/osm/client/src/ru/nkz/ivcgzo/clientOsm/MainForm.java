@@ -88,7 +88,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
 		
-		vvod = new Vvod();
 		patInfoView = new PatientInfoViewMainForm(conMan, authInfo);
 	}
 
@@ -108,6 +107,9 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					return;
 				}
 				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+				
+				if (vvod == null)
+					vvod = new Vvod();
 				vvod.onConnect();
 			} catch (KmiacServerException | ParseException e) {
 				// TODO Auto-generated catch block

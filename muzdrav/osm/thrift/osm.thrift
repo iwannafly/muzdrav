@@ -199,6 +199,7 @@ struct PdiagZ{
 	20: optional i32 pat;
 	21: optional i32 prizb;
 	22: optional i32 prizi;
+	23: optional i32 disp;
 }
 
 struct PatientCommonInfo {
@@ -436,7 +437,7 @@ struct Pdisp{
 	8: optional i32 ishod;
 	9: optional i64 dataish;
 	10: optional i64 datag;
-	11: optional i64 datad; date,
+	11: optional i64 datad; 
 	12: optional string diag_s;
 	13: optional i32 d_grup_s;
 	14: optional i32 cod_sp;
@@ -444,6 +445,7 @@ struct Pdisp{
 	16: optional bool sob;
 	17: optional bool sxoch;
 }
+
 
 exception PvizitNotFoundException {
 }
@@ -553,6 +555,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	list<Pvizit> getPvizitInfo(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
+
+//templates
+	list<classifier.IntegerClassifier> getShablonTexts(1: i32 id_razd, 2: i32 id_pok, 3: string pcod_s00) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShablonCdol(1: i32 id_razd, 2: string pcod_s00) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getPokNames() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	list<RdSlStruct> getRdSlInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);

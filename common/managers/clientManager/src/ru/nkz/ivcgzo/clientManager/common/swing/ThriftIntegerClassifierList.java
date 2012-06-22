@@ -6,32 +6,32 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 
 /**
  * Параметризированный класс для работы со списками swing. В качестве параметра должна
  * указываться thrift-структура.
  * @author bsv798
  *
- * @param <T> - thrift-структура {@link StringClassifier}
+ * @param <T> - thrift-структура {@link IntegerClassifier}
  */
-public class ThriftStringClassifierList<T extends StringClassifier> extends JList<StringClassifier> {
-	private static final long serialVersionUID = 677069909690689690L;
-	private List<StringClassifier> items;
+public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
+	private static final long serialVersionUID = -873049270461876460L;
+	private List<IntegerClassifier> items;
 	private StringListModel model;
 	
 	/**
 	 * Конструктор списка.
 	 */
-	public ThriftStringClassifierList() {
-		this(new ArrayList<StringClassifier>());
+	public ThriftIntegerClassifierList() {
+		this(new ArrayList<IntegerClassifier>());
 	}
 	
 	/**
 	 * Конструктор списка.
 	 * @param list - список из thrift-структур для отображения
 	 */
-	public ThriftStringClassifierList(List<StringClassifier> list) {
+	public ThriftIntegerClassifierList(List<IntegerClassifier> list) {
 		setModel();
 		setData(list);
 	}
@@ -44,10 +44,10 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	/**
 	 * Устанавливает список для отображения. 
 	 */
-	public void setData(List<StringClassifier> list) {
+	public void setData(List<IntegerClassifier> list) {
 		items = new ArrayList<>(list.size());
-		for (StringClassifier item : list) {
-			items.add(new StringClassifierItem(item));
+		for (IntegerClassifier item : list) {
+			items.add(new IntegerClassifierItem(item));
 		}
 		model.fireContentsChanged();
 	}
@@ -56,11 +56,11 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	 * Получает выбранный объект.
 	 */
 	@Override
-	public StringClassifier getSelectedValue() {
+	public IntegerClassifier getSelectedValue() {
 		Object selItem = super.getSelectedValue();
 		
-		if (selItem instanceof StringClassifier)
-			return (StringClassifier) selItem;
+		if (selItem instanceof IntegerClassifier)
+			return (IntegerClassifier) selItem;
 		else
 			return null;
 	}
@@ -68,7 +68,7 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	/**
 	 * Получает выбранный пользовательский код. 
 	 */
-	public String getSelectedPcod() {
+	public int getSelectedPcod() {
 		return getSelectedValue().pcod;
 	}
 	
@@ -76,11 +76,11 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	 * Устанавливает объект на основе пользовательского кода. Выбрасывает {@link RuntimeException},
 	 * если такой код не найден.  
 	 */
-	public void setSelectedPcod(String pcod) {
-		StringClassifier selItem = null;
+	public void setSelectedPcod(int pcod) {
+		IntegerClassifier selItem = null;
 		
-		for (StringClassifier item : items) {
-			if (item.pcod.equals(pcod)) {
+		for (IntegerClassifier item : items) {
+			if (item.pcod == pcod) {
 				selItem = item;
 				break;
 			}
@@ -92,11 +92,11 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 			setSelectedValue(selItem, true);
 	}
 	
-	class StringListModel extends DefaultListModel<StringClassifier> {
-		private static final long serialVersionUID = -2344352512126576791L;
+	class StringListModel extends DefaultListModel<IntegerClassifier> {
+		private static final long serialVersionUID = -5142318941761484444L;
 
 		@Override
-		public StringClassifier getElementAt(int index) {
+		public IntegerClassifier getElementAt(int index) {
 			return items.get(index);
 		}
 		
@@ -106,14 +106,14 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 		}
 		
 		public void fireContentsChanged() {
-			super.fireContentsChanged(ThriftStringClassifierList.this, 0, getSize() - 1);
+			super.fireContentsChanged(ThriftIntegerClassifierList.this, 0, getSize() - 1);
 		}
 	}
 	
-	class StringClassifierItem extends StringClassifier {
-		private static final long serialVersionUID = -7379841009003710937L;
+	class IntegerClassifierItem extends IntegerClassifier {
+		private static final long serialVersionUID = 8395296885089622783L;
 
-		private StringClassifierItem(StringClassifier item) {
+		private IntegerClassifierItem(IntegerClassifier item) {
 			super(item);
 		}
 		
