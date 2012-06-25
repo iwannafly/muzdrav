@@ -501,8 +501,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 
-	i32 AddPdisp(1: Pdisp id_diag) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdatePdisp(1: Pdisp id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePdisp(1: Pdisp diag) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
 	
 
