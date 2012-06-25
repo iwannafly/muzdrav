@@ -1981,8 +1981,8 @@ public class Vvod extends JFrame {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()){
-					if (TabPos.getSelectedItem()!= null) {
-						
+					if (TabDiag.getSelectedItem()!= null) {
+						diagamb = TabDiag.getSelectedItem();
 					}
 				}
 			}
@@ -2005,7 +2005,7 @@ public class Vvod extends JFrame {
 					  		diagamb.setDatap(System.currentTimeMillis());
 					  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
 					  		diagamb.setCdol(MainForm.authInfo.getCdol());
-								MainForm.tcl.AddPdiagAmb(diagamb);
+							diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
 							} catch (KmiacServerException e1) {
 								e1.printStackTrace();
 							} catch (TException e1) {
