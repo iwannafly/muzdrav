@@ -459,6 +459,11 @@ exception PriemNotFoundException {
 exception PatientNotFoundException {
 }
 
+exception PdiagNotFoundException {
+}
+
+exception PdispNotFoundException {
+}
 
 /**
  * 
@@ -499,13 +504,13 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	//i32 AddPdiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagZ> getPdiagzProsm(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	//void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
-	void setPdiag(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
-	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
+	void setPdiag(1: PdiagZ diag) throws (1: kmiacServer.KmiacServerException kse);
+	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
 	//i32 AddPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	//void UpdatePdisp(1: Pdisp diag) throws (1: kmiacServer.KmiacServerException kse);
 	void setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
 	
 
 	/*Исследования*/
