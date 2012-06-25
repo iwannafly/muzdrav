@@ -3,22 +3,19 @@ package ru.nkz.ivcgzo.clientOsm;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.StringReader;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JComponent;
+import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,7 +26,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.JViewport;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -65,11 +61,6 @@ import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import javax.swing.JComboBox;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JCheckBox;
-import java.awt.Font;
-import javax.swing.JList;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
@@ -77,16 +68,14 @@ public class Vvod extends JFrame {
 	private static Pvizit pvizit;
 	private static PvizitAmb pvizitAmb;
 	private static PdiagAmb diagamb;
-	private static PdiagZ pdiagz;
+	private static PdiagZ pdiag;
 	private static Priem priem;
 	private static AnamZab anamZab;
 	private static Pdisp pdisp;
 	private FormSign sign;
 	private PrintForm printform;
-	private SettingsOsm settingsosm;
 	private FormPostBer postber;
 	private JPanel pzakl;
-	private PdiagZ dz;
 	private JPanel Jalob;
 	private JTextField tftemp;
 	private JTextField tfad;
@@ -165,7 +154,7 @@ public class Vvod extends JFrame {
 	private PInfo pinfo;
 	private JTextField tfDvz;
 	public static List<IntegerClassifier> pokNames;
-	
+	private JCheckBox cbDisp;
 	
 	/**
 	 * Create the frame.
@@ -180,8 +169,8 @@ public class Vvod extends JFrame {
 		
 		 sign = new FormSign();
 //		 postber = new FormPostBer();
-		 settingsosm = new SettingsOsm();
-		 dz = new PdiagZ();
+//		 settingsosm = new SettingsOsm();
+//		 dz = new PdiagZ();
 		 printform = new PrintForm();
 		setBounds(100, 100, 1029, 747);
 		
@@ -315,15 +304,11 @@ public class Vvod extends JFrame {
 					MainForm.tcl.UpdatePvizit(pvizit);
 					MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 				} catch (KmiacServerException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (TException e1) {
 					e1.printStackTrace();
 					MainForm.conMan.reconnect(e1);
 				}
-				//pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
-//				pr.setOsmotr("<Жалобы> "+tpJalob.getText()+" <Анамнез заболевания> "+tpanamn.getText()+" <StatusPraesense> Темп. "+tftemp.getText()+"Чсс "+tfchss.getText()+"<StatusPraesense> АД "+tfad.getText()+"Рост "+tfrost.getText()+"Вес "+tfves.getText()+" <Физикальное обсл.> "+tposm.getText()+" "+tpaus.getText()+" "+tppalp.getText()+" "+tpperk.getText());
-
 			}
 		});
 		
@@ -409,10 +394,8 @@ public class Vvod extends JFrame {
 						disableTextFields(selPan);
 					}
 				} catch (KmiacServerException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				System.out.println(tabbedPane.getSelectedIndex());
@@ -1270,7 +1253,6 @@ public class Vvod extends JFrame {
 					TabPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
 					TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
 				} catch (KmiacServerException e2) {
-					// TODO Auto-generated catch block
 					e2.printStackTrace();
 				} catch (PvizitNotFoundException e2) {
 					try {
@@ -1279,7 +1261,6 @@ public class Vvod extends JFrame {
 						TabPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
 						TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
 					} catch (KmiacServerException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (TException e) {
 						MainForm.conMan.reconnect(e);
@@ -2015,9 +1996,22 @@ public class Vvod extends JFrame {
 				 JButton bAddDiag = new JButton("+");
 				 bAddDiag.addActionListener(new ActionListener() {
 				 	public void actionPerformed(ActionEvent e) {
-				 	//	try {
-				 			TabDiag.requestFocus();
+				 		TabDiag.requestFocus();
 				 			TabDiag.addItem();
+					  		try {
+ 					  		diagamb = new PdiagAmb();
+					  		diagamb.setId_obr(zapVr.getId_pvizit());
+					  		diagamb.setNpasp(zapVr.getNpasp());
+					  		diagamb.setDatap(System.currentTimeMillis());
+					  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
+					  		diagamb.setCdol(MainForm.authInfo.getCdol());
+								MainForm.tcl.AddPdiagAmb(diagamb);
+							} catch (KmiacServerException e1) {
+								e1.printStackTrace();
+							} catch (TException e1) {
+								MainForm.conMan.reconnect(e1);
+							}
+
 
 				 	}	
 
@@ -2029,9 +2023,9 @@ public class Vvod extends JFrame {
 				  
 				  JPanel pStady = new JPanel();
 				  pStady.setBorder(new TitledBorder(null, "\u0421\u0442\u0430\u0434\u0438\u044F \u0437\u0430\u0431\u043E\u043B\u0435\u0432\u0430\u043D\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLACK));
-				  JRadioButton rbRan = new JRadioButton("Ранняя", false);
+				  final JRadioButton rbRan = new JRadioButton("Ранняя", false);
 				  
-				  JRadioButton rbPoz = new JRadioButton("Поздняя", false);
+				  final JRadioButton rbPoz = new JRadioButton("Поздняя", false);
 				  pStady.add(rbRan);
 				  pStady.add(rbPoz);
 				  GBoxStady.add(rbRan);
@@ -2039,10 +2033,10 @@ public class Vvod extends JFrame {
 				  
 				  JPanel pXzab = new JPanel();
 				  pXzab.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0425\u0430\u0440\u0430\u043A\u0442\u0435\u0440 \u0437\u0430\u0431\u043E\u043B\u0435\u0432\u0430\u043D\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-				  JRadioButton rbOstr = new JRadioButton("Острое", false);
+				  final JRadioButton rbOstr = new JRadioButton("Острое", false);
 				  pXzab.add(rbOstr);
 				  
-				  JRadioButton rbHron = new JRadioButton("Хроническое", false);
+				  final JRadioButton rbHron = new JRadioButton("Хроническое", false);
 				  pXzab.add(rbHron);
 				  GBoxHar.add(rbOstr);
 				  GBoxHar.add(rbHron);
@@ -2050,45 +2044,65 @@ public class Vvod extends JFrame {
 				  JPanel pDisp = new JPanel();
 				  pDisp.setBorder(new TitledBorder(null, "\u0414\u0438\u0441\u043F\u0430\u043D\u0441\u0435\u0440\u043D\u044B\u0439 \u0443\u0447\u0435\u0442", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLACK));
 				  
-				  JCheckBox cbPatol = new JCheckBox("Патология, имеющая абсолютные противопоказания к вынашиванию беременности");
+				  final JCheckBox cbPatol = new JCheckBox("Патология, имеющая абсолютные противопоказания к вынашиванию беременности");
 				  
-				  JCheckBox cbPriznb = new JCheckBox("Связь с участием в боевых действиях");
+				  final JCheckBox cbPriznb = new JCheckBox("Связь с участием в боевых действиях");
 				  
-				  JCheckBox cbPrizni = new JCheckBox("Инвалидность");
+				  final JCheckBox cbPrizni = new JCheckBox("Инвалидность");
 				  
 				  JButton bSaveDiag = new JButton("v");
 				  bSaveDiag.addActionListener(new ActionListener() {
 				  	public void actionPerformed(ActionEvent e) {
 				  		try{
-				  		diagamb = new PdiagAmb();
-				  		pdiagz = new PdiagZ();
+					  		diagamb.setDiag(TabDiag.getSelectedItem().getDiag());
+					  		diagamb.setNamed(TabDiag.getSelectedItem().getNamed());
+					  		diagamb.setDatad(System.currentTimeMillis());
+					  		MainForm.tcl.UpdatePdiagAmb(diagamb);
+				  		pdiag = new PdiagZ();
 				  		pdisp = new Pdisp();
-				  		diagamb.setId_obr(zapVr.getId_pvizit());
-				  		diagamb.setNpasp(zapVr.getNpasp());
-				  		diagamb.setDatap(System.currentTimeMillis());
-				  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
-				  		diagamb.setCdol(MainForm.authInfo.getCdol());
-				  		diagamb.setDiag(TabDiag.getSelectedItem().getDiag());
-				  		diagamb.setNamed(TabDiag.getSelectedItem().getNamed());
-				  		diagamb.setDatad(System.currentTimeMillis());
 				  		if (jbpredv.isSelected()) {
 				  			diagamb.setPredv(true);
 				  		}
 				  		if (jbzakl.isSelected()) {
 				  			diagamb.setPredv(false);
-				  			
+				  			pdiag.setId_diag_amb(diagamb.getId());
+				  			pdiag.setNpasp(diagamb.getNpasp());
+				  			pdiag.setDiag(diagamb.getDiag());
+				  			pdiag.setCpodr(MainForm.authInfo.getCpodr());
+				  			pdiag.setNmvd(diagamb.getObstreg());
+				  			if (rbOstr.isSelected()) pdiag.setXzab(1);
+				  			if (rbHron.isSelected()) pdiag.setXzab(2);
+				  			if (rbPoz.isSelected()) pdiag.setStady(2);
+				  			if (rbRan.isSelected()) pdiag.setStady(1);
+				  			if (cbPatol.isSelected()) pdiag.setPat(1);
+				  			if (cbPriznb.isSelected()) pdiag.setPrizb(1);
+				  			if (cbPrizni.isSelected()) pdiag.setPrizi(1);
 				  		}
 				  		if (jbosn.isSelected()) diagamb.setDiag_stat(1);
 				  		if (jbsoput.isSelected())diagamb.setDiag_stat(3);
 				  		if (jbosl.isSelected()) diagamb.setDiag_stat(2);
 				  		if (cbObstreg.getSelectedPcod() != null) diagamb.setObstreg(cbObstreg.getSelectedPcod());
 				  		if (vid_travm.getSelectedPcod() != null) diagamb.setVid_tr(vid_travm.getSelectedPcod());
-				  		MainForm.tcl.AddPdiagAmb(diagamb);
+			  			if (cbDisp.isSelected()){
+			  			pdisp.setId_diag(diagamb.getId());
+			  			pdisp.setNpasp(diagamb.getNpasp());
+			  			pdisp.setDiag(diagamb.getDiag());
+			  			pdisp.setPcod(MainForm.authInfo.getCpodr());
+//			  			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//			  			pdisp.setD_vz(sdf.parse(tfDvz.getText()).getTime());
+				  		if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());
+				  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod());
+
+			  			pdisp.setCod_sp(diagamb.getCod_sp());
+			  			pdisp.setCdol_ot(diagamb.getCdol());
+			  				
+			  			}
+			  			
+				  		if (pdisp != null) MainForm.tcl.setPdisp(pdisp);
+				  		if (pdiag != null) MainForm.tcl.setPdiag(pdiag);
 				  	} catch (KmiacServerException e1) {
 				  		// TODO Auto-generated catch block
-				  		e1.printStackTrace();
 				  	} catch (TException e1) {
-				  		// TODO Auto-generated catch block
 				  		MainForm.conMan.reconnect(e1);
 				  	}
 				  	}
@@ -2185,7 +2199,7 @@ public class Vvod extends JFrame {
 				   
 				    cbDgrup = new ThriftIntegerClassifierCombobox<>(true);
 				    
-				    JCheckBox cbDisp = new JCheckBox("Состоит на д/у");
+				      cbDisp = new JCheckBox("Состоит на д/у");
 				    GroupLayout gl_pDisp = new GroupLayout(pDisp);
 				    gl_pDisp.setHorizontalGroup(
 				    	gl_pDisp.createParallelGroup(Alignment.LEADING)
