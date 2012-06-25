@@ -415,7 +415,7 @@ public class PInfo extends JFrame {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(Vvod.zapVr.getNpasp(), sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
 				posinfo.add(new PvizitTreeNode(pvizit));
-			for (PdiagZ pdiag : MainForm.tcl.getPdiagZ(Vvod.zapVr.getNpasp()))
+			for (PdiagZ pdiag : MainForm.tcl.getPdiagzProsm(Vvod.zapVr.getNpasp()))
 				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {
