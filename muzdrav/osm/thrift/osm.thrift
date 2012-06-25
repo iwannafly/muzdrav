@@ -496,12 +496,14 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Priem getPriem(1: i32 npasp, 2: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
-	i32 AddPdiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
-	list<PdiagZ> getPdiagZ(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdateDiagZ(1: PdiagZ dz) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPdiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
+	list<PdiagZ> getPdiagzProsm(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
+	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 
-	i32 AddPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdatePdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPdisp(1: Pdisp id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePdisp(1: Pdisp id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
 	
 
 	/*Исследования*/
