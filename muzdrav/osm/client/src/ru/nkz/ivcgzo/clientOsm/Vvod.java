@@ -47,6 +47,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
@@ -158,7 +159,7 @@ public class Vvod extends JFrame {
 	private CustomTable<PdiagAmb,PdiagAmb._Fields> TabDiag;
 	private JEditorPane tpzakl;
 	private PInfo pinfo;
-	private JTextField tfDvz;
+	private CustomDateEditor tfDvz;
 	public static List<IntegerClassifier> pokNames;
 	private JCheckBox cbDisp;
 	private JRadioButton rbPoz;
@@ -168,7 +169,7 @@ public class Vvod extends JFrame {
 	private JCheckBox cbPatol;
 	private JCheckBox cbPriznb;
 	private JCheckBox cbPrizni;
-	private JTextField tfFDatDIsh;
+	private CustomDateEditor tfFDatDIsh;
 	
 	/**
 	 * Create the frame.
@@ -1874,10 +1875,10 @@ public class Vvod extends JFrame {
 					.addContainerGap(381, Short.MAX_VALUE))
 		);
 		plocst.setLayout(gl_plocst);
-		ButtonGroup GroupBox1 = new ButtonGroup();
-		ButtonGroup GroupBox2 = new ButtonGroup();;
-		ButtonGroup GBoxStady = new ButtonGroup();
-		ButtonGroup GBoxHar = new ButtonGroup();
+		final ButtonGroup GroupBox1 = new ButtonGroup();
+		final ButtonGroup GroupBox2 = new ButtonGroup();;
+		final ButtonGroup GBoxStady = new ButtonGroup();
+		final ButtonGroup GBoxHar = new ButtonGroup();
 
 		
 		JPanel pnazn = new JPanel();
@@ -1989,48 +1990,67 @@ public class Vvod extends JFrame {
 		spDiag.setViewportView(TabDiag);
 		TabDiag.setFillsViewportHeight(true);
 		TabDiag.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			PdiagZ pdiag;
+			Pdisp pdisp;
+			
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()){
 					if (TabDiag.getSelectedItem()!= null) {
 						diagamb = TabDiag.getSelectedItem();
+						GroupBox1.clearSelection();
+						GroupBox2.clearSelection();
 							jbosn.setSelected(diagamb.diag_stat == 1);
 							jbsoput.setSelected(diagamb.diag_stat == 3);
 							jbosl.setSelected(diagamb.diag_stat == 2);
-							jbpredv.setSelected(diagamb.predv == true);
-							jbzakl.setSelected(diagamb.predv == false);
+							if (diagamb.predv)
+								jbpredv.setSelected(true);
+							else
+								jbzakl.setSelected(true);
 							if (diagamb.getObstreg()!=0) cbObstreg.setSelectedPcod(diagamb.getObstreg());
 							if (diagamb.getVid_tr()!=0) vid_travm.setSelectedPcod(diagamb.getVid_tr());
+							
+						pdiag = new PdiagZ();
+						GBoxStady.clearSelection();
+						GBoxHar.clearSelection();
 						try {
-							PdiagZ pdiag = MainForm.tcl.getPdiagZ(TabDiag.getSelectedItem().getId());
-								rbPoz.setSelected(pdiag.getStady() == 1);
-								rbRan.setSelected(pdiag.getStady() == 2);
-								rbOstr.setSelected(pdiag.getXzab() == 1);
-								rbHron.setSelected(pdiag.getXzab() == 2);
-								cbPatol.setSelected(pdiag.getPat() == 1);
-								cbPriznb.setSelected(pdiag.getPrizb() == 1);
-								cbPrizni.setSelected(pdiag.getPrizi() == 1);
-								cbDisp.setSelected(pdiag.getDisp() == 1);
+							pdiag = MainForm.tcl.getPdiagZ(TabDiag.getSelectedItem().getId());
 						} catch (KmiacServerException e) {
 							e.printStackTrace();
 						} catch (PdiagNotFoundException e) {
-							e.printStackTrace();
+							System.out.println("diagZ not found");
 						} catch (TException e) {
 							MainForm.conMan.reconnect(e);
 						}
-							try {
-								Pdisp pdisp = MainForm.tcl.getPdisp(TabDiag.getSelectedItem().getId());
-								tfDvz.setText(DateFormat.getDateInstance().format(new Date(pdisp.getD_vz())));
-								tfFDatDIsh.setText(DateFormat.getDateInstance().format(new Date(pdisp.getDataish())));
-								if (pdisp.getIshod()!=0) cbDish.setSelectedPcod(pdisp.getIshod());
-								if (pdisp.getD_grup()!=0) cbDgrup.setSelectedPcod(pdisp.getD_grup());
-							} catch (KmiacServerException e) {
-								e.printStackTrace();
-							} catch (PdispNotFoundException e) {
-								e.printStackTrace();
-							} catch (TException e) {
-								MainForm.conMan.reconnect(e);
-							}
+						rbPoz.setSelected(pdiag.getStady() == 1);
+						rbRan.setSelected(pdiag.getStady() == 2);
+						rbOstr.setSelected(pdiag.getXzab() == 1);
+						rbHron.setSelected(pdiag.getXzab() == 2);
+						cbPatol.setSelected(pdiag.getPat() == 1);
+						cbPriznb.setSelected(pdiag.getPrizb() == 1);
+						cbPrizni.setSelected(pdiag.getPrizi() == 1);
+						cbDisp.setSelected(pdiag.getDisp() == 1);
+						
+						pdisp = new Pdisp();
+						try {
+							pdisp = MainForm.tcl.getPdisp(TabDiag.getSelectedItem().getId());
+						} catch (KmiacServerException e) {
+							e.printStackTrace();
+						} catch (PdispNotFoundException e) {
+							System.out.println("disp not found");
+						} catch (TException e) {
+							MainForm.conMan.reconnect(e);
+						}
+						tfDvz.setDate(pdisp.getD_vz());
+						tfFDatDIsh.setDate(pdisp.getDataish());
+						if (pdisp.isSetIshod())
+							cbDish.setSelectedPcod(pdisp.getIshod());
+						else
+							cbDish.setSelectedItem(null);
+						if (pdisp.isSetD_grup())
+							cbDgrup.setSelectedPcod(pdisp.getD_grup());
+						else
+							cbDgrup.setSelectedItem(null);
 						}	
 					}
 				}
@@ -2045,20 +2065,22 @@ public class Vvod extends JFrame {
 				 bAddDiag.addActionListener(new ActionListener() {
 				 	public void actionPerformed(ActionEvent e) {
 				 		TabDiag.requestFocus();
-				 			TabDiag.addItem();
-					  		try {
- 					  		diagamb = new PdiagAmb();
+				  		try {
+					  		diagamb = new PdiagAmb();
 					  		diagamb.setId_obr(zapVr.getId_pvizit());
 					  		diagamb.setNpasp(zapVr.getNpasp());
 					  		diagamb.setDatap(System.currentTimeMillis());
+					  		diagamb.setDatad(System.currentTimeMillis());
 					  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
 					  		diagamb.setCdol(MainForm.authInfo.getCdol());
+					  		diagamb.setPredv(true);
 							diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
-							} catch (KmiacServerException e1) {
-								e1.printStackTrace();
-							} catch (TException e1) {
-								MainForm.conMan.reconnect(e1);
-							}
+				 			TabDiag.addItem(diagamb);
+						} catch (KmiacServerException e1) {
+							e1.printStackTrace();
+						} catch (TException e1) {
+							MainForm.conMan.reconnect(e1);
+						}
 
 
 				 	}	
@@ -2101,40 +2123,41 @@ public class Vvod extends JFrame {
 				  JButton bSaveDiag = new JButton("v");
 				  bSaveDiag.addActionListener(new ActionListener() {
 				  	public void actionPerformed(ActionEvent e) {
-				  		try{
+				  		try {
 					  		diagamb.setDiag(TabDiag.getSelectedItem().getDiag());
 					  		diagamb.setNamed(TabDiag.getSelectedItem().getNamed());
-					  		diagamb.setDatad(System.currentTimeMillis());
+					  		diagamb.setDatad(TabDiag.getSelectedItem().getDatad());
 					  		if (jbosn.isSelected()) diagamb.setDiag_stat(1);
 					  		if (jbsoput.isSelected())diagamb.setDiag_stat(3);
 					  		if (jbosl.isSelected()) diagamb.setDiag_stat(2);
 					  		if (cbObstreg.getSelectedPcod() != null) diagamb.setObstreg(cbObstreg.getSelectedPcod());
 					  		if (vid_travm.getSelectedPcod() != null) diagamb.setVid_tr(vid_travm.getSelectedPcod());
 					  		
-				  		pdiag = new PdiagZ();
-				  		pdisp = new Pdisp();
-				  		if (jbpredv.isSelected()) {
-				  			diagamb.setPredv(true);
-				  		}
-				  		if (jbzakl.isSelected()) {
-				  			diagamb.setPredv(false);
-				  			pdiag.setId_diag_amb(diagamb.getId());
-				  			pdiag.setNpasp(diagamb.getNpasp());
-				  			pdiag.setDiag(diagamb.getDiag());
-				  			pdiag.setCpodr(MainForm.authInfo.getCpodr());
-				  			pdiag.setNmvd(diagamb.getObstreg());
-				  			pdiag.setCod_sp(diagamb.getCod_sp());
-				  			pdiag.setCdol_ot(diagamb.getCdol());
-				  			pdiag.setNamed(diagamb.getNamed());
-				  			if (rbOstr.isSelected()) pdiag.setXzab(1);
-				  			if (rbHron.isSelected()) pdiag.setXzab(2);
-				  			if (rbPoz.isSelected()) pdiag.setStady(2);
-				  			if (rbRan.isSelected()) pdiag.setStady(1);
-				  			if (cbPatol.isSelected()) pdiag.setPat(1);
-				  			if (cbPriznb.isSelected()) pdiag.setPrizb(1);
-				  			if (cbPrizni.isSelected()) pdiag.setPrizi(1);
-				  			MainForm.tcl.setPdiag(pdiag);
-				  		}
+					  		pdiag = new PdiagZ();
+					  		pdisp = new Pdisp();
+					  		if (jbpredv.isSelected()) {
+					  			diagamb.setPredv(true);
+					  		}
+					  		if (jbzakl.isSelected()) {
+					  			diagamb.setPredv(false);
+					  			pdiag.setId_diag_amb(diagamb.getId());
+					  			pdiag.setNpasp(diagamb.getNpasp());
+					  			pdiag.setDiag(diagamb.getDiag());
+					  			pdiag.setCpodr(MainForm.authInfo.getCpodr());
+					  			pdiag.setNmvd(diagamb.getObstreg());
+					  			pdiag.setCod_sp(diagamb.getCod_sp());
+					  			pdiag.setCdol_ot(diagamb.getCdol());
+					  			pdiag.setNamed(diagamb.getNamed());
+					  			if (rbOstr.isSelected()) pdiag.setXzab(1);
+					  			if (rbHron.isSelected()) pdiag.setXzab(2);
+					  			if (rbPoz.isSelected()) pdiag.setStady(2);
+					  			if (rbRan.isSelected()) pdiag.setStady(1);
+					  			if (cbPatol.isSelected()) pdiag.setPat(1);
+					  			if (cbPriznb.isSelected()) pdiag.setPrizb(1);
+					  			if (cbPrizni.isSelected()) pdiag.setPrizi(1);
+//					  			pdiag.setDisp(Boolean.t cbDisp.isSelected());
+					  			MainForm.tcl.setPdiag(pdiag);
+					  		}
 				  		MainForm.tcl.UpdatePdiagAmb(diagamb);
 			  			if (cbDisp.isSelected()){
 				  			pdisp.setId_diag(diagamb.getId());
@@ -2142,17 +2165,10 @@ public class Vvod extends JFrame {
 				  			pdisp.setNpasp(diagamb.getNpasp());
 				  			pdisp.setDiag(diagamb.getDiag());
 				  			pdisp.setPcod(MainForm.authInfo.getCpodr());
-				  			try {
-								pdisp.setD_vz(SimpleDateFormat.getDateInstance().parse(tfDvz.getText()).getTime());
-							} catch (ParseException e1) {
-									e1.printStackTrace();
-							}
-				  			try {
-								pdisp.setDataish(SimpleDateFormat.getDateInstance().parse(tfFDatDIsh.getText()).getTime());
-							} catch (ParseException e1) {
-									e1.printStackTrace();
-							}
-				  			//pdisp.setD_vz(System.currentTimeMillis());
+				  			if (tfDvz.getDate() != null)
+								pdisp.setD_vz(tfDvz.getDate().getTime());
+				  			if (tfFDatDIsh.getDate() != null)
+								pdisp.setDataish(tfFDatDIsh.getDate().getTime());
 					  		if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());
 					  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod());
 	
@@ -2170,6 +2186,7 @@ public class Vvod extends JFrame {
 				  		
 				  		
 				  	} catch (KmiacServerException e1) {
+				  		e1.printStackTrace();
 				  	} catch (TException e1) {
 				  		MainForm.conMan.reconnect(e1);
 				  	}
@@ -2251,7 +2268,7 @@ public class Vvod extends JFrame {
 				   
 				   JLabel lblDvz = new JLabel("Дата взятия на д/у");
 				   
-				   tfDvz = new JTextField();
+				   tfDvz = new CustomDateEditor();
 				   tfDvz.setColumns(10);
 				   
 				   JLabel lblDGrup = new JLabel("Группа д/у");
@@ -2262,7 +2279,7 @@ public class Vvod extends JFrame {
 				    
 				    JLabel lblDatDIsh = new JLabel("Дата установления исхода");
 				    
-				    tfFDatDIsh = new JTextField();
+				    tfFDatDIsh = new CustomDateEditor();
 				    tfFDatDIsh.setColumns(10);
 				    GroupLayout gl_pDisp = new GroupLayout(pDisp);
 				    gl_pDisp.setHorizontalGroup(
