@@ -2079,6 +2079,7 @@ public class Vvod extends JFrame {
 				  			if (cbPatol.isSelected()) pdiag.setPat(1);
 				  			if (cbPriznb.isSelected()) pdiag.setPrizb(1);
 				  			if (cbPrizni.isSelected()) pdiag.setPrizi(1);
+				  			MainForm.tcl.setPdiag(pdiag);
 				  		}
 				  		if (jbosn.isSelected()) diagamb.setDiag_stat(1);
 				  		if (jbsoput.isSelected())diagamb.setDiag_stat(3);
@@ -2086,23 +2087,23 @@ public class Vvod extends JFrame {
 				  		if (cbObstreg.getSelectedPcod() != null) diagamb.setObstreg(cbObstreg.getSelectedPcod());
 				  		if (vid_travm.getSelectedPcod() != null) diagamb.setVid_tr(vid_travm.getSelectedPcod());
 			  			if (cbDisp.isSelected()){
-			  			pdisp.setId_diag(diagamb.getId());
-			  			pdisp.setNpasp(diagamb.getNpasp());
-			  			pdisp.setDiag(diagamb.getDiag());
-			  			pdisp.setPcod(MainForm.authInfo.getCpodr());
-//			  			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-//			  			pdisp.setD_vz(sdf.parse(tfDvz.getText()).getTime());
-			  			pdisp.setD_vz(System.currentTimeMillis());
-				  		if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());
-				  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod());
-
-			  			pdisp.setCod_sp(diagamb.getCod_sp());
-			  			pdisp.setCdol_ot(diagamb.getCdol());
-			  				
+				  			pdisp.setId_diag(diagamb.getId());
+				  			pdisp.setNpasp(diagamb.getNpasp());
+				  			pdisp.setDiag(diagamb.getDiag());
+				  			pdisp.setPcod(MainForm.authInfo.getCpodr());
+	//			  			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+	//			  			pdisp.setD_vz(sdf.parse(tfDvz.getText()).getTime());
+				  			pdisp.setD_vz(System.currentTimeMillis());
+					  		if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());
+					  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod());
+	
+				  			pdisp.setCod_sp(diagamb.getCod_sp());
+				  			pdisp.setCdol_ot(diagamb.getCdol());
+				  			MainForm.tcl.setPdisp(pdisp);	
 			  			}
 			  			
-				  		if (pdisp != null) MainForm.tcl.setPdisp(pdisp);
-				  		if (pdiag != null) MainForm.tcl.setPdiag(pdiag);
+				  		
+				  		
 				  	} catch (KmiacServerException e1) {
 				  		// TODO Auto-generated catch block
 				  	} catch (TException e1) {
