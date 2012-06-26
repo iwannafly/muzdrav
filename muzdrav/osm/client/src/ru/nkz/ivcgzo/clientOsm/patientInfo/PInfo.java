@@ -203,7 +203,7 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Обстоятельства регистрации", getValueFromClassifier(MainForm.tcl.get_n_abv(),pdiag.isSetNmvd(),pdiag.getNmvd()));
 					addLineToDetailInfo("Характер заболевания", getValueFromClassifier(MainForm.tcl.get_n_abx(),pdiag.isSetXzab(),pdiag.getXzab()));
 					addLineToDetailInfo("Стадия заболевания", getValueFromClassifier(MainForm.tcl.get_n_aby(),pdiag.isSetStady(),pdiag.getStady()));
-					addLineIf("Состоит на д.учете: состоит", pdiag.isSetDisp(), pdiag.getDisp());
+					addLineToDetailInfo("Состоит на д.учете", pdiag.isSetDisp(), pdiag.getDisp());
 					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_vz(), DateFormat.getDateInstance().format(new Date(pdiag.getD_vz())));
 					addLineToDetailInfo("Группа д/у", getValueFromClassifier(MainForm.tcl.get_n_abc(),pdiag.isSetD_grup(),pdiag.getD_grup()));
 					addLineToDetailInfo("Исход д/у", getValueFromClassifier(MainForm.tcl.get_n_abb(),pdiag.isSetIshod(),pdiag.getIshod()));
@@ -211,9 +211,9 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
 	 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
 					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(MainForm.tcl.get_n_s00(),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
-					addLineIf("Противопоказания к вынашиванию беременности: имеются", pdiag.isSetPat(), pdiag.getPat());
-					addLineIf("Участие в боевых действиях: +", pdiag.isSetPrizb(), pdiag.getPrizb());
-					addLineIf("Инвалидизующий диагноз: +", pdiag.isSetPrizi(), pdiag.getPrizi());
+					addLineToDetailInfo("Противопоказания к вынашиванию беременности", pdiag.isSetPat(), pdiag.getPat());
+					addLineToDetailInfo("Участие в боевых действиях", pdiag.isSetPrizb(), pdiag.getPrizb());
+					addLineToDetailInfo("Инвалидизующий диагноз", pdiag.isSetPrizi(), pdiag.getPrizi());
 					eptxt.setText(sb.toString());
 		 			} 			
 		 				else
@@ -528,12 +528,6 @@ public class PInfo extends JFrame {
 		sb.append(name + lineSep);
 	}
 	
-	private void addLineIf(String name, boolean isSet, Object value) {
-		if (isSet)
-			if ((name != null) && (value != null))
-				if ((name.length() > 0) && (value.toString().length() > 0))
-					sb.append(String.format("%s: %s%s", name, lineSep));
-	}
 
 	
 }

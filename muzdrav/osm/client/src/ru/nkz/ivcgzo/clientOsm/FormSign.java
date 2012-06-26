@@ -16,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
@@ -29,7 +28,6 @@ import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.JList;
 
 public class FormSign extends JFrame {
 	private static final long serialVersionUID = -5267798845014525253L;
@@ -103,7 +101,6 @@ public class FormSign extends JFrame {
 			} catch (KmiacServerException e1) {
 				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошибка");
 			} catch (PsignNotFoundException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (TException e1) {
 //				MainForm.conMan.reconnect(e1);
@@ -208,10 +205,8 @@ public class FormSign extends JFrame {
 				try {
 					MainForm.tcl.setPsign(psign);
 				} catch (KmiacServerException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
