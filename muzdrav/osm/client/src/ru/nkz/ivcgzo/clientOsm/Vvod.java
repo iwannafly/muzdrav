@@ -2070,6 +2070,8 @@ public class Vvod extends JFrame {
 				  			pdiag.setDiag(diagamb.getDiag());
 				  			pdiag.setCpodr(MainForm.authInfo.getCpodr());
 				  			pdiag.setNmvd(diagamb.getObstreg());
+				  			pdiag.setCod_sp(diagamb.getCod_sp());
+				  			pdiag.setCdol_ot(diagamb.getCdol());
 				  			if (rbOstr.isSelected()) pdiag.setXzab(1);
 				  			if (rbHron.isSelected()) pdiag.setXzab(2);
 				  			if (rbPoz.isSelected()) pdiag.setStady(2);
@@ -2090,6 +2092,7 @@ public class Vvod extends JFrame {
 			  			pdisp.setPcod(MainForm.authInfo.getCpodr());
 //			  			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 //			  			pdisp.setD_vz(sdf.parse(tfDvz.getText()).getTime());
+			  			pdisp.setD_vz(System.currentTimeMillis());
 				  		if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());
 				  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod());
 
