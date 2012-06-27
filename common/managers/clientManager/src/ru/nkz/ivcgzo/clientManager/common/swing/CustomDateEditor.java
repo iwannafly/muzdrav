@@ -172,7 +172,10 @@ public class CustomDateEditor extends JFormattedTextField {
 	}
 	
 	public void setDate(Date date) {
-		setValue(dateFormatter.format(date));
+		if (date != null)
+			setValue(dateFormatter.format(date));
+		else
+			setValue(null);
 	}
 	
 	public void setDate(long mills) {
