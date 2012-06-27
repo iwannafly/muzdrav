@@ -29,6 +29,7 @@ import org.apache.thrift.transport.TTransportException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.UserIdPassword;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 
 public class PermForm extends JDialog {
@@ -176,7 +177,9 @@ public class PermForm extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					tbPass.setText(MainForm.tcl.setPassword(mRab.pcod, mRab.clpu, mRab.cpodr, tbLog.getText()));
+					UserIdPassword idPass = MainForm.tcl.setPassword(mRab.pcod, mRab.clpu, mRab.cpodr, tbLog.getText()); 
+					tbPass.setText(idPass.getPassword());
+					mRab.setUser_id(idPass.getUser_id());
 					setDelPassPermEnabled(true);
 				} catch (TTransportException e1) {
 					MainForm.conMan.reconnect(e1);

@@ -30,6 +30,7 @@ import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRabNotFoundException;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.ShablonPok;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.ShablonRazd;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.ShablonText;
+import ru.nkz.ivcgzo.thriftServerVrachInfo.UserIdPassword;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachExistsException;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachNotFoundException;
@@ -39,8 +40,8 @@ import ru.nkz.ivcgzo.thriftServerVrachInfo.ThriftServerVrachInfo;
 public class serverVrachInfo extends Server implements Iface {
 	private TServer thrServ;
 	private TResultSetMapper<VrachInfo, VrachInfo._Fields> rsmVrach;
-	private static final Class<?>[] vrachTypes = new Class<?>[] {Integer.class, String.class, String.class, String.class, Short.class, Date.class, Short.class, String.class, String.class}; 
-	private static final Class<?>[] mrabTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class}; 
+	private static final Class<?>[] vrachTypes = new Class<?>[] {Integer.class, String.class, String.class, String.class, Integer.class, Date.class, String.class, String.class, String.class}; 
+	private static final Class<?>[] mrabTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class}; 
 	private TResultSetMapper<MestoRab, MestoRab._Fields> rsmMrab;
 	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 	private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
@@ -67,7 +68,7 @@ public class serverVrachInfo extends Server implements Iface {
 		super(sse, tse);
 
 		rsmVrach = new TResultSetMapper<>(VrachInfo.class, "pcod", "fam", "im", "ot", "pol", "datar", "obr", "snils", "idv");
-		rsmMrab = new TResultSetMapper<>(MestoRab.class, "id", "pcod", "clpu", "cslu", "cpodr", "cdol", "datau", "priznd");
+		rsmMrab = new TResultSetMapper<>(MestoRab.class, "id", "pcod", "clpu", "cslu", "cpodr", "cdol", "datau", "priznd", "user_id");
 		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
 		rsmShabRazd = new TResultSetMapper<>(ShablonRazd.class, "id", "name");
@@ -160,7 +161,7 @@ public class serverVrachInfo extends Server implements Iface {
 	public int AddMrab(MestoRab mr) throws MestoRabExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isMrabExists(mr)) {
-				sme.execPreparedT("INSERT INTO s_mrab (pcod, clpu, cslu, cpodr, cdol, datau, priznd) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, mr, mrabTypes, 1, 2, 3, 4, 5, 6, 7);
+				sme.execPreparedT("INSERT INTO s_mrab (pcod, clpu, cslu, cpodr, cdol, datau, priznd, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, mr, mrabTypes, 1, 2, 3, 4, 5, 6, 7, 8);
 				int id = sme.getGeneratedKeys().getInt("id");
 				sme.setCommit();
 				return id;
@@ -172,11 +173,11 @@ public class serverVrachInfo extends Server implements Iface {
 	}
 	
 	@Override
-	public void UpdMrab(MestoRab mr, int user_id) throws MestoRabExistsException, TException {
+	public void UpdMrab(MestoRab mr) throws MestoRabExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			if (!isMrabExists(mr)) {
 				sme.execPreparedT("UPDATE s_mrab SET cslu = ?, cpodr = ?, cdol = ?, datau = ?, priznd = ? WHERE id = ? ", false, mr, mrabTypes, 3, 4, 5, 6, 7, 0);
-				sme.execPrepared("UPDATE s_users SET cpodr = ? WHERE id = ?", false, mr.getCpodr(), user_id);
+				sme.execPrepared("UPDATE s_users SET cpodr = ? WHERE id = ?", false, mr.getCpodr(), mr.getUser_id());
 				sme.setCommit();
 			} else
 				throw new MestoRabExistsException();
@@ -186,26 +187,18 @@ public class serverVrachInfo extends Server implements Iface {
 	}
 
 	@Override
-	public void DelMrab(int id) throws TException {
+	public void DelMrab(MestoRab mr) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM s_mrab WHERE id = ? ", false, id);
-			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
-			throw new TException(e);
-		}
-	}
-
-	@Override
-	public void ClearVrachMrab(int vrPcod) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM s_mrab WHERE pcod = ? ", false, vrPcod);
+			sme.execPrepared("DELETE FROM s_mrab WHERE id = ? ", false, mr.getId());
+			sme.execPrepared("DELETE FROM s_users WHERE id = ? ", false, mr.getUser_id());
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
 		}
 	}
 	
-
+	
+	
 	@Override
 	public String getLogin(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT login FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
@@ -219,17 +212,23 @@ public class serverVrachInfo extends Server implements Iface {
 	}
 	
 	@Override
-	public String setPassword(int vrachPcod, int lpuPcod, int podrPcod, String login) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction(); AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public UserIdPassword setPassword(int vrachPcod, int lpuPcod, int podrPcod, String login) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction(); AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
 			while (true) {
 				try {
 					String pass = generatePassword(login);
-					if (acrs.getResultSet().next())
+					UserIdPassword idPass;
+					if (acrs.getResultSet().next()) {
 						sme.execPrepared("UPDATE s_users SET login = ?, password = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, login, pass, vrachPcod, lpuPcod, podrPcod);
-					else
-						sme.execPrepared("INSERT INTO s_users (pcod, login, password, clpu, cpodr) VALUES (?, ?, ?, ?, ?) ", false, vrachPcod, login, pass, lpuPcod, podrPcod);
+						idPass = new UserIdPassword(acrs.getResultSet().getInt(1), pass);
+						sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, idPass.getUser_id(), vrachPcod, lpuPcod, podrPcod);
+					} else {
+						sme.execPrepared("INSERT INTO s_users (pcod, login, password, clpu, cpodr) VALUES (?, ?, ?, ?, ?) ", true, vrachPcod, login, pass, lpuPcod, podrPcod);
+						idPass = new UserIdPassword(sme.getGeneratedKeys().getInt("id"), pass);
+						sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, idPass.getUser_id(), vrachPcod, lpuPcod, podrPcod);
+					}
 					sme.setCommit();
-					return pass;
+					return idPass;
 				} catch (SQLException e) {
 					if (((SQLException)e.getCause()).getSQLState().equals("23505"))
 						continue;
@@ -430,6 +429,60 @@ public class serverVrachInfo extends Server implements Iface {
 		for (ShablonPok shPok : getShabPok(shRazd.getId(), cdol)) {
 			shPok.setChecked(value);
 			setShabPok(shPok, cdol);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_p0s13() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0s WHERE pcod BETWEEN 1 AND 3 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_o00(int clpu) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_o00 WHERE clpu = ? ", clpu)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_n00(int clpu) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_n00 WHERE clpu = ? ", clpu)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_lds(int clpu) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_lds WHERE clpu = ? ", clpu)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_z00() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z00 ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_z30() throws TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z30 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
 		}
 	}
 

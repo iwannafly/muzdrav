@@ -12,6 +12,7 @@ struct MestoRab {
 	 6: optional string cdol;
 	 7: optional i64 datau;
 	 8: optional i32 priznd;
+	 9: optional i32 user_id;
 }
 
 struct VrachInfo {
@@ -19,11 +20,17 @@ struct VrachInfo {
 	 2: string fam;
 	 3: string im;
 	 4: string ot;
-	 5: i16 pol;
+	 5: i32 pol;
 	 6: i64 datar;
-	 7: i16 obr;
+	 7: string obr;
 	 8: string snils;
 	 9: string idv;
+}
+
+//not otional
+struct UserIdPassword {
+	1: i32 user_id;
+	2: string password;
 }
 
 struct ShablonRazd {
@@ -73,64 +80,67 @@ exception MestoRabNotFoundException {
 
 
 service ThriftServerVrachInfo extends kmiacServer.KmiacServer {
-/**
- * Список всех врачей для данного лпу.
- */
+
+	list<classifier.IntegerClassifier> getPrizndList();
+	list<classifier.StringClassifier> get_n_s00();
+	list<classifier.IntegerClassifier> get_n_p0s13();
+	list<classifier.IntegerClassifier> get_n_o00(1: i32 clpu);
+	list<classifier.IntegerClassifier> get_n_n00(1: i32 clpu);
+	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu);
+	list<classifier.StringClassifier> get_n_z00();
+	list<classifier.IntegerClassifier> get_n_z30();
+
+
+	/**
+	 * Список всех врачей для данного лпу.
+	 */
 	list<VrachInfo> GetVrachList();
 
-/**
- * Информация на конкретного врача по его коду.
- */
+	/**
+	 * Информация на конкретного врача по его коду.
+	 */
 	VrachInfo GetVrach(1: i32 pcod) throws (1: VrachNotFoundException vne);
 
-/**
- * Добавление врача.
- */
+	/**
+	 * Добавление врача.
+	 */
 	i32 AddVrach(1: VrachInfo vr) throws (1: VrachExistsException vee);
 
-/**
- * Обновление информации о враче.
- */
+	/**
+	 * Обновление информации о враче.
+	 */
 	void UpdVrach(1: VrachInfo vr) throws (1: VrachExistsException vee);
 
-/**
- * Удаление врача.
- */
+	/**
+	 * Удаление врача.
+	 */
 	void DelVrach(1: i32 pcod);
 
 
-/**
- * Список всех мест работ для данного врача.
- */
+	/**
+	 * Список всех мест работ для данного врача.
+	 */
 	list<MestoRab> GetMrabList(1: i32 vrPcod);
 
-/**
- * Информация о конкретном месте работы по его коду.
- */
+	/**
+	 * Информация о конкретном месте работы по его коду.
+	 */
 	MestoRab GetMrab(1: i32 id) throws (1: MestoRabNotFoundException mne);
 
-/**
- * Добавление места работы.
- */
+	/**
+	 * Добавление места работы.
+	 */
 	i32 AddMrab(1: MestoRab mr) throws (1: MestoRabExistsException mee);
 
-/**
- * Обновление информации о месте работы.
- */
-	void UpdMrab(1: MestoRab mr, 2: i32 user_id) throws (1: MestoRabExistsException mee);
+	/**
+	 * Обновление информации о месте работы.
+	 */
+	void UpdMrab(1: MestoRab mr) throws (1: MestoRabExistsException mee);
 
-/**
- * Удаление места работы.
- */
-	void DelMrab(1: i32 id);
-
-/**
- * Удаление всех мест работы конкретного врача.
- */
-	void ClearVrachMrab(1: i32 vrPcod);
-
-	list<classifier.IntegerClassifier> getPrizndList();
-
+	/**
+	 * Удаление места работы.
+	 */
+	void DelMrab(1: MestoRab mr);
 
 	/**
 	 * Получает логин пользователя.
@@ -140,7 +150,7 @@ service ThriftServerVrachInfo extends kmiacServer.KmiacServer {
 	/**
 	 * Устанавливает пароль для пользователя, открывая ему доступ к системе.
 	 */
-	string setPassword(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string login);
+	UserIdPassword setPassword(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string login);
 
 	/**
 	 * Очищает пароль пользователя, закрывая ему доступ к системе.
@@ -156,8 +166,6 @@ service ThriftServerVrachInfo extends kmiacServer.KmiacServer {
 	 * Устанавливает разрешения пользователя.
 	 */
 	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
-
-	list<classifier.StringClassifier> get_n_s00();
 
 	/**
 	 * Получает список разделов шаблонов.
