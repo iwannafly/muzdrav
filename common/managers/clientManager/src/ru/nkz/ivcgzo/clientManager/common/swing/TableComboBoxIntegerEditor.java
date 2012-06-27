@@ -99,7 +99,11 @@ public class TableComboBoxIntegerEditor extends AbstractCellEditor implements Ta
 			return lst.get(cmb.getSelectedIndex()).pcod;
 	}
 	
-	class TableComboBoxIntegerRender extends DefaultTableCellRenderer {
+	public Component getEditor() {
+		return cmb;
+	}
+	
+	public class TableComboBoxIntegerRender extends DefaultTableCellRenderer {
 		private static final long serialVersionUID = -2915705885392742240L;
 		
 		@Override

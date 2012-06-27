@@ -83,8 +83,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	/**
 	 * Получает выбранный пользовательский код. 
 	 */
-	public int getSelectedPcod() {
-		return getSelectedItem().pcod;
+	public Integer getSelectedPcod() {
+		if (getSelectedItem() != null)
+			return getSelectedItem().getPcod();
+		else
+			return null;
 	}
 	
 	/**

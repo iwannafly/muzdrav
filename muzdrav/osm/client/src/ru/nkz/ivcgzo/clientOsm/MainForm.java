@@ -31,7 +31,7 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
 	private JFrame frame;
-	private CustomTable<ZapVr, ZapVr._Fields> table;
+	public static  CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
 	private PInfo pinfo;
 	
@@ -63,20 +63,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					vvod.showVvod(table.getSelectedItem());
 			}
 		});
-		
-		JButton btnPatInfoView = new JButton("Информация");
-		btnPatInfoView.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					tcl.testConnection();
-					//patInfoView.showForm(tcl, table.getSelectedItem().npasp);
-					pinfo = new PInfo();
-					pinfo.setVisible(true);
-				} catch (TException e1) {
-					conMan.reconnect(e1);
-				}
-			}
-		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -84,10 +70,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnPatInfoView, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton)))
+						.addComponent(btnNewButton))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -96,9 +79,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					.addContainerGap()
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
 					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnNewButton)
-						.addComponent(btnPatInfoView))
+					.addComponent(btnNewButton)
 					.addContainerGap())
 		);
 		
@@ -107,7 +88,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
 		
-		vvod = new Vvod();
 		patInfoView = new PatientInfoViewMainForm(conMan, authInfo);
 	}
 
@@ -127,8 +107,10 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					return;
 				}
 				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
+				
+				if (vvod == null)
+					vvod = new Vvod();
 				vvod.onConnect();
-				Classifiers.load(tcl);
 			} catch (KmiacServerException | ParseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

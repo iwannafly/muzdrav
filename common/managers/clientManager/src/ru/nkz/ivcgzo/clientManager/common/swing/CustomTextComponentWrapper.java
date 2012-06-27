@@ -169,7 +169,7 @@ public class CustomTextComponentWrapper {
 		
 		@Override
 		public void checkEnabled() {
-			setEnabled(textComponent.getSelectionStart() != textComponent.getSelectionEnd());
+			setEnabled((textComponent.getSelectionStart() != textComponent.getSelectionEnd()) && textComponent.isEditable());
 		}
 	}
 	
@@ -216,7 +216,7 @@ public class CustomTextComponentWrapper {
 				enabled = false;
 			}
 			
-			setEnabled(enabled);
+			setEnabled(enabled && textComponent.isEditable());
 		}
 	}
 	
@@ -244,7 +244,7 @@ public class CustomTextComponentWrapper {
 		
 		@Override
 		public void checkEnabled() {
-			setEnabled(textComponent.getSelectionStart() != textComponent.getSelectionEnd());
+			setEnabled((textComponent.getSelectionStart() != textComponent.getSelectionEnd()) && textComponent.isEditable());
 		}
 	}
 	

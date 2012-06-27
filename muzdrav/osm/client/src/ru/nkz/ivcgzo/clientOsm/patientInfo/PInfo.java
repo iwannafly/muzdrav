@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientOsm.patientInfo;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -25,17 +27,27 @@ import javax.swing.tree.DefaultTreeModel;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientOsm.MainForm;
+import ru.nkz.ivcgzo.clientOsm.Vvod;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
+import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JTextField;
+import java.awt.Font;
 
 public class PInfo extends JFrame {
 	private static final long serialVersionUID = 7025194439882492263L;
@@ -44,6 +56,7 @@ public class PInfo extends JFrame {
 	private JTree treeinfo;
 	private StringBuilder sb;
 	private JTextField tfdat;
+	public static ZapVr zapVr;
 
 	public PInfo() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -93,11 +106,118 @@ public class PInfo extends JFrame {
 		);
 		
 		 treeinfo = new JTree(createNodes());
+		 treeinfo.setFont(new Font("Arial", Font.PLAIN, 12));
 		 treeinfo.addTreeSelectionListener(new TreeSelectionListener() {
 		 	public void valueChanged(TreeSelectionEvent e) {
 		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
 		 		sb = new StringBuilder();	
 		 		try {
+		 			if (lastPath.toString() ==  "Личная информация"){
+		 				PatientCommonInfo info;
+						try {
+							info = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
+							addLineToDetailInfo("Уникальный номер", info.isSetNpasp(), info.getNpasp());
+		 				addLineToDetailInfo("Фамилия", info.getFam());
+		 				addLineToDetailInfo("Имя", info.getIm());
+		 				addLineToDetailInfo("Отчество", info.getOt());
+		 				addLineToDetailInfo("Дата рождения", info.isSetDatar(), DateFormat.getDateInstance().format(new Date(info.getDatar())));
+		 				addLineToDetailInfo("Серия полиса ОМС", info.getPoms_ser());
+		 				addLineToDetailInfo("Номер полиса ОМС", info.getPoms_nom());
+		 				addLineToDetailInfo("Пол", getValueFromClassifier(Classifiers.n_z30, info.isSetPol(), info.getPol()));
+		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(Classifiers.n_am0, info.isSetJitel(), info.getJitel()));
+		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(Classifiers.n_az9, info.isSetSgrp(), info.getSgrp()));
+		 				addLineToDetailInfo("Область (прописка)", info.getAdp_obl());
+		 				addLineToDetailInfo("Город (прописка)", info.getAdp_gorod());
+		 				addLineToDetailInfo("Улица (прописка)", info.getAdp_ul());
+		 				addLineToDetailInfo("Дом (прописка)", info.getAdp_dom());
+		 				addLineToDetailInfo("Корпус (прописка)", info.getAdp_korp());
+		 				addLineToDetailInfo("Квартира (прописка)", info.getAdp_kv());
+		 				addLineToDetailInfo("Область (проживание)", info.getAdm_obl());
+		 				addLineToDetailInfo("Город (проживание)", info.getAdm_gorod());
+		 				addLineToDetailInfo("Улица (проживание)", info.getAdm_ul());
+		 				addLineToDetailInfo("Дом (проживание)", info.getAdm_dom());
+		 				addLineToDetailInfo("Корпус (проживание)", info.getAdm_korp());
+		 				addLineToDetailInfo("Квартира (проживание)", info.getAdm_kv());
+		 				//addLineToDetailInfo("Место работы", getValueFromClassifier(Classifiers.n_z43, info.isSetMrab()(), info.getName_mr());
+		 				addLineToDetailInfo("Тип места работы", info.getNcex());
+		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPoms_strg(), info.getPoms_strg()));
+		 				addLineToDetailInfo("Тип документа ОМС", info.getPoms_tdoc());
+		 				addLineToDetailInfo("Номер договора ОМС", info.getPoms_ndog());
+		 				addLineToDetailInfo("Страховая организация ДМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPdms_strg(), info.getPdms_strg()));
+		 				addLineToDetailInfo("Серия полиса ДМС", info.getPdms_ser());
+		 				addLineToDetailInfo("Номер полиса ДМС", info.getPdms_nom());
+		 				addLineToDetailInfo("Номер договора ДМС", info.getPdms_ndog());
+		 				addLineToDetailInfo("Поликлиника прикрепления", getValueFromClassifier(Classifiers.n_n00, info.isSetCpol_pr(), info.getCpol_pr()));
+		 				addLineToDetailInfo("Территория прикрепления", getValueFromClassifier(Classifiers.n_l01, info.isSetTerp(), info.getTerp()));
+		 				addLineToDetailInfo("Дата прикрепления", info.isSetDatapr(), DateFormat.getDateInstance().format(new Date(info.getDatapr())));
+		 				addLineToDetailInfo("Тип удостоверения личности", getValueFromClassifier(Classifiers.n_az0, info.isSetTdoc(), info.getTdoc()));
+		 				addLineToDetailInfo("Серия документа", info.getDocser());
+		 				addLineToDetailInfo("Номер документа", info.getDocnum());
+		 				addLineToDetailInfo("Дата выдачи документа", info.isSetDatadoc(), DateFormat.getDateInstance().format(new Date(info.getDatadoc())));
+		 				addLineToDetailInfo("Дата сверки данных", info.isSetDsv(), DateFormat.getDateInstance().format(new Date(info.getDsv())));
+		 				addLineToDetailInfo("Кем выдан документ", info.getOdoc());
+		 				addLineToDetailInfo("СНИЛС", info.getSnils());
+		 				addLineToDetailInfo("Профессия", info.getProf());
+		 				addLineToDetailInfo("Телефон", info.getTel());
+		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(Classifiers.n_l02, info.isSetRegion_liv(), info.getRegion_liv()));
+		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(Classifiers.n_l01, info.isSetTer_liv(), info.getTer_liv()));
+		 				eptxt.setText(sb.toString());
+
+						} catch (PatientNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+		 						 			}
+		 			else
+		 				if (lastPath.toString() ==  "Анамнез жизни"){
+		 					Psign psign;
+		 					try {
+								psign = MainForm.tcl.getPatientMiscInfo(MainForm.table.getSelectedItem().npasp);
+								addLineToDetailInfo("Группа крови", psign.getGrup());
+								addLineToDetailInfo("Резус-фактор", psign.getPh());
+								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
+								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
+								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
+								addLineToDetailInfo("Вредные привычки", psign.getVred());
+								addLineToDetailInfo("Развитие", psign.getRazv());
+								addLineToDetailInfo("Условия проживания", psign.getUslov());
+								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
+								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
+								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
+								addLineToDetailInfo("Наследственность", psign.getNasl());
+								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
+								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
+								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
+								eptxt.setText(sb.toString());
+							} catch (PatientNotFoundException e1) {
+								e1.printStackTrace();
+							}
+		 				}
+		 				else
+		 		if (lastPath instanceof PdiagTreeNode) {
+		 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
+		 			PdiagZ pdiag = pdiagNode.pdiag;
+					addLineToDetailInfo("Поликлиника",getValueFromClassifier(MainForm.tcl.get_n_n00(),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
+					addLineToDetailInfo("Медицинское описание", pdiag.isSetNamed(),pdiag.getNamed());
+					addLineToDetailInfo("Дата регистрации", pdiag.isSetDatad(),pdiag.getDatad());
+					addLineToDetailInfo("Обстоятельства регистрации", getValueFromClassifier(MainForm.tcl.get_n_abv(),pdiag.isSetNmvd(),pdiag.getNmvd()));
+					addLineToDetailInfo("Характер заболевания", getValueFromClassifier(MainForm.tcl.get_n_abx(),pdiag.isSetXzab(),pdiag.getXzab()));
+					addLineToDetailInfo("Стадия заболевания", getValueFromClassifier(MainForm.tcl.get_n_aby(),pdiag.isSetStady(),pdiag.getStady()));
+					addLineToDetailInfo("Состоит на д.учете", pdiag.isSetDisp(), pdiag.getDisp());
+					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_vz(), DateFormat.getDateInstance().format(new Date(pdiag.getD_vz())));
+					addLineToDetailInfo("Группа д/у", getValueFromClassifier(MainForm.tcl.get_n_abc(),pdiag.isSetD_grup(),pdiag.getD_grup()));
+					addLineToDetailInfo("Исход д/у", getValueFromClassifier(MainForm.tcl.get_n_abb(),pdiag.isSetIshod(),pdiag.getIshod()));
+		 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
+					addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
+	 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
+					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(MainForm.tcl.get_n_s00(),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
+					addLineToDetailInfo("Противопоказания к вынашиванию беременности", pdiag.isSetPat(), pdiag.getPat());
+					addLineToDetailInfo("Участие в боевых действиях", pdiag.isSetPrizb(), pdiag.getPrizb());
+					addLineToDetailInfo("Инвалидизующий диагноз", pdiag.isSetPrizi(), pdiag.getPrizi());
+					eptxt.setText(sb.toString());
+		 			} 			
+		 				else
+		 					
 		 		if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
@@ -105,7 +225,7 @@ public class PInfo extends JFrame {
 		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
 					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
-		 			//addLineToDetailInfo("Врач", pvizit.isSetFio_vr(),pvizit.getFio_vr());
+		 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
 					addLineToDetailInfo("Исход", getValueFromClassifier(MainForm.tcl.getAq0(), pvizit.isSetIshod(), pvizit.getIshod()));
 					addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pvizit.isSetRezult(), pvizit.getRezult()));
 					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
@@ -116,7 +236,19 @@ public class PInfo extends JFrame {
 					addDetailInfo(anamnez.isSetT_sympt(), anamnez.getT_sympt());
 					addDetailInfo(anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
 					addDetailInfo(anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
-					eptxt.setText(sb.toString());
+		 			addHeader("Назначенные иссл.");
+	 				for (IsslInfo issl : MainForm.tcl.getIsslInfo(pvizit.getId())) {
+	 	 				addLineToDetailInfo("Показатель",issl.isSetPokaz_name(),issl.getPokaz_name());
+	 					addLineToDetailInfo("Результат",issl.isSetRez(),issl.getRez());
+	 					addLineToDetailInfo("Дата",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+	 				}
+	 				addHeader("Поставленные д-зы");//getPdiagAmb
+	 				for (PdiagAmb pdiagamb : MainForm.tcl.getPdiagAmb(pvizit.getId())) {
+	 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
+	 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
+	 					addLineToDetailInfo("Статус",getValueFromClassifier(MainForm.tcl.getVdi(), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
+	 				}
+	 				eptxt.setText(sb.toString());
 		 			} 
 		 		else if (lastPath instanceof PvizitAmbNode) {
 		 			
@@ -127,7 +259,6 @@ public class PInfo extends JFrame {
 						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
 						addLineToDetailInfo("Должность",getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
 						addLineToDetailInfo("Врач",pam.isSetFio_vr(),pam.getFio_vr());
-						
 						addHeader("Жалобы");
 						addDetailInfo(priem.isSetT_jalob(), priem.getT_jalob());
 						addDetailInfo(priem.isSetT_jalob_d(), priem.getT_jalob_d());
@@ -207,6 +338,10 @@ public class PInfo extends JFrame {
 		 			
 		 		
 		 	}
+
+			
+
+			
 		 });
 		 treeinfo.addTreeExpansionListener(new TreeExpansionListener() {
 		 	public void treeCollapsed(TreeExpansionEvent event) {
@@ -256,6 +391,7 @@ public class PInfo extends JFrame {
 		);
 		
 		 eptxt = new JEditorPane();
+		 eptxt.setFont(new Font("Arial", Font.PLAIN, 12));
 		sptxt.setViewportView(eptxt);
 		eptxt.setEditable(false);
 		pr.setLayout(gl_pr);
@@ -265,12 +401,22 @@ public class PInfo extends JFrame {
 
 	
 	private DefaultMutableTreeNode createNodes() {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень зла");
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
+		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
+		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
+		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
+		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
+		root.add(patinfo);
+		root.add(signinfo);
+		root.add(posinfo);
+		root.add(diaginfo);
 		
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(2, sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
-				root.add(new PvizitTreeNode(pvizit));
+			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(Vvod.zapVr.getNpasp(), sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
+				posinfo.add(new PvizitTreeNode(pvizit));
+			for (PdiagZ pdiag : MainForm.tcl.getPdiagzProsm(Vvod.zapVr.getNpasp()))
+				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {
 			// TODO Auto-generated catch block
@@ -285,6 +431,8 @@ public class PInfo extends JFrame {
 
 		return root;
 	}
+	
+
 	
 	class PvizitTreeNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = 4212592425962984738L;
@@ -304,7 +452,7 @@ public class PInfo extends JFrame {
 	}
 	
 	class PvizitAmbNode extends DefaultMutableTreeNode{
-		private static final long serialVersionUID = -4684514837066276873L;
+		private static final long serialVersionUID = -5215124870459111226L;
 		private PvizitAmb pam;
 		
 		public PvizitAmbNode(PvizitAmb pam) {
@@ -316,6 +464,22 @@ public class PInfo extends JFrame {
 			return DateFormat.getDateInstance().format(new Date(pam.getDatap()));
 		}
 	}
+	
+	class PdiagTreeNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = -46003968655861926L;
+		private PdiagZ pdiag;
+		
+		public PdiagTreeNode(PdiagZ pdiag) {
+			this.pdiag = pdiag;
+			
+		}
+		
+		@Override
+		public String toString() {
+			return pdiag.getDiag();
+		}
+	}
+	
 	private void addLineToDetailInfo(String name, boolean isSet, Object value) {
 		if (isSet)
 			if ((name != null) && (value != null))
@@ -363,4 +527,7 @@ public class PInfo extends JFrame {
 	private void addHeader(String name) {
 		sb.append(name + lineSep);
 	}
+	
+
+	
 }

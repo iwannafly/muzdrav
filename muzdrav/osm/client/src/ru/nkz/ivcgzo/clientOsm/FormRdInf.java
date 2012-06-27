@@ -25,9 +25,14 @@ import java.awt.Color;
 import javax.swing.JOptionPane;
 
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-//import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
@@ -56,7 +61,6 @@ public class FormRdInf extends JFrame {
 	private JTextField TFio;
 	private JTextField TMrab;
 	private JTextField TTelef;
-	private JTextField TGrk;
 	private JTextField TPhf;
     private RdInfStruct rdinf;
     private int oslrod;
@@ -84,6 +88,10 @@ public class FormRdInf extends JFrame {
     private String namobr;
     private int codsem;
     private String namsem;
+	private int npasp;
+	private ThriftStringClassifierCombobox<StringClassifier> CBGrOtec;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBObr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSem;
 
 	/**
 	 * Launch the application.
@@ -118,6 +126,7 @@ public class FormRdInf extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
 		rdinf = new RdInfStruct();
+		
 		oslrod = rdinf.getOSocO();
 		if ((oslrod-128)<0){
 		or8=0; iw1=oslrod;	
@@ -185,16 +194,6 @@ public class FormRdInf extends JFrame {
 		ot2=1; iw2=iw2-2;	
 		}
 		ot1=iw2; 
-        if (rdinf.getObr()==1){namobr="Высшее";}
-        if (rdinf.getObr()==2){namobr="Незаконченное высшее";}
-        if (rdinf.getObr()==3){namobr="Среднее специальное";}
-        if (rdinf.getObr()==4){namobr="Среднее";}
-        if (rdinf.getObr()==5){namobr="Начальное";}
-        if (rdinf.getObr()==0){namobr="";}
-        if (rdinf.getSem()==1){namsem="Регистрированный";}
-        if (rdinf.getSem()==2){namsem="Не регистрированный";}
-        if (rdinf.getSem()==3){namsem="Одна";}
-        if (rdinf.getSem()==0){namsem="";}
 		JPanel panel = new JPanel();
 		contentPane.add(panel);
 		
@@ -205,23 +204,36 @@ public class FormRdInf extends JFrame {
 		TNkart.setText(Integer.toString(rdinf.idDispb));
 		
 		LObr = new JLabel("Образование");
+		CBObr = new ThriftIntegerClassifierCombobox<>(true);
 		
 		LSem = new JLabel("Семейное положение");
-		
+		CBSem = new ThriftIntegerClassifierCombobox<>(true);		
 		JPanel panel_1 = new JPanel();
 		
-		final JComboBox CBObr = new JComboBox();
-		CBObr.setModel(new DefaultComboBoxModel(new String[] {"Начальное", "Среднее", "Среднее специальное", "Незаконченное высшее", "Высшее"}));
-		CBObr.setSelectedItem(namobr);
-		
-		final JComboBox CBSem = new JComboBox();
-		CBSem.setModel(new DefaultComboBoxModel(new String[] {"Регистрированный", "Не регистрированный", "Одна"}));
-		CBSem.setSelectedItem(namsem);
 		JPanel panel_2 = new JPanel();
 		
 		JPanel panel_3 = new JPanel();
 		
 		JButton Sbutton = new JButton("Сохранить");
+		
+		JButton btnNewButton = new JButton("Новая запись");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					RdInfStruct rdinf = new RdInfStruct();
+					rdinf.setNpasp(npasp);
+					MainForm.tcl.AddRdInf(rdinf);
+					setRdInfData(rdinf);
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(FormRdInf.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				}
+			}
+
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -247,8 +259,10 @@ public class FormRdInf extends JFrame {
 							.addGap(100)
 							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(113)
-							.addComponent(Sbutton)))
+							.addGap(111)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnNewButton)
+								.addComponent(Sbutton))))
 					.addGap(77))
 		);
 		gl_panel.setVerticalGroup(
@@ -273,14 +287,16 @@ public class FormRdInf extends JFrame {
 								.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
+							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+							.addComponent(btnNewButton)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(27)
-							.addComponent(Sbutton)))
-					.addContainerGap())
+							.addComponent(Sbutton)
+							.addGap(48))))
 		);
 		
 		JLabel lblNewLabel_1 = new JLabel("Информация об отце ребенка");
@@ -319,12 +335,12 @@ public class FormRdInf extends JFrame {
 		
 		TTelef = new JTextField();
 		TTelef.setText(rdinf.telOtec);
-		
-		TGrk = new JTextField();
 //		TGrk.setText(rdinf.grOtec);
 		
 		TPhf = new JTextField();
 		TPhf.setText(rdinf.phOtec);
+		
+		CBGrOtec = new ThriftStringClassifierCombobox<>(true);
 		
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
@@ -342,17 +358,19 @@ public class FormRdInf extends JFrame {
 								.addComponent(LVoz)
 								.addComponent(LMrab)
 								.addComponent(LTel)
-								.addComponent(LGrk)
 								.addComponent(Lph))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addComponent(TTelef, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TMrab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TPhf, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TGrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SVozr, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(48, Short.MAX_VALUE))
+								.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING)
+									.addComponent(TPhf, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+									.addComponent(TMrab, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
+									.addComponent(TTelef, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(CBGrOtec, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(SVozr, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))))
+						.addComponent(LGrk))
+					.addContainerGap(37, Short.MAX_VALUE))
 		);
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -370,7 +388,7 @@ public class FormRdInf extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 						.addComponent(LGrk)
-						.addComponent(TGrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(CBGrOtec, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 						.addComponent(Lph)
@@ -508,7 +526,7 @@ public class FormRdInf extends JFrame {
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
 		Sbutton.addActionListener(new ActionListener() {
-			private int codobr (int codobr){
+/*			private int codobr (int codobr){
 				if (CBObr.getSelectedItem().equals("Высшее")){codobr = 1;}
 				if (CBObr.getSelectedItem().equals("Незаконченное высшее")){codobr = 2;}
 				if (CBObr.getSelectedItem().equals("Среднее специальное")){codobr = 3;}
@@ -523,7 +541,7 @@ public class FormRdInf extends JFrame {
 				if (CBObr.getSelectedItem().equals("Одна")){codsem = 3;}
 				if (CBObr.getSelectedItem().equals("")){codsem = 0;}
 							return codsem;
-			};
+			};*/
 			private int oslrod (int oslrod){
 		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
 		            if (ChBots.isSelected()){oslrod=oslrod+2;}
@@ -551,15 +569,20 @@ public class FormRdInf extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
-rdinf.setObr(codobr);
-rdinf.setSem(codsem);
+//rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
+//rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
 rdinf.setOSocO(oslrod);
 rdinf.setUslPr(uslj);
 rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
-//rdinf.setGrOtec(TGrk.getText());
+//rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
 rdinf.setPhOtec(TPhf.getText());
 			}
 		});
+	}
+
+	protected void setRdInfData(RdInfStruct rdinf2) {
+		// TODO Auto-generated method stub
+		
 	}
 }

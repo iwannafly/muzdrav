@@ -35,7 +35,10 @@ import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
+import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
+import ru.nkz.ivcgzo.thriftOsm.Pdisp;
+import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
@@ -65,6 +68,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pvizitAmbTypes; 
 	private final TResultSetMapper<PdiagAmb, PdiagAmb._Fields> rsmPdiagAmb;
 	private final Class<?>[] pdiagAmbTypes; 
+	private final TResultSetMapper<PdiagZ, PdiagZ._Fields> rsmPdiagZ;
+	private final Class<?>[] pdiagZTypes; 
 	private final TResultSetMapper<Psign, Psign._Fields> rsmPsign;
 	private final Class<?>[] psignTypes; 
 	private final TResultSetMapper<Priem, Priem._Fields> rsmPriem;
@@ -100,7 +105,10 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] anamZabTypes; 
 	private final TResultSetMapper<IsslInfo, IsslInfo._Fields> rsmIsslInfo;
 	@SuppressWarnings("unused")
-	private final Class<?>[] isslInfoTypes; 
+	private final Class<?>[] isslInfoTypes;
+	private final TResultSetMapper<Pdisp, Pdisp._Fields> rsmPdisp;
+	private final Class<?>[] pdispTypes;
+
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -117,11 +125,14 @@ public class ServerOsm extends Server implements Iface {
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
 		
-		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred",       "razv",       "uslov",      "per_zab",    "per_oper",   "gemotr",     "nasl",       "ginek",      "priem_lek",  "prim_gorm");
+		rsmPdiagZ = new TResultSetMapper<>(PdiagZ.class, "id",          "id_diag_amb", "npasp",       "diag",       "cpodr",       "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "nmvd",        "xzab",        "stady",       "disp",        "pat",         "prizb",       "prizi",       "named",      "nameC00");
+		pdiagZTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class};
+		
+		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred",       "razv",       "uslov",      "per_zab",    "per_oper",   "gemotrans",     "nasl",       "ginek",      "priem_lek",  "prim_gorm");
 		psignTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class};
 		
-		rsmPriem = new TResultSetMapper<>(Priem.class, "id_obr",      "npasp",       "id_pos",      "sl_ob",       "n_is",        "n_kons",      "n_proc",      "n_lek",       "t_jalob_d",  "t_jalob_krov", "t_jalob_p",  "t_jalob_moch", "t_jalob_endo", "t_jalob_nerv", "t_jalob_opor", "t_jalob_lih", "t_jalob_obh", "t_jalob_proch", "t_ob_sost",  "t_koj_pokr", "t_sliz",     "t_podk_kl",  "t_limf_uzl", "t_kost_mysh", "t_nervn_ps", "t_chss",     "t_temp",     "t_ad",       "t_rost",     "t_ves",      "t_telo",     "t_sust",     "t_dyh",      "t_gr_kl",    "t_perk_l",   "t_aus_l",    "t_bronho",   "t_arter",    "t_obl_s",    "t_perk_s",   "t_aus_s",    "t_pol_rta",  "t_jivot",    "t_palp_jivot", "t_jel_kish", "t_palp_jel", "t_palp_podjel", "t_pechen",   "t_jelch",    "t_selez",    "t_obl_zad",  "t_poyasn",   "t_pochk",    "t_moch",     "t_mol_jel", "t_gr_jel",    "t_matka",    "t_nar_polov", "t_chitov",   "t_st_localis", "t_ocenka",   "t_jalob",    "t_ist_zab",  "t_status_praesense", "t_fiz_obsl");
-		priemTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class,   String.class, String.class,   String.class,   String.class,   String.class,   String.class,  String.class,  String.class,    String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,   String.class, String.class, String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class,   String.class, String.class, String.class, String.class,         String.class};
+		rsmPriem = new TResultSetMapper<>(Priem.class, "id_obr",      "npasp",       "id_pos",      "sl_ob",       "n_is",        "n_kons",      "n_proc",      "n_lek",       "t_jalob_d",  "t_jalob_krov", "t_jalob_p",  "t_jalob_moch", "t_jalob_endo", "t_jalob_nerv", "t_jalob_opor", "t_jalob_lih", "t_jalob_obh", "t_jalob_proch", "t_ob_sost",  "t_koj_pokr", "t_sliz",     "t_podk_kl",  "t_limf_uzl", "t_kost_mysh", "t_nervn_ps", "t_chss",     "t_temp",     "t_ad",       "t_rost",     "t_ves",      "t_telo",     "t_sust",     "t_dyh",      "t_gr_kl",    "t_perk_l",   "t_aus_l",    "t_bronho",   "t_arter",    "t_obl_s",    "t_perk_s",   "t_aus_s",    "t_pol_rta",  "t_jivot",    "t_palp_jivot", "t_jel_kish", "t_palp_jel", "t_palp_podjel", "t_pechen",   "t_jelch",    "t_selez",    "t_obl_zad",  "t_poyasn",   "t_pochk",    "t_moch",     "t_mol_jel", "t_gr_jel",    "t_matka",    "t_nar_polov", "t_chitov",   "t_st_localis", "t_ocenka",   "t_jalob",    "t_status_praesense", "t_fiz_obsl");
+		priemTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class,   String.class, String.class,   String.class,   String.class,   String.class,   String.class,  String.class,  String.class,    String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,   String.class, String.class, String.class,    String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,  String.class, String.class,   String.class, String.class, String.class,         String.class};
 		
 		rsmPatComInfo = new TResultSetMapper<>(PatientCommonInfo.class, "npasp",       "fam",        "im",         "ot",         "datar",    "poms_ser",   "poms_nom",   "pol",         "jitel",       "sgrp",        "adp_obl",    "adp_gorod",  "adp_ul",     "adp_dom",    "adp_korp",   "adp_kv",     "adm_obl",    "adm_gorod",  "adm_ul",     "adm_dom",    "adm_korp",   "adm_kv",     "mrab",       "name_mr",    "ncex",        "poms_strg",   "poms_tdoc",   "poms_ndog",  "pdms_strg",   "pdms_ser",   "pdms_nom",   "pdms_ndog",  "cpol_pr",     "terp",        "datapr",   "tdoc",        "docser",     "docnum",     "datadoc",  "odoc",       "snils",      "dataz",    "prof",       "tel",        "dsv",      "prizn",       "ter_liv",     "region_liv");
 		patComInfoTypes = new Class<?>[] {                              Integer.class, String.class, String.class, String.class, Date.class, String.class, String.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, Date.class, String.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
@@ -150,11 +161,14 @@ public class ServerOsm extends Server implements Iface {
 		rsmPokaz = new TResultSetMapper<>(Pokaz.class, "pcod",       "name_n",     "stoim",      "c_p0e1",      "c_n_nz1");
 		pokazTypes = new Class<?>[] {                  String.class, String.class, Double.class, Integer.class, String.class};
 		
-		rsmAnamZab = new TResultSetMapper<>(AnamZab.class, "id_pvizit",   "npasp",       "t_nachalo_zab", "t_sympt",    "t_otn_bol", "t_ps_syt");
-		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class,    String.class, String.class, String.class};
+		rsmAnamZab = new TResultSetMapper<>(AnamZab.class, "id_pvizit",   "npasp",       "t_nachalo_zab", "t_sympt",    "t_otn_bol", "t_ps_syt",    "t_ist_zab");
+		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class,    String.class, String.class, String.class, String.class};
 		
 		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cp0e1",       "np0e1",      "cldi",       "nldi",       "zpok",       "datav");
 		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class};
+																																
+		rsmPdisp = new TResultSetMapper<>(Pdisp.class, "id_diag",     "npasp",       "id",          "diag",       "pcod",        "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "sob",         "sxoch");
+		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Boolean.class, Boolean.class};
 	}
 
 	@Override
@@ -184,7 +198,8 @@ public class ServerOsm extends Server implements Iface {
 //		UpdatePvizit(obr);
 //		DeletePvizit(obr.id);
 		
-//		Psign psign = new Psign(1, "2", "3", "4", "5", "6", "7");
+//		Psign psign = new Psign(1, "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16");
+//		Psign psign = new Psign().setNpasp(5).setPrim_gorm("11");
 //		setPsign(psign);
 //		psign = getPsign(psign.npasp);
 		
@@ -222,6 +237,10 @@ public class ServerOsm extends Server implements Iface {
 //		AnamZab az = new AnamZab(377, 2, "начало заболевания", "симптом", "отношение больного к заболеванию", "посттравматические синдромы");
 //		setAnamZab(az);
 		
+//		PdiagZ pdz = new PdiagZ().setId_diag_amb(172).setNpasp(2).setDiag("3").setCpodr(4).setD_post(5).setD_grup(6).setIshod(7).setDataish(8).setDatag(9).setDatad(10).setDiag_s("11").setD_grup_s(12).setCod_sp(13).setCdol_ot("14");
+//		AddPdiagZ(pdz);
+//		List<PdiagZ> ldz = getPdiagZ(pdz.getNpasp());
+		
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
@@ -256,7 +275,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public Pvizit getPvizit(int obrId) throws PvizitNotFoundException, KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE id = ? ", obrId)) {
-			if (acrs.getResultSet().next())
+		if (acrs.getResultSet().next())
 				return rsmPvizit.map(acrs.getResultSet());
 			else
 				throw new PvizitNotFoundException();
@@ -268,7 +287,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, ztext = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 12, 0);
+			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -300,7 +319,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<PvizitAmb> getPvizitAmb(int obrId) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ", obrId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ORDER BY pva.datap", obrId)) {
 			return rsmPvizitAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -385,10 +404,10 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
 				getPsign(sign.npasp);
-				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ? WHERE npasp = ? ", false, sign, psignTypes, 1, 2, 3, 4, 5, 6, 0);
+				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ?, razv = ?, uslov = ?, per_zab = ?, per_oper = ?, gemotrans = ?, nasl = ?, ginek = ?, priem_lek = ?, prim_gorm = ? WHERE npasp = ? ", false, sign, psignTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0);
 				sme.setCommit();
 			} catch (PsignNotFoundException e) {
-				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6);
+				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred, razv, uslov, per_zab, per_oper, gemotrans, nasl, ginek, priem_lek, prim_gorm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 				sme.setCommit();
 			}
 		} catch (SQLException | InterruptedException e) {
@@ -411,19 +430,25 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void setPriem(Priem pr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_priem SET sl_ob = ?, n_is = ?, n_kons = ?, n_proc = ?, n_lek = ?, t_jalob_d = ?, t_jalob_krov = ?, t_jalob_p = ?, t_jalob_moch = ?, t_jalob_endo = ?, t_jalob_nerv = ?, t_jalob_opor = ?, t_jalob_lih = ?, t_jalob_obh = ?, t_jalob_proch = ?, t_ob_sost = ?, t_koj_pokr = ?, t_sliz = ?, t_podk_kl = ?, t_limf_uzl = ?, t_kost_mysh = ?, t_nervn_ps = ?, t_chss = ?, t_temp = ?, t_ad = ?, t_rost = ?, t_ves = ?, t_telo = ?, t_sust = ?, t_dyh = ?, t_gr_kl = ?, t_perk_l = ?, t_aus_l = ?, t_bronho = ?, t_arter = ?, t_obl_s = ?, t_perk_s = ?, t_aus_s = ?, t_pol_rta = ?, t_jivot = ?, t_palp_jivot = ?, t_jel_kish = ?, t_palp_jel = ?, t_palp_podjjel = ?, t_pechen = ?, t_jelch = ?, t_selez = ?, t_obl_zad = ?, t_poyasn = ?, t_pochk = ?, t_moch = ?, t_mol_jel = ?, t_gr_jel = ?, t_matka = ?, t_nar_polov = ?, t_chitov = ?, t_st_localis = ?, t_ocenka = ?, t_jalob = ?, t_ist_zab = ?, t_status_praesense = ?, t_fiz_obsl = ? WHERE id_obr = ? AND npasp = ? AND id_pos = ? ", false, pr, priemTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 0, 1, 2);
+			sme.execPreparedT("UPDATE p_priem SET sl_ob = ?, n_is = ?, n_kons = ?, n_proc = ?, n_lek = ?, t_jalob_d = ?, t_jalob_krov = ?, t_jalob_p = ?, t_jalob_moch = ?, t_jalob_endo = ?, t_jalob_nerv = ?, t_jalob_opor = ?, t_jalob_lih = ?, t_jalob_obh = ?, t_jalob_proch = ?, t_ob_sost = ?, t_koj_pokr = ?, t_sliz = ?, t_podk_kl = ?, t_limf_uzl = ?, t_kost_mysh = ?, t_nervn_ps = ?, t_chss = ?, t_temp = ?, t_ad = ?, t_rost = ?, t_ves = ?, t_telo = ?, t_sust = ?, t_dyh = ?, t_gr_kl = ?, t_perk_l = ?, t_aus_l = ?, t_bronho = ?, t_arter = ?, t_obl_s = ?, t_perk_s = ?, t_aus_s = ?, t_pol_rta = ?, t_jivot = ?, t_palp_jivot = ?, t_jel_kish = ?, t_palp_jel = ?, t_palp_podjjel = ?, t_pechen = ?, t_jelch = ?, t_selez = ?, t_obl_zad = ?, t_poyasn = ?, t_pochk = ?, t_moch = ?, t_mol_jel = ?, t_gr_jel = ?, t_matka = ?, t_nar_polov = ?, t_chitov = ?, t_st_localis = ?, t_ocenka = ?, t_jalob = ?, t_status_praesense = ?, t_fiz_obsl = ? WHERE id_obr = ? AND npasp = ? AND id_pos = ? ", false, pr, priemTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 0, 1, 2);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
 		}
 	}
 	
-	@Override
-	public void AddPdiagZ(PdiagZ dz) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
+//	@Override
+//	public int AddPdiagZ(PdiagZ dz) throws KmiacServerException, TException {
+//		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//			sme.execPreparedT("INSERT INTO p_diag (id_diag_amb, npasp, diag, cpodr, d_vz, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot, nmvd, xzab, stady, disp, pat, prizb, prizi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, dz, pdiagZTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
+//			int id = sme.getGeneratedKeys().getInt("id");
+//			sme.setCommit();
+//			return id;
+//		} catch (InterruptedException | SQLException e) {
+//			throw new KmiacServerException();
+//		}
+//	}
+//
 	@Override
 	public List<StringClassifier> getP0c() throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0c ")) {
@@ -599,7 +624,17 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-
+	
+	@Override
+	public List<IntegerClassifier> getVdi() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_vdi ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+	
 	@Override
 	public List<RdSlStruct> getRdSlInfo(int idDispb, int npasp)
 			throws KmiacServerException, TException {
@@ -887,9 +922,12 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<PdiagZ> getPdiagZ(int id_diag) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PdiagZ> getPdiagzProsm(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_diag WHERE npasp = ? ", npasp)) {
+			return rsmPdiagZ.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
@@ -916,7 +954,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void setAnamZab(AnamZab anam) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_anam_zab SET t_nachalo_zab = ?, t_sympt = ?, t_otn_bol = ?, t_ps_syt = ? WHERE id_pvizit = ? ", false, anam, anamZabTypes, 2, 3, 4, 5, 0);
+			sme.execPreparedT("UPDATE p_anam_zab SET t_nachalo_zab = ?, t_sympt = ?, t_otn_bol = ?, t_ps_syt = ?, t_ist_zab = ? WHERE id_pvizit = ? ", false, anam, anamZabTypes, 2, 3, 4, 5, 6, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -938,4 +976,199 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
+
+	@Override
+	public List<IntegerClassifier> get_n_ai0() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_ai0 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_abs() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_abs ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_abv() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_abv ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_abx() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_abx ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_aby() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_aby ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_abc() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_abc ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_abb() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_abb ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<PdiagAmb> getPdiagAmbProsm(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE npasp = ? AND predv = FALSE ", npasp)) {
+			return rsmPdiagAmb.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+//	@Override
+//	public void UpdateDiagZ(PdiagZ dz) throws KmiacServerException, TException {
+//		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//			sme.execPreparedT("UPDATE p_diag SET diag = ?, cpodr = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ? WHERE id_diag_amb = ?", false, dz, pdiagZTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 1);
+//			sme.setCommit();
+//		} catch (InterruptedException | SQLException e) {
+//			throw new KmiacServerException();
+//		}
+//	}
+//
+//	@Override
+//	public int AddPdisp(Pdisp disp) throws KmiacServerException, TException {
+//		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//			sme.execPreparedT("INSERT INTO p_disp (id_diag, npasp, diag, pcod, d_vz, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot, sob, sxoch) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, disp, pdispTypes, 0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+//			int id = sme.getGeneratedKeys().getInt("id");
+//			sme.setCommit();
+//			return id;
+//		} catch (InterruptedException | SQLException e) {
+//			throw new KmiacServerException();
+//		}
+//	}
+//
+//	@Override
+//	public void UpdatePdisp(Pdisp disp) throws KmiacServerException, TException {
+//		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//			sme.execPreparedT("UPDATE p_disp SET diag = ?, pcod = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, sob = ?, sxoch = ?) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE id_diag = ? ", false, disp, pdispTypes, 	3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
+//			sme.setCommit();
+//		} catch (InterruptedException | SQLException e) {
+//			throw new KmiacServerException();
+//		}
+//	}
+//
+	@Override
+	public List<IntegerClassifier> getShablonTexts(int id_razd, int id_pok, String pcod_s00) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT t.id AS pcod, t.text AS name FROM sh_s_text t JOIN sh_s_cdol c ON (c.id_razd = t.id_razd AND c.id_pok = t.id_pok AND c.pcod_s00 = t.pcod_s00) WHERE c.checked = true AND c.id_razd = ? AND c.id_pok = ? AND c.pcod_s00 = ? ", id_razd, id_pok, pcod_s00)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShablonCdol(int id_razd, String pcod_s00) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id_pok AS pcod, pcod_s00 AS name FROM sh_s_cdol WHERE checked = true AND id_razd = ? AND pcod_s00 = ? ", id_razd, pcod_s00)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getPokNames() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id AS pcod, name FROM sh_n_pok ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public PdiagZ getPdiagZ(int id_diag_amb) throws PdiagNotFoundException, KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT d.*, c.name AS nameC00 FROM p_diag d LEFT JOIN n_c00 c ON (c.pcod = d.diag) WHERE d.id_diag_amb = ? ", id_diag_amb)) {
+			if (acrs.getResultSet().next())
+				return rsmPdiagZ.map(acrs.getResultSet());
+			else
+				throw new PdiagNotFoundException();
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public Pdisp getPdisp(int id_diag) throws PdispNotFoundException, KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_disp WHERE id_diag = ? ", id_diag)) {
+			if (acrs.getResultSet().next())
+				return rsmPdisp.map(acrs.getResultSet());
+			else
+				throw new PdispNotFoundException();
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public int setPdiag(PdiagZ diag) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			try {
+				getPdiagZ(diag.id_diag_amb);
+				sme.execPreparedT("UPDATE p_diag SET diag = ?, cpodr = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ?, named = ? WHERE id_diag_amb = ?", false, diag, pdiagZTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 1);
+				sme.setCommit();
+				return diag.getId();
+			} catch (PdiagNotFoundException e) {
+				sme.execPreparedT("INSERT INTO p_diag (id_diag_amb, npasp, diag, cpodr, d_vz, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot, nmvd, xzab, stady, disp, pat, prizb, prizi, named) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, diag, pdiagZTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
+				int id = sme.getGeneratedKeys().getInt("id");
+				sme.setCommit();
+				return id;
+			}
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public int setPdisp(Pdisp disp) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			try {
+				getPdisp(disp.id_diag);
+				sme.execPreparedT("UPDATE p_disp SET diag = ?, pcod = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, sob = ?, sxoch = ? WHERE id_diag = ? ", false, disp, pdispTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
+				sme.setCommit();
+				return disp.getId();
+			} catch (PdispNotFoundException e) {
+				sme.execPreparedT("INSERT INTO p_disp (id_diag, npasp, diag, pcod, d_vz, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot, sob, sxoch) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, disp, pdispTypes, 0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
+				int id = sme.getGeneratedKeys().getInt("id");
+				sme.setCommit();
+				return id;
+			}
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+
 }
