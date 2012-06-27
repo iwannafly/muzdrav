@@ -8,10 +8,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.StringReader;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -161,7 +157,6 @@ public class Vvod extends JFrame {
 	private PInfo pinfo;
 	private CustomDateEditor tfDvz;
 	public static List<IntegerClassifier> pokNames;
-	private JCheckBox cbDisp;
 	private JRadioButton rbPoz;
 	private JRadioButton rbRan;
 	private JRadioButton rbOstr;
@@ -2029,7 +2024,6 @@ public class Vvod extends JFrame {
 						cbPatol.setSelected(pdiag.getPat() == 1);
 						cbPriznb.setSelected(pdiag.getPrizb() == 1);
 						cbPrizni.setSelected(pdiag.getPrizi() == 1);
-						cbDisp.setSelected(pdiag.getDisp() == 1);
 						
 						pdisp = new Pdisp();
 						try {
@@ -2041,8 +2035,17 @@ public class Vvod extends JFrame {
 						} catch (TException e) {
 							MainForm.conMan.reconnect(e);
 						}
-						tfDvz.setDate(pdisp.getD_vz());
-						tfFDatDIsh.setDate(pdisp.getDataish());
+						
+						if (pdisp.isSetD_vz())
+							tfDvz.setDate(pdisp.getD_vz());
+						else
+							tfDvz.setDate(null);
+						
+						if (pdisp.isSetDataish())
+							tfFDatDIsh.setDate(pdisp.getDataish());
+						else
+							tfFDatDIsh.setDate(null);
+						
 						if (pdisp.isSetIshod())
 							cbDish.setSelectedPcod(pdisp.getIshod());
 						else
@@ -2155,11 +2158,12 @@ public class Vvod extends JFrame {
 					  			if (cbPatol.isSelected()) pdiag.setPat(1);
 					  			if (cbPriznb.isSelected()) pdiag.setPrizb(1);
 					  			if (cbPrizni.isSelected()) pdiag.setPrizi(1);
-//					  			pdiag.setDisp(Boolean.t cbDisp.isSelected());
+					  			if (tfDvz.getDate() != null) pdiag.setDisp(1);
 					  			MainForm.tcl.setPdiag(pdiag);
 					  		}
 				  		MainForm.tcl.UpdatePdiagAmb(diagamb);
-			  			if (cbDisp.isSelected()){
+				  		
+			  			if (tfDvz.getDate() != null){
 				  			pdisp.setId_diag(diagamb.getId());
 				  			pdiag.setId_diag_amb(diagamb.getId());
 				  			pdisp.setNpasp(diagamb.getNpasp());
@@ -2275,8 +2279,6 @@ public class Vvod extends JFrame {
 				   
 				    cbDgrup = new ThriftIntegerClassifierCombobox<>(true);
 				    
-				      cbDisp = new JCheckBox("Состоит на д/у");
-				    
 				    JLabel lblDatDIsh = new JLabel("Дата установления исхода");
 				    
 				    tfFDatDIsh = new CustomDateEditor();
@@ -2292,14 +2294,12 @@ public class Vvod extends JFrame {
 				    						.addGroup(gl_pDisp.createSequentialGroup()
 				    							.addComponent(lblDvz)
 				    							.addGap(4)
-				    							.addComponent(tfDvz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-				    							.addGap(37)
-				    							.addComponent(cbDisp, GroupLayout.PREFERRED_SIZE, 127, GroupLayout.PREFERRED_SIZE))
+				    							.addComponent(tfDvz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				    						.addGroup(gl_pDisp.createSequentialGroup()
 				    							.addComponent(lblDGrup)
 				    							.addPreferredGap(ComponentPlacement.RELATED)
 				    							.addComponent(cbDgrup, GroupLayout.PREFERRED_SIZE, 216, GroupLayout.PREFERRED_SIZE)))
-				    					.addGap(79))
+				    					.addGap(156))
 				    				.addGroup(gl_pDisp.createSequentialGroup()
 				    					.addComponent(lblDatDIsh, GroupLayout.PREFERRED_SIZE, 152, GroupLayout.PREFERRED_SIZE)
 				    					.addPreferredGap(ComponentPlacement.RELATED)
@@ -2307,7 +2307,7 @@ public class Vvod extends JFrame {
 				    				.addGroup(gl_pDisp.createSequentialGroup()
 				    					.addComponent(lblDish)
 				    					.addPreferredGap(ComponentPlacement.RELATED)
-				    					.addComponent(cbDish, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+				    					.addComponent(cbDish, GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)))
 				    			.addContainerGap())
 				    );
 				    gl_pDisp.setVerticalGroup(
@@ -2317,9 +2317,7 @@ public class Vvod extends JFrame {
 				    				.addGroup(gl_pDisp.createSequentialGroup()
 				    					.addGap(3)
 				    					.addComponent(lblDvz))
-				    				.addGroup(gl_pDisp.createParallelGroup(Alignment.BASELINE)
-				    					.addComponent(tfDvz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-				    					.addComponent(cbDisp)))
+				    				.addComponent(tfDvz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 				    			.addPreferredGap(ComponentPlacement.RELATED)
 				    			.addGroup(gl_pDisp.createParallelGroup(Alignment.BASELINE)
 				    				.addComponent(lblDGrup)
@@ -2332,7 +2330,7 @@ public class Vvod extends JFrame {
 				    			.addGroup(gl_pDisp.createParallelGroup(Alignment.BASELINE)
 				    				.addComponent(lblDatDIsh)
 				    				.addComponent(tfFDatDIsh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				    			.addContainerGap(4, Short.MAX_VALUE))
+				    			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				    );
 				    pDisp.setLayout(gl_pDisp);
 				    pds.setLayout(gl_pds);
