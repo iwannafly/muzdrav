@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.clientGenTalons;
 
+import java.util.List;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -8,16 +10,27 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.JTabbedPane;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
+import javax.swing.UIManager;
+import javax.swing.JTable;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTabbedPane;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
@@ -30,10 +43,9 @@ import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons.Iface;
 import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.UIManager;
-import javax.swing.JTable;
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
+import javax.swing.table.DefaultTableModel;
 
 public class TalonMainFrame extends JFrame {
 
@@ -43,7 +55,8 @@ public class TalonMainFrame extends JFrame {
 	private String curSpec = null;
 	private int curVrach = 0;
 	private final ButtonGroup btnGroup_cxema = new ButtonGroup();
-	private JTable table;
+	private List<Nrasp> NraspInfo;
+	private CustomTable<Nrasp, Nrasp._Fields> tbl_rasp;
 
 	/**
 	 * Launch the application.
@@ -99,28 +112,39 @@ public class TalonMainFrame extends JFrame {
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0445\u0435\u043C\u0443 \u0440\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u044F :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
+		
+		JEditorPane editorPane = new JEditorPane();
 		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
 		gl_tbRasp.setHorizontalGroup(
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-						.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 360, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(310, Short.MAX_VALUE))
+						.addComponent(editorPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE)
+							.addGap(417))
+						.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE))
+					.addGap(76))
 		);
 		gl_tbRasp.setVerticalGroup(
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-					.addGap(51)
-					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(383, Short.MAX_VALUE))
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 89, Short.MAX_VALUE)
+					.addGap(27)
+					.addComponent(editorPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+					.addGap(389))
 		);
 		
-		table = new JTable();
-		scrollPane_1.setViewportView(table);
+		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 3,"Вид приема",4,"С",5,"По");
+		tbl_rasp.setPreferredWidths(90,50,50);
+//		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 3,"Вид приема",4,"С",5,"По",4,"С",5,"По",4,"С",5,"По",4,"С",5,"По",4,"С",5,"По");
+//		tbl_rasp.setPreferredWidths(90,50,50,50,50,50,50,50,50,50,50);
+		tbl_rasp.setFillsViewportHeight(true);
+		scrollPane_1.setViewportView(tbl_rasp);
 		
 		JRadioButton cxm_1 = new JRadioButton("на каждый день");
 		btnGroup_cxema.add(cxm_1);
