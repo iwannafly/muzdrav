@@ -18,12 +18,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<location>D:/kmiac_repos/gitrep/muzdrav/genTalons/config</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/genTalons/config</locationURI>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<location>D:/kmiac_repos/gitrep/muzdrav/genTalons/thrift/gen-java</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/genTalons/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
