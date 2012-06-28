@@ -1,17 +1,23 @@
 package ru.nkz.ivcgzo.clientVrachInfo;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
+import javax.swing.AbstractCellEditor;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransportException;
@@ -19,6 +25,8 @@ import org.apache.thrift.transport.TTransportException;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
+import ru.nkz.ivcgzo.clientManager.common.swing.TableComboBoxIntegerEditor;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.MestoRab;
 import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 
@@ -43,6 +51,7 @@ public class UserPanel extends JPanel {
 				try {
 					if (!arg0.getValueIsAdjusting()) {
 						if (tblVrach.getSelectedItem() != null) {
+							MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod);
 							tblMrab.setData(MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod));
 							btnVrPerm.setEnabled(tblMrab.getRowCount() > 0);
 							btnMrDel.setEnabled(btnVrPerm.isEnabled());
@@ -125,7 +134,9 @@ public class UserPanel extends JPanel {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<MestoRab> event) {
 				try {
-					MainForm.tcl.DelMrab(event.getItem().id);
+					MainForm.tcl.DelMrab(event.getItem());
+					btnVrPerm.setEnabled(tblMrab.getRowCount() > 1);
+					btnMrDel.setEnabled(btnVrPerm.isEnabled());
 					return true;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
@@ -139,7 +150,7 @@ public class UserPanel extends JPanel {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<MestoRab> event) {
 				try {
-					MainForm.tcl.UpdMrab(event.getItem(), MainForm.authInfo.getUser_id());
+					MainForm.tcl.UpdMrab(event.getItem());
 					return true;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
@@ -154,9 +165,11 @@ public class UserPanel extends JPanel {
 			public boolean doAction(CustomTableItemChangeEvent<MestoRab> event) {
 				try {
 					MestoRab item = event.getItem();
-					item.pcod = tblVrach.getSelectedItem().pcod;
-					item.clpu = 20;
+					item.setPcod(tblVrach.getSelectedItem().getPcod());
+					item.setClpu(MainForm.authInfo.getClpu());
 					item.id = MainForm.tcl.AddMrab(item);
+					btnVrPerm.setEnabled(true);
+					btnMrDel.setEnabled(btnVrPerm.isEnabled());
 					return true;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
@@ -257,6 +270,66 @@ public class UserPanel extends JPanel {
 	
 	public void onConnect() throws TException {
 		tblVrach.setData(MainForm.tcl.GetVrachList());
+		tblVrach.setIntegerClassifierSelector(3, MainForm.tcl.get_n_z30());
+		tblVrach.setStringClassifierSelector(5, MainForm.tcl.get_n_z00());
+		
+		tblMrab.setIntegerClassifierSelector(0, MainForm.tcl.get_n_p0s13());
+		new TableVidSluComboBoxEditorRenderer(tblMrab, 0, 1);
 		tblMrab.setIntegerClassifierSelector(4, MainForm.tcl.getPrizndList());
+		tblMrab.setStringClassifierSelector(2, MainForm.tcl.get_n_s00());
+	}
+	
+	class TableVidSluComboBoxEditorRenderer extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
+		private static final long serialVersionUID = -5851458127435781104L;
+		private static final int sluCount = 4;
+		private int sluColIdx;
+		private int colIdx;
+		private CustomTable<MestoRab, MestoRab._Fields> table;
+		private TableComboBoxIntegerEditor[] cmbs;
+		private TableComboBoxIntegerEditor curCmb;
+
+		public TableVidSluComboBoxEditorRenderer(CustomTable<MestoRab, MestoRab._Fields> table, int sluColIdx, int colIdx) throws TException {
+			this.sluColIdx = sluColIdx;
+			this.colIdx = colIdx;
+			this.table = table;
+			
+			cmbs = new TableComboBoxIntegerEditor[sluCount];
+			
+			cmbs[0] = new TableComboBoxIntegerEditor(new ArrayList<IntegerClassifier>());
+			cmbs[1] = new TableComboBoxIntegerEditor(MainForm.tcl.get_n_o00(MainForm.authInfo.clpu));
+			cmbs[2] = new TableComboBoxIntegerEditor(MainForm.tcl.get_n_n00(MainForm.authInfo.clpu));
+			cmbs[3] = new TableComboBoxIntegerEditor(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
+			
+			resetColumnModel();
+		}
+		
+		public void resetColumnModel() {
+			table.getColumnModel().getColumn(colIdx).setCellEditor(this);
+			table.getColumnModel().getColumn(colIdx).setCellRenderer(this);
+		}
+		
+		@Override
+		public Object getCellEditorValue() {
+			return curCmb.getCellEditorValue();
+		}
+
+		@Override
+		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+			curCmb = cmbs[(int) this.table.getValueAt(row, sluColIdx)];
+			
+			return curCmb.getEditor();
+		}
+		
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			Object sluValue = this.table.getValueAt(row, sluColIdx);
+			
+			if (sluValue != null)
+				curCmb = cmbs[(int) sluValue];
+			else
+				curCmb = cmbs[0];
+			
+			return curCmb.getRender().getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+		}
 	}
 }
