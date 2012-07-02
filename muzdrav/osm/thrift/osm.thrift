@@ -192,14 +192,15 @@ struct PdiagZ{
 	13: optional i32 d_grup_s;
 	14: optional i32 cod_sp;
 	15: optional string cdol_ot;
-	16: optional string named;
-	17: optional i32 nmvd;
-	18: optional i32 xzab;
-	19: optional i32 stady;
+	16: optional i32 nmvd;
+	17: optional i32 xzab;
+	18: optional i32 stady;
+	19: optional i32 disp;
 	20: optional i32 pat;
 	21: optional i32 prizb;
 	22: optional i32 prizi;
-	23: optional i32 disp;
+	23: optional string named;
+	24: optional string nameC00;
 }
 
 struct PatientCommonInfo {
@@ -459,6 +460,11 @@ exception PriemNotFoundException {
 exception PatientNotFoundException {
 }
 
+exception PdiagNotFoundException {
+}
+
+exception PdispNotFoundException {
+}
 
 /**
  * 
@@ -496,14 +502,16 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Priem getPriem(1: i32 npasp, 2: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
 
-	i32 AddPdiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
+	//i32 AddPdiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagZ> getPdiagzProsm(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
-	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
+	//void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
+	i32 setPdiag(1: PdiagZ diag) throws (1: kmiacServer.KmiacServerException kse);
+	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
-	i32 AddPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdatePdisp(1: Pdisp diag) throws (1: kmiacServer.KmiacServerException kse);
-	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse);
+	//i32 AddPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
+	//void UpdatePdisp(1: Pdisp diag) throws (1: kmiacServer.KmiacServerException kse);
+	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
+	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
 	
 
 	/*Исследования*/
@@ -520,7 +528,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
 	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
-	string printVypis(1: i32 npasp, 2: i32 pvizitAmbId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
+	string printVypis(1: i32 npasp, 2: i32 pvizitId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
 
 

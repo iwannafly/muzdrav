@@ -123,10 +123,12 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(ListSelectionEvent e) {
-					if (getSelectedRow() > -1)
-						updateSelectedItem();
-					sel = getSelectedItem();
-					cop = getDeepCopySelectedItem();
+					if (!e.getValueIsAdjusting()) {
+						if (getSelectedRow() > -1)
+							updateSelectedItem();
+						sel = getSelectedItem();
+						cop = getDeepCopySelectedItem();
+					}
 				}
 			});
 			
@@ -176,9 +178,31 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 						addItem();
 				}
 			});
+		    
+		    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancelSelRow");
+		    this.getActionMap().put("cancelSelRow", new AbstractAction() {
+				private static final long serialVersionUID = 8883313793725297972L;
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (getSelectedRow() < 0)
+						return;
+					
+					itemUpd = true;
+					if (itemAdd) {
+						sel = null;
+					} else {
+						sel = getDeepCopyItem(cop);
+						itemAdd = false;
+					}
+					lst.set(copIdx, sel);
+					updateSelectedItem();
+		        }
+		    });
 		}
 		
 		this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.setAutoCreateColumnsFromModel(false);
+		this.createDefaultColumnsFromModel();
 	}
 	
 	private F[] getThriftFields(Class<T> cls) {
@@ -327,15 +351,20 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * изменений строки в случае ошибки синхронизации с сервером.
 	 */
 	private T getDeepCopySelectedItem() {
+		return getDeepCopyItem(getSelectedItem());
+	}
+	
+	private T getDeepCopyItem(T item) {
 		T copy;
 		
-		if (sel != null) {
+		if (item != null) {
 			try {
 				F thrFld;
 				copy = cls.newInstance();
 				for (int i = 0; i < thrFields.length; i++) {
 					thrFld = thrFields[i];
-					copy.setFieldValue(thrFld, sel.getFieldValue(thrFld));
+					if (item.isSet(thrFld))
+						copy.setFieldValue(thrFld, item.getFieldValue(thrFld));
 				}
 				copIdx = getSortedRowIndex();
 				return copy;
@@ -360,8 +389,9 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				thrFld = thrFields[i];
 				if (i1.isSet(thrFld) != i2.isSet(thrFld))
 					return false;
-				if (!i1.getFieldValue(thrFld).equals(i2.getFieldValue(thrFld)))
-					return false;
+				if (i1.isSet(thrFld))
+					if (!i1.getFieldValue(thrFld).equals(i2.getFieldValue(thrFld)))
+						return false;
 			}
 		}
 		return true;
@@ -412,15 +442,16 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			@Override
 			public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 				try {
-					if (aValue != null)
-						if (aValue.toString().length() == 0)
-							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
-						else if (colTypes[colOrder[columnIndex]] == Date.class)
-							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], ((Date)aValue).getTime());
+					if (lst.get(rowIndex) != null)
+						if (aValue != null)
+							if (aValue.toString().length() == 0)
+								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
+							else if (colTypes[colOrder[columnIndex]] == Date.class)
+								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], ((Date)aValue).getTime());
+							else
+								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], aValue);
 						else
-							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], aValue);
-					else
-						lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
+							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
 					itemUpd = true;
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -501,7 +532,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				else if (cmp instanceof JComboBox<?>)
 					((JComboBox<?>)cmp).showPopup();
 		}
-	
+		
 		return result;
 	}
 	
@@ -568,7 +599,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsInserted(updRow, updRow);
+			getModel().fireTableRowsInserted(selRow, selRow);
 			selRow = convertRowIndexToView(selRow);
 			this.changeSelection(selRow, 0, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
@@ -576,7 +607,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			break;
 		case 2: //update
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsUpdated(updRow, updRow);
+			getModel().fireTableRowsUpdated(selRow, selRow);
 			this.changeSelection(selRow, 0, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
@@ -608,8 +639,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 					boolean res = (updSelRowLst != null) ? updSelRowLst.doAction(new CustomTableItemChangeEvent<>(this, sel)) : true;
 					if (!res)
 						lst.set(copIdx, cop);
-					updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 				}
+				updateSelectedIndex(getSelectedRow(), getSelectedColumn(), copIdx, 2);
 			} else {
 				if (!checkEmpty(sel)) {
 					if (addRowLst != null)
@@ -637,13 +668,23 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * Добавление новой строки.
 	 */
 	public void addItem() {
+		addItem(null);
+	}
+	
+	/**
+	 * Добавление новой строки.
+	 */
+	public void addItem(T item) {
 		if (itemAdd && !itemUpd)
 			deleteSelectedRow();
 		else if (itemAdd)
 			updateSelectedItem();
 		
 		try {
-			lst.add(cls.newInstance());
+			if (item == null)
+				lst.add(cls.newInstance());
+			else
+				lst.add(item);
 			updateSelectedIndex(lst.size(), getSelectedColumn(), lst.size(), 1);
 			itemUpd = false;
 			itemAdd = true;

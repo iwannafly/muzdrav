@@ -19,6 +19,7 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
+import java.awt.Font;
 
 public class PacientMainFrame extends JFrame {
 	private static final long serialVersionUID = 8528181014663112901L;
@@ -40,9 +41,10 @@ public class PacientMainFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public PacientMainFrame() {
+		setFont(new Font("Tahoma", Font.PLAIN, 11));
 		setTitle("Поиск пациента");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(200, 200, 264, 279);
+		setBounds(200, 200, 308, 279);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -69,6 +71,7 @@ public class PacientMainFrame extends JFrame {
 		);
 		
 		JButton btnOtkaz = new JButton("Отказ");
+		btnOtkaz.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		btnOtkaz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				dispose();
@@ -76,6 +79,7 @@ public class PacientMainFrame extends JFrame {
 		});
 		
 		JButton btnPoisk = new JButton("Поиск");
+		btnPoisk.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		btnPoisk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			    //TODO мои исправления
@@ -113,14 +117,14 @@ public class PacientMainFrame extends JFrame {
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addGap(26)
-					.addComponent(btnOtkaz)
-					.addPreferredGap(ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
-					.addComponent(btnPoisk)
-					.addGap(30))
+					.addComponent(btnOtkaz, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+					.addGap(42)
+					.addComponent(btnPoisk, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(30, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
-			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+			gl_panel_1.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnOtkaz)
@@ -130,39 +134,51 @@ public class PacientMainFrame extends JFrame {
 		panel_1.setLayout(gl_panel_1);
 		
 		tfFam = new JTextField();
+		tfFam.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfFam.setColumns(10);
 		
 		tfIm = new JTextField();
+		tfIm.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfIm.setColumns(10);
 		
 		tfOt = new JTextField();
+		tfOt.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfOt.setColumns(10);
 		
 		tfDr = new JTextField();
+		tfDr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfDr.setColumns(10);
 		
 		tfSer = new JTextField();
+		tfSer.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfSer.setColumns(10);
 		
 		tfNom = new JTextField();
+		tfNom.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfNom.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("Фамилия");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblNewLabel_1 = new JLabel("Имя");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblNewLabel_2 = new JLabel("Отчество");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblNewLabel_3 = new JLabel("Дата рождения");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblNewLabel_4 = new JLabel("Полис ОМС:  Серия");
+		lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblNewLabel_5 = new JLabel("Номер");
+		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-					.addContainerGap(10, Short.MAX_VALUE)
+			gl_panel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(10)
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addComponent(lblNewLabel)
 						.addComponent(lblNewLabel_1)
@@ -178,7 +194,7 @@ public class PacientMainFrame extends JFrame {
 						.addComponent(tfDr)
 						.addComponent(tfSer)
 						.addComponent(tfNom))
-					.addContainerGap())
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -207,7 +223,7 @@ public class PacientMainFrame extends JFrame {
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(tfNom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel_5))
-					.addContainerGap(27, Short.MAX_VALUE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);

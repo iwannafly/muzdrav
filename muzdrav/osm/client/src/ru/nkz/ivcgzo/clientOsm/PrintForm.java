@@ -29,8 +29,11 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
+import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import ru.nkz.ivcgzo.thriftOsm.Psign;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTextField;
@@ -88,10 +91,8 @@ public class PrintForm extends JFrame{
 							cbSys.setData(MainForm.tcl.get_n_nz1(cbVidIssl.getSelectedItem().pcod));	
 								}
 						} catch (KmiacServerException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} catch (TException e) {
-							// TODO Auto-generated catch block
 							MainForm.conMan.reconnect(e);
 							
 						}
@@ -157,10 +158,8 @@ public class PrintForm extends JFrame{
 					if (cbSys.getSelectedItem() != null)
 					tabPokaz.setData(MainForm.tcl.getPokaz(cbVidIssl.getSelectedItem().pcod,cbSys.getSelectedItem().pcod));
 				} catch (KmiacServerException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}	
 }
@@ -192,6 +191,28 @@ public class PrintForm extends JFrame{
 						}
 					}
 				}
+					/*Napr napr=new Napr();
+					 * MainForm.tcl.printNapr(napr)
+					 * napr.setnpasp(Vvod.ZapVr.getNpasp());
+					 * napr.setuserId(MainForm.authInfo.pcod);
+					 * napr.setobosnov(tfob.gettext);
+					 * napr.setclpu(cblpu.getselectedpcod)*/
+					
+					/*
+					 * NaprKons naprkons=new NaprKons
+					 * * MainForm.tcl.printNaprKons(naprkons)
+					 * naprkons.setnpasp(Vvod.ZapVr.getNpasp());
+					 * naprkons.setuserId(MainForm.authInfo.pcod);
+					 * naprkons.setobosnov(tfob.gettext);
+					 * naprkons.setcpol(cbpol.getselectedpcod)*/
+					
+					/*
+					 * * MainForm.tcl.printVypis(Vvod.ZapVr.getNpasp(),MainForm.authInfo.pcod(),vvod.TabPos.getSelectedItem.getId_obr);
+				*/
+					
+						/*
+					 * * MainForm.tcl.printKek(Vvod.ZapVr.getNpasp(),vvod.TabPos.getSelectedItem.getId_obr);
+				*/
 //				if (rbPokaz.isSelected()){
 //					if ((cbVidIssl.getSelectedItem() != null) && (cbSys.getSelectedItem() != null)) {
 //						List<String> selItems = new ArrayList<>();
@@ -211,7 +232,6 @@ public class PrintForm extends JFrame{
 					e1.printStackTrace();
 					MainForm.conMan.reconnect(e1);
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -352,6 +372,9 @@ public class PrintForm extends JFrame{
 			});
 			
 		pNaprIssl.setLayout(gl_pNaprIssl);
+		
+		JPanel pNaprKons = new JPanel();
+		tabbedPane.addTab("New tab", null, pNaprKons, null);
 		getContentPane().setLayout(groupLayout);
 		
 		rbMethods.doClick();
