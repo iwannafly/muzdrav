@@ -231,6 +231,14 @@ public class MainForm {
 						plug.showNormal();
 						conMan.connect();
 						frame.setVisible(false);
+						plug.getFrame().addWindowListener(new WindowAdapter() {
+							@Override
+							public void windowClosing(WindowEvent e) {
+								super.windowClosing(e);
+								
+								frame.setVisible(plug.getFrame().getDefaultCloseOperation() == JFrame.DISPOSE_ON_CLOSE);
+							}
+						});
 					} catch (Exception e1) {
 						e1.printStackTrace();
 						JOptionPane.showMessageDialog(frame, e1.getLocalizedMessage(), "Ошибка загрузки модуля", JOptionPane.ERROR_MESSAGE);
