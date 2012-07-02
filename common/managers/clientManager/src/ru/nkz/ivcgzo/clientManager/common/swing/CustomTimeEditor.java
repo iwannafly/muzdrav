@@ -15,23 +15,23 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
 /**
- * Текстовое поле для ввода дат, обернутое в {@link CustomTextComponentWrapper}.
+ * Текстовое поле для ввода времени, обернутое в {@link CustomTextComponentWrapper}.
  * @author bsv798
  */
-public class CustomDateEditor extends JFormattedTextField {
-	private static final long serialVersionUID = -817488987418629780L;
+public class CustomTimeEditor extends JFormattedTextField {
+	private static final long serialVersionUID = 834656272032185057L;
 	private CustomTextComponentWrapper ctcWrapper;
 	private JFormattedTextField txt;
-	protected SimpleDateFormat dateFormatter;
-	protected char dateSeparator;
+	protected SimpleDateFormat timeFormatter;
+	protected char timeSeparator;
 	protected char placeHolderChar = '_';
 	protected String placeHolder = "";
 	
-	public CustomDateEditor() {
+	public CustomTimeEditor() {
 		this(true, true);
 	}
 	
-	public CustomDateEditor(boolean selectOnFocus, boolean popupMenu) {
+	public CustomTimeEditor(boolean selectOnFocus, boolean popupMenu) {
 		super();
 		
 		ctcWrapper = new CustomTextComponentWrapper(this);
@@ -41,11 +41,11 @@ public class CustomDateEditor extends JFormattedTextField {
 		if (popupMenu)
 			ctcWrapper.setPopupMenu();
 		
-		dateFormatter = new SimpleDateFormat(convertDatePattern(((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT)).toPattern()));
+		timeFormatter = new SimpleDateFormat(convertTimePattern(((SimpleDateFormat) DateFormat.getTimeInstance(DateFormat.SHORT)).toPattern()));
 		try {
 			txt = this;
-			String mask = dateFormatter.toPattern();
-			mask = mask.replace('d', '#').replace('M', '#').replace('y', '#');
+			String mask = timeFormatter.toPattern();
+			mask = mask.replace('h', '#').replace('m', '#');
 			MaskFormatter maskFormatter = new MaskFormatter(mask);
 			maskFormatter.setPlaceholderCharacter(placeHolderChar);
 			txt.setFormatterFactory(new DefaultFormatterFactory(maskFormatter));
@@ -53,63 +53,55 @@ public class CustomDateEditor extends JFormattedTextField {
 		} catch (ParseException e1) {
 			e1.printStackTrace();
 		}
-		dateFormatter.setLenient(false);
+		timeFormatter.setLenient(false);
 		
-		this.addCaretListener(new TableDateSelector());
+		this.addCaretListener(new TableTimeSelector());
 	}
 	
-	public CustomDateEditor(Date date) {
+	public CustomTimeEditor(Date time) {
 		this();
 		
-		setDate(date);
+		setTime(time);
 	}
 	
-	public CustomDateEditor(long mills) {
+	public CustomTimeEditor(long mills) {
 		this();
 		
-		setDate(mills);
+		setTime(mills);
 	}
 
-	public CustomDateEditor(String date) {
+	public CustomTimeEditor(String time) {
 		this();
 		
-		setDate(date);
+		setTime(time);
 	}
 	
-	private String convertDatePattern(String pattern)
+	private String convertTimePattern(String pattern)
 	{
-		if (pattern.indexOf('/') > -1)
-			dateSeparator = '/';
-		else if (pattern.indexOf('-') > -1)
-			dateSeparator = '-';
+		if (pattern.indexOf(':') > -1)
+			timeSeparator = ':';
 		else
-			dateSeparator = '.';
+			timeSeparator = '.';
 
-		pattern = pattern.replaceAll("dd", "d");
-		pattern = pattern.replaceAll("MM", "M");
-		pattern = pattern.replaceAll("yy", "y");
-		pattern = pattern.replaceAll("yy", "y");
-		pattern = pattern.replaceAll("d", "dd");
-		pattern = pattern.replaceAll("M", "MM");
-		pattern = pattern.replaceAll("y", "yyyy");
+		pattern = "hh" + timeSeparator + "mm";
 		
 		return pattern;
 	}
 	
 	@Override
-	public void commitEdit() throws ParseException {
-		Date date = getDate();
+	public void commitEdit() {
+		Date time = getTime();
 		
-		if (date != null)
-			setValue(dateFormatter.format(date));
+		if (time != null)
+			setValue(timeFormatter.format(time));
 		else
 			setValue(null);
 	}
 	
-	class TableDateSelector implements CaretListener {
+	class TableTimeSelector implements CaretListener {
 		private boolean updating = false;
 		
-		public TableDateSelector() {
+		public TableTimeSelector() {
 			txt.addKeyListener(new KeyAdapter() {
 				
 				@Override
@@ -122,7 +114,7 @@ public class CustomDateEditor extends JFormattedTextField {
 						}
 						
 						while (pos > 0) {
-							if (txt.getText().charAt(pos) != dateSeparator)
+							if (txt.getText().charAt(pos) != timeSeparator)
 								break;
 							pos--;
 						}
@@ -166,30 +158,30 @@ public class CustomDateEditor extends JFormattedTextField {
 		}
 	}
 	
-	public Date getDate() {
+	public Date getTime() {
 		try {
 			if (txt.getText().indexOf(placeHolderChar) == -1)
-				return dateFormatter.parse(txt.getText());
+				return timeFormatter.parse(txt.getText());
 		} catch (ParseException e) {
 		}
 		
 		return null;
 	}
 	
-	public void setDate(Date date) {
-		if (date != null)
-			setValue(dateFormatter.format(date));
+	public void setTime(Date time) {
+		if (time != null)
+			setValue(timeFormatter.format(time));
 		else
 			setValue(null);
 	}
 	
-	public void setDate(long mills) {
-		setDate(new Date(mills));
+	public void setTime(long mills) {
+		setTime(new Date(mills));
 	}
 	
-	public void setDate(String date) {
+	public void setTime(String time) {
 		try {
-			setDate(dateFormatter.parse(date));
+			setTime(timeFormatter.parse(time));
 		} catch (Exception e) {
 			setValue(null);
 		}
