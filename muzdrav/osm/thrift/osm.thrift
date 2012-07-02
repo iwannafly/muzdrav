@@ -528,7 +528,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
 	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
-	string printVypis(1: i32 npasp, 2: i32 pvizitAmbId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
+	string printVypis(1: i32 npasp, 2: i32 pvizitId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
 
 

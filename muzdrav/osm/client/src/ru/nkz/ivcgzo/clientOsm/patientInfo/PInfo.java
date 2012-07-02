@@ -3,7 +3,6 @@ package ru.nkz.ivcgzo.clientOsm.patientInfo;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -26,6 +24,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.clientOsm.Vvod;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -46,8 +45,10 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
 import java.awt.Font;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class PInfo extends JFrame {
 	private static final long serialVersionUID = 7025194439882492263L;
@@ -55,37 +56,62 @@ public class PInfo extends JFrame {
 	private JEditorPane eptxt;
 	private JTree treeinfo;
 	private StringBuilder sb;
-	private JTextField tfdat;
+	private CustomDateEditor tfdatn;
+	private CustomDateEditor tfDatk;
 	public static ZapVr zapVr;
 
 	public PInfo() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 822, 732);
 		
 		JSplitPane splitpinfo = new JSplitPane();
 		
 		JLabel lblperiod = new JLabel("Период ");
+		lblperiod.setVisible(false);
 		
-		tfdat = new JTextField();
-		tfdat.setColumns(10);
+		tfdatn = new CustomDateEditor();
+		tfdatn.setVisible(false);
+		tfdatn.setColumns(10);
+		
+		JLabel label = new JLabel("-");
+		label.setVisible(false);
+		
+		tfDatk = new CustomDateEditor();
+		tfDatk.setVisible(false);
+		tfDatk.setColumns(10);
+		
+		JButton btnOk = new JButton("OK");
+		btnOk.setVisible(false);
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+					
+			}	
+		});
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitpinfo)
+				.addComponent(splitpinfo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblperiod)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tfdat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(673, Short.MAX_VALUE))
+					.addComponent(tfdatn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tfDatk, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnOk))
 		);
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblperiod)
-						.addComponent(tfdat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfdatn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label)
+						.addComponent(tfDatk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnOk))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(splitpinfo, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE))
 		);
@@ -105,7 +131,7 @@ public class PInfo extends JFrame {
 				.addComponent(sptree, GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
 		);
 		
-		 treeinfo = new JTree(createNodes());
+		treeinfo = new JTree(createNodes());
 		 treeinfo.setFont(new Font("Arial", Font.PLAIN, 12));
 		 treeinfo.addTreeSelectionListener(new TreeSelectionListener() {
 		 	public void valueChanged(TreeSelectionEvent e) {
@@ -164,7 +190,6 @@ public class PInfo extends JFrame {
 		 				eptxt.setText(sb.toString());
 
 						} catch (PatientNotFoundException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 		 						 			}
@@ -203,7 +228,7 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Обстоятельства регистрации", getValueFromClassifier(MainForm.tcl.get_n_abv(),pdiag.isSetNmvd(),pdiag.getNmvd()));
 					addLineToDetailInfo("Характер заболевания", getValueFromClassifier(MainForm.tcl.get_n_abx(),pdiag.isSetXzab(),pdiag.getXzab()));
 					addLineToDetailInfo("Стадия заболевания", getValueFromClassifier(MainForm.tcl.get_n_aby(),pdiag.isSetStady(),pdiag.getStady()));
-					addLineToDetailInfo("Состоит на д.учете", pdiag.isSetDisp(), pdiag.getDisp());
+					addLineIf("Состоит на д.учете: да", pdiag.isSetDisp(), pdiag.getDisp());
 					addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_vz(), DateFormat.getDateInstance().format(new Date(pdiag.getD_vz())));
 					addLineToDetailInfo("Группа д/у", getValueFromClassifier(MainForm.tcl.get_n_abc(),pdiag.isSetD_grup(),pdiag.getD_grup()));
 					addLineToDetailInfo("Исход д/у", getValueFromClassifier(MainForm.tcl.get_n_abb(),pdiag.isSetIshod(),pdiag.getIshod()));
@@ -211,9 +236,9 @@ public class PInfo extends JFrame {
 					addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
 	 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
 					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(MainForm.tcl.get_n_s00(),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
-					addLineToDetailInfo("Противопоказания к вынашиванию беременности", pdiag.isSetPat(), pdiag.getPat());
-					addLineToDetailInfo("Участие в боевых действиях", pdiag.isSetPrizb(), pdiag.getPrizb());
-					addLineToDetailInfo("Инвалидизующий диагноз", pdiag.isSetPrizi(), pdiag.getPrizi());
+					addLineIf("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
+					addLineIf("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
+					addLineIf("Инвалидизующий диагноз: да", pdiag.isSetPrizi(), pdiag.getPrizi());
 					eptxt.setText(sb.toString());
 		 			} 			
 		 				else
@@ -321,17 +346,14 @@ public class PInfo extends JFrame {
 						addDetailInfo(priem.isSetT_ocenka(), priem.getT_ocenka());
 						eptxt.setText(sb.toString());
 					} catch (PriemNotFoundException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 		 			
 		 		}
 		 			}
 		 			catch (KmiacServerException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (TException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 						MainForm.conMan.reconnect(e1);
 					}
@@ -357,7 +379,6 @@ public class PInfo extends JFrame {
 						}
 						((DefaultTreeModel) treeinfo.getModel()).reload(pvizitNode);
 					} catch (KmiacServerException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (TException e) {
 						e.printStackTrace();
@@ -413,19 +434,17 @@ public class PInfo extends JFrame {
 		
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(Vvod.zapVr.getNpasp(), sdf.parse("01.01.1970").getTime(), sdf.parse("31.12.2070").getTime()))
-				posinfo.add(new PvizitTreeNode(pvizit));
+			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(Vvod.zapVr.getNpasp(), sdf.parse("01.01.2012").getTime(), sdf.parse("31.12.2012").getTime()))
+					posinfo.add(new PvizitTreeNode(pvizit));
 			for (PdiagZ pdiag : MainForm.tcl.getPdiagzProsm(Vvod.zapVr.getNpasp()))
 				diaginfo.add(new PdiagTreeNode(pdiag));
 
 		} catch (KmiacServerException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (TException e) {
 			e.printStackTrace();
 			MainForm.conMan.reconnect(e);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -528,6 +547,10 @@ public class PInfo extends JFrame {
 		sb.append(name + lineSep);
 	}
 	
-
-	
+	private void addLineIf(String txt,boolean isSet, int value) {
+		if (isSet)
+			if (value == 1)
+				if (txt.toString().length() > 0)
+					sb.append(txt+lineSep);
+	}
 }
