@@ -97,14 +97,9 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	P_smert getPsmert(1:i32 npasp) throws (1: MssNotFoundException sne);
 
 /**
- * ввод информации
+ * ввод или корректировка информации
  */
-	i32 addPsmert(1: P_smert npasp);
-
-/**
- * корректировка (изменение) информации 
- */
-	void UpdPsmert(1: P_smert npasp);
+	i32 setPsmert(1: P_smert npasp);
 
 /**
  * удаление записи
