@@ -48,21 +48,6 @@ public class serverMss extends Server implements Iface {
 				String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class,
 				String.class, String.class, Date.class, Date.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,
 				String.class, String.class};
-		
-		try {
-			P_smert sm = new P_smert();
-			sm.setNpasp(2);
-			sm.setSer(3);
-			sm.setNomer(4);
-			sm.setVid(5);
-			sm.setDatav(System.currentTimeMillis());
-			sm.setDatas(System.currentTimeMillis()*2);
-			sm.setVrems("11:22");
-			addPsmert(sm);
-		} catch (TException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -105,7 +90,7 @@ public class serverMss extends Server implements Iface {
 	}
 
 	@Override
-	public int addPsmert(P_smert npasp) throws TException {
+	public int setPsmert(P_smert npasp) throws TException {
 		String sql;
 		
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -120,9 +105,9 @@ public class serverMss extends Server implements Iface {
 						"psm_pk = ?, psm_pd = ?, psm_p1 = ?, psm_p1n = ?, psm_p1k = ?, psm_p1d = ?, psm_p2 = ?, psm_p2n = ?, psm_p2k = ?, " + 
 						"psm_p2d = ?, dtp = ?, umerla = ?, cuser = ?, clpu = ?, fio_r = ?, don = ?, ves = ?, nreb = ?, mrojd = ?, fam_m = ?, " + 
 						"im_m = ?, ot_m = ?, datarm = ?, dataz = ?, fio_pol = ?, sdok = ?, ndok = ?, dvdok = ?, kvdok = ?, gpol = ?, upol = ?, " + 
-						"dpol = ?, kpol = ?) WHERE npasp = ?";
+						"dpol = ?, kpol = ? WHERE npasp = ?";
 
-				sme.execPreparedT(sql, false, npasp, mssTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 1);
+				sme.execPreparedT(sql, false, npasp, mssTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 1);
 				sme.setCommit();
 			} catch (MssNotFoundException e) {
 				try {
@@ -150,10 +135,6 @@ public class serverMss extends Server implements Iface {
 		}
 		// TODO Auto-generated method stub
 		return 0;
-	}
-
-	@Override
-	public void UpdPsmert(P_smert npasp) throws TException {
 	}
 
 	@Override

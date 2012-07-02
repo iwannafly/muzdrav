@@ -9,5 +9,6 @@ base port + 0	auth
 6	mss
 7	viewSelect
 8	genTalons
+9	outputInfo
 
 55201	libUpd
