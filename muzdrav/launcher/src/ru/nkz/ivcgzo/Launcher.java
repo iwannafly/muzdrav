@@ -23,7 +23,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Launcher {
-	private static final String libDir = "launcher_lib";
+	private static final String libDir = "lib";
+	private final String rootPath;
 	private class LibraryInfo {
 		int id;
 		String name;
@@ -32,13 +33,19 @@ public class Launcher {
 	}
 	
 	public static void main(String[] args) {
-		Launcher lnc = new Launcher();
-		lnc.checkAndUpdate();
+		Launcher lnc;
 		try {
+			lnc = new Launcher();
+			lnc.checkAndUpdate();
+			
 			Runtime.getRuntime().exec("java -jar auth.jar");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public Launcher() {
+		rootPath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
 	}
 	
 	public void checkAndUpdate() {
@@ -83,7 +90,7 @@ public class Launcher {
 	}
 	
 	private List<LibraryInfo> getUpdateList(Document domLibList) {
-		String path = checkAndCreateLibFolder();
+		String path = checkAndCreateLibFolder(rootPath);
 		List<LibraryInfo> updList = new ArrayList<>();
 		NodeList libList = domLibList.getElementsByTagName("libInfo");
 		for (int i = 0; i < libList.getLength(); i++) {
@@ -93,14 +100,14 @@ public class Launcher {
 			libInf.name = getTagValue(libElement, "name");
 			libInf.md5 = getTagValue(libElement, "md5");
 			libInf.size = Integer.parseInt(getTagValue(libElement, "size"));
-			if (!checkLibExistenceAndMd5(path, libInf))
+			if (!checkLibExistenceAndMd5(libInf.id == 0 ? rootPath : path, libInf))
 				updList.add(libInf);
 		}
 		return updList;
 	}
 	
-	private String checkAndCreateLibFolder() {
-		File libFolder = new File(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile(), libDir);
+	private String checkAndCreateLibFolder(String rootPath) {
+		File libFolder = new File(rootPath, libDir);
 		if (!libFolder.exists())
 			libFolder.mkdir();
 		return libFolder.getAbsolutePath();
@@ -141,14 +148,14 @@ public class Launcher {
 	}
 	
 	private void updateLibs(Socket servSct, List<LibraryInfo> updList) throws Exception {
-		String path = checkAndCreateLibFolder();
+		String path = checkAndCreateLibFolder(rootPath);
 		byte[] buf = new byte[65536];
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
 				PrintWriter writer = new PrintWriter(servSct.getOutputStream())) {
 			for (LibraryInfo libInfo : updList) {
-				writer.println(libInfo.name);
+				writer.println(libInfo.id);
 				writer.flush();
-				try (FileOutputStream fos = new FileOutputStream(new File(path, libInfo.name))) {
+				try (FileOutputStream fos = new FileOutputStream(new File(libInfo.id == 0 ? rootPath : path, libInfo.name))) {
 					fos.getChannel().lock();
 					int read = servSct.getInputStream().read(buf);
 					int readFile = read;
