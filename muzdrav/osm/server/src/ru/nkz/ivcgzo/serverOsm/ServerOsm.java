@@ -45,6 +45,7 @@ import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Protokol;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
@@ -881,7 +882,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_m00(int clpu) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT m.pcod, m.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod != ? ", clpu)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT m.pcod, m.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod != ? ", clpu)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -1169,6 +1170,10 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-
-
+	
+	@Override
+	public String printProtokol(Protokol pk) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return "";
+	}
 }

@@ -447,6 +447,14 @@ struct Pdisp{
 	17: optional bool sxoch;
 }
 
+struct Protokol{
+	1: optional i32 npasp;
+	2: optional i32 userId;
+	3: optional i32 pvizit_id;
+	4: optional i32 pvizit_ambId;
+	5: optional i32 cpol;
+}
+
 
 exception PvizitNotFoundException {
 }
@@ -529,7 +537,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
 	string printVypis(1: i32 npasp, 2: i32 pvizitId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
-	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
+	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
+	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
