@@ -190,8 +190,8 @@ public class serverManager extends AdminController {
 	private void loadPluginClass(File file, String clName) throws Exception {
 		try {
 			String fileName = file.getName();
-			URL fileUrl = file.toURI().toURL();
-			URLClassLoader clLdr = new URLClassLoader(new URL[] {fileUrl});
+			@SuppressWarnings("resource") //class loader must not be closed
+			URLClassLoader clLdr = new URLClassLoader(new URL[] {file.toURI().toURL()});
 			Class<?> plug = clLdr.loadClass(clName);
 			Constructor<?> cntr = plug.getConstructor(ISqlSelectExecutor.class, ITransactedSqlExecutor.class);
 			plugins.put(fileName.substring(0, fileName.length() - 4), new ThreadedServer((IServer) cntr.newInstance(sse, tse)));

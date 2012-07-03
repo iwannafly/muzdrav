@@ -51,8 +51,7 @@ public class RemoteInstaller extends Thread implements Runnable {
 	@Override
 	public void run() {
 		while (!stopping) {
-			try {
-				Socket clientSct = listenForClient();
+			try (Socket clientSct = listenForClient()) {
 				checkAndTransferLibs(clientSct);
 			} catch (Exception e) {
 				if (!stopping)
@@ -126,8 +125,6 @@ public class RemoteInstaller extends Thread implements Runnable {
 			writer.flush();
 		} catch (Exception e) {
 			throw new Exception("Failed checking or transfering libraries.", e);
-		} finally {
-			clientSct.close();
 		}
 	}
 	
