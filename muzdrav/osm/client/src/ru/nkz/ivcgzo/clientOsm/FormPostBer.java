@@ -265,7 +265,9 @@ public class FormPostBer extends JFrame {
 		SRost = new JSpinner();
 		rdsl.setRost(150);
 		SRost.setModel(new SpinnerNumberModel(rdsl.rost, 140, 200, 1));
-		rdsl.setAbort((int) SRost.getModel().getValue());
+		/*150 должно быть заменено на 140, т.к.
+		 * */
+//		rdsl.setAbort((int) SRost.getModel().getValue());
 		
 		final JSpinner SVes = new JSpinner();
 		SVes.setModel(new SpinnerNumberModel(rdsl.vesd, 40,250,1));
@@ -424,7 +426,7 @@ public class FormPostBer extends JFrame {
 		final JComboBox CBRod = new JComboBox();
 		CBRod.setModel(new DefaultComboBoxModel(new String[] {"", "Естественные роды", "Кесарево сечение"}));
 		CBRod.setSelectedItem(rdsl.getPlrod()); 
-		rdsl.setPlrod(CBRod.getSelectedItem().toString());
+//		rdsl.setPlrod(CBRod.getSelectedItem().toString());
 		
 		final JComboBox CBOslAb = new JComboBox();
 		CBOslAb.setModel(new DefaultComboBoxModel(new String[] {"", "Сальпингит и оофорит", "Воспалительные болезни матки", "Воспалительные болезни шейки матки", "Другие воспалительные болезни влагалища и вульвы " }));
