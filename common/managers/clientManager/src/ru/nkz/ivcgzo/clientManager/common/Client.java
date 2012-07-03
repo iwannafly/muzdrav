@@ -46,6 +46,9 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	public void setFrame(JFrame frame) {
 		this.frame = frame;
 		setDisconnectOnFrameClose();
+		
+		//FIXME uncomment to enable return to plugin selection form
+		//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
 	@Override

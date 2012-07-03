@@ -182,7 +182,7 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		setTitle("Постановка на учет по беременности");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -265,7 +265,9 @@ public class FormPostBer extends JFrame {
 		SRost = new JSpinner();
 		rdsl.setRost(150);
 		SRost.setModel(new SpinnerNumberModel(rdsl.rost, 140, 200, 1));
-		rdsl.setAbort((int) SRost.getModel().getValue());
+		/*150 должно быть заменено на 140, т.к.
+		 * */
+//		rdsl.setAbort((int) SRost.getModel().getValue());
 		
 		final JSpinner SVes = new JSpinner();
 		SVes.setModel(new SpinnerNumberModel(rdsl.vesd, 40,250,1));
@@ -424,7 +426,7 @@ public class FormPostBer extends JFrame {
 		final JComboBox CBRod = new JComboBox();
 		CBRod.setModel(new DefaultComboBoxModel(new String[] {"", "Естественные роды", "Кесарево сечение"}));
 		CBRod.setSelectedItem(rdsl.getPlrod()); 
-		rdsl.setPlrod(CBRod.getSelectedItem().toString());
+//		rdsl.setPlrod(CBRod.getSelectedItem().toString());
 		
 		final JComboBox CBOslAb = new JComboBox();
 		CBOslAb.setModel(new DefaultComboBoxModel(new String[] {"", "Сальпингит и оофорит", "Воспалительные болезни матки", "Воспалительные болезни шейки матки", "Другие воспалительные болезни влагалища и вульвы " }));
@@ -500,7 +502,7 @@ public class FormPostBer extends JFrame {
 				}
 			}
 		});
-//		inform = new FormRdInf;
+		inform = new FormRdInf();
 		JButton button = new JButton("Дополнительная информация");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -560,7 +562,7 @@ public class FormPostBer extends JFrame {
 								.addComponent(CBRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SDataOsl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(SKolDet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+//								.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 									.addComponent(SPolJ, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addComponent(SMenC, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -648,9 +650,9 @@ public class FormPostBer extends JFrame {
 									.addComponent(LDataPlRod, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED))
 								.addGroup(gl_panel.createSequentialGroup()
-									.addComponent(CBRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+									.addComponent(CBRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+//									.addPreferredGap(ComponentPlacement.RELATED)
+//									.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 							.addGap(16)
 							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 								.addComponent(LPrish)

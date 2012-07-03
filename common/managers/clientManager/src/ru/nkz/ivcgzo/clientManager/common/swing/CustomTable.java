@@ -120,6 +120,10 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			this.setDefaultEditor(Date.class, tde);
 			this.setDefaultRenderer(Date.class, tde.getRenderer());
 			
+			TableTimeEditor tte = new TableTimeEditor();
+			this.setDefaultEditor(Time.class, tte);
+			this.setDefaultRenderer(Time.class, tte.getRenderer());
+			
 			this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(ListSelectionEvent e) {
@@ -300,6 +304,16 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
+	 * Устанавливает выбранному полю тип <code>Time.class</code> для
+	 * корректного отображения и редактирования времени.
+	 * @param colIdx
+	 * @see TableDateEditor
+	 */
+	public void setTimeField(int colIdx) {
+		colTypes[colOrder[colIdx]] = Time.class;
+	}
+	
+	/**
 	 * Определяет, какие поля можно изменять. Переопределяет настройку <b>editable</b> для
 	 * всей таблицы, указанную в конструкторе.
 	 * @param value - доступность для изменения указанных далее полей
@@ -446,7 +460,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 						if (aValue != null)
 							if (aValue.toString().length() == 0)
 								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
-							else if (colTypes[colOrder[columnIndex]] == Date.class)
+							else if (colTypes[colOrder[columnIndex]] == Date.class || colTypes[colOrder[columnIndex]] == Time.class)
 								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], ((Date)aValue).getTime());
 							else
 								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], aValue);
@@ -467,7 +481,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			public Object getValueAt(int rowIndex, int columnIndex) {
 				try {
 					if (lst.get(rowIndex).isSet(thrFields[colIdx[colOrder[columnIndex]]]))
-						if (colTypes[colOrder[columnIndex]] == Date.class)
+						if (colTypes[colOrder[columnIndex]] == Date.class || colTypes[colOrder[columnIndex]] == Time.class)
 							return new Date((long)lst.get(rowIndex).getFieldValue(thrFields[colIdx[colOrder[columnIndex]]]));
 						else
 							return lst.get(rowIndex).getFieldValue(thrFields[colIdx[colOrder[columnIndex]]]);
@@ -718,4 +732,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			this.getColumnModel().getColumn(colOrder[i]).setPreferredWidth(wdt[i]);
 		}
 	}
+}
+
+class Time {
+	
 }

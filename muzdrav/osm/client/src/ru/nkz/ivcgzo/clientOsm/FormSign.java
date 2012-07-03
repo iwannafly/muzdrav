@@ -99,11 +99,11 @@ public class FormSign extends JFrame {
 				cba.setSelected(vrp.charAt(1) == '1');
 				cbn.setSelected(vrp.charAt(2) == '1');
 			} catch (KmiacServerException e1) {
-				JOptionPane.showMessageDialog(FormSign.this, "Неизвестная ошибка");
+				e1.printStackTrace();
 			} catch (PsignNotFoundException e1) {
 				e1.printStackTrace();
 			} catch (TException e1) {
-//				MainForm.conMan.reconnect(e1);
+				MainForm.conMan.reconnect(e1);
 			}	
 			}
 		});
@@ -437,20 +437,17 @@ public class FormSign extends JFrame {
 			}else {
 				s1 = "0";
 			}
-			System.out.println(s1);
-			
+	
 			if (cba.isSelected()){
 				s2 = "1";	
 				}else {
 					s2 = "0";
 				}
-			System.out.println(s2);
 			if (cbn.isSelected()){
 				s3 = "1";	
 				}else {
 					s3 = "0";
 				}
-			System.out.println(s3);
 			
 			prv = s1+s2+s3;
 

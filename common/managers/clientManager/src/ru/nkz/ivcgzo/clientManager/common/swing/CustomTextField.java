@@ -24,4 +24,12 @@ public class CustomTextField extends JTextField {
 		if (popupMenu)
 			ctcWrapper.setPopupMenu();
 	}
+	
+	public boolean isEmpty () {
+		return getText().isEmpty();
+	}
+	
+	public void clear() {
+		setText(null);
+	}
 }

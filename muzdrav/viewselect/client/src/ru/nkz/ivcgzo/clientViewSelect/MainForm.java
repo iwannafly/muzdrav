@@ -32,6 +32,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		initialize();
 		
 		setFrame(frame);
+//		setFrame(new PatientSearchForm());
 	}
 
 	/**
