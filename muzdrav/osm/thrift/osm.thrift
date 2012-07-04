@@ -506,18 +506,16 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	AnamZab getAnamZab(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	void setAnamZab(1: AnamZab anam) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteAnamZab(1: i32 pvizit_id) throws (1: kmiacServer.KmiacServerException kse);
 
 	Priem getPriem(1: i32 npasp, 2: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePriem(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
 
-	//i32 AddPdiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagZ> getPdiagzProsm(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	//void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	i32 setPdiag(1: PdiagZ diag) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
-	//i32 AddPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	//void UpdatePdisp(1: Pdisp diag) throws (1: kmiacServer.KmiacServerException kse);
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
 	
