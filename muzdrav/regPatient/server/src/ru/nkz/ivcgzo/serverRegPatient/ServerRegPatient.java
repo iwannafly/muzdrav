@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
+import java.io.File;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -229,7 +230,8 @@ public class ServerRegPatient extends Server implements Iface {
         super(sse, tse);
 
         //Инициализация логгера с конфигом из файла ../../manager/log4j.xml;
-        DOMConfigurator.configure("log4j.xml");
+		String manPath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath();
+        DOMConfigurator.configure(new File(manPath, "log4j.xml").getAbsolutePath());
 
         rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
