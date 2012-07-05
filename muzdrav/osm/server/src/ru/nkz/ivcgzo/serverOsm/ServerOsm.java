@@ -918,8 +918,8 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printKek(int npasp, int pvizitAmbId) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
+
+		return "c:\\kek.html";
 	}
 
 	@Override
@@ -1175,5 +1175,26 @@ public class ServerOsm extends Server implements Iface {
 	public String printProtokol(Protokol pk) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		return "";
+	}
+
+	@Override
+	public void DeletePriem(int posId) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_priem WHERE id_pos = ? ", false, posId);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}		
+	}
+
+	@Override
+	public void DeleteAnamZab(int pvizit_id) throws KmiacServerException,
+			TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_anam_zab WHERE id_pvizit = ? ", false, pvizit_id);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}	
 	}
 }
