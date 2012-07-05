@@ -182,6 +182,7 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_BRIEF_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom"
     };
+
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
@@ -799,7 +800,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new GospAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
-            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитадизации: ", e);
+            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитализации: ", e);
             throw new TException(e);
         }
     }
