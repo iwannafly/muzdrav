@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -68,6 +69,17 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField textField_40;
 	private JTextField textField_41;
 	private JTextField textField_42;
+	private JTextField textField_43;
+	private JTextField textField_44;
+	private JTextField textField_45;
+	private JTextField textField_46;
+	private JTextField textField_47;
+	private JTextField textField_48;
+	private JTextField textField_49;
+	private JTextField textField_50;
+	private JTextField textField_51;
+	private JTextField textField_52;
+	private JTextField textField_53;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -82,7 +94,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 751, 615);
+		frame.setBounds(100, 100, 751, 652);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(configuration.appName);
 		
@@ -221,6 +233,21 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0417\u0430\u043F\u043E\u043B\u043D\u044F\u0435\u0442\u0441\u044F \u043D\u0430 \u0434\u0435\u0442\u0435\u0439, \u0443\u043C\u0435\u0440\u0448\u0438\u0445 \u0432 \u0432\u043E\u0437\u0440\u0430\u0441\u0442\u0435 \u043E\u0442 168 \u0434\u043D\u0435\u0439 \u0434\u043E \u0433\u043E\u0434\u0430", TitledBorder.CENTER, TitledBorder.TOP, null, null));
+		
+		JLabel lblNewLabel_37 = new JLabel("Предыдущее свидетельство: Серия ");
+		
+		textField_43 = new JTextField();
+		textField_43.setColumns(10);
+		
+		textField_44 = new JTextField();
+		textField_44.setColumns(10);
+		
+		textField_45 = new JTextField();
+		textField_45.setColumns(10);
+		
+		JLabel label_13 = new JLabel("Номер");
+		
+		JLabel label_14 = new JLabel("Дата выдачи");
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -232,7 +259,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 							.addContainerGap())
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(separator, GroupLayout.DEFAULT_SIZE, 1309, Short.MAX_VALUE)
+								.addComponent(separator, GroupLayout.DEFAULT_SIZE, 1493, Short.MAX_VALUE)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 										.addGroup(gl_panel.createSequentialGroup()
@@ -256,6 +283,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 										.addGroup(gl_panel.createSequentialGroup()
 											.addPreferredGap(ComponentPlacement.UNRELATED)
 											.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+												.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 												.addGroup(gl_panel.createSequentialGroup()
 													.addComponent(lblNewLabel_7)
 													.addPreferredGap(ComponentPlacement.RELATED)
@@ -263,8 +291,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 													.addGap(18)
 													.addComponent(label)
 													.addPreferredGap(ComponentPlacement.UNRELATED)
-													.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))
-												.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+													.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE))))
 										.addGroup(gl_panel.createSequentialGroup()
 											.addGap(99)
 											.addComponent(lblNewLabel_10))))
@@ -285,8 +312,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel.createSequentialGroup()
-									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-										.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_panel.createSequentialGroup()
 											.addGap(18)
 											.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 												.addComponent(lblNewLabel_16)
@@ -326,7 +353,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 														.addComponent(lblNewLabel_17)
 														.addComponent(textField_20, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)))
 												.addComponent(textField_15)))
-										.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+										.addGroup(gl_panel.createSequentialGroup()
 											.addComponent(lblNewLabel_18)
 											.addGap(10)
 											.addComponent(comboBox_2, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
@@ -342,7 +369,21 @@ public class MainForm extends Client<ThriftMss.Client> {
 							.addGap(231))))
 				.addGroup(gl_panel.createSequentialGroup()
 					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 693, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(857, Short.MAX_VALUE))
+					.addContainerGap(1041, Short.MAX_VALUE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblNewLabel_37)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(textField_43, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+					.addGap(13)
+					.addComponent(label_13)
+					.addGap(18)
+					.addComponent(textField_44, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(label_14)
+					.addGap(43)
+					.addComponent(textField_45, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(1112, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
@@ -383,7 +424,15 @@ public class MainForm extends Client<ThriftMss.Client> {
 								.addComponent(textField_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(label)
 								.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED, 26, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblNewLabel_37)
+								.addComponent(textField_43, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_45, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(textField_44, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(label_13)
+								.addComponent(label_14))
+							.addPreferredGap(ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblNewLabel_8)
 								.addComponent(textField_7, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -694,6 +743,36 @@ public class MainForm extends Client<ThriftMss.Client> {
 					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 331, GroupLayout.PREFERRED_SIZE)
 					.addGap(57))
 		);
+		
+		JLabel lblI = new JLabel("I. а)");
+		
+		textField_51 = new JTextField();
+		textField_51.setColumns(10);
+		
+		textField_52 = new JTextField();
+		textField_52.setColumns(10);
+		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
+		gl_panel_4.setHorizontalGroup(
+			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addComponent(lblI)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(textField_52, GroupLayout.PREFERRED_SIZE, 423, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField_51, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(216, Short.MAX_VALUE))
+		);
+		gl_panel_4.setVerticalGroup(
+			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblI)
+						.addComponent(textField_51, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(textField_52, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(256, Short.MAX_VALUE))
+		);
+		panel_4.setLayout(gl_panel_4);
 		panel_1.setLayout(gl_panel_1);
 		
 		JPanel panel_2 = new JPanel();
@@ -844,13 +923,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JButton btnNewButton_3 = new JButton("Распечатать");
 		
-		JButton button = new JButton("Выход");
+		JButton btnNewButton_4 = new JButton("Взамен");
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnNewButton)
@@ -860,28 +939,145 @@ public class MainForm extends Client<ThriftMss.Client> {
 							.addComponent(btnNewButton_2)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnNewButton_3)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(button)))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnNewButton_4)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(tabbedPane)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(17)
-							.addComponent(button))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnNewButton)
-								.addComponent(btnNewButton_1)
-								.addComponent(btnNewButton_2)
-								.addComponent(btnNewButton_3))))
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnNewButton)
+						.addComponent(btnNewButton_1)
+						.addComponent(btnNewButton_2)
+						.addComponent(btnNewButton_3)
+						.addComponent(btnNewButton_4))
 					.addContainerGap())
 		);
+		
+		JPanel panel_5 = new JPanel();
+		tabbedPane.addTab("Настройка", null, panel_5, null);
+		
+		JLabel lblNewLabel_38 = new JLabel("Населенный пункт");
+		
+		JLabel label_15 = new JLabel("Область");
+		
+		JLabel label_16 = new JLabel("автоматически проставлять населенный пункт");
+		
+		JLabel label_17 = new JLabel("автоматически проставлять область");
+		
+		JLabel label_18 = new JLabel("автоматически проставлять серию свидетельства");
+		
+		JLabel label_19 = new JLabel("автоматически проставлять номер свидетельства   с");
+		
+		JLabel label_20 = new JLabel("по");
+		
+		JCheckBox chckbxNewCheckBox = new JCheckBox(" ");
+		
+		JCheckBox chckbxNewCheckBox_1 = new JCheckBox(" ");
+		
+		textField_46 = new JTextField();
+		textField_46.setColumns(10);
+		
+		textField_47 = new JTextField();
+		textField_47.setColumns(10);
+		
+		textField_48 = new JTextField();
+		textField_48.setColumns(10);
+		
+		textField_49 = new JTextField();
+		textField_49.setColumns(10);
+		
+		textField_50 = new JTextField();
+		textField_50.setColumns(10);
+		
+		JLabel label_21 = new JLabel("Текущий номер свидетельства");
+		
+		textField_53 = new JTextField();
+		textField_53.setColumns(10);
+		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
+		gl_panel_5.setHorizontalGroup(
+			gl_panel_5.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addGap(27)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(label_21)
+							.addGap(47)
+							.addComponent(textField_53, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(label_19)
+							.addGap(12)
+							.addComponent(textField_49, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(label_20)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(textField_50, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(label_18)
+							.addGap(18)
+							.addComponent(textField_48, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING, false)
+							.addGroup(gl_panel_5.createSequentialGroup()
+								.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
+									.addComponent(label_16)
+									.addComponent(label_17))
+								.addGap(18)
+								.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
+									.addComponent(chckbxNewCheckBox_1)
+									.addComponent(chckbxNewCheckBox, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)))
+							.addGroup(gl_panel_5.createSequentialGroup()
+								.addGroup(gl_panel_5.createParallelGroup(Alignment.TRAILING)
+									.addGroup(gl_panel_5.createSequentialGroup()
+										.addComponent(lblNewLabel_38)
+										.addGap(18))
+									.addGroup(gl_panel_5.createSequentialGroup()
+										.addComponent(label_15)
+										.addGap(70)))
+								.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
+									.addComponent(textField_46)
+									.addComponent(textField_47, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)))))
+					.addContainerGap(1424, Short.MAX_VALUE))
+		);
+		gl_panel_5.setVerticalGroup(
+			gl_panel_5.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addGap(21)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_38)
+						.addComponent(textField_46, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_15)
+						.addComponent(textField_47, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(40)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_16)
+						.addComponent(chckbxNewCheckBox))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_17)
+						.addComponent(chckbxNewCheckBox_1))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_18)
+						.addComponent(textField_48, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_19)
+						.addComponent(label_20)
+						.addComponent(textField_49, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField_50, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(26)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_21)
+						.addComponent(textField_53, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(278, Short.MAX_VALUE))
+		);
+		panel_5.setLayout(gl_panel_5);
 		frame.getContentPane().setLayout(groupLayout);
 	}
 	

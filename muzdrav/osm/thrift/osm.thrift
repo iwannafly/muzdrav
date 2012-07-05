@@ -414,6 +414,9 @@ struct NaprKons{
 	2: optional i32 userId;
 	3: optional string obosnov;
 	4: optional i32 cpol;
+	5: optional string nazv;
+	6: optional string cdol;
+	7: optional i32 pvizitId;
 }
 
 struct IsslInfo{

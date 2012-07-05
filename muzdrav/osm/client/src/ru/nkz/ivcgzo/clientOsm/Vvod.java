@@ -1574,7 +1574,7 @@ mi2.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		try{
-				String servPath = MainForm.tcl.printVypis(Vvod.zapVr.getNpasp(), TabPos.getSelectedItem().id_obr, TabPos.getSelectedItem().id);
+				String servPath = MainForm.tcl.printVypis(Vvod.zapVr.getNpasp(), TabPos.getSelectedItem().id_obr, MainForm.authInfo.getUser_id());
 				String cliPath;
 				cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
 				MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -2487,7 +2487,7 @@ rbPokaz.addActionListener(new ActionListener() {
 					}
 				}
 		});
-		cbVidNapr.setModel(new DefaultComboBoxModel(new String[] {"госпитализация", "консультация", "обследование"}));
+		cbVidNapr.setModel(new DefaultComboBoxModel(new String[] {"госпитализацию", "консультацию", "обследование"}));
 		
 		lblObosnov = new JLabel("<html>Обоснование для <br>\r\nнаправления");
 		
@@ -2504,7 +2504,10 @@ rbPokaz.addActionListener(new ActionListener() {
 					naprkons.setUserId(MainForm.authInfo.getUser_id());
 					naprkons.setNpasp(Vvod.zapVr.getNpasp());
 					naprkons.setObosnov(tpObosnov.getText());
-					naprkons.setCpol(cbN00.getSelectedItem().getPcod());
+					if (cbN00.getSelectedItem()!=null) naprkons.setCpol(cbN00.getSelectedItem().getPcod());
+					naprkons.setNazv(cbVidNapr.getSelectedItem().toString());
+					naprkons.setCdol(MainForm.authInfo.getCdol());
+					naprkons.setPvizitId(TabPos.getSelectedItem().getId_obr());
 					String servPath = MainForm.tcl.printNaprKons(naprkons);
 					String cliPath;
 					cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
@@ -2534,6 +2537,8 @@ rbPokaz.addActionListener(new ActionListener() {
 			}
 		});
 		
+		JLabel label = new JLabel("на");
+		
 		GroupLayout gl_pKons = new GroupLayout(pKons);
 		gl_pKons.setHorizontalGroup(
 			gl_pKons.createParallelGroup(Alignment.LEADING)
@@ -2541,11 +2546,13 @@ rbPokaz.addActionListener(new ActionListener() {
 					.addContainerGap()
 					.addGroup(gl_pKons.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_pKons.createSequentialGroup()
+							.addComponent(label)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(cbVidNapr, GroupLayout.PREFERRED_SIZE, 252, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pKons.createSequentialGroup()
 							.addComponent(lblN00)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_pKons.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbVidNapr, GroupLayout.PREFERRED_SIZE, 252, GroupLayout.PREFERRED_SIZE)
-								.addComponent(cbN00, GroupLayout.PREFERRED_SIZE, 480, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(cbN00, GroupLayout.PREFERRED_SIZE, 480, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pKons.createSequentialGroup()
 							.addComponent(lblObosnov, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -2557,7 +2564,9 @@ rbPokaz.addActionListener(new ActionListener() {
 			gl_pKons.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pKons.createSequentialGroup()
 					.addGap(5)
-					.addComponent(cbVidNapr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_pKons.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label)
+						.addComponent(cbVidNapr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_pKons.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblN00)

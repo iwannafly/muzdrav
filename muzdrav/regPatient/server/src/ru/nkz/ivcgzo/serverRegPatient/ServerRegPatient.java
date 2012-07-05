@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
+import java.io.File;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -182,6 +183,7 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_BRIEF_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom"
     };
+
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
@@ -229,7 +231,8 @@ public class ServerRegPatient extends Server implements Iface {
         super(sse, tse);
 
         //Инициализация логгера с конфигом из файла ../../manager/log4j.xml;
-        DOMConfigurator.configure("log4j.xml");
+		String manPath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath();
+        DOMConfigurator.configure(new File(manPath, "log4j.xml").getAbsolutePath());
 
         rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
@@ -799,7 +802,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new GospAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
-            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитадизации: ", e);
+            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитализации: ", e);
             throw new TException(e);
         }
     }

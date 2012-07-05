@@ -1,2 +1,6 @@
-bin/
-*_lib/
+*
+.*~
+!.gitignore
+!*.thrift
+!*.bat
+!*.sh

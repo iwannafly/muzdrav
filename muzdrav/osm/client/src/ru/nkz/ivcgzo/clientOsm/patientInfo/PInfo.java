@@ -3,7 +3,9 @@ package ru.nkz.ivcgzo.clientOsm.patientInfo;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -70,13 +72,15 @@ public class PInfo extends JFrame {
 		
 		tfdatn = new CustomDateEditor();
 		tfdatn.setColumns(10);
-		tfdatn.setDate(System.currentTimeMillis());
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		tfdatn.setDate("01.01."+calendar.get(Calendar.YEAR));
 		
 		JLabel label = new JLabel("-");
 		
 		tfDatk = new CustomDateEditor();
 		tfDatk.setColumns(10);
-		tfDatk.setDate(System.currentTimeMillis());
+		tfDatk.setDate("31.12."+calendar.get(Calendar.YEAR));
 		
 	JButton btnOk = new JButton("OK");
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
