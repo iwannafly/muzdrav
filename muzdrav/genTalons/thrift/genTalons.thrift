@@ -1,4 +1,4 @@
-namespace java ru.nkz.ivcgzo.thriftGenTalon
+﻿namespace java ru.nkz.ivcgzo.thriftGenTalon
 
 include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
@@ -113,6 +113,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 
 	/**
 	*Возвращает график приема врача в поликлинике
+	* сортировать denn,vidp
 	*/
 	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema) throws (1: kmiacServer.KmiacServerException kse);
 
