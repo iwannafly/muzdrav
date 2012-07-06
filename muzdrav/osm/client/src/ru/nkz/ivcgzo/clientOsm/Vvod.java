@@ -1535,11 +1535,9 @@ public class Vvod extends JFrame {
 		pmvizit = new JPopupMenu();
 		addPopup(TabPos, pmvizit);
 		
-//		JPopupMenu pmvizit = new JPopupMenu();
-		
 		priem = new Priem();
 		anamZab = new AnamZab();
-				JMenuItem mi1 = new JMenuItem("Протокол посещения");
+				JMenuItem mi1 = new JMenuItem("Случай заболевания");
 				pmvizit.add(mi1);
 				JMenuItem mi2 = new JMenuItem("Выписка из карты");
 				pmvizit.add(mi2);
@@ -1639,13 +1637,20 @@ mi3.addActionListener(new ActionListener() {
 							
 							priem = MainForm.tcl.getPriem(TabPos.getSelectedItem().npasp,TabPos.getSelectedItem().id);
 							anamZab = MainForm.tcl.getAnamZab(TabPos.getSelectedItem().npasp,TabPos.getSelectedItem().id_obr);
-							} catch (KmiacServerException e) {
+						try {
+							pvizit	= MainForm.tcl.getPvizit(TabPos.getSelectedItem().getId_obr());
+						} catch (PvizitNotFoundException e) {
+							e.printStackTrace();
+						}
+						} catch (KmiacServerException e) {
 								e.printStackTrace();
 							} catch (PriemNotFoundException e) {
 								e.printStackTrace();
 							} catch (TException e) {
 								MainForm.conMan.reconnect(e);
 							}
+						c_obr.setSelectedPcod(pvizit.getCobr());
+						
 						tpJalob.setText(priem.getT_jalob());	
 						tpJalobd.setText(priem.getT_jalob_d());	
 						tpJalobkrov.setText(priem.getT_jalob_krov());	
@@ -2504,7 +2509,7 @@ rbPokaz.addActionListener(new ActionListener() {
 					naprkons.setUserId(MainForm.authInfo.getUser_id());
 					naprkons.setNpasp(Vvod.zapVr.getNpasp());
 					naprkons.setObosnov(tpObosnov.getText());
-					if (cbN00.getSelectedItem()!=null) naprkons.setCpol(cbN00.getSelectedItem().getPcod());
+					if (cbN00.getSelectedItem()!=null) naprkons.setCpol(cbN00.getSelectedItem().getName());
 					naprkons.setNazv(cbVidNapr.getSelectedItem().toString());
 					naprkons.setCdol(MainForm.authInfo.getCdol());
 					naprkons.setPvizitId(TabPos.getSelectedItem().getId_obr());
@@ -2518,7 +2523,8 @@ rbPokaz.addActionListener(new ActionListener() {
 					napr.setUserId(MainForm.authInfo.getUser_id());
 					napr.setNpasp(Vvod.zapVr.getNpasp());
 					napr.setObosnov(tpObosnov.getText());
-					napr.setClpu(cbN00.getSelectedItem().getPcod());
+					if (cbN00.getSelectedItem()!=null) napr.setClpu(cbN00.getSelectedItem().getName());
+					napr.setPvizitId(TabPos.getSelectedItem().getId_obr());
 					String servPath = MainForm.tcl.printNapr(napr);
 					String cliPath;
 					cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();

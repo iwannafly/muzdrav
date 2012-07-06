@@ -406,14 +406,15 @@ struct Napr{
 	1: optional i32 npasp;
 	2: optional i32 userId;
 	3: optional string obosnov;
-	4: optional i32 clpu;
+	4: optional string clpu;
+	5: optional i32 pvizitId; 
 }
 
 struct NaprKons{
 	1: optional i32 npasp;
 	2: optional i32 userId;
 	3: optional string obosnov;
-	4: optional i32 cpol;
+	4: optional string cpol;
 	5: optional string nazv;
 	6: optional string cdol;
 	7: optional i32 pvizitId;
