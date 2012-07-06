@@ -1649,8 +1649,36 @@ mi3.addActionListener(new ActionListener() {
 							} catch (TException e) {
 								MainForm.conMan.reconnect(e);
 							}
-						c_obr.setSelectedPcod(pvizit.getCobr());
-						
+//						if (pvizit.getCobr()!=null) c_obr.setSelectedPcod(pvizit.getCobr());
+//						if (pvizit.getRezult()!= 0)
+//							cbrez.setSelectedPcod(pvizit.getRezult());
+//						if (pvizit.getIshod()!= 0)
+//							cbish.setSelectedPcod(pvizit.getIshod());
+//						
+//						if (pvizitAmb.getMobs() != 0)
+//							cbMobsp.setSelectedPcod(pvizitAmb.getMobs());
+//						if (pvizitAmb.getOpl() != 0)
+//							vid_opl.setSelectedPcod(pvizitAmb.getOpl());
+						if (pvizit.isSetCobr())
+							c_obr.setSelectedPcod(pvizit.getCobr());
+						else
+							c_obr.setSelectedItem(null);
+						if (pvizit.isSetRezult())
+							cbrez.setSelectedPcod(pvizit.getRezult());
+						else
+							cbrez.setSelectedItem(null);
+						if (pvizit.isSetIshod())
+							cbish.setSelectedPcod(pvizit.getIshod());
+						else
+							cbish.setSelectedItem(null);
+						if (pvizitAmb.isSetMobs())
+							cbMobsp.setSelectedPcod(pvizitAmb.getMobs());
+						else
+							cbMobsp.setSelectedItem(null);
+						if (pvizitAmb.isSetOpl())
+							vid_opl.setSelectedPcod(pvizitAmb.getOpl());
+						else
+							vid_opl.setSelectedItem(null);
 						tpJalob.setText(priem.getT_jalob());	
 						tpJalobd.setText(priem.getT_jalob_d());	
 						tpJalobkrov.setText(priem.getT_jalob_krov());	
