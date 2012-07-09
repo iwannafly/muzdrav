@@ -246,183 +246,9 @@ public class Vvod extends JFrame {
 		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollPane.setRowHeaderView(panel);
 		
-		//JButton btnAnamz = new JButton("Анамнез жизни");
-//		btnAnamz.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//			sign.setVisible(true);}
-//		});
-		
-		
-//		JButton bS = new JButton("Сохранить");
-//		bS.addActionListener(new ActionListener() {
-//			
-//			public void actionPerformed(ActionEvent e) {
-//				try {
-//					priem = new Priem();
-//					anamZab = new AnamZab();
-//					priem.setId(zapVr.getId_pvizit());
-//					priem.setNpasp(zapVr.getNpasp());
-//					priem.setIdpos(pvizitAmb.getId());
-//					priem.setT_ad(getTextOrNull(tfad.getText()));
-//					priem.setT_chss(getTextOrNull(tfchss.getText()));
-//					priem.setT_rost(getTextOrNull(tfrost.getText()));
-//					priem.setT_ves(getTextOrNull(tfves.getText()));
-//					priem.setT_st_localis(getTextOrNull(tpLocalis.getText()));
-//					priem.setT_jalob_d(getTextOrNull(tpJalobd.getText()));
-//					priem.setT_jalob_krov(getTextOrNull(tpJalobkrov.getText()));
-//					priem.setT_jalob_p(getTextOrNull(tpJalobp.getText()));
-//					priem.setT_jalob_moch(getTextOrNull(tpJalobmoch.getText()));
-//					priem.setT_jalob_endo(getTextOrNull(tpJalobendo.getText()));
-//					priem.setT_jalob_nerv(getTextOrNull(tpJalobnerv.getText()));
-//					priem.setT_jalob_opor(getTextOrNull(tpJalobopor.getText()));
-//					priem.setT_jalob_lih(getTextOrNull(tpJaloblih.getText()));
-//					priem.setT_jalob_obh(getTextOrNull(tpJalobobh.getText()));
-//					priem.setT_jalob_proch(getTextOrNull(tpJalobproch.getText()));
-//					priem.setT_ob_sost(getTextOrNull(tpObsost.getText()));
-//					priem.setT_koj_pokr(getTextOrNull(tpKoj.getText()));
-//					priem.setT_sliz(getTextOrNull(tpSliz.getText()));
-//					priem.setT_podk_kl(getTextOrNull(tpPodkkl.getText()));
-//					priem.setT_limf_uzl(getTextOrNull(tpLimf.getText()));
-//					priem.setT_kost_mysh(getTextOrNull(tpKostmysh.getText()));
-//					priem.setT_nervn_ps(getTextOrNull(tpNervnps.getText()));
-//					priem.setT_telo(getTextOrNull(tpTelo.getText()));
-//					priem.setT_sust(getTextOrNull(tpSust.getText()));
-//					priem.setT_dyh(getTextOrNull(tpDyh.getText()));
-//					priem.setT_gr_kl(getTextOrNull(tpGrkl.getText()));
-//					priem.setT_perk_l(getTextOrNull(tpPerkl.getText()));
-//					priem.setT_aus_l(getTextOrNull(tpAusl.getText()));
-//					priem.setT_bronho(getTextOrNull(tpBronho.getText()));
-//					priem.setT_arter(getTextOrNull(tpArter.getText()));
-//					priem.setT_obl_s(getTextOrNull(tpObls.getText()));
-//					priem.setT_perk_s(getTextOrNull(tpPerks.getText()));
-//					priem.setT_aus_s(getTextOrNull(tpAuss.getText()));
-//					priem.setT_pol_rta(getTextOrNull(tpPolrta.getText()));
-//					priem.setT_jivot(getTextOrNull(tpJivot.getText()));
-//					priem.setT_palp_jivot(getTextOrNull(tpPalpjivot.getText()));
-//					priem.setT_jel_kish(getTextOrNull(tpJkt.getText()));
-//					priem.setT_palp_jel(getTextOrNull(tpPalpjel.getText()));
-//					priem.setT_palp_podjjel(getTextOrNull(tpPalppodjel.getText()));
-//					priem.setT_pechen(getTextOrNull(tpPechen.getText()));
-//					priem.setT_jelch(getTextOrNull(tpJelch.getText()));
-//					priem.setT_selez(getTextOrNull(tpSelez.getText()));
-//					priem.setT_obl_zad(getTextOrNull(tpOblzad.getText()));
-//					priem.setT_poyasn(getTextOrNull(tpPoyasn.getText()));
-//					priem.setT_pochk(getTextOrNull(tpPochki.getText()));
-//					priem.setT_moch(getTextOrNull(tpMoch.getText()));
-//					priem.setT_mol_jel(getTextOrNull(tpMoljel.getText()));
-//					priem.setT_gr_jel(getTextOrNull(tpGrjel.getText()));
-//					priem.setT_matka(getTextOrNull(tpMatka.getText()));
-//					priem.setT_nar_polov(getTextOrNull(tpNarpolov.getText()));
-//					priem.setT_chitov(getTextOrNull(tpChitov.getText()));
-//					priem.setT_ocenka(getTextOrNull(tpOcenka.getText()));
-//					priem.setT_jalob(getTextOrNull(tpJalob.getText()));
-//					priem.setT_status_praesense(getTextOrNull(tpStPraes.getText()));
-//					priem.setT_fiz_obsl(getTextOrNull(tpFizObsl.getText()));
-//					
-//					anamZab.setId_pvizit(zapVr.getId_pvizit());
-//					anamZab.setNpasp(zapVr.getNpasp());
-//					anamZab.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
-//					anamZab.setT_sympt(getTextOrNull(tpSympt.getText()));
-//					anamZab.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));
-//					anamZab.setT_ps_syt(getTextOrNull(tpPssit.getText()));
-//					
-//					pvizit.setZakl(getTextOrNull(tpzakl.getText()));
-//					pvizit.setRecomend(getTextOrNull(tprecom.getText()));
-//					if (c_obr.getSelectedPcod() != null)
-//						pvizit.setCobr(c_obr.getSelectedPcod());
-//					if (cbrez.getSelectedPcod() != null)
-//						pvizit.setRezult(cbrez.getSelectedPcod());
-//					if (cbish.getSelectedPcod() != null)
-//						pvizit.setIshod(cbish.getSelectedPcod());
-//					
-//					if (cbMobsp.getSelectedPcod() != null)
-//						pvizitAmb.setMobs(cbMobsp.getSelectedPcod());
-//					if (vid_opl.getSelectedPcod() != null)
-//						pvizitAmb.setOpl(vid_opl.getSelectedPcod());
-//					
-//					MainForm.tcl.setPriem(priem);
-//					MainForm.tcl.setAnamZab(anamZab);
-//					MainForm.tcl.UpdatePvizit(pvizit);
-//					MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
-//				} catch (KmiacServerException e1) {
-//					e1.printStackTrace();
-//				} catch (TException e1) {
-//					e1.printStackTrace();
-//					MainForm.conMan.reconnect(e1);
-//				}
-//			}
-//		});
-		
-//		JButton bSSh = new JButton("Сохранить как шаблон");
-//		
-//		JButton bZSh = new JButton("Загрузить из шаблона");
-		
-//		final JButton bVD = new JButton("Печатные формы");
-//		bVD.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				printform.setVisible(true);
-//			int x = bVD.getX();
-//	                int y = bVD.getY() + bVD.getHeight();
-//	                JPopupMenu jPopupMenu = new JPopupMenu();
-//
-//	                JMenuItem mi1 = new JMenuItem("Мед.карта амб.больного");
-//	                jPopupMenu.add(mi1);
-//	                mi1.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                JMenuItem mi2 = new JMenuItem("Протокол посещения");
-//	                jPopupMenu.add(mi2);
-//	                mi2.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                JMenuItem mi3 = new JMenuItem("Выписка из амб.карты");
-//	                jPopupMenu.add(mi3);
-//	                mi3.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                JMenuItem mi4 = new JMenuItem("Направление на госпитализацию");
-//	                jPopupMenu.add(mi4);
-//	                mi4.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                  JMenuItem mi5 = new JMenuItem("Направление на консультацию");
-//	                jPopupMenu.add(mi5);
-//	                mi5.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                JMenuItem mi6 = new JMenuItem("Направление на исследование");
-//	                jPopupMenu.add(mi6);
-//	                mi6.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                JMenuItem mi7 = new JMenuItem("Направление на МСЭК");
-//	                jPopupMenu.add(mi7);
-//	                mi7.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                JMenuItem mi8 = new JMenuItem("Заключение ВК");
-//	                jPopupMenu.add(mi8);
-//	                mi8.addActionListener(new ActionListener() {
-//	        			public void actionPerformed(ActionEvent e) {
-//	        			}
-//	        		});
-//	                jPopupMenu.show(panel, x, y);
-//}
-//		});
-		
+	
 		JPanel panel_Talon = new JPanel();
 				panel_Talon.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0422\u0430\u043B\u043E\u043D \u0430\u043C\u0431.\u043F\u0430\u0446\u0438\u0435\u043D\u0442\u0430", TitledBorder.LEFT, TitledBorder.TOP, null, new Color(0, 0, 0)));
-//		bDelet.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//			}
-//		});
 		
 		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -1261,12 +1087,6 @@ public class Vvod extends JFrame {
 		
 		JScrollPane sPos = new JScrollPane();
 		
-		//JButton bDB = new JButton("Наблюдение за берем.");
-//		bDB.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				postber.setVisible(true);
-//			}
-//		});
 		
 		JButton AddVizit = new JButton("+");
 		AddVizit.addActionListener(new ActionListener() {
@@ -1314,17 +1134,7 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-//		JButton bInfo = new JButton("Просмотр");
-//		bInfo.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				try {
-//					MainForm.tcl.testConnection();
-//					pinfo = new PInfo();
-//					pinfo.setVisible(true);
-//				} catch (TException e1) {
-//					MainForm.conMan.reconnect(e1);
-//				}}
-//		});
+
 		
 		JScrollPane spShab = new JScrollPane();
 		
@@ -1555,7 +1365,7 @@ mi1.addActionListener(new ActionListener() {
 				protokol.setCpol(MainForm.authInfo.getCpodr());
 				String servPath = MainForm.tcl.printProtokol(protokol);
 				String cliPath;
-				cliPath = File.createTempFile("pr", ".htm").getAbsolutePath();
+				cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 				MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
 		}
@@ -1606,24 +1416,6 @@ mi3.addActionListener(new ActionListener() {
 		}
 	});
 			
-			/*@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				if (!arg0.getValueIsAdjusting()){
-					if (TabDiag.getSelectedItem()!= null) {
-						diagamb = TabDiag.getSelectedItem();
-						GroupBox1.clearSelection();
-						GroupBox2.clearSelection();
-							jbosn.setSelected(diagamb.diag_stat == 1);
-							jbsoput.setSelected(diagamb.diag_stat == 3);
-							jbosl.setSelected(diagamb.diag_stat == 2);
-							if (diagamb.predv)
-								jbpredv.setSelected(true);
-							else
-								jbzakl.setSelected(true);
-							if (diagamb.getObstreg()!=0) cbObstreg.setSelectedPcod(diagamb.getObstreg());
-							if (diagamb.getVid_tr()!=0) vid_travm.setSelectedPcod(diagamb.getVid_tr());
-							
-						pdiag = new PdiagZ();*/
 		
 			TabPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -1631,8 +1423,6 @@ mi3.addActionListener(new ActionListener() {
 				if (!arg0.getValueIsAdjusting()){
 					if (TabPos.getSelectedItem()!= null) {
 						pvizitAmb = TabPos.getSelectedItem();
-//						priem = new Priem();
-//						anamZab = new AnamZab();
 						try {
 							
 							priem = MainForm.tcl.getPriem(TabPos.getSelectedItem().npasp,TabPos.getSelectedItem().id);
@@ -1649,16 +1439,6 @@ mi3.addActionListener(new ActionListener() {
 							} catch (TException e) {
 								MainForm.conMan.reconnect(e);
 							}
-//						if (pvizit.getCobr()!=null) c_obr.setSelectedPcod(pvizit.getCobr());
-//						if (pvizit.getRezult()!= 0)
-//							cbrez.setSelectedPcod(pvizit.getRezult());
-//						if (pvizit.getIshod()!= 0)
-//							cbish.setSelectedPcod(pvizit.getIshod());
-//						
-//						if (pvizitAmb.getMobs() != 0)
-//							cbMobsp.setSelectedPcod(pvizitAmb.getMobs());
-//						if (pvizitAmb.getOpl() != 0)
-//							vid_opl.setSelectedPcod(pvizitAmb.getOpl());
 						if (pvizit.isSetCobr())
 							c_obr.setSelectedPcod(pvizit.getCobr());
 						else

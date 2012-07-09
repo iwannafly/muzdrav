@@ -1490,7 +1490,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	
 	@Override
 	public String printProtokol(Protokol pk) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\pr.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\protokol.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1504,19 +1504,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				acrs = sse.execPreparedQuery("SELECT datao,cobr,n_p0c.name FROM p_vizit join n_p0c on(p_vizit.cobr=n_p0c.pcod) where id=?", pk.getPvizit_id());
 				if (!acrs.getResultSet().next()) throw new KmiacServerException("Datap is null");//заменить текст
 				sb.append(String.format("<b>Дата перв.обращения</b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(1)));
+				sb.append(String.format("<br>Цель обращения %s", acrs.getResultSet().getString(3)));
 				sb.append("<br><b>	Анамнез заболевания</b><br>");
 				acrs.close();
 				acrs = sse.execPreparedQuery("select t_nachalo_zab,t_sympt,t_otn_bol,t_ps_syt from p_anam_zab where id_pvizit=?", pk.getPvizit_id()); 
 				if (!acrs.getResultSet().next()) 
 					throw new KmiacServerException("Anamn is null");
-					if (acrs.getResultSet().getString(1)!=null) sb.append(String.format("%Начало заболевания s.", acrs.getResultSet().getString(1)));
+					if (acrs.getResultSet().getString(1)!=null) sb.append(String.format("Начало заболевания %s.", acrs.getResultSet().getString(1)));
 					if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("Симптомы %s.", acrs.getResultSet().getString(2)));
 					if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("Отношение больного %s.", acrs.getResultSet().getString(3)));
 					if (acrs.getResultSet().getString(4)!=null) sb.append(String.format("Психологическая ситуация в связи с болезнью %s.", acrs.getResultSet().getString(4)));
 				
 					sb.append("<br><b>Осмотр: </b><br>");
 					acrs.close();
-					acrs = sse.execPreparedQuery("select * from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) where p_vizit_amb.id_obr=? ", pk.getPvizit_id());
+					acrs = sse.execPreparedQuery("select * from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) where p_vizit_amb.id_obr=? order by id", pk.getPvizit_id());
 					if (!acrs.getResultSet().next()) 
 						throw new KmiacServerException("Priem is null");
 					sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(4)));
@@ -1689,7 +1690,7 @@ sb.append(String.format("%s %s %s",acrs.getResultSet().getString(1),acrs.getResu
 
 		acrs.close();
 			osw.write(sb.toString());
-			return "c:\\pr.htm";
+			return "c:\\protokol.htm";
 		} catch (SQLException | IOException | KmiacServerException e) {
 			throw new KmiacServerException();
 		}
