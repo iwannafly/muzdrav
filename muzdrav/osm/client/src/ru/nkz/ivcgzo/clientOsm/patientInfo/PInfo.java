@@ -86,7 +86,7 @@ public class PInfo extends JFrame {
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitpinfo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addComponent(splitpinfo)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblperiod)
@@ -102,7 +102,7 @@ public class PInfo extends JFrame {
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblperiod)
 						.addComponent(tfdatn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -110,7 +110,7 @@ public class PInfo extends JFrame {
 						.addComponent(tfDatk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnOk))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(splitpinfo, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE))
+					.addComponent(splitpinfo, GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE))
 		);
 		
 		final JPanel pl = new JPanel();
@@ -246,32 +246,35 @@ public class PInfo extends JFrame {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 			Pvizit pvizit = pvizitNode.pvizit;
 		 			AnamZab anamnez =  MainForm.tcl.getAnamZab(pvizit.getId(),pvizit.getNpasp());
-		 			addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
+		 			//addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
 					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
 		 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
-					addLineToDetailInfo("Исход", getValueFromClassifier(MainForm.tcl.getAq0(), pvizit.isSetIshod(), pvizit.getIshod()));
-					addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pvizit.isSetRezult(), pvizit.getRezult()));
-					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
-		 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
-					addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
-					addHeader("Анамнез заболевания");
-					addDetailInfo(anamnez.isSetT_nachalo_zab(), anamnez.getT_nachalo_zab());
-					addDetailInfo(anamnez.isSetT_sympt(), anamnez.getT_sympt());
-					addDetailInfo(anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
-					addDetailInfo(anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
-		 			addHeader("Назначенные иссл.");
+										//addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
+					//addHeader("Анамнез заболевания");
+					addLineToDetailInfo("Начало заболевания",anamnez.isSetT_nachalo_zab(), anamnez.getT_nachalo_zab());
+					addLineToDetailInfo("Симптомы",anamnez.isSetT_sympt(), anamnez.getT_sympt());
+					addLineToDetailInfo("Отношение больного",anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
+					addLineToDetailInfo("Психологическая ситуация",anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
+					addHeader("Назначенные исследования");
 	 				for (IsslInfo issl : MainForm.tcl.getIsslInfo(pvizit.getId())) {
+	 					if (issl.isSetNisl()){
 	 	 				addLineToDetailInfo("Показатель",issl.isSetPokaz_name(),issl.getPokaz_name());
 	 					addLineToDetailInfo("Результат",issl.isSetRez(),issl.getRez());
-	 					addLineToDetailInfo("Дата",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+	 					addLineToDetailInfo("Дата",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));}
+	 					else addLine("Исследований нет");
 	 				}
-	 				addHeader("Поставленные д-зы");//getPdiagAmb
+	 				addHeader("Поставленные диагнозы");//getPdiagAmb
 	 				for (PdiagAmb pdiagamb : MainForm.tcl.getPdiagAmb(pvizit.getId())) {
 	 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 	 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 	 					addLineToDetailInfo("Статус",getValueFromClassifier(MainForm.tcl.getVdi(), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
 	 				}
+	 				addLineToDetailInfo("Исход", getValueFromClassifier(MainForm.tcl.getAq0(), pvizit.isSetIshod(), pvizit.getIshod()));
+					addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pvizit.isSetRezult(), pvizit.getRezult()));
+					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
+		 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
+
 	 				eptxt.setText(sb.toString());
 		 			} 
 		 		else if (lastPath instanceof PvizitAmbNode) {
@@ -283,66 +286,69 @@ public class PInfo extends JFrame {
 						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
 						addLineToDetailInfo("Должность",getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
 						addLineToDetailInfo("Врач",pam.isSetFio_vr(),pam.getFio_vr());
-						addHeader("Жалобы");
-						addDetailInfo(priem.isSetT_jalob(), priem.getT_jalob());
-						addDetailInfo(priem.isSetT_jalob_d(), priem.getT_jalob_d());
-						addDetailInfo(priem.isSetT_jalob_krov(), priem.getT_jalob_krov());
-						addDetailInfo(priem.isSetT_jalob_p(), priem.getT_jalob_p());
-						addDetailInfo(priem.isSetT_jalob_moch(), priem.getT_jalob_moch());
-						addDetailInfo(priem.isSetT_jalob_endo(), priem.getT_jalob_endo());
-						addDetailInfo(priem.isSetT_jalob_nerv(), priem.getT_jalob_nerv());
-						addDetailInfo(priem.isSetT_jalob_opor(), priem.getT_jalob_opor());
-						addDetailInfo(priem.isSetT_jalob_lih(), priem.getT_jalob_lih());
-						addDetailInfo(priem.isSetT_jalob_proch(), priem.getT_jalob_proch());
-						addHeader("Status Praesense");
-						addDetailInfo(priem.isSetT_status_praesense(), priem.getT_status_praesense());
-						addDetailInfo(priem.isSetT_ob_sost(), priem.getT_ob_sost());
-						addDetailInfo(priem.isSetT_koj_pokr(), priem.getT_koj_pokr());
-						addDetailInfo(priem.isSetT_sliz(), priem.getT_sliz());
-						addDetailInfo(priem.isSetT_podk_kl(), priem.getT_podk_kl());
-						addDetailInfo(priem.isSetT_limf_uzl(), priem.getT_limf_uzl());
-						addDetailInfo(priem.isSetT_kost_mysh(), priem.getT_kost_mysh());
-						addDetailInfo(priem.isSetT_nervn_ps(), priem.getT_nervn_ps());
-						addDetailInfo(priem.isSetT_chss(), priem.getT_chss());
-						addDetailInfo(priem.isSetT_temp(), priem.getT_temp());
-						addDetailInfo(priem.isSetT_ad(), priem.getT_ad());
-						addDetailInfo(priem.isSetT_rost(), priem.getT_rost());
-						addDetailInfo(priem.isSetT_ves(), priem.getT_ves());
-						addDetailInfo(priem.isSetT_telo(), priem.getT_telo());
-						addHeader("Физикальное обследование");
-						addDetailInfo(priem.isSetT_fiz_obsl(), priem.getT_fiz_obsl());
-						addDetailInfo(priem.isSetT_sust(), priem.getT_sust());
-						addDetailInfo(priem.isSetT_dyh(), priem.getT_dyh());
-						addDetailInfo(priem.isSetT_gr_kl(), priem.getT_gr_kl());
-						addDetailInfo(priem.isSetT_perk_l(), priem.getT_perk_l());
-						addDetailInfo(priem.isSetT_aus_l(), priem.getT_aus_l());
-						addDetailInfo(priem.isSetT_bronho(), priem.getT_bronho());
-						addDetailInfo(priem.isSetT_arter(), priem.getT_arter());
-						addDetailInfo(priem.isSetT_obl_s(), priem.getT_obl_s());
-						addDetailInfo(priem.isSetT_perk_s(), priem.getT_perk_s());
-						addDetailInfo(priem.isSetT_aus_s(), priem.getT_aus_s());
-						addDetailInfo(priem.isSetT_pol_rta(), priem.getT_pol_rta());
-						addDetailInfo(priem.isSetT_jivot(), priem.getT_jivot());
-						addDetailInfo(priem.isSetT_palp_jivot(), priem.getT_palp_jivot());
-						addDetailInfo(priem.isSetT_jel_kish(), priem.getT_jel_kish());
-						addDetailInfo(priem.isSetT_palp_jel(), priem.getT_palp_jel());
-						addDetailInfo(priem.isSetT_palp_podjjel(), priem.getT_palp_podjjel());
-						addDetailInfo(priem.isSetT_pechen(), priem.getT_pechen());
-						addDetailInfo(priem.isSetT_jelch(), priem.getT_jelch());
-						addDetailInfo(priem.isSetT_selez(), priem.getT_selez());
-						addDetailInfo(priem.isSetT_obl_zad(), priem.getT_obl_zad());
-						addDetailInfo(priem.isSetT_poyasn(), priem.getT_poyasn());
-						addDetailInfo(priem.isSetT_pochk(), priem.getT_pochk());
-						addDetailInfo(priem.isSetT_moch(), priem.getT_moch());
-						addDetailInfo(priem.isSetT_mol_jel(), priem.getT_mol_jel());
-						addDetailInfo(priem.isSetT_gr_jel(), priem.getT_gr_jel());
-						addDetailInfo(priem.isSetT_matka(), priem.getT_matka());
-						addDetailInfo(priem.isSetT_nar_polov(), priem.getT_nar_polov());
-						addDetailInfo(priem.isSetT_chitov(), priem.getT_chitov());
-						addHeader("Status localis");
-						addDetailInfo(priem.isSetT_st_localis(), priem.getT_st_localis());
-						addHeader("Оценка данных анамнеза и объективного исследования");
-						addDetailInfo(priem.isSetT_ocenka(), priem.getT_ocenka());
+						//addHeader("Жалобы");
+						//addLineToDetailInfo("Жалобы",priem.isSetT_jalob(), priem.getT_jalob());
+						addLineToDetailInfo("Место обслуживания",getValueFromClassifier(MainForm.tcl.get_n_abs(), pam.isSetMobs(), pam.getMobs()));
+						addLineToDetailInfo("Жалобы (дыхательная система)",priem.isSetT_jalob_d(), priem.getT_jalob_d());
+						addLineToDetailInfo("Жалобы (система кровообращения)",priem.isSetT_jalob_krov(), priem.getT_jalob_krov());
+						addLineToDetailInfo("Жалобы (система пищеварения)",priem.isSetT_jalob_p(), priem.getT_jalob_p());
+						addLineToDetailInfo("Жалобы (мочеполовая система)",priem.isSetT_jalob_moch(), priem.getT_jalob_moch());
+						addLineToDetailInfo("Жалобы (эндокринная система)",priem.isSetT_jalob_endo(), priem.getT_jalob_endo());
+						addLineToDetailInfo("Жалобы (нервная система и органы чувств)",priem.isSetT_jalob_nerv(), priem.getT_jalob_nerv());
+						addLineToDetailInfo("Жалобы (опорно-двигательная система)",priem.isSetT_jalob_opor(), priem.getT_jalob_opor());
+						addLineToDetailInfo("Жалобы (лихорадка)",priem.isSetT_jalob_lih(), priem.getT_jalob_lih());
+						addLineToDetailInfo("Жалобы (общего характера)",priem.isSetT_jalob_obh(), priem.getT_jalob_obh());
+						addLineToDetailInfo("Жалобы (прочие)",priem.isSetT_jalob_proch(), priem.getT_jalob_proch());
+						//addHeader("Status Praesense");
+						//addLineToDetailInfo("Жалобы (прочие)",priem.isSetT_status_praesense(), priem.getT_status_praesense());
+						addLineToDetailInfo("Общее состояние",priem.isSetT_ob_sost(), priem.getT_ob_sost());
+						addLineToDetailInfo("Кожные покровы",priem.isSetT_koj_pokr(), priem.getT_koj_pokr());
+						addLineToDetailInfo("Видимые слизистые",priem.isSetT_sliz(), priem.getT_sliz());
+						addLineToDetailInfo("Подкожная клетчатка",priem.isSetT_podk_kl(), priem.getT_podk_kl());
+						addLineToDetailInfo("Лимфатические узлы",priem.isSetT_limf_uzl(), priem.getT_limf_uzl());
+						addLineToDetailInfo("Костно-мышечная система",priem.isSetT_kost_mysh(), priem.getT_kost_mysh());
+						addLineToDetailInfo("Нервно-психический статус",priem.isSetT_nervn_ps(), priem.getT_nervn_ps());
+						addLineToDetailInfo("ЧСС",priem.isSetT_chss(), priem.getT_chss());
+						addLineToDetailInfo("Температура",priem.isSetT_temp(), priem.getT_temp());
+						addLineToDetailInfo("Артериальное давление",priem.isSetT_ad(), priem.getT_ad());
+						addLineToDetailInfo("Рост",priem.isSetT_rost(), priem.getT_rost());
+						addLineToDetailInfo("Вес",priem.isSetT_ves(), priem.getT_ves());
+						addLineToDetailInfo("Телосложение",priem.isSetT_telo(), priem.getT_telo());
+						//addHeader("Физикальное обследование");
+						//addLineToDetailInfo("Жалобы (прочие)",priem.isSetT_fiz_obsl(), priem.getT_fiz_obsl());
+						addLineToDetailInfo("Суставы",priem.isSetT_sust(), priem.getT_sust());
+						addLineToDetailInfo("Дыхание",priem.isSetT_dyh(), priem.getT_dyh());
+						addLineToDetailInfo("Грудная клетка",priem.isSetT_gr_kl(), priem.getT_gr_kl());
+						addLineToDetailInfo("Перкуссия легких",priem.isSetT_perk_l(), priem.getT_perk_l());
+						addLineToDetailInfo("Аускультация легких",priem.isSetT_aus_l(), priem.getT_aus_l());
+						addLineToDetailInfo("Бронхофония",priem.isSetT_bronho(), priem.getT_bronho());
+						addLineToDetailInfo("Артерии и шейные вены",priem.isSetT_arter(), priem.getT_arter());
+						addLineToDetailInfo("Осмотр области сердца",priem.isSetT_obl_s(), priem.getT_obl_s());
+						addLineToDetailInfo("Перкуссия сердца",priem.isSetT_perk_s(), priem.getT_perk_s());
+						addLineToDetailInfo("Аускультация сердца",priem.isSetT_aus_s(), priem.getT_aus_s());
+						addLineToDetailInfo("Полость рта",priem.isSetT_pol_rta(), priem.getT_pol_rta());
+						addLineToDetailInfo("Живот",priem.isSetT_jivot(), priem.getT_jivot());
+						addLineToDetailInfo("Пальпация живота",priem.isSetT_palp_jivot(), priem.getT_palp_jivot());
+						addLineToDetailInfo("Пальпация, перкуссия и аускультация ЖКТ",priem.isSetT_jel_kish(), priem.getT_jel_kish());
+						addLineToDetailInfo("Пальпация желудка",priem.isSetT_palp_jel(), priem.getT_palp_jel());
+						addLineToDetailInfo("Пальпация поджелудочной железы",priem.isSetT_palp_podjjel(), priem.getT_palp_podjjel());
+						addLineToDetailInfo("Печень",priem.isSetT_pechen(), priem.getT_pechen());
+						addLineToDetailInfo("Желчный пузырь",priem.isSetT_jelch(), priem.getT_jelch());
+						addLineToDetailInfo("Селезенка",priem.isSetT_selez(), priem.getT_selez());
+						addLineToDetailInfo("Область заднего прохода",priem.isSetT_obl_zad(), priem.getT_obl_zad());
+						addLineToDetailInfo("Поясничная область",priem.isSetT_poyasn(), priem.getT_poyasn());
+						addLineToDetailInfo("Почки",priem.isSetT_pochk(), priem.getT_pochk());
+						addLineToDetailInfo("Мочевой пузырь",priem.isSetT_moch(), priem.getT_moch());
+						addLineToDetailInfo("Молочные железы",priem.isSetT_mol_jel(), priem.getT_mol_jel());
+						addLineToDetailInfo("Грудные железы мужчин",priem.isSetT_gr_jel(), priem.getT_gr_jel());
+						addLineToDetailInfo("Матка и ее придатки",priem.isSetT_matka(), priem.getT_matka());
+						addLineToDetailInfo("Наружные половые органы у мужчин",priem.isSetT_nar_polov(), priem.getT_nar_polov());
+						addLineToDetailInfo("Щитовидная железа",priem.isSetT_chitov(), priem.getT_chitov());
+						//addHeader("Status localis");
+						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
+						//addHeader("Оценка данных анамнеза и объективного исследования");
+						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
+						addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 					} catch (PriemNotFoundException e1) {
 						e1.printStackTrace();
@@ -816,5 +822,9 @@ public class PInfo extends JFrame {
 			if (value == 1)
 				if (txt.toString().length() > 0)
 					sb.append(txt+lineSep);
+	}
+	
+	private void addLine(String txt) {
+		sb.append(txt);
 	}
 }

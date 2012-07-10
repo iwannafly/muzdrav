@@ -1,4 +1,4 @@
-﻿namespace java ru.nkz.ivcgzo.thriftGenTalon
+namespace java ru.nkz.ivcgzo.thriftGenTalon
 
 include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
@@ -49,7 +49,9 @@ struct Nrasp{
 	4:i64 time_n,
 	5:i64 time_k,
 	6:i32 cxema,
-	7:string cdol
+	7:string cdol,
+	8:i32 cpol,
+	9:i32 id
 }
 
 struct Rasp{
@@ -132,8 +134,22 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	*/
 	list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Добавляет записи в табл расписание работы врача
+        * @param Nrasp - thrift-объект с информацией о расписании
+        */
+	void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+       * Удаляет расписание работы врача
+       */
+	void deleteNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Сохраняет изменения в табл расписание работы врача
+        * @param Nrasp - thrift-объект с информацией о расписании
+        */
+	void updateNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 
 
