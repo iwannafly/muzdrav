@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.dbConnection;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,14 +23,19 @@ public class DBConnection {
 		loadDriver();
 	}
 	
-	private String getBinPath() throws Exception {
-		String exeName = getExecutableName();
-		for (String path : getPaths()) {
-			File exeFile = new File(path, exeName);
-			if (exeFile.exists())
-				return exeFile.getParentFile().getAbsolutePath();
+	private String getBinPath() {
+		try {
+			String exeName = getExecutableName();
+			for (String path : getPaths()) {
+				File exeFile = new File(path, exeName);
+				if (exeFile.exists())
+					return exeFile.getParentFile().getAbsolutePath();
+			}
+			throw new Exception(String.format("The 'bin' folder not specified for %s database in PATH variable.", databaseParams.type));
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return "";
 		}
-		throw new Exception(String.format("The 'bin' folder not specified for %s database in PATH variable.", databaseParams.type));
 	}
 	
 	private String getExecutableName() throws Exception {
@@ -119,5 +125,25 @@ public class DBConnection {
 	
 	public ResultSet executeQuery(Statement stm, String sql) throws SQLException {
 		return stm.executeQuery(sql);
+	}
+	
+	public PreparedStatement createPreparedStatement(String sql) throws SQLException {
+		return connection.prepareStatement(sql);
+	}
+	
+	public void commit() {
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void rollback() {
+		try {
+			connection.rollback();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
