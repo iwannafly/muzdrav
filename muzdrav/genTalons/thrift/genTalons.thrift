@@ -33,13 +33,17 @@ struct Ndv{
 	1:i32 pcod,
 	2:i64 datan,
 	3:i64 datak,
-	4:string cdol
+	4:string cdol,
+	5:i32 cpol,
+	6:i32 id
 }
 
 struct Norm{
 	1:string cdol,
 	2:i32 vidp,
-	3:i32 dlit
+	3:i32 dlit,
+	4:i32 cpol,
+	5:i32 id
 }
 
 struct Nrasp{
@@ -141,9 +145,26 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-       * Удаляет расписание работы врача
-       */
+        * Добавляет записи в табл ndv
+        * @param Ndv - thrift-объект с информацией о нерабочих днях
+        */
+	void addNdv(1: Ndv ndv) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+        * Добавляет записи в табл norm
+        * @param Norm - thrift-объект с информацией о нормах длительности приема
+        */
+	void addNorm(1: list<Norm> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+        * Удаляет расписание работы врача
+        */
 	void deleteNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+        * Удаляет строку в табл ndv
+        */
+	void deleteNdv(1:i32 id) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
         * Сохраняет изменения в табл расписание работы врача
@@ -151,6 +172,11 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         */
 	void updateNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Сохраняет изменения в табл norm
+        * @param Norm - thrift-объект с информацией о расписании
+        */
+	void updateNorm(1: list<Norm> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
+import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 
 public class RaspisanieUnit {
 
@@ -50,4 +51,20 @@ public class RaspisanieUnit {
 		}
 	}
 
+	static void NewNorm(int cpodr, String cdol){
+		try {
+			List<Norm> NormInf = new ArrayList<Norm>();
+				for (int i=1; i <= 5; i++) {
+					Norm tmpNorm = new Norm();
+					tmpNorm.setCpol(cpodr);
+					tmpNorm.setCdol(cdol);
+					tmpNorm.setVidp(i);
+					tmpNorm.setDlit(0);
+					NormInf.add(tmpNorm);
+				}
+			MainForm.tcl.addNorm(NormInf);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
