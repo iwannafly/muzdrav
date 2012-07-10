@@ -390,6 +390,7 @@ struct IsslMet {
 	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
+	8: optional i32 pvizitId;
 }
 
 struct IsslPokaz {
@@ -400,6 +401,7 @@ struct IsslPokaz {
 	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
+	8: optional i32 pvizitId;
 }
 
 struct Napr{

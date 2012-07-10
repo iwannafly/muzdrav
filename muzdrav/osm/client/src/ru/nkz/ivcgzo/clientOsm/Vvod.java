@@ -157,6 +157,7 @@ public class Vvod extends JFrame {
 	private JEditorPane tpLocalis;
 	private JEditorPane tpOcenka;
 	private JEditorPane tpIstZab;
+	private JEditorPane tpObosnov;
 	private ThriftStringClassifierCombobox<StringClassifier> c_obr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbrez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbish;
@@ -218,7 +219,7 @@ public class Vvod extends JFrame {
 		 sign = new FormSign();
 		 postber = new FormPostBer();
 		 printform = new PrintForm();
-		setBounds(100, 100, 1029, 747);
+		setBounds(100, 100, 1029, 962);
 		
 		final ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
 		listShablon.addMouseListener(new MouseAdapter() {
@@ -1241,6 +1242,8 @@ public class Vvod extends JFrame {
 						if (c_obr.getSelectedPcod() != null)
 							pvizit.setCobr(c_obr.getSelectedPcod());
 						if (cbrez.getSelectedPcod() != null)
+							pvizitAmb.setRezult(cbrez.getSelectedPcod());
+						if (cbrez.getSelectedPcod() != null)
 							pvizit.setRezult(cbrez.getSelectedPcod());
 						if (cbish.getSelectedPcod() != null)
 							pvizit.setIshod(cbish.getSelectedPcod());
@@ -1443,8 +1446,8 @@ mi3.addActionListener(new ActionListener() {
 							c_obr.setSelectedPcod(pvizit.getCobr());
 						else
 							c_obr.setSelectedItem(null);
-						if (pvizit.isSetRezult())
-							cbrez.setSelectedPcod(pvizit.getRezult());
+						if (pvizitAmb.isSetRezult())
+							cbrez.setSelectedPcod(pvizitAmb.getRezult());
 						else
 							cbrez.setSelectedItem(null);
 						if (pvizit.isSetIshod())
@@ -1989,6 +1992,7 @@ rbPokaz.addActionListener(new ActionListener() {
  	public void actionPerformed(ActionEvent e) {
  		rbMetodIssl.setSelected(false);
 	 	lblmet.setVisible(false);
+	 	spMetod.setVisible(false);
 	 	spPokazMet.setVisible(false);
 	 	tabMetod.setVisible(false);
 	 	lblPokazMet.setVisible(false);
@@ -1997,7 +2001,9 @@ rbPokaz.addActionListener(new ActionListener() {
 	 	lblOrgan.setVisible(true);
 	 	cbOrgan.setVisible(true);
 	 	spPokaz.setVisible(true);
-	 	tabPokaz.setVisible(true);}
+	 	tabPokaz.setVisible(true);
+
+ 	}
  });
 		
 		
@@ -2074,6 +2080,7 @@ rbPokaz.addActionListener(new ActionListener() {
 						}
 						if (selItems.size() != 0) {
 							IsslMet isslmet = new IsslMet();
+							isslmet.setPvizitId(TabPos.getSelectedItem().getId_obr());
 							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
 							isslmet.setNpasp(Vvod.zapVr.getNpasp());
@@ -2087,28 +2094,6 @@ rbPokaz.addActionListener(new ActionListener() {
 						}
 					}
 				}
-					/*Napr napr=new Napr();
-					 * MainForm.tcl.printNapr(napr)
-					 * napr.setnpasp(Vvod.ZapVr.getNpasp());
-					 * napr.setuserId(MainForm.authInfo.pcod);
-					 * napr.setobosnov(tfob.gettext);
-					 * napr.setclpu(cblpu.getselectedpcod)*/
-					
-					/*
-					 * NaprKons naprkons=new NaprKons
-					 * * MainForm.tcl.printNaprKons(naprkons)
-					 * naprkons.setnpasp(Vvod.ZapVr.getNpasp());
-					 * naprkons.setuserId(MainForm.authInfo.pcod);
-					 * naprkons.setobosnov(tfob.gettext);
-					 * naprkons.setcpol(cbpol.getselectedpcod)*/
-					
-					/*
-					 * * MainForm.tcl.printVypis(Vvod.ZapVr.getNpasp(),MainForm.authInfo.pcod(),vvod.TabPos.getSelectedItem.getId_obr);
-				*/
-					
-						/*
-					 * * MainForm.tcl.printKek(Vvod.ZapVr.getNpasp(),vvod.TabPos.getSelectedItem.getId_obr);
-				*/
 				if (rbPokaz.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) && (cbOrgan.getSelectedItem() != null)) {
 							List<String> selItems = new ArrayList<>();
@@ -2118,12 +2103,13 @@ rbPokaz.addActionListener(new ActionListener() {
 							}
 							if (selItems.size() != 0) {
 								IsslPokaz pokaz = new IsslPokaz();
+								pokaz.setPvizitId(TabPos.getSelectedItem().getId_obr());
 								pokaz.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 								pokaz.setUserId(MainForm.authInfo.getUser_id());
 								pokaz.setNpasp(Vvod.zapVr.getNpasp());
 								pokaz.setPokaz(selItems);
-								pokaz.setMesto(cbMesto.getSelectedItem().getName());
-								pokaz.setKab(tfKab.getText());
+								if (cbMesto.getSelectedItem()!=null)pokaz.setMesto(cbMesto.getSelectedItem().getName());
+								pokaz.setKab(getTextOrNull(tfKab.getText()));
 								String servPath = MainForm.tcl.printIsslPokaz(pokaz);
 								String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -2131,18 +2117,6 @@ rbPokaz.addActionListener(new ActionListener() {
 							}
 						}
 					}
-//						List<String> selItems = new ArrayList<>();
-//						for (Pokaz pokaz : tabPokaz.getData()) {
-//							if (pokaz.vybor)
-//								selItems.add(pokaz.getPcod());
-//						}
-//						if (selItems.size() != 0) {
-//							String servPath = MainForm.tcl.printIsslPokaz(cbVidIssl.getSelectedItem().pcod, MainForm.authInfo.user_id, Vvod.zapVrSave.getNpasp(), cbSys.getSelectedItem().pcod, selItems);
-//							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-//							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
-//						}
-//					}
-//				}
 				}
 					catch (TException e1) {
 					e1.printStackTrace();
@@ -2171,7 +2145,7 @@ rbPokaz.addActionListener(new ActionListener() {
 								.addComponent(lblPokazMet, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_pNaprIssl.createSequentialGroup()
 									.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addGap(18)
 									.addComponent(butPrint))
 								.addGroup(gl_pNaprIssl.createSequentialGroup()
 									.addComponent(lblMesto, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
@@ -2238,9 +2212,9 @@ rbPokaz.addActionListener(new ActionListener() {
 								.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
 							.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 166, GroupLayout.PREFERRED_SIZE)
-							.addGap(57)
+							.addGap(49)
 							.addComponent(butPrint)))
-					.addContainerGap(159, Short.MAX_VALUE))
+					.addContainerGap(233, Short.MAX_VALUE))
 		);
 		
 		tabPokaz = new CustomTable<>(false, true, Pokaz.class, 0,"Код показателя",1,"Наименование",2,"Стоимость",5,"Выбор");
@@ -2304,7 +2278,7 @@ rbPokaz.addActionListener(new ActionListener() {
 		
 		lblObosnov = new JLabel("<html>Обоснование для <br>\r\nнаправления");
 		
-		final JEditorPane tpObosnov = new JEditorPane();
+		 tpObosnov = new JEditorPane();
 		tpObosnov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		butPrintNapr = new JButton("Печать");

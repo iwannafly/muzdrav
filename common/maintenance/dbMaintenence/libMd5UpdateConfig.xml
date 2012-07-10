@@ -1,0 +1,4 @@
+<libsMd5Config>
+	<base host="10.0.0.242" port="5432" schema="public" name="zabol" login="postgres" password="postgres" />
+	<paths libs="../../../../lib" plugins="../../../muzdrav/auth/client/plugin" />
+</libsMd5Config>
