@@ -8,7 +8,7 @@ public class ManagerAuth extends serverManager {
 		ManagerAuth manAuth = new ManagerAuth();
 		
 		try {
-			manAuth.ConnectToDatabase(DatabaseDriver.postgre, "10.0.0.66", "5432", "zabol", null, 5, "postgres", "postgres");
+			manAuth.ConnectToDatabase(DatabaseDriver.postgre, "10.0.0.242", "5432", "zabol", null, 5, "postgres", "postgres");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();

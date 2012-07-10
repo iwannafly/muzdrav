@@ -2,7 +2,6 @@ package ru.nkz.ivcgzo.clientGenTalons;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -24,13 +23,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
-import javax.swing.JToolBar;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import javax.swing.SwingConstants;
-import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -42,20 +37,15 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Rasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
-import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons;
-import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons.Iface;
 import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 
 public class TalonMainFrame extends JFrame {
 
@@ -73,10 +63,8 @@ public class TalonMainFrame extends JFrame {
 	private JCheckBox cbx_rasp;
 	private List<Nrasp> NraspInfo;
 	private List<Norm> NormInfo;
-	private List<Calendar> CalInfo;
 	private CustomTable<Nrasp, Nrasp._Fields> tbl_rasp;
 	private CustomTable<Norm, Norm._Fields> tbl_norm;
-	private CustomTable<Calendar, Calendar._Fields> tbl_cal;
 
 	/**
 	 * Launch the application.
@@ -113,7 +101,6 @@ public class TalonMainFrame extends JFrame {
 			public void stateChanged(ChangeEvent arg0) {
 				if (tbMain.getSelectedIndex() == 1) ChangeNormInfo();
 				if (tbMain.getSelectedIndex() == 2) ChangeTalonInfo();
-				if (tbMain.getSelectedIndex() == 3) ChangeCalendarInfo();
 			}
 		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -169,17 +156,44 @@ public class TalonMainFrame extends JFrame {
 		JButton btn_new = new JButton("Создать");
 		btn_new.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (cbx_rasp.isSelected()) RaspisanieUnit.NewRaspisanie(1);
-				else RaspisanieUnit.NewRaspisanie(0);
+				if (cbx_rasp.isSelected()){
+					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec,1);
+				//	ChangeCxemaInfo(1);
+				}
+				else {
+					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
+				//	ChangeCxemaInfo(0);
+				}
+				ChangeNraspInfo();
 			}
 		});
 		btn_new.setToolTipText("Создать расписание");
 		
 		JButton btn_save = new JButton("Сохранить");
+		btn_save.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					tbl_rasp.updateSelectedItem();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		btn_save.setToolTipText("Сохранить расписание");
 		
 		JButton btn_del = new JButton("Удалить");
+		btn_del.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					tbl_rasp.requestFocus();
+				    tbl_rasp.deleteSelectedRow();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		btn_del.setToolTipText("Удалить расписание");
+		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -220,11 +234,50 @@ public class TalonMainFrame extends JFrame {
 //		tbl_rasp.setPreferredWidths(90,50,50,50,50,50,50,50,50,50,50);
 		tbl_rasp.setFillsViewportHeight(true);
 		sp_rasp.setViewportView(tbl_rasp);
-		
+
+		tbl_rasp.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<Nrasp>() {
+			@Override
+			public boolean doAction(CustomTableItemChangeEvent<Nrasp> event) {
+		        try {
+				    MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
+			}
+		});
+
+		tbl_rasp.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Nrasp>() {
+			@Override
+			public boolean doAction(CustomTableItemChangeEvent<Nrasp> event) {
+		        try {
+					List<Nrasp> NraspInfo = new ArrayList<Nrasp>();
+//					for (int i=0; i <= tbl_rasp.size(); i++) {
+//						Nrasp tmpNrasp = new Nrasp();
+//						tmpNrasp.setCpol(tbl_rasp.getSelectedItem().cpol);
+//						tmpNrasp.setPcod(pcod);
+//						tmpNrasp.setCdol(cdol);
+//						tmpNrasp.setCxema(cxm);
+//						tmpNrasp.setDenn(i);
+//						tmpNrasp.setVidp(j);
+//						tmpNrasp.setTime_n(0);
+//						tmpNrasp.setTime_k(0);
+//						NraspInfo.add(tmpNrasp);
+//						
+//					}
+					MainForm.tcl.updateNrasp(NraspInfo);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
+			}
+		});
+
 		cxm_1 = new JRadioButton("на каждый день");
 		cxm_1.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-//				cxm_1.setSelected(true);
 				ChangeCxemaInfo(0);			}
 		});
 		btnGroup_cxema.add(cxm_1);
@@ -232,7 +285,6 @@ public class TalonMainFrame extends JFrame {
 		cxm_2 = new JRadioButton("четные дни");
 		cxm_2.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-//				cxm_2.setSelected(true);
 				ChangeCxemaInfo(1);			}
 		});
 		btnGroup_cxema.add(cxm_2);
@@ -240,7 +292,6 @@ public class TalonMainFrame extends JFrame {
 		cxm_3 = new JRadioButton("нечетные дни");
 		cxm_3.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-//				cxm_3.setSelected(true);
 				ChangeCxemaInfo(2);			}
 		});
 		btnGroup_cxema.add(cxm_3);
@@ -306,34 +357,6 @@ public class TalonMainFrame extends JFrame {
 		);
 		tbTalon.setLayout(gl_tbTalon);
 		
-		JPanel tbCalendar = new JPanel();
-		tbMain.addTab("Производственный календарь", null, tbCalendar, null);
-		
-		JScrollPane sp_cal = new JScrollPane();
-		GroupLayout gl_tbCalendar = new GroupLayout(tbCalendar);
-		gl_tbCalendar.setHorizontalGroup(
-			gl_tbCalendar.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbCalendar.createSequentialGroup()
-					.addGap(67)
-					.addComponent(sp_cal, GroupLayout.PREFERRED_SIZE, 257, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(356, Short.MAX_VALUE))
-		);
-		gl_tbCalendar.setVerticalGroup(
-			gl_tbCalendar.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbCalendar.createSequentialGroup()
-					.addGap(68)
-					.addComponent(sp_cal, GroupLayout.PREFERRED_SIZE, 309, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(230, Short.MAX_VALUE))
-		);
-		
-		tbl_cal =new CustomTable<>(true, true, Calendar.class, 0,"Дата",6,"Признак", 7, "Дата");
-		tbl_cal.setDateField(0);
-		tbl_cal.setDateField(2);
-		tbl_cal.setFillsViewportHeight(true);
-		tbl_cal.setPreferredWidths(90,90,90);
-		sp_cal.setViewportView(tbl_cal);
-		tbCalendar.setLayout(gl_tbCalendar);
-		
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
@@ -369,7 +392,6 @@ public class TalonMainFrame extends JFrame {
 					if (tbMain.getSelectedIndex() == 0) ChangeNraspInfo();
 					if (tbMain.getSelectedIndex() == 1) ChangeNormInfo();
 					if (tbMain.getSelectedIndex() == 2) ChangeTalonInfo();
-					if (tbMain.getSelectedIndex() == 3) ChangeCalendarInfo();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -496,15 +518,6 @@ public class TalonMainFrame extends JFrame {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
 			tbl_norm.setData(NormInfo);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	private void ChangeCalendarInfo(){
-		try {
-			tbl_cal.setData(new ArrayList<Calendar>());
-			CalInfo = MainForm.tcl.getCalendar(2012);
-			tbl_cal.setData(CalInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
