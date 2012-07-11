@@ -48,6 +48,8 @@ import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import javax.swing.JTable;
 import java.awt.Font;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 
 public class TalonMainFrame extends JFrame {
 
@@ -464,15 +466,64 @@ public class TalonMainFrame extends JFrame {
 		
 		JPanel tbTalon = new JPanel();
 		tbMain.addTab("Журнал талонов", null, tbTalon, null);
+		
+		JPanel panel_5 = new JPanel();
 		GroupLayout gl_tbTalon = new GroupLayout(tbTalon);
 		gl_tbTalon.setHorizontalGroup(
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 680, Short.MAX_VALUE)
+				.addGroup(gl_tbTalon.createSequentialGroup()
+					.addGap(25)
+					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 582, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(73, Short.MAX_VALUE))
 		);
 		gl_tbTalon.setVerticalGroup(
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 618, Short.MAX_VALUE)
+				.addGroup(gl_tbTalon.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(442, Short.MAX_VALUE))
 		);
+		
+		JFormattedTextField formattedTextField = new JFormattedTextField();
+		
+		JFormattedTextField formattedTextField_1 = new JFormattedTextField();
+		
+		JLabel lblNewLabel = new JLabel("Период: с");
+		
+		JLabel lblNewLabel_1 = new JLabel("По");
+		
+		JButton btnNewButton = new JButton("Формировать");
+		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
+		gl_panel_5.setHorizontalGroup(
+			gl_panel_5.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(lblNewLabel)
+							.addGap(20)
+							.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_1)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnNewButton))
+					.addContainerGap(304, Short.MAX_VALUE))
+		);
+		gl_panel_5.setVerticalGroup(
+			gl_panel_5.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+						.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel)
+						.addComponent(lblNewLabel_1))
+					.addGap(34)
+					.addComponent(btnNewButton)
+					.addContainerGap(66, Short.MAX_VALUE))
+		);
+		panel_5.setLayout(gl_panel_5);
 		tbTalon.setLayout(gl_tbTalon);
 		
 		JScrollPane scrollPane = new JScrollPane();
