@@ -67,7 +67,9 @@ struct Rasp{
 	6:i64 time_n,
 	7:i64 time_k,
 	8:i32 vidp,
-	9:string cdol
+	9:string cdol,
+	10:i32 cpol,
+	11:i32 id
 }
 
 struct Vidp{
@@ -88,7 +90,8 @@ struct Talon{
 	9:i64 timepk
 	10:i64 datapt,
 	11:i64 datap,
-	12:i64 timep
+	12:i64 timep,
+	13:i32 cpol
 }
 
 service ThriftGenTalons extends kmiacServer.KmiacServer {
