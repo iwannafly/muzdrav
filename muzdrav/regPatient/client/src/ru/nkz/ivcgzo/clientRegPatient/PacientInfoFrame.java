@@ -307,7 +307,6 @@ public class PacientInfoFrame extends JFrame {
 			e.printStackTrace();
 		} 
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(1, 1, 1002, 748); //ширина, высота
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
