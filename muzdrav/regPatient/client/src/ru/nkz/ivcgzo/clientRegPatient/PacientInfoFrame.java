@@ -68,6 +68,8 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -206,6 +208,7 @@ public class PacientInfoFrame extends JFrame {
 	private PatientBrief newPatBr;
 	private AllGosp newPriem;
 //	private Info pInfo;
+	private PacientMainFrame pacientMainFrame;
 
 	/**
 	 * Launch the application.
@@ -224,6 +227,7 @@ public class PacientInfoFrame extends JFrame {
 //	}
 
 	public void refresh(List<PatientBrief> pat) {
+//		pacientMainFrame.ClearPatientMainFrame();
 		tbl_patient.requestFocus();
 		tbl_patient.setData(pat);
 	}
@@ -231,6 +235,12 @@ public class PacientInfoFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public PacientInfoFrame(List<PatientBrief> pat) {
+//		addWindowListener(new WindowAdapter() {
+//			@Override
+//			public void windowOpened(WindowEvent arg0) {
+//				setExtendedState(JFrame.MAXIMIZED_BOTH);
+//			}
+//		});
 		setFont(new Font("Tahoma", Font.PLAIN, 11));
 		try {
 			cmb_ishod = new ThriftIntegerClassifierCombobox<>(true);

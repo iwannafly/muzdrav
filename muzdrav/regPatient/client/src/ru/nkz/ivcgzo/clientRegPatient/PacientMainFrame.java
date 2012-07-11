@@ -18,6 +18,7 @@ import javax.swing.border.TitledBorder;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import java.awt.Font;
@@ -25,6 +26,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JFormattedTextField;
 
 public class PacientMainFrame extends JFrame {
 	private static final long serialVersionUID = 8528181014663112901L;
@@ -33,9 +35,9 @@ public class PacientMainFrame extends JFrame {
 	private JTextField tfFam;
 	private JTextField tfIm;
 	private JTextField tfOt;
-	private JTextField tfDr;
 	private JTextField tfSer;
 	private JTextField tfNom;
+	private CustomDateEditor tfDr;
 	private PacientInfoFrame pacientInfoFrame;
 	public List<PatientBrief> pat;
 
@@ -94,6 +96,7 @@ public class PacientMainFrame extends JFrame {
 					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
 					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().toUpperCase().trim());
 					if (!tfNom.getText().isEmpty()) patBr.setNpolis(tfNom.getText().toUpperCase().trim());
+					//if ( tfDr.getDate().getTime() != 0) patBr.setDatar(tfDr.getDate().getTime());
 					try {
                         pat = MainForm.tcl.getAllPatientBrief(patBr);
                         dispose();
@@ -104,7 +107,7 @@ public class PacientMainFrame extends JFrame {
                         } else
                             pacientInfoFrame.refresh(pat);
                         	pacientInfoFrame.setVisible(true);
-                        	pacientInfoFrame.setSize(1002, 748);
+                        	pacientInfoFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
                     	}
 					catch (PatientNotFoundException e) {
 						JOptionPane.showMessageDialog(pacientInfoFrame, "По заданным критериям сведения о пациенте отсутствуют.");
@@ -150,10 +153,8 @@ public class PacientMainFrame extends JFrame {
 		tfOt.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfOt.setColumns(10);
 		
-		tfDr = new JTextField();
-		tfDr.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		tfDr.setColumns(10);
-		
+		tfDr = new CustomDateEditor();
+
 		tfSer = new JTextField();
 		tfSer.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tfSer.setColumns(10);
@@ -179,6 +180,7 @@ public class PacientMainFrame extends JFrame {
 		
 		JLabel lblNewLabel_5 = new JLabel("Номер");
 		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
@@ -193,13 +195,13 @@ public class PacientMainFrame extends JFrame {
 						.addComponent(lblNewLabel_5))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(tfDr)
 						.addComponent(tfFam, GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
 						.addComponent(tfIm)
 						.addComponent(tfOt)
-						.addComponent(tfDr)
 						.addComponent(tfSer)
 						.addComponent(tfNom))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(32, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -216,7 +218,7 @@ public class PacientMainFrame extends JFrame {
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addComponent(lblNewLabel_2)
 						.addComponent(tfOt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(9)
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addComponent(lblNewLabel_3)
 						.addComponent(tfDr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -232,5 +234,17 @@ public class PacientMainFrame extends JFrame {
 		);
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);
+	}
+	public void ClearPatientMainFrame(){
+		try {
+			tfFam.setText(null);
+			tfIm.setText(null);
+			tfOt.setText(null);
+			tfSer.setText(null);
+			tfNom.setText(null);
+			tfDr.setValue(null);
+		} catch (Exception e) {
+			e.printStackTrace();						
+		}
 	}
 }
