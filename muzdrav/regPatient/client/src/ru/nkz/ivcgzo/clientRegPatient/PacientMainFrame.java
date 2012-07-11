@@ -9,6 +9,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -82,7 +83,6 @@ public class PacientMainFrame extends JFrame {
 		btnPoisk.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		btnPoisk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			    //TODO мои исправления
 				try {
 					instance = PacientMainFrame.this;
 					PatientBrief patBr = new PatientBrief();
@@ -103,6 +103,7 @@ public class PacientMainFrame extends JFrame {
                         	pacientInfoFrame.setSize(954, 672);
                     	}
 					catch (PatientNotFoundException e) {
+						JOptionPane.showMessageDialog(pacientInfoFrame, "По заданным критериям сведения о пациенте отсутствуют.");
                         System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
                     }
 				} catch (TException e) {
