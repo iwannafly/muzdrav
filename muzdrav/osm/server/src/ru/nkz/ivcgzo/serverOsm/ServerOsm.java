@@ -816,13 +816,13 @@ public class ServerOsm extends Server implements Iface {
 					sb.append("<b>Время:</b><br />");
 					sb.append("<b>Подготовка:</b><br />");
 				sb.append("</td>");
-				acrs = sse.execPreparedQuery("SELECT n.name, m.name, v.fam, v.im, v.ot FROM s_users u JOIN n_n00 n ON (n.pcod = u.cpodr) JOIN n_m00 m ON (m.pcod = n.clpu) JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", im.getUserId());
+				acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", im.getUserId());
 				if (!acrs.getResultSet().next())
 					throw new KmiacServerException("Logged user info not found.");
 				sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
-					sb.append(String.format("<h3>%s<br />", acrs.getResultSet().getString(1)));
-					sb.append(String.format("%s<br />", acrs.getResultSet().getString(2)));
-					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), acrs.getResultSet().getString(5));
+//FIXME					sb.append(String.format("<h3>%s<br />", acrs.getResultSet().getString(1)));
+//					sb.append(String.format("%s<br />", acrs.getResultSet().getString(2)));
+					String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3));
 					acrs.close();
 					acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", im.getKodVidIssl());
 					if (!acrs.getResultSet().next())
@@ -991,11 +991,9 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				acrs = sse.execPreparedQuery("select n_n00.name,n_m00.name,s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join n_n00 on (s_users.cpodr=n_n00.pcod) join n_m00 on (n_n00.clpu=n_m00.pcod) join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",na.getUserId());
 				sb.append("<br>	<div style=\"background:000000;width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
 				sb.append("<br>");
-				if (!acrs.getResultSet().next()) throw new KmiacServerException("Cpol is null");//заменить текст
-				sb.append(String.format("%s, %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2)));
+//FIXME				sb.append(String.format("%s, %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2)));
 				sb.append("</div>"); 
 				sb.append("<div  style=\"background:000000;width:150px; float:right;\">Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</div>");
 				sb.append("<br><br><br><br><br><br><br><br><br><br><br>");
@@ -1004,7 +1002,6 @@ public class ServerOsm extends Server implements Iface {
 			 	sb.append(String.format("<br>Куда %s", na.getClpu()));
 			 	sb.append("<br><br>");
 			 	sb.append("1. Номер страхового полиса ОМС: " );
-			 	acrs.close();
 				acrs = sse.execPreparedQuery("SELECT poms_nom FROM patient WHERE npasp = ? ", na.getNpasp());
 				if (!acrs.getResultSet().next())
 					throw new KmiacServerException("Logged user info not found.");
@@ -1067,11 +1064,9 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				acrs = sse.execPreparedQuery("select n_n00.name,n_m00.name,s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join n_n00 on (s_users.cpodr=n_n00.pcod) join n_m00 on (n_n00.clpu=n_m00.pcod) join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",nk.getUserId());
 				sb.append("<br>	<div style=\"background:000000;width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
 				sb.append("<br>");
-				if (!acrs.getResultSet().next()) throw new KmiacServerException("Cpol is null");//заменить текст
-				sb.append(String.format("%s, %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2)));
+//FIXME				sb.append(String.format("%s, %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(1)));
 				sb.append("</div>"); 
 				sb.append("<div  style=\"background:000000;width:150px; float:right;\">Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</div>");
 				sb.append("<br><br><br><br><br><br><br><br><br><br><br>");
@@ -1080,7 +1075,6 @@ public class ServerOsm extends Server implements Iface {
 			 	sb.append(String.format("<br> Куда: %s", nk.getCpol()));
 			 	sb.append("<br><br>");
 			 	sb.append("1. Номер страхового полиса ОМС: " );
-			 	acrs.close();
 				acrs = sse.execPreparedQuery("SELECT poms_nom FROM patient WHERE npasp = ? ", nk.getNpasp());
 				if (!acrs.getResultSet().next())
 					throw new KmiacServerException("Logged user info not found.");
@@ -1142,18 +1136,18 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				acrs = sse.execPreparedQuery("select n_n00.name,n_m00.name,s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join n_n00 on (s_users.cpodr=n_n00.pcod) join n_m00 on (n_n00.clpu=n_m00.pcod) join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",userId);
-				sb.append("<br>	<div style=\"background:000000;width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
-				sb.append("<br>");
-				if (!acrs.getResultSet().next()) throw new KmiacServerException("Vrach is null");//заменить текст
-				sb.append(String.format("%s, %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2)));
-				sb.append("</div>"); 
-				sb.append("<div  style=\"background:000000;width:150px; float:right;\">Медицинская документация<br>Форма № 027/у<br> Утверждена Минздравом СССР<br>04.10.80 г. № 1090</div>");
-				sb.append("<br><br><br><br><br><br><br><br>");
-				sb.append("<h3 align=center>ВЫПИСКА</h3>");
-				sb.append("<h4 align=center>из медицинской карты амбулаторного больного</h4><br>в _____________________________________________________________");//пока черта, потому что в табл.patient поле mrab и спр.z43.pcod разные типы данных.дб одинаковые
-				sb.append("<br><div align=\"left\"><sub>название и адрес учреждения, куда направляется выписка</sub></div><br><br>");
-				acrs.close();
+//FIXME				acrs = sse.execPreparedQuery("select n_n00.name,n_m00.name,s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join n_n00 on (s_users.cpodr=n_n00.pcod) join n_m00 on (n_n00.clpu=n_m00.pcod) join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",userId);
+//				sb.append("<br>	<div style=\"background:000000;width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
+//				sb.append("<br>");
+//				if (!acrs.getResultSet().next()) throw new KmiacServerException("Vrach is null");//заменить текст
+//				sb.append(String.format("%s, %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2)));
+//				sb.append("</div>"); 
+//				sb.append("<div  style=\"background:000000;width:150px; float:right;\">Медицинская документация<br>Форма № 027/у<br> Утверждена Минздравом СССР<br>04.10.80 г. № 1090</div>");
+//				sb.append("<br><br><br><br><br><br><br><br>");
+//				sb.append("<h3 align=center>ВЫПИСКА</h3>");
+//				sb.append("<h4 align=center>из медицинской карты амбулаторного больного</h4><br>в _____________________________________________________________");//пока черта, потому что в табл.patient поле mrab и спр.z43.pcod разные типы данных.дб одинаковые
+//				sb.append("<br><div align=\"left\"><sub>название и адрес учреждения, куда направляется выписка</sub></div><br><br>");
+//				acrs.close();
 				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar,adm_ul,adm_dom,adm_kv FROM patient where npasp=?", npasp);
 				if (!acrs.getResultSet().next()) throw new KmiacServerException("Patient is null");//заменить текст
 				sb.append(String.format("1. Ф.И.О.</b> %s  %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
@@ -1226,7 +1220,7 @@ sb.append("<br>");
 
 sb.append("Лечащий врач:");
 acrs.close();
-acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join n_n00 on (s_users.cpodr=n_n00.pcod) join n_m00 on (n_n00.clpu=n_m00.pcod) join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",userId);
+acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",userId);
 				if (!acrs.getResultSet().next()) throw new KmiacServerException("Vrach is null");//заменить текст 
 
 				sb.append(String.format("%s  %s  %s ", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
@@ -1578,116 +1572,64 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					acrs = sse.execPreparedQuery("select * from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) where p_vizit_amb.id_obr=? order by id", pk.getPvizit_id());
 					if (!acrs.getResultSet().next()) {
 						throw new KmiacServerException("Priem is null");}
-					else{sb.append("<br><b>Осмотр: </b><br>");
-					sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(4)));
-					
-					if (acrs.getResultSet().getString(28)!=null) sb.append(String.format("<i>Жалобы: дыхательная система </i> %s <br>", acrs.getResultSet().getString(28)));
-					if (acrs.getResultSet().getString(29)!=null) sb.append(String.format("<i>Жалобы: система кровообращения </i> %s <br>", acrs.getResultSet().getString(29)));
-					if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Жалобы: система пищеварения </i> %s <br>", acrs.getResultSet().getString(30)));
-					if (acrs.getResultSet().getString(31)!=null) sb.append(String.format("<i>Жалобы: мочеполовая система </i> %s <br>", acrs.getResultSet().getString(31)));
-					if (acrs.getResultSet().getString(32)!=null) sb.append(String.format("<i>Жалобы: эндокринная система </i> %s <br>", acrs.getResultSet().getString(32)));
-					if (acrs.getResultSet().getString(33)!=null) sb.append(String.format("<i>Жалобы: нервная система и органы чувств </i> %s <br>", acrs.getResultSet().getString(33)));
-					if (acrs.getResultSet().getString(34)!=null) sb.append(String.format("<i>Жалобы: опорно-двигательная система </i> %s <br>", acrs.getResultSet().getString(34)));
-					if (acrs.getResultSet().getString(35)!=null) sb.append(String.format("<i>Жалобы: лихорадка </i> %s <br>", acrs.getResultSet().getString(35)));
-					if (acrs.getResultSet().getString(36)!=null) sb.append(String.format("<i>Жалобы: общего характера </i> %s <br>", acrs.getResultSet().getString(36)));
-					if (acrs.getResultSet().getString(37)!=null) sb.append(String.format("<i>Жалобы: прочие </i> %s <br>", acrs.getResultSet().getString(37)));
-					if (acrs.getResultSet().getString(38)!=null) sb.append(String.format("<i>Общее состояние </i> %s <br>", acrs.getResultSet().getString(38)));
-					if (acrs.getResultSet().getString(39)!=null) sb.append(String.format("<i>Кожные покровы </i> %s <br>", acrs.getResultSet().getString(39)));
-					if (acrs.getResultSet().getString(40)!=null) sb.append(String.format("<i>Видимые слизистые </i> %s <br>", acrs.getResultSet().getString(40)));
-					if (acrs.getResultSet().getString(41)!=null) sb.append(String.format("<i>Подкожная клетчатка </i> %s <br>", acrs.getResultSet().getString(41)));
-					if (acrs.getResultSet().getString(42)!=null) sb.append(String.format("<i>Лимфатические узлы </i> %s <br>", acrs.getResultSet().getString(42)));
-					if (acrs.getResultSet().getString(43)!=null) sb.append(String.format("<i>Костно-мышечная система </i> %s <br>", acrs.getResultSet().getString(43)));
-					if (acrs.getResultSet().getString(44)!=null) sb.append(String.format("<i>Нервно-психический статус </i> %s <br>", acrs.getResultSet().getString(44)));
-					if (acrs.getResultSet().getString(45)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(45)));
-					if (acrs.getResultSet().getString(46)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(46)));
-					if (acrs.getResultSet().getString(47)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(47)));
-					if (acrs.getResultSet().getString(48)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(49)));
-					if (acrs.getResultSet().getString(50)!=null) sb.append(String.format("<i>Телосложение </i> %s <br>", acrs.getResultSet().getString(50)));
-					if (acrs.getResultSet().getString(51)!=null) sb.append(String.format("<i>Суставы </i> %s <br>", acrs.getResultSet().getString(51)));
-					if (acrs.getResultSet().getString(52)!=null) sb.append(String.format("<i>Дыхание </i> %s <br>", acrs.getResultSet().getString(52)));
-					if (acrs.getResultSet().getString(53)!=null) sb.append(String.format("<i>Грудная клетка </i> %s <br>", acrs.getResultSet().getString(53)));
-					if (acrs.getResultSet().getString(54)!=null) sb.append(String.format("<i>Перкуссия легких </i> %s <br>", acrs.getResultSet().getString(54)));
-					if (acrs.getResultSet().getString(55)!=null) sb.append(String.format("<i>Аускультация легких </i> %s <br>", acrs.getResultSet().getString(55)));
-					if (acrs.getResultSet().getString(56)!=null) sb.append(String.format("<i>Бронхофония </i> %s <br>", acrs.getResultSet().getString(56)));
-					if (acrs.getResultSet().getString(57)!=null) sb.append(String.format("<i>Артерии и шейные вены </i> %s <br>", acrs.getResultSet().getString(57)));
-					if (acrs.getResultSet().getString(58)!=null) sb.append(String.format("<i>Область сердца </i> %s <br>", acrs.getResultSet().getString(58)));
-					if (acrs.getResultSet().getString(59)!=null) sb.append(String.format("<i>Перкуссия сердца </i> %s <br>", acrs.getResultSet().getString(59)));
-					if (acrs.getResultSet().getString(60)!=null) sb.append(String.format("<i>Аускультация сердца </i> %s <br>", acrs.getResultSet().getString(60)));
-					if (acrs.getResultSet().getString(61)!=null) sb.append(String.format("<i>Полость рта </i> %s <br>", acrs.getResultSet().getString(61)));
-					if (acrs.getResultSet().getString(62)!=null) sb.append(String.format("<i>Живот </i> %s <br>", acrs.getResultSet().getString(62)));
-					if (acrs.getResultSet().getString(63)!=null) sb.append(String.format("<i>Пальпация живота </i> %s <br>", acrs.getResultSet().getString(63)));
-					if (acrs.getResultSet().getString(64)!=null) sb.append(String.format("<i>Пальпация, перкуссия и аускультация ЖКТ </i> %s <br>", acrs.getResultSet().getString(64)));
-					if (acrs.getResultSet().getString(65)!=null) sb.append(String.format("<i>Пальпация желудка </i> %s <br>", acrs.getResultSet().getString(65)));
-					if (acrs.getResultSet().getString(66)!=null) sb.append(String.format("<i>Пальпация поджелудочной железы </i> %s <br>", acrs.getResultSet().getString(66)));
-					if (acrs.getResultSet().getString(67)!=null) sb.append(String.format("<i>Печень </i> %s <br>", acrs.getResultSet().getString(67)));
-					if (acrs.getResultSet().getString(68)!=null) sb.append(String.format("<i>Желчный пузырь </i> %s <br>", acrs.getResultSet().getString(68)));
-					if (acrs.getResultSet().getString(69)!=null) sb.append(String.format("<i>Селезенка </i> %s <br>", acrs.getResultSet().getString(69)));
-					if (acrs.getResultSet().getString(70)!=null) sb.append(String.format("<i>Область заднего прохода </i> %s <br>", acrs.getResultSet().getString(70)));
-					if (acrs.getResultSet().getString(71)!=null) sb.append(String.format("<i>Поясничная область </i> %s <br>", acrs.getResultSet().getString(71)));
-					if (acrs.getResultSet().getString(72)!=null) sb.append(String.format("<i>Почки </i> %s <br>", acrs.getResultSet().getString(72)));
-					if (acrs.getResultSet().getString(73)!=null) sb.append(String.format("<i>Мочевой пузырь </i> %s <br>", acrs.getResultSet().getString(73)));
-					if (acrs.getResultSet().getString(74)!=null) sb.append(String.format("<i>Молочные железы </i> %s <br>", acrs.getResultSet().getString(74)));
-					if (acrs.getResultSet().getString(75)!=null) sb.append(String.format("<i>Грудные железы мужчин </i> %s <br>", acrs.getResultSet().getString(75)));
-					if (acrs.getResultSet().getString(76)!=null) sb.append(String.format("<i>Матка и ее придатки </i> %s <br>", acrs.getResultSet().getString(76)));
-					if (acrs.getResultSet().getString(77)!=null) sb.append(String.format("<i>Наружные половые органы </i> %s <br>", acrs.getResultSet().getString(77)));
-					if (acrs.getResultSet().getString(78)!=null) sb.append(String.format("<i>Щитовидная железа </i> %s <br>", acrs.getResultSet().getString(78)));
-					if (acrs.getResultSet().getString(79)!=null) sb.append(String.format("<i>Status Localis </i> %s <br>", acrs.getResultSet().getString(79)));
-					if (acrs.getResultSet().getString(80)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(80)));}
-								while (acrs.getResultSet().next()){
-									sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(4)));
-									if (acrs.getResultSet().getString(28)!=null) sb.append(String.format("<i>Жалобы: дыхательная система </i> %s <br>", acrs.getResultSet().getString(28)));
-									if (acrs.getResultSet().getString(29)!=null) sb.append(String.format("<i>Жалобы: система кровообращения </i> %s <br>", acrs.getResultSet().getString(29)));
-									if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Жалобы: система пищеварения </i> %s <br>", acrs.getResultSet().getString(30)));
-									if (acrs.getResultSet().getString(31)!=null) sb.append(String.format("<i>Жалобы: мочеполовая система </i> %s <br>", acrs.getResultSet().getString(31)));
-									if (acrs.getResultSet().getString(32)!=null) sb.append(String.format("<i>Жалобы: эндокринная система </i> %s <br>", acrs.getResultSet().getString(32)));
-									if (acrs.getResultSet().getString(33)!=null) sb.append(String.format("<i>Жалобы: нервная система и органы чувств </i> %s <br>", acrs.getResultSet().getString(33)));
-									if (acrs.getResultSet().getString(34)!=null) sb.append(String.format("<i>Жалобы: опорно-двигательная система </i> %s <br>", acrs.getResultSet().getString(34)));
-									if (acrs.getResultSet().getString(35)!=null) sb.append(String.format("<i>Жалобы: лихорадка </i> %s <br>", acrs.getResultSet().getString(35)));
-									if (acrs.getResultSet().getString(36)!=null) sb.append(String.format("<i>Жалобы: общего характера </i> %s <br>", acrs.getResultSet().getString(36)));
-									if (acrs.getResultSet().getString(37)!=null) sb.append(String.format("<i>Жалобы: прочие </i> %s <br>", acrs.getResultSet().getString(37)));
-									if (acrs.getResultSet().getString(38)!=null) sb.append(String.format("<i>Общее состояние </i> %s <br>", acrs.getResultSet().getString(38)));
-									if (acrs.getResultSet().getString(39)!=null) sb.append(String.format("<i>Кожные покровы </i> %s <br>", acrs.getResultSet().getString(39)));
-									if (acrs.getResultSet().getString(40)!=null) sb.append(String.format("<i>Видимые слизистые </i> %s <br>", acrs.getResultSet().getString(40)));
-									if (acrs.getResultSet().getString(41)!=null) sb.append(String.format("<i>Подкожная клетчатка </i> %s <br>", acrs.getResultSet().getString(41)));
-									if (acrs.getResultSet().getString(42)!=null) sb.append(String.format("<i>Лимфатические узлы </i> %s <br>", acrs.getResultSet().getString(42)));
-									if (acrs.getResultSet().getString(43)!=null) sb.append(String.format("<i>Костно-мышечная система </i> %s <br>", acrs.getResultSet().getString(43)));
-									if (acrs.getResultSet().getString(44)!=null) sb.append(String.format("<i>Нервно-психический статус </i> %s <br>", acrs.getResultSet().getString(44)));
-									if (acrs.getResultSet().getString(45)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(45)));
-									if (acrs.getResultSet().getString(46)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(46)));
-									if (acrs.getResultSet().getString(47)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(47)));
-									if (acrs.getResultSet().getString(48)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(49)));
-									if (acrs.getResultSet().getString(50)!=null) sb.append(String.format("<i>Телосложение </i> %s <br>", acrs.getResultSet().getString(50)));
-									if (acrs.getResultSet().getString(51)!=null) sb.append(String.format("<i>Суставы </i> %s <br>", acrs.getResultSet().getString(51)));
-									if (acrs.getResultSet().getString(52)!=null) sb.append(String.format("<i>Дыхание </i> %s <br>", acrs.getResultSet().getString(52)));
-									if (acrs.getResultSet().getString(53)!=null) sb.append(String.format("<i>Грудная клетка </i> %s <br>", acrs.getResultSet().getString(53)));
-									if (acrs.getResultSet().getString(54)!=null) sb.append(String.format("<i>Перкуссия легких </i> %s <br>", acrs.getResultSet().getString(54)));
-									if (acrs.getResultSet().getString(55)!=null) sb.append(String.format("<i>Аускультация легких </i> %s <br>", acrs.getResultSet().getString(55)));
-									if (acrs.getResultSet().getString(56)!=null) sb.append(String.format("<i>Бронхофония </i> %s <br>", acrs.getResultSet().getString(56)));
-									if (acrs.getResultSet().getString(57)!=null) sb.append(String.format("<i>Артерии и шейные вены </i> %s <br>", acrs.getResultSet().getString(57)));
-									if (acrs.getResultSet().getString(58)!=null) sb.append(String.format("<i>Область сердца </i> %s <br>", acrs.getResultSet().getString(58)));
-									if (acrs.getResultSet().getString(59)!=null) sb.append(String.format("<i>Перкуссия сердца </i> %s <br>", acrs.getResultSet().getString(59)));
-									if (acrs.getResultSet().getString(60)!=null) sb.append(String.format("<i>Аускультация сердца </i> %s <br>", acrs.getResultSet().getString(60)));
-									if (acrs.getResultSet().getString(61)!=null) sb.append(String.format("<i>Полость рта </i> %s <br>", acrs.getResultSet().getString(61)));
-									if (acrs.getResultSet().getString(62)!=null) sb.append(String.format("<i>Живот </i> %s <br>", acrs.getResultSet().getString(62)));
-									if (acrs.getResultSet().getString(63)!=null) sb.append(String.format("<i>Пальпация живота </i> %s <br>", acrs.getResultSet().getString(63)));
-									if (acrs.getResultSet().getString(64)!=null) sb.append(String.format("<i>Пальпация, перкуссия и аускультация ЖКТ </i> %s <br>", acrs.getResultSet().getString(64)));
-									if (acrs.getResultSet().getString(65)!=null) sb.append(String.format("<i>Пальпация желудка </i> %s <br>", acrs.getResultSet().getString(65)));
-									if (acrs.getResultSet().getString(66)!=null) sb.append(String.format("<i>Пальпация поджелудочной железы </i> %s <br>", acrs.getResultSet().getString(66)));
-									if (acrs.getResultSet().getString(67)!=null) sb.append(String.format("<i>Печень </i> %s <br>", acrs.getResultSet().getString(67)));
-									if (acrs.getResultSet().getString(68)!=null) sb.append(String.format("<i>Желчный пузырь </i> %s <br>", acrs.getResultSet().getString(68)));
-									if (acrs.getResultSet().getString(69)!=null) sb.append(String.format("<i>Селезенка </i> %s <br>", acrs.getResultSet().getString(69)));
-									if (acrs.getResultSet().getString(70)!=null) sb.append(String.format("<i>Область заднего прохода </i> %s <br>", acrs.getResultSet().getString(70)));
-									if (acrs.getResultSet().getString(71)!=null) sb.append(String.format("<i>Поясничная область </i> %s <br>", acrs.getResultSet().getString(71)));
-									if (acrs.getResultSet().getString(72)!=null) sb.append(String.format("<i>Почки </i> %s <br>", acrs.getResultSet().getString(72)));
-									if (acrs.getResultSet().getString(73)!=null) sb.append(String.format("<i>Мочевой пузырь </i> %s <br>", acrs.getResultSet().getString(73)));
-									if (acrs.getResultSet().getString(74)!=null) sb.append(String.format("<i>Молочные железы </i> %s <br>", acrs.getResultSet().getString(74)));
-									if (acrs.getResultSet().getString(75)!=null) sb.append(String.format("<i>Грудные железы мужчин </i> %s <br>", acrs.getResultSet().getString(75)));
-									if (acrs.getResultSet().getString(76)!=null) sb.append(String.format("<i>Матка и ее придатки </i> %s <br>", acrs.getResultSet().getString(76)));
-									if (acrs.getResultSet().getString(77)!=null) sb.append(String.format("<i>Наружные половые органы </i> %s <br>", acrs.getResultSet().getString(77)));
-									if (acrs.getResultSet().getString(78)!=null) sb.append(String.format("<i>Щитовидная железа </i> %s <br>", acrs.getResultSet().getString(78)));
-									if (acrs.getResultSet().getString(79)!=null) sb.append(String.format("<i>Status Localis </i> %s <br>", acrs.getResultSet().getString(79)));
-									if (acrs.getResultSet().getString(80)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(80)));
-						}		
+					else {
+						sb.append("<br><b>Осмотр: </b><br>");
+						do {
+							sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(4)));
+							if (acrs.getResultSet().getString(28)!=null) sb.append(String.format("<i>Жалобы: дыхательная система </i> %s <br>", acrs.getResultSet().getString(28)));
+							if (acrs.getResultSet().getString(29)!=null) sb.append(String.format("<i>Жалобы: система кровообращения </i> %s <br>", acrs.getResultSet().getString(29)));
+							if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Жалобы: система пищеварения </i> %s <br>", acrs.getResultSet().getString(30)));
+							if (acrs.getResultSet().getString(31)!=null) sb.append(String.format("<i>Жалобы: мочеполовая система </i> %s <br>", acrs.getResultSet().getString(31)));
+							if (acrs.getResultSet().getString(32)!=null) sb.append(String.format("<i>Жалобы: эндокринная система </i> %s <br>", acrs.getResultSet().getString(32)));
+							if (acrs.getResultSet().getString(33)!=null) sb.append(String.format("<i>Жалобы: нервная система и органы чувств </i> %s <br>", acrs.getResultSet().getString(33)));
+							if (acrs.getResultSet().getString(34)!=null) sb.append(String.format("<i>Жалобы: опорно-двигательная система </i> %s <br>", acrs.getResultSet().getString(34)));
+							if (acrs.getResultSet().getString(35)!=null) sb.append(String.format("<i>Жалобы: лихорадка </i> %s <br>", acrs.getResultSet().getString(35)));
+							if (acrs.getResultSet().getString(36)!=null) sb.append(String.format("<i>Жалобы: общего характера </i> %s <br>", acrs.getResultSet().getString(36)));
+							if (acrs.getResultSet().getString(37)!=null) sb.append(String.format("<i>Жалобы: прочие </i> %s <br>", acrs.getResultSet().getString(37)));
+							if (acrs.getResultSet().getString(38)!=null) sb.append(String.format("<i>Общее состояние </i> %s <br>", acrs.getResultSet().getString(38)));
+							if (acrs.getResultSet().getString(39)!=null) sb.append(String.format("<i>Кожные покровы </i> %s <br>", acrs.getResultSet().getString(39)));
+							if (acrs.getResultSet().getString(40)!=null) sb.append(String.format("<i>Видимые слизистые </i> %s <br>", acrs.getResultSet().getString(40)));
+							if (acrs.getResultSet().getString(41)!=null) sb.append(String.format("<i>Подкожная клетчатка </i> %s <br>", acrs.getResultSet().getString(41)));
+							if (acrs.getResultSet().getString(42)!=null) sb.append(String.format("<i>Лимфатические узлы </i> %s <br>", acrs.getResultSet().getString(42)));
+							if (acrs.getResultSet().getString(43)!=null) sb.append(String.format("<i>Костно-мышечная система </i> %s <br>", acrs.getResultSet().getString(43)));
+							if (acrs.getResultSet().getString(44)!=null) sb.append(String.format("<i>Нервно-психический статус </i> %s <br>", acrs.getResultSet().getString(44)));
+							if (acrs.getResultSet().getString(45)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(45)));
+							if (acrs.getResultSet().getString(46)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(46)));
+							if (acrs.getResultSet().getString(47)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(47)));
+							if (acrs.getResultSet().getString(48)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(49)));
+							if (acrs.getResultSet().getString(50)!=null) sb.append(String.format("<i>Телосложение </i> %s <br>", acrs.getResultSet().getString(50)));
+							if (acrs.getResultSet().getString(51)!=null) sb.append(String.format("<i>Суставы </i> %s <br>", acrs.getResultSet().getString(51)));
+							if (acrs.getResultSet().getString(52)!=null) sb.append(String.format("<i>Дыхание </i> %s <br>", acrs.getResultSet().getString(52)));
+							if (acrs.getResultSet().getString(53)!=null) sb.append(String.format("<i>Грудная клетка </i> %s <br>", acrs.getResultSet().getString(53)));
+							if (acrs.getResultSet().getString(54)!=null) sb.append(String.format("<i>Перкуссия легких </i> %s <br>", acrs.getResultSet().getString(54)));
+							if (acrs.getResultSet().getString(55)!=null) sb.append(String.format("<i>Аускультация легких </i> %s <br>", acrs.getResultSet().getString(55)));
+							if (acrs.getResultSet().getString(56)!=null) sb.append(String.format("<i>Бронхофония </i> %s <br>", acrs.getResultSet().getString(56)));
+							if (acrs.getResultSet().getString(57)!=null) sb.append(String.format("<i>Артерии и шейные вены </i> %s <br>", acrs.getResultSet().getString(57)));
+							if (acrs.getResultSet().getString(58)!=null) sb.append(String.format("<i>Область сердца </i> %s <br>", acrs.getResultSet().getString(58)));
+							if (acrs.getResultSet().getString(59)!=null) sb.append(String.format("<i>Перкуссия сердца </i> %s <br>", acrs.getResultSet().getString(59)));
+							if (acrs.getResultSet().getString(60)!=null) sb.append(String.format("<i>Аускультация сердца </i> %s <br>", acrs.getResultSet().getString(60)));
+							if (acrs.getResultSet().getString(61)!=null) sb.append(String.format("<i>Полость рта </i> %s <br>", acrs.getResultSet().getString(61)));
+							if (acrs.getResultSet().getString(62)!=null) sb.append(String.format("<i>Живот </i> %s <br>", acrs.getResultSet().getString(62)));
+							if (acrs.getResultSet().getString(63)!=null) sb.append(String.format("<i>Пальпация живота </i> %s <br>", acrs.getResultSet().getString(63)));
+							if (acrs.getResultSet().getString(64)!=null) sb.append(String.format("<i>Пальпация, перкуссия и аускультация ЖКТ </i> %s <br>", acrs.getResultSet().getString(64)));
+							if (acrs.getResultSet().getString(65)!=null) sb.append(String.format("<i>Пальпация желудка </i> %s <br>", acrs.getResultSet().getString(65)));
+							if (acrs.getResultSet().getString(66)!=null) sb.append(String.format("<i>Пальпация поджелудочной железы </i> %s <br>", acrs.getResultSet().getString(66)));
+							if (acrs.getResultSet().getString(67)!=null) sb.append(String.format("<i>Печень </i> %s <br>", acrs.getResultSet().getString(67)));
+							if (acrs.getResultSet().getString(68)!=null) sb.append(String.format("<i>Желчный пузырь </i> %s <br>", acrs.getResultSet().getString(68)));
+							if (acrs.getResultSet().getString(69)!=null) sb.append(String.format("<i>Селезенка </i> %s <br>", acrs.getResultSet().getString(69)));
+							if (acrs.getResultSet().getString(70)!=null) sb.append(String.format("<i>Область заднего прохода </i> %s <br>", acrs.getResultSet().getString(70)));
+							if (acrs.getResultSet().getString(71)!=null) sb.append(String.format("<i>Поясничная область </i> %s <br>", acrs.getResultSet().getString(71)));
+							if (acrs.getResultSet().getString(72)!=null) sb.append(String.format("<i>Почки </i> %s <br>", acrs.getResultSet().getString(72)));
+							if (acrs.getResultSet().getString(73)!=null) sb.append(String.format("<i>Мочевой пузырь </i> %s <br>", acrs.getResultSet().getString(73)));
+							if (acrs.getResultSet().getString(74)!=null) sb.append(String.format("<i>Молочные железы </i> %s <br>", acrs.getResultSet().getString(74)));
+							if (acrs.getResultSet().getString(75)!=null) sb.append(String.format("<i>Грудные железы мужчин </i> %s <br>", acrs.getResultSet().getString(75)));
+							if (acrs.getResultSet().getString(76)!=null) sb.append(String.format("<i>Матка и ее придатки </i> %s <br>", acrs.getResultSet().getString(76)));
+							if (acrs.getResultSet().getString(77)!=null) sb.append(String.format("<i>Наружные половые органы </i> %s <br>", acrs.getResultSet().getString(77)));
+							if (acrs.getResultSet().getString(78)!=null) sb.append(String.format("<i>Щитовидная железа </i> %s <br>", acrs.getResultSet().getString(78)));
+							if (acrs.getResultSet().getString(79)!=null) sb.append(String.format("<i>Status Localis </i> %s <br>", acrs.getResultSet().getString(79)));
+							if (acrs.getResultSet().getString(80)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(80)));
+						 } while (acrs.getResultSet().next());
+					}
 					
 					
 				sb.append("<br><b>Поставленные диагнозы: </b><br>");
@@ -1739,7 +1681,7 @@ sb.append("<br>");
 			sb.append(String.format("<p align=\"left\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 sb.append("Лечащий врач:");
 acrs.close();
-acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join n_n00 on (s_users.cpodr=n_n00.pcod) join n_m00 on (n_n00.clpu=n_m00.pcod) join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",pk.getUserId());
+acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_users join s_vrach on(s_vrach.pcod=s_users.pcod) where s_users.id=?",pk.getUserId());
 				if (!acrs.getResultSet().next()) throw new KmiacServerException("Vrach is null");//заменить текст 
 sb.append(String.format("%s %s %s",acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
 sb.append("<br>Подпись ____________");
