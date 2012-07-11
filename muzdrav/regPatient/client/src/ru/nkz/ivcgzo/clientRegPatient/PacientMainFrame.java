@@ -9,6 +9,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -20,6 +21,10 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import java.awt.Font;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 public class PacientMainFrame extends JFrame {
 	private static final long serialVersionUID = 8528181014663112901L;
@@ -43,7 +48,6 @@ public class PacientMainFrame extends JFrame {
 	public PacientMainFrame() {
 		setFont(new Font("Tahoma", Font.PLAIN, 11));
 		setTitle("Поиск пациента");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(200, 200, 308, 279);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -82,27 +86,28 @@ public class PacientMainFrame extends JFrame {
 		btnPoisk.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		btnPoisk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			    //TODO мои исправления
 				try {
 					instance = PacientMainFrame.this;
 					PatientBrief patBr = new PatientBrief();
-					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().trim());
-					if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().trim());
-					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().trim());
-					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().trim());
-					if (!tfNom.getText().isEmpty()) patBr.setNpolis(tfNom.getText().trim());
+					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase().trim());
+					if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase().trim());
+					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
+					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().toUpperCase().trim());
+					if (!tfNom.getText().isEmpty()) patBr.setNpolis(tfNom.getText().toUpperCase().trim());
 					try {
                         pat = MainForm.tcl.getAllPatientBrief(patBr);
                         dispose();
                         if (pacientInfoFrame == null) {
                             pacientInfoFrame = new PacientInfoFrame(pat);
+                            MainForm.instance.addChildFrame(pacientInfoFrame);
                             pacientInfoFrame.pack();
                         } else
                             pacientInfoFrame.refresh(pat);
                         	pacientInfoFrame.setVisible(true);
-                        	pacientInfoFrame.setSize(954, 672);
+                        	pacientInfoFrame.setSize(1002, 748);
                     	}
 					catch (PatientNotFoundException e) {
+						JOptionPane.showMessageDialog(pacientInfoFrame, "По заданным критериям сведения о пациенте отсутствуют.");
                         System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
                     }
 				} catch (TException e) {

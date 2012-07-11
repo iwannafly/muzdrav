@@ -64,10 +64,10 @@ public class Launcher {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
 			PrintWriter writer = new PrintWriter(servSct.getOutputStream());
 			String str = reader.readLine();
-			if (str.equals("Кто это?")) {
-				writer.println("Клиент муздрава.");
+			if (str.equals("Who's this?")) {
+				writer.println("Muzdrav client.");
 				writer.flush();
-				if (reader.readLine().equals("Приветствую."))
+				if (reader.readLine().equals("Ohayo."))
 					return;
 			}
 			throw new Exception("Talking to stranger.");
@@ -165,7 +165,7 @@ public class Launcher {
 						readFile += read;
 					}
 					fos.write(buf, 0, read);
-					writer.println("Получил.");
+					writer.println("Got it.");
 					writer.flush();
 				} catch (Exception e) {
 					throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
@@ -173,7 +173,7 @@ public class Launcher {
 			}
 			writer.println("");
 			writer.flush();
-			if (!reader.readLine().equals("Всего хорошего."))
+			if (!reader.readLine().equals("Good bye."))
 				throw new Exception("Farewell failed.");
 		} catch (Exception e) {
 			throw new Exception("Error transferring files from server.", e);

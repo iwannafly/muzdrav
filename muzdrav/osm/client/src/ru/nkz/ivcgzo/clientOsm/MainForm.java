@@ -19,10 +19,10 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
-import ru.nkz.ivcgzo.clientOsm.patientInfo.PatientInfoViewMainForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
@@ -30,19 +30,19 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
+	public static Client<ThriftOsm.Client> instance;
 	private JFrame frame;
 	public static  CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
-	private PInfo pinfo;
 	
-	private PatientInfoViewMainForm patInfoView;
-
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
 		initialize();
 		
 		setFrame(frame);
+		
+		instance = this;
 	}
 
 	/**
@@ -87,8 +87,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
-		
-		patInfoView = new PatientInfoViewMainForm(conMan, authInfo);
 	}
 
 	@Override
@@ -108,8 +106,10 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				}
 				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
 				
-				if (vvod == null)
+				if (vvod == null) {
 					vvod = new Vvod();
+					addChildFrame(vvod);
+				}
 				vvod.onConnect();
 			} catch (KmiacServerException | ParseException e) {
 				// TODO Auto-generated catch block

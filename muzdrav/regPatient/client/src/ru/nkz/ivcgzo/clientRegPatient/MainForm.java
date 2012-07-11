@@ -12,11 +12,14 @@ import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 
 public class MainForm extends Client<ThriftRegPatient.Client> {
     public static ThriftRegPatient.Client tcl;
+    public static Client<ThriftRegPatient.Client> instance;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException, UnsupportedLookAndFeelException {
 		super(conMan, authInfo, ThriftRegPatient.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
 		initialize();
+		
+		instance = this;
 	}
 	/**
 	 * Initialize the contents of the frame.

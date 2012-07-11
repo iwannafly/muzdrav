@@ -390,6 +390,9 @@ struct IsslMet {
 	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
+	8: optional i32 pvizitId;
+	9: optional string cpodr_name;
+	10: optional string clpu_name;
 }
 
 struct IsslPokaz {
@@ -400,20 +403,29 @@ struct IsslPokaz {
 	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
+	8: optional i32 pvizitId;
 }
 
 struct Napr{
 	1: optional i32 npasp;
 	2: optional i32 userId;
 	3: optional string obosnov;
-	4: optional i32 clpu;
+	4: optional string clpu;
+	5: optional i32 pvizitId; 
+	6: optional string cpodr_name;
+	7: optional string clpu_name;
 }
 
 struct NaprKons{
 	1: optional i32 npasp;
 	2: optional i32 userId;
 	3: optional string obosnov;
-	4: optional i32 cpol;
+	4: optional string cpol;
+	5: optional string nazv;
+	6: optional string cdol;
+	7: optional i32 pvizitId;
+	8: optional string cpodr_name;
+	9: optional string clpu_name;
 }
 
 struct IsslInfo{
@@ -453,6 +465,14 @@ struct Protokol{
 	3: optional i32 pvizit_id;
 	4: optional i32 pvizit_ambId;
 	5: optional i32 cpol;
+}
+
+struct Vypis {
+	1: optional i32 npasp;
+	2: optional i32 userId;
+	3: optional i32 pvizit_id;
+	4: optional string cpodr_name;
+	5: optional string clpu_name;
 }
 
 
@@ -534,7 +554,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
 	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
-	string printVypis(1: i32 npasp, 2: i32 pvizitId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
+	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 

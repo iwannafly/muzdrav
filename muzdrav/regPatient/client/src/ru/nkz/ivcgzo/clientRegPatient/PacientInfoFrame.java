@@ -307,7 +307,6 @@ public class PacientInfoFrame extends JFrame {
 			e.printStackTrace();
 		} 
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(1, 1, 1002, 748); //ширина, высота
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -1389,18 +1388,18 @@ public class PacientInfoFrame extends JFrame {
 					SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 					AgentInfo = new Agent();
 					AgentInfo.setNpasp(curPatientId);
-					AgentInfo.setFam(tf_Fam_pr.getText().trim());
-					AgentInfo.setIm(tf_Im_pr.getText().trim());
-					AgentInfo.setOt(tf_Ot_pr.getText().trim());
+					AgentInfo.setFam(tf_Fam_pr.getText().toUpperCase().trim());
+					AgentInfo.setIm(tf_Im_pr.getText().toUpperCase().trim());
+					AgentInfo.setOt(tf_Ot_pr.getText().toUpperCase().trim());
 //					AgentInfo.setDatar(sdf.parse(tf_dr_pr.getText()).getTime());
 					AgentInfo.setDatar(tf_dr_pr.getDate().getTime());
 					AgentInfo.setBirthplace(tf_Mr_pr.getText().trim());
-					AgentInfo.setSpolis(tf_Polis_ser_pr.getText().trim());
-					AgentInfo.setNpolis(tf_Polis_nom_pr.getText().trim());
+					AgentInfo.setSpolis(tf_Polis_ser_pr.getText().toUpperCase().trim());
+					AgentInfo.setNpolis(tf_Polis_nom_pr.getText().toUpperCase().trim());
 					AgentInfo.setName_str(tf_Name_sk_pr.getText().trim());
 					AgentInfo.setOgrn_str(tf_Ogrn.getText().trim());
-					AgentInfo.setDocser(tf_Ser_doc_pr.getText().trim());
-					AgentInfo.setDocnum(tf_Nomdoc_pr.getText().trim());
+					AgentInfo.setDocser(tf_Ser_doc_pr.getText().toUpperCase().trim());
+					AgentInfo.setDocnum(tf_Nomdoc_pr.getText().toUpperCase().trim());
 					if (rbtn_pol_pr_m.isSelected()) AgentInfo.setPol(1);
 					if (rbtn_pol_pr_j.isSelected()) AgentInfo.setPol(2);
 					if (cmb_Tdoc_pr.getSelectedItem() != null) AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
@@ -2780,31 +2779,31 @@ public class PacientInfoFrame extends JFrame {
 					PersonalInfo.nambk = new Nambk();
 					PersonalInfo.setDataz(new Date().getTime());
 					PersonalInfo.setNpasp(curPatientId);
-					PersonalInfo.setFam(tfFam.getText().trim());
-					PersonalInfo.setIm(tfIm.getText().trim());
-					PersonalInfo.setOt(tfOt.getText().trim());
-					PersonalInfo.admAddress.setRegion(tf_Adm_obl.getText().trim());
-					PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().trim());
-					PersonalInfo.admAddress.setStreet(tf_Adm_ul.getText().trim());
-					PersonalInfo.admAddress.setHouse(tf_Adm_dom.getText().trim());
-					PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().trim());
-					PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().trim());
-					PersonalInfo.adpAddress.setCity(tf_Adp_gorod.getText().trim());
-					PersonalInfo.adpAddress.setStreet(tf_Adp_ul.getText().trim());
-					PersonalInfo.adpAddress.setHouse(tf_Adp_dom.getText().trim());
-					PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().trim());
-					PersonalInfo.setNamemr(tfMrname.getText().trim());
-					PersonalInfo.setMrab(tfMr.getText().trim());
+					PersonalInfo.setFam(tfFam.getText().toUpperCase().trim());
+					PersonalInfo.setIm(tfIm.getText().toUpperCase().trim());
+					PersonalInfo.setOt(tfOt.getText().toUpperCase().trim());
+					PersonalInfo.admAddress.setRegion(tf_Adm_obl.getText().toUpperCase().trim());
+					PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().toUpperCase().trim());
+					PersonalInfo.admAddress.setStreet(tf_Adm_ul.getText().toUpperCase().trim());
+					PersonalInfo.admAddress.setHouse(tf_Adm_dom.getText().toUpperCase().trim());
+					PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase().trim());
+					PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase().trim());
+					PersonalInfo.adpAddress.setCity(tf_Adp_gorod.getText().toUpperCase().trim());
+					PersonalInfo.adpAddress.setStreet(tf_Adp_ul.getText().toUpperCase().trim());
+					PersonalInfo.adpAddress.setHouse(tf_Adp_dom.getText().toUpperCase().trim());
+					PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase().trim());
+					PersonalInfo.setNamemr(tfMrname.getText().toUpperCase().trim());
+					PersonalInfo.setMrab(tfMr.getText().toUpperCase().trim());
 					PersonalInfo.setProf(tfDolj.getText().trim());
 					PersonalInfo.setTel(tfTel.getText().trim());
-					PersonalInfo.setSnils(tf_Snils.getText().trim());
+					PersonalInfo.setSnils(tf_Snils.getText().toUpperCase().trim());
 					PersonalInfo.setOdoc(tf_Odoc.getText().trim());
 					PersonalInfo.setDocser(tf_serdoc.getText().trim());
 					PersonalInfo.setDocnum(tf_nomdoc.getText().trim());
-					PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().trim());
-					PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().trim());
-					PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().trim());
-					PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().trim());
+					PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().toUpperCase().trim());
+					PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().toUpperCase().trim());
+					PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().toUpperCase().trim());
+					PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().toUpperCase().trim());
 					if (!tf_oms_smo.getText().isEmpty()) PersonalInfo.polis_oms.setStrg(Integer.valueOf(tf_oms_smo.getText()));
 					if (!tf_dms_smo.getText().isEmpty()) PersonalInfo.polis_dms.setStrg(Integer.valueOf(tf_dms_smo.getText()));
 					PersonalInfo.nambk.setNambk(tf_Nambk.getText());
@@ -2829,9 +2828,9 @@ public class PacientInfoFrame extends JFrame {
 //7:i32 jitel, 11:i32 ncex,13:i32 terp,23:i64 dsv,24:i32 prizn,25:i32 ter_liv,26:i32 region_liv,
 					if (curPatientId == 0){
 						curPatientId = MainForm.tcl.addPatient(PersonalInfo);
-						newPatBr.setFam(PersonalInfo.getFam());
-						newPatBr.setOt(PersonalInfo.getOt());
-						newPatBr.setIm(PersonalInfo.getIm());
+						newPatBr.setFam(PersonalInfo.getFam().toUpperCase());
+						newPatBr.setOt(PersonalInfo.getOt().toUpperCase());
+						newPatBr.setIm(PersonalInfo.getIm().toUpperCase());
 						newPatBr.setNpasp(curPatientId);
 						tbl_patient.updateSelectedItem();
 //						RefreshTablePatient();
@@ -3519,16 +3518,17 @@ public class PacientInfoFrame extends JFrame {
 	private void RefreshTablePatient(){
 		try {
 			PatientBrief patBr = new PatientBrief();
-			if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().trim());
-			if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().trim());
-			if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().trim());
-			if (!tf_oms_ser.getText().isEmpty()) patBr.setSpolis(tf_oms_ser.getText().trim());
-			if (!tf_oms_nom.getText().isEmpty()) patBr.setNpolis(tf_oms_nom.getText().trim());
+			if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase().trim());
+			if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase().trim());
+			if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
+			if (!tf_oms_ser.getText().isEmpty()) patBr.setSpolis(tf_oms_ser.getText().toUpperCase().trim());
+			if (!tf_oms_nom.getText().isEmpty()) patBr.setNpolis(tf_oms_nom.getText().toUpperCase().trim());
 			try {
 	            pat = MainForm.tcl.getAllPatientBrief(patBr);
                 refresh(pat);
 			}
             catch (PatientNotFoundException e) {
+				JOptionPane.showMessageDialog(tfFam, "По заданным критериям сведения о пациенте отсутствуют.");
 	            System.out.println(patBr.setFam(tfFam.getText().trim())+", "+patBr.setIm(tfIm.getText().trim())+", "+patBr.setOt(tfOt.getText().trim()));
 	            System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
 	        }
