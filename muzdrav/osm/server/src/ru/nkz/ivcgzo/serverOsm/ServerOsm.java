@@ -810,8 +810,8 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<tr valign=\"top\">");
 				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
 					sb.append("<h3>Информация для пациента:</h3>");
-					sb.append(String.format("<b>Место: </b>%s<br />", im.getMesto()));
-					sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
+					if (im.getMesto()!=null)sb.append(String.format("<b>Место: </b>%s<br />", im.getMesto()));
+					if (im.getKab()!=null)sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
 					sb.append("<b>Дата:</b><br />");
 					sb.append("<b>Время:</b><br />");
 					sb.append("<b>Подготовка:</b><br />");
@@ -890,8 +890,8 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<tr valign=\"top\">");
 				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
 					sb.append("<h3>Информация для пациента:</h3>");
-					sb.append(String.format("<b>Место: </b>%s<br />", ip.getMesto()));
-					sb.append(String.format("<b>Каб. №: </b>%s<br />", ip.getKab()));
+					if (ip.getMesto()!=null)sb.append(String.format("<b>Место: </b>%s<br />", ip.getMesto()));
+					if (ip.getKab()!=null)sb.append(String.format("<b>Каб. №: </b>%s<br />", ip.getKab()));
 					sb.append("<b>Дата:</b><br />");
 					sb.append("<b>Время:</b><br />");
 					sb.append("<b>Подготовка:</b><br />");

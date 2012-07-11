@@ -31,7 +31,7 @@ import javax.swing.ScrollPaneConstants;
 
 public class FormSign extends JFrame {
 	private static final long serialVersionUID = -5267798845014525253L;
-	private JEditorPane tpallerg; 
+	private ShablonTextField tpallerg; 
 	private JEditorPane tpfarm;
 	private JEditorPane tpanamnz;
 	private Psign psign;
@@ -212,7 +212,7 @@ public class FormSign extends JFrame {
 			}
 		});
 		
-		tpallerg = new JEditorPane();
+		tpallerg = new  ShablonTextField(3, 67, listShablon);
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpfarm = new JEditorPane();
