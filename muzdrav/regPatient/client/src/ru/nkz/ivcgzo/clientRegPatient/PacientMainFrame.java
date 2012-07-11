@@ -86,11 +86,11 @@ public class PacientMainFrame extends JFrame {
 				try {
 					instance = PacientMainFrame.this;
 					PatientBrief patBr = new PatientBrief();
-					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().trim());
-					if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().trim());
-					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().trim());
-					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().trim());
-					if (!tfNom.getText().isEmpty()) patBr.setNpolis(tfNom.getText().trim());
+					if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase().trim());
+					if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase().trim());
+					if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
+					if (!tfSer.getText().isEmpty()) patBr.setSpolis(tfSer.getText().toUpperCase().trim());
+					if (!tfNom.getText().isEmpty()) patBr.setNpolis(tfNom.getText().toUpperCase().trim());
 					try {
                         pat = MainForm.tcl.getAllPatientBrief(patBr);
                         dispose();
