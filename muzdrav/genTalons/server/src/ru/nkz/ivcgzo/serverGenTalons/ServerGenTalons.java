@@ -242,4 +242,51 @@ public class ServerGenTalons extends Server implements Iface {
                 throw new KmiacServerException();
             }
     }
+
+    @Override
+    public void addNrasp(List<Nrasp> nrasp) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addNdv(Ndv ndv) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void addNorm(List<Norm> nrasp) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteNrasp(int cpodr, int pcodvrach, String cdol)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteNdv(int id) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void updateNrasp(List<Nrasp> nrasp) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void updateNorm(List<Norm> nrasp) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        
+    }
 }

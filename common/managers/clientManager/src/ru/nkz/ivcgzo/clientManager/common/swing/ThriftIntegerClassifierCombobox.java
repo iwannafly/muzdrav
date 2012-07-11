@@ -184,6 +184,19 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		
 		@Override
 		public void insertUpdate(DocumentEvent e) {
+			search();
+		}
+		
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			search();
+		}
+		
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+		}
+		
+		private void search() {
 			if (searching)
 				return;
 			
@@ -196,7 +209,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 						String editText = editor.getText();
 						String editTextLow = editText.toLowerCase();
 						String lastSelTextLow = (lastSelected != null) ? lastSelected.name.toLowerCase() : "";
-						if ((lastSelected != null) && (lastSelTextLow.indexOf(editTextLow) == 0)) {
+						if (editText.length() == 0) {
+							searching = true;
+							cmb.setSelectedItem(null);
+							return;
+						} else if ((lastSelected != null) && (lastSelTextLow.indexOf(editTextLow) == 0)) {
 							searching = true;
 							if (!lastSelTextLow.equals(editTextLow)) {
 								editor.setText(lastSelected.name);
@@ -230,14 +247,6 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 					}
 				}
 			});
-		}
-		
-		@Override
-		public void removeUpdate(DocumentEvent e) {
-		}
-		
-		@Override
-		public void changedUpdate(DocumentEvent e) {
 		}
 	}
 	

@@ -503,6 +503,7 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		inform = new FormRdInf();
+		MainForm.instance.addChildFrame(inform);
 		JButton button = new JButton("Дополнительная информация");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
