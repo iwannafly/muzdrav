@@ -89,6 +89,7 @@ import javax.swing.DefaultComboBoxModel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
+import java.awt.Font;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
@@ -266,7 +267,7 @@ public class Vvod extends JFrame {
 		
 	
 		JPanel panel_Talon = new JPanel();
-				panel_Talon.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0422\u0430\u043B\u043E\u043D \u0430\u043C\u0431.\u043F\u0430\u0446\u0438\u0435\u043D\u0442\u0430", TitledBorder.LEFT, TitledBorder.TOP, null, new Color(0, 0, 0)));
+				panel_Talon.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0422\u0430\u043B\u043E\u043D \u043F\u0430\u0446\u0438\u0435\u043D\u0442\u0430", TitledBorder.LEFT, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		
 		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -490,16 +491,16 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panAnamnes.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panAnamnes.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpNachzab, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpNachzab, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpSympt.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSympt, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpSympt, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpOtnbol.getLabel(), GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOtnbol, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPssit, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpOtnbol, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPssit, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpNachzab.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPssit.getLabel(), GroupLayout.PREFERRED_SIZE, 271, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblIstZab, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
 						.addContainerGap(315, Short.MAX_VALUE))
 		);
 		gl_panAnamnes.setVerticalGroup(
@@ -664,24 +665,24 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panPraesense.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panPraesense.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpStPraes, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpStPraes, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblStPraes)
-						.addComponent(tpObsost, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpKoj, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpObsost, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpKoj, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpKoj.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpObsost.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpSliz.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSliz, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpSliz, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPodkkl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPodkkl, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPodkkl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpLimf.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpLimf, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpLimf, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpKostmysh.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpKostmysh, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpKostmysh, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpNervnps.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNervnps, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpNervnps, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpTelo.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpTelo, GroupLayout.PREFERRED_SIZE, 500, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tpTelo, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(0, Short.MAX_VALUE))
 		);
 		gl_panPraesense.setVerticalGroup(
@@ -846,63 +847,63 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panFiz.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panFiz.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpFizObsl, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpFizObsl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpSust.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSust, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpSust, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpDyh.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpDyh, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpDyh, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpGrkl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpGrkl, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpGrkl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPerkl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPerkl, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPerkl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpAusl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpAusl, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpAusl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpBronho.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpBronho, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpBronho, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpArter.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpArter, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpArter, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpObls.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpObls, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpObls, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPerks.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPerks, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPerks, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpAuss.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpAuss, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpAuss, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPolrta.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPolrta, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPolrta, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpJivot.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJivot, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJivot, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPalpjivot.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalpjivot, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPalpjivot, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpJkt.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJkt, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJkt, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPalpjel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalpjel, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPalpjel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPalppodjel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalppodjel, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPalppodjel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPechen.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPechen, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPechen, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpJelch.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJelch, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpJelch, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpSelez.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSelez, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpSelez, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpOblzad.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOblzad, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpOblzad, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPoyasn.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPoyasn, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPoyasn, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPochki.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPochki, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPochki, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpMoch.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMoch, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpMoch, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpMoljel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMoljel, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpMoljel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpGrjel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpGrjel, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpGrjel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpMatka.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMatka, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpMatka, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpNarpolov.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNarpolov, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpNarpolov, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpChitov.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpChitov, GroupLayout.PREFERRED_SIZE, 515, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpChitov, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblfizik, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(0, Short.MAX_VALUE))
 		);
@@ -1041,14 +1042,9 @@ public class Vvod extends JFrame {
 		
 		cbrez = new ThriftIntegerClassifierCombobox<>(true);
 		
-		
-		JLabel lblish = new JLabel("Исход");
-		
-		 cbish = new ThriftIntegerClassifierCombobox<>(true);
-		
 		cbMobsp = new ThriftIntegerClassifierCombobox<>(true);
 		
-		JLabel lblmobs = new JLabel("Место");
+		JLabel lblmobs = new JLabel("Место обслуживания");
 		 
 		GroupLayout gl_panel_Talon = new GroupLayout(panel_Talon);
 		gl_panel_Talon.setHorizontalGroup(
@@ -1069,16 +1065,12 @@ public class Vvod extends JFrame {
 						.addGroup(gl_panel_Talon.createSequentialGroup()
 							.addComponent(lblrez, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
 							.addGap(10)
-							.addComponent(cbrez, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE))
+							.addComponent(cbrez, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 						.addGroup(gl_panel_Talon.createSequentialGroup()
-							.addComponent(lblish, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cbish, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-					.addGap(18)
-					.addComponent(lblmobs, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-					.addGap(10)
-					.addComponent(cbMobsp, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addComponent(lblmobs)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(cbMobsp, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(274, Short.MAX_VALUE))
 		);
 		gl_panel_Talon.setVerticalGroup(
 			gl_panel_Talon.createParallelGroup(Alignment.LEADING)
@@ -1087,26 +1079,19 @@ public class Vvod extends JFrame {
 					.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_Talon.createSequentialGroup()
 							.addGap(3)
-							.addComponent(lblmobs))
-						.addComponent(cbMobsp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblrez))
 						.addGroup(gl_panel_Talon.createSequentialGroup()
 							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_Talon.createSequentialGroup()
-									.addGap(3)
-									.addComponent(lblrez))
+								.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
+									.addComponent(lblvid_opl)
+									.addComponent(vid_opl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addComponent(cbrez, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(9)
-							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblish)
-								.addComponent(cbish, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_panel_Talon.createSequentialGroup()
-							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblvid_opl)
-								.addComponent(vid_opl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_Talon.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblcobr)
-								.addComponent(c_obr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(c_obr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblmobs)
+								.addComponent(cbMobsp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_Talon.setLayout(gl_panel_Talon);
@@ -1115,8 +1100,8 @@ public class Vvod extends JFrame {
 		
 		
 		JButton AddVizit = new JButton("");
+		AddVizit.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		AddVizit.setToolTipText("Добавить новую запись");
-		AddVizit.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/add2.png")));
 		AddVizit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				pvizit = new Pvizit();
@@ -1211,7 +1196,7 @@ public class Vvod extends JFrame {
 			
 			PosSave = new JButton("");
 			PosSave.setToolTipText("Сохранить");
-			PosSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/Save1.png")));
+			PosSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 			PosSave.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
@@ -1323,7 +1308,7 @@ public class Vvod extends JFrame {
 			});
 			
 			PosDelete = new JButton("");
-			PosDelete.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/delet.png")));
+			PosDelete.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 			PosDelete.setToolTipText("Удалить запись");
 			PosDelete.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
@@ -1341,6 +1326,97 @@ public class Vvod extends JFrame {
 			});
 			
 			 tfPatient = new JLabel("");
+			 tfPatient.setFont(new Font("Tahoma", Font.BOLD, 11));
+			 
+			
+			final JButton BPrint = new JButton("Печатные формы");
+			final JPanel jPanel = new JPanel();
+		        jPanel.add(BPrint);
+		        getContentPane().add(jPanel);
+			BPrint.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					int x = BPrint.getX();
+	                int y = BPrint.getY() + BPrint.getHeight();
+	                JPopupMenu jPopupMenu = new JPopupMenu();
+	               		JMenuItem mi1 = new JMenuItem("Случай заболевания");
+	               		jPopupMenu.add(mi1);
+				JMenuItem mi2 = new JMenuItem("Выписка из карты");
+				jPopupMenu.add(mi2);
+				JMenuItem mi3 = new JMenuItem("Протокол заключения КЭК");
+				jPopupMenu.add(mi3);
+                jPopupMenu.show(jPanel, x, y);
+
+mi1.addActionListener(new ActionListener() {
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		try{
+				Protokol protokol = new Protokol();
+				protokol.setUserId(MainForm.authInfo.getUser_id());
+				protokol.setNpasp(Vvod.zapVr.getNpasp());
+				protokol.setPvizit_id(TabPos.getSelectedItem().id_obr);
+				protokol.setPvizit_ambId(TabPos.getSelectedItem().id);
+				protokol.setCpol(MainForm.authInfo.getCpodr());
+				String servPath = MainForm.tcl.printProtokol(protokol);
+				String cliPath;
+				cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
+				MainForm.conMan.transferFileFromServer(servPath, cliPath);
+
+		}
+		catch (TException e1) {
+			e1.printStackTrace();
+			MainForm.conMan.reconnect(e1);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		}
+	});
+
+mi2.addActionListener(new ActionListener() {
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		try{
+			Vypis vp = new Vypis();
+			vp.setNpasp(Vvod.zapVr.getNpasp());
+			vp.setPvizit_id(TabPos.getSelectedItem().id_obr);
+			vp.setUserId(MainForm.authInfo.getUser_id());
+			vp.setCpodr_name(MainForm.authInfo.getCpodr_name());
+			vp.setClpu_name(MainForm.authInfo.getClpu_name());
+			
+			String servPath = MainForm.tcl.printVypis(vp);
+			String cliPath;
+			cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
+			MainForm.conMan.transferFileFromServer(servPath, cliPath);
+
+		}
+		catch (TException e1) {
+			e1.printStackTrace();
+			MainForm.conMan.reconnect(e1);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		}
+	});
+
+mi3.addActionListener(new ActionListener() {
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		try{
+				String servPath = MainForm.tcl.printKek(Vvod.zapVr.getNpasp(), TabPos.getSelectedItem().id_obr);
+				String cliPath;
+				cliPath = File.createTempFile("kek", ".htm").getAbsolutePath();
+				MainForm.conMan.transferFileFromServer(servPath, cliPath);
+
+		}
+		catch (TException e1) {
+			e1.printStackTrace();
+			MainForm.conMan.reconnect(e1);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		}
+	});
+				}
+			});
 			gl_panel = new GroupLayout(panel);
 			gl_panel.setHorizontalGroup(
 				gl_panel.createParallelGroup(Alignment.LEADING)
@@ -1349,12 +1425,10 @@ public class Vvod extends JFrame {
 						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel.createSequentialGroup()
 								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-										.addGroup(gl_panel.createSequentialGroup()
-											.addComponent(tabbedPane, 0, 0, Short.MAX_VALUE)
-											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(spShab, GroupLayout.PREFERRED_SIZE, 287, GroupLayout.PREFERRED_SIZE))
-										.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+									.addGroup(gl_panel.createSequentialGroup()
+										.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 701, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(spShab, GroupLayout.PREFERRED_SIZE, 297, GroupLayout.PREFERRED_SIZE))
 									.addGroup(gl_panel.createSequentialGroup()
 										.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 609, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(ComponentPlacement.RELATED)
@@ -1363,45 +1437,49 @@ public class Vvod extends JFrame {
 										.addComponent(PosSave, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(ComponentPlacement.UNRELATED)
 										.addComponent(PosDelete, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE))
-									.addGroup(gl_panel.createSequentialGroup()
-										.addComponent(tfPatient, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
-										.addGap(405)))
-								.addContainerGap(3103, Short.MAX_VALUE))
+									.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 741, GroupLayout.PREFERRED_SIZE))
+								.addContainerGap(3732, Short.MAX_VALUE))
+							.addGroup(gl_panel.createSequentialGroup()
+								.addComponent(tfPatient, GroupLayout.DEFAULT_SIZE, 624, Short.MAX_VALUE)
+								.addGap(4112))
 							.addGroup(gl_panel.createSequentialGroup()
 								.addComponent(butAnamn)
 								.addGap(18)
 								.addComponent(butProsm)
 								.addPreferredGap(ComponentPlacement.UNRELATED)
 								.addComponent(butBer)
-								.addContainerGap(3707, Short.MAX_VALUE))))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(BPrint)
+								.addContainerGap(4240, Short.MAX_VALUE))))
 			);
 			gl_panel.setVerticalGroup(
 				gl_panel.createParallelGroup(Alignment.LEADING)
 					.addGroup(gl_panel.createSequentialGroup()
-						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addContainerGap()
+						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+							.addComponent(butAnamn)
+							.addComponent(butProsm)
+							.addComponent(butBer)
+							.addComponent(BPrint))
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 							.addGroup(gl_panel.createSequentialGroup()
-								.addContainerGap()
+								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+									.addComponent(PosSave, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+									.addComponent(PosDelete)
+									.addComponent(AddVizit, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addGap(29))
+							.addGroup(gl_panel.createSequentialGroup()
 								.addComponent(tfPatient, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-									.addComponent(butAnamn)
-									.addComponent(butProsm)
-									.addComponent(butBer))
 								.addGap(6)
 								.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.RELATED))
-							.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-								.addContainerGap(94, Short.MAX_VALUE)
-								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-									.addComponent(PosSave)
-									.addComponent(AddVizit)
-									.addComponent(PosDelete))
-								.addGap(29)))
+								.addPreferredGap(ComponentPlacement.RELATED)))
+						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-							.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(spShab, GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE))
+							.addComponent(spShab, GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
+							.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 499, Short.MAX_VALUE))
 						.addContainerGap())
 			);
 		
@@ -1591,7 +1669,7 @@ mi3.addActionListener(new ActionListener() {
 						tpMatka.setText(priem.getT_matka());	
 						tpNarpolov.setText(priem.getT_nar_polov());	
 						tpChitov.setText(priem.getT_chitov());	
-						//tpLocalis.setText(priem.getT_st_localis());	
+						tpLocalis.setText(priem.getT_st_localis());	
 						tpOcenka.setText(priem.getT_ocenka());	
 
 					}
@@ -1599,7 +1677,7 @@ mi3.addActionListener(new ActionListener() {
 			}
 		});
 			
-		JPanel plocst = new ShablonTextPanel(5);
+		JPanel plocst = new ShablonTextPanel(8);
 		tabbedPane.addTab("Localis status", null, plocst, null);
 		
 		tpLocalis = new ShablonTextField(8, 68, listShablon);
@@ -1609,7 +1687,7 @@ mi3.addActionListener(new ActionListener() {
 			gl_plocst.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_plocst.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(tpLocalis, GroupLayout.PREFERRED_SIZE, 529, GroupLayout.PREFERRED_SIZE)
+					.addComponent(tpLocalis, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_plocst.setVerticalGroup(
@@ -2467,7 +2545,7 @@ gl_pNaprIssl.setVerticalGroup(
 			gl_pOcenka.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pOcenka.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(tpOcenka, GroupLayout.PREFERRED_SIZE, 592, GroupLayout.PREFERRED_SIZE)
+					.addComponent(tpOcenka, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(239, Short.MAX_VALUE))
 		);
 		gl_pOcenka.setVerticalGroup(
@@ -2491,23 +2569,25 @@ gl_pNaprIssl.setVerticalGroup(
 		
 		 tprecom = new ShablonTextField(10, 66, listShablon);
 		tprecom.setBorder(UIManager.getBorder("TextField.border"));
+		
+		JLabel label_1 = new JLabel("Исход");
+		
+		cbish = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
 		GroupLayout gl_pzakl = new GroupLayout(pzakl);
 		gl_pzakl.setHorizontalGroup(
 			gl_pzakl.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pzakl.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pzakl.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblzakl)
+						.addComponent(lblrecom)
+						.addComponent(tpzakl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(tprecom, GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
 						.addGroup(gl_pzakl.createSequentialGroup()
-							.addComponent(lblzakl)
-							.addContainerGap(701, Short.MAX_VALUE))
-						.addGroup(gl_pzakl.createSequentialGroup()
-							.addComponent(lblrecom)
-							.addContainerGap(687, Short.MAX_VALUE))
-						.addGroup(Alignment.TRAILING, gl_pzakl.createSequentialGroup()
-							.addGroup(gl_pzakl.createParallelGroup(Alignment.TRAILING)
-								.addComponent(tpzakl, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
-								.addComponent(tprecom))
-							.addContainerGap())))
+							.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(cbish, GroupLayout.PREFERRED_SIZE, 248, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
 		);
 		gl_pzakl.setVerticalGroup(
 			gl_pzakl.createParallelGroup(Alignment.LEADING)
@@ -2520,7 +2600,13 @@ gl_pNaprIssl.setVerticalGroup(
 					.addComponent(lblrecom)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tprecom, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
-					.addGap(255))
+					.addGap(18)
+					.addGroup(gl_pzakl.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pzakl.createSequentialGroup()
+							.addGap(3)
+							.addComponent(label_1))
+						.addComponent(cbish, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(221))
 		);
 		pzakl.setLayout(gl_pzakl);
 		panel.setLayout(gl_panel);
@@ -2531,13 +2617,13 @@ gl_pNaprIssl.setVerticalGroup(
 		Vvod.zapVr = zapVr;
 				
 		try {
-//			PatientCommonInfo inf;
-//				try {
-//					inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-//					tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-//				} catch (PatientNotFoundException e) {
-//					e.printStackTrace();
-//				}
+			PatientCommonInfo inf;
+				try {
+					inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
+					tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
+				} catch (PatientNotFoundException e) {
+					e.printStackTrace();
+				}
 			TabPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 			if (TabPos.getRowCount() > 0)
 				TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
