@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -23,6 +25,7 @@ import javax.swing.border.BevelBorder;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
@@ -31,7 +34,6 @@ import javax.swing.ScrollPaneConstants;
 
 public class FormSign extends JFrame {
 	private static final long serialVersionUID = -5267798845014525253L;
-	private ShablonTextField tpallerg; 
 	private JEditorPane tpfarm;
 	private JEditorPane tpanamnz;
 	private Psign psign;
@@ -45,6 +47,7 @@ public class FormSign extends JFrame {
 	private JRadioButton rbpol;
 	private JRadioButton rbotr;
 	private String vrp;
+	private ShablonTextField tpallerg;
 	private ShablonTextField tprazv;
 	private ShablonTextField tpuslov;
 	private ShablonTextField tpper_zab;
@@ -54,6 +57,7 @@ public class FormSign extends JFrame {
 	private ShablonTextField tpginek;
 	private ShablonTextField tppriem_lek;
 	private ShablonTextField tpprim_gorm;
+	public static List<IntegerClassifier> pokNames;
 
 	/**
 	 * Launch the application.
@@ -107,6 +111,15 @@ public class FormSign extends JFrame {
 			}	
 			}
 		});
+		
+		try {
+			pokNames = MainForm.tcl.getPokNames();
+		} catch (Exception e3) {
+			e3.printStackTrace();
+			pokNames = new ArrayList<>();
+		}
+
+
 		setBounds(100, 100, 1011, 726);
 		
 		ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
@@ -129,14 +142,14 @@ public class FormSign extends JFrame {
 		
 		
 		final JLabel lblFarm = new JLabel("Фармакологический анамнез");
+		lblFarm.setVisible(false);
 		
 		final JLabel lblGrkr = new JLabel("Группа крови");
 		
 		final JLabel lblRezus = new JLabel("Резус-фактор");
 		
-		final JLabel lblAllerg = new JLabel("Аллергоанамнез");
-		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
+		lblAnamnz.setVisible(false);
 		
 		
 		tprazv = new ShablonTextField(4, 15, listShablon);
@@ -212,13 +225,12 @@ public class FormSign extends JFrame {
 			}
 		});
 		
-		tpallerg = new  ShablonTextField(3, 67, listShablon);
-		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
-		
 		tpfarm = new JEditorPane();
+		tpfarm.setVisible(false);
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpanamnz = new JEditorPane();
+		tpanamnz.setVisible(false);
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JLabel lblVr = new JLabel("Вредные привычки");
@@ -281,6 +293,8 @@ public class FormSign extends JFrame {
 		);
 		
 		JScrollPane spSh = new JScrollPane();
+		
+		JPanel pallerg = new JPanel();
 		GroupLayout gl_pAnamn = new GroupLayout(pAnamn);
 		gl_pAnamn.setHorizontalGroup(
 			gl_pAnamn.createParallelGroup(Alignment.LEADING)
@@ -304,36 +318,23 @@ public class FormSign extends JFrame {
 							.addComponent(bSave))
 						.addGroup(gl_pAnamn.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(tpper_oper.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_pAnamn.createSequentialGroup()
-							.addContainerGap()
 							.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING)
-								.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING)
-									.addComponent(lblAllerg, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING, false)
+									.addComponent(tpfarm, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
 									.addComponent(lblFarm, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(lblAnamnz, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING)
-									.addComponent(tprazv.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tprazv, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpuslov.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpuslov, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpper_zab.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpper_zab, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpper_oper, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpgemotrans.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpgemotrans, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpnasl.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpnasl, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpginek.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpginek, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tppriem_lek.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tppriem_lek, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpprim_gorm.getLabel(), GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-									.addComponent(tpprim_gorm, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)))
-							.addGap(18)
+									.addComponent(tpanamnz, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(lblAnamnz, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+									.addComponent(tprazv, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpuslov, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpper_zab, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpper_oper, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpgemotrans, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpnasl, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpginek, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tppriem_lek, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+									.addComponent(tpprim_gorm, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
+								.addComponent(pallerg, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(spSh, GroupLayout.PREFERRED_SIZE, 455, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(1096, Short.MAX_VALUE))
 		);
@@ -366,54 +367,58 @@ public class FormSign extends JFrame {
 					.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_pAnamn.createSequentialGroup()
 							.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblAllerg)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(pallerg, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblFarm)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tprazv.getLabel())
-							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(tprazv, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tpuslov.getLabel())
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(tpuslov, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tpper_zab.getLabel())
-							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(tpper_zab, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE))
-						.addComponent(spSh))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpper_oper.getLabel())
+						.addComponent(spSh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpper_oper, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpgemotrans.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpgemotrans, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpnasl.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpnasl, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addComponent(tpginek.getLabel())
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpginek, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tppriem_lek.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tppriem_lek, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpprim_gorm.getLabel())
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpprim_gorm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 					.addGap(15)
 					.addComponent(bSave)
 					.addGap(15))
 		);
+		
+		JLabel label = new JLabel("Аллергоанамнез");
+		
+		 tpallerg = new ShablonTextField(3, 67, (ThriftIntegerClassifierList) null);
+		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
+		GroupLayout gl_pallerg = new GroupLayout(pallerg);
+		gl_pallerg.setHorizontalGroup(
+			gl_pallerg.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pallerg.createSequentialGroup()
+					.addGroup(gl_pallerg.createParallelGroup(Alignment.LEADING)
+						.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(20, Short.MAX_VALUE))
+		);
+		gl_pallerg.setVerticalGroup(
+			gl_pallerg.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pallerg.createSequentialGroup()
+					.addComponent(label)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		pallerg.setLayout(gl_pallerg);
 		
 		spSh.setViewportView(listShablon);
 		pAnamn.setLayout(gl_pAnamn);
