@@ -409,7 +409,13 @@ public class serverVrachInfo extends Server implements Iface {
 				int id = sme.getGeneratedKeys().getInt("id");
 				sme.setCommit();
 				return id;
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			if (((SQLException)e.getCause()).getSQLState().equals("23503")) {
+				setShabPok(new ShablonPok().setId(shText.getId_pok()).setId_razd(shText.getId_razd()), shText.getPcod_s00());
+				return addShablonText(shText);
+			} else
+				throw new TException(e);
+		} catch (InterruptedException e) {
 			throw new TException(e);
 		}
 	}

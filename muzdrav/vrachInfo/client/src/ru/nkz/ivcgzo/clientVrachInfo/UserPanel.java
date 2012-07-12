@@ -33,6 +33,7 @@ import ru.nkz.ivcgzo.thriftServerVrachInfo.VrachInfo;
 public class UserPanel extends JPanel {
 	private static final long serialVersionUID = 4036696963713695558L;
 	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
+	private VrachInfo prevSelVrachItem;
 	private CustomTable<MestoRab, MestoRab._Fields> tblMrab;
 	private PermForm permForm;
 	private JButton btnVrPerm;
@@ -53,6 +54,7 @@ public class UserPanel extends JPanel {
 						if (tblVrach.getSelectedItem() != null) {
 							MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod);
 							tblMrab.setData(MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod));
+							prevSelVrachItem = tblVrach.getSelectedItem();
 							btnVrPerm.setEnabled(tblMrab.getRowCount() > 0);
 							btnMrDel.setEnabled(btnVrPerm.isEnabled());
 						}
@@ -107,6 +109,7 @@ public class UserPanel extends JPanel {
 		tblVrach.setFillsViewportHeight(true);
 		
 		JButton btnVrAdd = new JButton();
+		btnVrAdd.setToolTipText("Добавить пользователя");
 		btnVrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789242_Add.png")));
 		btnVrAdd.addActionListener(new ActionListener() {
 			@Override
@@ -118,6 +121,7 @@ public class UserPanel extends JPanel {
 		btnVrAdd.setEnabled(tblVrach.isEditable());
 		
 		JButton btnVrDel = new JButton();
+		btnVrDel.setToolTipText("Удалить пользователя");
 		btnVrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789259_Delete.png")));
 		btnVrDel.addActionListener(new ActionListener() {
 			@Override
@@ -165,7 +169,7 @@ public class UserPanel extends JPanel {
 			public boolean doAction(CustomTableItemChangeEvent<MestoRab> event) {
 				try {
 					MestoRab item = event.getItem();
-					item.setPcod(tblVrach.getSelectedItem().getPcod());
+					item.setPcod(prevSelVrachItem.getPcod());
 					item.setClpu(MainForm.authInfo.getClpu());
 					item.id = MainForm.tcl.AddMrab(item);
 					btnVrPerm.setEnabled(true);
@@ -182,6 +186,7 @@ public class UserPanel extends JPanel {
 		tblMrab.setFillsViewportHeight(true);
 		
 		btnVrPerm = new JButton();
+		btnVrPerm.setToolTipText("Права доступа");
 		btnVrPerm.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789257_User.png")));
 		btnVrPerm.addActionListener(new ActionListener() {
 			@Override
@@ -200,10 +205,12 @@ public class UserPanel extends JPanel {
 		});
 
 		btnMrAdd = new JButton();
+		btnMrAdd.setToolTipText("Добавить профиль");
 		btnMrAdd.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789242_Add.png")));
 		btnMrAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				tblVrach.updateSelectedItem();
 				tblMrab.requestFocus();
 				tblMrab.addItem();
 			}
@@ -211,6 +218,7 @@ public class UserPanel extends JPanel {
 		btnMrAdd.setEnabled(tblMrab.isEditable());
 		
 		btnMrDel = new JButton();
+		btnMrDel.setToolTipText("Удалить профиль");
 		btnMrDel.setIcon(new ImageIcon(PermForm.class.getResource("/ru/nkz/ivcgzo/clientVrachInfo/resources/1331789259_Delete.png")));
 		btnMrDel.addActionListener(new ActionListener() {
 			@Override
