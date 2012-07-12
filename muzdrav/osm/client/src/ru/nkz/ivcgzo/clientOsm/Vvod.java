@@ -3,13 +3,18 @@ package ru.nkz.ivcgzo.clientOsm;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.StringReader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -21,6 +26,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
@@ -60,6 +66,8 @@ import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
+import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
@@ -73,10 +81,14 @@ import ru.nkz.ivcgzo.thriftOsm.Protokol;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.ImageIcon;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
@@ -149,6 +161,7 @@ public class Vvod extends JFrame {
 	private ShablonTextField tpNarpolov;
 	private ShablonTextField tpChitov;
 	private JEditorPane tpFizObsl;
+	private ShablonTextField tpLocalis;
 	private ShablonTextField tpOcenka;
 	private JEditorPane tpIstZab;
 	private JEditorPane tpObosnov;
@@ -197,12 +210,19 @@ public class Vvod extends JFrame {
 	private JLabel lblObosnov;
 	private JButton butPrintNapr;
 	private JPopupMenu pmvizit;
+	private JLabel tfPatient;
 
 	
 	/**
 	 * Create the frame.
 	 */
 	public Vvod() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 		try {
 			pokNames = MainForm.tcl.getPokNames();
 		} catch (Exception e3) {
@@ -310,8 +330,10 @@ public class Vvod extends JFrame {
 		spJalob.setViewportView(panJalob);
 		
 		final JLabel lblJalob = new JLabel("Жалобы");
+		lblJalob.setVisible(false);
 		
 		tpJalob = new ShablonTextField(1, 1, listShablon);
+		tpJalob.setVisible(false);
 		tpJalob.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobd = new ShablonTextField(1, 1, listShablon);
@@ -457,8 +479,10 @@ public class Vvod extends JFrame {
 		tpPssit.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JLabel lblIstZab = new JLabel("История заболевания");
+		lblIstZab.setVisible(false);
 		
 		 tpIstZab = new JEditorPane();
+		 tpIstZab.setVisible(false);
 		tpIstZab.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_panAnamnes = new GroupLayout(panAnamnes);
 		gl_panAnamnes.setHorizontalGroup(
@@ -466,16 +490,16 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panAnamnes.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panAnamnes.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpNachzab, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpNachzab, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpSympt.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSympt, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpSympt, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpOtnbol.getLabel(), GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOtnbol, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPssit, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpOtnbol, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tpPssit, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpNachzab.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpPssit.getLabel(), GroupLayout.PREFERRED_SIZE, 271, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblIstZab, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 525, GroupLayout.PREFERRED_SIZE))
 						.addContainerGap(315, Short.MAX_VALUE))
 		);
 		gl_panAnamnes.setVerticalGroup(
@@ -604,8 +628,10 @@ public class Vvod extends JFrame {
 		sppraesense.setViewportView(panPraesense);
 		
 		final JLabel lblStPraes = new JLabel("Status praesense");
+		lblStPraes.setVisible(false);
 		
 		 tpStPraes = new JEditorPane();
+		 tpStPraes.setVisible(false);
 		tpStPraes.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpObsost = new ShablonTextField(6, 24, listShablon);
@@ -724,8 +750,10 @@ public class Vvod extends JFrame {
 		spFizik.setViewportView(panFiz);
 		
 		final JLabel lblfizik = new JLabel("Физикальное обследование");
+		lblfizik.setVisible(false);
 		
 		tpFizObsl = new JEditorPane();
+		tpFizObsl.setVisible(false);
 		tpFizObsl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpSust = new ShablonTextField(7, 37, listShablon);
@@ -1086,7 +1114,9 @@ public class Vvod extends JFrame {
 		JScrollPane sPos = new JScrollPane();
 		
 		
-		JButton AddVizit = new JButton("+");
+		JButton AddVizit = new JButton("");
+		AddVizit.setToolTipText("Добавить новую запись");
+		AddVizit.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/add2.png")));
 		AddVizit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				pvizit = new Pvizit();
@@ -1105,6 +1135,21 @@ public class Vvod extends JFrame {
 				pvizitAmb.setDatap(System.currentTimeMillis());
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+				
+				try {
+					SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
+					String strDat = frm.format(new Date(System.currentTimeMillis()));
+					Date dat = frm.parse(strDat);
+					long curDateMills = dat.getTime();
+					for (PvizitAmb pviz : TabPos.getData()) {
+						if (pviz.getDatap() == curDateMills) {
+							JOptionPane.showMessageDialog(Vvod.this, "333333");
+							return;
+						}
+					}
+				} catch (ParseException e1) {
+					e1.printStackTrace();
+				}
 				
 				try {
 					Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
@@ -1139,7 +1184,8 @@ public class Vvod extends JFrame {
 		butAnamn = new JButton("Анамнез жизни");
 		butAnamn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				sign.setVisible(true);}
+				sign.setVisible(true);	
+			}
 		});
 		
 		butProsm = new JButton("Просмотр");
@@ -1154,7 +1200,8 @@ public class Vvod extends JFrame {
 				}}
 		});
 		
-		butBer = new JButton("Набл.за берем.");
+		butBer = new JButton("Наблюдение за беременными");
+		butBer.setActionCommand("Наблюдение за беременными");
 		butBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				postber.setVisible(true);
@@ -1162,7 +1209,9 @@ public class Vvod extends JFrame {
 		});
 		GroupLayout gl_panel;
 			
-			PosSave = new JButton("v");
+			PosSave = new JButton("");
+			PosSave.setToolTipText("Сохранить");
+			PosSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/Save1.png")));
 			PosSave.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
@@ -1175,7 +1224,7 @@ public class Vvod extends JFrame {
 						priem.setT_chss(getTextOrNull(tfchss.getText()));
 						priem.setT_rost(getTextOrNull(tfrost.getText()));
 						priem.setT_ves(getTextOrNull(tfves.getText()));
-						//priem.setT_st_localis(getTextOrNull(tpLocalis.getText()));
+						priem.setT_st_localis(getTextOrNull(tpLocalis.getText()));
 						priem.setT_jalob_d(getTextOrNull(tpJalobd.getText()));
 						priem.setT_jalob_krov(getTextOrNull(tpJalobkrov.getText()));
 						priem.setT_jalob_p(getTextOrNull(tpJalobp.getText()));
@@ -1238,17 +1287,26 @@ public class Vvod extends JFrame {
 						pvizit.setRecomend(getTextOrNull(tprecom.getText()));
 						if (c_obr.getSelectedPcod() != null)
 							pvizit.setCobr(c_obr.getSelectedPcod());
+							else pvizit.unsetCobr();
 						if (cbrez.getSelectedPcod() != null)
 							pvizitAmb.setRezult(cbrez.getSelectedPcod());
+							else pvizitAmb.unsetRezult();
 						if (cbrez.getSelectedPcod() != null)
 							pvizit.setRezult(cbrez.getSelectedPcod());
+							else pvizit.unsetRezult();
+
 						if (cbish.getSelectedPcod() != null)
 							pvizit.setIshod(cbish.getSelectedPcod());
-						
+							else pvizit.unsetIshod();
+					
 						if (cbMobsp.getSelectedPcod() != null)
 							pvizitAmb.setMobs(cbMobsp.getSelectedPcod());
+						else
+							pvizitAmb.unsetMobs();
 						if (vid_opl.getSelectedPcod() != null)
 							pvizitAmb.setOpl(vid_opl.getSelectedPcod());
+						else pvizitAmb.unsetOpl();
+
 						
 						MainForm.tcl.setPriem(priem);
 						MainForm.tcl.setAnamZab(anamZab);
@@ -1264,7 +1322,9 @@ public class Vvod extends JFrame {
 
 			});
 			
-			PosDelete = new JButton("-");
+			PosDelete = new JButton("");
+			PosDelete.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/delet.png")));
+			PosDelete.setToolTipText("Удалить запись");
 			PosDelete.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					try {
@@ -1279,13 +1339,15 @@ public class Vvod extends JFrame {
 					}
 				}
 			});
+			
+			 tfPatient = new JLabel("");
 			gl_panel = new GroupLayout(panel);
 			gl_panel.setHorizontalGroup(
 				gl_panel.createParallelGroup(Alignment.LEADING)
 					.addGroup(gl_panel.createSequentialGroup()
+						.addContainerGap()
 						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel.createSequentialGroup()
-								.addContainerGap()
 								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 										.addGroup(gl_panel.createSequentialGroup()
@@ -1294,44 +1356,52 @@ public class Vvod extends JFrame {
 											.addComponent(spShab, GroupLayout.PREFERRED_SIZE, 287, GroupLayout.PREFERRED_SIZE))
 										.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 									.addGroup(gl_panel.createSequentialGroup()
-										.addComponent(sPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+										.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 609, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(ComponentPlacement.RELATED)
-										.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
-											.addComponent(PosDelete, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addComponent(PosSave, 0, 0, Short.MAX_VALUE)
-											.addComponent(AddVizit, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+										.addComponent(AddVizit, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+										.addGap(10)
+										.addComponent(PosSave, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(PosDelete, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE))
+									.addGroup(gl_panel.createSequentialGroup()
+										.addComponent(tfPatient, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+										.addGap(405)))
+								.addContainerGap(3103, Short.MAX_VALUE))
 							.addGroup(gl_panel.createSequentialGroup()
-								.addGap(34)
 								.addComponent(butAnamn)
 								.addGap(18)
 								.addComponent(butProsm)
 								.addPreferredGap(ComponentPlacement.UNRELATED)
-								.addComponent(butBer)))
-						.addContainerGap(3103, Short.MAX_VALUE))
+								.addComponent(butBer)
+								.addContainerGap(3707, Short.MAX_VALUE))))
 			);
 			gl_panel.setVerticalGroup(
 				gl_panel.createParallelGroup(Alignment.LEADING)
 					.addGroup(gl_panel.createSequentialGroup()
-						.addGap(6)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-							.addComponent(butAnamn)
-							.addComponent(butProsm)
-							.addComponent(butBer))
-						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-							.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel.createSequentialGroup()
-								.addComponent(AddVizit)
-								.addGap(1)
-								.addComponent(PosSave)
+								.addContainerGap()
+								.addComponent(tfPatient, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(PosDelete)))
-						.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+									.addComponent(butAnamn)
+									.addComponent(butProsm)
+									.addComponent(butBer))
+								.addGap(6)
+								.addComponent(sPos, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED))
+							.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+								.addContainerGap(94, Short.MAX_VALUE)
+								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+									.addComponent(PosSave)
+									.addComponent(AddVizit)
+									.addComponent(PosDelete))
+								.addGap(29)))
 						.addComponent(panel_Talon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-							.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)
-							.addComponent(spShab, GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE))
+							.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(spShab, GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE))
 						.addContainerGap())
 			);
 		
@@ -1382,10 +1452,17 @@ mi2.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		try{
-				String servPath = MainForm.tcl.printVypis(Vvod.zapVr.getNpasp(), TabPos.getSelectedItem().id_obr, MainForm.authInfo.getUser_id());
-				String cliPath;
-				cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
-				MainForm.conMan.transferFileFromServer(servPath, cliPath);
+			Vypis vp = new Vypis();
+			vp.setNpasp(Vvod.zapVr.getNpasp());
+			vp.setPvizit_id(TabPos.getSelectedItem().id_obr);
+			vp.setUserId(MainForm.authInfo.getUser_id());
+			vp.setCpodr_name(MainForm.authInfo.getCpodr_name());
+			vp.setClpu_name(MainForm.authInfo.getClpu_name());
+			
+			String servPath = MainForm.tcl.printVypis(vp);
+			String cliPath;
+			cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
+			MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
 		}
 		catch (TException e1) {
@@ -1525,37 +1602,23 @@ mi3.addActionListener(new ActionListener() {
 		JPanel plocst = new ShablonTextPanel(5);
 		tabbedPane.addTab("Localis status", null, plocst, null);
 		
-		JScrollPane spLocSt = new JScrollPane();
+		tpLocalis = new ShablonTextField(8, 68, listShablon);
+		tpLocalis.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_plocst = new GroupLayout(plocst);
 		gl_plocst.setHorizontalGroup(
 			gl_plocst.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_plocst.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(spLocSt, GroupLayout.DEFAULT_SIZE, 529, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(tpLocalis, GroupLayout.PREFERRED_SIZE, 529, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_plocst.setVerticalGroup(
 			gl_plocst.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_plocst.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(spLocSt, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(413, Short.MAX_VALUE))
+					.addComponent(tpLocalis, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(427, Short.MAX_VALUE))
 		);
-		
-		JPanel panLocst = new JPanel();
-		spLocSt.setViewportView(panLocst);
-		
-		JEditorPane tpLocalis = new JEditorPane();
-		GroupLayout gl_panLocst = new GroupLayout(panLocst);
-		gl_panLocst.setHorizontalGroup(
-			gl_panLocst.createParallelGroup(Alignment.LEADING)
-				.addComponent(tpLocalis, GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)
-		);
-		gl_panLocst.setVerticalGroup(
-			gl_panLocst.createParallelGroup(Alignment.LEADING)
-				.addComponent(tpLocalis, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-		);
-		panLocst.setLayout(gl_panLocst);
 		plocst.setLayout(gl_plocst);
 		final ButtonGroup GroupBox1 = new ButtonGroup();
 		final ButtonGroup GroupBox2 = new ButtonGroup();;
@@ -1609,8 +1672,9 @@ mi3.addActionListener(new ActionListener() {
 								jbpredv.setSelected(true);
 							else
 								jbzakl.setSelected(true);
-							if (diagamb.getObstreg()!=0) cbObstreg.setSelectedPcod(diagamb.getObstreg());
-							if (diagamb.getVid_tr()!=0) vid_travm.setSelectedPcod(diagamb.getVid_tr());
+							if (diagamb.isSetObstreg()) cbObstreg.setSelectedPcod(diagamb.getObstreg());else cbObstreg.setSelectedItem(null);
+							if (diagamb.isSetVid_tr()) vid_travm.setSelectedPcod(diagamb.getVid_tr()); else vid_travm.setSelectedItem(null);
+
 							
 						pdiag = new PdiagZ();
 						GBoxStady.clearSelection();
@@ -1741,7 +1805,8 @@ mi3.addActionListener(new ActionListener() {
 					  		if (jbsoput.isSelected())diagamb.setDiag_stat(3);
 					  		if (jbosl.isSelected()) diagamb.setDiag_stat(2);
 					  		if (cbObstreg.getSelectedPcod() != null) diagamb.setObstreg(cbObstreg.getSelectedPcod());
-					  		if (vid_travm.getSelectedPcod() != null) diagamb.setVid_tr(vid_travm.getSelectedPcod());
+					  		else diagamb.unsetObstreg();
+					  		if (vid_travm.getSelectedPcod() != null) diagamb.setVid_tr(vid_travm.getSelectedPcod());else diagamb.unsetVid_tr();
 					  		
 					  		pdiag = new PdiagZ();
 					  		pdisp = new Pdisp();
@@ -1781,8 +1846,9 @@ mi3.addActionListener(new ActionListener() {
 								pdisp.setD_vz(tfDvz.getDate().getTime());
 				  			if (tfFDatDIsh.getDate() != null)
 								pdisp.setDataish(tfFDatDIsh.getDate().getTime());
-					  		if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());
-					  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod());
+				  			if (cbDish.getSelectedPcod() != null) pdisp.setIshod(cbDish.getSelectedPcod());else pdisp.unsetIshod();
+					  		if (cbDgrup.getSelectedPcod() != null) pdisp.setD_grup(cbDgrup.getSelectedPcod()); else pdisp.unsetD_grup();
+
 	
 				  			pdisp.setCod_sp(diagamb.getCod_sp());
 				  			pdisp.setCdol_ot(diagamb.getCdol());
@@ -1958,7 +2024,7 @@ mi3.addActionListener(new ActionListener() {
 
 		
 		JPanel pprint = new JPanel();
-		tabbedPane.addTab("Печать", null, pprint, null);
+		tabbedPane.addTab("Направления", null, pprint, null);
 		
 		JScrollPane spPrint = new JScrollPane();
 		GroupLayout gl_pprint = new GroupLayout(pprint);
@@ -1975,7 +2041,7 @@ mi3.addActionListener(new ActionListener() {
 		spPrint.setViewportView(tabPrint);
 		
 		JPanel pNaprIssl = new JPanel();
-		tabPrint.addTab("Направление на иссл.", null, pNaprIssl, null);
+		tabPrint.addTab("Направление на исследование", null, pNaprIssl, null);
 		
 		final JLabel lblmet = new JLabel("Методы");
 		
@@ -2099,6 +2165,8 @@ rbPokaz.addActionListener(new ActionListener() {
 							isslmet.setPokaz(selItems);
 							if (cbMesto.getSelectedItem()!=null)isslmet.setMesto(cbMesto.getSelectedItem().getName());
 							isslmet.setKab(getTextOrNull(tfKab.getText()));
+							isslmet.setClpu_name(MainForm.authInfo.getClpu_name());
+							isslmet.setCpodr_name(MainForm.authInfo.getCpodr_name());
 							String servPath = MainForm.tcl.printIsslMetod(isslmet);
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
@@ -2117,8 +2185,11 @@ rbPokaz.addActionListener(new ActionListener() {
 								pokaz.setPvizitId(TabPos.getSelectedItem().getId_obr());
 								pokaz.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 								pokaz.setUserId(MainForm.authInfo.getUser_id());
+								pokaz.setClpu_name(MainForm.authInfo.getClpu_name());
+								pokaz.setCpodr_name(MainForm.authInfo.getCpodr_name());
 								pokaz.setNpasp(Vvod.zapVr.getNpasp());
 								pokaz.setPokaz(selItems);
+								
 								if (cbMesto.getSelectedItem()!=null)pokaz.setMesto(cbMesto.getSelectedItem().getName());
 								pokaz.setKab(getTextOrNull(tfKab.getText()));
 								String servPath = MainForm.tcl.printIsslPokaz(pokaz);
@@ -2304,6 +2375,8 @@ gl_pNaprIssl.setVerticalGroup(
 					naprkons.setNazv(cbVidNapr.getSelectedItem().toString());
 					naprkons.setCdol(MainForm.authInfo.getCdol());
 					naprkons.setPvizitId(TabPos.getSelectedItem().getId_obr());
+					naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
+					naprkons.setClpu_name(MainForm.authInfo.getClpu_name());
 					String servPath = MainForm.tcl.printNaprKons(naprkons);
 					String cliPath;
 					cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
@@ -2315,6 +2388,8 @@ gl_pNaprIssl.setVerticalGroup(
 					napr.setNpasp(Vvod.zapVr.getNpasp());
 					napr.setObosnov(tpObosnov.getText());
 					if (cbN00.getSelectedItem()!=null) napr.setClpu(cbN00.getSelectedItem().getName());
+					napr.setCpodr_name(MainForm.authInfo.getCpodr_name());
+					napr.setClpu_name(MainForm.authInfo.getClpu_name());
 					napr.setPvizitId(TabPos.getSelectedItem().getId_obr());
 					String servPath = MainForm.tcl.printNapr(napr);
 					String cliPath;
@@ -2456,18 +2531,24 @@ gl_pNaprIssl.setVerticalGroup(
 		Vvod.zapVr = zapVr;
 				
 		try {
-			Vvod.pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
+//			PatientCommonInfo inf;
+//				try {
+//					inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
+//					tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
+//				} catch (PatientNotFoundException e) {
+//					e.printStackTrace();
+//				}
 			TabPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
-			TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
+			if (TabPos.getRowCount() > 0)
+				TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
 			TabDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
+			
 			//c_obr.setSelectedPcod(TabPos.getSelectedItem().getId_obr());
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
 			e.printStackTrace();
 			MainForm.conMan.reconnect(e);
-		} catch (PvizitNotFoundException e) {
-			e.printStackTrace();
 		}
 		
 		setVisible(true);

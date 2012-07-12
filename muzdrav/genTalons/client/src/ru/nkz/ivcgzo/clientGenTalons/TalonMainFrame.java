@@ -29,6 +29,7 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
@@ -61,9 +62,13 @@ public class TalonMainFrame extends JFrame {
 	private String curSpec = null;
 	private int curVrach = 0;
 	private final ButtonGroup btnGroup_cxema = new ButtonGroup();
+	private final ButtonGroup btnGroup_talon = new ButtonGroup();
 	private JRadioButton cxm_1;
 	private JRadioButton cxm_2;
 	private JRadioButton cxm_3;
+	private JRadioButton tal_1;
+	private JRadioButton tal_2;
+	private JRadioButton tal_3;
 	private JCheckBox cbx_rasp;
 	private List<Nrasp> NraspInfo;
 	private List<Norm> NormInfo;
@@ -71,6 +76,8 @@ public class TalonMainFrame extends JFrame {
 	private CustomTable<Nrasp, Nrasp._Fields> tbl_rasp;
 	private CustomTable<Norm, Norm._Fields> tbl_norm;
 	private CustomTable<Ndv, Ndv._Fields> tbl_ndv;
+	private CustomDateEditor tf_datn;
+	private CustomDateEditor tf_datk;
 
 	/**
 	 * Launch the application.
@@ -108,7 +115,10 @@ public class TalonMainFrame extends JFrame {
 				if (tbMain.getSelectedIndex() == 1) {
 					ChangeNormInfo();
 				}
-				if (tbMain.getSelectedIndex() == 2) ChangeTalonInfo();
+				if (tbMain.getSelectedIndex() == 2) {
+					ChangeTalonInfo();
+					tal_1.setSelected(true);
+				}
 			}
 		});
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
@@ -484,44 +494,64 @@ public class TalonMainFrame extends JFrame {
 					.addContainerGap(442, Short.MAX_VALUE))
 		);
 		
-		JFormattedTextField formattedTextField = new JFormattedTextField();
-		
-		JFormattedTextField formattedTextField_1 = new JFormattedTextField();
-		
-		JLabel lblNewLabel = new JLabel("Период: с");
-		
-		JLabel lblNewLabel_1 = new JLabel("По");
+		tf_datn = new CustomDateEditor();
+		tf_datk = new CustomDateEditor();
 		
 		JButton btnNewButton = new JButton("Формировать");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+//				RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), btnGroup_talon.isSelected(btnGroup_talon.getSelection()));
+			}
+		});
+
+		JLabel lblNewLabel = new JLabel("Период: с");
+		JLabel lblNewLabel_1 = new JLabel("По");
+		
+		tal_1 = new JRadioButton("все специалисты");
+		btnGroup_talon.add(tal_1);
+		
+		tal_2 = new JRadioButton("для выбранной специальности");
+		btnGroup_talon.add(tal_2);
+		
+		tal_3 = new JRadioButton("для выбранного врача");
+		btnGroup_talon.add(tal_3);
 		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
 		gl_panel_5.setHorizontalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_5.createSequentialGroup()
 					.addContainerGap()
+					.addComponent(lblNewLabel)
+					.addGap(20)
+					.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblNewLabel_1)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
+					.addGap(32)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_5.createSequentialGroup()
-							.addComponent(lblNewLabel)
-							.addGap(20)
-							.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblNewLabel_1)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btnNewButton))
-					.addContainerGap(304, Short.MAX_VALUE))
+						.addComponent(btnNewButton)
+						.addComponent(tal_3)
+						.addComponent(tal_2)
+						.addComponent(tal_1))
+					.addContainerGap(89, Short.MAX_VALUE))
 		);
 		gl_panel_5.setVerticalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_5.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(formattedTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(formattedTextField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel)
-						.addComponent(lblNewLabel_1))
-					.addGap(34)
+						.addComponent(lblNewLabel_1)
+						.addComponent(tal_1))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tal_2)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tal_3)
+					.addGap(26)
 					.addComponent(btnNewButton)
-					.addContainerGap(66, Short.MAX_VALUE))
+					.addContainerGap(26, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
 		tbTalon.setLayout(gl_tbTalon);
@@ -563,7 +593,10 @@ public class TalonMainFrame extends JFrame {
 						ChangeNdvInfo();
 					}
 					if (tbMain.getSelectedIndex() == 1) ChangeNormInfo();
-					if (tbMain.getSelectedIndex() == 2) ChangeTalonInfo();
+					if (tbMain.getSelectedIndex() == 2) {
+						ChangeTalonInfo();
+						tal_1.setSelected(true);
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}

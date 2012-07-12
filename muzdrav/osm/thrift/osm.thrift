@@ -404,6 +404,8 @@ struct IsslPokaz {
 	6: optional string mesto;
 	7: optional string kab;
 	8: optional i32 pvizitId;
+	9: optional string cpodr_name;
+	10: optional string clpu_name;
 }
 
 struct Napr{
