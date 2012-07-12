@@ -1,7 +1,7 @@
 thrift base port 55000
 
 base port + 0	auth
-1	vrachInfo
+1	admin
 2	stationar
 3	osm
 4	lds
