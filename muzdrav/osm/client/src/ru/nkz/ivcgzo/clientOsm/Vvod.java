@@ -2193,10 +2193,13 @@ mi3.addActionListener(new ActionListener() {
 		tfKab.setColumns(10);
 		
 		final JScrollPane spPokaz = new JScrollPane();
+		spPokaz.setVisible(false);
 		
 		final JLabel lblOrgan = new JLabel("Органы и системы");
+		lblOrgan.setVisible(false);
 		
 rbPokaz = new JRadioButton("Показатели");
+rbPokaz.setVisible(false);
 rbPokaz.addActionListener(new ActionListener() {
  	public void actionPerformed(ActionEvent e) {
  		rbMetodIssl.setSelected(false);
@@ -2218,6 +2221,7 @@ rbPokaz.addActionListener(new ActionListener() {
 		
 		
 		cbOrgan = new ThriftStringClassifierCombobox<StringClassifier>(true);
+		cbOrgan.setVisible(false);
 		cbOrgan.addActionListener(new ActionListener() {
 		 	public void actionPerformed(ActionEvent e) {
 				try {
@@ -2234,6 +2238,7 @@ rbPokaz.addActionListener(new ActionListener() {
 		
 		
 		 rbMetodIssl = new JRadioButton("Методы исследований");
+		 rbMetodIssl.setVisible(false);
 		 rbMetodIssl.addActionListener(new ActionListener() {
 			 	public void actionPerformed(ActionEvent arg0) {
 			 	rbPokaz.setSelected(false);	
@@ -2258,9 +2263,9 @@ rbPokaz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (cbVidIssl.getSelectedItem()!= null){
 					try {
-						if (rbMetodIssl.isSelected()){//
+//						if (rbMetodIssl.isSelected()){//
 								tabMetod.setData(MainForm.tcl.getMetod(cbVidIssl.getSelectedItem().pcod));
-						}
+//						}
 						if (rbPokaz.isSelected()){
 							cbOrgan.setSelectedItem(null);
 							cbOrgan.setData(MainForm.tcl.get_n_nz1(cbVidIssl.getSelectedItem().pcod));	
@@ -2280,7 +2285,7 @@ rbPokaz.addActionListener(new ActionListener() {
 		butPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (rbMetodIssl.isSelected()){
+	//				if (rbMetodIssl.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) && (tabMetod.getSelectedItem() != null)) {
 						List<String> selItems = new ArrayList<>();
 						for (PokazMet pokazMet : tabPokazMet.getData()) {
@@ -2304,7 +2309,7 @@ rbPokaz.addActionListener(new ActionListener() {
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						}
 					}
-				}
+//				}
 				if (rbPokaz.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) && (cbOrgan.getSelectedItem() != null)) {
 							List<String> selItems = new ArrayList<>();
@@ -2345,90 +2350,90 @@ rbPokaz.addActionListener(new ActionListener() {
 		
 		GroupLayout gl_pNaprIssl = new GroupLayout(pNaprIssl);
 		gl_pNaprIssl.setHorizontalGroup(
-		gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
-		.addGroup(gl_pNaprIssl.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+			gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(rbMetodIssl, GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
-					.addGap(683))
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(spMetod, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
-					.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(472, Short.MAX_VALUE))
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(lblPokazMet, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.TRAILING)
-						.addComponent(lblmet, Alignment.LEADING)
+					.addContainerGap()
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(lblVidIssl)
+							.addComponent(rbMetodIssl, GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+							.addGap(683))
+						.addGroup(Alignment.TRAILING, gl_pNaprIssl.createSequentialGroup()
+							.addComponent(spMetod, GroupLayout.PREFERRED_SIZE, 532, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(lblPokazMet, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.TRAILING)
+								.addComponent(lblmet, Alignment.LEADING)
+								.addGroup(gl_pNaprIssl.createSequentialGroup()
+									.addComponent(lblVidIssl)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+									.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+										.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+										.addComponent(lblOrgan, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
-								.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-								.addComponent(lblOrgan, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+							.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(butPrint)
+							.addContainerGap(887, Short.MAX_VALUE))
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(lblMesto)
+							.addGap(18)
+							.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(lblKab)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap(843, Short.MAX_VALUE))
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())))
+		);
+		gl_pNaprIssl.setVerticalGroup(
+			gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(butPrint)
-					.addContainerGap(811, Short.MAX_VALUE))
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(lblMesto)
-					.addGap(18)
-					.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(lblKab)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(767, Short.MAX_VALUE))))
-);
-gl_pNaprIssl.setVerticalGroup(
-	gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
-		.addGroup(gl_pNaprIssl.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-				.addComponent(rbMetodIssl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-			.addPreferredGap(ComponentPlacement.RELATED)
-			.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
+					.addContainerGap()
 					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblVidIssl))
+						.addComponent(rbMetodIssl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblmet))
-				.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-					.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addComponent(lblOrgan)))
-			.addGap(8)
-			.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addComponent(spMetod, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblPokazMet)
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblVidIssl))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblmet))
+						.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+							.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblOrgan)))
 					.addGap(8)
-					.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
-				.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-				.addComponent(lblMesto)
-				.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-			.addPreferredGap(ComponentPlacement.UNRELATED)
-			.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-				.addComponent(lblKab)
-				.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-			.addGap(115)
-			.addComponent(butPrint)
-			.addGap(22))
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addComponent(spMetod, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(lblPokazMet))
+						.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
+					.addGap(3)
+					.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
+					.addGap(36)
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblMesto)
+						.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblKab)
+						.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(115)
+					.addComponent(butPrint)
+					.addGap(22))
 		);
 		
 		tabPokaz = new CustomTable<>(false, true, Pokaz.class, 0,"Код показателя",1,"Наименование",2,"Стоимость",5,"Выбор");

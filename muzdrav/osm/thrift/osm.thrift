@@ -467,6 +467,8 @@ struct Protokol{
 	3: optional i32 pvizit_id;
 	4: optional i32 pvizit_ambId;
 	5: optional i32 cpol;
+	6: optional string cpodr_name;
+	7: optional string clpu_name;
 }
 
 struct Vypis {
