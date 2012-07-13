@@ -2,13 +2,16 @@ package ru.nkz.ivcgzo.clientGenTalons;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
+import java.util.Calendar;
 
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
+import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 
 public class RaspisanieUnit {
 
-	static void NewRaspisanie(int cpodr, int pcod, String cdol,int cxm){
+	static void NewRaspisanie(int cpodr, int pcod, String cdol, int cxm){
 		try {
 			List<Nrasp> NraspInf = new ArrayList<Nrasp>();
 			if (cxm == 0){
@@ -67,4 +70,13 @@ public class RaspisanieUnit {
 			e.printStackTrace();
 		}
 	}
+	
+	static void CreateTalons(int cpodr, int pcod, String cdol, long datn,  long datk, int ind){
+		try {
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

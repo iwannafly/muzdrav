@@ -18,7 +18,7 @@ struct Vrach{
 	5:string cdol
 }
 
-struct Calendar{
+struct Calend{
 	1:i64 datacal,
 	2:i32 dweek,
 	3:i32 nweek,
@@ -108,7 +108,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
 	*Возвращает календарь на текущий год
 	*/
-	list<Calendar> getCalendar(1:i32 cyear) throws (1: kmiacServer.KmiacServerException kse);
+	list<Calend> getCalendar(1:i32 cyear) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает длительность приема специалистом в поликлинике

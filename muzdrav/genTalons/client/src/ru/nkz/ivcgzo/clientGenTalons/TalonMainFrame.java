@@ -1,9 +1,15 @@
 package ru.nkz.ivcgzo.clientGenTalons;
 
+import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -47,20 +53,17 @@ import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
-import javax.swing.JTable;
-import java.awt.Font;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
 
 public class TalonMainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTree treevrach;
-	private JTabbedPane tbMain;
-	private JTabbedPane tbRasp;
+//	private JTabbedPane tbMain;
+//	private JTabbedPane tbRasp;
 	private String curSpec = null;
 	private int curVrach = 0;
+	private int ind = 0;
 	private final ButtonGroup btnGroup_cxema = new ButtonGroup();
 	private final ButtonGroup btnGroup_talon = new ButtonGroup();
 	private JRadioButton cxm_1;
@@ -168,14 +171,16 @@ public class TalonMainFrame extends JFrame {
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_tbRasp.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_tbRasp.createSequentialGroup()
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(sp_rasp, GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE))
-						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 509, GroupLayout.PREFERRED_SIZE))
+							.addComponent(sp_rasp, GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE))
+						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addGap(42)
+							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		
@@ -330,22 +335,19 @@ public class TalonMainFrame extends JFrame {
 					.addComponent(btn_save)
 					.addGap(36)
 					.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(29, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
+					.addGap(1)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addGap(1)
-							.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btn_save, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE)
-								.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE)))
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addGap(1)
-							.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btn_new)
-								.addComponent(cbx_rasp, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btn_save, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE)
+							.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE))
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE, false)
+							.addComponent(btn_new)
+							.addComponent(cbx_rasp)))
 					.addGap(4))
 		);
 		panel_2.setLayout(gl_panel_2);
@@ -410,23 +412,20 @@ public class TalonMainFrame extends JFrame {
 		gl_tbNorm.setHorizontalGroup(
 			gl_tbNorm.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbNorm.createSequentialGroup()
+					.addGap(27)
 					.addGroup(gl_tbNorm.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_tbNorm.createSequentialGroup()
-							.addGap(53)
-							.addComponent(sp_norm, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_tbNorm.createSequentialGroup()
-							.addGap(27)
-							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 465, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(sp_norm, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 465, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(188, Short.MAX_VALUE))
 		);
 		gl_tbNorm.setVerticalGroup(
 			gl_tbNorm.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_tbNorm.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addComponent(sp_norm, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-					.addGap(407))
+					.addContainerGap(407, Short.MAX_VALUE))
 		);
 		
 		JButton btn_new_norm = new JButton("Создать");
@@ -496,11 +495,17 @@ public class TalonMainFrame extends JFrame {
 		
 		tf_datn = new CustomDateEditor();
 		tf_datk = new CustomDateEditor();
-		
+		tf_datn.setDate(System.currentTimeMillis());
+		tf_datk.setDate(System.currentTimeMillis());
+
 		JButton btnNewButton = new JButton("Формировать");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), btnGroup_talon.isSelected(btnGroup_talon.getSelection()));
+				if (tal_1.isSelected()) ind = 1;
+				if (tal_2.isSelected()) ind = 2;
+				if (tal_3.isSelected()) ind = 3;
+				if (curVrach != 0  )
+				RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
 			}
 		});
 
