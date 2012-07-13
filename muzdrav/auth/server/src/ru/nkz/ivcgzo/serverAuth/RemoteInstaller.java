@@ -84,13 +84,13 @@ public class RemoteInstaller extends Thread implements Runnable {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(clientSct.getInputStream()));
 			PrintWriter writer = new PrintWriter(clientSct.getOutputStream());
-			writer.println("Кто это?");
+			writer.println("Who's this?");
 			writer.flush();
-			if (reader.readLine().equals("Клиент муздрава.")) {
-				writer.println("Приветствую.");
+			if (reader.readLine().equals("Muzdrav client.")) {
+				writer.println("Ohayo.");
 				writer.flush();
 			} else {
-				writer.println("Отстань.");
+				writer.println("Get off me.");
 				writer.flush();
 				throw new Exception("Talked to stranger.");
 			}
@@ -122,11 +122,11 @@ public class RemoteInstaller extends Thread implements Runnable {
 					}
 					clientSct.getOutputStream().write(buf, 0, read);
 				}
-				if (!reader.readLine().equals("Получил."))
+				if (!reader.readLine().equals("Got it."))
 					throw new Exception("Did not get success transfer message from client.");
 			}
 			
-			writer.println("Всего хорошего.");
+			writer.println("Good bye.");
 			writer.flush();
 		} catch (Exception e) {
 			throw new Exception("Failed checking or transfering libraries.", e);

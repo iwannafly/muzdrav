@@ -47,7 +47,7 @@ public class serverManager extends AdminController {
 		serverManager servMan = new serverManager();
 		
 		try {
-			servMan.ConnectToDatabase(DatabaseDriver.postgre, "10.0.0.66", "5432", "zabol", null, 5, "postgres", "postgres");
+			servMan.ConnectToDatabase(DatabaseDriver.postgre, "10.0.0.242", "5432", "zabol", null, 5, "postgres", "postgres");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
@@ -151,7 +151,8 @@ public class serverManager extends AdminController {
 	 */
 	public void loadPlugins(){
 		plugins = new HashMap<>();
-		File[] files = new File(pluginsDirectory).listFiles(new FileFilter() {
+		String corePath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
+		File[] files = new File(corePath, pluginsDirectory).listFiles(new FileFilter() {
 			
 			@Override
 			public boolean accept(File pathname) {
