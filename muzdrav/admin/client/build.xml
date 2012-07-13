@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientOsm" default="main_d" basedir=".">
+<project name="clientAdmin" default="main_d" basedir=".">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_client.dir" location="src" />
@@ -8,9 +8,9 @@
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="com_resources.dir" location="../../../common/resources" />
-	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientOsm/resources" />
+	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientAdmin/resources" />
 	<property name="build.dir" location="bin" />
-	<property name="export.jar" location="../../auth/client/plugin/clientOsm.jar" />
+	<property name="export.jar" location="../../auth/client/plugin/clientAdmin.jar" />
 	<property name="export.copy.dir" location="../../manager/client" />
 	
 	<path id="build.classpath">
@@ -38,8 +38,9 @@
 			<classpath refid="build.classpath"/>
 		</javac>
 		<copy file="${com_resources.dir}/1331789242_Add.png" todir="${bin_resources.dir}" />
+		<copy file="${com_resources.dir}/1331789257_User.png" todir="${bin_resources.dir}" />
 		<copy file="${com_resources.dir}/1331789259_Delete.png" todir="${bin_resources.dir}" />
-		<copy file="${com_resources.dir}/1341981970_Accept.png" todir="${bin_resources.dir}" />
+		<copy file="${com_resources.dir}/icon_2_32x32.png" todir="${bin_resources.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->
