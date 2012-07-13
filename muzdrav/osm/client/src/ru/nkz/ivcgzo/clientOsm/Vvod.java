@@ -1170,7 +1170,7 @@ public class Vvod extends JFrame {
 		butAnamn = new JButton("Анамнез жизни");
 		butAnamn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				sign.setVisible(true);	
+				sign.showPsign();
 			}
 		});
 		
