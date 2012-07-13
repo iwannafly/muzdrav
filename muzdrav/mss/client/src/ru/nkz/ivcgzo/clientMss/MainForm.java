@@ -72,9 +72,6 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField textField_43;
 	private JTextField textField_44;
 	private JTextField textField_45;
-	private JTextField textField_46;
-	private JTextField textField_47;
-	private JTextField textField_48;
 	private JTextField textField_49;
 	private JTextField textField_50;
 	private JTextField textField_51;
@@ -94,7 +91,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 751, 652);
+		frame.setBounds(100, 100, 751, 685);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(configuration.appName);
 		
@@ -961,32 +958,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JPanel panel_5 = new JPanel();
 		tabbedPane.addTab("Настройка", null, panel_5, null);
 		
-		JLabel lblNewLabel_38 = new JLabel("Населенный пункт");
-		
-		JLabel label_15 = new JLabel("Область");
-		
-		JLabel label_16 = new JLabel("автоматически проставлять населенный пункт");
-		
-		JLabel label_17 = new JLabel("автоматически проставлять область");
-		
-		JLabel label_18 = new JLabel("автоматически проставлять серию свидетельства");
+		JLabel label_18 = new JLabel("автоматически проставлять номер свидетельства");
 		
 		JLabel label_19 = new JLabel("автоматически проставлять номер свидетельства   с");
 		
 		JLabel label_20 = new JLabel("по");
 		
 		JCheckBox chckbxNewCheckBox = new JCheckBox(" ");
-		
-		JCheckBox chckbxNewCheckBox_1 = new JCheckBox(" ");
-		
-		textField_46 = new JTextField();
-		textField_46.setColumns(10);
-		
-		textField_47 = new JTextField();
-		textField_47.setColumns(10);
-		
-		textField_48 = new JTextField();
-		textField_48.setColumns(10);
 		
 		textField_49 = new JTextField();
 		textField_49.setColumns(10);
@@ -1002,80 +980,44 @@ public class MainForm extends Client<ThriftMss.Client> {
 		gl_panel_5.setHorizontalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_5.createSequentialGroup()
-					.addGap(27)
+					.addContainerGap()
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_5.createSequentialGroup()
-							.addComponent(label_21)
-							.addGap(47)
-							.addComponent(textField_53, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_5.createSequentialGroup()
-							.addComponent(label_19)
-							.addGap(12)
-							.addComponent(textField_49, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(label_20)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(textField_50, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_5.createSequentialGroup()
 							.addComponent(label_18)
 							.addGap(18)
-							.addComponent(textField_48, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING, false)
-							.addGroup(gl_panel_5.createSequentialGroup()
-								.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-									.addComponent(label_16)
-									.addComponent(label_17))
-								.addGap(18)
-								.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-									.addComponent(chckbxNewCheckBox_1)
-									.addComponent(chckbxNewCheckBox, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)))
-							.addGroup(gl_panel_5.createSequentialGroup()
-								.addGroup(gl_panel_5.createParallelGroup(Alignment.TRAILING)
-									.addGroup(gl_panel_5.createSequentialGroup()
-										.addComponent(lblNewLabel_38)
-										.addGap(18))
-									.addGroup(gl_panel_5.createSequentialGroup()
-										.addComponent(label_15)
-										.addGap(70)))
-								.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-									.addComponent(textField_46)
-									.addComponent(textField_47, GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)))))
-					.addContainerGap(1424, Short.MAX_VALUE))
+							.addComponent(chckbxNewCheckBox, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(label_19)
+							.addGap(18)
+							.addComponent(textField_49, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+							.addGap(34)
+							.addComponent(label_20)
+							.addGap(30)
+							.addComponent(textField_50, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(label_21)
+							.addGap(36)
+							.addComponent(textField_53, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(1399, Short.MAX_VALUE))
 		);
 		gl_panel_5.setVerticalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_5.createSequentialGroup()
-					.addGap(21)
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel_38)
-						.addComponent(textField_46, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_15)
-						.addComponent(textField_47, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(40)
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_16)
-						.addComponent(chckbxNewCheckBox))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_17)
-						.addComponent(chckbxNewCheckBox_1))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGap(24)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_18)
-						.addComponent(textField_48, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(chckbxNewCheckBox))
 					.addGap(18)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_19)
-						.addComponent(label_20)
 						.addComponent(textField_49, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(textField_50, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(26)
+						.addComponent(textField_50, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_20))
+					.addGap(32)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_21)
 						.addComponent(textField_53, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(278, Short.MAX_VALUE))
+					.addContainerGap(428, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
 		frame.getContentPane().setLayout(groupLayout);
