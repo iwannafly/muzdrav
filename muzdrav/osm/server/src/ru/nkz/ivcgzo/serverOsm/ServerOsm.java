@@ -1547,16 +1547,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				}				
 					
 					acrs.close();
-					acrs = sse.execPreparedQuery("select p_vizit_amb.*,p_priem.*,n_abs.name,n_opl.name,n_ap0.name from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) "+ 
-							"left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) "+
-							"left join n_opl on(p_vizit_amb.opl=n_opl.pcod) "+
-							"left join n_ap0 on(p_vizit_amb.rezult=n_ap0.pcod) "+
-							"where p_vizit_amb.id_obr=? order by id)", pk.getPvizit_id());
+					acrs = sse.execPreparedQuery("select p_vizit_amb.*,p_priem.*,n_abs.name,n_opl.name,n_ap0.name from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) left join n_opl on(p_vizit_amb.opl=n_opl.pcod) left join n_ap0 on(p_vizit_amb.rezult=n_ap0.pcod) where p_vizit_amb.id_obr=? order by id ", pk.getPvizit_id());
 					if (acrs.getResultSet().next()) {
 						sb.append("<br><b>Осмотр: </b><br>");
 						do {
 							sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(4)));
-							if (acrs.getResultSet().next()) {sb.append(String.format("<b>Дата перв.обращения</b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(1)));
 							if (acrs.getResultSet().getString(84)!=null) sb.append(String.format("<i>Место обслуживания </i> %s <br>", acrs.getResultSet().getString(84)));
 							if (acrs.getResultSet().getString(86)!=null) sb.append(String.format("<i>Способ оплаты </i> %s <br>", acrs.getResultSet().getString(86)));
 							if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Жалобы: система пищеварения </i> %s <br>", acrs.getResultSet().getString(30)));
@@ -1612,7 +1607,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							if (acrs.getResultSet().getString(78)!=null) sb.append(String.format("<i>Щитовидная железа </i> %s <br>", acrs.getResultSet().getString(78)));
 							if (acrs.getResultSet().getString(79)!=null) sb.append(String.format("<i>Status Localis </i> %s <br>", acrs.getResultSet().getString(79)));
 							if (acrs.getResultSet().getString(80)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(80)));
-							if (acrs.getResultSet().getString(85)!=null) sb.append(String.format("<i>Результат </i> %s <br>", acrs.getResultSet().getString(86)));}
+							if (acrs.getResultSet().getString(85)!=null) sb.append(String.format("<i>Результат </i> %s <br>", acrs.getResultSet().getString(86)));
 						} while (acrs.getResultSet().next());
 					}
 					

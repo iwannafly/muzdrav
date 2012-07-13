@@ -2703,8 +2703,8 @@ rbPokaz.addActionListener(new ActionListener() {
 		try {
 			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
 			c_obr.setData(MainForm.tcl.getP0c());
-			cbrez.setData(MainForm.tcl.getAp0());
-			cbish.setData(MainForm.tcl.getAq0());
+			cbrez.setData(MainForm.tcl.getAq0());
+			cbish.setData(MainForm.tcl.getAp0());
 			cbMobsp.setData(MainForm.tcl.get_n_abs());
 			cbObstreg.setData(MainForm.tcl.get_n_abv());
 			cbDgrup.setData(MainForm.tcl.get_n_abc());
