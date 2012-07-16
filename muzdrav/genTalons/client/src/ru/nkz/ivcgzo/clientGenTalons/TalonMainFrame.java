@@ -504,7 +504,7 @@ public class TalonMainFrame extends JFrame {
 				if (tal_1.isSelected()) ind = 1;
 				if (tal_2.isSelected()) ind = 2;
 				if (tal_3.isSelected()) ind = 3;
-				if (curVrach != 0  )
+				if (curVrach != 0  && ind == 3)
 				RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
 			}
 		});
