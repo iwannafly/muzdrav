@@ -82,12 +82,54 @@ struct P_smert{
 	76:string gpol,
 	77:string upol,
 	78:string dpol,
-	79:string kpol
+	79:string kpol,
+        80:i32 vz_ser,
+        81:i32 vz_nomer,
+        82:i64 vz_datav
 }
+
+struct PatientCommonInfo {
+	 1: i32 npasp,
+	 2: string fam,
+	 3: string im,
+	 4: string ot,
+	 5: i64 datar,
+	 6: i32 pol,
+	 7: string adm_obl,
+	 8: string adm_gorod,
+	 9: string adm_ul,
+	10: string adm_dom,
+	11: string adm_korp,
+	12: string adm_kv,
+	13: string mrab,
+	14: string name_mr	
+}
+struct Psmertdop {
+	 1: i32 cpodr,
+	 2: i32 cslu,
+	 3: bool prizn,
+	 4: i32 nomer_n,
+	 5: i32 nomer_k,
+	 6: i32 nomer_t
+	 
+}
+
+/**
+ * пациент не зарегистрирован в базе
+ */
+exception PatientNotFoundException {
+}
+
 /**
  * запись на данного пациента отсутствует
  */
 exception MssNotFoundException {
+}
+
+/**
+ * информация диапазона номеров мед. свидетельства отсутствует
+ */
+exception MssdopNotFoundException {
 }
 
 service ThriftMss extends kmiacServer.KmiacServer {
@@ -97,7 +139,7 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	P_smert getPsmert(1:i32 npasp) throws (1: MssNotFoundException sne);
 
 /**
- * ввод или корректировка информации
+ * ввод или корректировка информации медицинского свидетельства
  */
 	i32 setPsmert(1: P_smert npasp);
 
@@ -105,4 +147,31 @@ service ThriftMss extends kmiacServer.KmiacServer {
  * удаление записи
  */
 	void delPsmert(1: P_smert npasp);
+
+/**
+ * возвращает сведения о пациенте для печати мед.свидетельства
+ */
+	PatientCommonInfo getPatientCommonInfo(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse,2:PatientNotFoundException pnf);
+
+/**
+ * выбор записи из таблицы дополнительной информации
+ */
+	Psmertdop getPsmertdop(1:i32 cpodr) throws (1: MssdopNotFoundException sdne);
+
+/**
+ * ввод или корректировка диапазона номеров мед. свидетельства
+ */
+	i32 setPsmertdop(1: Psmertdop cpodr);
+
+
+	list<classifier.IntegerClassifier> get_n_z60() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z10() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z42() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z43() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z70() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_l00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z01() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z80() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_z90() throws (1: kmiacServer.KmiacServerException kse);
 }
