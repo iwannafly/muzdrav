@@ -45,7 +45,7 @@ public class CustomTimeEditor extends JFormattedTextField {
 		try {
 			txt = this;
 			String mask = timeFormatter.toPattern();
-			mask = mask.replace('h', '#').replace('m', '#');
+			mask = mask.replace('H', '#').replace('m', '#');
 			MaskFormatter maskFormatter = new MaskFormatter(mask);
 			maskFormatter.setPlaceholderCharacter(placeHolderChar);
 			txt.setFormatterFactory(new DefaultFormatterFactory(maskFormatter));
@@ -83,7 +83,7 @@ public class CustomTimeEditor extends JFormattedTextField {
 		else
 			timeSeparator = '.';
 
-		pattern = "hh" + timeSeparator + "mm";
+		pattern = "HH" + timeSeparator + "mm";
 		
 		return pattern;
 	}

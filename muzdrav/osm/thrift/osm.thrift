@@ -390,6 +390,9 @@ struct IsslMet {
 	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
+	8: optional i32 pvizitId;
+	9: optional string cpodr_name;
+	10: optional string clpu_name;
 }
 
 struct IsslPokaz {
@@ -400,20 +403,31 @@ struct IsslPokaz {
 	5: optional list<string> pokaz;
 	6: optional string mesto;
 	7: optional string kab;
+	8: optional i32 pvizitId;
+	9: optional string cpodr_name;
+	10: optional string clpu_name;
 }
 
 struct Napr{
 	1: optional i32 npasp;
 	2: optional i32 userId;
 	3: optional string obosnov;
-	4: optional i32 clpu;
+	4: optional string clpu;
+	5: optional i32 pvizitId; 
+	6: optional string cpodr_name;
+	7: optional string clpu_name;
 }
 
 struct NaprKons{
 	1: optional i32 npasp;
 	2: optional i32 userId;
 	3: optional string obosnov;
-	4: optional i32 cpol;
+	4: optional string cpol;
+	5: optional string nazv;
+	6: optional string cdol;
+	7: optional i32 pvizitId;
+	8: optional string cpodr_name;
+	9: optional string clpu_name;
 }
 
 struct IsslInfo{
@@ -445,6 +459,24 @@ struct Pdisp{
 	15: optional string cdol_ot;
 	16: optional bool sob;
 	17: optional bool sxoch;
+}
+
+struct Protokol{
+	1: optional i32 npasp;
+	2: optional i32 userId;
+	3: optional i32 pvizit_id;
+	4: optional i32 pvizit_ambId;
+	5: optional i32 cpol;
+	6: optional string cpodr_name;
+	7: optional string clpu_name;
+}
+
+struct Vypis {
+	1: optional i32 npasp;
+	2: optional i32 userId;
+	3: optional i32 pvizit_id;
+	4: optional string cpodr_name;
+	5: optional string clpu_name;
 }
 
 
@@ -498,18 +530,16 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	AnamZab getAnamZab(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	void setAnamZab(1: AnamZab anam) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteAnamZab(1: i32 pvizit_id) throws (1: kmiacServer.KmiacServerException kse);
 
 	Priem getPriem(1: i32 npasp, 2: i32 posId) throws (1: kmiacServer.KmiacServerException kse, 2: PriemNotFoundException pne);
 	void setPriem(1: Priem pr) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePriem(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
 
-	//i32 AddPdiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagZ> getPdiagzProsm(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	//void UpdateDiagZ(1: PdiagZ id_diag_amb) throws (1: kmiacServer.KmiacServerException kse);
 	i32 setPdiag(1: PdiagZ diag) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
-	//i32 AddPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	//void UpdatePdisp(1: Pdisp diag) throws (1: kmiacServer.KmiacServerException kse);
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
 	
@@ -528,8 +558,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printIsslPokaz(1: IsslPokaz ip) throws (1: kmiacServer.KmiacServerException kse);
 	string printNapr(1: Napr na) throws (1: kmiacServer.KmiacServerException kse);//госпитализация и обследование
 	string printNaprKons(1: NaprKons nk) throws (1: kmiacServer.KmiacServerException kse);//консультация
-	string printVypis(1: i32 npasp, 2: i32 pvizitId, 3:i32 userId) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
-	string printKek(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
+	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
+	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
+	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers

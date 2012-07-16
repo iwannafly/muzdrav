@@ -6,6 +6,7 @@
 	<property name="src_config.dir" location="../config" />
 	<property name="src_thrift.dir" location="../thrift/gen-java" />
 	<property name="lib.dir" value="../../../../lib" />
+	<property name="lib.only.dir" value="lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="com_resources.dir" location="../../../common/resources" />
 	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientAuth/resources" />
@@ -13,6 +14,7 @@
 	<property name="export.file" location="../../auth/client/auth.jar" />
 	<property name="main.class" value="ru.nkz.ivcgzo.clientAuth.MainForm" />
 	<property name="muzdrav.dir" location="../../../muzdrav" />
+	<property name="manager.dir" location="../../manager" />
 	
 	<path id="build.classpath" >
 	  <fileset dir="${lib.dir}">
@@ -20,15 +22,6 @@
 	  </fileset>
 	  <pathelement path="${bin_client_manager.dir}"/>		
 	</path>
-	
-	<pathconvert pathsep=" " property="jar.classpath" refid="build.classpath">
-		<mapper>
-			<chainedmapper>
-				<flattenmapper/>
-				<globmapper from="*.jar" to="${lib.dir}/*.jar"/>
-			</chainedmapper>
-		</mapper>
-	</pathconvert>
 	
 	<property name="build.classpath" refid="build.classpath" />
 	
@@ -57,6 +50,19 @@
 	
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description="Создание jar">
+		<condition property="libr.dir" value="${lib.dir}" else="${lib.only.dir}">
+			<equals arg1="${debug.build}" arg2="true" />
+		</condition>
+		
+		<pathconvert pathsep=" " property="jar.classpath" refid="build.classpath">
+			<mapper>
+				<chainedmapper>
+					<flattenmapper/>
+					<globmapper from="*.jar" to="${libr.dir}/*.jar"/>
+				</chainedmapper>
+			</mapper>
+		</pathconvert>
+		
 		<jar destfile="${export.file}" basedir="${build.dir}" >
 			<fileset dir="${bin_client_manager.dir}"/>
 			<manifest>
@@ -64,6 +70,7 @@
 				<attribute name="Class-Path" value=". ${jar.classpath}"/>
 			</manifest>
 		</jar>
+		<copy file="${export.file}" todir="${manager.dir}" overwrite="true" force="true" />
 	</target>
 
 	<target name="main" depends="jar" description="Компиляция всех клиентских модулей">

@@ -344,9 +344,9 @@ public class ConnectionManager {
 	}
 	
 	public void transferFileToServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, OpenFileException, TException {
-		try (FileInputStream fis = new FileInputStream(srcPath)) {
-			int port = openWriteServerSocket(dstPath);
-			Socket socket = new Socket("localhost", port);
+		int port = openWriteServerSocket(dstPath);
+		try (FileInputStream fis = new FileInputStream(srcPath);
+				Socket socket = new Socket("localhost", port);) {
 			byte[] buf = new byte[Constants.bufSize];
 			int read = Constants.bufSize;
 			while (read == Constants.bufSize) {
@@ -354,20 +354,22 @@ public class ConnectionManager {
 				socket.getOutputStream().write(buf, 0, read);
 			}
 			socket.getOutputStream().close();
+		} finally {
 			closeServerSocket(port, false);
 		}
 	}
 
 	public void transferFileFromServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, FileNotFoundException, OpenFileException, TException {
-		try (FileOutputStream fos = new FileOutputStream(dstPath)) {
-			int port = openReadServerSocket(srcPath);
-			Socket socket = new Socket("localhost", port);
+		int port = openReadServerSocket(srcPath);
+		try (FileOutputStream fos = new FileOutputStream(dstPath);
+				Socket socket = new Socket("localhost", port);) {
 			byte[] buf = new byte[Constants.bufSize];
 			int read = socket.getInputStream().read(buf);
 			while (read > -1) {
 				fos.write(buf, 0, read);
 				read = socket.getInputStream().read(buf);
 			}
+		} finally {
 			closeServerSocket(port, false);
 		}
 	}

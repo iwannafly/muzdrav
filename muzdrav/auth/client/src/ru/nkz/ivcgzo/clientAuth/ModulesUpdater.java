@@ -52,7 +52,7 @@ public class ModulesUpdater {
 				if (!checkLibExistenceAndMd5(path, module))
 					updList.add(module);
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
 		}
 		return updList;

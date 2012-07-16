@@ -8,7 +8,8 @@
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="build.dir" location="bin" />
-	<property name="export.dir" location="../../auth/client/plugin/clientOutputInfo.jar" />
+	<property name="export.jar" location="../../auth/client/plugin/clientOutputInfo.jar" />
+	<property name="export.copy.dir" location="../../manager/client" />
 	
 	<path id="build.classpath">
 	  <fileset dir="${lib.dir}">
@@ -38,7 +39,8 @@
 	
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description = "Создание jar">
-		<jar destfile="${export.dir}" basedir="${build.dir}" />
+		<jar destfile="${export.jar}" basedir="${build.dir}" />
+		<copy file="${export.jar}" todir="${export.copy.dir}" overwrite="true" force="true" />
 	</target>
 
 	<target name="main" depends="jar">

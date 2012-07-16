@@ -1,15 +1,30 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
@@ -38,8 +53,30 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	/**
 	 * Create the application.
 	 */
-
-	@Override
+	private void search()
+    {
+        String target = tfSearch.getText();
+        for(int row = 0; row < table.getRowCount(); row++)
+            for(int col = 0; col < table.getColumnCount(); col++)
+            {
+                String next = table.getValueAt(row, col).toString();
+                Pattern pt = Pattern.compile(target.toLowerCase());
+                Matcher mt = pt.matcher(next.toLowerCase());
+                if (mt.find())
+                //if (next.regionMatches(true, 0, target, 0, next.length()))
+                //if(next.equals(target))
+                {
+                	table.setRowSelectionInterval(row, row);
+                	table.setLocation(0, -((table.getRowHeight() * row) - 100));
+                	//table.scrollRectToVisible(table.getCellRect(row, 0, true));
+                	//table.requestFocus();
+                    return;
+                }
+            }
+        
+    }
+ 
+  	@Override
 	public String getName() {
 		return configuration.appName;
 	}
@@ -66,12 +103,23 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		tfSearch = new JTextField();
-		tfSearch.addActionListener(new ActionListener()
+		tfSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				table.requestFocus();
+			}
+		});
+				
+		tfSearch.getDocument().addDocumentListener(new DocumentListener ()
         {
-            public void actionPerformed(ActionEvent e)
-            {
-                search();
-            }
+		      public void changedUpdate(DocumentEvent documentEvent) {
+		          search();
+		      }
+		      public void insertUpdate(DocumentEvent documentEvent) {
+		          search();
+		      }
+		      public void removeUpdate(DocumentEvent documentEvent) {
+		          search();
+		      }
         });
 		frame.getContentPane().add(tfSearch, BorderLayout.NORTH);
 		tfSearch.setColumns(10);
@@ -84,6 +132,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		table.setAutoCreateRowSorter(true);
 		table.getRowSorter().toggleSortOrder(0);
 		table.setFillsViewportHeight(true);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		spClassifier.setViewportView(table);
 		}
 
@@ -103,27 +153,5 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 	}
 	
-	//Поиск по таблице
-	private void search()
-    {
-        String target = tfSearch.getText();
-        for(int row = 0; row < table.getRowCount(); row++)
-            for(int col = 0; col < table.getColumnCount(); col++)
-            {
-                String next = (String)table.getValueAt(row, col);
-                if(next.equals(target))
-                {
-                    showSearchResults(row, col);
-                    return;
-                }
-            }
-		
-	}
-	
-	//Отображение результатов поиска
-	private void showSearchResults(int row, int col)
-    {
-        table.setRowSelectionInterval(row, row);
-    }
-	
+
 }

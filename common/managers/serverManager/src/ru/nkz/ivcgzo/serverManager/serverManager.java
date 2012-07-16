@@ -151,7 +151,8 @@ public class serverManager extends AdminController {
 	 */
 	public void loadPlugins(){
 		plugins = new HashMap<>();
-		File[] files = new File(pluginsDirectory).listFiles(new FileFilter() {
+		String corePath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
+		File[] files = new File(corePath, pluginsDirectory).listFiles(new FileFilter() {
 			
 			@Override
 			public boolean accept(File pathname) {
@@ -190,8 +191,8 @@ public class serverManager extends AdminController {
 	private void loadPluginClass(File file, String clName) throws Exception {
 		try {
 			String fileName = file.getName();
-			URL fileUrl = file.toURI().toURL();
-			URLClassLoader clLdr = new URLClassLoader(new URL[] {fileUrl});
+			@SuppressWarnings("resource") //class loader must not be closed
+			URLClassLoader clLdr = new URLClassLoader(new URL[] {file.toURI().toURL()});
 			Class<?> plug = clLdr.loadClass(clName);
 			Constructor<?> cntr = plug.getConstructor(ISqlSelectExecutor.class, ITransactedSqlExecutor.class);
 			plugins.put(fileName.substring(0, fileName.length() - 4), new ThreadedServer((IServer) cntr.newInstance(sse, tse)));

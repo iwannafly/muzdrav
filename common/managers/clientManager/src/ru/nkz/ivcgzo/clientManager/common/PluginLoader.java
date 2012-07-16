@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientManager.common;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -88,7 +89,7 @@ public class PluginLoader {
 	 * Загрузка модуля по индексу.
 	 * @param index - индекс модуля в списке
 	 */
-	public IClient loadPluginByIndex(int index) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public IClient loadPluginByIndex(int index) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
 		return pList.get(index).load();
 	}
 	
@@ -96,7 +97,7 @@ public class PluginLoader {
 	 * Загрузка модуля по уникальному идентификатору.
 	 * @param appId - идентификатор модуля
 	 */
-	public IClient loadPluginByAppId(int appId) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public IClient loadPluginByAppId(int appId) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException {
 		for (Plugin plugin : pList) {
 			if (plugin.getId() == appId)
 				return plugin.load();
@@ -125,8 +126,7 @@ public class PluginLoader {
 		private void loadParams() throws Exception {
 			File file = new File(path);
 			try (JarFile jar = new JarFile(file);
-					URLClassLoader confLoader = new URLClassLoader(new URL[] {file.toURI().toURL()}, null);
-				) {
+					URLClassLoader confLoader = new URLClassLoader(new URL[] {file.toURI().toURL()}, null);) {
 				Class<?> confClass = confLoader.loadClass("ru.nkz.ivcgzo.configuration");
 				className = (String) confClass.getDeclaredField("clientClassName").get(null);
 				name = (String) confClass.getDeclaredField("appName").get(null);
@@ -134,9 +134,9 @@ public class PluginLoader {
 			}
 		}
 		
-		protected IClient load() throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			URL fileUrl = new File(path).toURI().toURL();
-			URLClassLoader clLdr = new URLClassLoader(new URL[] {fileUrl});
+		protected IClient load() throws MalformedURLException, IOException, ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+			@SuppressWarnings("resource") //class loader must not be closed
+			URLClassLoader clLdr = new URLClassLoader(new URL[] {new File(path).toURI().toURL()});
 			Class<?> plug = clLdr.loadClass(className);
 			Constructor<?> cntr = plug.getConstructor(ConnectionManager.class, UserAuthInfo.class, int.class);
 			return (IClient) cntr.newInstance(conMan, authInfo, launchParam);

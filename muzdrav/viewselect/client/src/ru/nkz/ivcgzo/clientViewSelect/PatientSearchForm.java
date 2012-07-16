@@ -433,8 +433,8 @@ public class PatientSearchForm extends JFrame {
 		tbFam.clear();
 		tbIm.clear();
 		tbOt.clear();
-		tbBirDate.setDate(null);
-		tbBirDate2.setDate(null);
+		tbBirDate.setValue(null);
+		tbBirDate2.setValue(null);
 		tbSerPol.clear();
 		tbNumPol.clear();
 	}

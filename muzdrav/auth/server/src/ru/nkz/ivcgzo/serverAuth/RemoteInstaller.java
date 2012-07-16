@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerConfigurationException;
@@ -30,6 +32,7 @@ public class RemoteInstaller extends Thread implements Runnable {
 	private ISqlSelectExecutor sse;
 	private ServerSocket servSct;
 	private boolean stopping;
+	private Map<Integer, LibraryInfo> libs;
 	
 	public RemoteInstaller(ISqlSelectExecutor sse) {
 		this.sse = sse;
@@ -51,8 +54,7 @@ public class RemoteInstaller extends Thread implements Runnable {
 	@Override
 	public void run() {
 		while (!stopping) {
-			try {
-				Socket clientSct = listenForClient();
+			try (Socket clientSct = listenForClient()) {
 				checkAndTransferLibs(clientSct);
 			} catch (Exception e) {
 				if (!stopping)
@@ -82,13 +84,13 @@ public class RemoteInstaller extends Thread implements Runnable {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(clientSct.getInputStream()));
 			PrintWriter writer = new PrintWriter(clientSct.getOutputStream());
-			writer.println("Кто это?");
+			writer.println("Who's this?");
 			writer.flush();
-			if (reader.readLine().equals("Клиент муздрава.")) {
-				writer.println("Приветствую.");
+			if (reader.readLine().equals("Muzdrav client.")) {
+				writer.println("Ohayo.");
 				writer.flush();
 			} else {
-				writer.println("Отстань.");
+				writer.println("Get off me.");
 				writer.flush();
 				throw new Exception("Talked to stranger.");
 			}
@@ -100,17 +102,19 @@ public class RemoteInstaller extends Thread implements Runnable {
 	private synchronized void checkAndTransferLibs(Socket clientSct) throws Exception {
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSct.getInputStream()));
 				PrintWriter writer = new PrintWriter(clientSct.getOutputStream())) {
-			writer.println(getSharedLibrariesInfo());
+			writer.println(getSharedLibrariesAndMainModuleInfo());
 			writer.flush();
 			
-			String path = new File(new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile(), "lib").getAbsolutePath();
-			String name;
+			String mainModulePath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath();
+			String libPath = new File(new File(mainModulePath), "lib").getAbsolutePath();
+			String idStr;
 			byte[] buf = new byte[65536];
 //			clientSct.setSoTimeout(2000);
-			while ((name = reader.readLine()) != null) {
-				if (name.length() == 0)
+			while ((idStr = reader.readLine()) != null) {
+				if (idStr.length() == 0)
 					break;
-				try (FileInputStream fis = new FileInputStream(new File(path, name))) {
+				int id = Integer.parseInt(idStr);
+				try (FileInputStream fis = new FileInputStream(new File(libs.get(id).id == 0 ? mainModulePath : libPath, libs.get(id).name))) {
 					int read = fis.read(buf);
 					while (read == buf.length) {
 						clientSct.getOutputStream().write(buf, 0, read);
@@ -118,34 +122,37 @@ public class RemoteInstaller extends Thread implements Runnable {
 					}
 					clientSct.getOutputStream().write(buf, 0, read);
 				}
-				if (!reader.readLine().equals("Получил."))
+				if (!reader.readLine().equals("Got it."))
 					throw new Exception("Did not get success transfer message from client.");
 			}
 			
-			writer.println("Всего хорошего.");
+			writer.println("Good bye.");
 			writer.flush();
 		} catch (Exception e) {
 			throw new Exception("Failed checking or transfering libraries.", e);
-		} finally {
-			clientSct.close();
 		}
 	}
 	
-	private String getSharedLibrariesInfo() throws Exception {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM s_libs WHERE (id < 0) ")) {
+	private String getSharedLibrariesAndMainModuleInfo() throws Exception {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM s_libs WHERE (id < 1) ")) {
+			libs = new HashMap<>();
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 			Element root = doc.createElement("libInfoList");
 			doc.appendChild(root);
 			ResultSet rs = acrs.getResultSet();
 			while (rs.next()) {
+				LibraryInfo lib = new LibraryInfo();
+				
 				Element libInfo = doc.createElement("libInfo");
 				libInfo.setAttribute("id", rs.getString(1));
 				root.appendChild(libInfo);
+				lib.id = rs.getInt(1);
 				
 				Element libInfoValue;
 				libInfoValue = doc.createElement("name");
 				libInfoValue.appendChild(doc.createTextNode(rs.getString(2)));
 				libInfo.appendChild(libInfoValue);
+				lib.name = rs.getString(2);
 				
 				libInfoValue = doc.createElement("md5");
 				libInfoValue.appendChild(doc.createTextNode(rs.getString(3)));
@@ -154,6 +161,8 @@ public class RemoteInstaller extends Thread implements Runnable {
 				libInfoValue = doc.createElement("size");
 				libInfoValue.appendChild(doc.createTextNode(rs.getString(4)));
 				libInfo.appendChild(libInfoValue);
+				
+				libs.put(lib.id, lib);
 			}
 			return xmlDocToString(doc);
 		} catch (Exception e) {
@@ -167,4 +176,10 @@ public class RemoteInstaller extends Thread implements Runnable {
 		TransformerFactory.newInstance().newTransformer().transform(new DOMSource(doc), sr);
 		return sw.toString();
 	}
+	
+	private class LibraryInfo {
+		int id;
+		String name;
+	}
 }
+

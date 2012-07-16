@@ -7,5 +7,5 @@ public class configuration {
             "ru.nkz.ivcgzo.clientGenTalons.MainForm";
     public static final int thrPort = 55008;
     public static final int appId = 8;
-    public static final String appName = "Формирование талонов";
+    public static final String appName = "Формирование талонов для записи к врачу";
 }

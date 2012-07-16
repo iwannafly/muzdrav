@@ -27,6 +27,7 @@ public class MainForm extends Client<ThriftGenTalons.Client> {
     private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		talonMainFrame = new TalonMainFrame();
 		talonMainFrame.pack();
+		talonMainFrame.setExtendedState(talonMainFrame.MAXIMIZED_BOTH);
 		setFrame(talonMainFrame);
     }
 
