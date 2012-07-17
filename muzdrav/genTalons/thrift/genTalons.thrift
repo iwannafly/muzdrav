@@ -55,7 +55,8 @@ struct Nrasp{
 	6:i32 cxema,
 	7:string cdol,
 	8:i32 cpol,
-	9:i32 id
+	9:i32 id,
+	10:bool pfd
 }
 
 struct Rasp{
@@ -69,7 +70,8 @@ struct Rasp{
 	8:i32 vidp,
 	9:string cdol,
 	10:i32 cpol,
-	11:i32 id
+	11:i32 id,
+	12:bool pfd
 }
 
 struct Vidp{
@@ -117,7 +119,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 
 	/**
 	*Возвращает график приема врача в поликлинике
-	* сортировать denn,vidp
+	* сортировать denn,vidp,cxema
 	*/
 	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -181,8 +183,23 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         */
 	void updateNorm(1: list<Norm> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	*Возвращает график приема всех врачей в поликлинике
+	* сортировать denn,vidp,cxema
+	*/
+	list<Nrasp> getNraspCpodr(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	*Возвращает график приема конкретной специальности в поликлинике
+	* сортировать denn,vidp,cxema
+	*/
+	list<Nrasp> getNraspCdol(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	*Возвращает график приема конкретного врача в поликлинике
+	* сортировать denn,vidp,cxema
+	*/
+	list<Nrasp> getNraspVrach(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 
 
