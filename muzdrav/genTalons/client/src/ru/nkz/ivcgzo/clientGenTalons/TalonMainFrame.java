@@ -146,24 +146,28 @@ public class TalonMainFrame extends JFrame {
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0441\u0445\u0435\u043C\u0443 \u0440\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u044F :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JScrollPane sp_rasp = new JScrollPane();
-		
 		JPanel panel_2 = new JPanel();
 		
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(null, "\u0418\u043D\u0434\u0438\u0432\u0438\u0434\u0443\u0430\u043B\u044C\u043D\u0430\u044F \u043E\u0442\u043C\u0435\u043D\u0430 \u043F\u0440\u0438\u0435\u043C\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_6 = new JPanel();
+		panel_6.setBorder(new TitledBorder(null, "\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u0435\u043C\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
 		gl_tbRasp.setHorizontalGroup(
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addGap(23)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 619, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-								.addComponent(sp_rasp, GroupLayout.PREFERRED_SIZE, 331, GroupLayout.PREFERRED_SIZE)
-								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE))
-							.addGap(70)
+							.addGroup(gl_tbRasp.createParallelGroup(Alignment.TRAILING, false)
+								.addGroup(gl_tbRasp.createSequentialGroup()
+									.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
+									.addGap(70))
+								.addGroup(gl_tbRasp.createSequentialGroup()
+									.addComponent(panel_6, 0, 0, Short.MAX_VALUE)
+									.addGap(43)))
 							.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 222, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(18, Short.MAX_VALUE))
 		);
@@ -173,16 +177,74 @@ public class TalonMainFrame extends JFrame {
 					.addContainerGap()
 					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_tbRasp.createSequentialGroup()
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(sp_rasp, GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE))
-						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE))
+						.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
 							.addGap(42)
 							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
+		
+		JScrollPane sp_rasp = new JScrollPane();
+		
+		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По", 5, "Схема");
+		tbl_rasp.setPreferredWidths(100,90,60,60,30);
+		tbl_rasp.setTimeField(2);
+		tbl_rasp.setTimeField(3);
+		tbl_rasp.setFillsViewportHeight(true);
+		sp_rasp.setViewportView(tbl_rasp);
+		
+		JButton btn_save = new JButton("+");
+		btn_save.setToolTipText("Сохранить расписание");
+		btn_save.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					MainForm.tcl.updateNrasp(tbl_rasp.getData());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		JButton btn_del = new JButton("-");
+		btn_del.setToolTipText("Удалить расписание");
+		btn_del.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+				    MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
+					tbl_rasp.setData(new ArrayList<Nrasp>());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
+		gl_panel_6.setHorizontalGroup(
+			gl_panel_6.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_6.createSequentialGroup()
+					.addGroup(gl_panel_6.createParallelGroup(Alignment.LEADING)
+						.addComponent(sp_rasp, GroupLayout.PREFERRED_SIZE, 352, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_6.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(btn_save, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		gl_panel_6.setVerticalGroup(
+			gl_panel_6.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_panel_6.createSequentialGroup()
+					.addGap(5)
+					.addComponent(sp_rasp, GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+					.addGap(17)
+					.addGroup(gl_panel_6.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btn_save)
+						.addComponent(btn_del)))
+		);
+		panel_6.setLayout(gl_panel_6);
 		
 		JScrollPane sp_ndv = new JScrollPane();
 		
@@ -219,23 +281,24 @@ public class TalonMainFrame extends JFrame {
 				.addGroup(gl_panel_4.createSequentialGroup()
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_4.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(btn_add_ndv, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btn_del_ndv, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(12)
-							.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)))
+							.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(btn_add_ndv, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btn_del_ndv, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_panel_4.setVerticalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_4.createSequentialGroup()
-					.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addComponent(btn_add_ndv)
-						.addComponent(btn_del_ndv, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)))
+			gl_panel_4.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+					.addGap(17)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btn_del_ndv)
+						.addComponent(btn_add_ndv, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(1))
 		);
 		
 		tbl_ndv =new CustomTable<>(true, true, Ndv.class, 1,"С",2,"По");
@@ -298,31 +361,6 @@ public class TalonMainFrame extends JFrame {
 		});
 		btn_new.setToolTipText("Создать расписание");
 		
-		JButton btn_save = new JButton("Сохранить");
-		btn_save.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try{
-					MainForm.tcl.updateNrasp(tbl_rasp.getData());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		btn_save.setToolTipText("Сохранить расписание");
-		
-		JButton btn_del = new JButton("Удалить");
-		btn_del.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try{
-				    MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
-					tbl_rasp.setData(new ArrayList<Nrasp>());
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		btn_del.setToolTipText("Удалить расписание");
-		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -331,33 +369,18 @@ public class TalonMainFrame extends JFrame {
 					.addComponent(btn_new, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(cbx_rasp, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE)
-					.addGap(39)
-					.addComponent(btn_save)
-					.addGap(36)
-					.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(29, Short.MAX_VALUE))
+					.addContainerGap(278, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addGap(1)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-							.addComponent(btn_save, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE)
-							.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE))
-						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE, false)
-							.addComponent(btn_new)
-							.addComponent(cbx_rasp)))
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE, false)
+						.addComponent(btn_new)
+						.addComponent(cbx_rasp))
 					.addGap(4))
 		);
 		panel_2.setLayout(gl_panel_2);
-		
-		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По", 5, "Схема");
-		tbl_rasp.setPreferredWidths(100,90,60,60,30);
-		tbl_rasp.setTimeField(2);
-		tbl_rasp.setTimeField(3);
-		tbl_rasp.setFillsViewportHeight(true);
-		sp_rasp.setViewportView(tbl_rasp);
 
 		cxm_1 = new JRadioButton("на каждый день");
 		cxm_1.addChangeListener(new ChangeListener() {
@@ -504,8 +527,13 @@ public class TalonMainFrame extends JFrame {
 				if (tal_1.isSelected()) ind = 1;
 				if (tal_2.isSelected()) ind = 2;
 				if (tal_3.isSelected()) ind = 3;
-				if (curVrach != 0  && ind == 3)
-				RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+				if ((ind == 1) || (curSpec != null  && ind == 2) || (curVrach != 0  && ind == 3))
+					RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+				else {
+				    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
+				    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
+				}
+				
 			}
 		});
 
