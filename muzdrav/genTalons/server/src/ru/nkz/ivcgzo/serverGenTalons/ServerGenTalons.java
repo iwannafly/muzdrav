@@ -16,7 +16,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
+import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
@@ -34,7 +34,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     private TResultSetMapper<Spec, Spec._Fields> rsmSpec;
     private TResultSetMapper<Vrach, Vrach._Fields> rsmVrach;
-    private TResultSetMapper<Calendar, Calendar._Fields> rsmCalendar;
+    private TResultSetMapper<Calend, Calend._Fields> rsmCalendar;
     private TResultSetMapper<Norm, Norm._Fields> rsmNorm;
     private TResultSetMapper<Ndv, Ndv._Fields> rsmNdv;
     private TResultSetMapper<Nrasp, Nrasp._Fields> rsmNrasp;
@@ -79,7 +79,7 @@ public class ServerGenTalons extends Server implements Iface {
 
         rsmSpec = new TResultSetMapper<>(Spec.class, SPEC_FIELD_NAMES);
         rsmVrach = new TResultSetMapper<>(Vrach.class, VRACH_FIELD_NAMES);
-        rsmCalendar = new TResultSetMapper<>(Calendar.class, CALENDAR_FIELD_NAMES);
+        rsmCalendar = new TResultSetMapper<>(Calend.class, CALENDAR_FIELD_NAMES);
         rsmNorm = new TResultSetMapper<>(Norm.class, NORM_FIELD_NAMES);
         rsmNdv = new TResultSetMapper<>(Ndv.class, NDV_FIELD_NAMES);
         rsmNrasp = new TResultSetMapper<>(Nrasp.class, NRASP_FIELD_NAMES);
@@ -146,7 +146,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public List<Calendar> getCalendar(int cyear) 
+    public List<Calend> getCalendar(int cyear) 
             throws KmiacServerException, TException  {
         String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
             + "pr_rab, d_rab FROM e_calendar WHERE cyear=? ORDER BY datacal";

@@ -15,7 +15,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
+import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
@@ -87,7 +87,7 @@ public class TestServerGenTalons {
             throws KmiacServerException, TException {
         final int expectedListSize = 1;
         final int cyear = 2012;
-        java.util.List <Calendar> testCalendar =
+        java.util.List <Calend> testCalendar =
                 testServer.getCalendar(cyear);
         assertEquals("list size", expectedListSize, testCalendar.size());
     }
