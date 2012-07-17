@@ -1,0 +1,6 @@
+*
+.*~
+!.gitignore
+!*.thrift
+!*.bat
+!*.sh

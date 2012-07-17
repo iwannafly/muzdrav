@@ -145,17 +145,23 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
+//    @Override
+//    public List<Calend> getCalendar(int cyear) 
+//            throws KmiacServerException, TException  {
+//        String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
+//            + "pr_rab, d_rab FROM e_calendar WHERE cyear=? ORDER BY datacal";
+//        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cyear)) {
+//            return rsmCalendar.mapToList(acrs.getResultSet());
+//        } catch (SQLException e) {
+//            //log.log(Level.ERROR, "SQl Exception: ", e);
+//            throw new KmiacServerException();
+//        }
+//    }
     @Override
-    public List<Calend> getCalendar(int cyear) 
-            throws KmiacServerException, TException  {
-        String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
-            + "pr_rab, d_rab FROM e_calendar WHERE cyear=? ORDER BY datacal";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cyear)) {
-            return rsmCalendar.mapToList(acrs.getResultSet());
-        } catch (SQLException e) {
-            //log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
-        }
+    public Calend getCalendar(long datacal) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -289,4 +295,5 @@ public class ServerGenTalons extends Server implements Iface {
         // TODO Auto-generated method stub
         
     }
+
 }
