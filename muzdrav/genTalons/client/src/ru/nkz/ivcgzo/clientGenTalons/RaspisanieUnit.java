@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Date;
 import java.util.Calendar;
 
+import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
@@ -71,12 +72,65 @@ public class RaspisanieUnit {
 		}
 	}
 	
-	static void CreateTalons(int cpodr, int pcod, String cdol, long datn,  long datk, int ind){
+	static void CreateTalons(int cpodr, int pcod, String cdol, long datn, long datk, int ind){
 		try {
-		
+			Calendar cal1 = Calendar.getInstance();
+			cal1.setTimeInMillis(datn);
+			Calendar cal2 = Calendar.getInstance();
+			cal2.setTimeInMillis(datk);
+			
+			while (!cal1.equals(cal2)) {
+				cal1.add(Calendar.DAY_OF_MONTH, 1);
+			    System.out.println(Long.toString(cal1.getTimeInMillis()));
+				if (getPrrabFromCalendar(cal1.getTimeInMillis())){
+					if (ind ==1 ){
+						
+					}
+				}
+			}
+			
+//			for (long idat=datn; idat <= datk; idat++) {
+//				if (getPr_rabFromCalendar(idat)){
+//					
+//				}
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private static boolean getPrrabFromCalendar(long cdate) {
+		try {
+			Calend cal = MainForm.tcl.getCalendar(cdate);
+			if (cal.isPr_rab())
+				return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	private static boolean getPrrabFromNdv(int cpodr, int pcod, String cdol, long cdate) {
+		try {
+			List<Ndv> ndv = MainForm.tcl.getNdv(cpodr, pcod, cdol);
+			if(ndv.size() != 0){
+				for (int i=0; i <= ndv.size();) {
+					Ndv tmpNdv = new Ndv();
+					tmpNdv.setDatak(ndv.get(i).getDatak());
+					Calendar cal1 = Calendar.getInstance();
+					cal1.setTimeInMillis(tmpNdv.getDatan());
+					Calendar cal2 = Calendar.getInstance();
+					cal2.setTimeInMillis(tmpNdv.getDatak());
+					Calendar cal3 = Calendar.getInstance();
+					cal3.setTimeInMillis(cdate);
+//					if (){
+//						return true;
+//					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 }

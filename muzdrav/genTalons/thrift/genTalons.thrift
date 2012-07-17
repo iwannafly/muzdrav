@@ -106,11 +106,6 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	list<Vrach> getVrachForCurrentSpec(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-	*Возвращает календарь на текущий год
-	*/
-	list<Calend> getCalendar(1:i32 cyear) throws (1: kmiacServer.KmiacServerException kse);
-
-	/**
 	*Возвращает длительность приема специалистом в поликлинике
 	*/
 	list<Norm> getNorm(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
@@ -140,6 +135,11 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	*Возвращает виды приема
 	*/
 	list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	*Возвращает календарь на текущую дату
+	*/
+	Calend getCalendar(1:i64 datacal) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
         * Добавляет записи в табл расписание работы врача
