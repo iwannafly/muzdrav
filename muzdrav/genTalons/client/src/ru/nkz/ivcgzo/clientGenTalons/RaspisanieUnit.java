@@ -118,9 +118,10 @@ public class RaspisanieUnit {
 						List<Nrasp> nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
 					}
 					List<Rasp> rasp = new ArrayList<Rasp>();
-					ArrayList<String> list = new ArrayList<String>();
+					List<Rasp> pauselist = new ArrayList<Rasp>();
 					for (int i=0; i <= nrasp.size()-1; i++) {
 						Rasp tmpRasp = new Rasp();
+						Rasp tmpPause = new Rasp();
 						tmpRasp.setPcod(nrasp.get(i).getPcod());
 						tmpRasp.setDenn(nrasp.get(i).getDenn());
 						tmpRasp.setDatap(cal1.getTimeInMillis());
@@ -130,8 +131,10 @@ public class RaspisanieUnit {
 						tmpRasp.setCpol(nrasp.get(i).getCpol());
 						tmpRasp.setCdol(nrasp.get(i).getCdol());
 						tmpRasp.setPfd(nrasp.get(i).isPfd());
-						if ( getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
+						if (tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
 							rasp.add(tmpRasp);
+							//if ()
+							
 						}
 					}
 				}

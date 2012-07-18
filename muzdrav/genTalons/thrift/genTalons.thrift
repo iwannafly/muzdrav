@@ -56,7 +56,9 @@ struct Nrasp{
 	7:string cdol,
 	8:i32 cpol,
 	9:i32 id,
-	10:bool pfd
+	10:bool pfd,
+	11:i64 timep_n,
+	12:i64 timep_k
 }
 
 struct Rasp{
