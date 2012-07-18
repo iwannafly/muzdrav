@@ -524,16 +524,20 @@ public class TalonMainFrame extends JFrame {
 		JButton btnNewButton = new JButton("Формировать");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (tal_1.isSelected()) ind = 1;
-				if (tal_2.isSelected()) ind = 2;
-				if (tal_3.isSelected()) ind = 3;
-				if ((ind == 1) || (curSpec != null  && ind == 2) || (curVrach != 0  && ind == 3))
-					RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
-				else {
-				    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
-				    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
+				if (tf_datn.getDate().getTime() <= tf_datk.getDate().getTime()){
+					if (tal_1.isSelected()) ind = 1;
+					if (tal_2.isSelected()) ind = 2;
+					if (tal_3.isSelected()) ind = 3;
+					if ((ind == 1) || (curSpec != null  && ind == 2) || (curVrach != 0  && ind == 3)){
+						RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+					}else {
+					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
+					    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
+					}
+			
+				}else{
+					System.out.println("Неправильно задан период формирования талонов.");
 				}
-				
 			}
 		});
 
