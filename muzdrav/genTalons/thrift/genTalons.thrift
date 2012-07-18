@@ -56,7 +56,9 @@ struct Nrasp{
 	7:string cdol,
 	8:i32 cpol,
 	9:i32 id,
-	10:bool pfd
+	10:bool pfd,
+	11:i64 timep_n,
+	12:i64 timep_k
 }
 
 struct Rasp{
@@ -201,11 +203,59 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	*/
 	list<Nrasp> getNraspVrach(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Добавляет записи в табл расписание работы врача
+        * @param Rasp - thrift-объект с информацией о расписании
+        */
+	void addRasp(1: list<Rasp> rasp) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет расписание работы врача всего подразделения за период (where datap >=datan and datap<=datak)
+        */
+	void deleteRaspCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет расписание работы врача по специальности за период (where datap >=datan and datap<=datak)
+        */
+	void deleteRaspCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет расписание работы врача по специальности за период (where datap >=datan and datap<=datak)
+        */
+	void deleteRaspVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	*Возвращает количество талонов
+	*/
+	i32 getTalonCountCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	*Возвращает количество талонов
+	*/
+	i32 getTalonCountCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	*Возвращает количество талонов
+	*/
+	i32 getTalonCountVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+        * Удаляет талоны всего подразделения за период (where datap >=datan and datap<=datak)
+        * если prv=2 или 3  делаем prv=4, остальные удаляем
+        */
+	void deleteTalonCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+        * Удаляет талоны по специальности за период (where datap >=datan and datap<=datak)
+        * если prv=2 или 3  делаем prv=4, остальные удаляем
+        */
+	void deleteTalonCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+        * Удаляет талоны по специальности за период (where datap >=datan and datap<=datak)
+        * если prv=2 или 3  делаем prv=4, остальные удаляем
+        */
+	void deleteTalonVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 
 
