@@ -55,10 +55,7 @@ struct Nrasp{
 	6:i32 cxema,
 	7:string cdol,
 	8:i32 cpol,
-	9:i32 id,
-	10:bool pfd,
-	11:i64 timep_n,
-	12:i64 timep_k
+	9:i32 id
 }
 
 struct Rasp{
@@ -72,8 +69,7 @@ struct Rasp{
 	8:i32 vidp,
 	9:string cdol,
 	10:i32 cpol,
-	11:i32 id,
-	12:bool pfd
+	11:i32 id
 }
 
 struct Vidp{
@@ -121,7 +117,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 
 	/**
 	*Возвращает график приема врача в поликлинике
-	* сортировать denn,vidp,cxema
+	* сортировать denn,vidp
 	*/
 	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -185,83 +181,16 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         */
 	void updateNorm(1: list<Norm> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-	*Возвращает график приема всех врачей в поликлинике
-	* сортировать denn,vidp,cxema
-	*/
-	list<Nrasp> getNraspCpodr(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-	*Возвращает график приема конкретной специальности в поликлинике
-	* сортировать denn,vidp,cxema
-	*/
-	list<Nrasp> getNraspCdol(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-	*Возвращает график приема конкретного врача в поликлинике
-	* сортировать denn,vidp,cxema
-	*/
-	list<Nrasp> getNraspVrach(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-        * Добавляет записи в табл расписание работы врача
-        * @param Rasp - thrift-объект с информацией о расписании
-        */
-	void addRasp(1: list<Rasp> rasp) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-        * Удаляет расписание работы врача всего подразделения за период (where datap >=datan and datap<=datak)
-        */
-	void deleteRaspCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-        * Удаляет расписание работы врача по специальности за период (where datap >=datan and datap<=datak)
-        */
-	void deleteRaspCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-        * Удаляет расписание работы врача по специальности за период (where datap >=datan and datap<=datak)
-        */
-	void deleteRaspVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-	*Возвращает количество талонов
-	*/
-	i32 getTalonCountCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-	*Возвращает количество талонов
-	*/
-	i32 getTalonCountCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-	*Возвращает количество талонов
-	*/
-	i32 getTalonCountVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-        * Удаляет талоны всего подразделения за период (where datap >=datan and datap<=datak)
-        * если prv=2 или 3  делаем prv=4, остальные удаляем
-        */
-	void deleteTalonCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
-
-	/**
-        * Удаляет талоны по специальности за период (where datap >=datan and datap<=datak)
-        * если prv=2 или 3  делаем prv=4, остальные удаляем
-        */
-	void deleteTalonCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
-
-	/**
-        * Удаляет талоны по специальности за период (where datap >=datan and datap<=datak)
-        * если prv=2 или 3  делаем prv=4, остальные удаляем
-        */
-	void deleteTalonVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
-
-	/**
-        * Добавляет записи в табл талонов
-        * @param Talon - thrift-объект с информацией о талонах
-        */
-	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
 
 

@@ -15,7 +15,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenTalon.Calendar;
+import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
@@ -31,7 +31,7 @@ import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 public class TestServerGenTalons {
 
     private String conn = String.format("jdbc:postgresql://%s:%s/%s",
-            "10.0.0.66", "5432", "zabol");
+            "10.0.0.242", "5432", "zabol");
     private ISqlSelectExecutor sse;
     private ITransactedSqlExecutor tse;
     private ServerGenTalons testServer;
@@ -62,38 +62,39 @@ public class TestServerGenTalons {
     }
 
     @Test
-    public final void getAllSpecForPolikliniki_isListSizeCorrect() 
+    public final void getAllSpecForPolikliniki_isListSizeCorrect()
             throws KmiacServerException, TException {
-        final int expectedListSize = 5;
-		final int cLpu = 20;
+        final int expectedListSize = 1;
+        final int cLpu = 201;
         java.util.List <Spec> testSpecList =
                 testServer.getAllSpecForPolikliniki(cLpu);
         assertEquals("list size", expectedListSize, testSpecList.size());
     }
 
     @Test
-    public final void getVrachForCurrentSpec_isListSizeCorrect() 
+    public final void getVrachForCurrentSpec_isListSizeCorrect()
             throws KmiacServerException, TException {
         final int expectedListSize = 2;
-        final int cLpu = 20;
+        final int cLpu = 201;
         final String cdol = "9";
         java.util.List <Vrach> testVrachList =
                 testServer.getVrachForCurrentSpec(cLpu, cdol);
         assertEquals("list size", expectedListSize, testVrachList.size());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    public final void getCalendar_isListSizeCorrect() 
+    public final void getCalendar_isValueCorrect()
             throws KmiacServerException, TException {
-        final int expectedListSize = 1;
-        final int cyear = 2012;
-        java.util.List <Calendar> testCalendar =
-                testServer.getCalendar(cyear);
-        assertEquals("list size", expectedListSize, testCalendar.size());
+        final int nweek = 52;
+        final long cdate = new Date(112, 0, 1).getTime();
+        Calend testCalendar =
+                testServer.getCalendar(cdate);
+        assertEquals("list nweek value", nweek, testCalendar.getNweek());
     }
-    
+
     @Test
-    public final void getNorm_isListSizeCorrect() 
+    public final void getNorm_isListSizeCorrect()
             throws KmiacServerException, TException {
         final int expectedListSize = 1;
         final int cpodr = 5;
@@ -104,7 +105,7 @@ public class TestServerGenTalons {
     }
 
     @Test
-    public final void getNdv_isListSizeCorrect() 
+    public final void getNdv_isListSizeCorrect()
             throws KmiacServerException, TException {
         final int expectedListSize = 1;
         final int cpodr = 5;
@@ -116,7 +117,7 @@ public class TestServerGenTalons {
     }
 
     @Test
-    public final void getNrasp_isListSizeCorrect() 
+    public final void getNrasp_isListSizeCorrect()
             throws KmiacServerException, TException {
         final int expectedListSize = 1;
         final int cpodr = 5;
@@ -129,7 +130,7 @@ public class TestServerGenTalons {
     }
 
     @Test
-    public final void getRasp_isListSizeCorrect() 
+    public final void getRasp_isListSizeCorrect()
             throws KmiacServerException, TException {
         final int expectedListSize = 1;
         final int cpodr = 5;
@@ -142,10 +143,10 @@ public class TestServerGenTalons {
 
     @SuppressWarnings("deprecation")
     @Test
-    public final void getTalon_isListSizeCorrect() 
+    public final void getTalon_isListSizeCorrect()
             throws KmiacServerException, TException {
         final int expectedListSize = 1;
-        final int cpodr = 20;
+        final int cpodr = 201;
         final int pcodvrach = 6;
         final String cdol = "3";
         final long datap = new Date(112,0,30).getTime();
@@ -155,9 +156,9 @@ public class TestServerGenTalons {
     }
 
     @Test
-    public final void getVidp_isListSizeCorrect() 
+    public final void getVidp_isListSizeCorrect()
             throws KmiacServerException, TException {
-        final int expectedListSize = 1;
+        final int expectedListSize = 5;
         java.util.List <Vidp> testVidp =
                 testServer.getVidp();
         assertEquals("list size", expectedListSize, testVidp.size());
