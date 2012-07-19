@@ -22,16 +22,25 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
+import ru.nkz.ivcgzo.thriftGenTalon.CalendNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
+import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
+import ru.nkz.ivcgzo.thriftGenTalon.NormNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
+import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Rasp;
+import ru.nkz.ivcgzo.thriftGenTalon.RaspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
+import ru.nkz.ivcgzo.thriftGenTalon.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
+import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons.Iface;
 import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
+import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
+import ru.nkz.ivcgzo.thriftGenTalon.VrachNotFoundException;
 
 public class ServerGenTalons extends Server implements Iface {
 
@@ -66,7 +75,7 @@ public class ServerGenTalons extends Server implements Iface {
     };
     private static final String[] NRASP_FIELD_NAMES = {
         "pcod", "denn", "vidp", "time_n", "time_k",
-        "cxema", "cdol", "cpol", "id", "pfd" //TODO сравнить с гет методом
+        "cxema", "cdol", "cpol", "id", "pfd", "timep_n", "timep_k" //TODO сравнить с гет методом
     };
     private static final String[] RASP_FIELD_NAMES = {
         "nrasp", "pcod", "nned", "denn", "datap", "time_n",
@@ -126,31 +135,39 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
-    //TODO дописать NotFoundException
     @Override
     public final List<Spec> getAllSpecForPolikliniki(final int cpodr)
-            throws KmiacServerException, TException {
+            throws KmiacServerException, SpecNotFoundException, TException {
         String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
             + "INNER JOIN s_mrab ON n_s00.pcod = s_mrab.cdol "
             + "WHERE s_mrab.cpodr = ? ORDER BY n_s00.name";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
-            return rsmSpec.mapToList(acrs.getResultSet());
+            List<Spec> tmpList = rsmSpec.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new SpecNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //TODO дописать NotFoundException
     @Override
     public final List<Vrach> getVrachForCurrentSpec(final int cpodr, final String cdol)
-            throws KmiacServerException, TException {
+            throws KmiacServerException, VrachNotFoundException, TException {
         String  sqlQuery = "SELECT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot, "
             + "s_mrab.cdol FROM s_vrach INNER JOIN s_mrab ON s_vrach.pcod=s_mrab.pcod "
             + "WHERE s_mrab.cpodr=? AND s_mrab.cdol=? AND s_mrab.datau is null "
             + "ORDER BY fam, im, ot";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
-            return rsmVrach.mapToList(acrs.getResultSet());
+            List<Vrach> tmpList = rsmVrach.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new VrachNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -159,7 +176,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final Calend getCalendar(final long datacal) throws KmiacServerException,
-            TException {
+            CalendNotFoundException, TException {
         String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
                 + "pr_rab, d_rab FROM e_calendar WHERE datacal=? ORDER BY datacal";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, new Date(datacal))) {
@@ -167,7 +184,7 @@ public class ServerGenTalons extends Server implements Iface {
                 Calend tmpCalend = rsmCalendar.map(acrs.getResultSet());
                 return tmpCalend;
             } else {
-                throw new KmiacServerException();
+                throw new CalendNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -175,78 +192,99 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Norm> getNorm(final int cpodr, final String cdol)
-            throws KmiacServerException, TException {
+            throws KmiacServerException, TException, NormNotFoundException {
         String  sqlQuery = "SELECT cdol, vidp, dlit, cpol, id "
             + "FROM e_norm WHERE cpol=? AND cdol =? ORDER BY vidp";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
-            return rsmNorm.mapToList(acrs.getResultSet());
+            List<Norm> tmpList = rsmNorm.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new NormNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Ndv> getNdv(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException {
+            throws KmiacServerException, TException, NdvNotFoundException {
         String  sqlQuery = "SELECT pcod, datan, datak, cdol, cpol, id "
             + "FROM e_ndv WHERE cpol=? AND pcod =? AND cdol =? ORDER BY datan, datak";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpodr, pcodvrach, cdol)) {
-            return rsmNdv.mapToList(acrs.getResultSet());
+            List<Ndv>tmpList = rsmNdv.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new NdvNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Nrasp> getNrasp(final int cpodr, final int pcodvrach, final String cdol,
-            final int cxema) throws KmiacServerException, TException {
+            final int cxema) throws KmiacServerException, TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-            + "cxema, cdol, cpol, id, pfd FROM e_nrasp WHERE cpol=? AND pcod =? AND cdol =? "
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k "
+            + "FROM e_nrasp WHERE cpol=? AND pcod =? AND cdol =? "
             + "AND cxema =? ORDER BY denn, vidp, time_n";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpodr, pcodvrach, cdol, cxema)) {
-            return rsmNrasp.mapToList(acrs.getResultSet());
+            List<Nrasp> tmpList = rsmNrasp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new NraspNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Rasp> getRasp(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException {
+            throws KmiacServerException, TException, RaspNotFoundException {
         String  sqlQuery = "SELECT nrasp, pcod, nned, denn, datap, time_n, time_k, "
             + "vidp, cdol, cpol, id, pfd FROM e_rasp WHERE cpol=? AND pcod =? AND cdol =? "
             + "ORDER BY datap, vidp, time_n";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpodr, pcodvrach, cdol)) {
-            return rsmRasp.mapToList(acrs.getResultSet());
+            List<Rasp> tmpList = rsmRasp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new RaspNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Talon> getTalon(final int cpodr, final int pcodvrach, final String cdol,
-            final long datap) throws KmiacServerException {
+            final long datap) throws KmiacServerException, TalonNotFoundException {
         String  sqlQuery = "SELECT id, ntalon, nrasp, pcod_sp, cdol, cdol_kem, "
             + "vidp, timepn, timepk, datapt, datap , timep, cpol "
             + "FROM e_talon WHERE cpol=? AND pcod_sp =? AND cdol =? AND datap =? "
             + "ORDER BY datap, timepn, timepk, vidp";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
                 sqlQuery, cpodr, pcodvrach, cdol, new java.sql.Date(datap))) {
-            return rsmTalon.mapToList(acrs.getResultSet());
+            List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new TalonNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -254,47 +292,103 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final List<Vidp> getVidp() throws KmiacServerException, TException {
+    public final List<Vidp> getVidp() throws KmiacServerException, TException,
+            VidpNotFoundException {
         String  sqlQuery = "SELECT pcod, name, vcolor FROM e_vidp "
                 + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
-            return rsmVidp.mapToList(acrs.getResultSet());
+            List<Vidp> tmpList = rsmVidp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new VidpNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Nrasp> getNraspCpodr(final int cpodr) throws KmiacServerException,
-            TException {
+            TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-                + "cxema, cdol, cpol, id, pfd FROM e_nrasp"
+                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
                 + "WHERE cpol =? "
                 + "ORDER BY pcod";
-        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
-            return rsmNrasp.mapToList(acrs.getResultSet());
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
+            List<Nrasp> tmpList = rsmNrasp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new NraspNotFoundException();
+            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Nrasp> getNraspCdol(final int cpodr, final String cdol)
-            throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-        return null;
+            throws KmiacServerException, TException, NraspNotFoundException {
+        String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
+                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+                + "WHERE cpol =? AND cdol =? "
+                + "ORDER BY pcod";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
+            List<Nrasp> tmpList = rsmNrasp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new NraspNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
-    //Выбирать по cpol из e_norm (как сейчас) или по cpodr из s_mrab
     @Override
     public final List<Nrasp> getNraspVrach(final int cpodr, final int pcodvrach, final String cdol)
+            throws KmiacServerException, TException, NraspNotFoundException {
+        String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
+                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+                + "WHERE cpol =? AND pcod = ? AND cdol =? "
+                + "ORDER BY pcod";
+        try (AutoCloseableResultSet acrs =
+                sse.execPreparedQuery(sqlQuery, cpodr, pcodvrach, cdol)) {
+            List<Nrasp> tmpList = rsmNrasp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new NraspNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final int getTalonCountCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        return null;
+        return 0;
+    }
+
+    @Override
+    public final int getTalonCountCdol(final long datan, final long datak,
+            final int cpodr, final String cdol) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public final int getTalonCountVrach(final long datan, final long datak, final int cpodr,
+            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        return 0;
     }
 
     @Override
@@ -335,6 +429,55 @@ public class ServerGenTalons extends Server implements Iface {
     public void updateNorm(final List<Norm> nrasp) throws KmiacServerException,
             TException {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void addRasp(final List<Rasp> rasp) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteRaspCpodr(final long datan, final long datak, final int cpodr)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteRaspCdol(final long datan, final long datak, final int cpodr, final String cdol)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteRaspVrach(final long datan, final long datak, final int cpodr,
+            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteTalonCpodr(final long datan, final long datak, final int cpodr)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteTalonCdol(final long datan, final long datak, final int cpodr, final String cdol)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void deleteTalonVrach(final long datan, final long datak, final int cpodr,
+            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        
     }
 
 }
