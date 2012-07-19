@@ -326,7 +326,11 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         */
 	void deleteTalonVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
-
+	/**
+        * Добавляет записи в табл талонов
+        * @param Talon - thrift-объект с информацией о талонах
+        */
+	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
 
 
