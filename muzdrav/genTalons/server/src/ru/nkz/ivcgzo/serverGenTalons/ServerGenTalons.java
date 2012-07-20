@@ -70,23 +70,23 @@ public class ServerGenTalons extends Server implements Iface {
         "pr_rab", "d_rab"
     };
     private static final String[] NORM_FIELD_NAMES = {
-        "cdol", "vidp", "dlit", "cpol", "id" //TODO сравнить с гет методом
+        "cdol", "vidp", "dlit", "cpol", "id"
     };
     private static final String[] NDV_FIELD_NAMES = {
-        "pcod", "datan", "datak", "cdol", "cpol", "id" //TODO сравнить с гет методом
+        "pcod", "datan", "datak", "cdol", "cpol", "id"
     };
     private static final String[] NRASP_FIELD_NAMES = {
         "pcod", "denn", "vidp", "time_n", "time_k",
-        "cxema", "cdol", "cpol", "id", "pfd", "timep_n", "timep_k" //TODO сравнить с гет методом
+        "cxema", "cdol", "cpol", "id", "pfd", "timep_n", "timep_k"
     };
     private static final String[] RASP_FIELD_NAMES = {
         "nrasp", "pcod", "nned", "denn", "datap", "time_n",
-        "time_k", "vidp", "cdol", "cpol", "id", "pfd" //TODO сравнить с гет методом
+        "time_k", "vidp", "cdol", "cpol", "id", "pfd"
     };
     private static final String[] TALON_FIELD_NAMES = {
         "id", "ntalon", "nrasp", "pcod_sp", "cdol",
         "cdol_kem", "vidp", "timepn", "timepk", "datapt",
-        "datap", "timep", "cpol" //TODO сравнить с гет методом
+        "datap", "timep", "cpol"
     };
     private static final String[] VIDP_FIELD_NAMES = {
         "pcod", "name", "vcolor"
@@ -106,11 +106,11 @@ public class ServerGenTalons extends Server implements Iface {
     };
     private static final Class<?>[] NRASP_TYPES = new Class<?>[] {
     //  pcod           denn           vidp           time_n
-        Integer.class, Integer.class, Integer.class, Date.class,
+        Integer.class, Integer.class, Integer.class, Time.class,
     //  time_k       cxema          cdol          cpol
-        Date.class,  Integer.class, String.class, Integer.class,
+        Time.class,  Integer.class, String.class, Integer.class,
     //  id             pfd            timep_n     timep_k
-        Integer.class, Boolean.class, Date.class, Date.class
+        Integer.class, Boolean.class, Time.class, Time.class
     };
     private static final Class<?>[] RASP_TYPES = new Class<?>[] {
     //  nrasp          pcod           nned           denn
@@ -573,35 +573,66 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
+    public final void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_nrasp WHERE cpol =? AND pcod = ? AND cpol = ?;",
+                    false, cpodr, pcodvrach, cdol);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteNdv(final int id) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
+    public final void deleteNdv(final int id) throws KmiacServerException, TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_ndv WHERE id =?;",
+                    false, id);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void deleteRaspCpodr(final long datan, final long datak, final int cpodr)
+    public final void deleteRaspCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_rasp WHERE datap >=? AND datap <= ? AND cpol = ?;",
+                    false, new Date(datan), new Date(datak), cpodr);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
 
     }
 
     @Override
-    public void deleteRaspCdol(final long datan, final long datak,
+    public final void deleteRaspCdol(final long datan, final long datak,
             final int cpodr, final String cdol) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_rasp WHERE datap >=? AND datap <= ? AND cpol = ? "
+                    + "AND cdol = ?;",
+                    false, new Date(datan), new Date(datak), cpodr, cdol);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
 
     }
 
     @Override
-    public void deleteRaspVrach(final long datan, final long datak, final int cpodr,
+    public final void deleteRaspVrach(final long datan, final long datak, final int cpodr,
             final int pcodvrach, final String cdol) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_rasp WHERE datap >=? AND datap <= ? AND cpol = ? "
+                    + "AND pcod = ? AND cdol = ?;",
+                    false, new Date(datan), new Date(datak), cpodr, pcodvrach, cdol);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
