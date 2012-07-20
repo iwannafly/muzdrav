@@ -123,9 +123,9 @@ public class ServerGenTalons extends Server implements Iface {
     private static final Class<?>[] TALON_TYPES = new Class<?>[] {
     //  id             ntalon         nrasp          pcod_sp
         Integer.class, Integer.class, Integer.class, Integer.class,
-    //  cdol          cdol_kem       vidp           timepn     
+    //  cdol          cdol_kem       vidp           timepn
         String.class, Integer.class, Integer.class, Time.class,
-    //  timepk      datapt      datap       timep 
+    //  timepk      datapt      datap       timep
         Time.class, Date.class, Date.class, Time.class,
     //  cpol
         Integer.class
@@ -462,8 +462,8 @@ public class ServerGenTalons extends Server implements Iface {
         final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Rasp elemRasp : rasp) {
-                sme.execPreparedT("INSERT INTO e_rasp (nrasp, pcod, nned, denn, datap, time_n,"
-                    + "time_k, vidp, cdol, cpol, pfd)"
+                sme.execPreparedT("INSERT INTO e_rasp (nrasp, pcod, nned, denn, datap, time_n, "
+                    + "time_k, vidp, cdol, cpol, pfd) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     false, elemRasp, RASP_TYPES, indexes);
             }
@@ -475,39 +475,101 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public void addNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
+    public final void addNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
             TException {
-        // TODO Auto-generated method stub
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Nrasp elemNrasp : nrasp) {
+                sme.execPreparedT("INSERT INTO e_nrasp (pcod, denn, vidp, time_n, time_k, "
+                    + "cxema, cdol, cpol, pfd, timep_n, timep_k) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    false, elemNrasp, NRASP_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void addNdv(final Ndv ndv) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
+    public final void addNdv(final Ndv ndv) throws KmiacServerException, TException {
+        final int[] indexes = {0, 1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("INSERT INTO e_ndv (pcod, datan, datak, cdol, cpol) "
+                + "VALUES (?, ?, ?, ?, ?);",
+                false, ndv, NDV_TYPES, indexes);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void addNorm(final List<Norm> nrasp) throws KmiacServerException,
+    public final void addNorm(final List<Norm> norm) throws KmiacServerException,
             TException {
-        // TODO Auto-generated method stub
+        final int[] indexes = {0, 1, 2, 3};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Norm elemNorm : norm) {
+                sme.execPreparedT("INSERT INTO e_norm (cdol, vidp, dlit, cpol) "
+                    + "VALUES (?, ?, ?, ?);",
+                    false, elemNorm, NORM_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void addTalons(final List<Talon> talon) throws KmiacServerException,
+    public final void addTalons(final List<Talon> talon) throws KmiacServerException,
             TException {
-        // TODO Auto-generated method stub
-        
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Talon elemTalon : talon) {
+                sme.execPreparedT("INSERT INTO e_talon (ntalon, nrasp, pcod_sp, cdol, "
+                    + "cdol_kem, vidp, timepn, timepk, datapt, datap, timep, cpol) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    false, elemTalon, TALON_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void updateNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
+    public final void updateNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
             TException {
-        // TODO Auto-generated method stub
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 8};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Nrasp elemNrasp : nrasp) {
+                sme.execPreparedT("UPDATE e_nrasp SET "
+                    + "pcod = ?, denn = ?, vidp = ?, time_n = ?, time_k = ?, "
+                    + "cxema = ?, cdol = ?, cpol = ?, pfd = ?, timep_n = ?, timep_k = ? "
+                    + "WHERE id = ?;",
+                    false, elemNrasp, NRASP_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
-    public void updateNorm(final List<Norm> nrasp) throws KmiacServerException,
+    public final void updateNorm(final List<Norm> norm) throws KmiacServerException,
             TException {
-        // TODO Auto-generated method stub
+        final int[] indexes = {0, 1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Norm elemNorm : norm) {
+                sme.execPreparedT("UPDATE e_norm SET "
+                    + "cdol= ?, vidp = ?, dlit = ?, cpol = ?"
+                    + "WHERE id = ?;",
+                    false, elemNorm, NORM_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
     }
 
     @Override
