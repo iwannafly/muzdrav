@@ -72,6 +72,11 @@ public class TalonMainFrame extends JFrame {
 	private JRadioButton tal_1;
 	private JRadioButton tal_2;
 	private JRadioButton tal_3;
+	private JRadioButton otm_day_1;
+	private JRadioButton otm_day_2;
+	private JRadioButton otm_day_3;
+	private JRadioButton otm_day_4;
+	private JRadioButton otm_day_5;
 	private JCheckBox cbx_rasp;
 	private List<Nrasp> NraspInfo;
 	private List<Norm> NormInfo;
@@ -130,7 +135,7 @@ public class TalonMainFrame extends JFrame {
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 245, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 685, GroupLayout.PREFERRED_SIZE))
+					.addComponent(tbMain, GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
@@ -197,7 +202,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_rasp.setFillsViewportHeight(true);
 		sp_rasp.setViewportView(tbl_rasp);
 		
-		JButton btn_save = new JButton("+");
+		JButton btn_save = new JButton("Сохранить");
 		btn_save.setToolTipText("Сохранить расписание");
 		btn_save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -209,7 +214,7 @@ public class TalonMainFrame extends JFrame {
 			}
 		});
 		
-		JButton btn_del = new JButton("-");
+		JButton btn_del = new JButton("Удалить");
 		btn_del.setToolTipText("Удалить расписание");
 		btn_del.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -229,14 +234,14 @@ public class TalonMainFrame extends JFrame {
 						.addComponent(sp_rasp, GroupLayout.PREFERRED_SIZE, 352, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_6.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(btn_save, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btn_del, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(btn_save)
+							.addGap(31)
+							.addComponent(btn_del)))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_panel_6.setVerticalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_6.createSequentialGroup()
+			gl_panel_6.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_6.createSequentialGroup()
 					.addGap(5)
 					.addComponent(sp_rasp, GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
 					.addGap(17)
@@ -275,15 +280,20 @@ public class TalonMainFrame extends JFrame {
 		});
 		btn_del_ndv.setToolTipText("Удалить");
 		btn_del_ndv.setFont(new Font("Tahoma", Font.BOLD, 14));
+		
+		JPanel panel_7 = new JPanel();
 		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
 		gl_panel_4.setHorizontalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_4.createSequentialGroup()
+				.addGroup(Alignment.TRAILING, gl_panel_4.createSequentialGroup()
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE))
+						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
 							.addGap(12)
 							.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
-						.addGroup(gl_panel_4.createSequentialGroup()
+						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(btn_add_ndv, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -293,7 +303,9 @@ public class TalonMainFrame extends JFrame {
 		gl_panel_4.setVerticalGroup(
 			gl_panel_4.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-					.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 454, Short.MAX_VALUE)
+					.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
 					.addGap(17)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btn_del_ndv)
@@ -301,7 +313,116 @@ public class TalonMainFrame extends JFrame {
 					.addGap(1))
 		);
 		
-		tbl_ndv =new CustomTable<>(true, true, Ndv.class, 1,"С",2,"По");
+		otm_day_1 = new JRadioButton("Понедельник");
+		otm_day_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					if (tbl_rasp.getSelectedItem() != null)
+						for (int i=0; i <= NraspInfo.size()-1; i++) 
+							if (otm_day_1.isSelected())
+								if (NraspInfo.get(i).getDenn() == 1)
+									NraspInfo.get(i).setPfd(true);
+//						tbl_rasp.setData(NraspInfo);
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		otm_day_2 = new JRadioButton("Вторник");
+		otm_day_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					if (tbl_rasp.getSelectedItem() != null)
+						for (int i=0; i <= NraspInfo.size()-1; i++) 
+							if (otm_day_2.isSelected())
+								if (NraspInfo.get(i).getDenn() == 2)
+								NraspInfo.get(i).setPfd(true);
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		otm_day_3 = new JRadioButton("Среда");
+		otm_day_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					if (tbl_rasp.getSelectedItem() != null)
+						for (int i=0; i <= NraspInfo.size()-1; i++) 
+							if (otm_day_3.isSelected())
+								if (NraspInfo.get(i).getDenn() == 3)
+								NraspInfo.get(i).setPfd(true);
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		otm_day_4 = new JRadioButton("Четверг");
+		otm_day_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					if (tbl_rasp.getSelectedItem() != null)
+						for (int i=0; i <= NraspInfo.size()-1; i++) 
+							if (otm_day_4.isSelected())
+								if (NraspInfo.get(i).getDenn() == 4)
+								NraspInfo.get(i).setPfd(true);
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		otm_day_5 = new JRadioButton("Пятница");
+		otm_day_5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					if (tbl_rasp.getSelectedItem() != null)
+						for (int i=0; i <= NraspInfo.size()-1; i++) 
+							if (otm_day_5.isSelected())
+								if (NraspInfo.get(i).getDenn() == 5)
+								NraspInfo.get(i).setPfd(true);
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		GroupLayout gl_panel_7 = new GroupLayout(panel_7);
+		gl_panel_7.setHorizontalGroup(
+			gl_panel_7.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
+						.addComponent(otm_day_1)
+						.addComponent(otm_day_2)
+						.addComponent(otm_day_3)
+						.addComponent(otm_day_4)
+						.addComponent(otm_day_5))
+					.addContainerGap(71, Short.MAX_VALUE))
+		);
+		gl_panel_7.setVerticalGroup(
+			gl_panel_7.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_7.createSequentialGroup()
+					.addComponent(otm_day_1)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(otm_day_2)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(otm_day_3)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(otm_day_4)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(otm_day_5)
+					.addGap(0, 0, Short.MAX_VALUE))
+		);
+		panel_7.setLayout(gl_panel_7);
+		
+		tbl_ndv =new CustomTable<>(true, true, Ndv.class, 1,"Дата начала",2,"окончания");
 		tbl_ndv.setPreferredWidths(90,90);
 		tbl_ndv.setDateField(0);
 		tbl_ndv.setDateField(1);
@@ -356,6 +477,7 @@ public class TalonMainFrame extends JFrame {
 				else {
 					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
 				}
+				ClearOtmetka();
 				ChangeNraspInfo();
 			}
 		});
@@ -383,22 +505,25 @@ public class TalonMainFrame extends JFrame {
 		panel_2.setLayout(gl_panel_2);
 
 		cxm_1 = new JRadioButton("на каждый день");
-		cxm_1.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
+		cxm_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ClearOtmetka();
 				ChangeCxemaInfo(0);			}
 		});
 		btnGroup_cxema.add(cxm_1);
 		
 		cxm_2 = new JRadioButton("четные дни");
-		cxm_2.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
+		cxm_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ClearOtmetka();
 				ChangeCxemaInfo(1);			}
 		});
 		btnGroup_cxema.add(cxm_2);
 		
 		cxm_3 = new JRadioButton("нечетные дни");
-		cxm_3.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
+		cxm_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ClearOtmetka();
 				ChangeCxemaInfo(2);			}
 		});
 		btnGroup_cxema.add(cxm_3);
@@ -437,9 +562,9 @@ public class TalonMainFrame extends JFrame {
 				.addGroup(gl_tbNorm.createSequentialGroup()
 					.addGap(27)
 					.addGroup(gl_tbNorm.createParallelGroup(Alignment.LEADING)
-						.addComponent(sp_norm, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 465, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(188, Short.MAX_VALUE))
+						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 243, GroupLayout.PREFERRED_SIZE)
+						.addComponent(sp_norm, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(410, Short.MAX_VALUE))
 		);
 		gl_tbNorm.setVerticalGroup(
 			gl_tbNorm.createParallelGroup(Alignment.TRAILING)
@@ -476,17 +601,18 @@ public class TalonMainFrame extends JFrame {
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
-					.addGap(33)
 					.addComponent(btn_new_norm)
 					.addGap(29)
 					.addComponent(btn_save_norm)
-					.addGap(225))
+					.addGap(274))
 		);
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
-					.addComponent(btn_new_norm)
-					.addComponent(btn_save_norm))
+				.addGroup(Alignment.TRAILING, gl_panel_3.createSequentialGroup()
+					.addContainerGap(13, Short.MAX_VALUE)
+					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btn_new_norm)
+						.addComponent(btn_save_norm)))
 		);
 		panel_3.setLayout(gl_panel_3);
 		
@@ -512,8 +638,8 @@ public class TalonMainFrame extends JFrame {
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbTalon.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(442, Short.MAX_VALUE))
+					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(461, Short.MAX_VALUE))
 		);
 		
 		tf_datn = new CustomDateEditor();
@@ -586,9 +712,9 @@ public class TalonMainFrame extends JFrame {
 					.addComponent(tal_2)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tal_3)
-					.addGap(26)
+					.addGap(18)
 					.addComponent(btnNewButton)
-					.addContainerGap(26, Short.MAX_VALUE))
+					.addContainerGap(34, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
 		tbTalon.setLayout(gl_tbTalon);
@@ -626,6 +752,7 @@ public class TalonMainFrame extends JFrame {
 			 		}
 				    System.out.println("curSpec= "+curSpec+", curVrach= "+Integer.toString(curVrach));
 					if (tbMain.getSelectedIndex() == 0) {
+						ClearOtmetka();
 						ChangeNraspInfo();
 						ChangeNdvInfo();
 					}
@@ -732,7 +859,20 @@ public class TalonMainFrame extends JFrame {
 					}
 				}
 			}
-			tbl_rasp.setData(NraspInfo);
+            if (NraspInfo.size() > 0) {
+    			tbl_rasp.setData(NraspInfo);
+    			for (int i=0; i <= NraspInfo.size()-1; i++) {
+    				System.out.println(NraspInfo.get(i).getDenn()+", "+NraspInfo.get(i).isPfd());
+    				if (NraspInfo.get(i).isPfd()){
+    					if (NraspInfo.get(i).getDenn() == 1 )otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
+    				}
+    			}
+            }
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -741,7 +881,19 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_rasp.setData(new ArrayList<Nrasp>());
 			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, cxm);
-			tbl_rasp.setData(NraspInfo);
+            if (NraspInfo.size() > 0) {
+    			tbl_rasp.setData(NraspInfo);
+    			for (int i=0; i <= NraspInfo.size()-1; i++) {
+    				if (NraspInfo.get(i).isPfd()){
+    					if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
+    				}
+    			}
+            }
+//			System.out.println();
 //		    tbl_rasp.getSelectedItem().setName(pInfo.getName());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -751,7 +903,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-			tbl_norm.setData(NormInfo);
+            if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -760,7 +912,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_ndv.setData(new ArrayList<Ndv>());
 			NdvInfo = MainForm.tcl.getNdv(MainForm.authInfo.cpodr, curVrach, curSpec);
-			tbl_ndv.setData(NdvInfo);
+			if (NdvInfo.size() > 0)tbl_ndv.setData(NdvInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -769,9 +921,16 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-			tbl_norm.setData(NormInfo);
+			if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	private void ClearOtmetka(){
+		otm_day_1.setSelected(false);
+		otm_day_2.setSelected(false);
+		otm_day_3.setSelected(false);
+		otm_day_4.setSelected(false);
+		otm_day_5.setSelected(false);
 	}
 }
