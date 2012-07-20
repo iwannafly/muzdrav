@@ -321,7 +321,7 @@ public class TalonMainFrame extends JFrame {
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
 							if (otm_day_1.isSelected())
 								if (NraspInfo.get(i).getDenn() == 1)
-									NraspInfo.get(i).isSetPfd();
+									NraspInfo.get(i).setPfd(true);
 //						tbl_rasp.setData(NraspInfo);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e1) {
@@ -338,7 +338,7 @@ public class TalonMainFrame extends JFrame {
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
 							if (otm_day_2.isSelected())
 								if (NraspInfo.get(i).getDenn() == 2)
-								NraspInfo.get(i).isSetPfd();
+								NraspInfo.get(i).setPfd(true);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -354,7 +354,7 @@ public class TalonMainFrame extends JFrame {
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
 							if (otm_day_3.isSelected())
 								if (NraspInfo.get(i).getDenn() == 3)
-								NraspInfo.get(i).isSetPfd();
+								NraspInfo.get(i).setPfd(true);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -370,7 +370,7 @@ public class TalonMainFrame extends JFrame {
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
 							if (otm_day_4.isSelected())
 								if (NraspInfo.get(i).getDenn() == 4)
-								NraspInfo.get(i).isSetPfd();
+								NraspInfo.get(i).setPfd(true);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -386,7 +386,7 @@ public class TalonMainFrame extends JFrame {
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
 							if (otm_day_5.isSelected())
 								if (NraspInfo.get(i).getDenn() == 5)
-								NraspInfo.get(i).isSetPfd();
+								NraspInfo.get(i).setPfd(true);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -477,6 +477,7 @@ public class TalonMainFrame extends JFrame {
 				else {
 					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
 				}
+				ClearOtmetka();
 				ChangeNraspInfo();
 			}
 		});
@@ -506,6 +507,7 @@ public class TalonMainFrame extends JFrame {
 		cxm_1 = new JRadioButton("на каждый день");
 		cxm_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				ClearOtmetka();
 				ChangeCxemaInfo(0);			}
 		});
 		btnGroup_cxema.add(cxm_1);
@@ -513,6 +515,7 @@ public class TalonMainFrame extends JFrame {
 		cxm_2 = new JRadioButton("четные дни");
 		cxm_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				ClearOtmetka();
 				ChangeCxemaInfo(1);			}
 		});
 		btnGroup_cxema.add(cxm_2);
@@ -520,6 +523,7 @@ public class TalonMainFrame extends JFrame {
 		cxm_3 = new JRadioButton("нечетные дни");
 		cxm_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				ClearOtmetka();
 				ChangeCxemaInfo(2);			}
 		});
 		btnGroup_cxema.add(cxm_3);
@@ -748,6 +752,7 @@ public class TalonMainFrame extends JFrame {
 			 		}
 				    System.out.println("curSpec= "+curSpec+", curVrach= "+Integer.toString(curVrach));
 					if (tbMain.getSelectedIndex() == 0) {
+						ClearOtmetka();
 						ChangeNraspInfo();
 						ChangeNdvInfo();
 					}
@@ -854,21 +859,20 @@ public class TalonMainFrame extends JFrame {
 					}
 				}
 			}
-			tbl_rasp.setData(NraspInfo);
+            if (NraspInfo.size() > 0) {
+    			tbl_rasp.setData(NraspInfo);
+    			for (int i=0; i <= NraspInfo.size()-1; i++) {
+    				System.out.println(NraspInfo.get(i).getDenn()+", "+NraspInfo.get(i).isPfd());
+    				if (NraspInfo.get(i).isPfd()){
+    					if (NraspInfo.get(i).getDenn() == 1 )otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
+    				}
+    			}
+            }
 
-			for (int i=0; i <= NraspInfo.size()-1; i++) {
-				System.out.println(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 1 ) {
-					if (NraspInfo.get(i).isSetPfd())
-						otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
-					System.out.println(Integer.toString(NraspInfo.get(i).getDenn()));
-					if (otm_day_1.isSelected()) System.out.println("vib 1");
-				}
-				if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
-			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -877,14 +881,18 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_rasp.setData(new ArrayList<Nrasp>());
 			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, cxm);
-			tbl_rasp.setData(NraspInfo);
-			for (int i=0; i <= NraspInfo.size()-1; i++) {
-				if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
-				if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
-			}
+            if (NraspInfo.size() > 0) {
+    			tbl_rasp.setData(NraspInfo);
+    			for (int i=0; i <= NraspInfo.size()-1; i++) {
+    				if (NraspInfo.get(i).isPfd()){
+    					if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
+    				}
+    			}
+            }
 //			System.out.println();
 //		    tbl_rasp.getSelectedItem().setName(pInfo.getName());
 		} catch (Exception e) {
@@ -895,7 +903,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-			tbl_norm.setData(NormInfo);
+            if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -904,7 +912,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_ndv.setData(new ArrayList<Ndv>());
 			NdvInfo = MainForm.tcl.getNdv(MainForm.authInfo.cpodr, curVrach, curSpec);
-			tbl_ndv.setData(NdvInfo);
+			if (NdvInfo.size() > 0)tbl_ndv.setData(NdvInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -913,9 +921,16 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-			tbl_norm.setData(NormInfo);
+			if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	private void ClearOtmetka(){
+		otm_day_1.setSelected(false);
+		otm_day_2.setSelected(false);
+		otm_day_3.setSelected(false);
+		otm_day_4.setSelected(false);
+		otm_day_5.setSelected(false);
 	}
 }
