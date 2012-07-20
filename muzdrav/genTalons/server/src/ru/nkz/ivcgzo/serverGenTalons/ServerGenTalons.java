@@ -106,11 +106,11 @@ public class ServerGenTalons extends Server implements Iface {
     };
     private static final Class<?>[] NRASP_TYPES = new Class<?>[] {
     //  pcod           denn           vidp           time_n
-        Integer.class, Integer.class, Integer.class, Date.class,
+        Integer.class, Integer.class, Integer.class, Time.class,
     //  time_k       cxema          cdol          cpol
-        Date.class,  Integer.class, String.class, Integer.class,
+        Time.class,  Integer.class, String.class, Integer.class,
     //  id             pfd            timep_n     timep_k
-        Integer.class, Boolean.class, Date.class, Date.class
+        Integer.class, Boolean.class, Time.class, Time.class
     };
     private static final Class<?>[] RASP_TYPES = new Class<?>[] {
     //  nrasp          pcod           nned           denn
