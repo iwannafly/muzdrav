@@ -23,11 +23,12 @@ public class RaspisanieUnit {
 	private static List<Nrasp> pauselist;
 	private static List<Rasp> rasp;
 	private static List<Talon> talon;
-	private static int TalonCount;
+	private static List<Talon> timelist;
 	private static List<Norm> mdlit;
 	private static int dlit;
-	private static long timepause_n;
-	private static long timepause_k;
+	private static int TalonCount;
+	private static long timepause_n = 0;
+	private static long timepause_k = 0;
 
 	static void NewRaspisanie(int cpodr, int pcod, String cdol, int cxm){
 		try {
@@ -127,28 +128,32 @@ public class RaspisanieUnit {
 					List<Rasp> rasp = new ArrayList<Rasp>();
 					List<Nrasp> pauselist = new ArrayList<Nrasp>();
 					for (int i=0; i <= nrasp.size()-1; i++) {
-						Rasp tmpRasp = new Rasp();
-						tmpRasp.setPcod(nrasp.get(i).getPcod());
-						tmpRasp.setDenn(nrasp.get(i).getDenn());
-						tmpRasp.setDatap(cal1.getTimeInMillis());
-						tmpRasp.setTime_n(nrasp.get(i).getTime_n());
-						tmpRasp.setTime_k(nrasp.get(i).getTime_k());
-						tmpRasp.setVidp(nrasp.get(i).getVidp());
-						tmpRasp.setCpol(nrasp.get(i).getCpol());
-						tmpRasp.setCdol(nrasp.get(i).getCdol());
-						tmpRasp.setPfd(nrasp.get(i).isPfd());
-						if (tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
-							if (tmpRasp.getTime_n() != 0 && tmpRasp.getTime_k() != 0){
-								rasp.add(tmpRasp);
-								if (nrasp.get(i).getTimep_n() != 0 && nrasp.get(i).getTimep_k() != 0){
-									Nrasp tmpPause = new Nrasp();
-									tmpPause.setPcod(tmpRasp.getPcod());
-									tmpPause.setDenn(tmpRasp.getDenn());
-									tmpPause.setCdol(tmpRasp.getCdol());
-									tmpPause.setVidp(tmpRasp.getVidp());
-									tmpPause.setTimep_n(nrasp.get(i).getTimep_n());
-									tmpPause.setTimep_k(nrasp.get(i).getTimep_k());
-									pauselist.add(tmpPause);
+						if((nrasp.get(i).getCxema() == 0) || 
+						(nrasp.get(i).getCxema() == 1 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) == 0)|| 		
+						(nrasp.get(i).getCxema() == 2 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) != 0)){
+							Rasp tmpRasp = new Rasp();
+							tmpRasp.setPcod(nrasp.get(i).getPcod());
+							tmpRasp.setDenn(nrasp.get(i).getDenn());
+							tmpRasp.setDatap(cal1.getTimeInMillis());
+							tmpRasp.setTime_n(nrasp.get(i).getTime_n());
+							tmpRasp.setTime_k(nrasp.get(i).getTime_k());
+							tmpRasp.setVidp(nrasp.get(i).getVidp());
+							tmpRasp.setCpol(nrasp.get(i).getCpol());
+							tmpRasp.setCdol(nrasp.get(i).getCdol());
+							tmpRasp.setPfd(nrasp.get(i).isPfd());
+							if (tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
+								if (tmpRasp.getTime_n() != 0 && tmpRasp.getTime_k() != 0){
+									rasp.add(tmpRasp);
+									if (nrasp.get(i).getTimep_n() != 0 && nrasp.get(i).getTimep_k() != 0){
+										Nrasp tmpPause = new Nrasp();
+										tmpPause.setPcod(tmpRasp.getPcod());
+										tmpPause.setDenn(tmpRasp.getDenn());
+										tmpPause.setCdol(tmpRasp.getCdol());
+										tmpPause.setVidp(tmpRasp.getVidp());
+										tmpPause.setTimep_n(nrasp.get(i).getTimep_n());
+										tmpPause.setTimep_k(nrasp.get(i).getTimep_k());
+										pauselist.add(tmpPause);
+									}
 								}
 							}
 						}
@@ -166,7 +171,6 @@ public class RaspisanieUnit {
 		    			if (ind ==2 )MainForm.tcl.deleteTalonCdol( cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, cdol);
 		    			if (ind ==3 )MainForm.tcl.deleteTalonVrach(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, pcod, cdol);
 						CreateTableTalon(rasp, pauselist);
-		            	
 		            }
 				}
 			}
@@ -182,6 +186,8 @@ public class RaspisanieUnit {
 				mdlit = MainForm.tcl.getNorm(rasp.get(i).getCpol(), rasp.get(i).getCdol());
 				for (int j=0; j <= mdlit.size()-1; j++) 
 					if (rasp.get(i).getVidp() == mdlit.get(j).getDlit()) dlit = mdlit.get(j).getDlit(); 
+				timepause_n = 0;
+				timepause_k = 0;
 				for (int j=0; j <= pauselist.size()-1; j++)
 					if (rasp.get(i).getPcod()==pauselist.get(j).getPcod() && 
 						rasp.get(i).getDenn()==pauselist.get(j).getDenn() &&
@@ -200,9 +206,16 @@ public class RaspisanieUnit {
 					tmpTalon.setTimepn(rasp.get(i).getTime_n());
 					tmpTalon.setTimepk(rasp.get(i).getTime_k());
 					tmpTalon.setDatap(rasp.get(i).getDatap());
-					getTalonTime(tmpTalon.getTimepn(), tmpTalon.getTimepk(), dlit, timepause_n, timepause_k);
-
-					talonlist.add(tmpTalon);
+					if (timepause_n==0 && timepause_k==0){
+						List<Talon> timelist = getTalonTime(tmpTalon.getTimepn(), tmpTalon.getTimepk(), dlit);
+					}else{
+						List<Talon> timelist = getTalonTime(tmpTalon.getTimepn(), tmpTalon.getTimepk(), dlit, timepause_n, timepause_k);
+					}
+					for (int j=0; j <= timelist.size()-1; j++){
+						tmpTalon.setTimep(timelist.get(j).getTimep());
+						tmpTalon.setDatapt(tmpTalon.getDatap() + tmpTalon.getTimep());
+						talonlist.add(tmpTalon);
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -214,24 +227,44 @@ public class RaspisanieUnit {
 			e.printStackTrace();
 		}
 	}
-    private static void getTalonTime(long timepn, long timepk, int dlitp,
+    private static List<Talon> getTalonTime(long timepn, long timepk, int dlitp) {
+		List<Talon> timelist = new ArrayList<Talon>();
+		Calendar cal1 = Calendar.getInstance();
+		Calendar cal2 = Calendar.getInstance();
+		cal1.add(Calendar.HOUR_OF_DAY, -dlitp);
+		while (!cal1.equals(cal2)) {
+			cal1.add(Calendar.HOUR_OF_DAY, dlitp);
+			Talon tmpTime = new Talon();
+			tmpTime.setTimep(cal1.getTimeInMillis());
+			timelist.add(tmpTime);
+		}
+		return timelist;
+	}
+
+	private static List<Talon> getTalonTime(long timepn, long timepk, int dlitp,
 			long timepausen, long timepausek) {
 		List<Talon> timelist = new ArrayList<Talon>();
 		Calendar cal1 = Calendar.getInstance();
-		cal1.setTimeInMillis(timepn);
 		Calendar cal2 = Calendar.getInstance();
+		Calendar cal3 = Calendar.getInstance();
+		Calendar cal4 = Calendar.getInstance();
+		cal1.setTimeInMillis(timepn);
 		cal2.setTimeInMillis(timepk);
-		cal1.add(Calendar.DAY_OF_MONTH, -1);
+		cal3.setTimeInMillis(timepausen);
+		cal4.setTimeInMillis(timepausek);
+		cal1.add(Calendar.HOUR_OF_DAY, -dlitp);
 
-		while (timepn < timepk) {
-			 Talon tmpTime = new Talon();
-			
+		while (!cal1.equals(cal2)) {
+			cal1.add(Calendar.HOUR_OF_DAY, dlitp);
+			if ((cal1.compareTo(cal3)>0 && cal1.compareTo(cal4)<0) || (cal1.compareTo(cal3)==0)){
+			}else{
+				Talon tmpTime = new Talon();
+				tmpTime.setTimep(cal1.getTimeInMillis());
+				timelist.add(tmpTime);
+			}
 		}
-		
+		return timelist;
 	}
-//	12:i64 timep,
-//	10:i64 datapt,
-
 	private static boolean getPrrabFromCalendar(long cdate) {
 		try {
 			Calend cal = MainForm.tcl.getCalendar(cdate);
