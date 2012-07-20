@@ -153,9 +153,9 @@ public class ServerRegPatient extends Server implements Iface {
         Integer.class, Date.class, Time.class, Date.class, String.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
-        //  npasp          nambk         cpol           nuch
+    //  npasp          nambk         cpol           nuch
         Integer.class, String.class, Integer.class, Integer.class,
-        //  datapr      dataot      ishod
+    //  datapr      dataot      ishod
         Date.class, Date.class, Integer.class
     };
     //Отражение таблицы p_kov (кроме поля name - это поле классификатора n_lkn)
@@ -183,7 +183,6 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_BRIEF_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom"
     };
-
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",

@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.serverGenTalons;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.thrift.TException;
 import org.junit.Before;
@@ -73,8 +75,8 @@ public class TestServerGenTalons {
     @Test
     public final void getAllSpecForPolikliniki_isListSizeCorrect()
             throws KmiacServerException, TException, SpecNotFoundException {
-        final int expectedListSize = 1;
-        final int cLpu = 201;
+        final int expectedListSize = 3;
+        final int cLpu = 2000004;
         java.util.List <Spec> testSpecList =
                 testServer.getAllSpecForPolikliniki(cLpu);
         assertEquals("list size", expectedListSize, testSpecList.size());
@@ -171,5 +173,46 @@ public class TestServerGenTalons {
         java.util.List <Vidp> testVidp =
                 testServer.getVidp();
         assertEquals("list size", expectedListSize, testVidp.size());
+    }
+
+    @Test
+    public final void getTalonCountCpodr_IsValueCorrect() throws KmiacServerException, TException {
+        final int expectedCount = 1;
+        final long daten = new Date(112,2,27).getTime();
+        final long datek = new Date(112,3,13).getTime();
+        final int cpodr = 2000004;
+        int talonCount = testServer.getTalonCountCpodr(daten, datek, cpodr);
+        assertEquals("talon's count", expectedCount, talonCount);
+    }
+
+    @Test
+    public final void getTalonCountCdol_IsValueCorrect() throws KmiacServerException, TException {
+        final int expectedCount = 1;
+        final long daten = new Date(112,2,27).getTime();
+        final long datek = new Date(112,3,13).getTime();
+        final int cpodr = 2000004;
+        final String cdol = "9";
+        int talonCount = testServer.getTalonCountCdol(daten, datek, cpodr, cdol);
+        assertEquals("talon's count", expectedCount, talonCount);
+    }
+
+    @Test
+    public final void getTalonCountVrach_IsValueCorrect() throws KmiacServerException, TException {
+        final int expectedCount = 1;
+        final long daten = new Date(112,2,27).getTime();
+        final long datek = new Date(112,3,13).getTime();
+        final int cpodr = 2000004;
+        final String cdol = "9";
+        final int pcodvrach = 6;
+        int talonCount = testServer.getTalonCountVrach(daten, datek, cpodr, pcodvrach, cdol);
+        assertEquals("talon's count", expectedCount, talonCount);
+    }
+    
+    @Test
+    public final void addRasp_IsActuallyAdded() throws KmiacServerException, TException{
+        List<Rasp> testList = new ArrayList();
+        testList.add(new Rasp(1, 13, 2, 3, 0, 0, 0, 5, "L100", 2, 2, true));
+        testList.add(new Rasp(1, 13, 2, 3, 0, 0, 0, 5, "K100", 2, 2, true));
+        testServer.addRasp(testList);
     }
 }

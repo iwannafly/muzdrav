@@ -213,7 +213,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         * Добавляет записи в табл расписание работы врача
         * @param Nrasp - thrift-объект с информацией о расписании
         */
-	void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+    void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
         * Добавляет записи в табл ndv
@@ -330,11 +330,6 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         * Добавляет записи в табл талонов
         * @param Talon - thrift-объект с информацией о талонах
         */
-	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
-
-
-
-
-
+    void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
 }

@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.serverGenTalons;
 import java.io.File;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -19,6 +20,7 @@ import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
@@ -88,6 +90,45 @@ public class ServerGenTalons extends Server implements Iface {
     };
     private static final String[] VIDP_FIELD_NAMES = {
         "pcod", "name", "vcolor"
+    };
+
+    private static final Class<?>[] NORM_TYPES = new Class<?>[] {
+    //  cdol          vidp           dlit           cpol
+        String.class, Integer.class, Integer.class, Integer.class,
+    //  id
+        Integer.class
+    };
+    private static final Class<?>[] NDV_TYPES = new Class<?>[] {
+    //  pcod           datan       datak       cdol
+        Integer.class, Date.class, Date.class, String.class,
+    //  cpol           id
+        Integer.class, Integer.class
+    };
+    private static final Class<?>[] NRASP_TYPES = new Class<?>[] {
+    //  pcod           denn           vidp           time_n
+        Integer.class, Integer.class, Integer.class, Date.class,
+    //  time_k       cxema          cdol          cpol
+        Date.class,  Integer.class, String.class, Integer.class,
+    //  id             pfd            timep_n     timep_k
+        Integer.class, Boolean.class, Date.class, Date.class
+    };
+    private static final Class<?>[] RASP_TYPES = new Class<?>[] {
+    //  nrasp          pcod           nned           denn
+        Integer.class, Integer.class, Integer.class, Integer.class,
+    //  datap        time_n      time_k      vidp
+        Date.class,  Time.class, Time.class, Integer.class,
+    //  cdol          cpol           id             pfd
+        String.class, Integer.class, Integer.class, Boolean.class
+    };
+    private static final Class<?>[] TALON_TYPES = new Class<?>[] {
+    //  id             ntalon         nrasp          pcod_sp
+        Integer.class, Integer.class, Integer.class, Integer.class,
+    //  cdol          cdol_kem       vidp           timepn     
+        String.class, Integer.class, Integer.class, Time.class,
+    //  timepk      datapt      datap       timep 
+        Time.class, Date.class, Date.class, Time.class,
+    //  cpol
+        Integer.class
     };
 
     public ServerGenTalons(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
@@ -178,7 +219,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final Calend getCalendar(final long datacal) throws KmiacServerException,
             CalendNotFoundException, TException {
         String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
-                + "pr_rab, d_rab FROM e_calendar WHERE datacal=? ORDER BY datacal";
+            + "pr_rab, d_rab FROM e_calendar WHERE datacal=? ORDER BY datacal";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, new Date(datacal))) {
             if (acrs.getResultSet().next()) {
                 Calend tmpCalend = rsmCalendar.map(acrs.getResultSet());
@@ -313,9 +354,9 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspCpodr(final int cpodr) throws KmiacServerException,
             TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
-                + "WHERE cpol =? "
-                + "ORDER BY pcod";
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+            + "WHERE cpol =? "
+            + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
             List<Nrasp> tmpList = rsmNrasp.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
@@ -333,9 +374,9 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspCdol(final int cpodr, final String cdol)
             throws KmiacServerException, TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
-                + "WHERE cpol =? AND cdol =? "
-                + "ORDER BY pcod";
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+            + "WHERE cpol =? AND cdol =? "
+            + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
             List<Nrasp> tmpList = rsmNrasp.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
@@ -373,22 +414,64 @@ public class ServerGenTalons extends Server implements Iface {
     @Override
     public final int getTalonCountCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-        return 0;
+        String  sqlQuery = "SELECT count(*) FROM e_talon "
+                + "WHERE datap >= ? AND datap <= ?  AND cpol = ? ";
+        try (AutoCloseableResultSet acrs =
+                sse.execPreparedQuery(sqlQuery, new Date(datan), new Date(datak), cpodr)) {
+            acrs.getResultSet().next();
+            return acrs.getResultSet().getInt("count");
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final int getTalonCountCdol(final long datan, final long datak,
             final int cpodr, final String cdol) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-        return 0;
+        String  sqlQuery = "SELECT count(*) FROM e_talon "
+                + "WHERE datap >= ? AND datap <= ?  AND cpol = ? AND cdol = ?";
+        try (AutoCloseableResultSet acrs =
+                sse.execPreparedQuery(sqlQuery, new Date(datan), new Date(datak), cpodr, cdol)) {
+            acrs.getResultSet().next();
+            return acrs.getResultSet().getInt("count");
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final int getTalonCountVrach(final long datan, final long datak, final int cpodr,
             final int pcodvrach, final String cdol) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-        return 0;
+        String  sqlQuery = "SELECT count(*) FROM e_talon "
+                + "WHERE datap >= ? AND datap <= ?  AND cpol = ? AND cdol = ? AND pcod_sp = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                sqlQuery, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach)) {
+            acrs.getResultSet().next();
+            return acrs.getResultSet().getInt("count");
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void addRasp(final List<Rasp> rasp) throws KmiacServerException,
+            TException {
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Rasp elemRasp : rasp) {
+                sme.execPreparedT("INSERT INTO e_rasp (nrasp, pcod, nned, denn, datap, time_n,"
+                    + "time_k, vidp, cdol, cpol, pfd)"
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    false, elemRasp, RASP_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+
     }
 
     @Override
@@ -409,14 +492,10 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException {
+    public void addTalons(final List<Talon> talon) throws KmiacServerException,
+            TException {
         // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void deleteNdv(final int id) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
+        
     }
 
     @Override
@@ -432,52 +511,56 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public void addRasp(final List<Rasp> rasp) throws KmiacServerException,
-            TException {
+    public void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
+            throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+    }
+
+    @Override
+    public void deleteNdv(final int id) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
     }
 
     @Override
     public void deleteRaspCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public void deleteRaspCdol(final long datan, final long datak, final int cpodr, final String cdol)
-            throws KmiacServerException, TException {
+    public void deleteRaspCdol(final long datan, final long datak,
+            final int cpodr, final String cdol) throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void deleteRaspVrach(final long datan, final long datak, final int cpodr,
             final int pcodvrach, final String cdol) throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void deleteTalonCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public void deleteTalonCdol(final long datan, final long datak, final int cpodr, final String cdol)
-            throws KmiacServerException, TException {
+    public void deleteTalonCdol(final long datan, final long datak, final int cpodr,
+            final String cdol) throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void deleteTalonVrach(final long datan, final long datak, final int cpodr,
             final int pcodvrach, final String cdol) throws KmiacServerException, TException {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
