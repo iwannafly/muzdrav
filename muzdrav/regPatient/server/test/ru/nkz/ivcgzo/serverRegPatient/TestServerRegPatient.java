@@ -38,7 +38,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Sign;
  */
 public class TestServerRegPatient {
     private String conn = String.format("jdbc:postgresql://%s:%s/%s",
-            "10.0.0.66", "5432", "zabol");
+            "10.0.0.242", "5432", "zabol");
     private ISqlSelectExecutor sse;
     private ITransactedSqlExecutor tse;
     private ServerRegPatient testServer;
