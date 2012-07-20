@@ -330,6 +330,6 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         * Добавляет записи в табл талонов
         * @param Talon - thrift-объект с информацией о талонах
         */
-    void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
+	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
 }

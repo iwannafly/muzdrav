@@ -195,8 +195,8 @@ public class TalonMainFrame extends JFrame {
 		
 		JScrollPane sp_rasp = new JScrollPane();
 		
-		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По", 5, "Схема");
-		tbl_rasp.setPreferredWidths(100,90,60,60,30);
+		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема");
+		tbl_rasp.setPreferredWidths(100,90,60,60,30,30);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
 		tbl_rasp.setFillsViewportHeight(true);
@@ -317,13 +317,13 @@ public class TalonMainFrame extends JFrame {
 		otm_day_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					if (tbl_rasp.getSelectedItem() != null)
+					if (tbl_rasp.getSelectedItem() != null){
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (otm_day_1.isSelected())
-								if (NraspInfo.get(i).getDenn() == 1)
-									NraspInfo.get(i).setPfd(true);
-//						tbl_rasp.setData(NraspInfo);
+							if (NraspInfo.get(i).getDenn() == 1)
+								NraspInfo.get(i).setPfd(otm_day_1.isSelected());
+						tbl_rasp.setData(NraspInfo);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -334,12 +334,13 @@ public class TalonMainFrame extends JFrame {
 		otm_day_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					if (tbl_rasp.getSelectedItem() != null)
+					if (tbl_rasp.getSelectedItem() != null){
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (otm_day_2.isSelected())
-								if (NraspInfo.get(i).getDenn() == 2)
-								NraspInfo.get(i).setPfd(true);
+							if (NraspInfo.get(i).getDenn() == 2)
+								NraspInfo.get(i).setPfd(otm_day_2.isSelected());
+						tbl_rasp.setData(NraspInfo);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -350,12 +351,13 @@ public class TalonMainFrame extends JFrame {
 		otm_day_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					if (tbl_rasp.getSelectedItem() != null)
+					if (tbl_rasp.getSelectedItem() != null){
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (otm_day_3.isSelected())
-								if (NraspInfo.get(i).getDenn() == 3)
-								NraspInfo.get(i).setPfd(true);
+							if (NraspInfo.get(i).getDenn() == 3)
+								NraspInfo.get(i).setPfd(otm_day_3.isSelected());
+						tbl_rasp.setData(NraspInfo);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -366,12 +368,16 @@ public class TalonMainFrame extends JFrame {
 		otm_day_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					if (tbl_rasp.getSelectedItem() != null)
-						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (otm_day_4.isSelected())
-								if (NraspInfo.get(i).getDenn() == 4)
-								NraspInfo.get(i).setPfd(true);
+					if (tbl_rasp.getSelectedItem() != null){
+						for (int i=0; i <= NraspInfo.size()-1; i++){ 
+							if (NraspInfo.get(i).getDenn() == 4)
+								NraspInfo.get(i).setPfd(otm_day_4.isSelected());
+		    				System.out.println(NraspInfo.get(i).getId()+", "+NraspInfo.get(i).isPfd());
+						}
+						tbl_rasp.setData(NraspInfo);
+//						MainForm.tcl.updateNrasp(NraspInfo);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -382,12 +388,13 @@ public class TalonMainFrame extends JFrame {
 		otm_day_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					if (tbl_rasp.getSelectedItem() != null)
+					if (tbl_rasp.getSelectedItem() != null){
 						for (int i=0; i <= NraspInfo.size()-1; i++) 
-							if (otm_day_5.isSelected())
-								if (NraspInfo.get(i).getDenn() == 5)
-								NraspInfo.get(i).setPfd(true);
+							if (NraspInfo.get(i).getDenn() == 5)
+								NraspInfo.get(i).setPfd(otm_day_5.isSelected());
+						tbl_rasp.setData(NraspInfo);
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -862,13 +869,13 @@ public class TalonMainFrame extends JFrame {
             if (NraspInfo.size() > 0) {
     			tbl_rasp.setData(NraspInfo);
     			for (int i=0; i <= NraspInfo.size()-1; i++) {
-    				System.out.println(NraspInfo.get(i).getDenn()+", "+NraspInfo.get(i).isPfd());
+//    				System.out.println(NraspInfo.get(i).getDenn()+", "+NraspInfo.get(i).isPfd());
     				if (NraspInfo.get(i).isPfd()){
-    					if (NraspInfo.get(i).getDenn() == 1 )otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 1 )otm_day_1.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isPfd());
     				}
     			}
             }
@@ -885,11 +892,11 @@ public class TalonMainFrame extends JFrame {
     			tbl_rasp.setData(NraspInfo);
     			for (int i=0; i <= NraspInfo.size()-1; i++) {
     				if (NraspInfo.get(i).isPfd()){
-    					if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isSetPfd());
-    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isSetPfd());
+    					if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isPfd());
+    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isPfd());
     				}
     			}
             }
