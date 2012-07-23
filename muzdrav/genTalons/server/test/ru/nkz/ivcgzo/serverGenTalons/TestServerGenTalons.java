@@ -3,7 +3,6 @@ package ru.nkz.ivcgzo.serverGenTalons;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.Date;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -176,6 +175,7 @@ public class TestServerGenTalons {
         assertEquals("list size", expectedListSize, testVidp.size());
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public final void getTalonCountCpodr_IsValueCorrect() throws KmiacServerException, TException {
         final int expectedCount = 1;
@@ -186,6 +186,7 @@ public class TestServerGenTalons {
         assertEquals("talon's count", expectedCount, talonCount);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public final void getTalonCountCdol_IsValueCorrect() throws KmiacServerException, TException {
         final int expectedCount = 1;
@@ -197,6 +198,7 @@ public class TestServerGenTalons {
         assertEquals("talon's count", expectedCount, talonCount);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public final void getTalonCountVrach_IsValueCorrect() throws KmiacServerException, TException {
         final int expectedCount = 1;
@@ -211,7 +213,7 @@ public class TestServerGenTalons {
 
     @Test
     public final void addRasp_IsActuallyAdded() throws KmiacServerException, TException {
-        List<Rasp> testList = new ArrayList();
+        List<Rasp> testList = new ArrayList<>();
         testList.add(new Rasp(1, 13, 2, 3, 0, 0, 0, 5, "L100", 2, 2, true));
         testList.add(new Rasp(1, 13, 2, 3, 0, 0, 0, 5, "K100", 2, 2, true));
         testServer.addRasp(testList);
@@ -219,7 +221,7 @@ public class TestServerGenTalons {
 
     @Test
     public final void updateNrasp_IsActuallyUpdated() throws KmiacServerException, TException {
-        List<Nrasp> testList = new ArrayList();
+        List<Nrasp> testList = new ArrayList<>();
         testList.add(new Nrasp(6, 1, 1, 0, 0, 0,
                 "9", 200004, 3, true, 0, 0));
         testServer.updateNrasp(testList);

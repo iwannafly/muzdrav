@@ -46,9 +46,15 @@ import ru.nkz.ivcgzo.thriftGenTalon.VrachNotFoundException;
 
 public class ServerGenTalons extends Server implements Iface {
 
+////////////////////////////////////////////////////////////////////////
+//                          Fields                                    //
+////////////////////////////////////////////////////////////////////////
+
     private TServer thrServ;
 
     private static Logger log = Logger.getLogger(ServerGenTalons.class.getName());
+
+////////////////////////////////Mappers /////////////////////////////////
 
     private TResultSetMapper<Spec, Spec._Fields> rsmSpec;
     private TResultSetMapper<Vrach, Vrach._Fields> rsmVrach;
@@ -59,6 +65,9 @@ public class ServerGenTalons extends Server implements Iface {
     private TResultSetMapper<Rasp, Rasp._Fields> rsmRasp;
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
     private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
+
+////////////////////////////Field Name Arrays ////////////////////////////
+
     private static final String[] SPEC_FIELD_NAMES = {
         "pcod", "name"
     };
@@ -91,6 +100,8 @@ public class ServerGenTalons extends Server implements Iface {
     private static final String[] VIDP_FIELD_NAMES = {
         "pcod", "name", "vcolor"
     };
+
+////////////////////////////////Type Arrays /////////////////////////////////
 
     private static final Class<?>[] NORM_TYPES = new Class<?>[] {
     //  cdol          vidp           dlit           cpol
@@ -131,6 +142,10 @@ public class ServerGenTalons extends Server implements Iface {
         Integer.class
     };
 
+////////////////////////////////////////////////////////////////////////
+//                         Constructors                               //
+////////////////////////////////////////////////////////////////////////
+
     public ServerGenTalons(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
         super(sse, tse);
 
@@ -150,6 +165,92 @@ public class ServerGenTalons extends Server implements Iface {
         rsmVidp = new TResultSetMapper<>(Vidp.class, VIDP_FIELD_NAMES);
     }
 
+////////////////////////////////////////////////////////////////////////
+//                       Private Methods                              //
+////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Вызывается при вызове открытого метода удаления. Заменяет признак
+     * талона на 4 (отмененный талон), в случае если признак равен 2 или 3.
+     */
+    private void updateTalonPrvCpodr(final long datan, final long datak, final int cpodr)
+            throws KmiacServerException, TException {
+        final int startPrvToUpdate = 2;
+        final int endPrvToUpdate = 3;
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("UPDATE e_talon SET prv = 4 "
+                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND (prv = ? OR prv = ?) ;",
+                false, datan, datak, cpodr, startPrvToUpdate, endPrvToUpdate);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+    /**
+     * Вызывается при вызове открытого метода удаления. Заменяет признак
+     * талона на 4 (отмененный талон), в случае если признак равен 2 или 3.
+     */
+    private void updateTalonPrvCdol(final long datan, final long datak, final int cpodr,
+            final String cdol) throws KmiacServerException, TException {
+        final int startPrvToUpdate = 2;
+        final int endPrvToUpdate = 3;
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("UPDATE e_talon SET prv = 4 "
+                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol = ?"
+                + "AND (prv = ? OR prv = ?) ;",
+                false, datan, datak, cpodr, cdol, startPrvToUpdate, endPrvToUpdate);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+    /**
+     * Вызывается при вызове открытого метода удаления. Заменяет признак
+     * талона на 4 (отмененный талон), в случае если признак равен 2 или 3.
+     */
+    private void updateTalonPrvVrach(final long datan, final long datak, final int cpodr,
+            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+        final int startPrvToUpdate = 2;
+        final int endPrvToUpdate = 3;
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("UPDATE e_talon SET prv = 4 "
+                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol =? AND pcod_sp = ?"
+                + "AND (prv = ? OR prv = ?) ;",
+                false, datan, datak, cpodr, cdol, pcodvrach, startPrvToUpdate, endPrvToUpdate);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            throw new TException(e);
+        }
+    }
+
+////////////////////////////////////////////////////////////////////////
+//                       Public Methods                               //
+////////////////////////////////////////////////////////////////////////
+
+//////////////////////// Start/Stop Methods ////////////////////////////////////
+
+    @Override
+    public final void start() throws Exception {
+        ThriftGenTalons.Processor<Iface> proc =
+                new ThriftGenTalons.Processor<Iface>(this);
+        thrServ = new TThreadedSelectorServer(new Args(
+                new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
+        log.info("Start serverGenTalons");
+        thrServ.serve();
+    }
+
+    @Override
+    public final void stop() {
+        if (thrServ != null) {
+            thrServ.stop();
+            log.info("Stop serverGenTalons");
+        }
+    }
+
+//////////////////////// Configuration Methods ////////////////////////////////////
+
     @Override
     public void testConnection() throws TException {
         // TODO Auto-generated method stub
@@ -160,21 +261,7 @@ public class ServerGenTalons extends Server implements Iface {
         // TODO Auto-generated method stub
     }
 
-    @Override
-    public final void start() throws Exception {
-        ThriftGenTalons.Processor<Iface> proc =
-                new ThriftGenTalons.Processor<Iface>(this);
-        thrServ = new TThreadedSelectorServer(new Args(
-                new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-        thrServ.serve();
-    }
-
-    @Override
-    public final void stop() {
-        if (thrServ != null) {
-            thrServ.stop();
-        }
-    }
+//////////////////////// Select Methods ////////////////////////////////////
 
     @Override
     public final List<Spec> getAllSpecForPolikliniki(final int cpodr)
@@ -456,6 +543,8 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
+//////////////////////// Add Methods ////////////////////////////////////
+
     @Override
     public final void addRasp(final List<Rasp> rasp) throws KmiacServerException,
             TException {
@@ -469,7 +558,8 @@ public class ServerGenTalons extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
 
     }
@@ -487,7 +577,8 @@ public class ServerGenTalons extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -500,7 +591,8 @@ public class ServerGenTalons extends Server implements Iface {
                 false, ndv, NDV_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -516,7 +608,8 @@ public class ServerGenTalons extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -533,9 +626,12 @@ public class ServerGenTalons extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
+
+//////////////////////// Update Methods ////////////////////////////////////
 
     @Override
     public final void updateNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
@@ -551,7 +647,8 @@ public class ServerGenTalons extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -568,9 +665,12 @@ public class ServerGenTalons extends Server implements Iface {
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
+
+//////////////////////// Delete Methods ////////////////////////////////////
 
     @Override
     public final void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
@@ -580,7 +680,8 @@ public class ServerGenTalons extends Server implements Iface {
                     false, cpodr, pcodvrach, cdol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -591,7 +692,8 @@ public class ServerGenTalons extends Server implements Iface {
                     false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -603,7 +705,8 @@ public class ServerGenTalons extends Server implements Iface {
                     false, new Date(datan), new Date(datak), cpodr);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
 
     }
@@ -617,7 +720,8 @@ public class ServerGenTalons extends Server implements Iface {
                     false, new Date(datan), new Date(datak), cpodr, cdol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
 
     }
@@ -631,29 +735,52 @@ public class ServerGenTalons extends Server implements Iface {
                     false, new Date(datan), new Date(datak), cpodr, pcodvrach, cdol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public void deleteTalonCpodr(final long datan, final long datak, final int cpodr)
+    public final void deleteTalonCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-
+        updateTalonPrvCpodr(datan, datak, cpodr);
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ?;",
+                    false, new Date(datan), new Date(datak), cpodr);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
-    public void deleteTalonCdol(final long datan, final long datak, final int cpodr,
+    public final void deleteTalonCdol(final long datan, final long datak, final int cpodr,
             final String cdol) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-
+        updateTalonPrvCdol(datan, datak, cpodr, cdol);
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ? "
+                    + "cdol = ?;",
+                    false, new Date(datan), new Date(datak), cpodr, cdol);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
-    public void deleteTalonVrach(final long datan, final long datak, final int cpodr,
+    public final void deleteTalonVrach(final long datan, final long datak, final int cpodr,
             final int pcodvrach, final String cdol) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-
+        updateTalonPrvVrach(datan, datak, cpodr, pcodvrach, cdol);
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ? "
+                    + "AND pcod_sp = ? AND cdol = ?;",
+                    false, new Date(datan), new Date(datak), cpodr, pcodvrach, cdol);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
-
 }
