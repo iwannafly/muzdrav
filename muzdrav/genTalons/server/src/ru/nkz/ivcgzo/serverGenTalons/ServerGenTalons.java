@@ -441,7 +441,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspCpodr(final int cpodr) throws KmiacServerException,
             TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
             + "WHERE cpol =? "
             + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
@@ -461,7 +461,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspCdol(final int cpodr, final String cdol)
             throws KmiacServerException, TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+            + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
             + "WHERE cpol =? AND cdol =? "
             + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
@@ -481,7 +481,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final List<Nrasp> getNraspVrach(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, TException, NraspNotFoundException {
         String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
-                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp"
+                + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
                 + "WHERE cpol =? AND pcod = ? AND cdol =? "
                 + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs =
