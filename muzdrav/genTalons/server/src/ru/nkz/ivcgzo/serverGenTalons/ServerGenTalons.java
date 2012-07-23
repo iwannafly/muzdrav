@@ -54,7 +54,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     private static Logger log = Logger.getLogger(ServerGenTalons.class.getName());
 
-////////////////////////////////Mappers /////////////////////////////////
+//////////////////////////////// Mappers /////////////////////////////////
 
     private TResultSetMapper<Spec, Spec._Fields> rsmSpec;
     private TResultSetMapper<Vrach, Vrach._Fields> rsmVrach;
@@ -66,7 +66,7 @@ public class ServerGenTalons extends Server implements Iface {
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
     private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
 
-////////////////////////////Field Name Arrays ////////////////////////////
+//////////////////////////// Field Name Arrays ////////////////////////////
 
     private static final String[] SPEC_FIELD_NAMES = {
         "pcod", "name"
@@ -197,7 +197,7 @@ public class ServerGenTalons extends Server implements Iface {
         final int endPrvToUpdate = 3;
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
-                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol = ?"
+                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol = ? "
                 + "AND (prv = ? OR prv = ?) ;",
                 false, datan, datak, cpodr, cdol, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
@@ -216,7 +216,7 @@ public class ServerGenTalons extends Server implements Iface {
         final int endPrvToUpdate = 3;
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
-                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol =? AND pcod_sp = ?"
+                + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol =? AND pcod_sp = ? "
                 + "AND (prv = ? OR prv = ?) ;",
                 false, datan, datak, cpodr, cdol, pcodvrach, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
@@ -760,7 +760,7 @@ public class ServerGenTalons extends Server implements Iface {
         updateTalonPrvCdol(datan, datak, cpodr, cdol);
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ? "
-                    + "cdol = ?;",
+                    + "AND cdol = ?;",
                     false, new Date(datan), new Date(datak), cpodr, cdol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
