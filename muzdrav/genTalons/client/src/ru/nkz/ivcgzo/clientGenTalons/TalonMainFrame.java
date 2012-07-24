@@ -45,12 +45,14 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
+import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
+import ru.nkz.ivcgzo.thriftGenTalon.NormNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
+import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Rasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
-import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 
@@ -207,7 +209,8 @@ public class TalonMainFrame extends JFrame {
 		btn_save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					if (tbl_rasp.getSelectedItem() != null)
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -219,8 +222,11 @@ public class TalonMainFrame extends JFrame {
 		btn_del.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-				    MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
 					tbl_rasp.setData(new ArrayList<Nrasp>());
+					if (tbl_rasp.getData() != null){
+						MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
+					}
+				} catch (KmiacServerException kse){
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -372,7 +378,7 @@ public class TalonMainFrame extends JFrame {
 						for (int i=0; i <= NraspInfo.size()-1; i++){ 
 							if (NraspInfo.get(i).getDenn() == 4)
 								NraspInfo.get(i).setPfd(otm_day_4.isSelected());
-		    				System.out.println(NraspInfo.get(i).getId()+", "+NraspInfo.get(i).isPfd());
+//		    				System.out.println(NraspInfo.get(i).getId()+", "+NraspInfo.get(i).isPfd());
 						}
 						tbl_rasp.setData(NraspInfo);
 //						MainForm.tcl.updateNrasp(NraspInfo);
@@ -588,6 +594,7 @@ public class TalonMainFrame extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
 					RaspisanieUnit.NewNorm(MainForm.authInfo.cpodr, curSpec);
+					ChangeNormInfo();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -880,6 +887,7 @@ public class TalonMainFrame extends JFrame {
     			}
             }
 
+		} catch (NraspNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -902,6 +910,7 @@ public class TalonMainFrame extends JFrame {
             }
 //			System.out.println();
 //		    tbl_rasp.getSelectedItem().setName(pInfo.getName());
+		} catch (NraspNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -911,6 +920,7 @@ public class TalonMainFrame extends JFrame {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
             if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
+		} catch (NormNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -920,6 +930,7 @@ public class TalonMainFrame extends JFrame {
 			tbl_ndv.setData(new ArrayList<Ndv>());
 			NdvInfo = MainForm.tcl.getNdv(MainForm.authInfo.cpodr, curVrach, curSpec);
 			if (NdvInfo.size() > 0)tbl_ndv.setData(NdvInfo);
+		} catch (NdvNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -929,6 +940,7 @@ public class TalonMainFrame extends JFrame {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
 			if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
+		} catch (NormNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
