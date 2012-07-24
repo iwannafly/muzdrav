@@ -676,7 +676,7 @@ public class ServerGenTalons extends Server implements Iface {
     public final void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM e_nrasp WHERE cpol =? AND pcod = ? AND cpol = ?;",
+            sme.execPrepared("DELETE FROM e_nrasp WHERE cpol =? AND pcod = ? AND cdol = ?;",
                     false, cpodr, pcodvrach, cdol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
