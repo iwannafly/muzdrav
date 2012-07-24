@@ -180,7 +180,7 @@ public class ServerGenTalons extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND (prv = ? OR prv = ?) ;",
-                false, datan, datak, cpodr, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -199,7 +199,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol = ? "
                 + "AND (prv = ? OR prv = ?) ;",
-                false, datan, datak, cpodr, cdol, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, cdol, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -218,7 +218,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol =? AND pcod_sp = ? "
                 + "AND (prv = ? OR prv = ?) ;",
-                false, datan, datak, cpodr, cdol, pcodvrach, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
