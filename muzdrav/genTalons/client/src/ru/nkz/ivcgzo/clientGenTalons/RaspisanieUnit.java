@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientGenTalons;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,13 @@ public class RaspisanieUnit {
 	private static int TalonCount;
 	private static long timepause_n = 0;
 	private static long timepause_k = 0;
+	private static List<Nrasp> nrasp2;
 
 	static void NewRaspisanie(int cpodr, int pcod, String cdol, int cxm){
 		try {
 			List<Nrasp> NraspInf = new ArrayList<Nrasp>();
 			if (cxm == 0){
-				for (int j=1; j <= 5; j++) { 
+				for (int j=1; j <= 3; j++) { 
 				for (int i=1; i <= 5; i++) {
 					Nrasp tmpNrasp = new Nrasp();
 					tmpNrasp.setCpol(cpodr);
@@ -43,16 +45,18 @@ public class RaspisanieUnit {
 					tmpNrasp.setCxema(cxm);
 					tmpNrasp.setDenn(i);
 					tmpNrasp.setVidp(j);
-					tmpNrasp.setTime_n(0);
-					tmpNrasp.setTime_k(0);
-					tmpNrasp.setPfd(true);
+					tmpNrasp.setTime_n(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTime_k(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTimep_n(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTimep_k(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setPfd(false);
 					NraspInf.add(tmpNrasp);
 				}
 				}
 			}
 			if (cxm == 1){
 				for (int k=1; k <= 2; k++) { 
-				for (int j=1; j <= 5; j++) { 
+				for (int j=1; j <= 3; j++) { 
 				for (int i=1; i <= 5; i++) {
 					Nrasp tmpNrasp = new Nrasp();
 					tmpNrasp.setCpol(cpodr);
@@ -61,9 +65,11 @@ public class RaspisanieUnit {
 					tmpNrasp.setCxema(k);
 					tmpNrasp.setDenn(i);
 					tmpNrasp.setVidp(j);
-					tmpNrasp.setTime_n(0);
-					tmpNrasp.setTime_k(0);
-					tmpNrasp.setPfd(true);
+					tmpNrasp.setTime_n(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTime_k(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTimep_n(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setTimep_k(Time.valueOf("00:00:00").getTime());
+					tmpNrasp.setPfd(false);
 					NraspInf.add(tmpNrasp);
 				}
 				}
@@ -78,14 +84,14 @@ public class RaspisanieUnit {
 	static void NewNorm(int cpodr, String cdol){
 		try {
 			List<Norm> NormInf = new ArrayList<Norm>();
-				for (int i=1; i <= 5; i++) {
-					Norm tmpNorm = new Norm();
-					tmpNorm.setCpol(cpodr);
-					tmpNorm.setCdol(cdol);
-					tmpNorm.setVidp(i);
-					tmpNorm.setDlit(0);
-					NormInf.add(tmpNorm);
-				}
+			for (int i=1; i <= 3; i++) {
+				Norm tmpNorm = new Norm();
+				tmpNorm.setCpol(cpodr);
+				tmpNorm.setCdol(cdol);
+				tmpNorm.setVidp(i);
+				tmpNorm.setDlit(0);
+				NormInf.add(tmpNorm);
+			}
 			MainForm.tcl.addNorm(NormInf);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -117,15 +123,15 @@ public class RaspisanieUnit {
 				cal1.add(Calendar.DAY_OF_MONTH, 1);
 				if (getPrrabFromCalendar(cal1.getTimeInMillis())){
 					if (ind ==1 ){
-						List<Nrasp> nrasp = MainForm.tcl.getNraspCpodr(cpodr);
+						nrasp = MainForm.tcl.getNraspCpodr(cpodr);
 					}
 					if (ind ==2 ){
-						List<Nrasp> nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
+						nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
 					}
 					if (ind ==3 ){
-						List<Nrasp> nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
+						nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
 					}
-					List<Rasp> rasp = new ArrayList<Rasp>();
+					rasp = new ArrayList<Rasp>();
 					List<Nrasp> pauselist = new ArrayList<Nrasp>();
 					for (int i=0; i <= nrasp.size()-1; i++) {
 						if((nrasp.get(i).getCxema() == 0) || 
@@ -141,7 +147,7 @@ public class RaspisanieUnit {
 							tmpRasp.setCpol(nrasp.get(i).getCpol());
 							tmpRasp.setCdol(nrasp.get(i).getCdol());
 							tmpRasp.setPfd(nrasp.get(i).isPfd());
-							if (tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
+							if (!tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
 								if (tmpRasp.getTime_n() != 0 && tmpRasp.getTime_k() != 0){
 									rasp.add(tmpRasp);
 									if (nrasp.get(i).getTimep_n() != 0 && nrasp.get(i).getTimep_k() != 0){
