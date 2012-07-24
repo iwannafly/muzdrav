@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import org.apache.thrift.protocol.TList;
 
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
+import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
@@ -119,20 +120,20 @@ public class RaspisanieUnit {
 				MainForm.tcl.deleteRaspVrach(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, pcod, cdol);
 				TalonCount = MainForm.tcl.getTalonCountVrach(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, pcod, cdol);
 			}
+			if (ind ==1 ){
+				nrasp = MainForm.tcl.getNraspCpodr(cpodr);
+			}
+			if (ind ==2 ){
+				nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
+			}
+			if (ind ==3 ){
+				nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
+			}
+			rasp = new ArrayList<Rasp>();
+			List<Nrasp> pauselist = new ArrayList<Nrasp>();
 			while (!cal1.equals(cal2)) {
 				cal1.add(Calendar.DAY_OF_MONTH, 1);
 				if (getPrrabFromCalendar(cal1.getTimeInMillis())){
-					if (ind ==1 ){
-						nrasp = MainForm.tcl.getNraspCpodr(cpodr);
-					}
-					if (ind ==2 ){
-						nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
-					}
-					if (ind ==3 ){
-						nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
-					}
-					rasp = new ArrayList<Rasp>();
-					List<Nrasp> pauselist = new ArrayList<Nrasp>();
 					for (int i=0; i <= nrasp.size()-1; i++) {
 						if((nrasp.get(i).getCxema() == 0) || 
 						(nrasp.get(i).getCxema() == 1 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) == 0)|| 		
@@ -307,6 +308,7 @@ public class RaspisanieUnit {
 				}
 			}
 			return true;
+		} catch (NdvNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

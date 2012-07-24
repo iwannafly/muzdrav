@@ -222,10 +222,10 @@ public class TalonMainFrame extends JFrame {
 		btn_del.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					tbl_rasp.setData(new ArrayList<Nrasp>());
-					if (tbl_rasp.getData() != null){
+					//if (tbl_rasp.getData() != null){
 						MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
-					}
+					//}
+					tbl_rasp.setData(new ArrayList<Nrasp>());
 				} catch (KmiacServerException kse){
 				} catch (Exception e1) {
 					e1.printStackTrace();
