@@ -112,8 +112,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					JOptionPane.showMessageDialog(frame, "Ошибка загрузки классификаторов", "Необработанная ошибка", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-				table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("27.03.2012").getTime()));
-				
+				//table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
+				table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
 				if (vvod == null) {
 					vvod = new Vvod();
 					addChildFrame(vvod);
