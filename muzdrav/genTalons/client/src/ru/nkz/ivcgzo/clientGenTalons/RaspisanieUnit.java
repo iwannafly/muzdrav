@@ -103,30 +103,24 @@ public class RaspisanieUnit {
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 			Calendar cal1 = Calendar.getInstance();
-			cal1.setTimeInMillis(datn);
 			Calendar cal2 = Calendar.getInstance();
+			cal1.setTimeInMillis(datn);
 			cal2.setTimeInMillis(datk);
 			cal1.add(Calendar.DAY_OF_MONTH, -1);
 			
 			if (ind ==1 ){
 				MainForm.tcl.deleteRaspCpodr(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr);
 				TalonCount = MainForm.tcl.getTalonCountCpodr(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr);
+				nrasp = MainForm.tcl.getNraspCpodr(cpodr);
 			}
 			if (ind ==2 ){
 				MainForm.tcl.deleteRaspCdol( cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, cdol);
 				TalonCount = MainForm.tcl.getTalonCountCdol(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, cdol);
+				nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
 			}
 			if (ind ==3 ){
 				MainForm.tcl.deleteRaspVrach(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, pcod, cdol);
 				TalonCount = MainForm.tcl.getTalonCountVrach(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, pcod, cdol);
-			}
-			if (ind ==1 ){
-				nrasp = MainForm.tcl.getNraspCpodr(cpodr);
-			}
-			if (ind ==2 ){
-				nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
-			}
-			if (ind ==3 ){
 				nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
 			}
 			rasp = new ArrayList<Rasp>();
@@ -134,32 +128,36 @@ public class RaspisanieUnit {
 			while (!cal1.equals(cal2)) {
 				cal1.add(Calendar.DAY_OF_MONTH, 1);
 				if (getPrrabFromCalendar(cal1.getTimeInMillis())){
+					int NumDayOfWeek = cal1.get(Calendar.DAY_OF_WEEK);
+					if (NumDayOfWeek >= 2) NumDayOfWeek = NumDayOfWeek-1;
 					for (int i=0; i <= nrasp.size()-1; i++) {
-						if((nrasp.get(i).getCxema() == 0) || 
-						(nrasp.get(i).getCxema() == 1 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) == 0)|| 		
-						(nrasp.get(i).getCxema() == 2 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) != 0)){
-							Rasp tmpRasp = new Rasp();
-							tmpRasp.setPcod(nrasp.get(i).getPcod());
-							tmpRasp.setDenn(nrasp.get(i).getDenn());
-							tmpRasp.setDatap(cal1.getTimeInMillis());
-							tmpRasp.setTime_n(nrasp.get(i).getTime_n());
-							tmpRasp.setTime_k(nrasp.get(i).getTime_k());
-							tmpRasp.setVidp(nrasp.get(i).getVidp());
-							tmpRasp.setCpol(nrasp.get(i).getCpol());
-							tmpRasp.setCdol(nrasp.get(i).getCdol());
-							tmpRasp.setPfd(nrasp.get(i).isPfd());
-							if (!tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
-								if (tmpRasp.getTime_n() != 0 && tmpRasp.getTime_k() != 0){
-									rasp.add(tmpRasp);
-									if (nrasp.get(i).getTimep_n() != 0 && nrasp.get(i).getTimep_k() != 0){
-										Nrasp tmpPause = new Nrasp();
-										tmpPause.setPcod(tmpRasp.getPcod());
-										tmpPause.setDenn(tmpRasp.getDenn());
-										tmpPause.setCdol(tmpRasp.getCdol());
-										tmpPause.setVidp(tmpRasp.getVidp());
-										tmpPause.setTimep_n(nrasp.get(i).getTimep_n());
-										tmpPause.setTimep_k(nrasp.get(i).getTimep_k());
-										pauselist.add(tmpPause);
+						if(nrasp.get(i).getDenn() == NumDayOfWeek){
+							if((nrasp.get(i).getCxema() == 0) || 
+							(nrasp.get(i).getCxema() == 1 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) == 0)|| 		
+							(nrasp.get(i).getCxema() == 2 && (cal1.get(Calendar.DAY_OF_MONTH) % 2) != 0)){
+								Rasp tmpRasp = new Rasp();
+								tmpRasp.setPcod(nrasp.get(i).getPcod());
+								tmpRasp.setDenn(nrasp.get(i).getDenn());
+								tmpRasp.setDatap(cal1.getTimeInMillis());
+								tmpRasp.setTime_n(nrasp.get(i).getTime_n());
+								tmpRasp.setTime_k(nrasp.get(i).getTime_k());
+								tmpRasp.setVidp(nrasp.get(i).getVidp());
+								tmpRasp.setCpol(nrasp.get(i).getCpol());
+								tmpRasp.setCdol(nrasp.get(i).getCdol());
+								tmpRasp.setPfd(nrasp.get(i).isPfd());
+								if (!tmpRasp.isPfd() && getPrrabFromNdv(tmpRasp.getCpol(), tmpRasp.getPcod(), tmpRasp.getCdol(), tmpRasp.getDatap())) {
+									if (tmpRasp.getTime_n() != 0 && tmpRasp.getTime_k() != 0){
+										rasp.add(tmpRasp);
+										if (nrasp.get(i).getTimep_n() != 0 && nrasp.get(i).getTimep_k() != 0){
+											Nrasp tmpPause = new Nrasp();
+											tmpPause.setPcod(tmpRasp.getPcod());
+											tmpPause.setDenn(tmpRasp.getDenn());
+											tmpPause.setCdol(tmpRasp.getCdol());
+											tmpPause.setVidp(tmpRasp.getVidp());
+											tmpPause.setTimep_n(nrasp.get(i).getTimep_n());
+											tmpPause.setTimep_k(nrasp.get(i).getTimep_k());
+											pauselist.add(tmpPause);
+										}
 									}
 								}
 							}
@@ -171,15 +169,17 @@ public class RaspisanieUnit {
 				MainForm.tcl.addRasp(rasp);
 				if (TalonCount != 0){
 					int answer = JOptionPane.showConfirmDialog(null, "За период "+sdf.format(new Date(cal1.getTimeInMillis()))+" - "+sdf.format(new Date(cal2.getTimeInMillis()))+" талоны уже сформированы. \n\r Записано пациентов на прием к врачу "+Integer.toString(TalonCount)+"\n\r Формировать талоны заново?",  null, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		            if (answer != JOptionPane.YES_OPTION)  { 
-		            	return; 
+		            if (answer != JOptionPane.YES_OPTION){
+			    		if (ind ==1 )MainForm.tcl.deleteTalonCpodr(datn, datk, cpodr);
+			    		if (ind ==2 )MainForm.tcl.deleteTalonCdol (datn, datk, cpodr, cdol);
+			    		if (ind ==3 )MainForm.tcl.deleteTalonVrach(datn, datk, cpodr, pcod, cdol);
 		            }else{
-		    			if (ind ==1 )MainForm.tcl.deleteTalonCpodr(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr);
-		    			if (ind ==2 )MainForm.tcl.deleteTalonCdol( cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, cdol);
-		    			if (ind ==3 )MainForm.tcl.deleteTalonVrach(cal1.getTimeInMillis(), cal2.getTimeInMillis(), cpodr, pcod, cdol);
-						CreateTableTalon(rasp, pauselist);
-		            }
+		            	return; 
+		            }            
 				}
+		        CreateTableTalon(rasp, pauselist);
+			}else {
+				System.out.println("Проверьте график работы.");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -191,19 +191,24 @@ public class RaspisanieUnit {
 		for (int i=0; i <= rasp.size()-1; i++) {
 			try {
 				mdlit = MainForm.tcl.getNorm(rasp.get(i).getCpol(), rasp.get(i).getCdol());
-				for (int j=0; j <= mdlit.size()-1; j++) 
-					if (rasp.get(i).getVidp() == mdlit.get(j).getDlit()) dlit = mdlit.get(j).getDlit(); 
 				timepause_n = 0;
 				timepause_k = 0;
-				for (int j=0; j <= pauselist.size()-1; j++)
-					if (rasp.get(i).getPcod()==pauselist.get(j).getPcod() && 
-						rasp.get(i).getDenn()==pauselist.get(j).getDenn() &&
-						rasp.get(i).getCdol()==pauselist.get(j).getCdol() &&
-						rasp.get(i).getVidp()==pauselist.get(j).getVidp()){
-						timepause_n = pauselist.get(j).getTimep_n();
-						timepause_k = pauselist.get(j).getTimep_k();
-						break;
+				dlit = 0;
+				for (int j=0; j <= mdlit.size()-1; j++) 
+					if (rasp.get(i).getVidp() == mdlit.get(j).getDlit()) dlit = mdlit.get(j).getDlit(); 
+				if (pauselist.size() != 0) {
+					for (int j=0; j <= pauselist.size()-1; j++){
+						if (rasp.get(i).getPcod()==pauselist.get(j).getPcod() && 
+							rasp.get(i).getDenn()==pauselist.get(j).getDenn() &&
+							rasp.get(i).getCdol()==pauselist.get(j).getCdol() &&
+							rasp.get(i).getVidp()==pauselist.get(j).getVidp()){
+							timepause_n = pauselist.get(j).getTimep_n();
+							timepause_k = pauselist.get(j).getTimep_k();
+							break;
+						}
 					}
+				}
+				
 				if (dlit != 0){
 					Talon tmpTalon = new Talon();
 					tmpTalon.setCpol(rasp.get(i).getCpol());
