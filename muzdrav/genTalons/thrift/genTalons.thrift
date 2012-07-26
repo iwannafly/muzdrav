@@ -84,11 +84,11 @@ struct Vidp{
 
 struct Talon{
 	1:i32 id,
-	2:i32 ntalon,
-	3:i32 nrasp,
+	2:optional i32 ntalon,
+	3:optional i32 nrasp,
 	4:i32 pcod_sp,
 	5:string cdol,
-	6:i32 cdol_kem,
+	6:optional i32 cdol_kem,
 	7:i32 vidp,
 	8:i64 timepn,
 	9:i64 timepk
@@ -210,44 +210,50 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
             2: CalendNotFoundException cnfe);
 
 	/**
-    * Добавляет записи в табл расписание работы врача
-    * @param Nrasp - thrift-объект с информацией о расписании
-    */  
-    void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+	 * Добавляет записи в табл расписание работы врача
+	 * @param Nrasp - thrift-объект с информацией о расписании
+	 */  
+    	void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-    * Добавляет записи в табл ndv
-    * @param Ndv - thrift-объект с информацией о нерабочих днях
-    */
+	* Добавляет записи в табл ndv
+    	* @param Ndv - thrift-объект с информацией о нерабочих днях
+	*/
 	void addNdv(1: Ndv ndv) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-    * Добавляет записи в табл norm
-    * @param Norm - thrift-объект с информацией о нормах длительности приема
-    */
+	* Добавляет записи в табл norm
+        * @param Norm - thrift-объект с информацией о нормах длительности приема
+        */
 	void addNorm(1: list<Norm> norm) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
-    * Удаляет расписание работы врача
-    */
+ 	/**
+        * Удаляет расписание работы врача
+	*/
 	void deleteNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-    * Удаляет строку в табл ndv
-    */
+	* Удаляет строку в табл ndv
+	*/
 	void deleteNdv(1:i32 id) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-    * Сохраняет изменения в табл расписание работы врача
-    * @param Nrasp - thrift-объект с информацией о расписании
-    */
+	* Сохраняет изменения в табл расписание работы врача
+	* @param Nrasp - thrift-объект с информацией о расписании
+	*/
 	void updateNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-    * Сохраняет изменения в табл norm
-    * @param Norm - thrift-объект с информацией о расписании
-    */
+	* Сохраняет изменения в табл norm
+	* @param Norm - thrift-объект с информацией о расписании
+	*/
 	void updateNorm(1: list<Norm> norm) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	* Сохраняет изменения в табл ndv
+	* @param Ndv - thrift-объект с информацией о расписании
+	*/
+	void updateNdv(1:list<Ndv> ndv) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
 	*Возвращает график приема всех врачей в поликлинике
