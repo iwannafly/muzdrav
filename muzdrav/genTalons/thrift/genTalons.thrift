@@ -84,17 +84,17 @@ struct Vidp{
 
 struct Talon{
 	1:i32 id,
-	2:i32 ntalon,
-	3:i32 nrasp,
+	2:optional i32 ntalon,
+	3:optional i32 nrasp,
 	4:i32 pcod_sp,
 	5:string cdol,
-	6:i32 cdol_kem,
+	6:optional i32 cdol_kem,
 	7:i32 vidp,
-	8:i64 timepn,
-	9:i64 timepk
-	10:i64 datapt,
-	11:i64 datap,
-	12:i64 timep,
+	8:optional i64 timepn,
+	9:optional i64 timepk
+	10:optional i64 datapt,
+	11:optional i64 datap,
+	12:optional i64 timep,
 	13:i32 cpol
 }
 
