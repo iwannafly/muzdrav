@@ -496,8 +496,8 @@ public class TalonMainFrame extends JFrame {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
 		        try {
-					if (tbl_ndv.getSelectedItem() != null)
-						MainForm.tcl.updateNdv(tbl_ndv.getData());
+					//if (tbl_ndv.getSelectedItem() != null)
+						//MainForm.tcl.updateNdv(tbl_ndv.getData());
 				} catch (Exception e) {
 					e.printStackTrace();
 					return false;
@@ -690,12 +690,15 @@ public class TalonMainFrame extends JFrame {
 		JButton btnNewButton = new JButton("Формировать");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				pBar.setMinimum(0);
+				pBar.setMaximum(100);
+				pBar.setValue(0);
 				if (tf_datn.getDate().getTime() <= tf_datk.getDate().getTime()){
 					if (tal_1.isSelected()) ind = 1;
 					if (tal_2.isSelected()) ind = 2;
 					if (tal_3.isSelected()) ind = 3;
 					if ((ind == 1) || (curSpec != null  && ind == 2) || (curVrach != 0  && ind == 3)){
-						RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+						RaspisanieUnit.CreateTalons(pBar, MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
 						JOptionPane.showMessageDialog(null, "Формирование талонов завершено.", null, JOptionPane.INFORMATION_MESSAGE); 
 					}else {
 					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
@@ -723,6 +726,10 @@ public class TalonMainFrame extends JFrame {
 		
 		pBar = new JProgressBar();
 		//progressBar.setIndeterminate(true); //бесконечный
+		pBar.setMinimum(0);
+		pBar.setMaximum(100);
+		pBar.setValue(0);
+		pBar.setStringPainted(true);
 		
 		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
 		gl_panel_5.setHorizontalGroup(
