@@ -199,7 +199,8 @@ public class ServerGenTalons extends Server implements Iface {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol = ? "
                 + "AND (prv = ? OR prv = ?) ;",
-                false, new Date(datan), new Date(datak), cpodr, cdol, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, cdol, startPrvToUpdate,
+                endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -218,7 +219,8 @@ public class ServerGenTalons extends Server implements Iface {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol =? AND pcod_sp = ? "
                 + "AND (prv = ? OR prv = ?) ;",
-                false, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach,
+                startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -659,9 +661,27 @@ public class ServerGenTalons extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Norm elemNorm : norm) {
                 sme.execPreparedT("UPDATE e_norm SET "
-                    + "cdol= ?, vidp = ?, dlit = ?, cpol = ?"
+                    + "cdol = ?, vidp = ?, dlit = ?, cpol = ? "
                     + "WHERE id = ?;",
                     false, elemNorm, NORM_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateNdv(final List<Ndv> ndv) throws KmiacServerException,
+            TException {
+        final int[] indexes = {0, 1, 2, 3, 4, 5};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Ndv elemNdv : ndv) {
+                sme.execPreparedT("UPDATE e_ndv SET "
+                    + "pcod = ?, datan = ?, datak = ?, cdol = ?, cpol =? "
+                    + "WHERE id = ?;",
+                    false, elemNdv, NDV_TYPES, indexes);
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {

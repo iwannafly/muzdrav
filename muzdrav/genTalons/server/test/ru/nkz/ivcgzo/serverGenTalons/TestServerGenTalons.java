@@ -227,6 +227,7 @@ public class TestServerGenTalons {
         testServer.updateNrasp(testList);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public final void deleteTalonVrach_IsActuallyDeleted() throws KmiacServerException, TException {
         testServer.deleteTalonVrach(new Date(112,2,26).getTime(), new Date(112,2,28).getTime(), 2000004, 6, "9");
