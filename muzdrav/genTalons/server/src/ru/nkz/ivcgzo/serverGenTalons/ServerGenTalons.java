@@ -199,7 +199,8 @@ public class ServerGenTalons extends Server implements Iface {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol = ? "
                 + "AND (prv = ? OR prv = ?) ;",
-                false, new Date(datan), new Date(datak), cpodr, cdol, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, cdol, startPrvToUpdate,
+                endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -218,7 +219,8 @@ public class ServerGenTalons extends Server implements Iface {
             sme.execPrepared("UPDATE e_talon SET prv = 4 "
                 + "WHERE datap >= ? AND datap <= ? AND cpol = ? AND cdol =? AND pcod_sp = ? "
                 + "AND (prv = ? OR prv = ?) ;",
-                false, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach, startPrvToUpdate, endPrvToUpdate);
+                false, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach,
+                startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -266,7 +268,7 @@ public class ServerGenTalons extends Server implements Iface {
     @Override
     public final List<Spec> getAllSpecForPolikliniki(final int cpodr)
             throws KmiacServerException, SpecNotFoundException, TException {
-        String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
+        final String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
             + "INNER JOIN s_mrab ON n_s00.pcod = s_mrab.cdol "
             + "WHERE s_mrab.cpodr = ? ORDER BY n_s00.name";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
@@ -278,14 +280,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Vrach> getVrachForCurrentSpec(final int cpodr, final String cdol)
             throws KmiacServerException, VrachNotFoundException, TException {
-        String  sqlQuery = "SELECT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot, "
+        final String  sqlQuery = "SELECT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot, "
             + "s_mrab.cdol FROM s_vrach INNER JOIN s_mrab ON s_vrach.pcod=s_mrab.pcod "
             + "WHERE s_mrab.cpodr=? AND s_mrab.cdol=? AND s_mrab.datau is null "
             + "ORDER BY fam, im, ot";
@@ -298,14 +300,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final Calend getCalendar(final long datacal) throws KmiacServerException,
             CalendNotFoundException, TException {
-        String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
+        final String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
             + "pr_rab, d_rab FROM e_calendar WHERE datacal=? ORDER BY datacal";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, new Date(datacal))) {
             if (acrs.getResultSet().next()) {
@@ -323,7 +325,7 @@ public class ServerGenTalons extends Server implements Iface {
     @Override
     public final List<Norm> getNorm(final int cpodr, final String cdol)
             throws KmiacServerException, TException, NormNotFoundException {
-        String  sqlQuery = "SELECT cdol, vidp, dlit, cpol, id "
+        final String  sqlQuery = "SELECT cdol, vidp, dlit, cpol, id "
             + "FROM e_norm WHERE cpol=? AND cdol =? ORDER BY vidp";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
             List<Norm> tmpList = rsmNorm.mapToList(acrs.getResultSet());
@@ -334,14 +336,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Ndv> getNdv(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, TException, NdvNotFoundException {
-        String  sqlQuery = "SELECT pcod, datan, datak, cdol, cpol, id "
+        final String  sqlQuery = "SELECT pcod, datan, datak, cdol, cpol, id "
             + "FROM e_ndv WHERE cpol=? AND pcod =? AND cdol =? ORDER BY datan, datak";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpodr, pcodvrach, cdol)) {
@@ -353,14 +355,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Nrasp> getNrasp(final int cpodr, final int pcodvrach, final String cdol,
             final int cxema) throws KmiacServerException, TException, NraspNotFoundException {
-        String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
+        final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
             + "cxema, cdol, cpol, id, pfd, timep_n, timep_k "
             + "FROM e_nrasp WHERE cpol=? AND pcod =? AND cdol =? "
             + "AND cxema =? ORDER BY denn, vidp, time_n";
@@ -374,14 +376,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Rasp> getRasp(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, TException, RaspNotFoundException {
-        String  sqlQuery = "SELECT nrasp, pcod, nned, denn, datap, time_n, time_k, "
+        final String  sqlQuery = "SELECT nrasp, pcod, nned, denn, datap, time_n, time_k, "
             + "vidp, cdol, cpol, id, pfd FROM e_rasp WHERE cpol=? AND pcod =? AND cdol =? "
             + "ORDER BY datap, vidp, time_n";
         try (AutoCloseableResultSet acrs =
@@ -394,14 +396,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Talon> getTalon(final int cpodr, final int pcodvrach, final String cdol,
             final long datap) throws KmiacServerException, TalonNotFoundException {
-        String  sqlQuery = "SELECT id, ntalon, nrasp, pcod_sp, cdol, cdol_kem, "
+        final String  sqlQuery = "SELECT id, ntalon, nrasp, pcod_sp, cdol, cdol_kem, "
             + "vidp, timepn, timepk, datapt, datap , timep, cpol "
             + "FROM e_talon WHERE cpol=? AND pcod_sp =? AND cdol =? AND datap =? "
             + "ORDER BY datap, timepn, timepk, vidp";
@@ -415,14 +417,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Vidp> getVidp() throws KmiacServerException, TException,
             VidpNotFoundException {
-        String  sqlQuery = "SELECT pcod, name, vcolor FROM e_vidp "
+        final String  sqlQuery = "SELECT pcod, name, vcolor FROM e_vidp "
                 + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             List<Vidp> tmpList = rsmVidp.mapToList(acrs.getResultSet());
@@ -433,14 +435,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Nrasp> getNraspCpodr(final int cpodr) throws KmiacServerException,
             TException, NraspNotFoundException {
-        String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
+        final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
             + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
             + "WHERE cpol =? "
             + "ORDER BY pcod";
@@ -453,14 +455,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Nrasp> getNraspCdol(final int cpodr, final String cdol)
             throws KmiacServerException, TException, NraspNotFoundException {
-        String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
+        final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
             + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
             + "WHERE cpol =? AND cdol =? "
             + "ORDER BY pcod";
@@ -473,14 +475,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final List<Nrasp> getNraspVrach(final int cpodr, final int pcodvrach, final String cdol)
             throws KmiacServerException, TException, NraspNotFoundException {
-        String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
+        final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
                 + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
                 + "WHERE cpol =? AND pcod = ? AND cdol =? "
                 + "ORDER BY pcod";
@@ -494,14 +496,14 @@ public class ServerGenTalons extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final int getTalonCountCpodr(final long datan, final long datak, final int cpodr)
             throws KmiacServerException, TException {
-        String  sqlQuery = "SELECT count(*) FROM e_talon "
+        final String  sqlQuery = "SELECT count(*) FROM e_talon "
                 + "WHERE datap >= ? AND datap <= ?  AND cpol = ? ";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, new Date(datan), new Date(datak), cpodr)) {
@@ -509,14 +511,14 @@ public class ServerGenTalons extends Server implements Iface {
             return acrs.getResultSet().getInt("count");
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final int getTalonCountCdol(final long datan, final long datak,
             final int cpodr, final String cdol) throws KmiacServerException, TException {
-        String  sqlQuery = "SELECT count(*) FROM e_talon "
+        final String  sqlQuery = "SELECT count(*) FROM e_talon "
                 + "WHERE datap >= ? AND datap <= ?  AND cpol = ? AND cdol = ?";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, new Date(datan), new Date(datak), cpodr, cdol)) {
@@ -524,14 +526,14 @@ public class ServerGenTalons extends Server implements Iface {
             return acrs.getResultSet().getInt("count");
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
     @Override
     public final int getTalonCountVrach(final long datan, final long datak, final int cpodr,
             final int pcodvrach, final String cdol) throws KmiacServerException, TException {
-        String  sqlQuery = "SELECT count(*) FROM e_talon "
+        final String  sqlQuery = "SELECT count(*) FROM e_talon "
                 + "WHERE datap >= ? AND datap <= ?  AND cpol = ? AND cdol = ? AND pcod_sp = ?";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
                 sqlQuery, new Date(datan), new Date(datak), cpodr, cdol, pcodvrach)) {
@@ -539,7 +541,7 @@ public class ServerGenTalons extends Server implements Iface {
             return acrs.getResultSet().getInt("count");
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -559,7 +561,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
 
     }
@@ -578,7 +580,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -592,7 +594,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -609,7 +611,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -627,7 +629,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -648,7 +650,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -659,14 +661,32 @@ public class ServerGenTalons extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Norm elemNorm : norm) {
                 sme.execPreparedT("UPDATE e_norm SET "
-                    + "cdol= ?, vidp = ?, dlit = ?, cpol = ?"
+                    + "cdol = ?, vidp = ?, dlit = ?, cpol = ? "
                     + "WHERE id = ?;",
                     false, elemNorm, NORM_TYPES, indexes);
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
+        }
+    }
+
+    @Override
+    public final void updateNdv(final List<Ndv> ndv) throws KmiacServerException,
+            TException {
+        final int[] indexes = {0, 1, 2, 3, 4, 5};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Ndv elemNdv : ndv) {
+                sme.execPreparedT("UPDATE e_ndv SET "
+                    + "pcod = ?, datan = ?, datak = ?, cdol = ?, cpol =? "
+                    + "WHERE id = ?;",
+                    false, elemNdv, NDV_TYPES, indexes);
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -693,7 +713,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -706,7 +726,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
 
     }
@@ -721,7 +741,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
 
     }
@@ -736,7 +756,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -750,7 +770,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -765,7 +785,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
@@ -780,7 +800,7 @@ public class ServerGenTalons extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
+            throw new KmiacServerException(e.getMessage());
         }
     }
 }
