@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Date;
 import java.util.Calendar;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
@@ -94,7 +96,7 @@ public class RaspisanieUnit {
 		}
 	}
 	
-	static void CreateTalons(int cpodr, int pcod, String cdol, long datn, long datk, int ind){
+	static void CreateTalons(JProgressBar pBar,int cpodr, int pcod, String cdol, long datn, long datk, int ind){
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 			Calendar cal1 = Calendar.getInstance();
@@ -126,6 +128,9 @@ public class RaspisanieUnit {
 	            	return; 
 	            }            
 			}
+//			 appThread.start();
+//			 appThread.run();
+
 			if (ind ==1) nrasp = MainForm.tcl.getNraspCpodr(cpodr);
 			if (ind ==2) nrasp = MainForm.tcl.getNraspCdol(cpodr, cdol);
 			if (ind ==3) nrasp = MainForm.tcl.getNraspVrach(cpodr, pcod, cdol);
@@ -140,6 +145,8 @@ public class RaspisanieUnit {
 					if (NumDayOfWeek == 1) NumDayOfWeek = 7;
 					if (NumDayOfWeek >= 2) NumDayOfWeek = NumDayOfWeek-1;
 					for (int i=0; i <= nrasp.size()-1; i++) {
+						int proc = (((i+1)/(nrasp.size()-1))*100);
+						pBar.setValue(proc);
 						if(nrasp.get(i).getDenn() == NumDayOfWeek){
 							//System.out.println(nrasp.get(i).getDenn()+", "+!nrasp.get(i).isPfd() +",  "+ getPrrabFromNdv(nrasp.get(i).getCpol(), nrasp.get(i).getPcod(), nrasp.get(i).getCdol(), cal1.getTimeInMillis()));
 							if (!nrasp.get(i).isPfd()) 
@@ -325,4 +332,20 @@ public class RaspisanieUnit {
 		}
 		return true;
 	}
+//	 final static Runnable doProgBar = new Runnable() {
+//	     public void run() {
+//	         System.out.println("Hello World on " + Thread.currentThread());
+//	     }
+//	 };
+//	 public static Thread appThread = new Thread() {
+//	     public void run() {
+//	         try {
+//	             //SwingUtilities.invokeAndWait(doProgBar);
+//	         }
+//	         catch (Exception e) {
+//	             e.printStackTrace();
+//	         }
+//	         System.out.println("Finished on " + Thread.currentThread());
+//	     }
+//	 };
 }
