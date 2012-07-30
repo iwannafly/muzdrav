@@ -66,6 +66,20 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField tfVrem_tr;
 	private JTextField tfObst;
 	private JTextField tfCvrach;
+	private JTextField tfPsm_a;
+	private JTextField tfPsm_ak;
+	private JTextField tfPsm_b;
+	private JTextField tfPsm_bk;
+	private JTextField tfPsm_v;
+	private JTextField tfPsm_vk;
+	private JTextField tfPsm_g;
+	private JTextField tfPsm_gk;
+	private JTextField tfPsm_p;
+	private JTextField tfPsm_pk;
+	private JTextField tfPsm_p1;
+	private JTextField tfPsm_p2;
+	private JTextField tfPsm_p1k;
+	private JTextField tfPsm_p2k;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -709,6 +723,96 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JLabel lblNewLabel_36 = new JLabel("на основании");
 		
 		JComboBox cmbOsn = new JComboBox();
+		
+		JLabel lblNewLabel_37 = new JLabel("Причины смерти:");
+		lblNewLabel_37.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		JLabel lblNewLabel_38 = new JLabel("Длительность пат. процесса");
+		
+		JLabel lblNewLabel_39 = new JLabel("I.a)");
+		lblNewLabel_39.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		tfPsm_a = new JTextField();
+		tfPsm_a.setColumns(10);
+		
+		JTextArea taPsm_an = new JTextArea();
+		
+		tfPsm_ak = new JTextField();
+		tfPsm_ak.setColumns(10);
+		
+		JComboBox cmbPsm_ad = new JComboBox();
+		
+		JLabel lblNewLabel_40 = new JLabel("б)");
+		lblNewLabel_40.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		tfPsm_b = new JTextField();
+		tfPsm_b.setColumns(10);
+		
+		JTextArea taPsm_bn = new JTextArea();
+		
+		tfPsm_bk = new JTextField();
+		tfPsm_bk.setColumns(10);
+		
+		JComboBox cmbPsm_bd = new JComboBox();
+		
+		JLabel lblNewLabel_41 = new JLabel("в)");
+		lblNewLabel_41.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		tfPsm_v = new JTextField();
+		tfPsm_v.setColumns(10);
+		
+		JTextArea taPsm_vn = new JTextArea();
+		
+		tfPsm_vk = new JTextField();
+		tfPsm_vk.setColumns(10);
+		
+		JComboBox cmbPsm_vd = new JComboBox();
+		
+		JLabel lblNewLabel_42 = new JLabel("г)");
+		lblNewLabel_42.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		tfPsm_g = new JTextField();
+		tfPsm_g.setColumns(10);
+		
+		JTextArea taPsm_gn = new JTextArea();
+		
+		tfPsm_gk = new JTextField();
+		tfPsm_gk.setColumns(10);
+		
+		JComboBox cmbPsm_ag = new JComboBox();
+		
+		JLabel lblNewLabel_43 = new JLabel("II.1");
+		lblNewLabel_43.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		tfPsm_p = new JTextField();
+		tfPsm_p.setColumns(10);
+		
+		JTextArea taPsm_pn = new JTextArea();
+		
+		tfPsm_pk = new JTextField();
+		tfPsm_pk.setColumns(10);
+		
+		JComboBox cmbPsm_pd = new JComboBox();
+		
+		tfPsm_p1 = new JTextField();
+		tfPsm_p1.setColumns(10);
+		
+		tfPsm_p2 = new JTextField();
+		tfPsm_p2.setColumns(10);
+		
+		JTextArea taPsm_p1n = new JTextArea();
+		
+		tfPsm_p1k = new JTextField();
+		tfPsm_p1k.setColumns(10);
+		
+		JComboBox cmbPsm_p1d = new JComboBox();
+		
+		JTextArea taPsm_p2n = new JTextArea();
+		
+		tfPsm_p2k = new JTextField();
+		tfPsm_p2k.setColumns(10);
+		
+		JComboBox cmbPsm_p2d = new JComboBox();
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -716,46 +820,99 @@ public class MainForm extends Client<ThriftMss.Client> {
 					.addContainerGap()
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_11)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbNastupila, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblNewLabel_12)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbProiz, GroupLayout.PREFERRED_SIZE, 320, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addComponent(lblNewLabel_11)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbNastupila, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblNewLabel_12)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbProiz, GroupLayout.PREFERRED_SIZE, 320, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addComponent(lblNewLabel_18)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfDatatr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblNewLabel_19)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfVrem_tr, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblNewLabel_25)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbVid_tr, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addComponent(lblNewLabel_32)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfObst, GroupLayout.PREFERRED_SIZE, 573, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addComponent(lblNewLabel_33)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbUstan, GroupLayout.PREFERRED_SIZE, 216, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblNewLabel_34)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfCvrach, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addComponent(lblNewLabel_35)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbCdol, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblNewLabel_36)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbOsn, GroupLayout.PREFERRED_SIZE, 270, GroupLayout.PREFERRED_SIZE)))
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_18)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfDatatr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblNewLabel_19)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfVrem_tr, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblNewLabel_25)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbVid_tr, GroupLayout.PREFERRED_SIZE, 261, GroupLayout.PREFERRED_SIZE))
+							.addComponent(lblNewLabel_37)
+							.addPreferredGap(ComponentPlacement.RELATED, 436, Short.MAX_VALUE)
+							.addComponent(lblNewLabel_38)
+							.addGap(43))
 						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_32)
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
+									.addComponent(lblNewLabel_42)
+									.addComponent(lblNewLabel_40)
+									.addComponent(lblNewLabel_39)
+									.addComponent(lblNewLabel_41))
+								.addComponent(lblNewLabel_43))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfObst, GroupLayout.PREFERRED_SIZE, 573, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_33)
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
+								.addComponent(tfPsm_p, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
+								.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
+									.addComponent(tfPsm_v, 0, 0, Short.MAX_VALUE)
+									.addComponent(tfPsm_b, 0, 0, Short.MAX_VALUE)
+									.addComponent(tfPsm_a, GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
+								.addComponent(tfPsm_g, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_p1, GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
+								.addComponent(tfPsm_p2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbUstan, GroupLayout.PREFERRED_SIZE, 216, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblNewLabel_34)
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addComponent(taPsm_p2n, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+								.addComponent(taPsm_p1n, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+								.addComponent(taPsm_pn, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+								.addComponent(taPsm_gn, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+								.addComponent(taPsm_vn, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+								.addComponent(taPsm_bn, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+								.addComponent(taPsm_an, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE))
+							.addGap(10)
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(tfPsm_p2k, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_p1k, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_pk, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_gk, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_vk, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_bk, 0, 0, Short.MAX_VALUE)
+								.addComponent(tfPsm_ak, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfCvrach, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(lblNewLabel_35)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbCdol, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblNewLabel_36)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbOsn, GroupLayout.PREFERRED_SIZE, 270, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addComponent(cmbPsm_bd, 0, 129, Short.MAX_VALUE)
+								.addComponent(cmbPsm_ad, 0, 129, Short.MAX_VALUE)
+								.addComponent(cmbPsm_vd, 0, 129, Short.MAX_VALUE)
+								.addComponent(cmbPsm_ag, 0, 129, Short.MAX_VALUE)
+								.addComponent(cmbPsm_pd, 0, 129, Short.MAX_VALUE)
+								.addComponent(cmbPsm_p1d, 0, 129, Short.MAX_VALUE)
+								.addComponent(cmbPsm_p2d, 0, 129, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -790,7 +947,69 @@ public class MainForm extends Client<ThriftMss.Client> {
 						.addComponent(cmbCdol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel_36)
 						.addComponent(cmbOsn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(433, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_37)
+						.addComponent(lblNewLabel_38))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(lblNewLabel_39)
+							.addComponent(tfPsm_a, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tfPsm_ak, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cmbPsm_ad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(taPsm_an, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(lblNewLabel_40)
+							.addComponent(tfPsm_b, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tfPsm_bk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cmbPsm_bd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(taPsm_bn, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+							.addComponent(lblNewLabel_41)
+							.addComponent(tfPsm_v, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+								.addComponent(tfPsm_vk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(cmbPsm_vd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(taPsm_vn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblNewLabel_42)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(taPsm_gn, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tfPsm_g, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tfPsm_gk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cmbPsm_ag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(lblNewLabel_43)
+							.addComponent(tfPsm_p, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tfPsm_pk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cmbPsm_pd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(taPsm_pn, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addComponent(tfPsm_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(taPsm_p1n, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tfPsm_p1k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cmbPsm_p1d, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addComponent(tfPsm_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(taPsm_p2n, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tfPsm_p2k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(cmbPsm_p2d, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(121, Short.MAX_VALUE))
 		);
 		panel_2.setLayout(gl_panel_2);
 
