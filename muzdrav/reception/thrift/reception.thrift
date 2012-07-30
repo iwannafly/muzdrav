@@ -93,6 +93,12 @@ exception TalonNotFoundException {
 exception ReserveTalonOperationFailedException {
 }
 
+/**
+ * Ошибка во время отмены талона
+ */
+exception ReleaseTalonOperationFailedException {
+}
+
 service ThriftReception extends kmiacServer.KmiacServer {
 
     /**
@@ -142,6 +148,7 @@ service ThriftReception extends kmiacServer.KmiacServer {
     /*
      * Отменяет выбор талона (освобождает талон)
      */
-    void releaseTalon(1:Talon talon);
+    void releaseTalon(1:Talon talon) throws (1: kmiacServer.KmiacServerException kse,
+            2: ReleaseTalonOperationFailedException rtofe);
 }
 

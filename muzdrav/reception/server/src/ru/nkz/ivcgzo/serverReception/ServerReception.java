@@ -1,8 +1,11 @@
 package ru.nkz.ivcgzo.serverReception;
 
 import java.io.File;
+import java.sql.SQLException;
+import java.sql.Date;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.thrift.TException;
@@ -12,15 +15,19 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.Policlinic;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
+import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.Spec;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
@@ -43,7 +50,7 @@ public class ServerReception extends Server implements Iface {
 
     private static Logger log = Logger.getLogger(ServerReception.class.getName());
 
-////////////////////////////////Mappers /////////////////////////////////
+//////////////////////////////// Mappers /////////////////////////////////
 
     private TResultSetMapper<Patient, Patient._Fields> rsmPatient;
     private TResultSetMapper<Policlinic, Policlinic._Fields> rsmPoliclinic;
@@ -52,7 +59,7 @@ public class ServerReception extends Server implements Iface {
     private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
 
-////////////////////////////Field Name Arrays ////////////////////////////
+//////////////////////////// Field Name Arrays ////////////////////////////
 
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom"
@@ -103,7 +110,7 @@ public class ServerReception extends Server implements Iface {
 //                       Public Methods                               //
 ////////////////////////////////////////////////////////////////////////
 
-////////////////////////Start/Stop Methods /////////////////////////////
+//////////////////////// Start/Stop Methods /////////////////////////////
 
     @Override
     public final void start() throws Exception {
@@ -140,54 +147,162 @@ public class ServerReception extends Server implements Iface {
     @Override
     public final Patient getPatient(final String omsSer, final String omsNum)
             throws KmiacServerException, PatientNotFoundException, TException {
-        return null;
+        final String sqlQuery = "SELECT npasp, fam, im, ot, datar, poms_ser, poms_nom "
+                + "FROM patient WHERE poms_ser = ? AND poms_nom = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, omsSer, omsNum)) {
+            if (acrs.getResultSet().next()) {
+                return rsmPatient.map(acrs.getResultSet());
+            } else {
+                throw new PatientNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final List<Policlinic> getPoliclinic() throws KmiacServerException,
             PoliclinicNotFoundException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        final String sqlQuery = "SELECT DISTINCT n_n00.pcod, n_n00.name FROM n_n00 "
+                + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            List<Policlinic> tmpList = rsmPoliclinic.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new PoliclinicNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final List<Spec> getSpec(final int cpol) throws KmiacServerException,
             SpecNotFoundException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        final String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
+                + "INNER JOIN e_talon ON n_s00.pcod = e_talon.cdol "
+                + "WHERE e_talon.cpol = ? AND e_talon.prv = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, 0)) {
+            List<Spec> tmpList = rsmSpec.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new SpecNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final List<Vrach> getVrach(final int cpol, final String cdol)
             throws KmiacServerException, VrachNotFoundException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
+                + "FROM s_vrach INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod_sp "
+                + "WHERE e_talon.cpol = ? AND e_talon.cdol = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, cdol)) {
+            List<Vrach> tmpList = rsmVrach.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new VrachNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final List<Vidp> getVidp() throws KmiacServerException,
             VidpNotFoundException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        final String sqlQuery = "SELECT pcod, name, vcolor FROM e_vidp";
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            List<Vidp> tmpList = rsmVidp.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new VidpNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
     public final List<Talon> getTalon(final int cpol, final String cdol, final int pcod)
             throws KmiacServerException, TalonNotFoundException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        final int prv = 0;
+        // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
+        // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
+        final long todayMillisec = new java.util.Date().getTime();
+        final String sqlQuery = "SELECT id, ntalon, vidp, timepn, timepk, datap, npasp, dataz, prv "
+                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? AND datap >= ? "
+                + "AND prv = ?;";
+        try (AutoCloseableResultSet acrs =
+                sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec), prv)) {
+            List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new TalonNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException(e.getMessage());
+        }
     }
 
     @Override
-    public void reserveTalon(final Patient pat, final Talon talon)
+    public final void reserveTalon(final Patient pat, final Talon talon)
             throws KmiacServerException, ReserveTalonOperationFailedException,
             TException {
-        // TODO Auto-generated method stub
+        final int prv = 2;
+        // java.sql.Date не имеет нулевого конструктора, а preparedUpdate() не работает с
+        // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
+        final long todayMillisec = new java.util.Date().getTime();
+        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ? "
+                + "WHERE  id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            final int numUpdated = sme.execPreparedUpdate(
+                    sqlQuery, false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+            if (numUpdated == 1) {
+                sme.setCommit();
+            } else {
+                sme.rollbackTransaction();
+                throw new ReserveTalonOperationFailedException();
+            }
+        } catch (SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     @Override
-    public void releaseTalon(final Talon talon) throws TException {
-        // TODO Auto-generated method stub
+    public final void releaseTalon(final Talon talon) throws KmiacServerException,
+            ReleaseTalonOperationFailedException, TException {
+        final int defaultNpasp = 0;
+        final int defaultPrv = 0;
+        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ? "
+                + "WHERE  id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            final int numUpdated = sme.execPreparedUpdate(
+                    sqlQuery, false, defaultNpasp, null, defaultPrv, talon.getId());
+            if (numUpdated == 1) {
+                sme.setCommit();
+            } else {
+                sme.rollbackTransaction();
+                throw new ReleaseTalonOperationFailedException();
+            }
+        } catch (SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
 }
