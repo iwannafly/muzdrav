@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientGenTalons;
 
+import java.awt.Cursor;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,6 +41,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -51,14 +53,16 @@ import ru.nkz.ivcgzo.thriftGenTalon.Norm;
 import ru.nkz.ivcgzo.thriftGenTalon.NormNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
-import ru.nkz.ivcgzo.thriftGenTalon.Rasp;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
-import javax.swing.JProgressBar;
+import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
 
+import javax.swing.JProgressBar;
 import org.apache.thrift.TException;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class TalonMainFrame extends JFrame {
 
@@ -93,6 +97,19 @@ public class TalonMainFrame extends JFrame {
 	private CustomTable<Ndv, Ndv._Fields> tbl_ndv;
 	private CustomDateEditor tf_datn;
 	private CustomDateEditor tf_datk;
+	private CustomTimeEditor tf_day1_p1;
+	private CustomTimeEditor tf_day1_p2;
+	private CustomTimeEditor tf_day2_p1;
+	private CustomTimeEditor tf_day2_p2;
+	private CustomTimeEditor tf_day3_p1;
+	private CustomTimeEditor tf_day3_p2;
+	private CustomTimeEditor tf_day4_p1;
+	private CustomTimeEditor tf_day4_p2;
+	private CustomTimeEditor tf_day5_p1;
+	private CustomTimeEditor tf_day5_p2;
+	private CustomDateEditor tf_sv1;
+	private CustomDateEditor tf_sv2;
+	private JComboBox<?> cmb_sv;
 
 	/**
 	 * Launch the application.
@@ -116,7 +133,7 @@ public class TalonMainFrame extends JFrame {
 	public TalonMainFrame() {
 		setTitle("Электронная регистратура");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(1, 1, 958, 690); //(x,y,width,height)
+		setBounds(1, 1, 1114, 690); //(x,y,width,height)
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -161,51 +178,193 @@ public class TalonMainFrame extends JFrame {
 		JPanel panel_2 = new JPanel();
 		
 		JPanel panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "\u0418\u043D\u0434\u0438\u0432\u0438\u0434\u0443\u0430\u043B\u044C\u043D\u0430\u044F \u043E\u0442\u043C\u0435\u043D\u0430 \u043F\u0440\u0438\u0435\u043C\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041E\u0442\u043C\u0435\u043D\u0430 \u0444\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u044F \u0442\u0430\u043B\u043E\u043D\u043E\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_6 = new JPanel();
 		panel_6.setBorder(new TitledBorder(null, "\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435 \u043F\u0440\u0438\u0435\u043C\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_8 = new JPanel();
+		panel_8.setBorder(new TitledBorder(null, "\u041F\u0435\u0440\u0435\u0440\u044B\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JButton btnNewButton_1 = new JButton("Сохранить");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					if (tbl_rasp.getSelectedItem() != null){
+						for (int i=0; i <= NraspInfo.size()-1; i++){
+							if (NraspInfo.get(i).getDenn() == 1){
+								NraspInfo.get(i).setTimep_n(tf_day1_p1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day1_p2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 2){
+								NraspInfo.get(i).setTimep_n(tf_day2_p1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day2_p2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 3){
+								NraspInfo.get(i).setTimep_n(tf_day3_p1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day3_p2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 4){
+								NraspInfo.get(i).setTimep_n(tf_day4_p1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day4_p2.getTime().getTime());
+							}
+							if (NraspInfo.get(i).getDenn() == 5){
+								NraspInfo.get(i).setTimep_n(tf_day5_p1.getTime().getTime());
+								NraspInfo.get(i).setTimep_k(tf_day5_p2.getTime().getTime());
+							}
+						}
+						
+						tbl_rasp.setData(NraspInfo);
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		btnNewButton_1.setToolTipText("Сохранить перерыв");
 		GroupLayout gl_tbRasp = new GroupLayout(tbRasp);
 		gl_tbRasp.setHorizontalGroup(
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addGap(23)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 619, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 359, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(45)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addGroup(gl_tbRasp.createParallelGroup(Alignment.TRAILING, false)
-								.addGroup(gl_tbRasp.createSequentialGroup()
-									.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
-									.addGap(70))
-								.addGroup(gl_tbRasp.createSequentialGroup()
-									.addComponent(panel_6, 0, 0, Short.MAX_VALUE)
-									.addGap(43)))
-							.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 222, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(18, Short.MAX_VALUE))
+							.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton_1)
+							.addGap(0, 0, Short.MAX_VALUE)))
+					.addContainerGap())
 		);
 		gl_tbRasp.setVerticalGroup(
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_tbRasp.createSequentialGroup()
+									.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 185, GroupLayout.PREFERRED_SIZE)
+									.addGap(18))
+								.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
+									.addComponent(btnNewButton_1)
+									.addGap(28)))
+							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+						.addGroup(gl_tbRasp.createSequentialGroup()
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE))
-						.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
-							.addGap(42)
-							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE)))
+							.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		
+		JLabel lblNewLabel_7 = new JLabel("Время");
+		JLabel lblNewLabel_2 = new JLabel("Понедельник");
+		JLabel lblNewLabel_3 = new JLabel("Вторник");
+		JLabel lblNewLabel_4 = new JLabel("Среда");
+		JLabel lblNewLabel_5 = new JLabel("Четверг");
+		JLabel lblNewLabel_6 = new JLabel("Пятница");
+
+		tf_day1_p1 = new CustomTimeEditor();
+		tf_day1_p2 = new CustomTimeEditor();
+		tf_day2_p1 = new CustomTimeEditor();
+		tf_day2_p2 = new CustomTimeEditor();
+		tf_day3_p1 = new CustomTimeEditor();
+		tf_day3_p2 = new CustomTimeEditor();
+		tf_day4_p1 = new CustomTimeEditor();
+		tf_day4_p2 = new CustomTimeEditor();
+		tf_day5_p1 = new CustomTimeEditor();
+		tf_day5_p2 = new CustomTimeEditor();
+		GroupLayout gl_panel_8 = new GroupLayout(panel_8);
+		gl_panel_8.setHorizontalGroup(
+			gl_panel_8.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addGap(113)
+					.addComponent(lblNewLabel_7, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+					.addGap(56))
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING, false)
+						.addGroup(gl_panel_8.createSequentialGroup()
+							.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblNewLabel_2)
+								.addComponent(lblNewLabel_5)
+								.addComponent(lblNewLabel_6))
+							.addGap(10)
+							.addGroup(gl_panel_8.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(tf_day5_p1)
+								.addComponent(tf_day2_p1, Alignment.LEADING)
+								.addComponent(tf_day1_p1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 45, Short.MAX_VALUE)
+								.addComponent(tf_day3_p1)
+								.addComponent(tf_day4_p1, Alignment.LEADING)))
+						.addComponent(lblNewLabel_3)
+						.addComponent(lblNewLabel_4))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(tf_day5_p2)
+						.addComponent(tf_day4_p2)
+						.addComponent(tf_day3_p2)
+						.addComponent(tf_day2_p2)
+						.addComponent(tf_day1_p2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE))
+					.addGap(33))
+		);
+		gl_panel_8.setVerticalGroup(
+			gl_panel_8.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_8.createSequentialGroup()
+					.addComponent(lblNewLabel_7)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tf_day1_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_2)
+						.addComponent(tf_day1_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_3)
+						.addComponent(tf_day2_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tf_day2_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_8.createSequentialGroup()
+							.addGap(12)
+							.addComponent(lblNewLabel_4))
+						.addGroup(gl_panel_8.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+								.addComponent(tf_day3_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day3_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_8.createSequentialGroup()
+							.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+								.addComponent(tf_day4_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day4_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_panel_8.createParallelGroup(Alignment.BASELINE)
+								.addComponent(tf_day5_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tf_day5_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(gl_panel_8.createSequentialGroup()
+							.addGap(7)
+							.addComponent(lblNewLabel_5)
+							.addGap(18)
+							.addComponent(lblNewLabel_6)))
+					.addGap(36))
+		);
+		panel_8.setLayout(gl_panel_8);
+		
 		JScrollPane sp_rasp = new JScrollPane();
 		
-		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема");
-		tbl_rasp.setPreferredWidths(100,90,60,60,30,30);
+		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема",10,"перерыв",11,"");
+		tbl_rasp.setPreferredWidths(100,90,60,60,30,30,50,50);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
+		tbl_rasp.setTimeField(6);
+		tbl_rasp.setTimeField(7);
 		tbl_rasp.setFillsViewportHeight(true);
 		sp_rasp.setViewportView(tbl_rasp);
 		
@@ -517,6 +676,7 @@ public class TalonMainFrame extends JFrame {
 					RaspisanieUnit.NewRaspisanie(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
 				}
 				ClearOtmetka();
+				ShowTimePause();
 				ChangeNraspInfo();
 			}
 		});
@@ -698,7 +858,9 @@ public class TalonMainFrame extends JFrame {
 					if (tal_2.isSelected()) ind = 2;
 					if (tal_3.isSelected()) ind = 3;
 					if ((ind == 1) || (curSpec != null  && ind == 2) || (curVrach != 0  && ind == 3)){
+						setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 						RaspisanieUnit.CreateTalons(pBar, MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+						setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						JOptionPane.showMessageDialog(null, "Формирование талонов завершено.", null, JOptionPane.INFORMATION_MESSAGE); 
 					}else {
 					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
@@ -709,11 +871,12 @@ public class TalonMainFrame extends JFrame {
 					System.out.println("Неправильно задан период формирования талонов.");
 					JOptionPane.showMessageDialog(null, "Неправильно задан период формирования талонов.", null, JOptionPane.INFORMATION_MESSAGE); 
 				}
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 			}
 		});
 
 		JLabel lblNewLabel = new JLabel("Период: с");
-		JLabel lblNewLabel_1 = new JLabel("По");
+		JLabel lblNewLabel_1 = new JLabel("по");
 		
 		tal_1 = new JRadioButton("все специалисты");
 		btnGroup_talon.add(tal_1);
@@ -725,6 +888,10 @@ public class TalonMainFrame extends JFrame {
 		btnGroup_talon.add(tal_3);
 		
 		pBar = new JProgressBar();
+		pBar.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+			}
+		});
 		//progressBar.setIndeterminate(true); //бесконечный
 		pBar.setMinimum(0);
 		pBar.setMaximum(100);
@@ -778,6 +945,87 @@ public class TalonMainFrame extends JFrame {
 		panel_5.setLayout(gl_panel_5);
 		tbTalon.setLayout(gl_tbTalon);
 		
+		JPanel tbSvodki = new JPanel();
+		tbMain.addTab("Сводки", null, tbSvodki, null);
+		
+		JPanel panel_9 = new JPanel();
+		panel_9.setBorder(new TitledBorder(null, "\u0424\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435 \u0441\u0432\u043E\u0434\u043E\u043A", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GroupLayout gl_tbSvodki = new GroupLayout(tbSvodki);
+		gl_tbSvodki.setHorizontalGroup(
+			gl_tbSvodki.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tbSvodki.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(panel_9, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+					.addGap(244))
+		);
+		gl_tbSvodki.setVerticalGroup(
+			gl_tbSvodki.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_tbSvodki.createSequentialGroup()
+					.addGap(23)
+					.addComponent(panel_9, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(471, Short.MAX_VALUE))
+		);
+		
+		JLabel lblNewLabel_8 = new JLabel("Вид сводки");
+		JLabel lblNewLabel_9 = new JLabel("За период  с");
+		JLabel lblNewLabel_10 = new JLabel("по");
+		
+		cmb_sv = new JComboBox<>();
+		cmb_sv.setModel(new DefaultComboBoxModel(new String[] {"1. Списки пациентов, записанных на прием", "2. Информация о выданных и неиспользованных талонах (по одному врачу)", "3. Информация о выданных и неиспользованных талонах (по всем врачам)", "4. Списки пациентов, которым необходимо перенести время приема", "5. Журнал пациентов, записанных на прием", "6. Списки пациентов, записанных через инфомат", "7. Количество использованных талонов"}));
+		cmb_sv.setEditable(true);
+		
+		tf_sv2 = new CustomDateEditor();
+		tf_sv1 = new CustomDateEditor();
+		tf_sv1.setDate(System.currentTimeMillis());
+		tf_sv2.setDate(System.currentTimeMillis());
+		
+		JButton btnSvod = new JButton("Создать сводку");
+		btnSvod.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SvodkiUnit.Svodki(cmb_sv.getSelectedIndex(), tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime());
+			}
+		});
+		GroupLayout gl_panel_9 = new GroupLayout(panel_9);
+		gl_panel_9.setHorizontalGroup(
+			gl_panel_9.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_9.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_9.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_9.createSequentialGroup()
+							.addComponent(lblNewLabel_8)
+							.addGap(18)
+							.addComponent(cmb_sv, 0, 478, Short.MAX_VALUE))
+						.addGroup(gl_panel_9.createSequentialGroup()
+							.addComponent(lblNewLabel_9)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(tf_sv1, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_10)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_sv2, GroupLayout.PREFERRED_SIZE, 78, GroupLayout.PREFERRED_SIZE)
+							.addGap(46)
+							.addComponent(btnSvod, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)))
+					.addContainerGap())
+		);
+		gl_panel_9.setVerticalGroup(
+			gl_panel_9.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_9.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_9.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_8)
+						.addComponent(cmb_sv, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addGroup(gl_panel_9.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_9)
+						.addComponent(tf_sv1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_10)
+						.addComponent(tf_sv2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnSvod))
+					.addContainerGap(26, Short.MAX_VALUE))
+		);
+		panel_9.setLayout(gl_panel_9);
+		tbSvodki.setLayout(gl_tbSvodki);
+		
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
@@ -812,6 +1060,7 @@ public class TalonMainFrame extends JFrame {
 				    System.out.println("curSpec= "+curSpec+", curVrach= "+Integer.toString(curVrach));
 					if (tbMain.getSelectedIndex() == 0) {
 						ClearOtmetka();
+						ClearTimePause();
 						ChangeNraspInfo();
 						ChangeNdvInfo();
 					}
@@ -824,6 +1073,7 @@ public class TalonMainFrame extends JFrame {
 					e1.printStackTrace();
 				}
 			}
+
 		});
 		treevrach.addTreeExpansionListener(new TreeExpansionListener() {
 			public void treeCollapsed(TreeExpansionEvent event) {
@@ -860,7 +1110,7 @@ public class TalonMainFrame extends JFrame {
 		treevrach.setModel(new DefaultTreeModel(createNodes()));
 	}
 	
-	private DefaultMutableTreeNode createNodes() {
+	  private DefaultMutableTreeNode createNodes() {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень дерева");
 		try {
 //			List<Spec> specList = MainForm.tcl.getAllSpecForPolikliniki(20);
@@ -920,16 +1170,8 @@ public class TalonMainFrame extends JFrame {
 			}
             if (NraspInfo.size() > 0) {
     			tbl_rasp.setData(NraspInfo);
-    			for (int i=0; i <= NraspInfo.size()-1; i++) {
-//    				System.out.println(NraspInfo.get(i).getDenn()+", "+NraspInfo.get(i).isPfd());
-    				if (NraspInfo.get(i).isPfd()){
-    					if (NraspInfo.get(i).getDenn() == 1 )otm_day_1.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isPfd());
-    				}
-    			}
+    			ShowOtmetka();
+    			ShowTimePause();
             }
 
 		} catch (NraspNotFoundException nnfe) {
@@ -943,15 +1185,8 @@ public class TalonMainFrame extends JFrame {
 			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, cxm);
             if (NraspInfo.size() > 0) {
     			tbl_rasp.setData(NraspInfo);
-    			for (int i=0; i <= NraspInfo.size()-1; i++) {
-    				if (NraspInfo.get(i).isPfd()){
-    					if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isPfd());
-    					if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isPfd());
-    				}
-    			}
+    			ShowOtmetka();
+    			ShowTimePause();
             }
 //			System.out.println();
 //		    tbl_rasp.getSelectedItem().setName(pInfo.getName());
@@ -996,5 +1231,69 @@ public class TalonMainFrame extends JFrame {
 		otm_day_3.setSelected(false);
 		otm_day_4.setSelected(false);
 		otm_day_5.setSelected(false);
+	}
+
+	private void ClearTimePause() {
+		tf_day1_p1.setValue(null);
+		tf_day1_p2.setValue(null);
+		tf_day2_p1.setValue(null);
+		tf_day2_p2.setValue(null);
+		tf_day3_p1.setValue(null);
+		tf_day3_p2.setValue(null);
+		tf_day4_p1.setValue(null);
+		tf_day4_p2.setValue(null);
+		tf_day5_p1.setValue(null);
+		tf_day5_p2.setValue(null);
+	}
+
+	private void ShowOtmetka(){
+		for (int i=0; i <= NraspInfo.size()-1; i++) {
+			if (NraspInfo.get(i).isPfd()){
+				if (NraspInfo.get(i).getDenn() == 1) otm_day_1.setSelected(NraspInfo.get(i).isPfd());
+				if (NraspInfo.get(i).getDenn() == 2) otm_day_2.setSelected(NraspInfo.get(i).isPfd());
+				if (NraspInfo.get(i).getDenn() == 3) otm_day_3.setSelected(NraspInfo.get(i).isPfd());
+				if (NraspInfo.get(i).getDenn() == 4) otm_day_4.setSelected(NraspInfo.get(i).isPfd());
+				if (NraspInfo.get(i).getDenn() == 5) otm_day_5.setSelected(NraspInfo.get(i).isPfd());
+			}
+		}
+	}
+
+	private void ShowTimePause(){
+		for (int i=0; i <= NraspInfo.size()-1; i++){ 
+			if (NraspInfo.get(i).getDenn() == 1){
+				tf_day1_p1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day1_p2.setTime(NraspInfo.get(i).getTimep_k());
+			}
+			if (NraspInfo.get(i).getDenn() == 2){
+				tf_day2_p1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day2_p2.setTime(NraspInfo.get(i).getTimep_k());
+			}
+			if (NraspInfo.get(i).getDenn() == 3){
+				tf_day3_p1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day3_p2.setTime(NraspInfo.get(i).getTimep_k());
+			}
+			if (NraspInfo.get(i).getDenn() == 4){
+				tf_day4_p1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day4_p2.setTime(NraspInfo.get(i).getTimep_k());
+			}
+			if (NraspInfo.get(i).getDenn() == 5){
+				tf_day5_p1.setTime(NraspInfo.get(i).getTimep_n());
+				tf_day5_p2.setTime(NraspInfo.get(i).getTimep_k());
+			}
+			
+		}
+	}
+
+	public void iterate(){
+		     int num = 0;
+			while (num < 1000){
+		     pBar.setValue(num);
+		     try {
+		       Thread.sleep(500);
+		     }
+		       catch (InterruptedException e) {
+		     }
+		     num += 90;
+		   }
 	}
 }
