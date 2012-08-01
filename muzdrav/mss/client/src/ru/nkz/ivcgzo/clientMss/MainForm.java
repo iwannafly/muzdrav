@@ -22,9 +22,14 @@ import javax.swing.border.TitledBorder;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 import javax.swing.JCheckBox;
+import javax.swing.JToolBar;
+import javax.swing.BoxLayout;
+import javax.swing.SwingConstants;
 
 public class MainForm extends Client<ThriftMss.Client> {
 	private JFrame frame;
@@ -91,46 +96,50 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField tfDpol;
 	private JTextField tKpol;
 	
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVid;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_semp;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_obraz;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_zan;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbNastupila;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbProiz;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVid_tr;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbUstan;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbCdol;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbOsn;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_ad;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_bd;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_vd;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_gd;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_pd;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_p1d;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_p2d;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVdok;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbUmerla;
+	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
 		initialize();
 		
 		setFrame(frame);
+		frame.getContentPane().setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
 		
 		JPanel panel = new JPanel();
-		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		frame.getContentPane().add(panel);
 		
-		JButton btn_save = new JButton("Сохранить");
-		panel.add(btn_save);
+		JButton btnNewButton = new JButton("Сохранить");
+		btnNewButton.setVerticalAlignment(SwingConstants.TOP);
+		panel.add(btnNewButton);
 		
-		JButton btn_del = new JButton("Удалить");
-		panel.add(btn_del);
+		JButton btnNewButton_1 = new JButton("Удалить");
+		btnNewButton_1.setVerticalAlignment(SwingConstants.TOP);
+		panel.add(btnNewButton_1);
 		
-		JButton btn_prnt = new JButton("Печать");
-		panel.add(btn_prnt);
+		JButton btnNewButton_2 = new JButton("Номера");
+		btnNewButton_2.setVerticalAlignment(SwingConstants.TOP);
+		panel.add(btnNewButton_2);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 932, Short.MAX_VALUE)
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-					.addGap(10)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 1016, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tabbedPane)
-					.addContainerGap())
-		);
-		
-		JButton btn_param = new JButton("Параметры");
-		panel.add(btn_param);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setToolTipText("");
@@ -145,7 +154,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JComboBox cmbVid = new JComboBox();
+		cmbVid = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel label = new JLabel("Номер");
 		
@@ -244,8 +253,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
-				.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 877, Short.MAX_VALUE)
-				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 877, Short.MAX_VALUE)
+				.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 907, Short.MAX_VALUE)
+				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 907, Short.MAX_VALUE)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 897, Short.MAX_VALUE)
 					.addContainerGap())
@@ -258,7 +267,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 311, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(47, Short.MAX_VALUE))
 		);
 		
 		JLabel lblNewLabel_24 = new JLabel("Заполняется для детей, умерших в возрасте от 168 час. до 1 года");
@@ -420,15 +429,15 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_21 = new JLabel("*Семейное положение");
 		
-		JComboBox cmb_semp = new JComboBox();
+		cmb_semp = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_22 = new JLabel("*Образование");
 		
-		JComboBox cmb_obraz = new JComboBox();
+		cmb_obraz = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_23 = new JLabel("*Занятость");
 		
-		JComboBox cmb_zan = new JComboBox();
+		cmb_zan = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel = new JLabel("Фамилия\r\n");
 		
@@ -692,11 +701,11 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_11 = new JLabel("Смерть: наступила");
 		
-		JComboBox cmbNastupila = new JComboBox();
+		cmbNastupila = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_12 = new JLabel("произошла от");
 		
-		JComboBox cmbProiz = new JComboBox();
+		cmbProiz = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_18 = new JLabel("Дата травмы ");
 		
@@ -710,7 +719,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_25 = new JLabel("вид травмы");
 		
-		JComboBox cmbVid_tr = new JComboBox();
+		cmbVid_tr = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_32 = new JLabel("Обстоятельства");
 		
@@ -719,7 +728,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_33 = new JLabel("Причины установлены");
 		
-		JComboBox cmbUstan = new JComboBox();
+		cmbUstan = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_34 = new JLabel("врач: ФИО");
 		
@@ -728,11 +737,11 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_35 = new JLabel("должность");
 		
-		JComboBox cmbCdol = new JComboBox();
+		cmbCdol = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_36 = new JLabel("на основании");
 		
-		JComboBox cmbOsn = new JComboBox();
+		cmbOsn = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_37 = new JLabel("Причины смерти:");
 		lblNewLabel_37.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -750,7 +759,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_ak = new JTextField();
 		tfPsm_ak.setColumns(10);
 		
-		JComboBox cmbPsm_ad = new JComboBox();
+		cmbPsm_ad = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_40 = new JLabel("б)");
 		lblNewLabel_40.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -763,7 +772,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_bk = new JTextField();
 		tfPsm_bk.setColumns(10);
 		
-		JComboBox cmbPsm_bd = new JComboBox();
+		cmbPsm_bd = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_41 = new JLabel("в)");
 		lblNewLabel_41.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -776,7 +785,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_vk = new JTextField();
 		tfPsm_vk.setColumns(10);
 		
-		JComboBox cmbPsm_vd = new JComboBox();
+		cmbPsm_vd = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_42 = new JLabel("г)");
 		lblNewLabel_42.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -789,7 +798,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_gk = new JTextField();
 		tfPsm_gk.setColumns(10);
 		
-		JComboBox cmbPsm_ag = new JComboBox();
+		cmbPsm_ad = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_43 = new JLabel("II.");
 		lblNewLabel_43.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -802,7 +811,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_pk = new JTextField();
 		tfPsm_pk.setColumns(10);
 		
-		JComboBox cmbPsm_pd = new JComboBox();
+		cmbPsm_pd = new ThriftIntegerClassifierCombobox<>(true);
 		
 		tfPsm_p1 = new JTextField();
 		tfPsm_p1.setColumns(10);
@@ -815,14 +824,14 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_p1k = new JTextField();
 		tfPsm_p1k.setColumns(10);
 		
-		JComboBox cmbPsm_p1d = new JComboBox();
+		cmbPsm_p1d = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JTextArea taPsm_p2n = new JTextArea();
 		
 		tfPsm_p2k = new JTextField();
 		tfPsm_p2k.setColumns(10);
 		
-		JComboBox cmbPsm_p2d = new JComboBox();
+		cmbPsm_p2d = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_44 = new JLabel("ДТП:  ");
 		
@@ -832,7 +841,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_45 = new JLabel("В случае смерти во время беременности....");
 		
-		JComboBox cmbUmerla = new JComboBox();
+		cmbUmerla = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblNewLabel_46 = new JLabel("Заполнил свидетельство");
 		
@@ -1207,6 +1216,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					.addContainerGap(371, Short.MAX_VALUE))
 		);
 		panel_3.setLayout(gl_panel_3);
+		frame.getContentPane().add(tabbedPane);
 
 			}
 	
