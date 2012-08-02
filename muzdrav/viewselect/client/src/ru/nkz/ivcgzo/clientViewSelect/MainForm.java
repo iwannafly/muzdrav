@@ -45,9 +45,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 
 		initialize();
-		
-		setFrame(frame);
-//		setFrame(new PatientSearchForm());
+
+		setFrame(new ViewTablePcodStringForm());
 	}
 
 	/**
@@ -63,13 +62,9 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
                 Pattern pt = Pattern.compile(target.toLowerCase());
                 Matcher mt = pt.matcher(next.toLowerCase());
                 if (mt.find())
-                //if (next.regionMatches(true, 0, target, 0, next.length()))
-                //if(next.equals(target))
                 {
                 	table.setRowSelectionInterval(row, row);
                 	table.setLocation(0, -((table.getRowHeight() * row) - 100));
-                	//table.scrollRectToVisible(table.getCellRect(row, 0, true));
-                	//table.requestFocus();
                     return;
                 }
             }
@@ -142,13 +137,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
-			try { 
-				table.setData(tcl.getVSIntegerClassifierView());
-				frame.setTitle( table.getModel().getColumnClass(1).toString());
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
+			ViewTablePcodStringForm.tableFill();
 		}
 		
 	}

@@ -59,9 +59,7 @@ struct Nrasp{
 	9:i32 id,
 	10:bool pfd,
 	11:i64 timep_n,
-	12:i64 timep_k,
-	13:string name_day,
-	14:string name_vidp
+	12:i64 timep_k
 }
 
 struct Rasp{
@@ -100,6 +98,16 @@ struct Talon{
 	12:optional i64 timep,
 	13:i32 cpol
 }
+/*
+struct Report1{
+	1:i32 cpol,
+	2:optional i32 pcod,
+	3:optional string cdol,
+	4:i64 datan,
+	5:i64 datak,
+	6:i32 npp
+}
+*/
 
 /**
  * Специальность не найдена
@@ -341,4 +349,6 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
         */
 	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
+/*	string printReport(1: Report1 rep1) throws (1: kmiacServer.KmiacServerException kse);
+*/
 }

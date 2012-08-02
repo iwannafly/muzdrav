@@ -1,15 +1,14 @@
 package ru.nkz.ivcgzo.clientGenTalons;
 
 import java.awt.Cursor;
-import java.awt.Font;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
@@ -55,14 +54,15 @@ import ru.nkz.ivcgzo.thriftGenTalon.Nrasp;
 import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
+import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
 
 import javax.swing.JProgressBar;
-import org.apache.thrift.TException;
 import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
+import javax.swing.JSpinner;
+import javax.swing.border.BevelBorder;
 
 public class TalonMainFrame extends JFrame {
 
@@ -74,6 +74,7 @@ public class TalonMainFrame extends JFrame {
 	private String curSpec = null;
 	private int curVrach = 0;
 	private int ind = 0;
+	private long getDatep = 0;
 	private final ButtonGroup btnGroup_cxema = new ButtonGroup();
 	private final ButtonGroup btnGroup_talon = new ButtonGroup();
 	private JRadioButton cxm_1;
@@ -92,9 +93,11 @@ public class TalonMainFrame extends JFrame {
 	private List<Nrasp> NraspInfo;
 	private List<Norm> NormInfo;
 	private List<Ndv> NdvInfo;
+	private List<Talon> TalonInfo;
 	private CustomTable<Nrasp, Nrasp._Fields> tbl_rasp;
 	private CustomTable<Norm, Norm._Fields> tbl_norm;
 	private CustomTable<Ndv, Ndv._Fields> tbl_ndv;
+	private CustomTable<Talon, Talon._Fields> tbl_talon;
 	private CustomDateEditor tf_datn;
 	private CustomDateEditor tf_datk;
 	private CustomTimeEditor tf_day1_p1;
@@ -109,7 +112,13 @@ public class TalonMainFrame extends JFrame {
 	private CustomTimeEditor tf_day5_p2;
 	private CustomDateEditor tf_sv1;
 	private CustomDateEditor tf_sv2;
-	private JComboBox<?> cmb_sv;
+	private JComboBox<String> cmb_sv;
+	private JComboBox<String> cmb_month;
+	private JSpinner sp_god;
+	private JSpinner sp_day;
+	private int nmonth = 0;
+	private int nyear = 0;
+	private int nday = 0;
 
 	/**
 	 * Launch the application.
@@ -148,8 +157,9 @@ public class TalonMainFrame extends JFrame {
 					ChangeNormInfo();
 				}
 				if (tbMain.getSelectedIndex() == 2) {
+					ChangeDatap();
 					ChangeTalonInfo();
-					tal_1.setSelected(true);
+//					tal_1.setSelected(true);
 				}
 			}
 		});
@@ -826,12 +836,18 @@ public class TalonMainFrame extends JFrame {
 		tbMain.addTab("Журнал талонов", null, tbTalon, null);
 		
 		JPanel panel_5 = new JPanel();
+		panel_5.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		
+		JPanel panel_10 = new JPanel();
+		panel_10.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		GroupLayout gl_tbTalon = new GroupLayout(tbTalon);
 		gl_tbTalon.setHorizontalGroup(
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_tbTalon.createSequentialGroup()
+				.addGroup(Alignment.TRAILING, gl_tbTalon.createSequentialGroup()
 					.addGap(25)
-					.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+					.addGroup(gl_tbTalon.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_10, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
+						.addComponent(panel_5, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
 					.addGap(73))
 		);
 		gl_tbTalon.setVerticalGroup(
@@ -839,8 +855,123 @@ public class TalonMainFrame extends JFrame {
 				.addGroup(gl_tbTalon.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(461, Short.MAX_VALUE))
+					.addGap(18)
+					.addComponent(panel_10, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+					.addContainerGap())
 		);
+		
+        String[] items = {
+           		"Январь",
+           		"Февраль",
+           		"Март",
+           		"Апрель",
+           		"Май",
+           		"Июнь",
+           		"Июль",
+           		"Август",
+           		"Сентябрь",
+           		"Октябрь",
+           		"Ноябрь",
+           		"Декабрь"
+            };
+
+        cmb_month = new JComboBox(items);
+        cmb_month.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
+				//if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
+				if (nmonth != 0 && nday != 0 && nyear != 0){
+	                nmonth = cmb_month.getSelectedIndex()+1;
+	                ChangeDatap();
+				}
+        	}
+        });
+        cmb_month.setMaximumRowCount(12);
+
+        sp_god = new JSpinner();
+        sp_god.addChangeListener(new ChangeListener() {
+        	public void stateChanged(ChangeEvent arg0) {
+			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
+//				if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
+				if (nmonth != 0 && nday != 0 && nyear != 0){
+	                nyear = Integer.valueOf(sp_god.getValue().toString());
+					ChangeDatap();
+				}
+        	}
+        });
+		sp_day = new JSpinner();
+		sp_day.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
+//				if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
+				if (nmonth != 0 && nday != 0 && nyear != 0){
+			        nday = Integer.valueOf(sp_day.getValue().toString());
+					ChangeDatap();
+				}
+			}
+		});
+		Calendar cal1 = Calendar.getInstance();
+		cal1.setTimeInMillis(System.currentTimeMillis());
+		sp_god.setValue(cal1.get(Calendar.YEAR));
+		sp_day.setValue(cal1.get(Calendar.DAY_OF_MONTH));
+        cmb_month.setSelectedIndex(cal1.get(Calendar.MONTH));
+        nyear = Integer.valueOf(sp_god.getValue().toString());
+        nday = Integer.valueOf(sp_day.getValue().toString());
+        nmonth = cmb_month.getSelectedIndex()+1;
+        
+		JLabel lblNewLabel_11 = new JLabel("Год");
+		JLabel lblNewLabel_12 = new JLabel("Месяц");
+		JLabel lblNewLabel_13 = new JLabel("День");
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
+		gl_panel_10.setHorizontalGroup(
+			gl_panel_10.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addGap(35)
+							.addComponent(lblNewLabel_11)
+							.addGap(55)
+							.addComponent(lblNewLabel_12)
+							.addGap(114)
+							.addComponent(lblNewLabel_13))
+						.addGroup(gl_panel_10.createSequentialGroup()
+							.addGap(24)
+							.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
+								.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_panel_10.createSequentialGroup()
+									.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(cmb_month, GroupLayout.PREFERRED_SIZE, 138, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, 56, GroupLayout.PREFERRED_SIZE)))))
+					.addGap(437))
+		);
+		gl_panel_10.setVerticalGroup(
+			gl_panel_10.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_10.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_12)
+						.addComponent(lblNewLabel_13)
+						.addComponent(lblNewLabel_11))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+						.addComponent(cmb_month, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		
+		tbl_talon =new CustomTable<>(true, true, Talon.class, 11,"Время", 6,"Вид приема");
+		tbl_talon.setPreferredWidths(50,90);
+		tbl_talon.setTimeField(0);
+		tbl_talon.setFillsViewportHeight(true);
+		scrollPane_1.setViewportView(tbl_talon);
+		panel_10.setLayout(gl_panel_10);
 		
 		tf_datn = new CustomDateEditor();
 		tf_datk = new CustomDateEditor();
@@ -970,9 +1101,24 @@ public class TalonMainFrame extends JFrame {
 		JLabel lblNewLabel_9 = new JLabel("За период  с");
 		JLabel lblNewLabel_10 = new JLabel("по");
 		
-		cmb_sv = new JComboBox<>();
-		cmb_sv.setModel(new DefaultComboBoxModel(new String[] {"1. Списки пациентов, записанных на прием", "2. Информация о выданных и неиспользованных талонах (по одному врачу)", "3. Информация о выданных и неиспользованных талонах (по всем врачам)", "4. Списки пациентов, которым необходимо перенести время приема", "5. Журнал пациентов, записанных на прием", "6. Списки пациентов, записанных через инфомат", "7. Количество использованных талонов"}));
-		cmb_sv.setEditable(true);
+        String[] items1 = {
+       		"1. Списки пациентов, записанных на прием",
+       		"2. Информация о выданных и неиспользованных талонах (по одному врачу)",
+       		"3. Информация о выданных и неиспользованных талонах (по всем врачам)",
+       		"4. Списки пациентов, которым необходимо перенести время приема",
+       		"5. Журнал пациентов, записанных на прием",
+       		"6. Списки пациентов, записанных через инфомат",
+       		"7. Количество использованных талонов"
+        };
+
+		cmb_sv = new JComboBox(items1);
+		cmb_sv.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JComboBox cb = (JComboBox) e.getSource();
+				String tmpName = (String) cb.getSelectedItem ();
+				System.out.println(tmpName);
+			}
+		});
 		
 		tf_sv2 = new CustomDateEditor();
 		tf_sv1 = new CustomDateEditor();
@@ -982,7 +1128,8 @@ public class TalonMainFrame extends JFrame {
 		JButton btnSvod = new JButton("Создать сводку");
 		btnSvod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				SvodkiUnit.Svodki(cmb_sv.getSelectedIndex(), tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime());
+//				SvodkiUnit.Svodki(cmb_sv.getSelectedIndex(), tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
+				//cmb_sv
 			}
 		});
 		GroupLayout gl_panel_9 = new GroupLayout(panel_9);
@@ -1066,8 +1213,9 @@ public class TalonMainFrame extends JFrame {
 					}
 					if (tbMain.getSelectedIndex() == 1) ChangeNormInfo();
 					if (tbMain.getSelectedIndex() == 2) {
-						ChangeTalonInfo();
-						tal_1.setSelected(true);
+						ChangeDatap();
+//						ChangeTalonInfo();
+//						tal_1.setSelected(true);
 					}
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -1154,27 +1302,43 @@ public class TalonMainFrame extends JFrame {
 		try {
 			btnGroup_cxema.clearSelection();
 			tbl_rasp.setData(new ArrayList<Nrasp>());
-			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
-			if (!NraspInfo.isEmpty()){
-				cxm_1.setSelected(true);
-			}else{
+			try {
+				NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 0);
+				if (!NraspInfo.isEmpty())
+					cxm_1.setSelected(true);
+			} catch (NraspNotFoundException nnfe) {
+				try {
 				NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 1);
-				if (!NraspInfo.isEmpty()){
+				if (!NraspInfo.isEmpty())
 					cxm_2.setSelected(true);
-				} else{
+				} catch (NraspNotFoundException nnfe1){
 					NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 2);
-					if (!NraspInfo.isEmpty()){
+					if (!NraspInfo.isEmpty())
 						cxm_3.setSelected(true);
-					}
+					
 				}
+				
 			}
+//			if (!NraspInfo.isEmpty()){
+//				cxm_1.setSelected(true);
+//			}else{
+//				NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 1);
+//				if (!NraspInfo.isEmpty()){
+//					cxm_2.setSelected(true);
+//				} else{
+//					NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 2);
+//					if (!NraspInfo.isEmpty()){
+//						cxm_3.setSelected(true);
+//					}
+//				}
+//			}
             if (NraspInfo.size() > 0) {
     			tbl_rasp.setData(NraspInfo);
     			ShowOtmetka();
     			ShowTimePause();
             }
 
-		} catch (NraspNotFoundException nnfe) {
+		} catch (NraspNotFoundException nnfe3) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1217,14 +1381,15 @@ public class TalonMainFrame extends JFrame {
 	}
 	private void ChangeTalonInfo(){
 		try {
-			tbl_norm.setData(new ArrayList<Norm>());
-			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-			if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
-		} catch (NormNotFoundException nnfe) {
+			tbl_talon.setData(new ArrayList<Talon>());
+			TalonInfo = MainForm.tcl.getTalon(MainForm.authInfo.cpodr, curVrach, curSpec, getDatep);
+			if (TalonInfo.size() > 0)tbl_talon.setData(TalonInfo);
+		} catch (TalonNotFoundException tnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
 	private void ClearOtmetka(){
 		otm_day_1.setSelected(false);
 		otm_day_2.setSelected(false);
@@ -1284,6 +1449,24 @@ public class TalonMainFrame extends JFrame {
 		}
 	}
 
+	public void ChangeDatap(){
+		try{
+			String numday = null;
+			String nummonth = null;
+			if (nday<10) numday = "0"+String.valueOf(nday);
+			else numday = String.valueOf(nday);
+			if (nmonth<10) nummonth = "0"+String.valueOf(nmonth);
+			else nummonth = String.valueOf(nmonth);
+			SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
+			String strDat = numday+"."+nummonth+"."+String.valueOf(nyear);
+			Date dat = frm.parse(strDat);
+			getDatep = dat.getTime();
+		    System.out.println(strDat+ ",   "+ dat+ ",   "+ getDatep);
+			ChangeTalonInfo();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
 	public void iterate(){
 		     int num = 0;
 			while (num < 1000){

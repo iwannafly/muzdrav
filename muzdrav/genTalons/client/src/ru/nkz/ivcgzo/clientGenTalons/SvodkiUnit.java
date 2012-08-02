@@ -2,20 +2,22 @@ package ru.nkz.ivcgzo.clientGenTalons;
 
 import org.apache.thrift.TException;
 import java.io.File;
+//import ru.nkz.ivcgzo.thriftGenTalon.Report1;
 
 public class SvodkiUnit {
 
-	static void Svodki(int num, long datn, long datk){
+	static void Svodki(int num, long datn, long datk, int pcod, String cdol){
 		try{
-//			Protokol protokol = new Protokol();
-//			protokol.setUserId(MainForm.authInfo.getUser_id());
-//			protokol.setNpasp(Vvod.zapVr.getNpasp());
-//			protokol.setPvizit_id(TabPos.getSelectedItem().id_obr);
-//			protokol.setPvizit_ambId(TabPos.getSelectedItem().id);
-//			protokol.setCpol(MainForm.authInfo.getCpodr());
-//			String servPath = MainForm.tcl.printProtokol(protokol);
-//			String cliPath;
-//			cliPath = File.createTempFile("svod1", ".htm").getAbsolutePath();
+//			Report1 report = new Report1();
+//			report.setCpol(MainForm.authInfo.getCpodr());
+//			report.setPcod(pcod);
+//			report.setCdol(cdol);
+//			report.setDatan(datn);
+//			report.setDatak(datk);
+//			report.setNpp(num);
+//		
+//			String servPath = MainForm.tcl.printReport(report);
+//			String cliPath = File.createTempFile("rep1", ".htm").getAbsolutePath();
 //			MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
 	        switch (num) {
