@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>clientGenTalons</name>
+	<name>serverReception</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -10,24 +10,26 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
+		<buildCommand>
+			<name>net.sf.eclipsecs.core.CheckstyleBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
 	</natures>
 	<linkedResources>
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/genTalons/config</locationURI>
+			<location>/home/as/Work/kmiac_repos/gitrep/muzdrav/reception/config</location>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-<<<<<<< HEAD
-			<location>/home/granovsky/workspace/gitrep/muzdrav/genTalons/thrift/gen-java</location>
-=======
-			<location>/home/as/Work/kmiac_repos/gitrep/muzdrav/genTalons/thrift/gen-java</location>
->>>>>>> 0dc1ab981b88900c4275426f9d96a4a82403564e
+			<location>/home/as/Work/kmiac_repos/gitrep/muzdrav/reception/thrift/gen-java</location>
 		</link>
 	</linkedResources>
 </projectDescription>

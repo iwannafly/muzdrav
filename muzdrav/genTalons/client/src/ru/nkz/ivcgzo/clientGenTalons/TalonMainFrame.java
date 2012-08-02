@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.JTabbedPane;
@@ -55,6 +56,9 @@ import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
+import javax.swing.JProgressBar;
+
+import org.apache.thrift.TException;
 
 public class TalonMainFrame extends JFrame {
 
@@ -79,6 +83,7 @@ public class TalonMainFrame extends JFrame {
 	private JRadioButton otm_day_3;
 	private JRadioButton otm_day_4;
 	private JRadioButton otm_day_5;
+	private JProgressBar pBar;
 	private JCheckBox cbx_rasp;
 	private List<Nrasp> NraspInfo;
 	private List<Norm> NormInfo;
@@ -259,51 +264,57 @@ public class TalonMainFrame extends JFrame {
 		
 		JScrollPane sp_ndv = new JScrollPane();
 		
-		JButton btn_add_ndv = new JButton("+");
-		btn_add_ndv.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					tbl_ndv.requestFocus();
-					tbl_ndv.addItem();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		btn_add_ndv.setToolTipText("Добавить");
-		btn_add_ndv.setFont(new Font("Tahoma", Font.BOLD, 14));
-		
-		JButton btn_del_ndv = new JButton("-");
-		btn_del_ndv.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					tbl_ndv.requestFocus();
-					tbl_ndv.deleteSelectedRow();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		btn_del_ndv.setToolTipText("Удалить");
-		btn_del_ndv.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
 		JPanel panel_7 = new JPanel();
+		
+		JButton btn_ndv_save = new JButton("Сохранить");
+		btn_ndv_save.setToolTipText("сохранить изменения");
+		btn_ndv_save.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					tbl_ndv.updateSelectedItem();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		JButton btn_ndv_add = new JButton("+");
+		btn_ndv_add.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				tbl_ndv.requestFocus();
+				tbl_ndv.addItem();
+			}
+		});
+		btn_ndv_add.setToolTipText("добавить");
+
+		JButton btn_ndv_del = new JButton("-");
+		btn_ndv_del.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tbl_ndv.requestFocus();
+				tbl_ndv.deleteSelectedRow();
+			}
+		});
+		btn_ndv_del.setToolTipText("удалить");
+		
 		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
 		gl_panel_4.setHorizontalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_4.createSequentialGroup()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
+			gl_panel_4.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_4.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
+							.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
+						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(12)
-							.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
+							.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE))
+						.addGroup(gl_panel_4.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(btn_add_ndv, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btn_del_ndv, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(btn_ndv_add, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btn_ndv_del, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btn_ndv_save)))
 					.addContainerGap())
 		);
 		gl_panel_4.setVerticalGroup(
@@ -312,10 +323,12 @@ public class TalonMainFrame extends JFrame {
 					.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 115, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(sp_ndv, GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
-					.addGap(17)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btn_del_ndv)
-						.addComponent(btn_add_ndv, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(16)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+							.addComponent(btn_ndv_del)
+							.addComponent(btn_ndv_save, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btn_ndv_add))
 					.addGap(1))
 		);
 		
@@ -444,31 +457,29 @@ public class TalonMainFrame extends JFrame {
 		panel_4.setLayout(gl_panel_4);
 
 		tbl_ndv.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<Ndv>() {
-			
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
-		        try {
-					if (tbl_ndv.getSelectedItem() !=  null) { 
-						MainForm.tcl.deleteNdv(tbl_ndv.getSelectedItem().getId());
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-					return false;
-				}
-				return true;
+	        	try {
+	        		if (tbl_ndv.getSelectedItem() !=  null) { 
+	        			MainForm.tcl.deleteNdv(tbl_ndv.getSelectedItem().getId());
+	        		}
+	        	} catch (Exception e) {
+	        		e.printStackTrace();
+	        		return false;
+	        	}
+	        	return true;
 			}
 		});
 
 		tbl_ndv.registerAddRowListener(new CustomTableItemChangeEventListener<Ndv>() {
-			
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
 		        try {
 					Ndv item = event.getItem();
 				    item.setId(tbl_ndv.getSelectedItem().id);
-				    item.setCpol(tbl_ndv.getSelectedItem().cpol);
-				    item.setCdol(tbl_ndv.getSelectedItem().cdol);
-				    item.setPcod(tbl_ndv.getSelectedItem().pcod);
+				    item.setCpol(MainForm.authInfo.cpodr);
+				    item.setCdol(curSpec);
+				    item.setPcod(curVrach);
 				    item.setDatan(tbl_ndv.getSelectedItem().datan);
 				    item.setDatak(tbl_ndv.getSelectedItem().datak);
 				    MainForm.tcl.addNdv(event.getItem());
@@ -480,6 +491,21 @@ public class TalonMainFrame extends JFrame {
 			}
 		});
 
+		//изменить
+		tbl_ndv.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Ndv>() {
+			@Override
+			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
+		        try {
+					//if (tbl_ndv.getSelectedItem() != null)
+						//MainForm.tcl.updateNdv(tbl_ndv.getData());
+				} catch (Exception e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
+			}
+		});
+		
 		cbx_rasp = new JCheckBox("учитывать четные и нечетные дни ");
 		JButton btn_new = new JButton("Создать");
 		btn_new.addActionListener(new ActionListener() {
@@ -645,8 +671,8 @@ public class TalonMainFrame extends JFrame {
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbTalon.createSequentialGroup()
 					.addGap(25)
-					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 582, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(73, Short.MAX_VALUE))
+					.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+					.addGap(73))
 		);
 		gl_tbTalon.setVerticalGroup(
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
@@ -664,12 +690,16 @@ public class TalonMainFrame extends JFrame {
 		JButton btnNewButton = new JButton("Формировать");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				pBar.setMinimum(0);
+				pBar.setMaximum(100);
+				pBar.setValue(0);
 				if (tf_datn.getDate().getTime() <= tf_datk.getDate().getTime()){
 					if (tal_1.isSelected()) ind = 1;
 					if (tal_2.isSelected()) ind = 2;
 					if (tal_3.isSelected()) ind = 3;
 					if ((ind == 1) || (curSpec != null  && ind == 2) || (curVrach != 0  && ind == 3)){
-						RaspisanieUnit.CreateTalons(MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+						RaspisanieUnit.CreateTalons(pBar, MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
+						JOptionPane.showMessageDialog(null, "Формирование талонов завершено.", null, JOptionPane.INFORMATION_MESSAGE); 
 					}else {
 					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
 					    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
@@ -677,6 +707,7 @@ public class TalonMainFrame extends JFrame {
 			
 				}else{
 					System.out.println("Неправильно задан период формирования талонов.");
+					JOptionPane.showMessageDialog(null, "Неправильно задан период формирования талонов.", null, JOptionPane.INFORMATION_MESSAGE); 
 				}
 			}
 		});
@@ -692,18 +723,29 @@ public class TalonMainFrame extends JFrame {
 		
 		tal_3 = new JRadioButton("для выбранного врача");
 		btnGroup_talon.add(tal_3);
+		
+		pBar = new JProgressBar();
+		//progressBar.setIndeterminate(true); //бесконечный
+		pBar.setMinimum(0);
+		pBar.setMaximum(100);
+		pBar.setValue(0);
+		pBar.setStringPainted(true);
+		
 		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
 		gl_panel_5.setHorizontalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_5.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(lblNewLabel)
-					.addGap(20)
-					.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(lblNewLabel_1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING, false)
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(lblNewLabel)
+							.addGap(20)
+							.addComponent(tf_datn, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel_1)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tf_datk, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
+						.addComponent(pBar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addGap(32)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnNewButton)
@@ -723,12 +765,15 @@ public class TalonMainFrame extends JFrame {
 						.addComponent(lblNewLabel_1)
 						.addComponent(tal_1))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tal_2)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tal_3)
-					.addGap(18)
-					.addComponent(btnNewButton)
-					.addContainerGap(34, Short.MAX_VALUE))
+					.addGroup(gl_panel_5.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel_5.createSequentialGroup()
+							.addComponent(tal_2)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tal_3)
+							.addGap(18)
+							.addComponent(btnNewButton))
+						.addComponent(pBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(15, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
 		tbTalon.setLayout(gl_tbTalon);
