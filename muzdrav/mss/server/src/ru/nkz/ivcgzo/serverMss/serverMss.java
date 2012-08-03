@@ -19,6 +19,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftMss.MssNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.MssdopNotFoundException;
@@ -38,6 +39,7 @@ public class serverMss extends Server implements Iface {
 	private TResultSetMapper<Psmertdop,Psmertdop._Fields> mssDop;
 	private static Class<?>[] dopTypes;
 	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> mssClass;
+	private TResultSetMapper<StringClassifier, StringClassifier._Fields> mssStrClas;
 	private static Class<?>[] intcTypes;
 
 	
@@ -299,17 +301,17 @@ public class serverMss extends Server implements Iface {
 
 	}
 
-	@Override
-	public List<IntegerClassifier> get_n_l00() throws KmiacServerException,
-			TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_l00 ")) {
-			return mssClass.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-
-	}
+//	@Override
+//	public List<IntegerClassifier> get_n_l00() throws KmiacServerException,
+//			TException {
+//		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_l00 ")) {
+//			return mssClass.mapToList(acrs.getResultSet());
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//			throw new KmiacServerException();
+//		}
+//
+//	}
 
 	@Override
 	public List<IntegerClassifier> get_n_z01() throws KmiacServerException,
@@ -346,5 +348,50 @@ public class serverMss extends Server implements Iface {
 		}
 
 	}
+
+	@Override
+	public List<IntegerClassifier> get_n_r0l() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_r0l ")) {
+			return mssClass.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_u50() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_u50 ")) {
+			return mssClass.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_p07() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p07 ")) {
+			return mssClass.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_az0() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_az0 ")) {
+			return mssClass.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
 
 }
