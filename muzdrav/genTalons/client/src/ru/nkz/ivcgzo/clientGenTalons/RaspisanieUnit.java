@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.Calendar;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
 
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
@@ -29,6 +28,7 @@ public class RaspisanieUnit {
 	public static int TalonCount;
 	public static long timepause_n = 0;
 	public static long timepause_k = 0;
+	public static int proc;
 
 	static void NewRaspisanie(int cpodr, int pcod, String cdol, int cxm){
 		try {
@@ -145,7 +145,7 @@ public class RaspisanieUnit {
 					if (NumDayOfWeek == 1) NumDayOfWeek = 7;
 					if (NumDayOfWeek >= 2) NumDayOfWeek = NumDayOfWeek-1;
 					for (int i=0; i <= nrasp.size()-1; i++) {
-						int proc = (((i+1)/(nrasp.size()-1))*100);
+						proc = (((i+1)/(nrasp.size()-1))*100);
 						pBar.setValue(proc);
 						if(nrasp.get(i).getDenn() == NumDayOfWeek){
 							//System.out.println(nrasp.get(i).getDenn()+", "+!nrasp.get(i).isPfd() +",  "+ getPrrabFromNdv(nrasp.get(i).getCpol(), nrasp.get(i).getPcod(), nrasp.get(i).getCdol(), cal1.getTimeInMillis()));

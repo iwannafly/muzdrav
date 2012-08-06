@@ -23,11 +23,7 @@
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-<<<<<<< HEAD
-			<location>/home/granovsky/workspace/gitrep/muzdrav/genTalons/thrift/gen-java</location>
-=======
-			<location>/home/as/Work/kmiac_repos/gitrep/muzdrav/genTalons/thrift/gen-java</location>
->>>>>>> 0dc1ab981b88900c4275426f9d96a4a82403564e
+			<location>C:/work/thin/gitrep/muzdrav/genTalons/thrift/gen-java</location>
 		</link>
 	</linkedResources>
 </projectDescription>

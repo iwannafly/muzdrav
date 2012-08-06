@@ -244,31 +244,18 @@ public class PacientInfoFrame extends JFrame {
 		setFont(new Font("Tahoma", Font.PLAIN, 11));
 		try {
 			cmb_ishod = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_ishod.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_status = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_status.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_tdoc = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_tdoc.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_oms_doc = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_oms_doc.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_Tdoc_pr = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_Tdoc_pr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_Polis_doc_pr = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_Polis_doc_pr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_cotd = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_cotd.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_travm = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_travm.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_trans = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_trans.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_otkaz = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_otkaz.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_alk = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_alk.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_org = new ThriftIntegerClassifierCombobox<>(true);
-			cmb_org.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_naprav = new ThriftStringClassifierCombobox<>(true);
-			cmb_naprav.setFont(new Font("Tahoma", Font.PLAIN, 11));
 			cmb_naprav.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					try {
