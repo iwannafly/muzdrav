@@ -27,37 +27,25 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 
-public class ViewTablePcodStringForm extends JFrame {
+public class ViewTablePcodStringForm extends ViewSelectForm {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 8600318603287809954L;
 	public static ThriftViewSelect.Client tcl;
-	public JTextField tfSearch;
-	public JScrollPane spClassifier;
+	//public JTextField tfSearch;
+	//public JScrollPane spClassifier;
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
 	
 	public ViewTablePcodStringForm() {
+		createGUI();
 		initialize();
 	}
 		/**
 		 * Initialize the contents of the frame.
 		 */
 	private void initialize() {
-		Dimension dm = Toolkit.getDefaultToolkit().getScreenSize();
-		/**
-			* aws - Ширина окна на треть экрана
-			* ahs - Высота окна на весь экран
-			*/
-		int aws=dm.width/3;
-		int ahs=dm.height;
-		setTitle("Выбор из классификатора");
-		setBounds(dm.width-aws, 0, aws, ahs);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		getContentPane().setLayout(new BorderLayout(0, 0));
-			
-		tfSearch = new JTextField();
 		tfSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				table.requestFocus();
@@ -76,11 +64,7 @@ public class ViewTablePcodStringForm extends JFrame {
 			      search();
 			  }
 	       });
-		getContentPane().add(tfSearch, BorderLayout.NORTH);
-		tfSearch.setColumns(10);
 			
-		spClassifier = new JScrollPane();
-		getContentPane().add(spClassifier, BorderLayout.CENTER);
 			
 		table = new CustomTable<>(false, true, StringClassifier.class, 0, "Код", 1, "Наименование");
 		table.getColumnModel().getColumn(0).setWidth(aws/3);
