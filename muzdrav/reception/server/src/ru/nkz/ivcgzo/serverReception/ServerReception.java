@@ -1,8 +1,10 @@
 package ru.nkz.ivcgzo.serverReception;
 
 import java.io.File;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -22,14 +24,14 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftReception.Policlinic;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
-import ru.nkz.ivcgzo.thriftReception.Spec;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.Talon;
 import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
@@ -37,7 +39,6 @@ import ru.nkz.ivcgzo.thriftReception.ThriftReception;
 import ru.nkz.ivcgzo.thriftReception.ThriftReception.Iface;
 import ru.nkz.ivcgzo.thriftReception.Vidp;
 import ru.nkz.ivcgzo.thriftReception.VidpNotFoundException;
-import ru.nkz.ivcgzo.thriftReception.Vrach;
 import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 
 public class ServerReception extends Server implements Iface {
@@ -53,9 +54,8 @@ public class ServerReception extends Server implements Iface {
 //////////////////////////////// Mappers /////////////////////////////////
 
     private TResultSetMapper<Patient, Patient._Fields> rsmPatient;
-    private TResultSetMapper<Policlinic, Policlinic._Fields> rsmPoliclinic;
-    private TResultSetMapper<Spec, Spec._Fields> rsmSpec;
-    private TResultSetMapper<Vrach, Vrach._Fields> rsmVrach;
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmPoliclinic;
+    private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSpec;
     private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
 
@@ -72,9 +72,6 @@ public class ServerReception extends Server implements Iface {
     };
     private static final String[] VIDP_FIELD_NAMES = {
         "pcod", "name", "vcolor"
-    };
-    private static final String[] VRACH_FIELD_NAMES = {
-        "pcod", "fam", "im", "ot"
     };
     private static final String[] TALON_FIELD_NAMES = {
         "id", "ntalon", "vidp", "timepn", "timepk", "datap", "npasp", "dataz", "prv"
@@ -93,10 +90,9 @@ public class ServerReception extends Server implements Iface {
         DOMConfigurator.configure(new File(manPath, "log4j.xml").getAbsolutePath());
 
         rsmPatient = new TResultSetMapper<>(Patient.class, PATIENT_FIELD_NAMES);
-        rsmPoliclinic = new TResultSetMapper<>(Policlinic.class, POLICLINIC_FIELD_NAMES);
-        rsmSpec = new TResultSetMapper<>(Spec.class, SPEC_FIELD_NAMES);
+        rsmPoliclinic = new TResultSetMapper<>(IntegerClassifier.class, POLICLINIC_FIELD_NAMES);
+        rsmSpec = new TResultSetMapper<>(StringClassifier.class, SPEC_FIELD_NAMES);
         rsmVidp = new TResultSetMapper<>(Vidp.class, VIDP_FIELD_NAMES);
-        rsmVrach = new TResultSetMapper<>(Vrach.class, VRACH_FIELD_NAMES);
         rsmTalon = new TResultSetMapper<>(Talon.class, TALON_FIELD_NAMES);
     }
 
@@ -162,12 +158,12 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
-    public final List<Policlinic> getPoliclinic() throws KmiacServerException,
+    public final List<IntegerClassifier> getPoliclinic() throws KmiacServerException,
             PoliclinicNotFoundException, TException {
         final String sqlQuery = "SELECT DISTINCT n_n00.pcod, n_n00.name FROM n_n00 "
                 + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
-            List<Policlinic> tmpList = rsmPoliclinic.mapToList(acrs.getResultSet());
+            List<IntegerClassifier> tmpList = rsmPoliclinic.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
             } else {
@@ -180,13 +176,13 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
-    public final List<Spec> getSpec(final int cpol) throws KmiacServerException,
+    public final List<StringClassifier> getSpec(final int cpol) throws KmiacServerException,
             SpecNotFoundException, TException {
         final String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
                 + "INNER JOIN e_talon ON n_s00.pcod = e_talon.cdol "
                 + "WHERE e_talon.cpol = ? AND e_talon.prv = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, 0)) {
-            List<Spec> tmpList = rsmSpec.mapToList(acrs.getResultSet());
+            List<StringClassifier> tmpList = rsmSpec.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
             } else {
@@ -199,13 +195,22 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
-    public final List<Vrach> getVrach(final int cpol, final String cdol)
+    public final List<IntegerClassifier> getVrach(final int cpol, final String cdol)
             throws KmiacServerException, VrachNotFoundException, TException {
         final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
                 + "FROM s_vrach INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod_sp "
                 + "WHERE e_talon.cpol = ? AND e_talon.cdol = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpol, cdol)) {
-            List<Vrach> tmpList = rsmVrach.mapToList(acrs.getResultSet());
+            List<IntegerClassifier> tmpList = new ArrayList<IntegerClassifier>();
+            ResultSet rs = acrs.getResultSet();
+            while (rs.next()) {
+                tmpList.add(
+                    new IntegerClassifier(
+                        rs.getInt(1),
+                        String.format("%s %s %s", rs.getString(2), rs.getString(3), rs.getString(4))
+                    )
+                );
+            }
             if (tmpList.size() > 0) {
                 return tmpList;
             } else {
