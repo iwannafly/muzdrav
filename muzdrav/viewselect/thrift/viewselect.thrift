@@ -38,6 +38,15 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	 */
 	list<classifier.IntegerClassifier> getVSIntegerClassifierView()
 
+    /**
+     * Является ли классификатор редактируемым
+     */
+    bool isClassifierEditable(),
 
+    /**
+     * Является ли классификатор с pcod типа integer
+     */
+    bool isClassifierPcodInteger(),
+    
 	list<PatientBriefInfo> searchPatient(1: PatientSearchParams prms) throws (1: kmiacServer.KmiacServerException kse);
 }

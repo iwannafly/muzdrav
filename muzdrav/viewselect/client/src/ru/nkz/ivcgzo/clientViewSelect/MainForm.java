@@ -37,41 +37,15 @@ import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 public class MainForm extends Client<ThriftViewSelect.Client> {
 	public static ThriftViewSelect.Client tcl;
 	public JFrame frame;
-	public JTextField tfSearch;
-	public JScrollPane spClassifier;
-	private CustomTable<IntegerClassifier, IntegerClassifier._Fields> table;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 
-		initialize();
-
 		setFrame(new ViewTablePcodStringForm());
+		//setFrame(new ViewTablePcodIntForm());
 	}
 
-	/**
-	 * Create the application.
-	 */
-	private void search()
-    {
-        String target = tfSearch.getText();
-        for(int row = 0; row < table.getRowCount(); row++)
-            for(int col = 0; col < table.getColumnCount(); col++)
-            {
-                String next = table.getValueAt(row, col).toString();
-                Pattern pt = Pattern.compile(target.toLowerCase());
-                Matcher mt = pt.matcher(next.toLowerCase());
-                if (mt.find())
-                {
-                	table.setRowSelectionInterval(row, row);
-                	table.setLocation(0, -((table.getRowHeight() * row) - 100));
-                    return;
-                }
-            }
-        
-    }
- 
-  	@Override
+	@Override
 	public String getName() {
 		return configuration.appName;
 	}
@@ -80,64 +54,18 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		Dimension dm = Toolkit.getDefaultToolkit().getScreenSize();
-		/**
-		 * aws - Ширина окна на треть экрана
-		 * ahs - Высота окна на весь экран
-		 */
-		int aws=dm.width/3;
-		int ahs=dm.height;
-		frame = new JFrame();
-		frame.setTitle("Выбор из классификатора");
-		frame.setBounds(dm.width-aws, 0, aws, ahs);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
-		tfSearch = new JTextField();
-		tfSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				table.requestFocus();
-			}
-		});
-				
-		tfSearch.getDocument().addDocumentListener(new DocumentListener ()
-        {
-		      public void changedUpdate(DocumentEvent documentEvent) {
-		          search();
-		      }
-		      public void insertUpdate(DocumentEvent documentEvent) {
-		          search();
-		      }
-		      public void removeUpdate(DocumentEvent documentEvent) {
-		          search();
-		      }
-        });
-		frame.getContentPane().add(tfSearch, BorderLayout.NORTH);
-		tfSearch.setColumns(10);
-		
-		spClassifier = new JScrollPane();
-		frame.getContentPane().add(spClassifier, BorderLayout.CENTER);
-		
-		table = new CustomTable<>(false, true, IntegerClassifier.class, 0, "Код", 1, "Наименование");
-		table.getColumnModel().getColumn(0).setWidth(100);
-		table.setAutoCreateRowSorter(true);
-		table.getRowSorter().toggleSortOrder(0);
-		table.setFillsViewportHeight(true);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-		table.getColumnModel().getColumn(0).setMaxWidth(100);
-		spClassifier.setViewportView(table);
-		}
-
 	@Override
 	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
 		super.onConnect(conn);
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
-			ViewTablePcodStringForm.tableFill();
+			try { 
+				if (tcl.isClassifierPcodInteger()) ViewTablePcodIntForm.tableFill();
+				else ViewTablePcodStringForm.tableFill();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			
 		}
 		
 	}
