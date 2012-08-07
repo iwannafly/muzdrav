@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class ConnectionManager {
 	private boolean connecting;
 	private JDialog reconnectForm;
 	private Thread reconnectThread;
+	private IClient viewClient;
 	
 	/**
 	 * Конструктор класса.
@@ -69,7 +71,7 @@ public class ConnectionManager {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
 		transports = new HashMap<>();
 		connections = new HashMap<>();
 		
@@ -90,11 +92,18 @@ public class ConnectionManager {
 	
 	public PluginLoader createPluginLoader(UserAuthInfo authInfo) {
 		pLdr = new PluginLoader(this, authInfo);
+		
 		return getPluginLoader();
 	}
 	
 	public PluginLoader getPluginLoader() {
 		return pLdr;
+	}
+	
+	public void loadViewClient() throws Exception {
+		viewClient = getPluginLoader().loadPluginByAppId(7);
+		client = viewClient;
+		connect(client.getPort());
 	}
 	
 	/**
@@ -120,7 +129,7 @@ public class ConnectionManager {
 	 * Закрывает подключение и удаляет его из списка наблюдаемых.
 	 */
 	public void remove(int port) {
-		transports.get(port).close();
+		disconnect(port);
 		transports.remove(port);
 		connections.remove(port);
 	}
@@ -146,20 +155,8 @@ public class ConnectionManager {
 	 * Подключение ко всем трифт-серверам.
 	 */
 	public void connect() throws TException {
-		try {
-			for (Integer key : transports.keySet()) {
-				TTransport transport = transports.get(key);
-				KmiacServer.Client connection = connections.get(key);
-				
-				if (!transport.isOpen()) {
-					transport.open();
-					if (client != null)
-						client.onConnect(connection);
-				}
-			}
-		} catch (TTransportException e) {
-			throw new ConnectionException(e);
-		}
+		for (Integer key : transports.keySet())
+			connect(key);
 	}
 	
 	/**
@@ -184,9 +181,16 @@ public class ConnectionManager {
 	 * Отключение от всех трифт-серверов.
 	 */
 	public void disconnect() {
-		for (TTransport transport : transports.values()) {
-			transport.close();
+		for (Integer key : transports.keySet()) {
+			disconnect(key);
 		}
+	}
+	
+	/**
+	 * Отключение от трифт-сервера.
+	 */
+	public void disconnect(int port) {
+		transports.get(port).close();
 	}
 	
 	/**
@@ -219,7 +223,7 @@ public class ConnectionManager {
 					} else
 						connection.testConnection();
 			} catch (TException e) {
-				transports.get(key).close();
+				disconnect(key);
 				return false;
 			}
 		}

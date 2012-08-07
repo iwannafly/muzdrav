@@ -325,6 +325,7 @@ public class MainForm {
 //					TODO На этапе разработки апдейтер будет только мешать
 //					modUpd.checkAndUpdate(authInfo.pdost);
 					conMan.getPluginLoader().loadPluginList(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+					conMan.loadViewClient();
 					break;
 				} catch (Exception e) {
 					e.printStackTrace();

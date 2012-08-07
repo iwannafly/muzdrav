@@ -107,6 +107,7 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 			conMan.connect();
 		} catch (TException e) {
 			e.printStackTrace();
+			conMan.setClient(parent);
 			conMan.reconnect(e);
 		}
 		
@@ -118,10 +119,10 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 * плагин-серверов.
 	 */
 	public void disposeModal() {
-		disposeChildren();
-		conMan.remove(getPort());
 		conMan.setClient(parent);
 		parent.getFrame().setModalExclusionType(parentModalType);
+		disposeChildren();
+		conMan.disconnect(getPort());
 	}
 	
 	private void setDisconnectOnFrameClose() {
