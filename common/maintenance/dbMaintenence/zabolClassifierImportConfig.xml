@@ -29,6 +29,9 @@
 		<table srcName="DB4" dstName="n_db4" />
 		<table srcName="DB5" dstName="n_db5" />
 		<table srcName="DB6" dstName="n_db6" />
+		<table srcName="DB7" dstName="n_db7" />
+		<table srcName="DB8" dstName="n_db8" />
+		<table srcName="DB9" dstName="n_db9" />
 		<table srcName="EDD" dstName="n_edd" />
 		<table srcName="FRM" dstName="n_frm" />
 		<table srcName="FRW" dstName="n_frw" />
