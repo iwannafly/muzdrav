@@ -381,4 +381,13 @@ public class ConnectionManager {
 	public void saveConfig(UserAuthInfo authInfo) throws TException {
 		filTrans.saveUserConfig(authInfo.user_id, authInfo.config);
 	}
+	
+	public int[] showPatientSearchForm() {
+		Object srcRes = viewClient.showModal(client, 1);
+		
+		if (srcRes != null)
+			return (int[]) srcRes;
+		
+		return null;
+	}
 }
