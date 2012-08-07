@@ -1,8 +1,15 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +36,15 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientSearchParams;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import sun.awt.ModalityEvent;
+import sun.awt.ModalityListener;
+import sun.awt.SunToolkit;
 
 public class PatientSearchForm extends JFrame {
 	private static final long serialVersionUID = -8340824528321653697L;
-	private List<PatientBriefInfo> results; 
+	private List<PatientBriefInfo> results, fullResults; 
 	
+	private JPanel pnlTextFields; 
 	private CustomTextField tbFam;
 	private CustomTextField tbIm;
 	private CustomTextField tbOt;
@@ -55,12 +62,15 @@ public class PatientSearchForm extends JFrame {
 	
 	private CustomTable<PatientBriefInfo, PatientBriefInfo._Fields> tblResults;
 	private JButton btnAcceptResults;
-	protected boolean resultsAccepted;
+	private boolean resultsAccepted;
+	private ModalityListener modListener;
 	
 	/**
 	 * Create the application.
 	 */
 	public PatientSearchForm() {
+		initialize();
+		
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -70,18 +80,76 @@ public class PatientSearchForm extends JFrame {
 				resultsAccepted = false;
 			}
 		});
-		initialize();
 	}
 
+	public void setModalityListener() {
+		if (modListener == null)
+			if (Toolkit.getDefaultToolkit() instanceof SunToolkit) {
+				modListener = new ModalityListener() {
+					
+					@Override
+					public void modalityPushed(ModalityEvent arg0) {
+					}
+					
+					@Override
+					public void modalityPopped(ModalityEvent arg0) {
+						if (!resultsAccepted)
+							results = null;
+					
+						resultsAccepted = false;
+					}
+				};
+				
+				((SunToolkit) Toolkit.getDefaultToolkit()).addModalityListener(modListener);
+			}
+	}
+	
+	public void removeModalityListener() {
+		if (modListener != null)
+			if (Toolkit.getDefaultToolkit() instanceof SunToolkit) {
+				((SunToolkit)Toolkit.getDefaultToolkit()).removeModalityListener(modListener);
+				modListener = null;
+			}
+	}
+	
+	private void closeForm() {
+		if (modListener != null)
+			setVisible(false);
+		else
+			PatientSearchForm.this.dispatchEvent(new WindowEvent(PatientSearchForm.this, WindowEvent.WINDOW_CLOSING));
+	}
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
 		final EmptyParamsChecker epc = new EmptyParamsChecker();
 		
+		final KeyAdapter enterKeyListener = new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					if (btnSearch.isEnabled())
+						btnSearch.doClick();
+				
+				super.keyPressed(e);
+			}
+		};
+		
+//		getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "keyPreviewEscape");
+//		getRootPane().getActionMap().put("keyPreviewEscape", new AbstractAction("keyPreviewEscape") {
+//			private static final long serialVersionUID = -3739828423153755300L;
+//
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				closeForm();
+//			}
+//		});
+		
 		setMinimumSize(new Dimension(568, 640));
 		setBounds(100, 100, 568, 640);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Поиск пациентов");
 		
 		JPanel pnlSearchParams = new JPanel();
 		pnlSearchParams.setBorder(new TitledBorder(null, "Критерии поиска пациентов", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -117,10 +185,13 @@ public class PatientSearchForm extends JFrame {
 				if (rbtOnePat.isSelected()) {
 					results = new ArrayList<>();
 					results.add(tblResults.getSelectedItem());
+				} else {
+					results = fullResults;
 				}
 				
 				resultsAccepted = true;
-				PatientSearchForm.this.dispatchEvent(new WindowEvent(PatientSearchForm.this, WindowEvent.WINDOW_CLOSING));
+				
+				closeForm();
 			}
 		});
 		btnAcceptResults.setEnabled(false);
@@ -154,6 +225,16 @@ public class PatientSearchForm extends JFrame {
 						btnAcceptResults.doClick();
 			}
 		});
+		tblResults.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					if (btnAcceptResults.isEnabled())
+						btnAcceptResults.doClick();
+				
+				super.keyPressed(e);
+			}
+		});
 		tblResults.setDateField(3);
 		tblResults.setFillsViewportHeight(true);
 		scpResults.setViewportView(tblResults);
@@ -168,7 +249,7 @@ public class PatientSearchForm extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				tbBirDate2.setVisible(rbtIllegible.isSelected());
-				PatientSearchForm.this.revalidate();
+				pnlTextFields.revalidate();
 				epc.changedUpdate(null);
 			}
 		};
@@ -206,16 +287,19 @@ public class PatientSearchForm extends JFrame {
 		);
 		gbSearchType.setLayout(gl_gbSearchType);
 		
-		JPanel pnlTextFields = new JPanel();
+		pnlTextFields = new JPanel();
 		
 		btnSearch = new JButton("Поиск");
 		btnSearch.setEnabled(false);
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					results = MainForm.tcl.searchPatient(createSearchParams());
+					fullResults = MainForm.tcl.searchPatient(createSearchParams());
+					results = fullResults;
 					btnAcceptResults.setEnabled(results.size() > 0);
 					tblResults.setData(results);
+					if (btnAcceptResults.isEnabled())
+						tblResults.requestFocusInWindow();
 					if (chbAutoClose.isSelected()) {
 						if (rbtManyPat.isSelected() && (results.size() > 0))
 							btnAcceptResults.doClick();
@@ -273,46 +357,53 @@ public class PatientSearchForm extends JFrame {
 					.addContainerGap())
 		);
 		
+		JLabel lblFam = new JLabel("Фамилия");
+		
 		tbFam = new CustomTextField();
 		tbFam.getDocument().addDocumentListener(epc);
+		tbFam.addKeyListener(enterKeyListener);
 		tbFam.setColumns(10);
 		
-		JLabel lblFam = new JLabel("Фамилия");
+		JLabel lblIm = new JLabel("Имя");
 		
 		tbIm = new CustomTextField();
 		tbIm.getDocument().addDocumentListener(epc);
+		tbIm.addKeyListener(enterKeyListener);
 		tbIm.setColumns(10);
+		
+		JLabel lblOt = new JLabel("Отчество");
 		
 		tbOt = new CustomTextField();
 		tbOt.getDocument().addDocumentListener(epc);
+		tbOt.addKeyListener(enterKeyListener);
 		tbOt.setColumns(10);
+		
+		JLabel lblBirDate = new JLabel("Дата рождения");
 		
 		tbBirDate = new CustomDateEditor();
 		tbBirDate.getDocument().addDocumentListener(epc);
+		tbBirDate.addKeyListener(enterKeyListener);
 		tbBirDate.setColumns(10);
+		
+		tbBirDate2 = new CustomDateEditor();
+		tbBirDate2.getDocument().addDocumentListener(epc);
+		tbBirDate2.addKeyListener(enterKeyListener);
+		tbBirDate2.setVisible(false);
+		tbBirDate2.setColumns(10);
+		
+		JLabel lblSerPol = new JLabel("Серия полиса");
 		
 		tbSerPol = new CustomTextField();
 		tbSerPol.getDocument().addDocumentListener(epc);
+		tbSerPol.addKeyListener(enterKeyListener);
 		tbSerPol.setColumns(10);
+		
+		JLabel lblNumPol = new JLabel("Номер полиса");
 		
 		tbNumPol = new CustomTextField();
 		tbNumPol.getDocument().addDocumentListener(epc);
 		tbNumPol.setColumns(10);
 		
-		JLabel lblIm = new JLabel("Имя");
-		
-		JLabel lblOt = new JLabel("Отчество");
-		
-		JLabel lblBirDate = new JLabel("Дата рождения");
-		
-		JLabel lblSerPol = new JLabel("Серия полиса");
-		
-		JLabel lblNumPol = new JLabel("Номер полиса");
-		
-		tbBirDate2 = new CustomDateEditor();
-		tbBirDate2.getDocument().addDocumentListener(epc);
-		tbBirDate2.setVisible(false);
-		tbBirDate2.setColumns(10);
 		GroupLayout gl_pnlTextFields = new GroupLayout(pnlTextFields);
 		gl_pnlTextFields.setHorizontalGroup(
 			gl_pnlTextFields.createParallelGroup(Alignment.LEADING)
