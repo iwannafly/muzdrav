@@ -264,6 +264,15 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
+	public List<ZapVr> getZapVrSrc(String npaspList) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pvz.id AS id_pvizit FROM p_vizit pvz JOIN patient pat ON (pat.npasp = pvz.npasp) WHERE pvz.npasp IN " + npaspList)) {
+			return rsmZapVr.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
 	public void AddPvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_vizit (id, npasp, cpol, datao, cod_sp, cdol, cuser, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", false, obr, pvizitTypes, 0, 1, 2, 4, 8, 9, 10, 12);
