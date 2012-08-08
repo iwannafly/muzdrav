@@ -24,12 +24,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<location>/home/as/Work/kmiac_repos/gitrep/muzdrav/reception/config</location>
+			<location>C:/kmiac_repos/gitrep/muzdrav/reception/config</location>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<location>/home/as/Work/kmiac_repos/gitrep/muzdrav/reception/thrift/gen-java</location>
+			<location>C:/kmiac_repos/gitrep/muzdrav/reception/thrift/gen-java</location>
 		</link>
 	</linkedResources>
 </projectDescription>

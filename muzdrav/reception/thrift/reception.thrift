@@ -13,26 +13,6 @@ struct Patient {
     7:optional string omsNum;
 }
 
-/*n_n00*/
-struct Policlinic {
-    1:i32 id;
-    2:i32 name;
-}
-
-/*n_s00*/
-struct Spec {
-	1:string pcod;
-	2:string name; 
-}
-
-/*s_vrach*/
-struct Vrach {
-	1:i32 pcod;
-	2:string fam;
-	3:string im;
-	4:string ot;
-}
-
 struct Vidp {
 	1:i32 pcod;
 	2:string name;
@@ -109,34 +89,34 @@ service ThriftReception extends kmiacServer.KmiacServer {
 
     /**
      * Возвращает список всех поликлиник, для которых сгенерированны талоны
-     */
-    list<Policlinic> getPoliclinic() throws (1: kmiacServer.KmiacServerException kse,
+     */    
+    list<classifier.IntegerClassifier> getPoliclinic() throws (1: kmiacServer.KmiacServerException kse,
             2: PoliclinicNotFoundException pnfe);
 
     /**
      * Возвращает список всех специальностей в выбранной поликлинике, для которых
      * сгенерированны талоны
      */
-    list<Spec> getSpec(1:i32 cpol) throws (1: kmiacServer.KmiacServerException kse,
+    list<classifier.StringClassifier> getSpec(1:i32 cpol) throws (1: kmiacServer.KmiacServerException kse,
             2: SpecNotFoundException snfe);
 
     /**
-	 * Возвращает список всех врачей выбранной поликлиники и специальности,
+     * Возвращает список всех врачей выбранной поликлиники и специальности,
      * для которых сгенерированны талоны
-	 */
-	list<Vrach> getVrach(1:i32 cpol, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse,
-            2: VrachNotFoundException vnfe);
+     */
+    list<classifier.IntegerClassifier> getVrach(1:i32 cpol, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse,
+	    2: VrachNotFoundException vnfe);
 
     /**
      * Возвращает список всех видов приёма
-	 */
-	list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse,
+     */
+    list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse,
             2: VidpNotFoundException vnfe);
 
     /**
      * Возвращает список всех талонов для выбранного врача
-	 */
-	list<Talon> getTalon(1:i32 cpol, 2:string cdol, 3:i32 pcod) throws (1: kmiacServer.KmiacServerException kse,
+     */
+    list<Talon> getTalon(1:i32 cpol, 2:string cdol, 3:i32 pcod) throws (1: kmiacServer.KmiacServerException kse,
             2: TalonNotFoundException tnfe);
 
     /*
