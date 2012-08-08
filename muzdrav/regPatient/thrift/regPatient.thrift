@@ -89,9 +89,9 @@ struct Agent{
 	9:i32 vpolis,
 	10:string spolis,
 	11:string npolis,
-	12:i32 tdoc,
-	13:string docser,
-	14:string docnum,
+	12:optional i32 tdoc,
+	13:optional string docser,
+	14:optional string docnum,
 	15:string birthplace
 }
 
@@ -256,6 +256,12 @@ exception GospAlreadyExistException {
 exception NambkAlreadyExistException {
 }
 
+/**
+ * Запись с такими данными не найдена
+ */
+exception SmorfNotFoundException {
+}
+
 service ThriftRegPatient extends kmiacServer.KmiacServer {
     
 	/**
@@ -397,6 +403,12 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	void updateLgota(1:Lgota lgota),
 	void updateKont(1:Kontingent kont),
 	void updateGosp(1:Gosp gosp),
+
+	/**
+	* Обновляет информацию в табл. preds поля name_str, ogrn_str если изменилось СМО и если есть запись в этой табл.
+	* update preds set name_str=null, ogrn_str=null where npasp=?
+     	*/
+	void updateOgrn(1:i32 npasp),
 	
 /*Классификаторы*/
 	
@@ -473,5 +485,11 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Классификатор N_ABB (N_ABB(pcod))
 	 */
-	list<classifier.IntegerClassifier> getABB()
+	list<classifier.IntegerClassifier> getABB(),
+
+	/**
+	 * Классификатор N_SMORF (N_SMORF(pcod))
+	 */
+	list<classifier.IntegerClassifier> getSMORF(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe)
+
 }

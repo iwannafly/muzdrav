@@ -80,7 +80,7 @@ public class PatientSearchForm extends JFrame {
 		final EmptyParamsChecker epc = new EmptyParamsChecker();
 		
 		setMinimumSize(new Dimension(568, 640));
-		setBounds(100, 100, 568, 640);
+		setBounds(100, 100, 532, 640);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel pnlSearchParams = new JPanel();
