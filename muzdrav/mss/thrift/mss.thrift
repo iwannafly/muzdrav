@@ -19,7 +19,7 @@ struct P_smert{
 	13:string ads_dom,
 	14:string ads_korp,
 	15:string ads_kv,
-	16:string ads_mestn	
+	16:i32 ads_mestn	
 	17:i32 nastupila,
 	18:i32 semp,
 	19:i32 obraz,
@@ -77,7 +77,7 @@ struct P_smert{
 	71:string fio_pol,
 	72:string sdok,
 	73:string ndok,
-	74:string dvdok,
+	74:i64 dvdok,
 	75:string kvdok,
 	76:string gpol,
 	77:string upol,
@@ -85,7 +85,9 @@ struct P_smert{
 	79:string kpol,
         80:i32 vz_ser,
         81:i32 vz_nomer,
-        82:i64 vz_datav
+        82:i64 vz_datav,
+	83:i32 vdok,
+	84:string vrem_tr
 }
 
 struct PatientCommonInfo {

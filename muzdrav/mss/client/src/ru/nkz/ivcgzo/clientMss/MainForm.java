@@ -2,8 +2,14 @@ package ru.nkz.ivcgzo.clientMss;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -21,12 +27,15 @@ import javax.swing.border.TitledBorder;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftMss.P_smert;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 import javax.swing.JCheckBox;
 import javax.swing.BoxLayout;
@@ -38,6 +47,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 	public static ThriftMss.Client tcl;
 	public static Client<ThriftMss.Client> instance; 
 	private JFrame frame;
+	private final ButtonGroup BtnGroup_ms = new ButtonGroup();
+	private final ButtonGroup BtnGroup_don = new ButtonGroup();
 	private JTextField tfAds_obl;
 	private JTextField tfAds_raion;
 	private JTextField tfAds_gorod;
@@ -49,20 +60,20 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField tfOt_m;
 	private JTextField tfFam_m;
 	private JTextField tfIm_m;
-	private JTextField tfdatarm;
-	private JTextField tfDatav;
+	private CustomDateEditor tfdatarm;
+	private CustomDateEditor tfDatav;
 	private JTextField tfNomer;
 	private JTextField tfSer;
-	private JTextField tfVz_datav;
+	private CustomDateEditor tfVz_datav;
 	private JTextField tfVz_nomer;
 	private JTextField tfVz_ser;
 	private JTextField tfFam;
 	private JTextField tfIm;
 	private JTextField tfOt;
 	private JTextField tfPol;
-	private JTextField tfDatar;
-	private JTextField tfDatas;
-	private JTextField tfVrems;
+	private CustomDateEditor tfDatar;
+	private CustomDateEditor tfDatas;
+	private CustomTimeEditor tfVrems;
 	private JTextField tfAdm_obl;
 	private JTextField tfAdm_raion;
 	private JTextField tfAdm_gorod;
@@ -70,36 +81,50 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField tfAdm_dom;
 	private JTextField tfAdm_korp;
 	private JTextField tfAdm_kv;
+	private JRadioButton rdbtnMs_gor;
+	private JRadioButton rdbtnMs_selo;
+	private JRadioButton rdbtn_don_don;
+	private JRadioButton rdbtn_don_ned;
+	private JRadioButton rdbtn_don_peren;
 	private JTextField tfNreb;
 	private JTextField tfMrojd;
-	private JTextField tfDatatr;
-	private JTextField tfVrem_tr;
+	private CustomDateEditor tfDatatr;
+	private CustomTimeEditor tfVrem_tr;
 	private JTextField tfObst;
 	private JTextField tfCvrach;
 	private JTextField tfPsm_a;
+	private JTextArea tfPsm_an;
 	private JTextField tfPsm_ak;
 	private JTextField tfPsm_b;
+	private JTextArea tfPsm_bn;
 	private JTextField tfPsm_bk;
 	private JTextField tfPsm_v;
+	private JTextArea tfPsm_vn;
 	private JTextField tfPsm_vk;
 	private JTextField tfPsm_g;
+	private JTextArea tfPsm_gn;
 	private JTextField tfPsm_gk;
 	private JTextField tfPsm_p;
+	private JTextArea tfPsm_pn;
 	private JTextField tfPsm_pk;
 	private JTextField tfPsm_p1;
+	private JTextArea tfPsm_p1n;
 	private JTextField tfPsm_p2;
+	private JTextArea tfPsm_p2n;
 	private JTextField tfPsm_p1k;
 	private JTextField tfPsm_p2k;
 	private JTextField tfZapolnil;
 	private JTextField tfFam_pol;
 	private JTextField tfSdok;
 	private JTextField tfNdok;
-	private JTextField tfDvdok;
+	private CustomDateEditor tfDvdok;
 	private JTextField tfKvdok;
 	private JTextField tfGpol;
 	private JTextField tfUpol;
 	private JTextField tfDpol;
 	private JTextField tKpol;
+	private JCheckBox chckbxDtp30;
+	private JCheckBox chckbxDtp7;
 	
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVid;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_semp;
@@ -120,6 +145,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_p2d;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVdok;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbUmerla;
+	
+	private P_smert Patientsmert;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -158,17 +185,107 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel);
 		
-		JButton btnNewButton = new JButton("Сохранить");
-		btnNewButton.setVerticalAlignment(SwingConstants.TOP);
-		panel.add(btnNewButton);
+		JButton btnSave = new JButton("Сохранить");
+		btnSave.setVerticalAlignment(SwingConstants.TOP);
+		panel.add(btnSave);
+		btnSave.addActionListener (new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+					Patientsmert = new P_smert();
+					Patientsmert.setSer(Integer.valueOf(tfSer.getText()));
+					Patientsmert.setNomer(Integer.valueOf(tfNomer.getText()));
+					if (cmbVid.getSelectedItem() != null) Patientsmert.setVid(cmbVid.getSelectedPcod());
+					Patientsmert.setDatav(tfDatav.getDate().getTime());
+					Patientsmert.setVz_ser(Integer.valueOf(tfVz_ser.getText()));
+					Patientsmert.setVz_nomer(Integer.valueOf(tfVz_nomer.getText()));
+					Patientsmert.setVz_datav(tfVz_datav.getDate().getTime());
+					Patientsmert.setDatas(tfDatas.getDate().getTime());
+					Patientsmert.setVrems(tfVrems.getTime().toString());
+					Patientsmert.setAds_obl(tfAds_obl.getText().trim());
+					Patientsmert.setAds_raion(tfAds_raion.getText().trim());
+					Patientsmert.setAds_gorod(tfAds_gorod.getText().trim());
+					Patientsmert.setAds_ul(tfAds_ul.getText().trim());
+					Patientsmert.setAds_dom(tfAds_dom.getText().trim());
+					Patientsmert.setAds_korp(tfAds_korp.getText().trim());
+					Patientsmert.setAds_kv(tfAds_kv.getText().trim());
+					if (rdbtnMs_gor.isSelected()) Patientsmert.setAds_mestn(1);
+					if (rdbtnMs_selo.isSelected()) Patientsmert.setAds_mestn(2);
+					if (cmb_semp.getSelectedItem() != null) Patientsmert.setSemp(cmb_semp.getSelectedPcod());
+					if (cmb_obraz.getSelectedItem() != null) Patientsmert.setObraz(cmb_obraz.getSelectedPcod());
+					if (cmb_zan.getSelectedItem() != null) Patientsmert.setZan(cmb_zan.getSelectedPcod());
+					if (rdbtn_don_don.isSelected()) Patientsmert.setDon(1);
+					if (rdbtn_don_ned.isSelected()) Patientsmert.setDon(2);
+					if (rdbtn_don_peren.isSelected()) Patientsmert.setDon(3);
+					Patientsmert.setVes(Integer.valueOf(tfves.getText()));
+					Patientsmert.setNreb(Integer.valueOf(tfNreb.getText()));
+					Patientsmert.setFam_m(tfFam_m.getText().trim());
+					Patientsmert.setIm_m(tfIm_m.getText().trim());
+					Patientsmert.setOt_m(tfOt_m.getText().trim());
+					Patientsmert.setMrojd(tfMrojd.getText().trim());
+					Patientsmert.setDatarm(tfdatarm.getDate().getTime());
+					if (cmbNastupila.getSelectedItem() != null) Patientsmert.setNastupila(cmbNastupila.getSelectedPcod());
+					if (cmbProiz.getSelectedItem() != null) Patientsmert.setProiz(cmbProiz.getSelectedPcod());
+					Patientsmert.setDatatr(tfDatatr.getDate().getTime());
+					Patientsmert.setVrem_tr(tfVrem_tr.getTime().toString());
+					if (cmbVid_tr.getSelectedItem() != null) Patientsmert.setVid_tr(cmbVid_tr.getSelectedPcod());
+					Patientsmert.setObst(tfObst.getText().trim());
+					if (cmbUstan.getSelectedItem() != null) Patientsmert.setUstan(cmbUstan.getSelectedPcod());
+					//Patientsmert.setCvrach(Integer.valueOf(tfCvrach.getText()));
+					//if (cmbCdol.getSelectedItem() != null) Patientsmert.setCdol(cmbCcdol.getSelectedPcod());
+					if (cmbOsn.getSelectedItem() != null) Patientsmert.setOsn(cmbOsn.getSelectedPcod());
+					Patientsmert.setPsm_a(tfPsm_a.getText().trim());
+					Patientsmert.setPsm_an(tfPsm_an.getText().trim());
+					Patientsmert.setPsm_ak(Integer.valueOf(tfPsm_ak.getText()));
+				//	if (cmbPsm_ad.getSelectedItem() != null) Patientsmert.setPsm_ad(cmbPsm_ad.getSelectedPcod());
+					Patientsmert.setPsm_b(tfPsm_b.getText().trim());
+					Patientsmert.setPsm_bn(tfPsm_bn.getText().trim());
+					Patientsmert.setPsm_bk(Integer.valueOf(tfPsm_bk.getText()));
+				//	if (cmbPsm_bd.getSelectedItem() != null) Patientsmert.setPsm_bd(cmbPsm_bd.getSelectedPcod());
+					Patientsmert.setPsm_v(tfPsm_v.getText().trim());
+					Patientsmert.setPsm_vn(tfPsm_vn.getText().trim());
+					Patientsmert.setPsm_vk(Integer.valueOf(tfPsm_vk.getText()));
+				//	if (cmbPsm_vd.getSelectedItem() != null) Patientsmert.setPsm_vd(cmbPsm_vd.getSelectedPcod());
+					Patientsmert.setPsm_g(tfPsm_g.getText().trim());
+					Patientsmert.setPsm_gn(tfPsm_gn.getText().trim());
+					Patientsmert.setPsm_gk(Integer.valueOf(tfPsm_gk.getText()));
+				//	if (cmbPsm_ag.getSelectedItem() != null) Patientsmert.setPsm_gd(cmbPsm_ag.getSelectedPcod());
+					Patientsmert.setPsm_p(tfPsm_p.getText().trim());
+					Patientsmert.setPsm_pn(tfPsm_pn.getText().trim());
+					Patientsmert.setPsm_pk(Integer.valueOf(tfPsm_pk.getText()));
+				//	if (cmbPsm_pd.getSelectedItem() != null) Patientsmert.setPsm_pd(cmbPsm_pd.getSelectedPcod());
+					Patientsmert.setPsm_p1(tfPsm_p1.getText().trim());
+					Patientsmert.setPsm_p1n(tfPsm_p1n.getText().trim());
+					Patientsmert.setPsm_p1k(Integer.valueOf(tfPsm_p1k.getText()));
+				//	if (cmbPsm_p1d.getSelectedItem() != null) Patientsmert.setPsm_p1d(cmbPsm_p1d.getSelectedPcod());
+					Patientsmert.setPsm_p2(tfPsm_p2.getText().trim());
+					Patientsmert.setPsm_p2n(tfPsm_p2n.getText().trim());
+					Patientsmert.setPsm_p2k(Integer.valueOf(tfPsm_p2k.getText()));
+				//	if (cmbPsm_p2d.getSelectedItem() != null) Patientsmert.setPsm_p2d(cmbPsm_p2d.getSelectedPcod());
+					if (chckbxDtp30.isSelected()) Patientsmert.setDtp(1);
+					if (chckbxDtp7.isSelected()) Patientsmert.setDtp(2);
+					if (cmbUmerla.getSelectedItem() != null) Patientsmert.setUmerla(cmbUmerla.getSelectedPcod());
+					Patientsmert.setFio_pol(tfFam_pol.getText().trim());
+					if (cmbVdok.getSelectedItem() != null) Patientsmert.setVdok(cmbVdok.getSelectedPcod());
+					Patientsmert.setSdok(tfSdok.getText().trim());
+					Patientsmert.setNdok(tfNdok.getText().trim());
+					Patientsmert.setDvdok(tfDvdok.getDate().getTime());
+					Patientsmert.setKvdok(tfKvdok.getText().trim());
+				} catch (Exception e1) {
+					e1.printStackTrace();						
+				}						
+			}
+		});
 		
-		JButton btnNewButton_1 = new JButton("Удалить");
-		btnNewButton_1.setVerticalAlignment(SwingConstants.TOP);
-		panel.add(btnNewButton_1);
 		
-		JButton btnNewButton_2 = new JButton("Номера");
-		btnNewButton_2.setVerticalAlignment(SwingConstants.TOP);
-		panel.add(btnNewButton_2);
+		JButton btnDelete = new JButton("Удалить");
+		btnDelete.setVerticalAlignment(SwingConstants.TOP);
+		panel.add(btnDelete);
+		
+		JButton btnNomer = new JButton("Номера");
+		btnNomer.setVerticalAlignment(SwingConstants.TOP);
+		panel.add(btnNomer);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
@@ -192,7 +309,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel label_2 = new JLabel("Серия");
 		
-		tfDatav = new JTextField();
+		tfDatav = new CustomDateEditor();
 		tfDatav.setColumns(10);
 		
 		tfNomer = new JTextField();
@@ -207,7 +324,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JLabel label_5 = new JLabel("номер\r\n");
 		label_5.setFont(new Font("Tahoma", Font.ITALIC, 11));
 		
-		tfVz_datav = new JTextField();
+		tfVz_datav = new CustomDateEditor();
 		tfVz_datav.setColumns(10);
 		
 		tfVz_nomer = new JTextField();
@@ -306,10 +423,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JLabel lblNewLabel_24 = new JLabel("Заполняется для детей, умерших в возрасте от 168 час. до 1 года");
 		
 		JRadioButton rdbtn_don_don = new JRadioButton("доношенный (37-41 недель)");
+		BtnGroup_don.add(rdbtn_don_don);
 		
 		JRadioButton rdbtn_don_ned = new JRadioButton("недоношенный (менее 37 недель)");
+		BtnGroup_don.add(rdbtn_don_ned);
 		
 		JRadioButton rdbtn_don_peren = new JRadioButton("переношенный (42 недель и более)");
+		BtnGroup_don.add(rdbtn_don_peren);
 		
 		JLabel lblNewLabel_26 = new JLabel("вес при рождении (грамм)\r\n");
 		
@@ -335,7 +455,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_31 = new JLabel("дата рождения");
 		
-		tfdatarm = new JTextField();
+		tfdatarm = new CustomDateEditor();
 		tfdatarm.setColumns(10);
 		
 		tfNreb = new JTextField();
@@ -457,8 +577,10 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JLabel lblNewLabel_20 = new JLabel("Местность");
 		
 		JRadioButton rdbtnMs_gor = new JRadioButton("городская");
+		BtnGroup_ms.add(rdbtnMs_gor);
 		
-		JRadioButton rdbtnMs_selo = new JRadioButton("сельская\r\n");
+		JRadioButton rdbtnMs_selo = new JRadioButton("сельская");
+		BtnGroup_ms.add(rdbtnMs_selo);
 		
 		JLabel lblNewLabel_21 = new JLabel("*Семейное положение");
 
@@ -491,17 +613,17 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_4 = new JLabel("Дата рождения\r\n");
 		
-		tfDatar = new JTextField();
+		tfDatar = new CustomDateEditor();
 		tfDatar.setColumns(10);
 		
 		JLabel lblNewLabel_5 = new JLabel("Дата смерти");
 		
-		tfDatas = new JTextField();
+		tfDatas = new CustomDateEditor();
 		tfDatas.setColumns(10);
 		
 		JLabel lblNewLabel_6 = new JLabel("время");
 		
-		tfVrems = new JTextField();
+		tfVrems = new CustomTimeEditor();
 		tfVrems.setColumns(10);
 		
 		tfAdm_obl = new JTextField();
@@ -738,12 +860,12 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_18 = new JLabel("Дата травмы ");
 		
-		tfDatatr = new JTextField();
+		tfDatatr = new CustomDateEditor();
 		tfDatatr.setColumns(10);
 		
 		JLabel lblNewLabel_19 = new JLabel("время");
 		
-		tfVrem_tr = new JTextField();
+		tfVrem_tr = new CustomTimeEditor();
 		tfVrem_tr.setColumns(10);
 		
 		JLabel lblNewLabel_25 = new JLabel("вид травмы");
@@ -779,7 +901,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_a = new JTextField();
 		tfPsm_a.setColumns(10);
 		
-		JTextArea taPsm_an = new JTextArea();
+		tfPsm_an = new JTextArea();
 		
 		tfPsm_ak = new JTextField();
 		tfPsm_ak.setColumns(10);
@@ -791,7 +913,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_b = new JTextField();
 		tfPsm_b.setColumns(10);
 		
-		JTextArea taPsm_bn = new JTextArea();
+		tfPsm_bn = new JTextArea();
 		
 		tfPsm_bk = new JTextField();
 		tfPsm_bk.setColumns(10);
@@ -803,7 +925,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_v = new JTextField();
 		tfPsm_v.setColumns(10);
 		
-		JTextArea taPsm_vn = new JTextArea();
+		tfPsm_vn = new JTextArea();
 		
 		tfPsm_vk = new JTextField();
 		tfPsm_vk.setColumns(10);
@@ -815,7 +937,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_g = new JTextField();
 		tfPsm_g.setColumns(10);
 		
-		JTextArea taPsm_gn = new JTextArea();
+		tfPsm_gn = new JTextArea();
 		
 		tfPsm_gk = new JTextField();
 		tfPsm_gk.setColumns(10);
@@ -827,7 +949,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_p = new JTextField();
 		tfPsm_p.setColumns(10);
 		
-		JTextArea taPsm_pn = new JTextArea();
+		tfPsm_pn = new JTextArea();
 		
 		tfPsm_pk = new JTextField();
 		tfPsm_pk.setColumns(10);
@@ -839,13 +961,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfPsm_p2 = new JTextField();
 		tfPsm_p2.setColumns(10);
 		
-		JTextArea taPsm_p1n = new JTextArea();
+		tfPsm_p1n = new JTextArea();
 		
 		tfPsm_p1k = new JTextField();
 		tfPsm_p1k.setColumns(10);
 		
 		
-		JTextArea taPsm_p2n = new JTextArea();
+		tfPsm_p2n = new JTextArea();
 		
 		tfPsm_p2k = new JTextField();
 		tfPsm_p2k.setColumns(10);
@@ -853,9 +975,9 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_44 = new JLabel("ДТП:  ");
 		
-		JCheckBox chckbxDtp30 = new JCheckBox("смерть наступила в течение 30 суток");
+		chckbxDtp30 = new JCheckBox("смерть наступила в течение 30 суток");
 		
-		JCheckBox chckbxDtp7 = new JCheckBox("из низ в течение 7 суток");
+		chckbxDtp7 = new JCheckBox("из низ в течение 7 суток");
 		
 		JLabel lblNewLabel_45 = new JLabel("В случае смерти во время беременности....");
 		
@@ -902,13 +1024,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 										.addComponent(tfPsm_b, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-										.addComponent(taPsm_p2n, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(taPsm_p1n, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(taPsm_pn, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(taPsm_gn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(taPsm_vn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(taPsm_bn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(taPsm_an, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))))
+										.addComponent(tfPsm_p2n, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+										.addComponent(tfPsm_p1n, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+										.addComponent(tfPsm_pn, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+										.addComponent(tfPsm_gn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+										.addComponent(tfPsm_vn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+										.addComponent(tfPsm_bn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+										.addComponent(tfPsm_an, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))))
 							.addGap(10)
 							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(tfPsm_p2k, 0, 0, Short.MAX_VALUE)
@@ -1029,14 +1151,14 @@ public class MainForm extends Client<ThriftMss.Client> {
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 							.addComponent(tfPsm_ak, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_ad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(taPsm_an, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfPsm_an, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblNewLabel_40)
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 							.addComponent(tfPsm_bk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_bd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(taPsm_bn, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tfPsm_bn, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tfPsm_b, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -1045,12 +1167,12 @@ public class MainForm extends Client<ThriftMss.Client> {
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 							.addComponent(tfPsm_vk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_vd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(taPsm_vn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfPsm_vn, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblNewLabel_42)
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-							.addComponent(taPsm_gn, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tfPsm_gn, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
 							.addComponent(tfPsm_g, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(tfPsm_gk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_ag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
@@ -1062,18 +1184,18 @@ public class MainForm extends Client<ThriftMss.Client> {
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 							.addComponent(tfPsm_pk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_pd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(taPsm_pn, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfPsm_pn, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(tfPsm_p1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-							.addComponent(taPsm_p1n, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tfPsm_p1n, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
 							.addComponent(tfPsm_p1k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_p1d, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(tfPsm_p2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(taPsm_p2n, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tfPsm_p2n, GroupLayout.PREFERRED_SIZE, 30, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 							.addComponent(tfPsm_p2k, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(cmbPsm_p2d, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
@@ -1118,7 +1240,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_51 = new JLabel("дата выдачи");
 		
-		tfDvdok = new JTextField();
+		tfDvdok = new CustomDateEditor();
 		tfDvdok.setColumns(10);
 		
 		JLabel lblNewLabel_52 = new JLabel("кем выдан");
@@ -1127,23 +1249,31 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfKvdok.setColumns(10);
 		
 		JLabel lblNewLabel_53 = new JLabel("Адрес: город");
+		lblNewLabel_53.setEnabled(false);
 		
 		tfGpol = new JTextField();
+		tfGpol.setEnabled(false);
 		tfGpol.setColumns(10);
 		
 		JLabel lblNewLabel_54 = new JLabel("улица");
+		lblNewLabel_54.setEnabled(false);
 		
 		tfUpol = new JTextField();
+		tfUpol.setEnabled(false);
 		tfUpol.setColumns(10);
 		
 		JLabel lblNewLabel_55 = new JLabel("дом");
+		lblNewLabel_55.setEnabled(false);
 		
 		tfDpol = new JTextField();
+		tfDpol.setEnabled(false);
 		tfDpol.setColumns(10);
 		
 		JLabel lblNewLabel_56 = new JLabel("квартира");
+		lblNewLabel_56.setEnabled(false);
 		
 		tKpol = new JTextField();
+		tKpol.setEnabled(false);
 		tKpol.setColumns(10);
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
