@@ -1179,8 +1179,7 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					MainForm.tcl.testConnection();
-					pinfo = new PInfo();
-					pinfo.setVisible(true);
+					MainForm.pInf.update(zapVr.getNpasp());
 				} catch (TException e1) {
 					MainForm.conMan.reconnect(e1);
 				}}

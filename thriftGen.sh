@@ -16,10 +16,9 @@ generateJavaSource muzdrav/lds/thrift
 generateJavaSource muzdrav/mss/thrift
 generateJavaSource muzdrav/osm/thrift
 generateJavaSource muzdrav/regPatient/thrift
-generateJavaSource muzdrav/vrachInfo/thrift
+generateJavaSource muzdrav/admin/thrift
 generateJavaSource muzdrav/viewselect/thrift
 generateJavaSource muzdrav/genTalons/thrift
 generateJavaSource muzdrav/outputInfo/thrift
-
-
+generateJavaSource muzdrav/reception/thrift
 
