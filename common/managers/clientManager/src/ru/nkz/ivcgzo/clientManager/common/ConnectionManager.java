@@ -382,8 +382,16 @@ public class ConnectionManager {
 		filTrans.saveUserConfig(authInfo.user_id, authInfo.config);
 	}
 	
-	public int[] showPatientSearchForm() {
-		Object srcRes = viewClient.showModal(client, 1);
+	/**
+	 * Вызов общей формы поиска пациентов.
+	 * @param title - заголовок формы
+	 * @param clearFields - очистка полей и прошлых результатов поиска
+	 * @param disableOptionalParams - выключение опциональных параметров поиска
+	 * @return массив кодов пациентов или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public int[] showPatientSearchForm(String title, boolean clearFields, boolean disableOptionalParams) {
+		Object srcRes = viewClient.showModal(client, 1, title, clearFields, disableOptionalParams);
 		
 		if (srcRes != null)
 			return (int[]) srcRes;
