@@ -50,6 +50,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 public class ConnectionManager {
 	private Map<Integer, TTransport> transports;
 	private Map<Integer, KmiacServer.Client> connections;
+	private Map<Integer, TTransport> commonTransports;
+	private Map<Integer, KmiacServer.Client> commonConnections;
 	private FileTransfer.Client filTrans;
 	private PluginLoader pLdr;
 	
@@ -74,11 +76,15 @@ public class ConnectionManager {
 	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
 		transports = new HashMap<>();
 		connections = new HashMap<>();
+		commonTransports = new HashMap<>();
+		commonConnections = new HashMap<>();
 		
 		this.mainForm = mainForm;
 		initReconnectForm();
 		
 		filTrans = add(filTransCls, filTransPort);
+		
+		addToCommon(filTransPort);
 	}
 	
 	/**
@@ -88,6 +94,18 @@ public class ConnectionManager {
 	public void setClient(IClient client) {
 		this.client = client;
 		this.mainForm = client.getFrame();
+	}
+	
+	private void addToCommon(int port) {
+		commonTransports.put(port, transports.get(port));
+		commonConnections.put(port, connections.get(port));
+	}
+	
+	private void restoreCommonConnections() {
+		for (Integer key : commonTransports.keySet()) {
+			transports.put(key, commonTransports.get(key));
+			connections.put(key, commonConnections.get(key));
+		}
 	}
 	
 	public PluginLoader createPluginLoader(UserAuthInfo authInfo) {
@@ -104,6 +122,8 @@ public class ConnectionManager {
 		viewClient = getPluginLoader().loadPluginByAppId(7);
 		client = viewClient;
 		connect(client.getPort());
+		
+		addToCommon(client.getPort());
 	}
 	
 	/**
@@ -155,6 +175,8 @@ public class ConnectionManager {
 	 * Подключение ко всем трифт-серверам.
 	 */
 	public void connect() throws TException {
+		restoreCommonConnections();
+		
 		for (Integer key : transports.keySet())
 			connect(key);
 	}

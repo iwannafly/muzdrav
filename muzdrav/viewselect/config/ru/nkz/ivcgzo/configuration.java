@@ -7,4 +7,5 @@ public class configuration {
     public static final int appId = 7;
     public static final String appName = "Просмотр и выбор из классификатора";
     public static final String appVersion = "0.0.0.0";
+    public static final boolean common = true;
 }
