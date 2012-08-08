@@ -77,7 +77,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		JButton btnSearch = new JButton("Поиск");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int[] res = conMan.showPatientSearchForm();
+				int[] res = conMan.showPatientSearchForm("Поиск ранее записанных на прием пациентов", false, false);
 				
 				try {
 					if (res == null)

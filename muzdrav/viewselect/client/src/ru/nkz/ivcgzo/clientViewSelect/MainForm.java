@@ -23,6 +23,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 		srcFrm = new PatientSearchForm();
 		
+//		setFrame(srcFrm);
 		setFrame(new ViewTablePcodStringForm());
 		//setFrame(new ViewTablePcodIntForm());
 	}
@@ -59,6 +60,10 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 				switch ((int) params[0]) {
 				case 1:
 					setFrame(srcFrm);
+					srcFrm.setTitle((String) params[1]);
+					if ((boolean) params[2])
+						srcFrm.clearFields();
+					srcFrm.setOptionalParamsEnabledState(!(boolean) params[3]);
 					srcFrm.setModalityListener();
 					prepareModal(parent).setVisible(true);
 					try {

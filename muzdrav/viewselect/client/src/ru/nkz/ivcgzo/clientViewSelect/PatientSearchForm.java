@@ -64,6 +64,7 @@ public class PatientSearchForm extends JFrame {
 	private JButton btnAcceptResults;
 	private boolean resultsAccepted;
 	private ModalityListener modListener;
+	private boolean legibleSearch;
 	
 	/**
 	 * Create the application.
@@ -147,7 +148,7 @@ public class PatientSearchForm extends JFrame {
 //		});
 		
 		setMinimumSize(new Dimension(568, 640));
-		setBounds(100, 100, 568, 640);
+		setBounds(100, 100, 800, 640);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Поиск пациентов");
 		
@@ -179,7 +180,7 @@ public class PatientSearchForm extends JFrame {
 		
 		JScrollPane scpResults = new JScrollPane();
 		
-		btnAcceptResults = new JButton("Принять");
+		btnAcceptResults = new JButton("Выбор");
 		btnAcceptResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (rbtOnePat.isSelected()) {
@@ -216,7 +217,7 @@ public class PatientSearchForm extends JFrame {
 					.addContainerGap())
 		);
 		
-		tblResults = new CustomTable<>(false, true, PatientBriefInfo.class, 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения", 5, "Серия", 6, "Номер");
+		tblResults = new CustomTable<>(false, true, PatientBriefInfo.class, 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения", 5, "Серия полиса", 6, "Номер полиса");
 		tblResults.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -300,7 +301,7 @@ public class PatientSearchForm extends JFrame {
 					tblResults.setData(results);
 					if (btnAcceptResults.isEnabled())
 						tblResults.requestFocusInWindow();
-					if (chbAutoClose.isSelected()) {
+					if (chbAutoClose.isEnabled() && chbAutoClose.isSelected()) {
 						if (rbtManyPat.isSelected() && (results.size() > 0))
 							btnAcceptResults.doClick();
 						else if (rbtOnePat.isSelected() && (results.size() == 1))
@@ -469,12 +470,12 @@ public class PatientSearchForm extends JFrame {
 		
 		GroupLayout gl_gbPatientCount = new GroupLayout(gbPatientCount);
 		gl_gbPatientCount.setHorizontalGroup(
-			gl_gbPatientCount.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_gbPatientCount.createSequentialGroup()
+			gl_gbPatientCount.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_gbPatientCount.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(rbtManyPat, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+					.addComponent(rbtOnePat, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
 					.addGap(18)
-					.addComponent(rbtOnePat, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+					.addComponent(rbtManyPat, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_gbPatientCount.setVerticalGroup(
@@ -484,15 +485,16 @@ public class PatientSearchForm extends JFrame {
 					.addGroup(gl_gbPatientCount.createParallelGroup(Alignment.BASELINE)
 						.addComponent(rbtManyPat)
 						.addComponent(rbtOnePat))
-					.addContainerGap(25, Short.MAX_VALUE))
+					.addContainerGap(16, Short.MAX_VALUE))
 		);
 		gbPatientCount.setLayout(gl_gbPatientCount);
 		pnlSearchParams.setLayout(gl_pnlSearchParams);
 		getContentPane().setLayout(groupLayout);
 		
 		btnClearFields.doClick();
-		rbtManyPat.doClick();
+		rbtOnePat.doClick();
 		rbtLegible.doClick();
+		setOptionalParamsEnabledState(true);
 	}
 	
 	private PatientSearchParams createSearchParams() {
@@ -520,7 +522,7 @@ public class PatientSearchForm extends JFrame {
 		return results;
 	}
 	
-	private void clearFields() {
+	public void clearFields() {
 		tbFam.clear();
 		tbIm.clear();
 		tbOt.clear();
@@ -528,6 +530,22 @@ public class PatientSearchForm extends JFrame {
 		tbBirDate2.setValue(null);
 		tbSerPol.clear();
 		tbNumPol.clear();
+		
+		tblResults.setData(new ArrayList<PatientBriefInfo>());
+		btnAcceptResults.setEnabled(false);
+	}
+	
+	public void setOptionalParamsEnabledState(boolean enabled) {
+		legibleSearch = !enabled;
+		
+		rbtManyPat.setEnabled(enabled);
+		rbtIllegible.setEnabled(enabled);
+		chbAutoClose.setEnabled(enabled);
+		
+		if (enabled == false) {
+			rbtOnePat.doClick();
+			rbtLegible.doClick();
+		}
 	}
 	
 	class EmptyParamsChecker implements DocumentListener {
@@ -548,17 +566,23 @@ public class PatientSearchForm extends JFrame {
 		}
 		
 		private void setBtnSearchEnabled() {
-			boolean disabled = true;
+			boolean disabled = !legibleSearch;
 			
-			disabled &= tbFam.isEmpty();
-			disabled &= tbIm.isEmpty();
-			disabled &= tbOt.isEmpty();
-			if (!rbtIllegible.isSelected())
-				disabled &= tbBirDate.getDate() == null;
-			else
-				disabled &= (tbBirDate.getDate() == null) || (tbBirDate2.getDate() == null);
-			disabled &= tbSerPol.isEmpty();
-			disabled &= tbNumPol.isEmpty();
+			if (legibleSearch) {
+				disabled |= tbFam.isEmpty();
+				disabled |= tbIm.isEmpty();
+				disabled |= tbOt.isEmpty();
+			} else {
+				disabled &= tbFam.isEmpty();
+				disabled &= tbIm.isEmpty();
+				disabled &= tbOt.isEmpty();
+				if (!rbtIllegible.isSelected())
+					disabled &= tbBirDate.getDate() == null;
+				else
+					disabled &= (tbBirDate.getDate() == null) || (tbBirDate2.getDate() == null);
+				disabled &= tbSerPol.isEmpty();
+				disabled &= tbNumPol.isEmpty();
+			}
 			
 			btnSearch.setEnabled(!disabled);
 		}

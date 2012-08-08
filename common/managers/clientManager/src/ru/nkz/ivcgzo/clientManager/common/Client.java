@@ -90,20 +90,22 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 * @param parent - родительский плагин-клиент
 	 */
 	public JDialog prepareModal(IClient parent) {
-		JDialog dialog = new JDialog(this.getFrame());
+		JDialog dialog = new JDialog(getFrame());
 		
 		this.parent = parent;
-		prevModalType = this.getFrame().getModalExclusionType();
+		prevModalType = getFrame().getModalExclusionType();
 		
 		this.getFrame().setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		
 		try {
-			dialog.setTitle(this.getFrame().getTitle());
+			dialog.setMinimumSize(getFrame().getMinimumSize());
+			dialog.setBounds(getFrame().getBounds());
+			dialog.setTitle(getFrame().getTitle());
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setModal(true);
 			dialog.setContentPane(getFrame().getContentPane());
-			dialog.pack();
-			dialog.setLocationRelativeTo(this.getFrame());
+			dialog.revalidate();
+			dialog.setLocationRelativeTo(parent.getFrame());
 			conMan.setClient(this);
 			conMan.connect();
 		} catch (TException e) {
