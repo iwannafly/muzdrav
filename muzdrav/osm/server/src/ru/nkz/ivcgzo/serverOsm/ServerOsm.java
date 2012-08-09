@@ -264,6 +264,15 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
+	public List<ZapVr> getZapVrSrc(String npaspList) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pvz.id AS id_pvizit FROM p_vizit pvz JOIN patient pat ON (pat.npasp = pvz.npasp) WHERE pvz.npasp IN " + npaspList)) {
+			return rsmZapVr.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
 	public void AddPvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_vizit (id, npasp, cpol, datao, cod_sp, cdol, cuser, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", false, obr, pvizitTypes, 0, 1, 2, 4, 8, 9, 10, 12);
@@ -636,7 +645,97 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-	
+
+	@Override
+	public List<IntegerClassifier> get_n_db1() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db1 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db2() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db2 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db3() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db3 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db4() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db4 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db5() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db5 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db6() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db6 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db7() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db7 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db8() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db8 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_db9() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_db9 ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
 	@Override
 	public List<RdSlStruct> getRdSlInfo(int idDispb, int npasp)
 			throws KmiacServerException, TException {

@@ -1,16 +1,20 @@
-package ru.ivcgzo.nkz.clientReception;
+package ru.nkz.ivcgzo.clientReception;
 
 import java.lang.reflect.InvocationTargetException;
+
+import javax.swing.JDialog;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftReception.ThriftReception;
 
 public class MainForm extends Client<ThriftReception.Client> {
     public static ThriftReception.Client tcl;
     public static Client<ThriftReception.Client> instance;
+    private TalonSelectFrame talonSelectFrame;
 
     public MainForm(final ConnectionManager conMan, final UserAuthInfo authInfo,
             final int accessParam) throws IllegalAccessException, NoSuchMethodException,
@@ -23,7 +27,7 @@ public class MainForm extends Client<ThriftReception.Client> {
     }
 
     private void initialize() {
-        TalonSelectFrame talonSelectFrame = new TalonSelectFrame();
+        talonSelectFrame = new TalonSelectFrame();
         talonSelectFrame.pack();
         setFrame(talonSelectFrame);
     }
@@ -39,7 +43,18 @@ public class MainForm extends Client<ThriftReception.Client> {
         super.onConnect(conn);
         if (conn instanceof ThriftReception.Client) {
             tcl = thrClient;
+            talonSelectFrame.onConnect();
         }
+    }
+
+    @Override
+    public final Object showModal(final IClient parent, final Object... params) {
+        JDialog dialog = prepareModal(parent);
+        talonSelectFrame.fillPatientInfoLabels((int) params[0], (String) params[1],
+                (String) params[2], (String) params[3], (long) params[4]);
+        dialog.setVisible(true);
+        disposeModal();
+        return null;
     }
 
 }
