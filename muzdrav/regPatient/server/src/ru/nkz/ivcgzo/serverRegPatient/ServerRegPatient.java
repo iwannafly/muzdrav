@@ -48,6 +48,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 
@@ -1032,8 +1033,17 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+
     @Override
-    public final void testConnection() throws TException {
+    public final void updateOgrn(final int npasp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("UPDATE p_preds SET name_str = null, ogrn_str = null WHERE npasp=?",
+                    false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
     }
 
 //////////////////////// Configuration Methods ////////////////////////////////////
@@ -1047,6 +1057,10 @@ public class ServerRegPatient extends Server implements Iface {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException();
         }
+    }
+
+    @Override
+    public final void testConnection() throws TException {
     }
 
 ////////////////////////// Classifiers ////////////////////////////////////
@@ -1244,5 +1258,32 @@ public class ServerRegPatient extends Server implements Iface {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getSmorf(final int kodsmo)
+            throws SmorfNotFoundException, TException {
+        final String sqlQuery = "SELECT smocod, nam_smop FROM n_smorf";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmSmorf =
+                new TResultSetMapper<>(IntegerClassifier.class, "smocod", "nam_smop");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmSmorf.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public String printMedCart(Gosp gosp, PatientFullInfo pat)
+            throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String printAmbCart(PatientFullInfo pat) throws TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
