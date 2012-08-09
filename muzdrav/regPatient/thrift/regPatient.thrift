@@ -420,6 +420,24 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
      */
     void updateOgrn(1:i32 npasp),
 	
+	/**
+	* Возвращает ОГРН
+	* select q_ogrn from n_smorf where smocod=?
+     	*/
+	string getOgrn(1:string smocod),
+
+	/**
+	* Возвращает регион проживания
+	* select c_ffomc from n_l02 where pcod=?
+     	*/
+	i32 getRegion_liv(1:i32 pcod),
+
+	/**
+	* Возвращает территорию проживания
+	* select ter from n_l00 where pcod=?
+     	*/
+	i32 getTer_liv(1:i32 pcod),
+
 /*Классификаторы*/
 	
 	/**
