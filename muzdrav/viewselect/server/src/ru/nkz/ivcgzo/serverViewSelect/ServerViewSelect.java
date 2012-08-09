@@ -27,7 +27,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
 
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
-	public String className = "n_c00";
+	public String className = "n_l01";
 	
 	private TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	
