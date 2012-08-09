@@ -299,7 +299,8 @@ public class FormPostBer extends JFrame {
 		button.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				inform.setVisible(true);
+				inform = new FormRdInf();
+			inform.setVisible(true);
 			}
 		});
 		
@@ -307,12 +308,8 @@ public class FormPostBer extends JFrame {
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-/*				dinform = new FormRdDin();
-				MainForm.instance.addChildFrame(inform);
-				JButton button = new JButton("Дополнительная информация");
-				button.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						dinform.setVisible(true);*/
+				dinform = new FormRdDin();
+						dinform.setVisible(true);
 			}
 		});
 		

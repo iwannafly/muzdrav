@@ -8,11 +8,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/clientManager"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/libthrift-0.8.0.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/log4j-1.2.12.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.5.8.jar"/>
-	<classpathentry kind="src" path="/serverViewSelect"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/clientManager"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

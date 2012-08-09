@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>serverReception</name>
+	<name>clientReception</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -24,12 +24,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<location>C:/kmiac_repos/gitrep/muzdrav/reception/config</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/reception/config</locationURI>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<location>C:/kmiac_repos/gitrep/muzdrav/reception/thrift/gen-java</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/reception/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

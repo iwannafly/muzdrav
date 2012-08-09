@@ -33,7 +33,7 @@
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<location>C:/work/thin/gitrep/muzdrav/auth/thrift/gen-java</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/auth/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
