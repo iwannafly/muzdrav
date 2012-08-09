@@ -4,6 +4,8 @@ import java.awt.Dialog.ModalExclusionType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -22,18 +24,22 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	public static UserAuthInfo authInfo;
 	public static int accessParam;
 	private Class<T> thrClass;
-	private static int appId;
-	private static int thrPort;
+	private int appId;
+	private int thrPort;
 	public T thrClient;
 	private JFrame frame;
+	private IClient parent;
+	private ModalExclusionType prevModalType;
+	private List<JFrame> childList;
 	
 	public Client(ConnectionManager conMan, UserAuthInfo authInfo, Class<T> thrClass, int appId, int thrPort, int accessParam, String... params) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		Client.conMan = conMan;
 		Client.authInfo = authInfo;
 		Client.accessParam = accessParam;
 		this.thrClass = thrClass;
-		Client.appId = appId;
-		Client.thrPort = thrPort;
+		this.appId = appId;
+		this.thrPort = thrPort;
+		childList = new ArrayList<>();
 		
 		conMan.add(thrClass, thrPort);
 	}
@@ -47,8 +53,8 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 		this.frame = frame;
 		setDisconnectOnFrameClose();
 		
-		//FIXME uncomment to enable return to plugin selection form
-		//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//FIXME	uncomment to enable return to plugin selection form
+//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	}
 	
 	@Override
@@ -59,38 +65,67 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 			throw new IllegalArgumentException("No displayable frame set.");
 	}
 	
+	/**
+	 * Добавление дочернего окна в список. Окна из списка закрываются при
+	 * закрытии модальной формы. 
+	 */
+	public void addChildFrame(JFrame child) {
+		child.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
+		childList.add(child);
+	}
+	
 	@Override
 	public void showNormal() {
 		getFrame().setVisible(true);
 	}
 	
 	@Override
-	public String[] showModal(IClient parent) {
-		ModalExclusionType parentModalType = parent.getFrame().getModalExclusionType();
+	public Object showModal(IClient parent, Object... params) {
+		return null;
+	}
+	
+	/**
+	 * Преобразует форму, установленную методом {@link #setFrame(JFrame)} в
+	 * модальный вид и устанавливает подключение к плагин-серверам.
+	 * @param parent - родительский плагин-клиент
+	 */
+	public JDialog prepareModal(IClient parent) {
+		JDialog dialog = new JDialog(getFrame());
 		
-		parent.getFrame().setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+		this.parent = parent;
+		prevModalType = getFrame().getModalExclusionType();
+		
+		this.getFrame().setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		
 		try {
-			JDialog dialog = new JDialog(parent.getFrame());
-			
+			dialog.setMinimumSize(getFrame().getMinimumSize());
+			dialog.setBounds(getFrame().getBounds());
+			dialog.setTitle(getFrame().getTitle());
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setModal(true);
 			dialog.setContentPane(getFrame().getContentPane());
-			dialog.pack();
+			dialog.revalidate();
 			dialog.setLocationRelativeTo(parent.getFrame());
 			conMan.setClient(this);
 			conMan.connect();
-			dialog.setVisible(true);
-			conMan.remove(getPort());
 		} catch (TException e) {
 			e.printStackTrace();
-			conMan.reconnect(e);
-		} finally {
 			conMan.setClient(parent);
-			parent.getFrame().setModalExclusionType(parentModalType);
+			conMan.reconnect(e);
 		}
 		
-		return null;
+		return dialog;
+	}
+	
+	/**
+	 * Закрывает все отрытые дочерние окна модальной формы и отключает ее от
+	 * плагин-серверов.
+	 */
+	public void disposeModal() {
+		conMan.setClient(parent);
+		parent.getFrame().setModalExclusionType(prevModalType);
+		disposeChildren();
+		conMan.disconnect(getPort());
 	}
 	
 	private void setDisconnectOnFrameClose() {
@@ -98,10 +133,16 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				conMan.remove();
+				disposeChildren();
 				
 				super.windowClosed(e);
 			}
 		});
+	}
+	
+	private void disposeChildren() {
+		for (JFrame child : childList)
+			child.dispose();
 	}
 	
 	@Override

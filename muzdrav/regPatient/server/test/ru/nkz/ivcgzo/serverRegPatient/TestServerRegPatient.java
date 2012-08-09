@@ -38,7 +38,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Sign;
  */
 public class TestServerRegPatient {
     private String conn = String.format("jdbc:postgresql://%s:%s/%s",
-            "10.0.0.66", "5432", "zabol");
+            "10.0.0.242", "5432", "zabol");
     private ISqlSelectExecutor sse;
     private ITransactedSqlExecutor tse;
     private ServerRegPatient testServer;
@@ -276,6 +276,7 @@ public class TestServerRegPatient {
         System.out.println(testGosp.vremp);
         System.out.println(testGosp.naprav);
         System.out.println(testGosp.pl_extr);
+        @SuppressWarnings("unused")
         int i = testServer.addGosp(testGosp);
     }
 
@@ -297,6 +298,7 @@ public class TestServerRegPatient {
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
         patientFullInfo.setFam("Уникальная_фамилия");
+        @SuppressWarnings("unused")
         int afterAddId = testServer.addPatient(patientFullInfo);
         //assertEquals(afterAddId, 0);
     }
@@ -308,6 +310,7 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         testException.expect(KontingentAlreadyExistException.class);
+        @SuppressWarnings("unused")
         Info afterAddId = testServer.addKont(kontingent.get(0));
         //assertEquals(afterAddId, 0);
     }
@@ -319,13 +322,13 @@ public class TestServerRegPatient {
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
         kontingent.get(0).setKateg((short) 12);
+        @SuppressWarnings("unused")
         Info afterAddId = testServer.addKont(kontingent.get(0));
     }
 
     @Test
     public final void addSign_isSignActuallyAdded()
             throws TException {
-        int npasp = 2;
         Sign s =new Sign();
         s.setNpasp(26006);
         s.setGrup("9");

@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
+import java.io.File;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -152,9 +153,9 @@ public class ServerRegPatient extends Server implements Iface {
         Integer.class, Date.class, Time.class, Date.class, String.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
-        //  npasp          nambk         cpol           nuch
+    //  npasp          nambk         cpol           nuch
         Integer.class, String.class, Integer.class, Integer.class,
-        //  datapr      dataot      ishod
+    //  datapr      dataot      ishod
         Date.class, Date.class, Integer.class
     };
     //Отражение таблицы p_kov (кроме поля name - это поле классификатора n_lkn)
@@ -229,7 +230,9 @@ public class ServerRegPatient extends Server implements Iface {
         super(sse, tse);
 
         //Инициализация логгера с конфигом из файла ../../manager/log4j.xml;
-        DOMConfigurator.configure("log4j.xml");
+        String manPath = new File(this.getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath();
+        DOMConfigurator.configure(new File(manPath, "log4j.xml").getAbsolutePath());
 
         rsmPatientBrief = new TResultSetMapper<>(PatientBrief.class,
                 PATIENT_BRIEF_FIELD_NAMES);
@@ -433,7 +436,7 @@ public class ServerRegPatient extends Server implements Iface {
                 new ThriftRegPatient.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(
                 new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-        log.info("Start serverReg Patient");
+        log.info("Start serverRegPatient");
         thrServ.serve();
     }
 
@@ -444,7 +447,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final void stop() {
         if (thrServ != null) {
             thrServ.stop();
-            log.info("Stop serverReg Patient");
+            log.info("Stop serverRegPatient");
         }
     }
 
@@ -516,6 +519,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -534,6 +538,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new AgentNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -553,6 +558,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new LgotaNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -571,6 +577,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new KontingentNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -586,6 +593,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new SignNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -604,6 +612,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new GospNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -619,6 +628,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new GospNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -669,6 +679,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new PatientAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -692,6 +703,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new LgotaAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -715,6 +727,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new KontingentAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -748,6 +761,7 @@ public class ServerRegPatient extends Server implements Iface {
                 sme.setCommit();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -771,6 +785,7 @@ public class ServerRegPatient extends Server implements Iface {
                 sme.setCommit();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -799,7 +814,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new GospAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
-            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитадизации: ", e);
+            log.log(Level.ERROR, "SQl Exception - Ошибка при добавлении госпитализации: ", e);
             throw new TException(e);
         }
     }
@@ -819,6 +834,7 @@ public class ServerRegPatient extends Server implements Iface {
                 throw new NambkAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -831,6 +847,7 @@ public class ServerRegPatient extends Server implements Iface {
             sme.execPrepared("DELETE FROM patient WHERE npasp = ?;", false, npasp);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -842,6 +859,7 @@ public class ServerRegPatient extends Server implements Iface {
                     false, npasp, cpol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -853,6 +871,7 @@ public class ServerRegPatient extends Server implements Iface {
                     false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -864,6 +883,7 @@ public class ServerRegPatient extends Server implements Iface {
                     false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -874,6 +894,7 @@ public class ServerRegPatient extends Server implements Iface {
             sme.execPrepared("DELETE FROM p_preds WHERE npasp = ?;", false, npasp);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -884,6 +905,7 @@ public class ServerRegPatient extends Server implements Iface {
             sme.execPrepared("DELETE FROM p_sign WHERE npasp = ?;", false, npasp);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -896,6 +918,7 @@ public class ServerRegPatient extends Server implements Iface {
                     false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -936,6 +959,7 @@ public class ServerRegPatient extends Server implements Iface {
                 patinfo.getRegion_liv(), patinfo.getNpasp());
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -951,6 +975,7 @@ public class ServerRegPatient extends Server implements Iface {
                     false, nambk, NAMBK_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -964,6 +989,7 @@ public class ServerRegPatient extends Server implements Iface {
                     lgota, LGOTA_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -977,6 +1003,7 @@ public class ServerRegPatient extends Server implements Iface {
                     kont, KONTINGENT_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1000,6 +1027,7 @@ public class ServerRegPatient extends Server implements Iface {
                     gosp, GOSP_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1016,6 +1044,7 @@ public class ServerRegPatient extends Server implements Iface {
             sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
             sme.setCommit();
         } catch (InterruptedException | SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException();
         }
     }
@@ -1030,6 +1059,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmSgrp.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1042,6 +1072,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmTdoc.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1054,6 +1085,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmTdoc.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1066,6 +1098,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmNaprav.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1078,6 +1111,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmM00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1090,6 +1124,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmN00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1102,6 +1137,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmO00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1114,6 +1150,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
             return rsmO00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1126,6 +1163,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAl0.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1138,6 +1176,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmW04.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1150,6 +1189,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAi0.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1162,6 +1202,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAf0.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1174,6 +1215,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAlk.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1186,6 +1228,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmVtr.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }
@@ -1198,6 +1241,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmVtr.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
     }

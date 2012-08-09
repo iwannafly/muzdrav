@@ -27,7 +27,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
 
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
-	public String classname = "n_l01";
+	public String className = "n_l01";
 	
 	private TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	
@@ -60,12 +60,10 @@ public class ServerViewSelect extends Server implements Iface {
             thrServ.stop();
     }
 
-    // Берет инфу из классификатора c целочисленным полем pcod
-    
 	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView() throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM "+classname;
+		final String sqlQuery = "SELECT pcod, name FROM "+className;
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIVS =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -75,12 +73,10 @@ public class ServerViewSelect extends Server implements Iface {
         }
 	}
 	
-    // Берет инфу из классификатора cо строковым полем pcod
-	
 	@Override
 	public List<StringClassifier> getVSStringClassifierView() throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM "+classname;
+		final String sqlQuery = "SELECT pcod, name FROM "+className;
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSVS =
                 new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -90,6 +86,30 @@ public class ServerViewSelect extends Server implements Iface {
         }
 	}
 	
+	@Override
+	public boolean isClassifierEditable() throws TException {
+		// TODO Auto-generated method stub
+		if (className.charAt(0)=='c')
+			return true;
+		else return false;
+	}
+
+	@Override
+	public boolean isClassifierPcodInteger() throws TException {
+		// TODO Auto-generated method stub
+		String sqlQueryGetType = "SELECT data_type FROM information_schema.columns where table_name = ? AND column_name = ?";
+		try (AutoCloseableResultSet arcs = sse.execPreparedQuery(sqlQueryGetType, className, "pcod")) {
+			if (arcs.getResultSet().next()){
+				if (arcs.getResultSet().getString(1).equals("integer"))
+					return true;
+				else return false;
+			} else {
+				throw new TException();
+			}				
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
 	///////////////////////// patient search ///////////////////////////////
 	
 	@Override
@@ -145,5 +165,7 @@ public class ServerViewSelect extends Server implements Iface {
 		
 		return list.toArray();
 	}
+
+	
 
 }

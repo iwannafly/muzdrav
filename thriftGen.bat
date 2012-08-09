@@ -10,10 +10,11 @@ CALL :generateJavaSource muzdrav\lds\thrift"
 CALL :generateJavaSource muzdrav\mss\thrift"
 CALL :generateJavaSource muzdrav\osm\thrift"
 CALL :generateJavaSource muzdrav\regPatient\thrift"
-CALL :generateJavaSource muzdrav\vrachInfo\thrift"
+CALL :generateJavaSource muzdrav\admin\thrift"
 CALL :generateJavaSource muzdrav\viewselect\thrift"
 CALL :generateJavaSource muzdrav\genTalons\thrift"
 CALL :generateJavaSource muzdrav\outputInfo\thrift"
+CALL :generateJavaSource muzdrav\reception\thrift"
 
 COLOR 2
 ECHO All sources successfully generated
