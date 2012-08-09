@@ -125,7 +125,7 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 	// Заполнение таблицы
 	public static void tableFill(){
 		try { 
-			table.setData(MainForm.tcl.getVSStringClassifierView());
+			table.setData(MainForm.tcl.getVSStringClassifierView("n_c00"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 

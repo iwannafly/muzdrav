@@ -113,7 +113,7 @@ public class ViewTablePcodIntForm extends ViewSelectForm {
 
 	public static void tableFill(){
 		try { 
-			table.setData(MainForm.tcl.getVSIntegerClassifierView());
+			table.setData(MainForm.tcl.getVSIntegerClassifierView("n_l01"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
