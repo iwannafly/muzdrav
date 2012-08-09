@@ -73,15 +73,16 @@ public class PIslForm {
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
-				.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 653, Short.MAX_VALUE)
+				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE)
+				.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 787, Short.MAX_VALUE)
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE))
+					.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 666, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(732, Short.MAX_VALUE))
 		);
 		
 		JScrollPane scrollPane = new JScrollPane();

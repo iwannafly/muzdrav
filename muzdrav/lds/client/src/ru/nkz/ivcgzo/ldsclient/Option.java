@@ -18,6 +18,8 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.ldsThrift.LdiNotFoundException;
@@ -25,18 +27,23 @@ import ru.nkz.ivcgzo.ldsThrift.Metod;
 import ru.nkz.ivcgzo.ldsThrift.MetodNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.N_ldi;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
+import ru.nkz.ivcgzo.ldsThrift.S_ot01ExistsException;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import javax.swing.JButton;
 
 public class Option {
 
 	public JFrame frame;
 	private CustomTable<N_ldi, N_ldi._Fields> tn_ldi;
 	private CustomTable<Metod, Metod._Fields> tmetod;
-	private CustomTable<S_ot01, S_ot01._Fields> ts_ot01;
+	public CustomTable<S_ot01, S_ot01._Fields> ts_ot01;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> p0e1;
 	public ThriftStringClassifierCombobox<StringClassifier> n_nz1;
-
+	
 	/**
 	 * Create the application.
 	 */
@@ -126,11 +133,13 @@ public class Option {
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitPane_1, GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE)
+				.addGroup(gl_panel_1.createSequentialGroup()
+					.addComponent(splitPane_1)
+					.addContainerGap())
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitPane_1, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+				.addComponent(splitPane_1, GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
 		);
 		
 		JPanel panel_2 = new JPanel();
@@ -142,26 +151,83 @@ public class Option {
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
-				.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 327, Short.MAX_VALUE)
+				.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
+				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
 		);
 		
-		tn_ldi = new CustomTable<>(false, true, N_ldi.class, 0, "Список анализов", 2, "Название", 6, "Выбор");
-		tn_ldi.setEditableFields(true, 2);
+		tn_ldi = new CustomTable<>(true, true, N_ldi.class, 0, "Список анализов", 2, "Название", 3, "Произвольное наименование", 6, "Выбор");
+		tn_ldi.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				try {
+						if (tn_ldi.getSelectedColumn()==3){
+							if (tn_ldi.getSelectedItem().vibor){
+								
+								S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, null,n_nz1.getSelectedPcod());
+								MainForm.ltc.AddS_ot01(s01);
+								ts_ot01.addItem(s01);
+							}else{
+								
+								for(int i = 0; i< tmetod.getRowCount(); i++){
+									tmetod.getModel().setValueAt(false, i, 3);
+									tmetod.repaint();
+									
+								}
+								
+								MainForm.ltc.DelS_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, n_nz1.getSelectedPcod());
+								ts_ot01.setData(MainForm.ltc.GetS_ot01(MainForm.authInfo.cpodr,n_nz1.getSelectedPcod()));
+							}
+						} 
+						
+				} catch (TException | S_ot01ExistsException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
 		
+		tn_ldi.setEditableFields(true, 2, 3);
+		tn_ldi.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<N_ldi>() {
+			
+			@Override
+			public boolean doAction(CustomTableItemChangeEvent<N_ldi> event) {
+				try {
+					MainForm.ltc.UpdN_ldi(event.getItem());
+					return true;
+				} catch (LdiNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return false;
+			}
+		});
 		tn_ldi.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		
+			
 			
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting())
 					filtN_stoim();
+				
+				//MainForm.ltc.UpdS_ot01(us01);
+					
+				
+				
+				
+				if (tmetod.getRowCount() > 0){
+					   checkTrueMet();
+					}
 			}
 		});
 		
@@ -197,18 +263,81 @@ public class Option {
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
-				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
+				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
+				.addComponent(scrollPane_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 453, Short.MAX_VALUE)
 		);
 		gl_panel_3.setVerticalGroup(
-			gl_panel_3.createParallelGroup(Alignment.TRAILING)
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
 					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE))
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE))
 		);
 		
 		tmetod = new CustomTable<>(false, true, Metod.class, 2, "Код", 3, "Наименование", 4, "Стоимость", 5, "Выбор");
+		tmetod.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				try {
+					if (tmetod.getSelectedColumn()==3){
+						if (tmetod.getSelectedItem().vibor){
+						
+							if (tn_ldi.getSelectedItem().vibor == false){
+								S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
+								MainForm.ltc.AddS_ot01(s01);
+								ts_ot01.addItem(s01);
+
+								// изменение значения строки с false на true
+								tn_ldi.getModel().setValueAt(true, tn_ldi.getSelectedRow(), 3);
+								// обновление таблицы
+								tn_ldi.repaint();
+							}else{
+								
+								String nldipcod = (String) tn_ldi.getValueAt(tn_ldi.getSelectedRow(), 0);
+								String s = (String) tmetod.getValueAt(tmetod.getSelectedRow(),0);
+									for (int y = 0; y < ts_ot01.getRowCount(); y++) {
+										String s1 = (String) ts_ot01.getModel().getValueAt(y, 2);
+										String sot01pcod = (String) ts_ot01.getModel().getValueAt(y, 1); 
+										
+										//System.out.println(s + " = "+ s1 + "; " + nldipcod +" = " + sot01pcod);
+										
+										if (nldipcod.equals(sot01pcod)){ 
+											if ((s1 != null)  && (s != s1)){
+												//System.out.println(s + " = "+ s1 + "; " + nldipcod +" = " + sot01pcod);
+												S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
+												MainForm.ltc.AddS_ot01(s01);
+												ts_ot01.addItem(s01);
+										
+											}else{
+												//System.out.println(s + " = "+ s1 + "; " + nldipcod +" = " + sot01pcod);
+												S_ot01 us01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
+												MainForm.ltc.UpdS_ot01(us01);
+												ts_ot01.setData(MainForm.ltc.GetS_ot01(MainForm.authInfo.cpodr,n_nz1.getSelectedPcod()));
+												//ts_ot01.updateSelectedItem();
+												//ts_ot01.repaint();
+											}
+										}
+									
+								}
+								
+							}
+							
+						}else{
+							MainForm.ltc.DelS_ot01D(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
+							ts_ot01.setData(MainForm.ltc.GetS_ot01(MainForm.authInfo.cpodr,n_nz1.getSelectedPcod()));
+						}
+						
+						ts_ot01.repaint();
+					} 
+					
+			} catch (TException | S_ot01ExistsException e) {
+				e.printStackTrace();
+			}
+				
+				
+			}
+		});
 		tmetod.setEditableFields(true, 3);
 		tmetod.setFillsViewportHeight(true);
 		scrollPane_1.setViewportView(tmetod);
@@ -278,12 +407,29 @@ public class Option {
 		scrollPane_2.setViewportView(ts_ot01);
 		panel_6.setLayout(gl_panel_6);
 		frame.getContentPane().setLayout(groupLayout);
+		
+				
 	}
 	
 	private void filtN_ldi() {
 		try {
 			if ((p0e1.getSelectedItem() != null) && (n_nz1.getSelectedItem() != null)){
-				tn_ldi.setData(MainForm.ltc.getN_ldi(n_nz1.getSelectedPcod(), p0e1.getSelectedPcod()));
+								
+				String s1 = n_nz1.getSelectedPcod();
+				int s2 = p0e1.getSelectedPcod();
+				List<N_ldi> spis = MainForm.ltc.getN_ldi(s1,s2);
+				
+				//System.out.print(spis.size());
+				
+				tn_ldi.setData(spis);
+				
+				//tn_ldi.setData(MainForm.ltc.getN_ldi(n_nz1.getSelectedPcod(), p0e1.getSelectedPcod()));
+				
+				ts_ot01.setData(MainForm.ltc.GetS_ot01(MainForm.authInfo.cpodr,n_nz1.getSelectedPcod()));
+				filtN_stoim();
+				chekTrue();
+				checkTrueMet();
+				
 			}
 		} catch (LdiNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -299,6 +445,7 @@ public class Option {
 		try {
 			if ((p0e1.getSelectedItem() != null) && (tn_ldi.getSelectedItem() != null)) {
 				tmetod.setData(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod(), String.format("%%.%02d.%%", p0e1.getSelectedPcod())));
+				//System.out.print(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod(), String.format("%%.%02d.%%", p0e1.getSelectedPcod())));
 			}
 		} catch (MetodNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -309,6 +456,58 @@ public class Option {
 		}
 	}
 	
+	private void chekTrue(){
+		for (int i = 0; i < ts_ot01.getRowCount(); i++) {
+			String s = (String) ts_ot01.getModel().getValueAt(i, 1);
+			
+			
+			for (int y = 0; y < tn_ldi.getRowCount(); y++){
+				String s1 = (String) tn_ldi.getModel().getValueAt(y, 0);
+				//System.out.println(s + " = "+ s1);
+				
+				if (s.equals(s1)){
+					// изменение значения строки с false на true
+					tn_ldi.getModel().setValueAt(true, y, 3);
+					// обновление таблицы
+					tn_ldi.repaint();
+				}
+			}
+		}
+		
+		
+	}
 	
-	
+	private void checkTrueMet(){
+		
+		//System.out.println(tn_ldi.getSelectedRow());
+		
+		if (tn_ldi.getSelectedRow() > -1){
+		
+		String spcod = (String) tn_ldi.getValueAt(tn_ldi.getSelectedRow(), 0);
+		
+				
+		for (int i = 0; i< tmetod.getRowCount(); i++){
+			String s = (String) tmetod.getModel().getValueAt(i,0);
+			
+			
+			for (int y = 0; y < ts_ot01.getRowCount(); y++) {
+				String s1 = (String) ts_ot01.getModel().getValueAt(y, 2);
+				String spcod1 = (String) ts_ot01.getModel().getValueAt(y, 1); 
+				
+				//System.out.println(s + " = "+ s1 + "; " + spcod +" = " + spcod1);
+				
+				if ((spcod.equals(spcod1)) && (s != null) && (s1 != null) && (s.equals(s1))){
+					// изменение значения строки с false на true
+					tmetod.getModel().setValueAt(true, i, 3);
+					// обновление таблицы
+					tmetod.repaint();
+				}
+				
+				}
+			
+			
+		}
+		
+	}
+	}
 }
