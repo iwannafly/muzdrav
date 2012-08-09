@@ -102,8 +102,7 @@ public class TestServerReception {
         final int default_cpol = 2000004;
         final String default_cdol = "8";
         final int default_pcod = 48;
-        final int excpectedListSize = 14;
-        System.out.println(new Date());
+        final int excpectedListSize = 244;
         List<Talon> listTalon = testServer.getTalon(default_cpol, default_cdol,
                 default_pcod);
         assertEquals("listSize", excpectedListSize, listTalon.size());

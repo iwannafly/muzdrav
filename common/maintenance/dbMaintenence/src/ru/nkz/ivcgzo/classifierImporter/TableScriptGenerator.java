@@ -38,8 +38,6 @@ public class TableScriptGenerator {
 				case "NUMBER":
 					if (rs.getInt(5) == 0)
 						scr += String.format("%s %s", rs.getString(1).toLowerCase(), (rs.getInt(4) < 11) ? "integer" : "bigint");
-//					else if (rs.getInt(5) < 25)
-//						scr += String.format("%s real", rs.getString(1).toLowerCase());
 					else
 						scr += String.format("%s double precision", rs.getString(1).toLowerCase());
 					break;
