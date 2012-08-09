@@ -262,6 +262,15 @@ exception NambkAlreadyExistException {
 exception SmorfNotFoundException {
 }
 
+exception OgrnNotFoundException {
+}
+
+exception RegionLiveNotFoundException {
+}
+
+exception TerLiveNotFoundException {
+}
+
 service ThriftRegPatient extends kmiacServer.KmiacServer {
     
     /**
@@ -424,19 +433,19 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	* Возвращает ОГРН
 	* select q_ogrn from n_smorf where smocod=?
      	*/
-	string getOgrn(1:string smocod),
+	string getOgrn(1:string smocod) throws (1:OgrnNotFoundException onfe),
 
 	/**
 	* Возвращает регион проживания
 	* select c_ffomc from n_l02 where pcod=?
      	*/
-	i32 getRegion_liv(1:i32 pcod),
+	i32 getRegionLive(1:i32 pcod) throws (1:RegionLiveNotFoundException rlnfe),
 
 	/**
 	* Возвращает территорию проживания
 	* select ter from n_l00 where pcod=?
      	*/
-	i32 getTer_liv(1:i32 pcod),
+	i32 getTerLive(1:i32 pcod) throws (1:TerLiveNotFoundException tlnfe),
 
 /*Классификаторы*/
 	

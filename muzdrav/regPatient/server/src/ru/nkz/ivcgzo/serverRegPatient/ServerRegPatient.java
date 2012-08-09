@@ -41,14 +41,17 @@ import ru.nkz.ivcgzo.thriftRegPatient.LgotaAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.LgotaNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
 import ru.nkz.ivcgzo.thriftRegPatient.NambkAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
+import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 
@@ -159,7 +162,7 @@ public class ServerRegPatient extends Server implements Iface {
     //  datapr      dataot      ishod
         Date.class, Date.class, Integer.class
     };
-    //Отражение таблицы p_kov (кроме поля name - это поле классификатора n_lkn)
+    // Отражение таблицы p_kov (кроме поля name - это поле классификатора n_lkn)
     private static final Class<?>[] LGOTA_TYPES = new Class<?>[] {
     //  id             npasp          lgot          datal
         Integer.class, Integer.class, Integer.class, Date.class,
@@ -627,6 +630,54 @@ public class ServerRegPatient extends Server implements Iface {
                 return rsmGosp.map(rs);
             } else {
                 throw new GospNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final String getOgrn(final String smocod) throws TException, OgrnNotFoundException {
+        String sqlQuery = "SELECT q_ogrn FROM n_smorf WHERE smocod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, smocod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("q_ogrn");
+            } else {
+                throw new OgrnNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final int getRegionLive(final int pcod) throws TException, RegionLiveNotFoundException {
+        String sqlQuery = "SELECT c_ffomc FROM n_l02 WHERE pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getInt("c_ffomc");
+            } else {
+                throw new RegionLiveNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final int getTerLive(final int pcod) throws TException, TerLiveNotFoundException {
+        String sqlQuery = "SELECT ter FROM n_l00 WHERE pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getInt("ter");
+            } else {
+                throw new TerLiveNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1275,14 +1326,14 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public String printMedCart(Gosp gosp, PatientFullInfo pat)
+    public final String printMedCart(final Gosp gosp, final PatientFullInfo pat)
             throws TException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public String printAmbCart(PatientFullInfo pat) throws TException {
+    public final String printAmbCart(final PatientFullInfo pat) throws TException {
         // TODO Auto-generated method stub
         return null;
     }
