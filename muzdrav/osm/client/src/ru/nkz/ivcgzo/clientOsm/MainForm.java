@@ -6,6 +6,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -54,6 +56,10 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent e) {
@@ -75,6 +81,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		});
 		
 		JButton btnSearch = new JButton("Поиск");
+		btnSearch.setVisible(false);
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int[] res = conMan.showPatientSearchForm("Поиск ранее записанных на прием пациентов", false, false);
@@ -96,6 +103,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		});
 		
 		JButton btnView = new JButton("Просмотр");
+		btnView.setVisible(false);
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pInf.update(table.getSelectedItem().getNpasp());

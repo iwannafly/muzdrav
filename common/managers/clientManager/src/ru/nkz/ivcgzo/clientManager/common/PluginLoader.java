@@ -25,6 +25,7 @@ public class PluginLoader {
 	private ConnectionManager conMan;
 	private UserAuthInfo authInfo;
 	private List<Plugin> pList;
+	private List<Plugin> cList;
 	private PluginComparator pComp;
 	
 	/**
@@ -37,7 +38,6 @@ public class PluginLoader {
 		this.conMan = conMan;
 		this.authInfo = authInfo;
 		
-		pList = new ArrayList<>();
 		pComp = new PluginComparator();
 	}
 	
@@ -45,6 +45,9 @@ public class PluginLoader {
 	 * Построение списка доступных пользователю модулей.
 	 */
 	public void loadPluginList(String path) throws FileNotFoundException {
+		pList = new ArrayList<>();
+		cList = new ArrayList<>();
+		
 		String exePath = new File(path).getParentFile().getAbsolutePath();
 		File plgDir = new File(exePath, "plugin");
 		if (!plgDir.exists())
@@ -61,6 +64,8 @@ public class PluginLoader {
 				Plugin plg = new Plugin(file.getAbsolutePath());
 				if (plg.getLaunchParam() != 0)
 					pList.add(plg);
+				else if (plg.isCommon())
+					cList.add(plg);
 			} catch (Exception e) {
 				e.printStackTrace();
 				continue;
@@ -103,6 +108,11 @@ public class PluginLoader {
 				return plugin.load();
 		}
 		
+		for (Plugin plugin : cList) {
+			if (plugin.getId() == appId)
+				return plugin.load();
+		}
+		
 		throw new IllegalArgumentException(String.format("Module with id %d not found.", appId));
 	}
 	
@@ -112,6 +122,7 @@ public class PluginLoader {
 		private String name;
 		private int id;
 		private int launchParam;
+		private boolean common;
 		
 		protected Plugin(String path) throws Exception {
 			this.path = path;
@@ -131,6 +142,10 @@ public class PluginLoader {
 				className = (String) confClass.getDeclaredField("clientClassName").get(null);
 				name = (String) confClass.getDeclaredField("appName").get(null);
 				id = confClass.getDeclaredField("appId").getInt(null);
+				try {
+					common = confClass.getDeclaredField("common").getBoolean(null);
+				} catch (NoSuchFieldException e) {
+				}
 			}
 		}
 		
@@ -150,8 +165,12 @@ public class PluginLoader {
 			return id;
 		}
 		
-		protected int getLaunchParam() {
+		private int getLaunchParam() {
 			return launchParam;
+		}
+		
+		private boolean isCommon() {
+			return common;
 		}
 	}
 	
