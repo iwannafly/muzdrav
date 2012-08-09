@@ -3,8 +3,11 @@
 	<dstBase host="10.0.0.242" port="5432" schema="public" name="zabol" login="postgres" password="postgres" tempDir="\\10.0.0.186\SomeSharedResource" />
 	<tableList>
 		<table srcName="A00" dstName="n_a00" />
+		<table srcName="ABA" dstName="n_aba" />
 		<table srcName="ABB" dstName="n_abb" />
 		<table srcName="ABC" dstName="n_abc" />
+		<table srcName="ABD" dstName="n_abd" />
+		<table srcName="ABG" dstName="n_abg" />
 		<table srcName="ABS" dstName="n_abs" />
 		<table srcName="ABT" dstName="n_abt" />
 		<table srcName="ABV" dstName="n_abv" />
@@ -23,6 +26,7 @@
 		<table srcName="AZ9" dstName="n_az9" />
 		<table srcName="B00" dstName="n_b00" />
 		<table srcName="C00" dstName="n_c00" />
+		<table srcName="D0S" dstName="n_dos" />
 		<table srcName="DB1" dstName="n_db1" />
 		<table srcName="DB2" dstName="n_db2" />
 		<table srcName="DB3" dstName="n_db3" />
@@ -77,6 +81,7 @@
 		<table srcName="VP3" dstName="n_vp3" />
 		<table srcName="VTR" dstName="n_vtr" />
 		<table srcName="W04" dstName="n_w04" />
+		<table srcName="W07" dstName="n_w07" />
 		<table srcName="Z00" dstName="n_z00" />
 		<table srcName="Z01" dstName="n_z01" />
 		<table srcName="Z10" dstName="n_z10" />
