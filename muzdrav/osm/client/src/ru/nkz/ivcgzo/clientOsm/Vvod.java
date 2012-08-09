@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -197,6 +198,7 @@ public class Vvod extends JFrame {
 	private JButton butBer;
 	private JButton PosSave;
 	private JButton PosDelete;
+	private JButton BSearch;
 	private JTextField tfKab;
 	private JRadioButton rbMetodIssl;
 	private JRadioButton rbPokaz;
@@ -1184,7 +1186,30 @@ public class Vvod extends JFrame {
 					MainForm.conMan.reconnect(e1);
 				}}
 		});
-		
+		BSearch = new JButton("Поиск"); 
+		BSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PatientCommonInfo inf;
+				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);
+				if (res != null) {
+					int npasp = res[0];
+					try {
+						inf = MainForm.tcl.getPatientCommonInfo(npasp);
+						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
+
+					} catch (KmiacServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PatientNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+			}
+		});
 		butBer = new JButton("Наблюдение за беременными");
 		butBer.setActionCommand("Наблюдение за беременными");
 		butBer.addActionListener(new ActionListener() {
@@ -1450,6 +1475,8 @@ mi3.addActionListener(new ActionListener() {
 								.addComponent(butBer)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(BPrint)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(BSearch)
 								.addContainerGap(4240, Short.MAX_VALUE))))
 			);
 			gl_panel.setVerticalGroup(
@@ -1460,7 +1487,8 @@ mi3.addActionListener(new ActionListener() {
 							.addComponent(butAnamn)
 							.addComponent(butProsm)
 							.addComponent(butBer)
-							.addComponent(BPrint))
+							.addComponent(BPrint)
+							.addComponent(BSearch))
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 							.addGroup(gl_panel.createSequentialGroup()
