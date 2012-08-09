@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientRegPatient;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -8,6 +9,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 
 public class MainForm extends Client<ThriftRegPatient.Client> {
@@ -29,9 +31,7 @@ public class MainForm extends Client<ThriftRegPatient.Client> {
 	 * @throws ClassNotFoundException 
 	 */
 	private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-		PacientMainFrame pacientMainFrame = new PacientMainFrame();
-		pacientMainFrame.pack();
-		setFrame(pacientMainFrame);
+		setFrame(new PacientInfoFrame(new ArrayList<PatientBrief>()));
 	}
 
 	@Override
