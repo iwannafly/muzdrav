@@ -54,6 +54,7 @@ public class LDSserver extends Server implements Iface {
 	private TResultSetMapper<Patient, Patient._Fields> rmsPatient;
 	private TResultSetMapper<Metod, Metod._Fields> rmsMetod;
 	private TResultSetMapper<N_ldi, N_ldi._Fields> rmsnldi;
+	private static final Class<?>[] n_ldiTypes = new Class<?>[] {String.class, String.class, String.class, String.class, String.class, Integer.class};
 	private final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 	private QueryGenerator<Patient> qgPatient;
 	@SuppressWarnings("unused")
@@ -399,8 +400,9 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<Metod> getMetod(int c_p0e1, String pcod, String pcod_m)
 			throws MetodNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?) and((n_stoim.c_obst like ?)or(n_stoim.c_obst is null))", c_p0e1, pcod, pcod_m)) {
-			return rmsMetod.mapToList(acrs.getResultSet());
+		//try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?) and((n_stoim.c_obst like ?)or(n_stoim.c_obst is null))", c_p0e1, pcod, pcod_m)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT n_stoim.c_obst, n_nsi_obst.nameobst as name, n_stoim.stoim FROM n_stoim left JOIN n_nsi_obst ON (n_stoim.c_obst = n_nsi_obst.obst) where (n_stoim.c_p0e1 = ?) and (n_stoim.pcod = ?)", c_p0e1, pcod)) {
+		return rmsMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -435,19 +437,30 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public List<S_ot01> GetS_ot01(int cotd, String pcod, String c_nz1)
+	public List<S_ot01> GetS_ot01(int cotd, String c_nz1)
 			throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM S_ot01 where (cotd = ?) and (pcod = ?)and(c_nz1 = ?) ", cotd, pcod, c_nz1)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM s_ot01 where (cotd = ?) and (c_nz1 = ?) ", cotd, c_nz1)) {
 			return rsmS_ot01.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
 	}
-
+	
+	
 	@Override
-	public S_ot01 GetSot01(int cotd, String pcod, String c_nz1)
+	public List<S_ot01> GetMinS_ot01(int cotd) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM s_ot01 where (cotd = ?) ", cotd)) {
+			return rsmS_ot01.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+	
+	
+	@Override
+	public S_ot01 GetSot01(int cotd, String c_nz1)
 			throws S_ot01NotFoundException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM s_ot01 WHERE (cotd = ?) and (pcod = ?) and (c_nz1 = ?) ", cotd, pcod, c_nz1)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM s_ot01 WHERE (cotd = ?) and (c_nz1 = ?) ", cotd, c_nz1)) {
 			if (acrs.getResultSet().next())
 				return rsmS_ot01.map(acrs.getResultSet());
 			else
@@ -459,20 +472,65 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public void AddS_ot01(S_ot01 so) throws S_ot01ExistsException, TException {
-		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//			if (!isIslExists(info)) {
+				sme.execPreparedT("INSERT INTO s_ot01 (cotd, pcod, c_obst, c_nz1) VALUES (?, ?, ?, ?) ", true, so, s_ot01Types, 0, 1, 2, 3);
+				sme.setCommit();
+			//} else
+				//throw new VrachExistsException();
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
 		
 	}
 
 	@Override
 	public void UpdS_ot01(S_ot01 so) throws S_ot01ExistsException, TException {
-		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//		if (!isIslExists(info)) {
+			sme.execPreparedT("UPDATE s_ot01 SET  c_obst = ? WHERE (cotd = ?) and (pcod = ?) and (c_nz1 = ?)", false, so, s_ot01Types, 2, 0, 1, 3);
+			sme.setCommit();
+//		} else
+//			throw new IslExistsException();
+	} catch (SQLException | InterruptedException e) {
+		throw new TException(e);
+	}
 		
 	}
 
 	@Override
 	public void DelS_ot01(int cotd, String pcod, String c_nz1)
 			throws TException {
-		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM s_ot01 WHERE (cotd = ?) and (pcod = ?) and (c_nz1 = ?)", false, cotd, pcod, c_nz1);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
 		
 	}
+
+	@Override
+	public void DelS_ot01D(int cotd, String pcod, String c_obst, String c_nz1)
+			throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM s_ot01 WHERE (cotd = ?) and (pcod = ?) and (c_obst = ?) and (c_nz1 = ?)", false, cotd, pcod, c_obst, c_nz1);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
+		
+	}
+
+	@Override
+	public void UpdN_ldi(N_ldi nldi)
+			throws LdiNotFoundException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE n_ldi SET name = ? WHERE (c_p0e1 = ?) and (c_nz1 = ?) and (pcod = ?)", false, nldi, n_ldiTypes, 3, 5, 1, 0);
+			sme.setCommit();
+	} catch (SQLException | InterruptedException e) {
+		throw new TException(e);
+	}
+	}
+
 }
