@@ -44,7 +44,11 @@ public class PatientSearchForm extends JFrame {
 	private static final long serialVersionUID = -8340824528321653697L;
 	private List<PatientBriefInfo> results, fullResults; 
 	
+	private static int heightWithOptionalParams = 340;
+	private static int heightWithoutOptionalParams = 240;
+	
 	private JPanel pnlTextFields; 
+	private JPanel pnlSearchParams;
 	private CustomTextField tbFam;
 	private CustomTextField tbIm;
 	private CustomTextField tbOt;
@@ -60,11 +64,14 @@ public class PatientSearchForm extends JFrame {
 	private JButton btnClearFields;
 	private JButton btnSearch;
 	
+	private static int resultsHeight = 242;
 	private CustomTable<PatientBriefInfo, PatientBriefInfo._Fields> tblResults;
+	private JPanel pnlResults;
 	private JButton btnAcceptResults;
 	private boolean resultsAccepted;
 	private ModalityListener modListener;
 	private boolean legibleSearch;
+	private JPanel pnlOptionalParams;
 	
 	/**
 	 * Create the application.
@@ -152,10 +159,10 @@ public class PatientSearchForm extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Поиск пациентов");
 		
-		JPanel pnlSearchParams = new JPanel();
+		pnlSearchParams = new JPanel();
 		pnlSearchParams.setBorder(new TitledBorder(null, "Критерии поиска пациентов", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JPanel pnlResults = new JPanel();
+		pnlResults = new JPanel();
 		pnlResults.setBorder(new TitledBorder(null, "Результаты", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
@@ -172,9 +179,9 @@ public class PatientSearchForm extends JFrame {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(pnlSearchParams, GroupLayout.PREFERRED_SIZE, 331, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(pnlResults, GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
+					.addComponent(pnlSearchParams, GroupLayout.PREFERRED_SIZE, heightWithOptionalParams, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(pnlResults, GroupLayout.DEFAULT_SIZE, resultsHeight, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
@@ -241,10 +248,6 @@ public class PatientSearchForm extends JFrame {
 		scpResults.setViewportView(tblResults);
 		pnlResults.setLayout(gl_pnlResults);
 		
-		JPanel gbPatientCount = new JPanel();
-		
-		JPanel gbSearchType = new JPanel();
-		
 		ActionListener illegibleListener = new ActionListener() {
 			
 			@Override
@@ -254,39 +257,8 @@ public class PatientSearchForm extends JFrame {
 				epc.changedUpdate(null);
 			}
 		};
-		rbtLegible = new JRadioButton("Четкий поиск");
-		rbtLegible.addActionListener(illegibleListener);
-		
-		rbtIllegible = new JRadioButton("Нечеткий поиск");
-		rbtIllegible.addActionListener(illegibleListener);
 		
 		ButtonGroup bgSearchType = new ButtonGroup();
-		
-		bgSearchType.add(rbtLegible);
-		bgSearchType.add(rbtIllegible);
-		
-		GroupLayout gl_gbSearchType = new GroupLayout(gbSearchType);
-		gl_gbSearchType.setHorizontalGroup(
-			gl_gbSearchType.createParallelGroup(Alignment.TRAILING)
-				.addGap(0, 386, Short.MAX_VALUE)
-				.addGroup(gl_gbSearchType.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(rbtLegible, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-					.addGap(18)
-					.addComponent(rbtIllegible, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-					.addContainerGap())
-		);
-		gl_gbSearchType.setVerticalGroup(
-			gl_gbSearchType.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 46, Short.MAX_VALUE)
-				.addGroup(gl_gbSearchType.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_gbSearchType.createParallelGroup(Alignment.BASELINE)
-						.addComponent(rbtLegible)
-						.addComponent(rbtIllegible))
-					.addContainerGap(25, Short.MAX_VALUE))
-		);
-		gbSearchType.setLayout(gl_gbSearchType);
 		
 		pnlTextFields = new JPanel();
 		
@@ -324,21 +296,22 @@ public class PatientSearchForm extends JFrame {
 		});
 		
 		chbAutoClose = new JCheckBox("Автоматически закрывать окно");
+		
+		pnlOptionalParams = new JPanel();
 		GroupLayout gl_pnlSearchParams = new GroupLayout(pnlSearchParams);
 		gl_pnlSearchParams.setHorizontalGroup(
 			gl_pnlSearchParams.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlSearchParams.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlSearchParams.createParallelGroup(Alignment.TRAILING)
-						.addComponent(gbSearchType, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
-						.addComponent(gbPatientCount, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
-						.addGroup(gl_pnlSearchParams.createSequentialGroup()
+					.addGroup(gl_pnlSearchParams.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_pnlSearchParams.createSequentialGroup()
 							.addComponent(chbAutoClose, GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
 							.addGap(18)
 							.addComponent(btnClearFields, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE))
-						.addComponent(pnlTextFields, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
+						.addComponent(pnlTextFields, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+						.addComponent(pnlOptionalParams, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_pnlSearchParams.setVerticalGroup(
@@ -347,9 +320,7 @@ public class PatientSearchForm extends JFrame {
 					.addContainerGap()
 					.addComponent(pnlTextFields, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(gbPatientCount, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(gbSearchType, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+					.addComponent(pnlOptionalParams, GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlSearchParams.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSearch, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
@@ -357,6 +328,85 @@ public class PatientSearchForm extends JFrame {
 						.addComponent(chbAutoClose, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addContainerGap())
 		);
+		
+		JPanel gbPatientCount = new JPanel();
+		ButtonGroup bgPatientCount = new ButtonGroup();
+		
+		rbtManyPat = new JRadioButton("Много пациентов");
+		
+		rbtOnePat = new JRadioButton("Один пациент");
+		
+		bgPatientCount.add(rbtManyPat);
+		bgPatientCount.add(rbtOnePat);
+		
+		GroupLayout gl_gbPatientCount = new GroupLayout(gbPatientCount);
+		gl_gbPatientCount.setHorizontalGroup(
+			gl_gbPatientCount.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_gbPatientCount.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(rbtOnePat, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+					.addGap(18)
+					.addComponent(rbtManyPat, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_gbPatientCount.setVerticalGroup(
+			gl_gbPatientCount.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_gbPatientCount.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_gbPatientCount.createParallelGroup(Alignment.BASELINE)
+						.addComponent(rbtManyPat)
+						.addComponent(rbtOnePat))
+					.addContainerGap(16, Short.MAX_VALUE))
+		);
+		gbPatientCount.setLayout(gl_gbPatientCount);
+		rbtOnePat.doClick();
+		
+		JPanel gbSearchType = new JPanel();
+		rbtLegible = new JRadioButton("Четкий поиск");
+		rbtLegible.addActionListener(illegibleListener);
+		
+		rbtIllegible = new JRadioButton("Нечеткий поиск");
+		rbtIllegible.addActionListener(illegibleListener);
+		
+		bgSearchType.add(rbtLegible);
+		bgSearchType.add(rbtIllegible);
+		
+		GroupLayout gl_gbSearchType = new GroupLayout(gbSearchType);
+		gl_gbSearchType.setHorizontalGroup(
+			gl_gbSearchType.createParallelGroup(Alignment.TRAILING)
+				.addGap(0, 386, Short.MAX_VALUE)
+				.addGroup(gl_gbSearchType.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(rbtLegible, GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+					.addGap(18)
+					.addComponent(rbtIllegible, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_gbSearchType.setVerticalGroup(
+			gl_gbSearchType.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 46, Short.MAX_VALUE)
+				.addGroup(gl_gbSearchType.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_gbSearchType.createParallelGroup(Alignment.BASELINE)
+						.addComponent(rbtLegible)
+						.addComponent(rbtIllegible))
+					.addContainerGap(25, Short.MAX_VALUE))
+		);
+		gbSearchType.setLayout(gl_gbSearchType);
+		GroupLayout gl_panel = new GroupLayout(pnlOptionalParams);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addComponent(gbPatientCount, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+				.addComponent(gbSearchType, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addComponent(gbPatientCount, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(gbSearchType, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
+		);
+		pnlOptionalParams.setLayout(gl_panel);
 		
 		JLabel lblFam = new JLabel("Фамилия");
 		
@@ -459,41 +509,12 @@ public class PatientSearchForm extends JFrame {
 		);
 		pnlTextFields.setLayout(gl_pnlTextFields);
 		
-		rbtManyPat = new JRadioButton("Много пациентов");
-		
-		rbtOnePat = new JRadioButton("Один пациент");
-		
-		ButtonGroup bgPatientCount = new ButtonGroup();
-		
-		bgPatientCount.add(rbtManyPat);
-		bgPatientCount.add(rbtOnePat);
-		
-		GroupLayout gl_gbPatientCount = new GroupLayout(gbPatientCount);
-		gl_gbPatientCount.setHorizontalGroup(
-			gl_gbPatientCount.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_gbPatientCount.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(rbtOnePat, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-					.addGap(18)
-					.addComponent(rbtManyPat, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
-					.addContainerGap())
-		);
-		gl_gbPatientCount.setVerticalGroup(
-			gl_gbPatientCount.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_gbPatientCount.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_gbPatientCount.createParallelGroup(Alignment.BASELINE)
-						.addComponent(rbtManyPat)
-						.addComponent(rbtOnePat))
-					.addContainerGap(16, Short.MAX_VALUE))
-		);
-		gbPatientCount.setLayout(gl_gbPatientCount);
 		pnlSearchParams.setLayout(gl_pnlSearchParams);
 		getContentPane().setLayout(groupLayout);
 		
-		btnClearFields.doClick();
 		rbtOnePat.doClick();
 		rbtLegible.doClick();
+		btnClearFields.doClick();
 		setOptionalParamsEnabledState(true);
 	}
 	
@@ -538,13 +559,28 @@ public class PatientSearchForm extends JFrame {
 	public void setOptionalParamsEnabledState(boolean enabled) {
 		legibleSearch = !enabled;
 		
-		rbtManyPat.setEnabled(enabled);
-		rbtIllegible.setEnabled(enabled);
-		chbAutoClose.setEnabled(enabled);
+		pnlOptionalParams.setVisible(enabled);
+		chbAutoClose.setVisible(enabled);
 		
 		if (enabled == false) {
 			rbtOnePat.doClick();
 			rbtLegible.doClick();
+		}
+		
+		if (getContentPane().getLayout() instanceof GroupLayout) {
+			int height = (enabled) ? heightWithOptionalParams : heightWithoutOptionalParams;
+			GroupLayout groupLayout = (GroupLayout) getContentPane().getLayout();
+			
+			groupLayout.setVerticalGroup(
+					groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(pnlSearchParams, GroupLayout.PREFERRED_SIZE, height, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(pnlResults, GroupLayout.DEFAULT_SIZE, resultsHeight, Short.MAX_VALUE)
+							.addContainerGap())
+				);
+			revalidate();
 		}
 	}
 	
