@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,11 +21,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
@@ -71,11 +68,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JComboBox;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -211,15 +203,14 @@ public class PacientInfoFrame extends JFrame {
     private ThriftStringClassifierCombobox <StringClassifier> cmb_naprav;
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_org;
     private ThriftStringClassifierCombobox <StringClassifier> cmb_ogrn;
-    private PatientBrief newPatBr;
+//    private PatientBrief newPatBr;
     private AllGosp newPriem;
 //	private Info pInfo;
 
-    public void refresh(List<PatientBrief> pat) {
-//		pacientMainFrame.ClearPatientMainFrame();
-        tbl_patient.requestFocus();
-        tbl_patient.setData(pat);
-    }
+//    public void refresh(List<PatientBrief> pat) {
+//        tbl_patient.requestFocus();
+//        tbl_patient.setData(pat);
+//    }
     /**
      * Create the frame.
      */
@@ -316,10 +307,10 @@ public class PacientInfoFrame extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
-		JPanel panel = new JPanel();
+		JPanel pl_print = new JPanel();
+		pl_print.setBorder(new TitledBorder(null, "\u041F\u0435\u0447\u0430\u0442\u044C \u0442\u0438\u0442\u0443\u043B\u044C\u043D\u043E\u0433\u043E \u043B\u0438\u0441\u0442\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		final JTabbedPane tbMain = new JTabbedPane(JTabbedPane.TOP);
-		tbMain.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbMain.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (tbMain.getSelectedIndex() == 1) {
@@ -339,21 +330,263 @@ public class PacientInfoFrame extends JFrame {
 				}
 			}
 		});
+		
+		JPanel pl_patient = new JPanel();
+		pl_patient.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+//		tbl_patient = new CustomTable<>(true, true, PatientBrief.class, 1,"Фамилия",2,"Имя",3,"Отчество",0,"ВН");
+//      tbl_patient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+//            @Override
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (!e.getValueIsAdjusting()) {
+//                    if (tbl_patient.getSelectedItem() != null) {
+//                    curPatientId = tbl_patient.getSelectedItem().npasp;
+//                    if (tbMain.getSelectedIndex() == 0) {
+//                        changePatientPersonalInfo(curPatientId);
+//                    }
+//                    if (tbMain.getSelectedIndex() == 1) {
+//                        changePatientLgotaInfo(curPatientId);
+//                    }
+//                    if (tbMain.getSelectedIndex() == 2) {
+//                        changePatientKategInfo(curPatientId);
+//                    }
+//                    if (tbMain.getSelectedIndex() == 3) {
+//                        changePatientAgentInfo(curPatientId);
+//                    }
+//                    if (tbMain.getSelectedIndex() == 4) {
+//                        changePatientSignInfo(curPatientId);
+//                    }
+//                    if (tbMain.getSelectedIndex() == 5) {
+//                        selectAllPatientPriemInfo(curPatientId);
+//                    }
+//                    }
+//                }
+//            }
+//        });
+//        tbl_patient.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<PatientBrief>() {
+//
+//            @Override
+//            public boolean doAction(CustomTableItemChangeEvent<PatientBrief> event) {
+//                try {
+//                    MainForm.tcl.deletePatient(curPatientId);
+//                } catch (TException e) {
+//                    e.printStackTrace();
+//                    return false;
+//                }
+//                return true;
+//            }
+//        });
+//
+//        tbl_patient.setFillsViewportHeight(true);
+//        tbl_patient.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//
+//        scrollPane.setViewportView(tbl_patient);
+////        refresh(pat);
+//
+//        //удалить пациента
+//        btnDel.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent arg0) {
+//              try{
+//                curPatientId = tbl_patient.getSelectedItem().npasp;
+//                tbl_patient.requestFocus();
+//                tbl_patient.deleteSelectedRow();
+//              } catch (Exception e) {
+//                e.printStackTrace();
+//              }
+//            }
+//        });
+
+        JButton btnNew = new JButton("Новый");
+        btnNew.setToolTipText("Создать карту нового пациента");
+        btnNew.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                try {
+//                    newPatBr = tbl_patient.addExternalItem();
+                    tfFam.requestFocus();
+                    curPatientId = 0;
+                    NewPatient();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        
+        JButton btnPoisk = new JButton("Поиск");
+        btnPoisk.setToolTipText("Поиск пациента");
+        btnPoisk.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+             	int[] res = MainForm.conMan.showPatientSearchForm("Поиск", false, true);
+            	
+            	if (res != null) {
+            		curPatientId = res[0];
+                    changePatientPersonalInfo(curPatientId);
+            	}
+//              tbMain.setSelectedIndex(0);
+//              PacientMainFrame.getInstance().setVisible(true);
+          }
+        });
+                
+        JButton btnSave = new JButton("Сохранить");
+        btnSave.setToolTipText("Сохранить изменения карты пациента");
+        btnSave.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		try {
+        			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        			PersonalInfo = new PatientFullInfo();
+        			PersonalInfo.admAddress = new Address();
+				    PersonalInfo.adpAddress = new Address();
+				    PersonalInfo.polis_oms = new Polis();
+				    PersonalInfo.polis_dms = new Polis();
+				    PersonalInfo.nambk = new Nambk();
+				    PersonalInfo.setDataz(new Date().getTime());
+				    PersonalInfo.setNpasp(curPatientId);
+				    PersonalInfo.setFam(tfFam.getText().toUpperCase().trim());
+				    PersonalInfo.setIm(tfIm.getText().toUpperCase().trim());
+				    PersonalInfo.setOt(tfOt.getText().toUpperCase().trim());
+				    PersonalInfo.admAddress.setRegion(tf_Adm_obl.getText().toUpperCase().trim());
+				    PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().toUpperCase().trim());
+				    PersonalInfo.admAddress.setStreet(tf_Adm_ul.getText().toUpperCase().trim());
+				    PersonalInfo.admAddress.setHouse(tf_Adm_dom.getText().toUpperCase().trim());
+				    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase().trim());
+				    PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase().trim());
+				    PersonalInfo.adpAddress.setCity(tf_Adp_gorod.getText().toUpperCase().trim());
+				    PersonalInfo.adpAddress.setStreet(tf_Adp_ul.getText().toUpperCase().trim());
+				    PersonalInfo.adpAddress.setHouse(tf_Adp_dom.getText().toUpperCase().trim());
+				    PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase().trim());
+				    PersonalInfo.setNamemr(tfMrname.getText().toUpperCase().trim());
+				    PersonalInfo.setMrab(tfMr.getText().toUpperCase().trim());
+				    PersonalInfo.setProf(tfDolj.getText().trim());
+				    PersonalInfo.setTel(tfTel.getText().trim());
+				    PersonalInfo.setSnils(tf_Snils.getText().toUpperCase().trim());
+				    PersonalInfo.setOdoc(tf_Odoc.getText().trim());
+				    PersonalInfo.setDocser(tf_serdoc.getText().trim());
+				    PersonalInfo.setDocnum(tf_nomdoc.getText().trim());
+				    PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().toUpperCase().trim());
+				    PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().toUpperCase().trim());
+				    PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().toUpperCase().trim());
+				    PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().toUpperCase().trim());
+				    if (!tf_oms_smo.getText().isEmpty()) PersonalInfo.polis_oms.setStrg(Integer.valueOf(tf_oms_smo.getText()));
+				    if (!tf_dms_smo.getText().isEmpty()) PersonalInfo.polis_dms.setStrg(Integer.valueOf(tf_dms_smo.getText()));
+				    PersonalInfo.nambk.setNambk(tf_Nambk.getText());
+				    if (!tf_Nuch.getText().isEmpty()) PersonalInfo.nambk.setNuch(Integer.valueOf(tf_Nuch.getText()));
+				    if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
+				    PersonalInfo.setDatar(tfDr.getDate().getTime());
+				    PersonalInfo.setDatadoc(tf_datadoc.getDate().getTime());
+				    PersonalInfo.nambk.setDatapr(tf_datapr.getDate().getTime());
+				    PersonalInfo.nambk.setDataot(tf_dataot.getDate().getTime());
+//					if (!tfDr.getText().isEmpty()) PersonalInfo.setDatar(sdf.parse(tfDr.getText()).getTime());
+//					if (!tf_datadoc.getText().isEmpty()) PersonalInfo.setDatadoc(sdf.parse(tf_datadoc.getText()).getTime());
+//					if (!tf_datapr.getText().isEmpty()) PersonalInfo.nambk.setDatapr(sdf.parse(tf_datapr.getText()).getTime());
+//					if (!tf_dataot.getText().isEmpty()) PersonalInfo.nambk.setDataot(sdf.parse(tf_dataot.getText()).getTime());
+				    if (rbtn_pol_m.isSelected()) PersonalInfo.setPol(1);
+				    if (rbtn_pol_j.isSelected()) PersonalInfo.setPol(2);
+				    if (cmb_status.getSelectedItem() != null) PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
+				    if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
+				    if (cmb_ishod.getSelectedItem() != null) PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
+				    if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
+				
+				    //PersonalInfo.setTer_liv(MainForm.tcl.getTer_liv(pcod));
+				    //PersonalInfo.setRegion_liv(MainForm.tcl.getRegion_liv(pcod));
+				//FIXME   jitel, terp
+				    if (curPatientId == 0){
+					curPatientId = MainForm.tcl.addPatient(PersonalInfo);
+					//newPatBr.setFam(PersonalInfo.getFam().toUpperCase());
+					//newPatBr.setOt(PersonalInfo.getOt().toUpperCase());
+					//newPatBr.setIm(PersonalInfo.getIm().toUpperCase());
+					//newPatBr.setNpasp(curPatientId);
+					//tbl_patient.updateSelectedItem();
+					//						RefreshTablePatient();
+				    }
+					else{
+						MainForm.tcl.updatePatient(PersonalInfo);
+					    }
+				} catch (PatientAlreadyExistException paee) {
+					    System.out.println("Пациент не найден.");
+				} catch (Exception e) {
+					    e.printStackTrace();
+				}
+			 }
+			});
+				
+				        JButton btnDel = new JButton("Удалить");
+				        btnDel.setToolTipText("Удалить карту пациента");
+				        btnDel.addActionListener(new ActionListener() {
+				        	public void actionPerformed(ActionEvent arg0) {
+				              try {
+				            	  MainForm.tcl.deletePatient(curPatientId);
+				              } catch (TException e) {
+				            	  e.printStackTrace();
+				              }
+				        	}
+				        });
+				
+				        JButton btnShowTalonSelectModule = new JButton("Запись на приём");
+				        btnShowTalonSelectModule.setToolTipText("Записать пациента на приём");
+				        btnShowTalonSelectModule.addActionListener(new ActionListener() {
+				            @Override
+				            public void actionPerformed(ActionEvent arg0) {
+				                try {
+				                    int patientId = curPatientId;
+				                    String patientSurname = tfFam.getText();
+				                    String patientName = tfIm.getText();
+				                    String patientMiddlename = tfOt.getText();
+				                    long patientBirthdate = tfDr.getDate().getTime();
+				                    IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
+				                    client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename, patientBirthdate);
+				                } catch (Exception e) {
+				                    e.printStackTrace();
+				                }
+				            }
+				        });
+
+				GroupLayout gl_pl_patient = new GroupLayout(pl_patient);
+				gl_pl_patient.setHorizontalGroup(
+					gl_pl_patient.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pl_patient.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(btnDel)
+							.addGap(77)
+							.addComponent(btnNew)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnPoisk)
+							.addGap(8)
+							.addComponent(btnSave)
+							.addPreferredGap(ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+							.addComponent(btnShowTalonSelectModule)
+							.addContainerGap())
+				);
+				gl_pl_patient.setVerticalGroup(
+					gl_pl_patient.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_pl_patient.createSequentialGroup()
+							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addGroup(gl_pl_patient.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnDel)
+								.addComponent(btnNew)
+								.addComponent(btnPoisk)
+								.addComponent(btnSave)
+								.addComponent(btnShowTalonSelectModule)))
+				);
+        pl_patient.setLayout(gl_pl_patient);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 241, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 737, GroupLayout.PREFERRED_SIZE))
+					.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 974, Short.MAX_VALUE)
+					.addContainerGap())
+				.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+					.addGap(19)
+					.addComponent(pl_patient, GroupLayout.PREFERRED_SIZE, 567, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
+					.addComponent(pl_print, GroupLayout.PREFERRED_SIZE, 287, GroupLayout.PREFERRED_SIZE)
+					.addGap(19))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 627, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(40)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addComponent(pl_print, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+						.addComponent(pl_patient, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(17)
 					.addComponent(tbMain, GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE))
 		);
 		
@@ -380,20 +613,19 @@ public class PacientInfoFrame extends JFrame {
 		panel_7.setBorder(new TitledBorder(null, "\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442, \u0443\u0434\u043E\u0441\u0442\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 \u043B\u0438\u0447\u043D\u043E\u0441\u0442\u044C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_tpPersonal = new GroupLayout(tpPersonal);
 		gl_tpPersonal.setHorizontalGroup(
-			gl_tpPersonal.createParallelGroup(Alignment.LEADING)
+			gl_tpPersonal.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_tpPersonal.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_tpPersonal.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 679, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				.addGroup(Alignment.TRAILING, gl_tpPersonal.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
+					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 679, Short.MAX_VALUE)
+					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 679, Short.MAX_VALUE)
+					.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
+					.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 679, Short.MAX_VALUE)
+					.addGroup(gl_tpPersonal.createSequentialGroup()
+					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGap(4)))
+					.addGap(43))
 		);
 		gl_tpPersonal.setVerticalGroup(
 			gl_tpPersonal.createParallelGroup(Alignment.LEADING)
@@ -410,7 +642,7 @@ public class PacientInfoFrame extends JFrame {
 					.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(47, Short.MAX_VALUE))
+					.addContainerGap(37, Short.MAX_VALUE))
 		);
 		
 		JLabel lblNewLabel_27 = new JLabel("Документ");
@@ -499,7 +731,6 @@ public class PacientInfoFrame extends JFrame {
 		panel_7.setLayout(gl_panel_7);
 		
 		tf_Cpol = new JTextField();
-		tf_Cpol.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tf_Cpol.setColumns(10);
 		
 		JLabel lblNewLabel_21 = new JLabel("Поликлиника");
@@ -1264,7 +1495,7 @@ public class PacientInfoFrame extends JFrame {
         tpKateg.setLayout(gl_tpKateg);
 
         JPanel tpAgent = new JPanel();
-        tbMain.addTab("Представитель", null, tpAgent, null);
+        tbMain.addTab("Доп. сведения", null, tpAgent, null);
 
         JPanel panel_8 = new JPanel();
         panel_8.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Общая информация", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -2563,263 +2794,46 @@ public class PacientInfoFrame extends JFrame {
             return true;
             }
         });
-
-        JPanel panel_1 = new JPanel();
-        JScrollPane scrollPane = new JScrollPane();
-
-        JButton btnDel = new JButton("Удалить");
-        btnDel.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-        JButton btnShowTalonSelectModule = new JButton("Запись на приём");
-        btnShowTalonSelectModule.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                try {
-                    int patientId = tbl_patient.getSelectedItem().getNpasp();
-                    String patientSurname = tbl_patient.getSelectedItem().getFam();
-                    String patientName = tbl_patient.getSelectedItem().getIm();
-                    String patientMiddlename = tbl_patient.getSelectedItem().getOt();
-                    long patientBirthdate = tbl_patient.getSelectedItem().getDatar();
-                    IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
-                    client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename, patientBirthdate);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        
+        JButton btnPrint_ambk = new JButton("Амбул.карты");
+        btnPrint_ambk.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        	}
         });
+        btnPrint_ambk.setToolTipText("Печать титульного листа амбулаторной карты");
+        
+        JButton btnPrint_istb = new JButton("Ист.болезни");
+        btnPrint_istb.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        	}
+        });
+        btnPrint_istb.setToolTipText("Печать титульного листа истории болезни");
 
-        GroupLayout gl_panel = new GroupLayout(panel);
-        gl_panel.setHorizontalGroup(
-            gl_panel.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel.createSequentialGroup()
-                    .addGap(2)
-                    .addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-                        .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
-                        .addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(gl_panel.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(btnDel)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(btnShowTalonSelectModule)
-                    .addContainerGap(59, Short.MAX_VALUE))
+        GroupLayout gl_pl_print = new GroupLayout(pl_print);
+        gl_pl_print.setHorizontalGroup(
+        	gl_pl_print.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_pl_print.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(btnPrint_ambk)
+        			.addGap(26)
+        			.addComponent(btnPrint_istb)
+        			.addContainerGap(27, Short.MAX_VALUE))
         );
-        gl_panel.setVerticalGroup(
-            gl_panel.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel.createSequentialGroup()
-                    .addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 538, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
-                    .addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(btnDel)
-                        .addComponent(btnShowTalonSelectModule))
-                    .addContainerGap())
+        gl_pl_print.setVerticalGroup(
+        	gl_pl_print.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(Alignment.LEADING, gl_pl_print.createSequentialGroup()
+        			.addGroup(gl_pl_print.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(btnPrint_ambk)
+        				.addComponent(btnPrint_istb))
+        			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        tbl_patient = new CustomTable<>(true, true, PatientBrief.class, 1,"Фамилия",2,"Имя",3,"Отчество",0,"ВН");
-        tbl_patient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    if (tbl_patient.getSelectedItem() != null) {
-                    curPatientId = tbl_patient.getSelectedItem().npasp;
-                    if (tbMain.getSelectedIndex() == 0) {
-                        changePatientPersonalInfo(curPatientId);
-                    }
-                    if (tbMain.getSelectedIndex() == 1) {
-                        changePatientLgotaInfo(curPatientId);
-                    }
-                    if (tbMain.getSelectedIndex() == 2) {
-                        changePatientKategInfo(curPatientId);
-                    }
-                    if (tbMain.getSelectedIndex() == 3) {
-                        changePatientAgentInfo(curPatientId);
-                    }
-                    if (tbMain.getSelectedIndex() == 4) {
-                        changePatientSignInfo(curPatientId);
-                    }
-                    if (tbMain.getSelectedIndex() == 5) {
-                        selectAllPatientPriemInfo(curPatientId);
-                    }
-                    }
-                }
-            }
-        });
-        tbl_patient.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<PatientBrief>() {
-
-            @Override
-            public boolean doAction(CustomTableItemChangeEvent<PatientBrief> event) {
-                try {
-                    MainForm.tcl.deletePatient(curPatientId);
-                } catch (TException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-                return true;
-            }
-        });
-
-        tbl_patient.setFillsViewportHeight(true);
-        tbl_patient.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-        scrollPane.setViewportView(tbl_patient);
-        refresh(pat);
-
-        //удалить пациента
-        btnDel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-              try{
-                curPatientId = tbl_patient.getSelectedItem().npasp;
-                tbl_patient.requestFocus();
-                tbl_patient.deleteSelectedRow();
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            }
-        });
-        JButton btnNew = new JButton("Новый");
-        btnNew.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        btnNew.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                try {
-                    newPatBr = tbl_patient.addExternalItem();
-                    tfFam.requestFocus();
-                    curPatientId = 0;
-                    NewPatient();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        JButton btnPoisk = new JButton("Поиск");
-        btnPoisk.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        btnPoisk.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	int[] res = MainForm.conMan.showPatientSearchForm("Поииииск", false, true);
-            	
-            	if (res != null) {
-            		curPatientId = res[0];
-                    changePatientPersonalInfo(curPatientId);
-            	}
-
-//                tbMain.setSelectedIndex(0);
-//                PacientMainFrame.getInstance().setVisible(true);
-            }
-        });
-
-        JButton btnSave = new JButton("Сохранить");
-        btnSave.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        btnSave.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-                    PersonalInfo = new PatientFullInfo();
-                    PersonalInfo.admAddress = new Address();
-                    PersonalInfo.adpAddress = new Address();
-                    PersonalInfo.polis_oms = new Polis();
-                    PersonalInfo.polis_dms = new Polis();
-                    PersonalInfo.nambk = new Nambk();
-                    PersonalInfo.setDataz(new Date().getTime());
-                    PersonalInfo.setNpasp(curPatientId);
-                    PersonalInfo.setFam(tfFam.getText().toUpperCase().trim());
-                    PersonalInfo.setIm(tfIm.getText().toUpperCase().trim());
-                    PersonalInfo.setOt(tfOt.getText().toUpperCase().trim());
-                    PersonalInfo.admAddress.setRegion(tf_Adm_obl.getText().toUpperCase().trim());
-                    PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().toUpperCase().trim());
-                    PersonalInfo.admAddress.setStreet(tf_Adm_ul.getText().toUpperCase().trim());
-                    PersonalInfo.admAddress.setHouse(tf_Adm_dom.getText().toUpperCase().trim());
-                    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase().trim());
-                    PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase().trim());
-                    PersonalInfo.adpAddress.setCity(tf_Adp_gorod.getText().toUpperCase().trim());
-                    PersonalInfo.adpAddress.setStreet(tf_Adp_ul.getText().toUpperCase().trim());
-                    PersonalInfo.adpAddress.setHouse(tf_Adp_dom.getText().toUpperCase().trim());
-                    PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase().trim());
-                    PersonalInfo.setNamemr(tfMrname.getText().toUpperCase().trim());
-                    PersonalInfo.setMrab(tfMr.getText().toUpperCase().trim());
-                    PersonalInfo.setProf(tfDolj.getText().trim());
-                    PersonalInfo.setTel(tfTel.getText().trim());
-                    PersonalInfo.setSnils(tf_Snils.getText().toUpperCase().trim());
-                    PersonalInfo.setOdoc(tf_Odoc.getText().trim());
-                    PersonalInfo.setDocser(tf_serdoc.getText().trim());
-                    PersonalInfo.setDocnum(tf_nomdoc.getText().trim());
-                    PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().toUpperCase().trim());
-                    PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().toUpperCase().trim());
-                    PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().toUpperCase().trim());
-                    PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().toUpperCase().trim());
-                    if (!tf_oms_smo.getText().isEmpty()) PersonalInfo.polis_oms.setStrg(Integer.valueOf(tf_oms_smo.getText()));
-                    if (!tf_dms_smo.getText().isEmpty()) PersonalInfo.polis_dms.setStrg(Integer.valueOf(tf_dms_smo.getText()));
-                    PersonalInfo.nambk.setNambk(tf_Nambk.getText());
-                    if (!tf_Nuch.getText().isEmpty()) PersonalInfo.nambk.setNuch(Integer.valueOf(tf_Nuch.getText()));
-                    if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
-                    PersonalInfo.setDatar(tfDr.getDate().getTime());
-                    PersonalInfo.setDatadoc(tf_datadoc.getDate().getTime());
-                    PersonalInfo.nambk.setDatapr(tf_datapr.getDate().getTime());
-                    PersonalInfo.nambk.setDataot(tf_dataot.getDate().getTime());
-//					if (!tfDr.getText().isEmpty()) PersonalInfo.setDatar(sdf.parse(tfDr.getText()).getTime());
-//					if (!tf_datadoc.getText().isEmpty()) PersonalInfo.setDatadoc(sdf.parse(tf_datadoc.getText()).getTime());
-//					if (!tf_datapr.getText().isEmpty()) PersonalInfo.nambk.setDatapr(sdf.parse(tf_datapr.getText()).getTime());
-//					if (!tf_dataot.getText().isEmpty()) PersonalInfo.nambk.setDataot(sdf.parse(tf_dataot.getText()).getTime());
-                    if (rbtn_pol_m.isSelected()) PersonalInfo.setPol(1);
-                    if (rbtn_pol_j.isSelected()) PersonalInfo.setPol(2);
-                    if (cmb_status.getSelectedItem() != null) PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
-                    if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
-                    if (cmb_ishod.getSelectedItem() != null) PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
-                    if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
-
-                    //PersonalInfo.setTer_liv(MainForm.tcl.getTer_liv(pcod));
-                    //PersonalInfo.setRegion_liv(MainForm.tcl.getRegion_liv(pcod));
-//FIXME   jitel, terp
-                    if (curPatientId == 0){
-                        curPatientId = MainForm.tcl.addPatient(PersonalInfo);
-                        newPatBr.setFam(PersonalInfo.getFam().toUpperCase());
-                        newPatBr.setOt(PersonalInfo.getOt().toUpperCase());
-                        newPatBr.setIm(PersonalInfo.getIm().toUpperCase());
-                        newPatBr.setNpasp(curPatientId);
-                        tbl_patient.updateSelectedItem();
-//						RefreshTablePatient();
-                    }
-                    else{
-                        MainForm.tcl.updatePatient(PersonalInfo);
-                    }
-                } catch (PatientAlreadyExistException paee) {
-                    System.out.println("Пациент не найден.");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-        gl_panel_1.setHorizontalGroup(
-            gl_panel_1.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_1.createSequentialGroup()
-                    .addComponent(btnNew)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(btnPoisk)
-                    .addPreferredGap(ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
-                    .addComponent(btnSave)
-                    .addContainerGap())
-        );
-        gl_panel_1.setVerticalGroup(
-            gl_panel_1.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_1.createSequentialGroup()
-                    .addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(btnNew)
-                        .addComponent(btnPoisk)
-                        .addComponent(btnSave))
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        panel_1.setLayout(gl_panel_1);
-        panel.setLayout(gl_panel);
+        pl_print.setLayout(gl_pl_print);
         contentPane.setLayout(gl_contentPane);
     }
     //слушатель таб контрола персональной информации о пациенте
     final ChangeListener  tpPersonalChangeListener= new ChangeListener() {
         public void stateChanged(ChangeEvent changeEvent) {
-            curPatientId = tbl_patient.getSelectedItem().npasp;
-//			selectAllPatientPriemInfo(curPatientId);
+//            curPatientId = tbl_patient.getSelectedItem().npasp;
             changePatientPersonalInfo(curPatientId);
         }
     };
@@ -3093,7 +3107,6 @@ public class PacientInfoFrame extends JFrame {
     // обновление информации о представителе
     private void changePatientAgentInfo(int PatId){
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             NewAgent();
             AgentInfo = MainForm.tcl.getAgent(PatId);
             if (AgentInfo.getFam() != null)	tf_Fam_pr.setText(AgentInfo.fam.trim());
@@ -3459,29 +3472,29 @@ public class PacientInfoFrame extends JFrame {
             e.printStackTrace();
         }
     }
-    @SuppressWarnings("unused")
-    private void RefreshTablePatient(){
-        try {
-            PatientBrief patBr = new PatientBrief();
-            if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase().trim());
-            if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase().trim());
-            if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
-            if (!tf_oms_ser.getText().isEmpty()) patBr.setSpolis(tf_oms_ser.getText().toUpperCase().trim());
-            if (!tf_oms_nom.getText().isEmpty()) patBr.setNpolis(tf_oms_nom.getText().toUpperCase().trim());
-            try {
-                pat = MainForm.tcl.getAllPatientBrief(patBr);
-                refresh(pat);
-            }
-            catch (PatientNotFoundException e) {
-                JOptionPane.showMessageDialog(tfFam, "По заданным критериям сведения о пациенте отсутствуют.");
-                System.out.println(patBr.setFam(tfFam.getText().trim())+", "+patBr.setIm(tfIm.getText().trim())+", "+patBr.setOt(tfOt.getText().trim()));
-                System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
-            }
-        } catch (Exception e) {
-            System.out.println("эксэпшн");
-            e.printStackTrace();
-        }
-    }
+//    @SuppressWarnings("unused")
+//    private void RefreshTablePatient(){
+//        try {
+//            PatientBrief patBr = new PatientBrief();
+//            if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase().trim());
+//            if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase().trim());
+//            if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
+//            if (!tf_oms_ser.getText().isEmpty()) patBr.setSpolis(tf_oms_ser.getText().toUpperCase().trim());
+//            if (!tf_oms_nom.getText().isEmpty()) patBr.setNpolis(tf_oms_nom.getText().toUpperCase().trim());
+//            try {
+//                pat = MainForm.tcl.getAllPatientBrief(patBr);
+//                refresh(pat);
+//            }
+//            catch (PatientNotFoundException e) {
+//                JOptionPane.showMessageDialog(tfFam, "По заданным критериям сведения о пациенте отсутствуют.");
+//                System.out.println(patBr.setFam(tfFam.getText().trim())+", "+patBr.setIm(tfIm.getText().trim())+", "+patBr.setOt(tfOt.getText().trim()));
+//                System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
+//            }
+//        } catch (Exception e) {
+//            System.out.println("эксэпшн");
+//            e.printStackTrace();
+//        }
+//    }
     private void CheckNotNullTableCgosp(){
         try {
             String strerr = "";
