@@ -16,6 +16,8 @@ public class CustomNumberEditor extends CustomTextField {
 	}
 	
 	public CustomNumberEditor(boolean selectOnFocus, boolean popupMenu) {
+		super(selectOnFocus, popupMenu, false);
+		
 		this.setDocument(new NumberDocument());
 	}
 	

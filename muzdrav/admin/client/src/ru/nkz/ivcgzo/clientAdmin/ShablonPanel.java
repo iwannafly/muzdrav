@@ -350,7 +350,7 @@ public class ShablonPanel extends JPanel {
 		private ShablonText shabText;
 		
 		public ShablonTextTreeItem(ShablonText shabText) {
-			txt = new CustomTextField();
+			txt = new CustomTextField(true, true, false);
 			setActionListener();
 			
 			lbl = new JLabel();

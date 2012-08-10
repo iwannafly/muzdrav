@@ -184,7 +184,7 @@ public class PacientInfoFrame extends JFrame {
     private Sign SignInfo;
     private Gosp Id_gosp;
     private List<AllGosp> AllGospInfo;
-    private CustomTable<PatientBrief, PatientBrief._Fields> tbl_patient;
+//    private CustomTable<PatientBrief, PatientBrief._Fields> tbl_patient;
     private CustomTable<Lgota, Lgota._Fields> tbl_lgota;
     private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
     private CustomTable<AllGosp, AllGosp._Fields> tbl_priem;
@@ -2047,11 +2047,9 @@ public class PacientInfoFrame extends JFrame {
         panel_17.setLayout(gl_panel_17);
 
         rbtn_rf1 = new JRadioButton("+");
-        rbtn_rf1.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_rf.add(rbtn_rf1);
 
         rbtn_rf2 = new JRadioButton("-");
-        rbtn_rf2.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_rf.add(rbtn_rf2);
         GroupLayout gl_panel_14 = new GroupLayout(panel_14);
         gl_panel_14.setHorizontalGroup(
@@ -2073,19 +2071,15 @@ public class PacientInfoFrame extends JFrame {
         panel_14.setLayout(gl_panel_14);
 
         rbtn_gk1 = new JRadioButton("I");
-        rbtn_gk1.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_gk.add(rbtn_gk1);
 
         rbtn_gk2 = new JRadioButton("II");
-        rbtn_gk2.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_gk.add(rbtn_gk2);
 
         rbtn_gk3 = new JRadioButton("III");
-        rbtn_gk3.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_gk.add(rbtn_gk3);
 
         rbtn_gk4 = new JRadioButton("IV");
-        rbtn_gk4.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_gk.add(rbtn_gk4);
 
         GroupLayout gl_panel_13 = new GroupLayout(panel_13);
@@ -2246,7 +2240,6 @@ public class PacientInfoFrame extends JFrame {
         panel_36.setLayout(gl_panel_36);
 
         cbx_gosp = new JCheckBox("");
-        cbx_gosp.setFont(new Font("Tahoma", Font.PLAIN, 11));
         cbx_gosp.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 ChangeStateCheckbox();
@@ -2280,11 +2273,7 @@ public class PacientInfoFrame extends JFrame {
 
         JPanel panel_26 = new JPanel();
 
-        JLabel lblNewLabel_48 = new JLabel("№ талона");
-        lblNewLabel_48.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
         tf_ntalon = new JTextField();
-        tf_ntalon.setFont(new Font("Tahoma", Font.PLAIN, 11));
         tf_ntalon.setColumns(10);
 
         JPanel panel_27 = new JPanel();
@@ -2305,23 +2294,16 @@ public class PacientInfoFrame extends JFrame {
         JPanel panel_32 = new JPanel();
         panel_32.setBorder(new TitledBorder(null, "Вызов скорой помощи", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
-        JLabel lblNewLabel_56 = new JLabel("Вид травмы");
-        lblNewLabel_56.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-        JLabel lblNewLabel_57 = new JLabel("Вид транспортировки");
-        lblNewLabel_57.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
         JPanel panel_33 = new JPanel();
         panel_33.setBorder(new TitledBorder(null, "\u0416\u0430\u043B\u043E\u0431\u044B", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
+        JLabel lblNewLabel_48 = new JLabel("№ талона");
+        JLabel lblNewLabel_56 = new JLabel("Вид травмы");
+        JLabel lblNewLabel_57 = new JLabel("Вид транспортировки");
         JLabel lblNewLabel_58 = new JLabel("Причина отказа в госпитализации");
-        lblNewLabel_58.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
         JLabel lblNist = new JLabel("№ ист. бол.");
-        lblNist.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
         tf_nist = new JTextField();
-        tf_nist.setFont(new Font("Tahoma", Font.PLAIN, 11));
         tf_nist.setColumns(10);
         GroupLayout gl_panel_25 = new GroupLayout(panel_25);
         gl_panel_25.setHorizontalGroup(
@@ -2427,17 +2409,12 @@ public class PacientInfoFrame extends JFrame {
         panel_33.setLayout(gl_panel_33);
 
         JLabel lblNewLabel_54 = new JLabel("Дата и время");
-        lblNewLabel_54.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
         JLabel lblNewLabel_55 = new JLabel("Номер");
-        lblNewLabel_55.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
         tf_smpn = new JTextField();
-        tf_smpn.setFont(new Font("Tahoma", Font.PLAIN, 11));
         tf_smpn.setColumns(10);
 
         cbx_smp = new JCheckBox("");
-        cbx_smp.setFont(new Font("Tahoma", Font.PLAIN, 11));
         cbx_smp.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent arg0) {
                 ChangeStateCheckbox();
@@ -2485,27 +2462,17 @@ public class PacientInfoFrame extends JFrame {
         panel_32.setLayout(gl_panel_32);
 
         cbx_nalz = new JCheckBox("чесотка");
-        cbx_nalz.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
         cbx_nalp = new JCheckBox("педикулез");
-        cbx_nalp.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
         JLabel lblNewLabel_51 = new JLabel("Опьянение");
-        lblNewLabel_51.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
-
         JLabel lblNewLabel_52 = new JLabel("Температура");
-        lblNewLabel_52.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
         JLabel lblNewLabel_53 = new JLabel("Давление");
-        lblNewLabel_53.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
         tf_toc = new JTextField();
-        tf_toc.setFont(new Font("Tahoma", Font.PLAIN, 11));
         tf_toc.setColumns(10);
 
         tf_ad = new JTextField();
-        tf_ad.setFont(new Font("Tahoma", Font.PLAIN, 11));
         tf_ad.setColumns(10);
         GroupLayout gl_panel_31 = new GroupLayout(panel_31);
         gl_panel_31.setHorizontalGroup(
@@ -2616,10 +2583,7 @@ public class PacientInfoFrame extends JFrame {
         panel_28.setLayout(gl_panel_28);
 
         JLabel lblNewLabel_49 = new JLabel("Поступления");
-        lblNewLabel_49.setFont(new Font("Tahoma", Font.PLAIN, 11));
-
         JLabel lblNewLabel_50 = new JLabel("Осмотра");
-        lblNewLabel_50.setFont(new Font("Tahoma", Font.PLAIN, 11));
 
         tf_datap = new CustomDateEditor();
         tf_timep = new CustomTimeEditor();
@@ -2665,11 +2629,9 @@ public class PacientInfoFrame extends JFrame {
         panel_27.setLayout(gl_panel_27);
 
         rbtn_plan = new JRadioButton("плановое");
-        rbtn_plan.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_plextr.add(rbtn_plan);
 
         rbtn_extr = new JRadioButton("экстренное");
-        rbtn_extr.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnGroup_plextr.add(rbtn_extr);
         GroupLayout gl_panel_26 = new GroupLayout(panel_26);
         gl_panel_26.setHorizontalGroup(
@@ -2693,7 +2655,6 @@ public class PacientInfoFrame extends JFrame {
         panel_25.setLayout(gl_panel_25);
 
         JButton btnNew_priem = new JButton("Новое обращение");
-        btnNew_priem.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnNew_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 newPriem = tbl_priem.addExternalItem();
@@ -2705,7 +2666,6 @@ public class PacientInfoFrame extends JFrame {
         });
 
         JButton btnSave_priem = new JButton("Сохранить");
-        btnSave_priem.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 SavePriemInfo();
@@ -2713,7 +2673,6 @@ public class PacientInfoFrame extends JFrame {
         });
 
         JButton btnDel_priem = new JButton("Удалить");
-        btnDel_priem.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnDel_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
               try{
@@ -2905,7 +2864,6 @@ public class PacientInfoFrame extends JFrame {
                 return;
             NewPatient();
             PersonalInfo = MainForm.tcl.getPatientFullInfo(PatId);
-            SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             if (PersonalInfo.getFam() != null){
                 tfFam.setText(PersonalInfo.fam.trim());
             }

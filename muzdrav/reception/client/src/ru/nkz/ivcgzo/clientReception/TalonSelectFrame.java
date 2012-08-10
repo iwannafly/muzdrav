@@ -246,7 +246,8 @@ public class TalonSelectFrame extends JFrame {
     }
 
     private void fillTalonSelectPane() {
-        tbTalonSelect = new CustomTable<Talon, Talon._Fields>(false, false, Talon.class, 1, "Номер талона", 3, "Время начала приёма");
+        tbTalonSelect = new CustomTable<Talon, Talon._Fields>(false, false, Talon.class, 1,
+                "Номер талона", 3, "Время начала приёма");
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
