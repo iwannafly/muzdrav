@@ -285,17 +285,6 @@ public class PacientInfoFrame extends JFrame {
 			});
 //			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
 			cmb_Tdoc_pr.setVisible(false);
-			cmb_status.setData(MainForm.tcl.getSgrp());
-			cmb_Polis_doc_pr.setData(MainForm.tcl.getPomsTdoc());
-			cmb_oms_doc.setData(MainForm.tcl.getPomsTdoc());
-			cmb_tdoc.setData(MainForm.tcl.getTdoc());
-			cmb_ishod.setData(MainForm.tcl.getABB());
-			cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
-			cmb_travm.setData(MainForm.tcl.getAI0());
-			cmb_trans.setData(MainForm.tcl.getVTR());
-			cmb_otkaz.setData(MainForm.tcl.getAF0());
-			cmb_alk.setData(MainForm.tcl.getALK());
-			cmb_naprav.setData(MainForm.tcl.getNaprav());
 			cmb_ogrn.setData(null);
 			cmb_org.setData(null); 
 		} catch (Exception e) {
@@ -2786,9 +2775,35 @@ public class PacientInfoFrame extends JFrame {
         				.addComponent(btnPrint_istb))
         			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+        
+        if (MainForm.authInfo.getCslu() != 1) {
+        	tbMain.remove(tpSign);
+        	tbMain.remove(tpPriem);
+        	btnPrint_istb.setVisible(false);
+        }
+        
         pl_print.setLayout(gl_pl_print);
         contentPane.setLayout(gl_contentPane);
     }
+
+	public void onConnect() {
+		try {
+			cmb_status.setData(MainForm.tcl.getSgrp());
+			cmb_Polis_doc_pr.setData(MainForm.tcl.getPomsTdoc());
+			cmb_oms_doc.setData(MainForm.tcl.getPomsTdoc());
+			cmb_tdoc.setData(MainForm.tcl.getTdoc());
+			cmb_ishod.setData(MainForm.tcl.getABB());
+			cmb_cotd.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.clpu));
+			cmb_travm.setData(MainForm.tcl.getAI0());
+			cmb_trans.setData(MainForm.tcl.getVTR());
+			cmb_otkaz.setData(MainForm.tcl.getAF0());
+			cmb_alk.setData(MainForm.tcl.getALK());
+			cmb_naprav.setData(MainForm.tcl.getNaprav());
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		}
+	}
     //слушатель таб контрола персональной информации о пациенте
     final ChangeListener  tpPersonalChangeListener= new ChangeListener() {
         public void stateChanged(ChangeEvent changeEvent) {

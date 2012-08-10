@@ -375,13 +375,6 @@ public class TalonMainFrame extends JFrame {
 		
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема",10,"перерыв",11,"");
 //		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
-		try {
-			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
-		} catch (KmiacServerException kse){
-		} catch ( VidpNotFoundException vnfe){
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
 		tbl_rasp.setPreferredWidths(100,90,60,60,30,30,50,50);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
@@ -1266,9 +1259,21 @@ public class TalonMainFrame extends JFrame {
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);	
 	}
+
+	public void fillTable() {
+	}
 	
 	public void onConnect() {
 		treevrach.setModel(new DefaultTreeModel(createNodes()));
+		
+		try {
+			//tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAZT());
+			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+		} catch (KmiacServerException kse){
+		} catch ( VidpNotFoundException vnfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	  private DefaultMutableTreeNode createNodes() {

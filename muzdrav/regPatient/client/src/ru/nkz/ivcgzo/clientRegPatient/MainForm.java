@@ -15,6 +15,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 public class MainForm extends Client<ThriftRegPatient.Client> {
     public static ThriftRegPatient.Client tcl;
     public static Client<ThriftRegPatient.Client> instance;
+    PacientInfoFrame infoFrame;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException, UnsupportedLookAndFeelException {
 		super(conMan, authInfo, ThriftRegPatient.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -31,7 +32,9 @@ public class MainForm extends Client<ThriftRegPatient.Client> {
 	 * @throws ClassNotFoundException 
 	 */
 	private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
-		setFrame(new PacientInfoFrame(new ArrayList<PatientBrief>()));
+		infoFrame = new PacientInfoFrame(new ArrayList<PatientBrief>());
+		
+		setFrame(infoFrame);
 	}
 
 	@Override
@@ -44,6 +47,7 @@ public class MainForm extends Client<ThriftRegPatient.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftRegPatient.Client) {
 			tcl = thrClient;
+			infoFrame.onConnect();
 		}
 	}
 
