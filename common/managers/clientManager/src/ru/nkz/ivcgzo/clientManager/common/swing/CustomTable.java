@@ -603,7 +603,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow - 1;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsDeleted(selRow, selRow);
+			getModel().fireTableRowsDeleted(updRow, updRow);
 			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
@@ -613,16 +613,16 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsInserted(selRow, selRow);
+			getModel().fireTableRowsInserted(updRow, updRow);
 			selRow = convertRowIndexToView(selRow);
-			this.changeSelection(selRow, 0, false, false);
+			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			this.editCellAt(selRow, 0);
 			break;
 		case 2: //update
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsUpdated(selRow, selRow);
-			this.changeSelection(selRow, 0, false, false);
+			getModel().fireTableRowsUpdated(updRow, updRow);
+			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
 		}
