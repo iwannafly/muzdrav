@@ -55,6 +55,7 @@ import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
+import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
@@ -374,6 +375,13 @@ public class TalonMainFrame extends JFrame {
 		
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема",10,"перерыв",11,"");
 //		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
+		try {
+			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+		} catch (KmiacServerException kse){
+		} catch ( VidpNotFoundException vnfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 		tbl_rasp.setPreferredWidths(100,90,60,60,30,30,50,50);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
