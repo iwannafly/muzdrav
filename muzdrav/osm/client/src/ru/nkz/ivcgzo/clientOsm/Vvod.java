@@ -215,7 +215,7 @@ public class Vvod extends JFrame {
 	private JButton butPrintNapr;
 	private JPopupMenu pmvizit;
 	private JLabel tfPatient;
-
+	private int idpv;
 	
 	/**
 	 * Create the frame.
@@ -1108,6 +1108,8 @@ public class Vvod extends JFrame {
 		AddVizit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				pvizit = new Pvizit();
+				idpv = zapVr.getId_pvizit();
+				if (idpv!=0){
 				pvizit.setId(zapVr.getId_pvizit());
 				pvizit.setNpasp(zapVr.getNpasp());
 				pvizit.setCpol(MainForm.authInfo.getCpodr());
@@ -1161,6 +1163,59 @@ public class Vvod extends JFrame {
 				} catch (TException e2) {
 					MainForm.conMan.reconnect(e2);
 					e2.printStackTrace();
+				}
+				}
+				else {
+					
+					try {
+						pvizit.setId(zapVr.getId_pvizit());
+					pvizit.setNpasp(zapVr.getNpasp());
+					pvizit.setCpol(MainForm.authInfo.getCpodr());
+					pvizit.setDatao(System.currentTimeMillis());
+					pvizit.setCod_sp(MainForm.authInfo.getPcod());
+					pvizit.setCdol(MainForm.authInfo.getCdol());
+					pvizit.setCuser(MainForm.authInfo.getUser_id());
+					pvizit.setDataz(System.currentTimeMillis());
+					pvizit.setId(MainForm.tcl.AddPViz(pvizit));
+					pvizitAmb = new PvizitAmb();
+					pvizitAmb.setId_obr(pvizit.getId());
+					pvizitAmb.setNpasp(zapVr.getNpasp());
+					pvizitAmb.setDatap(System.currentTimeMillis());
+					pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
+					pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+					try {
+						SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
+						String strDat = frm.format(new Date(System.currentTimeMillis()));
+						Date dat = frm.parse(strDat);
+						long curDateMills = dat.getTime();
+						for (PvizitAmb pviz : TabPos.getData()) {
+							if (pviz.getDatap() == curDateMills) {
+								JOptionPane.showMessageDialog(Vvod.this, "333333");
+								return;
+							}
+						}
+						
+						try {
+							Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
+							pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
+						TabPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
+						TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
+						} catch (PvizitNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					}
+						
+					} catch (KmiacServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						MainForm.conMan.reconnect(e);
+					}	
 				}
 			}
 		});
@@ -1227,8 +1282,8 @@ public class Vvod extends JFrame {
 					try {
 						priem = new Priem();
 						anamZab = new AnamZab();
-						priem.setId(zapVr.getId_pvizit());
-						priem.setNpasp(zapVr.getNpasp());
+						priem.setId(pvizit.getId());
+						priem.setNpasp(pvizit.getNpasp());
 						priem.setIdpos(pvizitAmb.getId());
 						priem.setT_ad(getTextOrNull(tfad.getText()));
 						priem.setT_chss(getTextOrNull(tfchss.getText()));
@@ -1286,8 +1341,8 @@ public class Vvod extends JFrame {
 						priem.setT_status_praesense(getTextOrNull(tpStPraes.getText()));
 						priem.setT_fiz_obsl(getTextOrNull(tpFizObsl.getText()));
 						
-						anamZab.setId_pvizit(zapVr.getId_pvizit());
-						anamZab.setNpasp(zapVr.getNpasp());
+						anamZab.setId_pvizit(pvizit.getId());
+						anamZab.setNpasp(pvizit.getNpasp());
 						anamZab.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
 						anamZab.setT_sympt(getTextOrNull(tpSympt.getText()));
 						anamZab.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));
@@ -1475,8 +1530,6 @@ mi3.addActionListener(new ActionListener() {
 								.addComponent(butBer)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(BPrint)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(BSearch)
 								.addContainerGap(4240, Short.MAX_VALUE))))
 			);
 			gl_panel.setVerticalGroup(
@@ -1487,8 +1540,7 @@ mi3.addActionListener(new ActionListener() {
 							.addComponent(butAnamn)
 							.addComponent(butProsm)
 							.addComponent(butBer)
-							.addComponent(BPrint)
-							.addComponent(BSearch))
+							.addComponent(BPrint))
 						.addPreferredGap(ComponentPlacement.UNRELATED)
 						.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 							.addGroup(gl_panel.createSequentialGroup()
