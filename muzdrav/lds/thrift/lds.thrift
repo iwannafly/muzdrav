@@ -185,18 +185,22 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void DelLIsl(1: i32 nisl, 2: string cpok);
 
 
-	list<S_ot01> GetS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
-	S_ot01 GetSot01(1: i32 cotd, 2: string pcod, 3: string c_nz1) throws (1: S_ot01NotFoundException sone);
+	list<S_ot01> GetS_ot01(1: i32 cotd, 2: string c_nz1);
+	list<S_ot01> GetMinS_ot01(1: i32 cotd);
+	S_ot01 GetSot01(1: i32 cotd, 2: string c_nz1) throws (1: S_ot01NotFoundException sone);
 	void AddS_ot01(1: S_ot01 so)throws (1: S_ot01ExistsException soee);
 	void UpdS_ot01(1: S_ot01 so)throws (1: S_ot01ExistsException soee);
 	void DelS_ot01(1: i32 cotd, 2: string pcod, 3: string c_nz1);
-
+	void DelS_ot01D(1: i32 cotd, 2: string pcod, 3: string c_obst, 4: string c_nz1);
+	
 
     	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
+	void UpdN_ldi (1: N_ldi nldi) throws (1: LdiNotFoundException lnfe);
+
 
 	list <classifier.IntegerClassifier> GetKlasCpos2();
 	list <classifier.IntegerClassifier> GetKlasPopl();

@@ -16,6 +16,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.CalendNotFoundException;
@@ -31,7 +32,6 @@ import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
-import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.thriftGenTalon.VrachNotFoundException;
@@ -169,8 +169,8 @@ public class TestServerGenTalons {
     @Test
     public final void getVidp_isListSizeCorrect()
             throws KmiacServerException, TException, VidpNotFoundException {
-        final int expectedListSize = 5;
-        java.util.List <Vidp> testVidp =
+        final int expectedListSize = 3;
+        java.util.List <IntegerClassifier> testVidp =
                 testServer.getVidp();
         assertEquals("list size", expectedListSize, testVidp.size());
     }

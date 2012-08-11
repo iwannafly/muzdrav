@@ -31,22 +31,24 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
 	 */
-	list<classifier.StringClassifier> getVSStringClassifierView(),
+	list<classifier.StringClassifier> getVSStringClassifierView(1: string className),
 	
 	/**
 	 * Информация из классификатора с pcod типа integer
 	 */
-	list<classifier.IntegerClassifier> getVSIntegerClassifierView()
+	list<classifier.IntegerClassifier> getVSIntegerClassifierView(1: string className),
 
     /**
      * Является ли классификатор редактируемым
      */
-    bool isClassifierEditable(),
+    bool isClassifierEditable(1: string className),
 
     /**
      * Является ли классификатор с pcod типа integer
      */
-    bool isClassifierPcodInteger(),
+    bool isClassifierPcodInteger(1: string className),
+
+
     
 	list<PatientBriefInfo> searchPatient(1: PatientSearchParams prms) throws (1: kmiacServer.KmiacServerException kse);
 }

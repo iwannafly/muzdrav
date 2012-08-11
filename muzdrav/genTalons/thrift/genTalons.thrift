@@ -211,8 +211,7 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
 	*Возвращает виды приема
 	*/
-	list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse, 
-            2: VidpNotFoundException vnfe);
+	list<classifier.IntegerClassifier> getVidp() throws (1: kmiacServer.KmiacServerException kse, 2: VidpNotFoundException vnfe);
 
 	/**
 	*Возвращает календарь на текущую дату
