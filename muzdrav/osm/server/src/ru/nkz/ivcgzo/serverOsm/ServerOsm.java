@@ -1695,4 +1695,91 @@ sb.append("<br>Подпись ____________");
 			throw new KmiacServerException();
 		}	
 	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db1() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db8 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db2() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db2 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db3() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db3 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db4() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db4 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db5() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db5 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db6() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db6 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db7() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db7 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_db8() throws KmiacServerException,	TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db8 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
+	@Override
+	public List<StringClassifier> get_n_db9() throws KmiacServerException,TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_db9 ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();}
+	}
 }

@@ -268,7 +268,7 @@ struct RdSlStruct{
 	11: optional string prRod;
 	12: optional i64 DataZs;
 	13: optional i32 kolRod;
-	14: optional i32 let;
+	14: optional i32 cdiagt;
 	15: optional i32 prmen;
 	16: optional i32 deti;
 	17: optional i32 polj;
@@ -287,6 +287,9 @@ struct RdSlStruct{
         30: optional string NSert;
         31: optional string SSert;
 	32: optional i64 DataRod;
+        33: optional i32 cvera;
+        34: optional i32 srokab;
+        35: optional i64 dataab; 
 }
 
 struct RdDinStruct{
