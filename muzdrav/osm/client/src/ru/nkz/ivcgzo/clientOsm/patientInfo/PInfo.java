@@ -447,10 +447,12 @@ public class PInfo extends JFrame {
 		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
 		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
 		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
+		DefaultMutableTreeNode berinfo = new DefaultMutableTreeNode("Случаи беременности");
 		root.add(patinfo);
 		root.add(signinfo);
 		root.add(posinfo);
 		root.add(diaginfo);
+		root.add(berinfo);
 		
 		try {
 			for (Pvizit pvizit : MainForm.tcl.getPvizitInfo(npasp, tfdatn.getDate().getTime(), tfDatk.getDate().getTime()))
