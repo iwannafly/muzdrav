@@ -286,10 +286,6 @@ public class PacientInfoFrame extends JFrame {
 					} 
 				}
 			});
-//			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
-			cmb_Tdoc_pr.setVisible(false);
-			cmb_ogrn.setData(null);
-			cmb_org.setData(null); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -2811,6 +2807,10 @@ public class PacientInfoFrame extends JFrame {
 			cmb_otkaz.setData(MainForm.tcl.getAF0());
 			cmb_alk.setData(MainForm.tcl.getALK());
 			cmb_naprav.setData(MainForm.tcl.getNaprav());
+//			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
+			cmb_Tdoc_pr.setVisible(false);
+			cmb_ogrn.setSelectedItem(null);
+			cmb_org.setSelectedItem(null); 
 		} catch (TException e) {
 			e.printStackTrace();
 			MainForm.conMan.reconnect(e);
@@ -3108,9 +3108,9 @@ public class PacientInfoFrame extends JFrame {
                 rbtn_pol_pr_m.setSelected(AgentInfo.pol == 1);
                 rbtn_pol_pr_j.setSelected(AgentInfo.pol == 2);
             }
-            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.ogrn_str);
-            if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.vpolis);
-            if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.tdoc);
+            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.getOgrn_str());
+            if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.getVpolis());
+            if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.getTdoc());
         } catch (AgentNotFoundException anfe) {
         } catch (Exception e) {
             e.printStackTrace();
