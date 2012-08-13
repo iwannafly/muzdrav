@@ -1278,6 +1278,7 @@ public class TalonMainFrame extends JFrame {
 			e1.printStackTrace();
 		}
 		try {
+			MainForm.tcl.getAzt();
 			tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAzt());
 		} catch (KmiacServerException kse){
 		} catch (AztNotFoundException anfe){

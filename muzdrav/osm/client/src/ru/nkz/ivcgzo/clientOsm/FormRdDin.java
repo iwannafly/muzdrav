@@ -100,46 +100,32 @@ public class FormRdDin extends JFrame {
 		setContentPane(contentPane);
 		rddin = new RdDinStruct();
 		patient = new PatientCommonInfo();
-/*		oslcode = rddin.getDspos();
-		if (oslcode.equals("O21")){oslname = "Чрезмерная рвота";}
-		if (oslcode.equals("O44")){oslname = "Предлежание плаценты";}
-		if (oslcode.equals("O45")){oslname = "Отслойка плаценты";}
-		if (oslcode.equals("O23.0")){oslname = "Инфекция почек";}
-		if (oslcode.equals("O24")){oslname = "Сахарный диабет";}
-		if (oslcode.equals("O30")){oslname = "Многоплодная беременность";}
-		if (oslcode.equals("O32")){oslname = "Неправильное предлежание плода";}
-		if (oslcode.equals("O36.0")){oslname = "Изоиммунизация";}
-		if (oslcode.equals("O99.0")){oslname = "Анемия";}
-		if (oslcode.equals("O48")){oslname = "Переношенная беременность";}
-		if (oslcode.equals("O11")){oslname = "Существовавшая ранее гипертензия с присоед.протеинурией";}
-		if (oslcode.equals("O12")){oslname = "Вызванные беременностью отеки и протеинурия без гипертензии";}
-		if (oslcode.equals("O13")){oslname = "Гипертензия без значительной протеинурии";}
-		if (oslcode.equals("O14")){oslname = "Гипертензия со значительной протеинурией";}
-		if (oslcode.equals("O15")){oslname = "Экламсия";}
-		if (oslcode==null){oslname = "";}
-        iw1 = rddin.getPolpl();
-		if (iw1 == 1){polplname ="Продольное";}
-		if (iw1 == 2){polplname ="Поперечное";}
-		if (iw1 == 3){polplname ="Косое";}
-        iw2 = rddin.getOteki();
-        if (iw2 == 1){otname ="Нижние конечности";}
-        if (iw2 == 2){otname ="Верхние конечности";}
-        if (iw2 == 3){otname ="Верхняя брюшная стенка";}
-        if (iw2 == 4){otname ="Генерализованные";}
-        if (iw2 == 0){otname ="Нет";}
-         iw3 = rddin.getSerd();
-		if (iw3==0){cerdname = "";}
-		if (iw3==1){cerdname = "Ясное";}
-		if (iw3==2){cerdname = "Приглушенное";}
-		if (iw3==3){cerdname = "Глухое";}
-		iw4 = rddin.getPredpl();
-		if (iw4==0){predname = "";}
-		if (iw4==1){predname = "Голова";}
-		if (iw4==2){predname = "Таз";}
-		iw5 = rddin.getSerd1();
-		if (iw5==0){cerdname1 = "";}
-		if (iw5==1){cerdname1 = "Ритмичное";}
-		if (iw5==2){cerdname1 = "Аритмичное";}*/
+/*       CBDiag.setData(MainForm.tcl.get_n_db6());
+		CBPolPl.setData(MainForm.tcl.get_n_db1());
+		CBPredPl.setData(MainForm.tcl.get_n_db2());
+        CBCerd.setData(MainForm.tcl.get_n_db3());
+		CBSerd1.setData(MainForm.tcl.get_n_db4());
+		CBOteki.setData(MainForm.tcl.get_n_db5());*/
+		if (rddin.isSetPredpl())
+			CBPredPl.setSelectedPcod(rddin.getPredpl());
+		else
+			CBPredPl.setSelectedItem(null);
+		if (rddin.isSetPolpl())
+			CBPolPl.setSelectedPcod(rddin.getPolpl());
+		else
+			CBPolPl.setSelectedItem(null);
+		if (rddin.isSetSerd())
+			CBCerd.setSelectedPcod(rddin.getSerd());
+		else
+			CBCerd.setSelectedItem(null);
+		if (rddin.isSetSerd1())
+			CBSerd1.setSelectedPcod(rddin.getSerd1());
+		else
+			CBSerd1.setSelectedItem(null);
+		if (rddin.isSetOteki())
+			CBOteki.setSelectedPcod(rddin.getOteki());
+		else
+			CBOteki.setSelectedItem(null);
 		
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
@@ -151,9 +137,9 @@ public class FormRdDin extends JFrame {
 		final JSpinner SPdad = new JSpinner();
 		SPdad.setModel(new SpinnerNumberModel(new Integer(rddin.art1), null,new Integer(220),new Integer(1)));
 		rddin.setArt1((int) SPdad.getModel().getValue());
-/*		patient.setFam((String) fam.getText());
+		patient.setFam((String) fam.getText());
 		patient.setIm((String)im.getText());
-		patient.setOt((String) ot.getText());*/
+		patient.setOt((String) ot.getText());
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -297,7 +283,7 @@ public class FormRdDin extends JFrame {
 		SVdm.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 		rddin.setHdm((int) SVdm.getModel().getValue());
 		
-		CBDiag = new ThriftStringClassifierCombobox<>(true);
+//		CBDiag = new ThriftIntegerClassifierCombobox<>(true);
 		
 		final JSpinner SPsad = new JSpinner();
 		SPsad.setModel(new SpinnerNumberModel(new Integer(rddin.art2), null ,new Integer(120),new Integer(1)));
@@ -326,59 +312,6 @@ public class FormRdDin extends JFrame {
 		SButton.setToolTipText("Сохранить");
 		SButton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		SButton.addActionListener(new ActionListener() {
-	/*			private int iw1(int iw1){
-					if (CBDiag.getSelectedItem().equals("Продольное")){iw1 = 1;}
-					if (CBDiag.getSelectedItem().equals("Поперечное")){iw1 = 2;}
-					if (CBDiag.getSelectedItem().equals("Косое")){iw1 = 3;}
-					return iw1;
-				};
-				private String oslcode (String oslcode){
-								if (CBDiag.getSelectedItem().equals("Чрезмерная рвота")){oslcode="O21";}
-					if (CBDiag.getSelectedItem().equals("Предлежание плаценты")){oslcode="O44";}
-					if (CBDiag.getSelectedItem().equals("Отслойка плаценты")){oslcode="O45";}
-					if (CBDiag.getSelectedItem().equals("Инфекция почек")){oslcode="O23.0";}
-					if (CBDiag.getSelectedItem().equals("Сахарный диабет")){oslcode="O24";}
-					if (CBDiag.getSelectedItem().equals("Многоплодная беременность")){oslcode="O30";}
-					if (CBDiag.getSelectedItem().equals("Неправильное предлежание плода")){oslcode="O32";}
-					if (CBDiag.getSelectedItem().equals("Изоиммунизация")){oslcode="O32";}
-					if (CBDiag.getSelectedItem().equals("Анемия")){oslcode="O99.0";}
-					if (CBDiag.getSelectedItem().equals("Переношенная беременность")){oslcode="O48";}
-					if (CBDiag.getSelectedItem().equals("Существовавшая ранее гипертензия с присоед.протеинурией")){oslcode="O11";}
-					if (CBDiag.getSelectedItem().equals("Вызванные беременностью отеки и протеинурия без гипертензии")){oslcode="O12";}
-					if (CBDiag.getSelectedItem().equals("Гипертензия без значительной протеинурии")){oslcode="O13";}
-					if (CBDiag.getSelectedItem().equals("Гипертензия со значительной протеинурией")){oslcode="O14";}
-					if (CBDiag.getSelectedItem().equals("Экламсия")){oslcode="O15";}
-					if (CBDiag.getSelectedItem().equals("")){oslcode = null;}
-					return oslcode;
-				};
-				private int ppp1(int iw2){
-					if (CBOteki.getSelectedItem().equals("Нижние конечности")){iw2 = 1;}
-					if (CBOteki.getSelectedItem().equals("Верхние конечности")){iw2 = 2;}
-					if (CBOteki.getSelectedItem().equals("Верхняя брюшная стенка")){iw2 = 3;}
-					if (CBOteki.getSelectedItem().equals("Генерализованные")){iw2 = 2;}
-					if (CBOteki.getSelectedItem().equals("")){iw2 = 0;}
-					return iw2;
-				};
-				private int ppp2(int iw3){
-					if (CBCerd.getSelectedItem().equals("Ясное")){iw3 = 1;}
-					if (CBCerd.getSelectedItem().equals("Приглушенное")){iw3 = 2;}
-					if (CBCerd.getSelectedItem().equals("Глухое")){iw3 = 3;}
-					if (CBCerd.getSelectedItem().equals("")){iw3 = 0;}
-					return iw3;
-				};
-				private int ppp3(int iw4){
-					if (CBDiag.getSelectedItem().equals("Голова")){iw4 = 1;}
-					if (CBDiag.getSelectedItem().equals("Таз")){iw4 = 2;}
-					if (CBDiag.getSelectedItem().equals("")){iw4 = 0;}
-					return iw4;
-				};
-				private int ppp4(int iw5){
-					if (CBDiag.getSelectedItem().equals("Ритмичное")){iw5 = 1;}
-					if (CBDiag.getSelectedItem().equals("Аритмичное")){iw5 = 2;}
-					if (CBDiag.getSelectedItem().equals("")){iw5 = 0;}
-					return iw5;
-				};*/
-				
 	public void actionPerformed(ActionEvent e) {
 		rddin.setArt1((int) SPdad.getModel().getValue());
 		rddin.setArt2((int) SPsad.getModel().getValue());
@@ -392,12 +325,22 @@ public class FormRdDin extends JFrame {
 		rddin.setSpl((int) STolP.getModel().getValue());
 		rddin.setSrok((int) SSrok.getModel().getValue());
 		rddin.setVes((int) SVes.getModel().getValue());
-//		rddin.setDspos(CBDiag.setData(MainForm.tcl.getn_db6()));
-//		rddin.setPolpl(CBPolPl.setData(MainForm.tcl.getn_db1()));
-//		rddin.setOteki(CBPredPl.setData(MainForm.tcl.getn_db2()));
-//		rddin.setPredpl(CBCerd.setData(MainForm.tcl.getn_db3()));
-//		rddin.setSerd1(CBSerd1.setData(MainForm.tcl.getn_db4()));
-//		rddin.setSerd(CBOteki.setData(MainForm.tcl.getn_db5()));
+		if (CBPredPl.getSelectedPcod() != null)
+			rddin.setPredpl(CBPredPl.getSelectedPcod());
+			else rddin.unsetPredpl();
+		if (CBPolPl.getSelectedPcod() != null)
+			rddin.setPolpl(CBPolPl.getSelectedPcod());
+			else rddin.unsetPolpl();
+		if (CBSerd1.getSelectedPcod() != null)
+			rddin.setSerd1(CBSerd1.getSelectedPcod());
+			else rddin.unsetSerd1();
+		if (CBCerd.getSelectedPcod() != null)
+			rddin.setSerd(CBCerd.getSelectedPcod());
+			else rddin.unsetSerd();
+		if (CBOteki.getSelectedPcod() != null)
+			rddin.setOteki(CBOteki.getSelectedPcod());
+			else rddin.unsetOteki();
+//		rddin.setDspos((string) CBDspos.getSelectedKod_Mkb.)//диагноз заменить на kod_mkb (вместо PCOD)
 			}
 		});
 		

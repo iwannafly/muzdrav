@@ -1802,6 +1802,7 @@ sb.append("<br>Подпись ____________");
 		}	
 	}
 
+<<<<<<< HEAD
 	@Override
 	public List<RdSlStruct> getRdSlInfo(int npasp) throws KmiacServerException,
 			TException {
@@ -1810,4 +1811,6 @@ sb.append("<br>Подпись ____________");
 	}
 
 
+=======
+>>>>>>> bc5ba091bd6e4b0bf8101e8bd7bdc7e08acdcbc2
 }
