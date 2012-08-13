@@ -1265,7 +1265,10 @@ public class Vvod extends JFrame {
 			}
 			}
 		});
+		
+		
 		butBer = new JButton("Наблюдение за беременными");
+		butBer.setEnabled(false);
 		butBer.setActionCommand("Наблюдение за беременными");
 		butBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -2762,6 +2765,7 @@ rbPokaz.addActionListener(new ActionListener() {
 				} catch (PatientNotFoundException e) {
 					e.printStackTrace();
 				}
+				if (zapVr.pol != 1 ) butBer.setEnabled(true); else butBer.setEnabled(false);
 			TabPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 			if (TabPos.getRowCount() > 0)
 				TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);

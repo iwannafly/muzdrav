@@ -16,6 +16,7 @@ struct ZapVr{
 	7: optional string serpolis;
 	8: optional string nompolis;
 	9: optional i32 id_pvizit;
+	10: optional i32 pol;
 }
 
 struct Pvizit {
