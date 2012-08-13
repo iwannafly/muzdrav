@@ -5,6 +5,10 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.regex.Matcher;
@@ -19,6 +23,7 @@ import javax.swing.event.DocumentListener;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
@@ -71,14 +76,53 @@ public class ViewTablePcodIntForm extends ViewSelectForm {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		spClassifier.setViewportView(table);
+		
+		table.addMouseListener(new MouseAdapter(){
+		     public void mouseClicked(MouseEvent e){
+		      if (e.getClickCount() == 2){
+		    	  // Вывод значения на консоль
+		    	  System.out.print(getViewTableValues().getName());
+		    	  System.out.println();
+		   
+		         }
+		      }
+		     } );
+		
+		table.addKeyListener(new KeyListener(){
+			public void keyPressed(KeyEvent e){
+				if(e.getKeyCode()== KeyEvent.VK_ENTER){ 
+		    	  // Вывод значения на консоль
+		    	  System.out.print(getViewTableValues().getName());
+		    	  System.out.println();
+		         }
+		      }
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		     } );
 		}
 
 	public static void tableFill(){
 		try { 
-			table.setData(MainForm.tcl.getVSIntegerClassifierView());
+			table.setData(MainForm.tcl.getVSIntegerClassifierView("n_c00"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
+	}
+	
+	// Запоминание выбранных ячеек
+	public IntegerClassifier getViewTableValues() {
+		return table.getSelectedItem();
+	
 	}
 	
     private void search()

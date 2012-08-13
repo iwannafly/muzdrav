@@ -357,6 +357,12 @@ public class TestServerRegPatient {
         testServer.updatePatient(patientFullInfo);
         //assertEquals(afterAddId, 0);
     }
+
+    @Test
+    public final void updateOgrn_isActuallyUpdated() throws TException {
+        int npasp = 5;
+        testServer.updateOgrn(npasp);
+    }
 //    @Test
 //    public final void isAgentExist_isThrowAlreadyExistException()
 //            throws TException, AgentNotFoundException, AgentAlreadyExistException {

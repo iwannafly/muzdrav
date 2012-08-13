@@ -1,4 +1,4 @@
-package ru.ivcgzo.nkz.clientReception;
+package ru.nkz.ivcgzo.clientReception;
 
 import java.util.List;
 
@@ -14,13 +14,13 @@ public class TalonTableModel extends AbstractTableModel {
     @Override
     public final int getRowCount() {
         // TODO Auto-generated method stub
-        return 0;
+        return 7;
     }
 
     @Override
     public final int getColumnCount() {
         // TODO Auto-generated method stub
-        return 0;
+        return 7;
     }
 
     @Override

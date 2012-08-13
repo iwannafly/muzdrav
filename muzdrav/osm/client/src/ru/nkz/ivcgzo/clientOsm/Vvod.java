@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -197,6 +198,7 @@ public class Vvod extends JFrame {
 	private JButton butBer;
 	private JButton PosSave;
 	private JButton PosDelete;
+	private JButton BSearch;
 	private JTextField tfKab;
 	private JRadioButton rbMetodIssl;
 	private JRadioButton rbPokaz;
@@ -213,7 +215,7 @@ public class Vvod extends JFrame {
 	private JButton butPrintNapr;
 	private JPopupMenu pmvizit;
 	private JLabel tfPatient;
-
+	private int idpv;
 	
 	/**
 	 * Create the frame.
@@ -1106,6 +1108,8 @@ public class Vvod extends JFrame {
 		AddVizit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				pvizit = new Pvizit();
+				idpv = zapVr.getId_pvizit();
+				if (idpv!=0){
 				pvizit.setId(zapVr.getId_pvizit());
 				pvizit.setNpasp(zapVr.getNpasp());
 				pvizit.setCpol(MainForm.authInfo.getCpodr());
@@ -1160,6 +1164,59 @@ public class Vvod extends JFrame {
 					MainForm.conMan.reconnect(e2);
 					e2.printStackTrace();
 				}
+				}
+				else {
+					
+					try {
+						pvizit.setId(zapVr.getId_pvizit());
+					pvizit.setNpasp(zapVr.getNpasp());
+					pvizit.setCpol(MainForm.authInfo.getCpodr());
+					pvizit.setDatao(System.currentTimeMillis());
+					pvizit.setCod_sp(MainForm.authInfo.getPcod());
+					pvizit.setCdol(MainForm.authInfo.getCdol());
+					pvizit.setCuser(MainForm.authInfo.getUser_id());
+					pvizit.setDataz(System.currentTimeMillis());
+					pvizit.setId(MainForm.tcl.AddPViz(pvizit));
+					pvizitAmb = new PvizitAmb();
+					pvizitAmb.setId_obr(pvizit.getId());
+					pvizitAmb.setNpasp(zapVr.getNpasp());
+					pvizitAmb.setDatap(System.currentTimeMillis());
+					pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
+					pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+					try {
+						SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
+						String strDat = frm.format(new Date(System.currentTimeMillis()));
+						Date dat = frm.parse(strDat);
+						long curDateMills = dat.getTime();
+						for (PvizitAmb pviz : TabPos.getData()) {
+							if (pviz.getDatap() == curDateMills) {
+								JOptionPane.showMessageDialog(Vvod.this, "333333");
+								return;
+							}
+						}
+						
+						try {
+							Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
+							pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
+						TabPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
+						TabPos.setRowSelectionInterval(TabPos.getRowCount() - 1, TabPos.getRowCount() - 1);
+						} catch (PvizitNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					}
+						
+					} catch (KmiacServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						MainForm.conMan.reconnect(e);
+					}	
+				}
 			}
 		});
 		
@@ -1179,13 +1236,35 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					MainForm.tcl.testConnection();
-					pinfo = new PInfo();
-					pinfo.setVisible(true);
+					MainForm.pInf.update(zapVr.getNpasp());
 				} catch (TException e1) {
 					MainForm.conMan.reconnect(e1);
 				}}
 		});
-		
+		BSearch = new JButton("Поиск"); 
+		BSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PatientCommonInfo inf;
+				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);
+				if (res != null) {
+					int npasp = res[0];
+					try {
+						inf = MainForm.tcl.getPatientCommonInfo(npasp);
+						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
+
+					} catch (KmiacServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PatientNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+			}
+		});
 		butBer = new JButton("Наблюдение за беременными");
 		butBer.setActionCommand("Наблюдение за беременными");
 		butBer.addActionListener(new ActionListener() {
@@ -1203,8 +1282,8 @@ public class Vvod extends JFrame {
 					try {
 						priem = new Priem();
 						anamZab = new AnamZab();
-						priem.setId(zapVr.getId_pvizit());
-						priem.setNpasp(zapVr.getNpasp());
+						priem.setId(pvizit.getId());
+						priem.setNpasp(pvizit.getNpasp());
 						priem.setIdpos(pvizitAmb.getId());
 						priem.setT_ad(getTextOrNull(tfad.getText()));
 						priem.setT_chss(getTextOrNull(tfchss.getText()));
@@ -1262,8 +1341,8 @@ public class Vvod extends JFrame {
 						priem.setT_status_praesense(getTextOrNull(tpStPraes.getText()));
 						priem.setT_fiz_obsl(getTextOrNull(tpFizObsl.getText()));
 						
-						anamZab.setId_pvizit(zapVr.getId_pvizit());
-						anamZab.setNpasp(zapVr.getNpasp());
+						anamZab.setId_pvizit(pvizit.getId());
+						anamZab.setNpasp(pvizit.getNpasp());
 						anamZab.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
 						anamZab.setT_sympt(getTextOrNull(tpSympt.getText()));
 						anamZab.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));

@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 public class ConnectionManager {
 	private Map<Integer, TTransport> transports;
 	private Map<Integer, KmiacServer.Client> connections;
+	private Map<Integer, TTransport> commonTransports;
+	private Map<Integer, KmiacServer.Client> commonConnections;
 	private FileTransfer.Client filTrans;
 	private PluginLoader pLdr;
 	
@@ -57,6 +60,7 @@ public class ConnectionManager {
 	private boolean connecting;
 	private JDialog reconnectForm;
 	private Thread reconnectThread;
+	private IClient viewClient;
 	
 	/**
 	 * Конструктор класса.
@@ -69,14 +73,18 @@ public class ConnectionManager {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
 		transports = new HashMap<>();
 		connections = new HashMap<>();
+		commonTransports = new HashMap<>();
+		commonConnections = new HashMap<>();
 		
 		this.mainForm = mainForm;
 		initReconnectForm();
 		
 		filTrans = add(filTransCls, filTransPort);
+		
+		addToCommon(filTransPort);
 	}
 	
 	/**
@@ -88,13 +96,34 @@ public class ConnectionManager {
 		this.mainForm = client.getFrame();
 	}
 	
+	private void addToCommon(int port) {
+		commonTransports.put(port, transports.get(port));
+		commonConnections.put(port, connections.get(port));
+	}
+	
+	private void restoreCommonConnections() {
+		for (Integer key : commonTransports.keySet()) {
+			transports.put(key, commonTransports.get(key));
+			connections.put(key, commonConnections.get(key));
+		}
+	}
+	
 	public PluginLoader createPluginLoader(UserAuthInfo authInfo) {
 		pLdr = new PluginLoader(this, authInfo);
+		
 		return getPluginLoader();
 	}
 	
 	public PluginLoader getPluginLoader() {
 		return pLdr;
+	}
+	
+	public void loadViewClient() throws Exception {
+		viewClient = getPluginLoader().loadPluginByAppId(7);
+		client = viewClient;
+		connect(client.getPort());
+		
+		addToCommon(client.getPort());
 	}
 	
 	/**
@@ -120,7 +149,7 @@ public class ConnectionManager {
 	 * Закрывает подключение и удаляет его из списка наблюдаемых.
 	 */
 	public void remove(int port) {
-		transports.get(port).close();
+		disconnect(port);
 		transports.remove(port);
 		connections.remove(port);
 	}
@@ -146,20 +175,10 @@ public class ConnectionManager {
 	 * Подключение ко всем трифт-серверам.
 	 */
 	public void connect() throws TException {
-		try {
-			for (Integer key : transports.keySet()) {
-				TTransport transport = transports.get(key);
-				KmiacServer.Client connection = connections.get(key);
-				
-				if (!transport.isOpen()) {
-					transport.open();
-					if (client != null)
-						client.onConnect(connection);
-				}
-			}
-		} catch (TTransportException e) {
-			throw new ConnectionException(e);
-		}
+		restoreCommonConnections();
+		
+		for (Integer key : transports.keySet())
+			connect(key);
 	}
 	
 	/**
@@ -184,9 +203,16 @@ public class ConnectionManager {
 	 * Отключение от всех трифт-серверов.
 	 */
 	public void disconnect() {
-		for (TTransport transport : transports.values()) {
-			transport.close();
+		for (Integer key : transports.keySet()) {
+			disconnect(key);
 		}
+	}
+	
+	/**
+	 * Отключение от трифт-сервера.
+	 */
+	public void disconnect(int port) {
+		transports.get(port).close();
 	}
 	
 	/**
@@ -219,7 +245,7 @@ public class ConnectionManager {
 					} else
 						connection.testConnection();
 			} catch (TException e) {
-				transports.get(key).close();
+				disconnect(key);
 				return false;
 			}
 		}
@@ -376,5 +402,22 @@ public class ConnectionManager {
 	
 	public void saveConfig(UserAuthInfo authInfo) throws TException {
 		filTrans.saveUserConfig(authInfo.user_id, authInfo.config);
+	}
+	
+	/**
+	 * Вызов общей формы поиска пациентов.
+	 * @param title - заголовок формы
+	 * @param clearFields - очистка полей и прошлых результатов поиска
+	 * @param disableOptionalParams - выключение опциональных параметров поиска
+	 * @return массив кодов пациентов или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public int[] showPatientSearchForm(String title, boolean clearFields, boolean disableOptionalParams) {
+		Object srcRes = viewClient.showModal(client, 1, title, clearFields, disableOptionalParams);
+		
+		if (srcRes != null)
+			return (int[]) srcRes;
+		
+		return null;
 	}
 }

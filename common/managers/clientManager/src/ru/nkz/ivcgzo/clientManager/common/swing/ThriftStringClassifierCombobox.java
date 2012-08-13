@@ -253,7 +253,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		private static final long serialVersionUID = -1173671126585172816L;
 		
 		public CustomComboBoxEditor() {
-			super();
+			super(true, true, false);
 			
 			setBorder(new EmptyBorder(1, 2, 1, 1));
 		}

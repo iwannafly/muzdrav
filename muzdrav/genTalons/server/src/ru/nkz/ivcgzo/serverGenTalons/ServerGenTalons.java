@@ -22,7 +22,9 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.CalendNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
@@ -39,7 +41,6 @@ import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons;
 import ru.nkz.ivcgzo.thriftGenTalon.ThriftGenTalons.Iface;
-import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.thriftGenTalon.VrachNotFoundException;
@@ -64,7 +65,7 @@ public class ServerGenTalons extends Server implements Iface {
     private TResultSetMapper<Nrasp, Nrasp._Fields> rsmNrasp;
     private TResultSetMapper<Rasp, Rasp._Fields> rsmRasp;
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
-    private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmVidp;
 
 //////////////////////////// Field Name Arrays ////////////////////////////
 
@@ -98,7 +99,7 @@ public class ServerGenTalons extends Server implements Iface {
         "datap", "timep", "cpol"
     };
     private static final String[] VIDP_FIELD_NAMES = {
-        "pcod", "name", "vcolor"
+        "pcod", "name"
     };
 
 ////////////////////////////////Type Arrays /////////////////////////////////
@@ -162,7 +163,7 @@ public class ServerGenTalons extends Server implements Iface {
         rsmNrasp = new TResultSetMapper<>(Nrasp.class, NRASP_FIELD_NAMES);
         rsmRasp = new TResultSetMapper<>(Rasp.class, RASP_FIELD_NAMES);
         rsmTalon = new TResultSetMapper<>(Talon.class, TALON_FIELD_NAMES);
-        rsmVidp = new TResultSetMapper<>(Vidp.class, VIDP_FIELD_NAMES);
+        rsmVidp = new TResultSetMapper<>(IntegerClassifier.class, VIDP_FIELD_NAMES);
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -422,12 +423,12 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final List<Vidp> getVidp() throws KmiacServerException, TException,
+    public final List<IntegerClassifier> getVidp() throws KmiacServerException, TException,
             VidpNotFoundException {
-        final String  sqlQuery = "SELECT pcod, name, vcolor FROM e_vidp "
+        final String  sqlQuery = "SELECT pcod, name FROM e_vidp "
                 + "ORDER BY pcod";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
-            List<Vidp> tmpList = rsmVidp.mapToList(acrs.getResultSet());
+            List<IntegerClassifier> tmpList = rsmVidp.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
             } else {
@@ -542,6 +543,20 @@ public class ServerGenTalons extends Server implements Iface {
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException(e.getMessage());
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getAzt() throws KmiacServerException,
+            AztNotFoundException, TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_azt";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAzt =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAzt.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
         }
     }
 
@@ -803,4 +818,5 @@ public class ServerGenTalons extends Server implements Iface {
             throw new KmiacServerException(e.getMessage());
         }
     }
+
 }
