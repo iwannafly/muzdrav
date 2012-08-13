@@ -385,8 +385,8 @@ public class FormRdDin extends JFrame {
 		rddin.setArt3((int) SLdad.getModel().getValue());
 		rddin.setArt4((int) SLsad.getModel().getValue());
 		rddin.setChcc((int) SChcc.getModel().getValue());
-		rddin.setDatapos(SDataPos.getDate().getTime());
-		rddin.setDatasl(SDataSl.getDate().getTime());
+//		rddin.setDatapos(SDataPos.getDate().getTime());
+//		rddin.setDatasl(SDataSl.getDate().getTime());
 		rddin.setHdm((int) SVdm.getModel().getValue());
 		rddin.setOj((int) SOkrj.getModel().getValue());
 		rddin.setSpl((int) STolP.getModel().getValue());

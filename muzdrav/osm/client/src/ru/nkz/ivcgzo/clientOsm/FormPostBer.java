@@ -189,12 +189,12 @@ public class FormPostBer extends JFrame {
 		}
 		or1=iw1; 
 //		rdsl.setOslAb("");
-		oslcode = rdsl.getOslAb();
-		if (oslcode.equals("N70")){oslname = "Сальпингит и оофорит";}
-		if (oslcode.equals("N71")){oslname = "Воспалительные болезни матки";}
-		if (oslcode.equals("N72")){oslname = "Воспалительные болезни шейки матки";}
-		if (oslcode.equals("N76")){oslname = "Другие воспалительные болезни влагалища и вульвы";}
-		if (oslcode==null){oslname = "";}
+//		oslcode = rdsl.getOslAb();
+//		if (oslcode.equals("N70")){oslname = "Сальпингит и оофорит";}
+//		if (oslcode.equals("N71")){oslname = "Воспалительные болезни матки";}
+//		if (oslcode.equals("N72")){oslname = "Воспалительные болезни шейки матки";}
+//		if (oslcode.equals("N76")){oslname = "Другие воспалительные болезни влагалища и вульвы";}
+//		if (oslcode==null){oslname = "";}
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
@@ -270,25 +270,25 @@ public class FormPostBer extends JFrame {
 			rdsl.setDataosl( SDataOsl.getDate().getTime());
 			rdsl.setDatasn( SDataSn.getDate().getTime());
 			rdsl.setDatasn( SDataRod.getDate().getTime());
-			rdsl.setDataSert( SDataSert.getDate().getTime());
-			rdsl.setSSert(getTextOrNull(TSSert.getText()));
-			rdsl.setNSert(getTextOrNull(TNSert.getText()));
+			rdsl.setDatasert( SDataSert.getDate().getTime());
+			rdsl.setSsert(getTextOrNull(TSSert.getText()));
+			rdsl.setNsert(getTextOrNull(TNSert.getText()));
 			rdsl.setDatay(SDataPos.getDate().getTime());
-			rdsl.setKont(iw3);
+//			rdsl.setKont();
 			rdsl.setDeti((int) SKolDet.getModel().getValue());
 			rdsl.setDsp((int) ((JSpinner) SDsp.getModel()).getValue());
 			rdsl.setDsr((int) SDcr.getModel().getValue());
 			rdsl.setDTroch((int) SDtroch.getModel().getValue());
-			rdsl.setIndSol((int) SindSol.getModel().getValue());
-			rdsl.setKolpr((int) SKolBer.getModel().getValue());
-			rdsl.setKolRod((int) SParRod.getModel().getValue());
+			rdsl.setIndsol((int) SindSol.getModel().getValue());
+			rdsl.setShet((int) SKolBer.getModel().getValue());
+			rdsl.setKolrod((int) SParRod.getModel().getValue());
 			rdsl.setPolj((int) SPolJ.getModel().getValue());
 			rdsl.setPrmen((int) SMenC.getModel().getValue());
-			rdsl.setRost((int) SRost.getModel().getValue());
+//			rdsl.setRost((int) SRost.getModel().getValue());
 			rdsl.setVesd((int) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
 			rdsl.setOslrod(oslrod);
-			rdsl.setOslAb(oslcode);
+//			rdsl.setOslAb(oslcode);
 //			rdsl.setOslAb(CBOslAb.setData(MainForm.tcl.getn_db7()));
 //			rdsl.setPlrod(CBRod.setData(MainForm.tcl.getn_db8()));
 //			rdsl.setPrishSn(CBPrishSn.setData(MainForm.tcl.getn_db9()));
@@ -413,7 +413,7 @@ public class FormPostBer extends JFrame {
 		JLabel LpolJ = new JLabel("Половая жизнь со скольки лет");
 		
 		final JCheckBox CBKontr = new JCheckBox("Контрацепция");
-		CBKontr.setSelected(rdsl.kont == 1);
+		CBKontr.setSelected(rdsl.kont == true);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(212, 208, 200));
@@ -439,8 +439,8 @@ public class FormPostBer extends JFrame {
 		JLabel LIndSol = new JLabel("Индекс Соловьева");
 		
 		SRost = new JSpinner();
-		rdsl.setRost(150);
-		SRost.setModel(new SpinnerNumberModel(rdsl.rost, 140, 200, 1));
+//		rdsl.setRost(150);
+//		SRost.setModel(new SpinnerNumberModel(rdsl.rost, 140, 200, 1));
 		/*150 должно быть заменено на 140, т.к.
 		 * */
 //		rdsl.setAbort((int) SRost.getModel().getValue());
@@ -466,8 +466,8 @@ public class FormPostBer extends JFrame {
 		rdsl.setCext((int) SCext.getModel().getValue());
 		
 		final JSpinner SindSol = new JSpinner();
-		SindSol.setModel(new SpinnerNumberModel(rdsl.indSol, 13, 20,1));
-		rdsl.setIndSol((int) SindSol.getModel().getValue());
+		SindSol.setModel(new SpinnerNumberModel(rdsl.indsol, 13, 20,1));
+		rdsl.setIndsol((int) SindSol.getModel().getValue());
 		
 		final JCheckBox CBKrov = new JCheckBox("Кровотечение");
 		CBKrov.setSelected(or1 == 1);
@@ -548,11 +548,11 @@ public class FormPostBer extends JFrame {
 		
 		final JSpinner SParRod = new JSpinner();
 		SParRod.setModel(new SpinnerNumberModel(0, 0, 20, 1));
-		rdsl.setKolRod((int) SParRod.getModel().getValue());
+		rdsl.setKolrod((int) SParRod.getModel().getValue());
 		
 		final JSpinner SKolBer = new JSpinner();
 		SKolBer.setModel(new SpinnerNumberModel(0, 0, 50, 1));
-		rdsl.setKolpr((int) SKolBer.getModel().getValue());
+		rdsl.setShet((int) SKolBer.getModel().getValue());
 		
 //		final JSpinner SDataOsl = new JSpinner();
 //		SDataOsl.setModel(new SpinnerDateModel(new Date(rdsl.dataosl), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
@@ -579,8 +579,8 @@ public class FormPostBer extends JFrame {
 		rdsl.setAbort((int) SKolAb.getModel().getValue());
 		
 		final JSpinner SVozMen = new JSpinner();
-		SVozMen.setModel(new SpinnerNumberModel(rdsl.VozMen , 8, 30, 1));
-		rdsl.setLet((int) SVozMen.getModel().getValue());
+		SVozMen.setModel(new SpinnerNumberModel(rdsl.vozmen , 8, 30, 1));
+		rdsl.setVozmen((int) SVozMen.getModel().getValue());
 		
 		final JSpinner SMenC = new JSpinner();
 		SMenC.setModel(new SpinnerNumberModel(rdsl.prmen, 20,  60, 1));
@@ -943,19 +943,19 @@ public class FormPostBer extends JFrame {
 	if (rdsl.dsp == 0) rdsl.setDsp(25);
 	if (rdsl.dsr == 0) rdsl.setDsr(28);
 	if (rdsl.dTroch == 0) rdsl.setDTroch(31);
-	if (rdsl.indSol == 0) rdsl.setIndSol(15);
-	if (rdsl.kolRod == 0) rdsl.setKolRod(0);
-	if (rdsl.kolpr == 0){ rdsl.setKolpr(0);} 
-	else {rdsl.setKolpr(rdsl.kolpr+1);}
+	if (rdsl.indsol == 0) rdsl.setIndsol(15);
+	if (rdsl.kolrod == 0) rdsl.setKolrod(0);
+	if (rdsl.shet == 0){ rdsl.setShet(0);} 
+	else {rdsl.setShet(rdsl.shet+1);}
 	if (rdsl.abort == 0) rdsl.setAbort(0);
 	if (rdsl.deti == 0) rdsl.setDeti(0);
 	if (rdsl.yavka1 == 0) rdsl.setYavka1(4);
-	if (rdsl.VozMen == 0) rdsl.setVozMen(11);
+	if (rdsl.vozmen == 0) rdsl.setVozmen(11);
 	if (rdsl.prmen == 0) rdsl.setPrmen(28);
 	if (rdsl.polj == 0) rdsl.setPolj(18);
-	if (rdsl.rost == 0) rdsl.setRost(160);
+	//if (rdsl.rost == 0) rdsl.setRost(160);
 	if (rdsl.vesd == 0) rdsl.setVesd(60);
-	    rdsl.setOslAb("");
+	    rdsl.setOslab("");
 		rdsl.setDataM(System.currentTimeMillis());
 		rdsl.setDatay(System.currentTimeMillis());
 		rdsl.setDataosl(System.currentTimeMillis());
@@ -964,26 +964,26 @@ public class FormPostBer extends JFrame {
 	}
 
 	private void setPostBerData(RdSlStruct rdsl) {
-		SRost.setValue(rdsl.getRost());
+		//SRost.setValue(rdsl.getRost());
 		SVes.setValue(rdsl.getVesd());
 		SDcp.setValue(rdsl.getDsp());
 		SDcr.setValue(rdsl.getDsr());
 		SDtroch.setValue(rdsl.getDTroch());
 		SCext.setValue(rdsl.getCext());
-		SindSol.setValue(rdsl.getIndSol());
+		SindSol.setValue(rdsl.getIndsol());
 		SDataPos.setDate(rdsl.getDatay());
 		SDataSn.setDate(rdsl.getDatasn());
-		SDataRod.setDate(rdsl.getDataRod());
-		SDataSert.setDate(rdsl.getDataSert());
-		TSSert.setText(rdsl.SSert);
-		TNSert.setText(rdsl.NSert);
-		SParRod.setValue(rdsl.getKolRod());
-		SKolBer.setValue(rdsl.getKolpr());
+		SDataRod.setDate(rdsl.getDataZs());
+		SDataSert.setDate(rdsl.getDatasert());
+		TSSert.setText(rdsl.ssert);
+		TNSert.setText(rdsl.nsert);
+		SParRod.setValue(rdsl.getKolrod());
+		SKolBer.setValue(rdsl.getShet());
 		SDataOsl.setDate(rdsl.getDataosl());
 		SYavka.setValue(rdsl.getYavka1());
 		SDataM.setDate(rdsl.getDataM());
 		SKolAb.setValue(rdsl.getAbort());
-		SVozMen.setValue(rdsl.getVozMen());
+		SVozMen.setValue(rdsl.getVozmen());
 		SMenC.setValue(rdsl.getPrmen());
 		SKolDet.setValue(rdsl.getDeti());
 		SPolJ.setValue(rdsl.getPolj());

@@ -751,13 +751,6 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<RdSlStruct> getRdSlInfo(int idDispb, int npasp)
-			throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
@@ -1807,6 +1800,13 @@ sb.append("<br>Подпись ____________");
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();
 		}	
+	}
+
+	@Override
+	public List<RdSlStruct> getRdSlInfo(int npasp) throws KmiacServerException,
+			TException {
+123
+		return null;
 	}
 
 
