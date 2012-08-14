@@ -26,6 +26,25 @@ struct PatientSearchParams {
 	9: string npolis;
 }
 
+struct mkb_2{
+	1: string pcod;
+	2: string name;
+	3: list<classifier.StringClassifier> mlb3;
+}
+
+struct mkb_1{
+	1: string pcod;
+	2: string klass;
+	3: string name;
+	5: list<mkb_2> mkb2;
+}
+
+struct mkb_0{
+	1: string pcod;
+	2: string name;
+	3: string kod_mkb;
+	4: list<mkb_1> mlb1;
+}
 
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
@@ -51,4 +70,10 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 
     
 	list<PatientBriefInfo> searchPatient(1: PatientSearchParams prms) throws (1: kmiacServer.KmiacServerException kse);
+
+	list<classifier.IntegerClassifier> getIntegerClassifier(1: classifier.IntegerClassifiers cls) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getIntegerClassifierSorted(1: classifier.IntegerClassifiers cls, 2: classifier.ClassifierSortOrder ord, 3: classifier.ClassifierSortFields fld) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getStringClassifier(1: classifier.StringClassifiers cls) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getStringClassifierSorted(1: classifier.StringClassifiers cls, 2: classifier.ClassifierSortOrder ord, 3: classifier.ClassifierSortFields fld) throws (1: kmiacServer.KmiacServerException kse);
+	list<mkb_0> getMkb_0() throws (1: kmiacServer.KmiacServerException kse);
 }
