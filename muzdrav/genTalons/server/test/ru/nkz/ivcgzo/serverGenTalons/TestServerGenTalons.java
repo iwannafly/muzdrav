@@ -18,6 +18,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.CalendNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
@@ -231,5 +232,12 @@ public class TestServerGenTalons {
     @Test
     public final void deleteTalonVrach_IsActuallyDeleted() throws KmiacServerException, TException {
         testServer.deleteTalonVrach(new Date(112,2,26).getTime(), new Date(112,2,28).getTime(), 2000004, 6, "9");
+    }
+
+    @Test
+    public final void getAzt_IsListSizeCorrect() throws KmiacServerException, TException, AztNotFoundException {
+        int expectedSize = 7;
+        List<IntegerClassifier> testList = testServer.getAzt();
+        assertEquals("list Azt size", expectedSize, testList.size());
     }
 }

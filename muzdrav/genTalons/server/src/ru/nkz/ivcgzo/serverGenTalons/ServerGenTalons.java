@@ -24,6 +24,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.CalendNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
@@ -545,6 +546,20 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
+    @Override
+    public final List<IntegerClassifier> getAzt() throws KmiacServerException,
+            AztNotFoundException, TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_azt";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAzt =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAzt.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
 //////////////////////// Add Methods ////////////////////////////////////
 
     @Override
@@ -803,4 +818,5 @@ public class ServerGenTalons extends Server implements Iface {
             throw new KmiacServerException(e.getMessage());
         }
     }
+
 }

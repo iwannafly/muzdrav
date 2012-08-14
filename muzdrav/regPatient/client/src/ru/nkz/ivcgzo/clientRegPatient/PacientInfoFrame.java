@@ -68,6 +68,9 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -242,10 +245,10 @@ public class PacientInfoFrame extends JFrame {
 				public void actionPerformed(ActionEvent arg0) {
 					try {
 						if (!tf_oms_smo.getText().isEmpty()) {
-							cmb_ogrn.setData(MainForm.tcl.getSMORF(Integer.valueOf(tf_oms_smo.getText())));
+							cmb_ogrn.setData(MainForm.tcl.getSmorf(Integer.valueOf(tf_oms_smo.getText())));
 						}
-//					} catch (SmorfNotFoundException snfe) {
-//						snfe.printStackTrace();
+					} catch (SmorfNotFoundException snfe) {
+						snfe.printStackTrace();
 					} catch (Exception e) {
 						e.printStackTrace();
 					} 
@@ -283,10 +286,6 @@ public class PacientInfoFrame extends JFrame {
 					} 
 				}
 			});
-//			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
-			cmb_Tdoc_pr.setVisible(false);
-			cmb_ogrn.setData(null);
-			cmb_org.setData(null); 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -474,8 +473,21 @@ public class PacientInfoFrame extends JFrame {
 				    if (cmb_ishod.getSelectedItem() != null) PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
 				    if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
 				
-				    //PersonalInfo.setTer_liv(MainForm.tcl.getTer_liv(pcod));
-				    //PersonalInfo.setRegion_liv(MainForm.tcl.getRegion_liv(pcod));
+//				    try{
+//					pcod из классификатора
+//				    	PersonalInfo.setTer_liv(MainForm.tcl.getTerLive(pcod)); 
+//					} catch (TerLiveNotFoundException tlnfe) {
+//					    System.out.println("Пациент не найден.");
+//					} catch (Exception e) {
+//				    	e.printStackTrace();
+//					}
+//				    try{
+//					    PersonalInfo.setRegion_liv(MainForm.tcl.getRegionLive(pcod));
+//					} catch (RegionLiveNotFoundException rlnfe) {
+//					    System.out.println("Пациент не найден.");
+//					} catch (Exception e) {
+//				    	e.printStackTrace();
+//					}
 				//FIXME   jitel, terp
 				    if (curPatientId == 0){
 					curPatientId = MainForm.tcl.addPatient(PersonalInfo);
@@ -1637,20 +1649,16 @@ public class PacientInfoFrame extends JFrame {
         panel_21.setLayout(gl_panel_21);
 
         JLabel lblNewLabel_40 = new JLabel("Серия");
+        JLabel lblNewLabel_41 = new JLabel("Номер");
+        JLabel lblNewLabel_42 = new JLabel("Документ");
+        JLabel lblNewLabel_43 = new JLabel("СМО ФФ ОМС");
+        JLabel lblNewLabel_44 = new JLabel("Наименование СМО");
 
         tf_Polis_ser_pr = new JTextField();
         tf_Polis_ser_pr.setColumns(10);
 
-        JLabel lblNewLabel_41 = new JLabel("Номер");
-
         tf_Polis_nom_pr = new JTextField();
         tf_Polis_nom_pr.setColumns(10);
-
-        JLabel lblNewLabel_42 = new JLabel("Документ");
-
-        JLabel lblNewLabel_43 = new JLabel("СМО ФФ ОМС");
-
-        JLabel lblNewLabel_44 = new JLabel("Наименование СМО");
 
         tf_Name_sk_pr = new JTextField();
         tf_Name_sk_pr.setColumns(10);
@@ -2799,6 +2807,10 @@ public class PacientInfoFrame extends JFrame {
 			cmb_otkaz.setData(MainForm.tcl.getAF0());
 			cmb_alk.setData(MainForm.tcl.getALK());
 			cmb_naprav.setData(MainForm.tcl.getNaprav());
+//			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
+			cmb_Tdoc_pr.setVisible(false);
+			cmb_ogrn.setSelectedItem(null);
+			cmb_org.setSelectedItem(null); 
 		} catch (TException e) {
 			e.printStackTrace();
 			MainForm.conMan.reconnect(e);
@@ -3096,9 +3108,9 @@ public class PacientInfoFrame extends JFrame {
                 rbtn_pol_pr_m.setSelected(AgentInfo.pol == 1);
                 rbtn_pol_pr_j.setSelected(AgentInfo.pol == 2);
             }
-            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.ogrn_str);
-            if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.vpolis);
-            if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.tdoc);
+            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.getOgrn_str());
+            if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.getVpolis());
+            if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.getTdoc());
         } catch (AgentNotFoundException anfe) {
         } catch (Exception e) {
             e.printStackTrace();

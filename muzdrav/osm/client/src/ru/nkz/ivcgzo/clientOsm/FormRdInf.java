@@ -136,7 +136,7 @@ public class FormRdInf extends JFrame {
 /*		patient.setFam((String) fam.getText());
 		patient.setIm((String)im.getText());
 		patient.setOt((String) ot.getText());*/
-		oslrod = rdinf.getOSocO();
+		oslrod = rdinf.getOsoco();
 		if ((oslrod-128)<0){
 		or8=0; iw1=oslrod;	
 		}else {
@@ -174,7 +174,7 @@ public class FormRdInf extends JFrame {
 		}
 		or1=iw1; 
 		
-		uslj = rdinf.getUslPr();
+		uslj = rdinf.getUslpr();
 		if ((uslj-8)<0){
 		us4=0; 	
 		}else {
@@ -589,8 +589,8 @@ rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
 //rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
 //rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
-rdinf.setOSocO(oslrod);
-rdinf.setUslPr(uslj);
+rdinf.setOsoco(oslrod);
+rdinf.setUslpr(uslj);
 rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
 //rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор

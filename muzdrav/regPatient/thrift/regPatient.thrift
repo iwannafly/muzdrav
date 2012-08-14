@@ -527,5 +527,5 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Классификатор N_SMORF (N_SMORF(pcod))
 	 */
-	list<classifier.IntegerClassifier> getSmorf(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe)
+	list<classifier.StringClassifier> getSmorf(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe)
 }

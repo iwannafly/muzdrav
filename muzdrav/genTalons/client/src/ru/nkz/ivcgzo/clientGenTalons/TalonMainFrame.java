@@ -46,6 +46,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
@@ -56,6 +57,7 @@ import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
+//import ru.nkz.ivcgzo.thriftGenTalon
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
@@ -1267,10 +1269,19 @@ public class TalonMainFrame extends JFrame {
 		treevrach.setModel(new DefaultTreeModel(createNodes()));
 		
 		try {
-			//tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAZT());
 			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+			tbl_norm.setIntegerClassifierSelector(0, MainForm.tcl.getVidp());
+			tbl_talon.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
 		} catch (KmiacServerException kse){
-		} catch ( VidpNotFoundException vnfe){
+		} catch (VidpNotFoundException vnfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		try {
+			MainForm.tcl.getAzt();
+			tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAzt());
+		} catch (KmiacServerException kse){
+		} catch (AztNotFoundException anfe){
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}

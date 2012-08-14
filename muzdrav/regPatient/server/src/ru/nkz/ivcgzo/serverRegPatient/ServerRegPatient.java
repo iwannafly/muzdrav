@@ -1312,12 +1312,12 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final List<IntegerClassifier> getSmorf(final int kodsmo)
+    public final List<StringClassifier> getSmorf(final int kodsmo)
             throws SmorfNotFoundException, TException {
-        final String sqlQuery = "SELECT smocod, nam_smop FROM n_smorf";
-        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmSmorf =
-                new TResultSetMapper<>(IntegerClassifier.class, "smocod", "nam_smop");
-        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+        final String sqlQuery = "SELECT smocod, nam_smop FROM n_smorf WHERE pcod = ?";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSmorf =
+                new TResultSetMapper<>(StringClassifier.class, "smocod", "nam_smop");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, kodsmo)) {
             return rsmSmorf.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);

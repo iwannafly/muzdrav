@@ -163,6 +163,11 @@ exception TalonNotFoundException {
 exception VidpNotFoundException {
 }
 
+/**
+ * День недели не найден
+ */
+exception AztNotFoundException {
+}
 
 service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
@@ -212,6 +217,11 @@ service ThriftGenTalons extends kmiacServer.KmiacServer {
 	*Возвращает виды приема
 	*/
 	list<classifier.IntegerClassifier> getVidp() throws (1: kmiacServer.KmiacServerException kse, 2: VidpNotFoundException vnfe);
+
+	/**
+	*Возвращает дни недели (select pcod, name from n_azt)
+	*/
+	list<classifier.IntegerClassifier> getAzt() throws (1: kmiacServer.KmiacServerException kse, 2: AztNotFoundException anfe);
 
 	/**
 	*Возвращает календарь на текущую дату
