@@ -431,9 +431,15 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	
 	/**
 	* Возвращает ОГРН
-	* select q_ogrn from n_smorf where smocod=?
+	* select ogrn from n_smorf where smocod=?
      	*/
 	string getOgrn(1:string smocod) throws (1:OgrnNotFoundException onfe),
+
+	/**
+	* Возвращает код СМО
+	* select smocod from n_smorf where ogrn=?
+     	*/
+	string getSmocod(1:string ogrn),
 
 	/**
 	* Возвращает регион проживания

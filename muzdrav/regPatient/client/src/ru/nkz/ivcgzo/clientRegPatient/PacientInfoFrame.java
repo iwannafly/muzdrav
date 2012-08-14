@@ -1574,8 +1574,6 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_Tdoc_pr.getSelectedItem() != null) AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
                     if (cmb_Polis_doc_pr.getSelectedItem() != null) AgentInfo.setTdoc(cmb_Polis_doc_pr.getSelectedPcod());
                     try{
-                    	System.out.println(cmb_ogrn.getSelectedPcod());
-                    	System.out.println(MainForm.tcl.getOgrn(cmb_ogrn.getSelectedPcod()));
                     	if (cmb_ogrn.getSelectedItem() != null) AgentInfo.setOgrn_str(MainForm.tcl.getOgrn(cmb_ogrn.getSelectedPcod()));
                 	} catch (OgrnNotFoundException onfe) {
                 		onfe.printStackTrace();
@@ -1800,11 +1798,11 @@ public class PacientInfoFrame extends JFrame {
         JLabel lblNewLabel_41 = new JLabel("Номер");
         JLabel lblNewLabel_42 = new JLabel("Документ");
         
-                tf_Polis_ser_pr = new JTextField();
-                tf_Polis_ser_pr.setColumns(10);
+        tf_Polis_ser_pr = new JTextField();
+        tf_Polis_ser_pr.setColumns(10);
         
-                tf_Polis_nom_pr = new JTextField();
-                tf_Polis_nom_pr.setColumns(10);
+        tf_Polis_nom_pr = new JTextField();
+        tf_Polis_nom_pr.setColumns(10);
         cmb_Polis_doc_pr = new ThriftIntegerClassifierCombobox<>(true);
         GroupLayout gl_panel = new GroupLayout(panel);
         gl_panel.setHorizontalGroup(
@@ -3128,7 +3126,7 @@ public class PacientInfoFrame extends JFrame {
                 rbtn_pol_pr_m.setSelected(AgentInfo.pol == 1);
                 rbtn_pol_pr_j.setSelected(AgentInfo.pol == 2);
             }
-            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.getOgrn_str());
+//FIXME            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.getOgrn_str());
             if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.getVpolis());
             if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.getTdoc());
         } catch (AgentNotFoundException anfe) {
