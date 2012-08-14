@@ -806,12 +806,6 @@ public class ServerOsm extends Server implements Iface {
 		
 	}
 
-	@Override
-	public List<RdInfStruct> getRdInfInfo(int idDispb, int npasp)
-			throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void AddRdInf(RdInfStruct rdInf) throws KmiacServerException,
