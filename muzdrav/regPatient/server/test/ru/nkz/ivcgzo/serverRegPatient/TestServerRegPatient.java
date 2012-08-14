@@ -367,9 +367,10 @@ public class TestServerRegPatient {
 
     @Test
     public final void getSmocod_isValueCorrect() throws TException, SmocodNotFoundException {
-        String expectedSmocod = "02001";
+        String expectedSmocod = "06500";
+        int pcod = 366;
         String ogrn = "1027739099772";
-        String smocod = testServer.getSmocod(ogrn);
+        String smocod = testServer.getSmocod(ogrn, pcod);
         assertEquals("smocod value = ", expectedSmocod, smocod);
     }
 

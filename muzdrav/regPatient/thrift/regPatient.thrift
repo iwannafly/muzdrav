@@ -442,7 +442,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	* Возвращает код СМО
 	* select smocod from n_smorf where ogrn=?
      	*/
-	string getSmocod(1:string ogrn) throws (1:SmocodNotFoundException snfe),
+	string getSmocod(1:string ogrn, 2:i32 pcod) throws (1:SmocodNotFoundException snfe),
 
 	/**
 	* Возвращает регион проживания

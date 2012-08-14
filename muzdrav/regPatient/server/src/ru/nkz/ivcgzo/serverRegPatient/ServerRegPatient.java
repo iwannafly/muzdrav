@@ -687,9 +687,9 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final String getSmocod(final String ogrn) throws TException, SmocodNotFoundException {
-        String sqlQuery = "SELECT smocod FROM n_smorf WHERE ogrn=?";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, ogrn)) {
+    public final String getSmocod(final String ogrn, final int pcod) throws TException, SmocodNotFoundException {
+        String sqlQuery = "SELECT smocod FROM n_smorf WHERE ogrn = ? AND pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, ogrn, pcod)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
                 return rs.getString("smocod");
