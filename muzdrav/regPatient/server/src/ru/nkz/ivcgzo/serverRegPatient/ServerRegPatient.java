@@ -1,9 +1,6 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +25,6 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -54,6 +50,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
@@ -682,6 +679,22 @@ public class ServerRegPatient extends Server implements Iface {
                 return rs.getInt("ter");
             } else {
                 throw new TerLiveNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final String getSmocod(final String ogrn) throws TException, SmocodNotFoundException {
+        String sqlQuery = "SELECT smocod FROM n_smorf WHERE ogrn=?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, ogrn)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("smocod");
+            } else {
+                throw new SmocodNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1334,7 +1347,7 @@ public class ServerRegPatient extends Server implements Iface {
             throws TException {
 //        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\NaprIsslPokaz.htm"), "utf-8")) {
 //            AutoCloseableResultSet acrs;
-//            
+//
 //            StringBuilder sb = new StringBuilder(0x10000);
 //            sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 //            sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -1344,7 +1357,7 @@ public class ServerRegPatient extends Server implements Iface {
 //            sb.append("</head>");
 //            sb.append("<body>");
 //            sb.append("<div>");
-//            
+//
 //            sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
 //            sb.append("<tr valign=\"top\">");
 //                sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
@@ -1377,7 +1390,7 @@ public class ServerRegPatient extends Server implements Iface {
 //                    sb.append("<b>Диагноз:</b><br />");
 //                    acrs.close();
 //                    acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", ip.getPvizitId());
-//                    if (!acrs.getResultSet().next()) 
+//                    if (!acrs.getResultSet().next())
 //                        throw new KmiacServerException("Diag is null");
 //                    sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
 //                    sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
@@ -1396,11 +1409,11 @@ public class ServerRegPatient extends Server implements Iface {
 //                sb.append("</td>");
 //            sb.append("</tr>");
 //            sb.append("</table>");
-//            
+//
 //            sb.append("</div>");
 //            sb.append("</body>");
 //            sb.append("</html>");
-//            
+//
 //            acrs.close();
 //            osw.write(sb.toString());
 //            return "c:\\NaprIsslPokaz.htm";

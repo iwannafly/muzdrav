@@ -32,6 +32,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
+import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 
 /**
  * @author Avdeev Alexander
@@ -363,6 +364,15 @@ public class TestServerRegPatient {
         int npasp = 5;
         testServer.updateOgrn(npasp);
     }
+
+    @Test
+    public final void getSmocod_isValueCorrect() throws TException, SmocodNotFoundException {
+        String expectedSmocod = "02001";
+        String ogrn = "1027739099772";
+        String smocod = testServer.getSmocod(ogrn);
+        assertEquals("smocod value = ", expectedSmocod, smocod);
+    }
+
 //    @Test
 //    public final void isAgentExist_isThrowAlreadyExistException()
 //            throws TException, AgentNotFoundException, AgentAlreadyExistException {
