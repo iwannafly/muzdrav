@@ -3126,7 +3126,7 @@ public class PacientInfoFrame extends JFrame {
                 rbtn_pol_pr_m.setSelected(AgentInfo.pol == 1);
                 rbtn_pol_pr_j.setSelected(AgentInfo.pol == 2);
             }
-//FIXME            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(AgentInfo.getOgrn_str());
+//            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(MainForm.tcl.getSmocod(AgentInfo.getOgrn_str(),PersonalInfo.getPolis_oms().strg));
             if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.getVpolis());
             if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.getTdoc());
         } catch (AgentNotFoundException anfe) {
