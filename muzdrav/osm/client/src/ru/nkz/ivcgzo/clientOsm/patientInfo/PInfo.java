@@ -32,6 +32,7 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientOsm.MainForm;
+import ru.nkz.ivcgzo.clientOsm.Vvod;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -46,6 +47,8 @@ import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+
 import java.awt.Dimension;
 
 public class PInfo extends JFrame {
@@ -356,6 +359,20 @@ public class PInfo extends JFrame {
 					}
 		 			
 		 		}
+		 		else 
+		 			if (lastPath.toString() == "Случаи беременности"){
+		 				RdSlStruct rdsl;
+							rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getNpasp());
+/*addLineToDetailInfo("Номер", rdsl.isSetId(), rdsl.getId());
+		 				addLineToDetailInfo("Дата первого посещения по беременности", rdsl.isSetDatay(), DateFormat.getDateInstance().format(new Date(rdsl.getDatay())));
+addLineToDetailInfo("Дата первого шевеления плода", rdsl.isSetDataosl(), DateFormat.getDateInstance().format(new Date(rdsl.getDataosl())));
+addLineToDetailInfo("Количество абортов", rdsl.isSetAbort(), rdsl.getAbort());
+addLineToDetailInfo("Паритет беременности", rdsl.isSetShet(), rdsl.getShet());
+addLineToDetailInfo("Дата последних месячных", rdsl.isSetDatam(), DateFormat.getDateInstance().format(new Date(rdsl.getDatam())));
+addLineToDetailInfo("Первая явка (кол-во недель срока беременности)", rdsl.isSetYavka1(), rdsl.getYavka1());
+*/
+		 				
+		 			}
 		 			}
 		 			catch (KmiacServerException e1) {
 						e1.printStackTrace();
@@ -459,6 +476,9 @@ public class PInfo extends JFrame {
 					posinfo.add(new PvizitTreeNode(pvizit));
 			for (PdiagZ pdiag : MainForm.tcl.getPdiagzProsm(npasp))
 				diaginfo.add(new PdiagTreeNode(pdiag));
+			for (RdSlStruct rdsl : MainForm.tcl.getRdSlInfo(npasp)) {
+				berinfo.add(new )
+			}
 
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
@@ -515,6 +535,21 @@ public class PInfo extends JFrame {
 		@Override
 		public String toString() {
 			return pdiag.getDiag();
+		}
+	}
+	
+	class RdslTreeNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = -46003968655861926L;
+		private RdSlStruct rdsl;
+		
+		public RdslTreeNode(RdSlStruct rdsl) {
+			this.rdsl = rdsl;
+			
+		}
+		
+		@Override
+		public String toString() {
+			return rdsl.getId();
 		}
 	}
 	

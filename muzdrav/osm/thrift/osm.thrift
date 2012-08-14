@@ -321,7 +321,7 @@ struct RdDinStruct{
 
 /*. Rd_Inf*/
 struct RdInfStruct{
-	1: optional i32 id_rd_sl;
+	1: optional i32 npasp;
 	2: optional i32 obr;
 	3: optional i32 sem;
 	4: optional i32 vOtec;
@@ -334,8 +334,6 @@ struct RdInfStruct{
 	11: optional i32 vredOtec;
 	12: optional i32 osoco;
 	13: optional i32 uslpr;
-	14: optional i32 id_pvizit;
-	15: optional i32 npasp;
 }
 
 /*Список показателей исследований по выбранному методу*/
