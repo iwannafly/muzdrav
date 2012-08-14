@@ -360,19 +360,28 @@ public class PInfo extends JFrame {
 		 			
 		 		}
 		 		else 
-		 			if (lastPath.toString() == "Случаи беременности"){
-		 				RdSlStruct rdsl;
-							rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getNpasp());
-/*addLineToDetailInfo("Номер", rdsl.isSetId(), rdsl.getId());
+		 			if (lastPath instanceof RdslTreeNode) {
+		 				RdslTreeNode rdslNode = (RdslTreeNode) lastPath;
+			 			RdSlStruct rdsl = rdslNode.rdsl;
+			 			addLineToDetailInfo("Номер", rdsl.isSetId(), rdsl.getId());
 		 				addLineToDetailInfo("Дата первого посещения по беременности", rdsl.isSetDatay(), DateFormat.getDateInstance().format(new Date(rdsl.getDatay())));
-addLineToDetailInfo("Дата первого шевеления плода", rdsl.isSetDataosl(), DateFormat.getDateInstance().format(new Date(rdsl.getDataosl())));
-addLineToDetailInfo("Количество абортов", rdsl.isSetAbort(), rdsl.getAbort());
-addLineToDetailInfo("Паритет беременности", rdsl.isSetShet(), rdsl.getShet());
-addLineToDetailInfo("Дата последних месячных", rdsl.isSetDatam(), DateFormat.getDateInstance().format(new Date(rdsl.getDatam())));
-addLineToDetailInfo("Первая явка (кол-во недель срока беременности)", rdsl.isSetYavka1(), rdsl.getYavka1());
-*/
+		 				addLineToDetailInfo("Дата первого шевеления плода", rdsl.isSetDataosl(), DateFormat.getDateInstance().format(new Date(rdsl.getDataosl())));
+		 				addLineToDetailInfo("Количество абортов", rdsl.isSetAbort(), rdsl.getAbort());
+		 				addLineToDetailInfo("Паритет беременности", rdsl.isSetShet(), rdsl.getShet());
+		 				addLineToDetailInfo("Дата последних месячных", rdsl.isSetDataM(), DateFormat.getDateInstance().format(new Date(rdsl.getDataM())));
+		 				addLineToDetailInfo("Первая явка (кол-во недель срока беременности)", rdsl.isSetYavka1(), rdsl.getYavka1());
+		 				addLineToDetailInfo("Причина снятия с учета", rdsl.isSetIshod(), rdsl.getIshod());
+		 				addLineToDetailInfo("Дата снятия с учета", rdsl.isSetDatasn(), DateFormat.getDateInstance().format(new Date(rdsl.getDatasn())));
+		 				addLineToDetailInfo("Дата планируемых родов", rdsl.isSetDataZs(), DateFormat.getDateInstance().format(new Date(rdsl.getDataZs())));
+		 				addLineToDetailInfo("Паритет родов", rdsl.isSetAbort(), rdsl.getAbort());
+		 				addLineToDetailInfo("Количество живых детей", rdsl.isSetDeti(), rdsl.getDeti());
+//		 				addLineIf("Контрацепция: да", rdsl.isSetKont(), rdsl.getKont());
+		 				addLineToDetailInfo("Вес до беременности", rdsl.isSetVesd(), rdsl.getVesd());
+
+						eptxt.setText(sb.toString());
+			 			} 	
+/**/
 		 				
-		 			}
 		 			}
 		 			catch (KmiacServerException e1) {
 						e1.printStackTrace();
@@ -476,9 +485,8 @@ addLineToDetailInfo("Первая явка (кол-во недель срока 
 					posinfo.add(new PvizitTreeNode(pvizit));
 			for (PdiagZ pdiag : MainForm.tcl.getPdiagzProsm(npasp))
 				diaginfo.add(new PdiagTreeNode(pdiag));
-			for (RdSlStruct rdsl : MainForm.tcl.getRdSlInfo(npasp)) {
-				berinfo.add(new )
-			}
+			for (RdSlStruct rdsl : MainForm.tcl.getRdSlInfo(npasp)) 
+				berinfo.add(new RdslTreeNode(rdsl));
 
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
@@ -539,7 +547,7 @@ addLineToDetailInfo("Первая явка (кол-во недель срока 
 	}
 	
 	class RdslTreeNode extends DefaultMutableTreeNode {
-		private static final long serialVersionUID = -46003968655861926L;
+		private static final long serialVersionUID = -3165163738807727905L;
 		private RdSlStruct rdsl;
 		
 		public RdslTreeNode(RdSlStruct rdsl) {
@@ -549,7 +557,7 @@ addLineToDetailInfo("Первая явка (кол-во недель срока 
 		
 		@Override
 		public String toString() {
-			return rdsl.getId();
+			return DateFormat.getDateInstance().format(new Date(rdsl.getDatay()));
 		}
 	}
 	
