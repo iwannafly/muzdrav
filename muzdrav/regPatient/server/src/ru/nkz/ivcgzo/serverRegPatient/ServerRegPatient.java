@@ -1,6 +1,9 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,6 +28,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -639,11 +643,11 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String getOgrn(final String smocod) throws TException, OgrnNotFoundException {
-        String sqlQuery = "SELECT q_ogrn FROM n_smorf WHERE smocod = ?";
+        String sqlQuery = "SELECT ogrn FROM n_smorf WHERE smocod = ?";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, smocod)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
-                return rs.getString("q_ogrn");
+                return rs.getString("ogrn");
             } else {
                 throw new OgrnNotFoundException();
             }
@@ -1328,7 +1332,71 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final String printMedCart(final Gosp gosp, final PatientFullInfo pat)
             throws TException {
-        // TODO Auto-generated method stub
+//        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\napr.htm"), "utf-8")) {
+//            AutoCloseableResultSet acrs;
+//
+//            StringBuilder sb = new StringBuilder(0x10000);
+//            sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+//            sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+//            sb.append("<head>");
+//                sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+//                sb.append("<title>Направление</title>");
+//                sb.append("</head>");
+//                sb.append("<body>");
+//                sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
+//                sb.append("<br> <div style=\"background:000000;width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
+//                sb.append("<br>");
+//                sb.append(String.format("%s, %s", na.getCpodr_name(), na.getClpu_name()));
+//                sb.append("</div>");
+//                sb.append("<div  style=\"background:000000;width:150px; float:right;\">Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</div>");
+//                sb.append("<br><br><br><br><br><br><br><br><br><br><br>");
+//                sb.append("<h2 align=center>Направление </h2>");
+//                sb.append(String.format("<p align=\"center\"><b>на госпитализацию</b></p>"));
+//                if (na.getClpu()!=null) sb.append(String.format("<br> Куда: %s", na.getClpu()));
+//                else sb.append("<br> Куда: _________________________________________________________" );
+//                sb.append("<br><br>");
+//                sb.append("1. Номер страхового полиса ОМС: " );
+//                acrs = sse.execPreparedQuery("SELECT poms_nom FROM patient WHERE npasp = ? ", na.getNpasp());
+//                if (acrs.getResultSet().next())
+//                sb.append(String.format(" %s ", acrs.getResultSet().getString(1)));
+//
+//            sb.append("<br>2. Код льготы: ");
+//            acrs.close();
+//                acrs = sse.execPreparedQuery("SELECT lgot FROM p_kov WHERE npasp = ? ", na.getNpasp());
+//                if (acrs.getResultSet().next())
+//                sb.append(String.format(" %s ", acrs.getResultSet().getString(1)));
+//                acrs.close();
+//                acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom,adm_kv FROM patient WHERE npasp = ? ", na.getNpasp());
+//                if (acrs.getResultSet().next()){
+//            sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+//            sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+//            sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
+//            sb.append("<br>6. Место работы, должность: _______________________________________________________");}
+//            sb.append("<br>7. Код диагноза по МКБ: ");
+//            acrs.close();
+//            acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", na.getPvizitId());
+//            if (acrs.getResultSet().next())
+//            sb.append(String.format("%s", acrs.getResultSet().getString(1)));
+//            if (na.getObosnov()!=null) sb.append(String.format("<br>8. Обоснование направления: %s",na.getObosnov()));
+//            else sb.append("<br>8. Обоснование направления: __________________________________________________");
+//            sb.append("<br>Должность медицинского работника, направившего больного: ");
+//            acrs.close();
+//            acrs = sse.execPreparedQuery("SELECT s_vrach.fam, s_vrach.im, s_vrach.ot,n_s00.name from s_mrab "+
+//  "join n_s00 on(s_mrab.cdol=n_s00.pcod)  join s_vrach on "+
+//  "(s_vrach.pcod=s_mrab.pcod) WHERE s_mrab.user_id = ? ",na.getUserId());
+//            if (acrs.getResultSet().next())
+//            sb.append(String.format("%s ", acrs.getResultSet().getString(4)));
+//            sb.append(String.format("<br>ФИО: %s %s %s", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
+//            sb.append(" Подпись_______________");
+//            sb.append("<br>Заведующий отделением_____________________________________________________________________________");
+//            sb.append(String.format("<p align=\"left\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+//            sb.append("<br>МП");
+//            acrs.close();
+//                            osw.write(sb.toString());
+//                            return "c:\\napr.htm";
+//                        } catch (SQLException | IOException e) {
+//                            throw new KmiacServerException();
+//                        }
         return null;
     }
 

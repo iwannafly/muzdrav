@@ -110,6 +110,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] isslInfoTypes;
 	private final TResultSetMapper<Pdisp, Pdisp._Fields> rsmPdisp;
 	private final Class<?>[] pdispTypes;
+	private final TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
+	private final Class<?>[] rdSlTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -171,6 +173,11 @@ public class ServerOsm extends Server implements Iface {
 																																
 		rsmPdisp = new TResultSetMapper<>(Pdisp.class, "id_diag",     "npasp",       "id",          "diag",       "pcod",        "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "sob",         "sxoch");
 		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Boolean.class, Boolean.class};
+	
+		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit");
+		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class};
+
+		
 	}
 
 	@Override
@@ -751,13 +758,6 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<RdSlStruct> getRdSlInfo(int idDispb, int npasp)
-			throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
@@ -806,12 +806,6 @@ public class ServerOsm extends Server implements Iface {
 		
 	}
 
-	@Override
-	public List<RdInfStruct> getRdInfInfo(int idDispb, int npasp)
-			throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public void AddRdInf(RdInfStruct rdInf) throws KmiacServerException,
@@ -1808,5 +1802,16 @@ sb.append("<br>Подпись ____________");
 			throw new KmiacServerException();
 		}	
 	}
+
+	@Override
+	public List<RdSlStruct> getRdSlInfo(int npasp) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
+			return rsmRdSl.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
 
 }
