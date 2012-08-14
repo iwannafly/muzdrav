@@ -259,7 +259,6 @@ struct RdSlStruct{
         1: optional  i32 id;
         2: optional i32 npasp;
         3: optional i64 datay;
-<<<<<<< HEAD
 	4: optional i64 dataosl;
 	5: optional i32 abort;
 	6: optional i32 shet;
@@ -293,40 +292,6 @@ struct RdSlStruct{
 	34: optional i32 cdiagt;
 	35: optional i32 cvera;
 	36: optional i32 id_pvizit;
-=======
-        4: optional i32 kolpr;
-        5: optional i32 abort;
-        6: optional string oslAb;
-        7: optional i64 dataosl;
-        8: optional i64 dataM;
-        9: optional i32 yavka1;
-	10: optional string plrod;
-	11: optional string prRod;
-	12: optional i64 DataZs;
-	13: optional i32 kolRod;
-	14: optional i32 cdiagt;
-	15: optional i32 prmen;
-	16: optional i32 deti;
-	17: optional i32 polj;
-	18: optional i32 kont;
-	19: optional i32 oslrod
-	20: optional i32 rost;
-	21: optional i32 vesd;
-	22: optional i32 dsp;
-	23: optional i32 dsr;
-	24: optional i32 dTroch;
-	25: optional i32 cext;
-	26: optional i32 indSol;
-	27: optional i64 Datasn; 
-	28: optional i32 VozMen;
-        29: optional i64 DataSert;
-        30: optional string NSert;
-        31: optional string SSert;
-	32: optional i64 DataRod;
-        33: optional i32 cvera;
-        34: optional i32 srokab;
-        35: optional i64 dataab; 
->>>>>>> bc5ba091bd6e4b0bf8101e8bd7bdc7e08acdcbc2
 }
 
 struct RdDinStruct{
@@ -673,7 +638,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void UpdateRdSl(1:i32 npasp, 2:i32 lgota) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdateRdDin(1:i32 idDispb,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
 
-	list<RdInfStruct> getRdInfInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdInfStruct> getRdInfInfo(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
 
