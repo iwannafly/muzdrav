@@ -97,6 +97,14 @@ public class ConnectionManager {
 		this.mainForm = client.getFrame();
 	}
 	
+	/**
+	 * Получение модуля, для которого будет проверяться актуальность подключений и
+	 * наличие обновлений.
+	 */
+	public IClient getClient() {
+		return client;
+	}
+	
 	private void addToCommon(int port) {
 		commonTransports.put(port, transports.get(port));
 		commonConnections.put(port, connections.get(port));
