@@ -377,11 +377,28 @@ public class PInfo extends JFrame {
 		 				addLineToDetailInfo("Количество живых детей", rdsl.isSetDeti(), rdsl.getDeti());
 //		 				addLineIf("Контрацепция: да", rdsl.isSetKont(), rdsl.getKont());
 		 				addLineToDetailInfo("Вес до беременности", rdsl.isSetVesd(), rdsl.getVesd());
-
+		 				addLineToDetailInfo("Таз: DSP", rdsl.isSetDsp(), rdsl.getDsp());
+		 				addLineToDetailInfo("Таз: DSR", rdsl.isSetDsr(),rdsl.getDsr());
+		 				addLineToDetailInfo("Таз: DTroch", rdsl.isSetDTroch(), rdsl.getDTroch());
+		 				addLineToDetailInfo("Таз: C.ext", rdsl.isSetCext(), rdsl.getCext());
+		 				addLineToDetailInfo("Индекс Соловьева", rdsl.isSetIndsol(), rdsl.getIndsol());
+		 				addLineToDetailInfo("Продолжительность менструального цикла", rdsl.isSetPrmen(), rdsl.getPrmen());
+		 				addLineToDetailInfo("Дата записи", rdsl.isSetDataz(), DateFormat.getDateInstance().format(new Date(rdsl.getDataz())));
+		 				addLineToDetailInfo("Дата выдачи сертификата", rdsl.isSetDatasert(), DateFormat.getDateInstance().format(new Date(rdsl.getDatasert())));
+		 				addLineToDetailInfo("Номер родового сертификата", rdsl.isSetNsert(), rdsl.getNsert());
+		 				addLineToDetailInfo("Серия родового сертификата", rdsl.isSetSsert(), rdsl.getSsert());
+		 				addLineToDetailInfo("Осложнение после аборта", rdsl.isSetOslab(), rdsl.getOslab());
+		 				addLineToDetailInfo("Планируемые роды", rdsl.isSetPlrod(), rdsl.getPlrod());
+		 				addLineToDetailInfo("Описание предыдущих родов", rdsl.isSetPrroid(), rdsl.getPrroid());
+		 				addLineToDetailInfo("Возраст Менархе", rdsl.isSetVozmen(), rdsl.getVozmen());
+		 				addLineToDetailInfo("Осложнения предыдущих родов", rdsl.isSetOslrod(), rdsl.getOslrod());
+		 				addLineToDetailInfo("Со сколько лет половая жизнь", rdsl.isSetPolj(), rdsl.getPolj());
+		 				addLineToDetailInfo("Дата предыдущего аборта", rdsl.isSetDataab(), DateFormat.getDateInstance().format(new Date(rdsl.getDataab())));
+		 				addLineToDetailInfo("Срок предыдущего аборта", rdsl.isSetSrokab(), rdsl.getSrokab());
+		 				addLineToDetailInfo("C.diag", rdsl.isSetCdiagt(), rdsl.getCdiagt());
+		 				addLineToDetailInfo("C.vera", rdsl.isSetCvera(), rdsl.getCvera());
 						eptxt.setText(sb.toString());
 			 			} 	
-/**/
-		 				
 		 			}
 		 			catch (KmiacServerException e1) {
 						e1.printStackTrace();

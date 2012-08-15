@@ -112,6 +112,10 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pdispTypes;
 	private final TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
 	private final Class<?>[] rdSlTypes;
+	private final TResultSetMapper<RdInfStruct, RdInfStruct._Fields> rsmRdInf;
+	private final Class<?>[] rdInfTypes;
+	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
+	private final Class<?>[] rdDinTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -177,7 +181,12 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit");
 		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
-		
+		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr");
+		rdInfTypes = new Class<?>[] {                        Integer.class, String.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class};
+
+		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "oteki",       "spl",         "chcc",        "poplp",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
+		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+
 	}
 
 	@Override
@@ -765,9 +774,17 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public void AddRdSl(RdSlStruct rdSl) throws KmiacServerException,
+	public int AddRdSl(RdSlStruct rdSl) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into p_rd_sl (npasp,datay,dataosl,abort,shet,datam,yavka1,ishod,datasn,datazs,kolrod,deti,kont,vesd,dsp,dsr,dtroch,cext,indsol,prmen,dataz,datasert,nsert,ssert,oslab,plrod,prrod,vozmen,oslrod,polj,dataab,srokab,cdiagt,cvera,id_pvizit) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ", true, rdSl, rdSlTypes,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
@@ -1812,6 +1829,13 @@ sb.append("<br>Подпись ____________");
 			throw new KmiacServerException();
 		}
 	}
+
+//	@Override
+//	public RdInfStruct getRdInfInfo(int npasp) throws KmiacServerException,
+//			TException {
+//		// TODO Auto-generated method stub
+
+//	}
 
 
 }
