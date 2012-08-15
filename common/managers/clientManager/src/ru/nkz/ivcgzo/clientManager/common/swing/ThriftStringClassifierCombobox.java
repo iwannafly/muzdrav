@@ -60,10 +60,14 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<StringClassifier> list) {
+		if (list == null)
+			list = new ArrayList<>();
+			
 		items = new ArrayList<>(list.size());
 		for (StringClassifier item : list) {
 			items.add(new StringClassifierItem(item));
 		}
+		setSelectedItem(null);
 		model.fireContentsChanged();
 	}
 	
