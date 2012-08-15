@@ -89,19 +89,10 @@ struct Psign{
 	5: optional string farmkol;
 	6: optional string vitae;
 	7: optional string vred;
-	8: optional string razv;
-	9: optional string uslov;
-	10: optional string per_zab;
-	11: optional string per_oper;
-	12: optional string gemotrans;
-	13: optional string nasl;
-	14: optional string ginek;
-	15: optional string priem_lek;
-	16: optional string prim_gorm;
 }
 
 struct Priem{
-	1: optional i32 id;
+	1: optional i32 id_pvizit;
 	2: optional i32 npasp;
 	3: optional i32 idpos;
 	4: optional i32 sl_ob;
@@ -109,72 +100,22 @@ struct Priem{
 	6: optional i32 n_kons;
 	7: optional i32 n_proc;
 	8: optional i32 n_lek;
-	9: optional string t_jalob_d;
-	10: optional string t_jalob_krov;
-	11: optional string t_jalob_p;
-	12: optional string t_jalob_moch;
-	13: optional string t_jalob_endo;
-	14: optional string t_jalob_nerv;
-	15: optional string t_jalob_opor;
-	16: optional string t_jalob_lih;
-	17: optional string t_jalob_obh;
-	18: optional string t_jalob_proch;
-	19: optional string t_ob_sost;
-	20: optional string t_koj_pokr;
-	21: optional string t_sliz;
-	22: optional string t_podk_kl;
-	23: optional string t_limf_uzl;
-	24: optional string t_kost_mysh;
-	25: optional string t_nervn_ps;
-	26: optional string t_chss;
-	27: optional string t_temp;
-	28: optional string t_ad;
-	29: optional string t_rost;
-	30: optional string t_ves;
-	31: optional string t_telo;
-	32: optional string t_sust;
-	33: optional string t_dyh;
-	34: optional string t_gr_kl;
-	35: optional string t_perk_l;
-	36: optional string t_aus_l;
-	37: optional string t_bronho;
-	38: optional string t_arter;
-	39: optional string t_obl_s;
-	40: optional string t_perk_s;
-	41: optional string t_aus_s;
-	42: optional string t_pol_rta;
-	43: optional string t_jivot;
-	44: optional string t_palp_jivot;
-	45: optional string t_jel_kish;
-	46: optional string t_palp_jel;
-	47: optional string t_palp_podjjel;
-	48: optional string t_pechen;
-	49: optional string t_jelch;
-	50: optional string t_selez;
-	51: optional string t_obl_zad;
-	52: optional string t_poyasn;
-	53: optional string t_pochk;
-	54: optional string t_moch;
-	55: optional string t_mol_jel;
-	56: optional string t_gr_jel;
-	57: optional string t_matka;
-	58: optional string t_nar_polov;
-	59: optional string t_chitov;
-	60: optional string t_st_localis;
-	61: optional string t_ocenka;
-	62: optional string t_jalob;
-	63: optional string t_status_praesense;
-	64: optional string t_fiz_obsl;
+	9: optional string t_chss;
+	10: optional string t_temp;
+	11: optional string t_ad;
+	12: optional string t_rost;
+	13: optional string t_ves;
+	14: optional string t_st_localis;
+	15: optional string t_ocenka;
+	16: optional string t_jalob;
+	17: optional string t_status_praesense;
+	18: optional string t_fiz_obsl;
 }
 
 struct AnamZab{
 	1: optional i32 id_pvizit;
 	2: optional i32 npasp;
-	3: optional string t_nachalo_zab;
-	4: optional string t_sympt;
-	5: optional string t_otn_bol;
-	6: optional string t_ps_syt;
-	7: optional string t_ist_zab;
+	3: optional string t_ist_zab;
 }
 
 struct PdiagZ{
@@ -609,7 +550,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_db3() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_db4() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_db5() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_db6() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_db6() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_db7() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_db8() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_db9() throws (1: kmiacServer.KmiacServerException kse);
