@@ -46,18 +46,18 @@ public class ServerViewSelect extends Server implements Iface {
 		
 		ccm = new ClassifierManager(sse);
 		
-		try {
-			getIntegerClassifier(IntegerClassifiers.n_aba);
-			getIntegerClassifier(IntegerClassifiers.n_aba);
-			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.descending, ClassifierSortFields.pcod);
-			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.ascending, ClassifierSortFields.pcodName);
-			getIntegerClassifier(IntegerClassifiers.n_edd);
-			getIntegerClassifier(IntegerClassifiers.n_edd);
-			getMkb_0();
-		} catch (KmiacServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			getIntegerClassifier(IntegerClassifiers.n_aba);
+//			getIntegerClassifier(IntegerClassifiers.n_aba);
+//			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.descending, ClassifierSortFields.pcod);
+//			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.ascending, ClassifierSortFields.pcodName);
+//			getIntegerClassifier(IntegerClassifiers.n_edd);
+//			getIntegerClassifier(IntegerClassifiers.n_edd);
+//			getMkb_0();
+//		} catch (KmiacServerException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override
