@@ -50,6 +50,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
@@ -639,11 +640,11 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String getOgrn(final String smocod) throws TException, OgrnNotFoundException {
-        String sqlQuery = "SELECT q_ogrn FROM n_smorf WHERE smocod = ?";
+        String sqlQuery = "SELECT ogrn FROM n_smorf WHERE smocod = ?";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, smocod)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
-                return rs.getString("q_ogrn");
+                return rs.getString("ogrn");
             } else {
                 throw new OgrnNotFoundException();
             }
@@ -678,6 +679,22 @@ public class ServerRegPatient extends Server implements Iface {
                 return rs.getInt("ter");
             } else {
                 throw new TerLiveNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final String getSmocod(final String ogrn, final int pcod) throws TException, SmocodNotFoundException {
+        String sqlQuery = "SELECT smocod FROM n_smorf WHERE ogrn = ? AND pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, ogrn, pcod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("smocod");
+            } else {
+                throw new SmocodNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1328,7 +1345,81 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final String printMedCart(final Gosp gosp, final PatientFullInfo pat)
             throws TException {
-        // TODO Auto-generated method stub
+//        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\NaprIsslPokaz.htm"), "utf-8")) {
+//            AutoCloseableResultSet acrs;
+//
+//            StringBuilder sb = new StringBuilder(0x10000);
+//            sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+//            sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+//            sb.append("<head>");
+//                sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+//                sb.append("<title>Направление на…</title>");
+//            sb.append("</head>");
+//            sb.append("<body>");
+//            sb.append("<div>");
+//
+//            sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
+//            sb.append("<tr valign=\"top\">");
+//                sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
+//                    sb.append("<h3>Информация для пациента:</h3>");
+//                    if (ip.getMesto()!=null)sb.append(String.format("<b>Место: </b>%s<br />", ip.getMesto()));
+//                    if (ip.getKab()!=null)sb.append(String.format("<b>Каб. №: </b>%s<br />", ip.getKab()));
+//                    sb.append("<b>Дата:</b><br />");
+//                    sb.append("<b>Время:</b><br />");
+//                    sb.append("<b>Подготовка:</b><br />");
+//                sb.append("</td>");
+//                acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", ip.getUserId());
+//                if (!acrs.getResultSet().next())
+//                    throw new KmiacServerException("Logged user info not found.");
+//                sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
+//                    sb.append(String.format("<h3>%s<br />", ip.getClpu_name()));
+//                    sb.append(String.format("%s<br />", ip.getCpodr_name()));
+//                    String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3));
+//                    acrs.close();
+//                    acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", ip.getKodVidIssl());
+//                    if (!acrs.getResultSet().next())
+//                        throw new KmiacServerException("Exam info info not found.");
+//                    sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
+//                    acrs.close();
+//                    acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", ip.getNpasp());
+//                    if (!acrs.getResultSet().next())
+//                        throw new KmiacServerException("Logged user info not found.");
+//                    sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+//                    sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+//                    sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
+//                    sb.append("<b>Диагноз:</b><br />");
+//                    acrs.close();
+//                    acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", ip.getPvizitId());
+//                    if (!acrs.getResultSet().next())
+//                        throw new KmiacServerException("Diag is null");
+//                    sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
+//                    sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
+//                    sb.append("<h3>Наименование показателей:</h3>");
+//                    sb.append("<ol>");
+//                    for (String str : ip.getPokaz()) {
+//                        acrs.close();
+//                        acrs = sse.execPreparedQuery("SELECT name_n FROM n_ldi WHERE pcod = ? ", str);
+//                        if (!acrs.getResultSet().next())
+//                            throw new KmiacServerException("Mark info info not found.");
+//                        sb.append(String.format("<li>%s</li>", acrs.getResultSet().getString(1)));
+//                    }
+//                    sb.append("</ol>");
+//                    sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+//                    sb.append("<b>Подпись врача:</b><br />");
+//                sb.append("</td>");
+//            sb.append("</tr>");
+//            sb.append("</table>");
+//
+//            sb.append("</div>");
+//            sb.append("</body>");
+//            sb.append("</html>");
+//
+//            acrs.close();
+//            osw.write(sb.toString());
+//            return "c:\\NaprIsslPokaz.htm";
+//        } catch (SQLException | IOException | KmiacServerException e) {
+//            throw new KmiacServerException();
+//        }
         return null;
     }
 
