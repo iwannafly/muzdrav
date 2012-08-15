@@ -17,16 +17,22 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
+import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientSearchParams;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
+import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
 
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
+	private ClassifierManager ccm;
 	public String className = "n_c00";
 	
 	private TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
@@ -37,6 +43,21 @@ public class ServerViewSelect extends Server implements Iface {
 		super(sse, tse);
 		
 		rsmPatBrief = new TResultSetMapper<>(PatientBriefInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom");
+		
+		ccm = new ClassifierManager(sse);
+		
+//		try {
+//			getIntegerClassifier(IntegerClassifiers.n_aba);
+//			getIntegerClassifier(IntegerClassifiers.n_aba);
+//			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.descending, ClassifierSortFields.pcod);
+//			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.ascending, ClassifierSortFields.pcodName);
+//			getIntegerClassifier(IntegerClassifiers.n_edd);
+//			getIntegerClassifier(IntegerClassifiers.n_edd);
+//			getMkb_0();
+//		} catch (KmiacServerException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	@Override
@@ -65,10 +86,10 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView(String className) throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM "+"n_c00";
+		final String sqlQuery = "SELECT pcod, name FROM + ?";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIVS =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, className)) {
             return rsmIVS.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             throw new TException(e);
@@ -78,7 +99,7 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<StringClassifier> getVSStringClassifierView(String className) throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM "+"n_c00";
+		final String sqlQuery = "SELECT pcod, name FROM " + className;
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSVS =
                 new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -100,7 +121,7 @@ public class ServerViewSelect extends Server implements Iface {
 	public boolean isClassifierPcodInteger(String className) throws TException {
 		// TODO Auto-generated method stub
 		String sqlQueryGetType = "SELECT data_type FROM information_schema.columns where table_name = ? AND column_name = ?";
-		try (AutoCloseableResultSet arcs = sse.execPreparedQuery(sqlQueryGetType, "n_c00", "pcod")) {
+		try (AutoCloseableResultSet arcs = sse.execPreparedQuery(sqlQueryGetType, className, "pcod")) {
 			if (arcs.getResultSet().next()){
 				if (arcs.getResultSet().getString(1).equals("integer"))
 					return true;
@@ -168,6 +189,30 @@ public class ServerViewSelect extends Server implements Iface {
 		return list.toArray();
 	}
 
+	///////////////////////// classifiers ///////////////////////////////
 	
+	@Override
+	public List<IntegerClassifier> getIntegerClassifier(IntegerClassifiers cls) throws KmiacServerException {
+		return ccm.getIntegerClassifier(cls);
+	}
 
+	@Override
+	public List<IntegerClassifier> getIntegerClassifierSorted(IntegerClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) throws KmiacServerException {
+		return ccm.getIntegerClassifier(cls, ord, fld);
+	}
+
+	@Override
+	public List<StringClassifier> getStringClassifier(StringClassifiers cls) throws KmiacServerException {
+		return ccm.getStringClassifier(cls);
+	}
+
+	@Override
+	public List<StringClassifier> getStringClassifierSorted(StringClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) throws KmiacServerException {
+		return ccm.getStringClassifier(cls, ord, fld);
+	}
+
+	@Override
+	public List<mkb_0> getMkb_0() throws KmiacServerException {
+		return ccm.getMkbTreeClassifier();
+	}
 }

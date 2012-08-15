@@ -33,6 +33,7 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer;
@@ -124,6 +125,10 @@ public class ConnectionManager {
 		connect(client.getPort());
 		
 		addToCommon(client.getPort());
+	}
+	
+	public IClient getViewClient() {
+		return viewClient;
 	}
 	
 	/**
@@ -417,6 +422,22 @@ public class ConnectionManager {
 		
 		if (srcRes != null)
 			return (int[]) srcRes;
+		
+		return null;
+	}
+	
+	/**
+	 * Вызов формы с древовидным отображением диагнозов.
+	 * @param title - заголовок формы
+	 * @param pcod - текущее значение кода диагноза
+	 * @return выбранный диагноз или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public StringClassifier showMkbTreeForm(String title, String pcod) {
+		Object srcRes = viewClient.showModal(client, 2, title, pcod);
+		
+		if (srcRes != null)
+			return (StringClassifier) srcRes;
 		
 		return null;
 	}
