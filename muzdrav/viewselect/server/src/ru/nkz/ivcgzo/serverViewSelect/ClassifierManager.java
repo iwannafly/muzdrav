@@ -134,7 +134,7 @@ public class ClassifierManager {
 		if (mkbTreeClass != null)
 			return mkbTreeClass;
 		
-		String sql0 = "SELECT a.pcod, a.name FROM n_a00 a ORDER BY a.cod_mkb ";
+		String sql0 = "SELECT a.pcod, a.name, a.cod_mkb FROM n_a00 a ORDER BY a.cod_mkb ";
 		String sql1 = "SELECT b.pcod, b.klass, b.name FROM n_a00 a JOIN n_b00 b ON (b.klass = a.pcod) ORDER BY b.pcod ";
 		String sql2 = "SELECT c.pcod, c.name FROM n_c00 c ORDER BY c.pcod ";
 		
@@ -149,22 +149,20 @@ public class ClassifierManager {
 			while (rs0.next()) {
 				String clas0 = rs0.getString(1);
 				List<mkb_1> mkb1List = new ArrayList<>();
-				mkb_0 mkb0 = new mkb_0(clas0, rs0.getString(2), "", mkb1List);
+				mkb_0 mkb0 = new mkb_0(clas0.trim(), rs0.getString(2).trim(), rs0.getString(3).trim(), mkb1List);
 				while (clas0.equals(rs1.getString(2))) {
 					List<mkb_2> mkb2List = new ArrayList<>();
-					mkb_1 mkb1 = new mkb_1(rs1.getString(1), rs1.getString(2), rs1.getString(3), mkb2List);
+					mkb_1 mkb1 = new mkb_1(rs1.getString(1).trim(), rs1.getString(2).trim(), rs1.getString(3).trim(), mkb2List);
 					String str = rs1.getString(1).substring(0, 3) + "    ";
 					String end = (rs1.getString(1).charAt(3) == ' ') ? str : rs1.getString(1).substring(4, 7) + "    ";
 					while ((rs2.getString(1).compareTo(str) > -1) && (rs2.getString(1).compareTo(end) < 1)) {
 						List<StringClassifier> mkb3 = new ArrayList<>();
-						mkb_2 mkb2 = new mkb_2(rs2.getString(1), rs2.getString(2), mkb3);
+						mkb_2 mkb2 = new mkb_2(rs2.getString(1).trim(), rs2.getString(2).trim(), mkb3);
 						if (!rs2.isAfterLast() && !rs2.next()) break;
 						while (rs2.getString(1).charAt(3) == '.') {
-							mkb3.add(new StringClassifier(rs2.getString(1), rs2.getString(2)));
+							mkb3.add(new StringClassifier(rs2.getString(1).trim(), rs2.getString(2).trim()));
 							if (!rs2.isAfterLast() && !rs2.next()) break;
 						}
-						if (mkb3.size() == 0)
-							mkb3.add(new StringClassifier(mkb2.getPcod(), mkb2.getName()));
 						mkb2List.add(mkb2);
 						if (rs2.isAfterLast()) break;
 					}

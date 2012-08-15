@@ -9,6 +9,8 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -17,13 +19,14 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public static ThriftViewSelect.Client tcl;
 	public JFrame frame;
 	public PatientSearchForm srcFrm;
+	public ViewMkbTreeForm mkbFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
-		srcFrm = new PatientSearchForm();
+		initModalForms();
 		
-		setFrame(new ViewTablePcodStringForm());
+//		setFrame(new ViewTablePcodStringForm());
 		//setFrame(new ViewTablePcodIntForm());
 	}
 
@@ -42,10 +45,10 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
 			try { 
-				if (tcl.isClassifierPcodInteger("n_l01")) System.out.print("ololo");
+//				if (tcl.isClassifierPcodInteger("n_l01")) System.out.print("ololo");
 				//ViewTablePcodIntForm.tableFill();
 				//else ViewTablePcodStringForm.tableFill();
-				ViewTablePcodStringForm.tableFill();
+//				ViewTablePcodStringForm.tableFill();
 				//NSForm.
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -53,6 +56,11 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 			
 		}
 		
+	}
+
+	private void initModalForms() {
+		srcFrm = new PatientSearchForm();
+		mkbFrm = new ViewMkbTreeForm();
 	}
 	
 	@Override
@@ -82,6 +90,19 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						disposeModal();
 					}
 					break;
+					
+				case 2:
+					setFrame(mkbFrm);
+					mkbFrm.setTitle((String) params[1]);
+					mkbFrm.prepare((String) params[2]);
+					mkbFrm.setModalityListener();
+					prepareModal(parent).setVisible(true);
+					try {
+						return mkbFrm.getResults();
+					} finally {
+						mkbFrm.removeModalityListener();
+						disposeModal();
+					}
 				}
 			}
 		
