@@ -231,7 +231,9 @@ public class PacientInfoFrame extends JFrame {
 		try {
 			cmb_ishod = new ThriftIntegerClassifierCombobox<>(true);
 			cmb_status = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_status.setMaximumRowCount(27);
 			cmb_tdoc = new ThriftIntegerClassifierCombobox<>(true);
+			cmb_tdoc.setMaximumRowCount(18);
 			cmb_oms_doc = new ThriftIntegerClassifierCombobox<>(true);
 			cmb_Tdoc_pr = new ThriftIntegerClassifierCombobox<>(true);
 			cmb_cotd = new ThriftIntegerClassifierCombobox<>(true);
@@ -408,6 +410,11 @@ public class PacientInfoFrame extends JFrame {
             	if (res != null) {
             		curPatientId = res[0];
                     changePatientPersonalInfo(curPatientId);
+                    changePatientLgotaInfo(curPatientId);
+                    changePatientKategInfo(curPatientId);
+                    changePatientAgentInfo(curPatientId);
+                    changePatientSignInfo(curPatientId);
+                    selectAllPatientPriemInfo(curPatientId);
             	}
 //              tbMain.setSelectedIndex(0);
 //              PacientMainFrame.getInstance().setVisible(true);
@@ -2827,8 +2834,10 @@ public class PacientInfoFrame extends JFrame {
 			cmb_naprav.setData(MainForm.tcl.getNaprav());
 //			cmb_Tdoc_pr.setData(MainForm.tcl.getTdoc());
 			cmb_Tdoc_pr.setVisible(false);
-			cmb_ogrn.setSelectedItem(null);
 			cmb_org.setSelectedItem(null); 
+			//cmb_ogrn.setSelectedItem(null); 
+			cmb_ogrn.setData(null);
+            //cmb_ogrn.removeAll();
 		} catch (TException e) {
 			e.printStackTrace();
 			MainForm.conMan.reconnect(e);
@@ -3126,7 +3135,7 @@ public class PacientInfoFrame extends JFrame {
                 rbtn_pol_pr_m.setSelected(AgentInfo.pol == 1);
                 rbtn_pol_pr_j.setSelected(AgentInfo.pol == 2);
             }
-//            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(MainForm.tcl.getSmocod(AgentInfo.getOgrn_str(),PersonalInfo.getPolis_oms().strg));
+            if (AgentInfo.getOgrn_str() != null) cmb_ogrn.setSelectedPcod(MainForm.tcl.getSmocod(AgentInfo.getOgrn_str(),PersonalInfo.getPolis_oms().strg));
             if (AgentInfo.getVpolis() != 0) cmb_Polis_doc_pr.setSelectedPcod(AgentInfo.getVpolis());
             if (AgentInfo.getTdoc() != 0) cmb_Tdoc_pr.setSelectedPcod(AgentInfo.getTdoc());
         } catch (AgentNotFoundException anfe) {
@@ -3152,7 +3161,9 @@ public class PacientInfoFrame extends JFrame {
             btnGroup_pol_pr.clearSelection();
             cmb_Tdoc_pr.setSelectedItem(null);
             cmb_Polis_doc_pr.setSelectedItem(null);
-            cmb_ogrn.setSelectedItem(null);
+			//cmb_ogrn.setSelectedItem(null); 
+            cmb_ogrn.setData(null);
+           // cmb_ogrn.removeAll();
         } catch (Exception e) {
             e.printStackTrace();
         }
