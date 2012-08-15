@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -102,9 +103,6 @@ public class FormPostBer extends JFrame {
     JSpinner SKolDet;
     JSpinner SPolJ;
     JSpinner SSrokA;
-//    JComboBox CBPrishSn;
-//    JComboBox CBRod;
-//    JComboBox CBOslAb;
     JCheckBox CBKrov; 
     JCheckBox CBEkl; 
     JCheckBox CBGnoin; 
@@ -192,14 +190,19 @@ public class FormPostBer extends JFrame {
 		or2=1; iw1=iw1-2;	
 		}
 		or1=iw1; 
-//		rdsl.setOslAb("");
-//		oslcode = rdsl.getOslAb();
-//		if (oslcode.equals("N70")){oslname = "Сальпингит и оофорит";}
-//		if (oslcode.equals("N71")){oslname = "Воспалительные болезни матки";}
-//		if (oslcode.equals("N72")){oslname = "Воспалительные болезни шейки матки";}
-//		if (oslcode.equals("N76")){oslname = "Другие воспалительные болезни влагалища и вульвы";}
-//		if (oslcode==null){oslname = "";}
-		addWindowListener(new WindowAdapter() {
+		if (rdsl.isSetOslab())
+			CBOslAb.setSelectedPcod(rdsl.getOslab());
+		else
+			CBOslAb.setSelectedItem(null);
+		if (rdsl.isSetIshod())
+			CBPrishSn.setSelectedPcod(rdsl.getIshod());
+		else
+			CBPrishSn.setSelectedItem(null);
+		if (rdsl.isSetPlrod())
+			CBRod.setSelectedPcod(rdsl.getPlrod());
+		else
+			CBRod.setSelectedItem(null);
+addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 //			rdsl.getAbort(SKolAb.value);
@@ -256,14 +259,6 @@ public class FormPostBer extends JFrame {
 				if (CBKontr.isSelected()){iw3 = 1;}
 				return iw3;
 			};
-	/*		private String oslcode(String oslcode){
-				if (CBOslAb.getSelectedItem().equals("Сальпингит и оофорит")){oslcode = "N70";}
-				if (CBOslAb.getSelectedItem().equals("Воспалительные болезни матки")){oslcode = "N71";}
-				if (CBOslAb.getSelectedItem().equals("Воспалительные болезни шейки матки")){oslcode = "N72";}
-				if (CBOslAb.getSelectedItem().equals("Другие воспалительные болезни влагалища и вульвы")){oslcode = "N76";}
-				if (CBOslAb.getSelectedItem().equals("")){oslcode = null;}
-				return oslcode;
-			};*/
 			public void actionPerformed(ActionEvent arg0) {
 				patient.setFam((String) fam.getText());
 				patient.setIm((String)im.getText());
@@ -296,16 +291,18 @@ public class FormPostBer extends JFrame {
 			rdsl.setVesd((int) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
 			rdsl.setOslrod(oslrod);
-//			rdsl.setOslAb(oslcode);
-//			rdsl.setOslAb(CBOslAb.setData(MainForm.tcl.getn_db7()));
-//			rdsl.setPlrod(CBRod.setData(MainForm.tcl.getn_db8()));
-//			rdsl.setPrishSn(CBPrishSn.setData(MainForm.tcl.getn_db9()));
-//			rdsl.setOslAb((string) CBOslAb.getSelectedPcod());
-//			rdsl.setPlrod((int) CBRod.getSelectedPcod().intValue());
-//			rdsl.setPrishSn((int) CBPrishSn.getSelectedPcod().intValue());
-//			rdsl.setOslAb(CBOslAb.setData(MainForm.tcl.get_n_db7()));
+//			rdsl.setOslab(CBOslAb.setData(MainForm.tcl.get_n_db9()));
 //			rdsl.setPlrod(CBRod.setData(MainForm.tcl.get_n_db8()));
-//			rdsl.setPrishSn(CBPrishSn.setData(MainForm.tcl.get_n_db9()));
+//			rdsl.setIshod(CBPrishSn.setData(MainForm.tcl.get_n_db7()));
+			if (CBOslAb.getSelectedPcod() != null)
+				rdsl.setOslab(CBOslAb.getSelectedPcod());
+				else rdsl.unsetOslab();
+			if (CBRod.getSelectedPcod() != null)
+				rdsl.setPlrod(CBRod.getSelectedPcod());
+				else rdsl.unsetPlrod();
+			if (CBPrishSn.getSelectedPcod() != null)
+				rdsl.setIshod(CBPrishSn.getSelectedPcod());
+				else rdsl.unsetIshod();
 			
 			}
 		});
@@ -453,12 +450,7 @@ public class FormPostBer extends JFrame {
 		JLabel LIndSol = new JLabel("Индекс Соловьева");
 		
 		SRost = new JSpinner();
-//		rdsl.setRost(150);
-//		SRost.setModel(new SpinnerNumberModel(rdsl.rost, 140, 200, 1));
-		/*150 должно быть заменено на 140, т.к.
-		 * */
-//		rdsl.setAbort((int) SRost.getModel().getValue());
-		
+
 		final JSpinner SVes = new JSpinner();
 		SVes.setModel(new SpinnerNumberModel(rdsl.vesd, 40,250,1));
 		rdsl.setVesd((int) SVes.getModel().getValue());
@@ -587,6 +579,11 @@ public class FormPostBer extends JFrame {
 //		final JSpinner SDataRod = new JSpinner();
 //		SDataRod.setModel(new SpinnerDateModel(new Date(rdsl.datay+(40-rdsl.yavka1)*7), System.currentTimeMillis(),(System.currentTimeMillis()+280), Calendar.DAY_OF_YEAR));
 		SDataRod = new CustomDateEditor();
+		SDataRod.setColumns(10);
+		Calendar cal1 = Calendar.getInstance();
+		cal1.setTimeInMillis(rdsl.getDatay());
+		cal1.add(Calendar.DAY_OF_MONTH, (280-(rdsl.getYavka1()*7)));
+//		SDataRod.setDate(cal1);
 		
 		final JSpinner SKolAb = new JSpinner();
 		SKolAb.setModel(new SpinnerNumberModel(rdsl.abort, 0, 50, 1));
@@ -616,25 +613,11 @@ public class FormPostBer extends JFrame {
 //		rdsl.setDatasn((long) SDataSn.getModel().getValue());
 		SDataSn = new CustomDateEditor();
 		
-//		JComboBox CBPrishSn = new JComboBox();
-//		CBPrishSn.setModel(new DefaultComboBoxModel(new String[] {" ", "Срочные роды", "Мед. аборт", "Выкидыш", "Выбыла"}));
 		CBPrishSn = new ThriftIntegerClassifierCombobox<>(true);
 		
-//		final JComboBox CBRod = new JComboBox();
-//		CBRod.setModel(new DefaultComboBoxModel(new String[] {"", "Естественные роды", "Кесарево сечение"}));
-//		CBRod.setSelectedItem(rdsl.getPlrod()); 
-//		rdsl.setPlrod(CBRod.getSelectedItem().toString());
 		CBRod = new ThriftIntegerClassifierCombobox<>(true);
 		
-//		final JComboBox CBOslAb = new JComboBox();
-//		CBOslAb.setModel(new DefaultComboBoxModel(new String[] {"", "Сальпингит и оофорит", "Воспалительные болезни матки", "Воспалительные болезни шейки матки", "Другие воспалительные болезни влагалища и вульвы " }));
-//		CBOslAb.setSelectedItem(oslname);
-//		inform = new FormRdInf();
-//		MainForm.instance.addChildFrame(inform);
 		CBOslAb = new ThriftStringClassifierCombobox<>(true);
-		
-/*		SDataRod = new JTextField();
-		SDataRod.setColumns(10);*/
 		
 		JLabel lblNewLabel = new JLabel("Дата выдачи Родового сертификата");
 		
@@ -650,8 +633,6 @@ public class FormPostBer extends JFrame {
 		
 		JLabel LDataAb = new JLabel("Дата аборта");
 		
-/*		TDataab = new JTextField();
-		TDataab.setColumns(10);*/
 		TDataab = new CustomDateEditor();
 		
 		JLabel lblNewLabel_4 = new JLabel("Срок");
@@ -1069,5 +1050,19 @@ public class FormPostBer extends JFrame {
 				return str;
 		
 		return null;
+	}
+	public void onConnect() {
+		try {
+			CBOslAb.setData(MainForm.tcl.get_n_db9());
+			CBRod.setData(MainForm.tcl.get_n_db8());
+			CBPrishSn.setData(MainForm.tcl.get_n_db7());
+			
+			
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		}
 	}
 }
