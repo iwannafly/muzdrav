@@ -99,10 +99,10 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<StringClassifier> getVSStringClassifierView(String className) throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM + ?";
+		final String sqlQuery = "SELECT pcod, name FROM " + className;
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSVS =
                 new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, className)) {
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmSVS.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             throw new TException(e);
