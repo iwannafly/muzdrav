@@ -65,10 +65,10 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView(String className) throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM "+"n_c00";
+		final String sqlQuery = "SELECT pcod, name FROM + ?";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIVS =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, className)) {
             return rsmIVS.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             throw new TException(e);
@@ -78,10 +78,10 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<StringClassifier> getVSStringClassifierView(String className) throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM "+"n_c00";
+		final String sqlQuery = "SELECT pcod, name FROM + ?";
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSVS =
                 new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, className)) {
             return rsmSVS.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             throw new TException(e);
@@ -100,7 +100,7 @@ public class ServerViewSelect extends Server implements Iface {
 	public boolean isClassifierPcodInteger(String className) throws TException {
 		// TODO Auto-generated method stub
 		String sqlQueryGetType = "SELECT data_type FROM information_schema.columns where table_name = ? AND column_name = ?";
-		try (AutoCloseableResultSet arcs = sse.execPreparedQuery(sqlQueryGetType, "n_c00", "pcod")) {
+		try (AutoCloseableResultSet arcs = sse.execPreparedQuery(sqlQueryGetType, className, "pcod")) {
 			if (arcs.getResultSet().next()){
 				if (arcs.getResultSet().getString(1).equals("integer"))
 					return true;

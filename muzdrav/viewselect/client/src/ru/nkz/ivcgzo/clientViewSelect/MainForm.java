@@ -41,10 +41,11 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
 			try { 
-				//if (tcl.isClassifierPcodInteger("n_l01")) ViewTablePcodIntForm.tableFill();
+				if (tcl.isClassifierPcodInteger("n_l01")) System.out.print("ololo");
 				//ViewTablePcodIntForm.tableFill();
 				//else ViewTablePcodStringForm.tableFill();
 				ViewTablePcodStringForm.tableFill();
+				//NSForm.
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
