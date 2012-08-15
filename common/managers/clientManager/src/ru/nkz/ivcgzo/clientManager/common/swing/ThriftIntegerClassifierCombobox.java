@@ -60,10 +60,14 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<IntegerClassifier> list) {
+		if (list == null)
+			list = new ArrayList<>();
+			
 		items = new ArrayList<>(list.size());
 		for (IntegerClassifier item : list) {
 			items.add(new IntegerClassifierItem(item));
 		}
+		setSelectedItem(null);
 		model.fireContentsChanged();
 	}
 	
