@@ -225,7 +225,11 @@ public class MainForm {
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				else
 					try {
-						plug = conMan.getPluginLoader().loadPluginByIndex(lbxAvailSys.getSelectedIndex());
+						//FIXME что-нибудь сделать с этим костылем
+						if (conMan.getPluginLoader().getPluginList().get(lbxAvailSys.getSelectedIndex()).getId() == conMan.getViewClient().getId())
+							plug = conMan.getViewClient();
+						else
+							plug = conMan.getPluginLoader().loadPluginByIndex(lbxAvailSys.getSelectedIndex());
 						conMan.setClient(plug);
 						plug.showNormal();
 						conMan.connect();

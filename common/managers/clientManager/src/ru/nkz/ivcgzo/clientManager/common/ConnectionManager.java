@@ -126,6 +126,10 @@ public class ConnectionManager {
 		addToCommon(client.getPort());
 	}
 	
+	public IClient getViewClient() {
+		return viewClient;
+	}
+	
 	/**
 	 * Добавление подключений, за которыми будет вестись наблюдение.
 	 * @param cls - клиентская часть трифтового сервиса
