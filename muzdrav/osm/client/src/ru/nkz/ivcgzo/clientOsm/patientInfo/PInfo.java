@@ -207,15 +207,6 @@ public class PInfo extends JFrame {
 								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
 								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
 								addLineToDetailInfo("Вредные привычки", psign.getVred());
-								addLineToDetailInfo("Развитие", psign.getRazv());
-								addLineToDetailInfo("Условия проживания", psign.getUslov());
-								addLineToDetailInfo("Перенесенные заболевания", psign.getPer_zab());
-								addLineToDetailInfo("Перенесенные операции", psign.getPer_oper());
-								addLineToDetailInfo("Гемотрансфузия", psign.getGemotrans());
-								addLineToDetailInfo("Наследственность", psign.getNasl());
-								addLineToDetailInfo("Гинекологический анамнез", psign.getGinek());
-								addLineToDetailInfo("Прием лекарственных средств", psign.getPriem_lek());
-								addLineToDetailInfo("Применение гормональных аппаратов", psign.getPrim_gorm());
 								eptxt.setText(sb.toString());
 							} catch (PatientNotFoundException e1) {
 								e1.printStackTrace();
@@ -256,7 +247,7 @@ public class PInfo extends JFrame {
 		 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
 										//addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
 					//addHeader("Анамнез заболевания");
-					addLineToDetailInfo("Начало заболевания",anamnez.isSetT_nachalo_zab(), anamnez.getT_nachalo_zab());
+					addLineToDetailInfo("История настоящего заболевания",anamnez.isSetT_ist_zab(), anamnez.getT_nachalo_zab());
 					addLineToDetailInfo("Симптомы",anamnez.isSetT_sympt(), anamnez.getT_sympt());
 					addLineToDetailInfo("Отношение больного",anamnez.isSetT_otn_bol(), anamnez.getT_otn_bol());
 					addLineToDetailInfo("Психологическая ситуация",anamnez.isSetT_ps_syt(), anamnez.getT_ps_syt());
