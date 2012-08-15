@@ -106,7 +106,7 @@ public class ViewMkbTreeForm extends ModalForm {
 	public void prepare(String pcod) {
 		if (mkbTree == null)
 			try {
-				mkbTree = MainForm.tcl.getMkb_0();
+				mkbTree = MainForm.ccm.getMkbTreeClassifier();
 				setModel();
 			} catch (KmiacServerException e) {
 				e.printStackTrace();

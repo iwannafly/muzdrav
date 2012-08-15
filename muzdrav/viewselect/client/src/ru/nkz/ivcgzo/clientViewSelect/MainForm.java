@@ -9,6 +9,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -18,6 +19,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 public class MainForm extends Client<ThriftViewSelect.Client> {
 	public static ThriftViewSelect.Client tcl;
 	public JFrame frame;
+	public static ClassifierManager ccm;
 	public PatientSearchForm srcFrm;
 	public ViewMkbTreeForm mkbFrm;
 
@@ -59,6 +61,9 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	}
 
 	private void initModalForms() {
+		if (ccm == null)
+			ccm = new ClassifierManager();
+		
 		srcFrm = new PatientSearchForm();
 		mkbFrm = new ViewMkbTreeForm();
 	}
