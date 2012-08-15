@@ -20,8 +20,9 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
-
-
+		
+		srcFrm = new PatientSearchForm();
+		
 		setFrame(new ViewTablePcodStringForm());
 		//setFrame(new ViewTablePcodIntForm());
 	}
