@@ -20,8 +20,9 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
-
-
+		
+		srcFrm = new PatientSearchForm();
+		
 		setFrame(new ViewTablePcodStringForm());
 		//setFrame(new ViewTablePcodIntForm());
 	}
@@ -41,10 +42,11 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
 			try { 
-				//if (tcl.isClassifierPcodInteger("n_l01")) ViewTablePcodIntForm.tableFill();
+				if (tcl.isClassifierPcodInteger("n_l01")) System.out.print("ololo");
 				//ViewTablePcodIntForm.tableFill();
 				//else ViewTablePcodStringForm.tableFill();
 				ViewTablePcodStringForm.tableFill();
+				//NSForm.
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 

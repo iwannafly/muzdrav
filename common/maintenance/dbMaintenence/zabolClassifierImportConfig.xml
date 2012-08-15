@@ -24,6 +24,7 @@
 		<table srcName="AREZ" dstName="n_arez" />
 		<table srcName="AZ0" dstName="n_az0" />
 		<table srcName="AZ9" dstName="n_az9" />
+		<table srcName="AZT" dstName="n_azt" />
 		<table srcName="B00" dstName="n_b00" />
 		<table srcName="C00" dstName="n_c00" />
 		<table srcName="D0S" dstName="n_dos" />
@@ -88,6 +89,7 @@
 		<table srcName="Z30" dstName="n_z30" />
 		<table srcName="Z42" dstName="n_z42" />
 		<table srcName="Z43" dstName="n_z43" />
+		<table srcName="Z43_GR" dstName="n_z43_gr" />
 		<table srcName="Z60" dstName="n_z60" />
 		<table srcName="Z70" dstName="n_z70" />
 		<table srcName="Z80" dstName="n_z80" />
