@@ -3373,15 +3373,10 @@ public class PacientInfoFrame extends JFrame {
             tf_timegosp.setEnabled(false);
             tf_timesmp.setEnabled(false);
 
-//			tf_datap.setValue(null);
-//			tf_dataosm.setValue(null);
             tf_datap.setDate(System.currentTimeMillis());
             tf_dataosm.setDate(System.currentTimeMillis());
             tf_timep.setTime(System.currentTimeMillis());
             tf_timeosm.setTime(System.currentTimeMillis());
-
-//			tf_timep.setValue(null);
-//			tf_timeosm.setValue(null);
             tf_datagosp.setValue(null);
             tf_datasmp.setValue(null);
             tf_timegosp.setValue(null);
