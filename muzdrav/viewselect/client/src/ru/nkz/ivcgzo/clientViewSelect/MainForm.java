@@ -32,8 +32,13 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+<<<<<<< HEAD
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+=======
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
+>>>>>>> b3320eb80464629161c561f59adc50dd67f13aef
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -44,13 +49,18 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	private JTextField tfSearch;
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
 	public PatientSearchForm srcFrm;
+	public ViewMkbTreeForm mkbFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
-		srcFrm = new PatientSearchForm();
+		initModalForms();
 		
+<<<<<<< HEAD
 		//setFrame(new ViewTablePcodStringForm());
+=======
+//		setFrame(new ViewTablePcodStringForm());
+>>>>>>> b3320eb80464629161c561f59adc50dd67f13aef
 		//setFrame(new ViewTablePcodIntForm());
 
 		initialize();
@@ -233,13 +243,26 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
 			try { 
+<<<<<<< HEAD
 				table.setData(tcl.getVSStringClassifierView("n_spr"));
+=======
+//				if (tcl.isClassifierPcodInteger("n_l01")) System.out.print("ololo");
+				//ViewTablePcodIntForm.tableFill();
+				//else ViewTablePcodStringForm.tableFill();
+//				ViewTablePcodStringForm.tableFill();
+				//NSForm.
+>>>>>>> b3320eb80464629161c561f59adc50dd67f13aef
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
 			
 		}
 		
+	}
+
+	private void initModalForms() {
+		srcFrm = new PatientSearchForm();
+		mkbFrm = new ViewMkbTreeForm();
 	}
 	
 	// Быстрый поиск по таблице
@@ -303,6 +326,19 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						disposeModal();
 					}
 					break;
+					
+				case 2:
+					setFrame(mkbFrm);
+					mkbFrm.setTitle((String) params[1]);
+					mkbFrm.prepare((String) params[2]);
+					mkbFrm.setModalityListener();
+					prepareModal(parent).setVisible(true);
+					try {
+						return mkbFrm.getResults();
+					} finally {
+						mkbFrm.removeModalityListener();
+						disposeModal();
+					}
 				}
 			}
 		

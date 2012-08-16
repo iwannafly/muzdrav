@@ -101,12 +101,16 @@ public class FormSign extends JFrame {
 		
 		
 		final JLabel lblIstJiz = new JLabel("История жизни");
+		lblIstJiz.setVisible(false);
 		
 		tprazv = new ShablonTextField(4, 15, listShablon);
+		tprazv.setVisible(false);
 		
 		 tpuslov = new ShablonTextField(4, 16, listShablon);
+		 tpuslov.setVisible(false);
 		 
 		  tpper_zab =  new ShablonTextField(4, 17, listShablon);
+		  tpper_zab.setVisible(false);
 		  
 		  tpper_oper = new ShablonTextField(4, 18, listShablon);
 		  
@@ -210,19 +214,11 @@ public class FormSign extends JFrame {
 				if (rbotr.isSelected()) {
 					psign.setPh("-");
 				}
-
+				
+				psign.setVitae(tpanamnz.getText());
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
-				psign.setGemotrans(tpgemotrans.getText());
-				psign.setGinek(tpginek.getText());
-				psign.setNasl(tpnasl.getText());
-				psign.setPer_oper(tpper_oper.getText());
-				psign.setPer_zab(tpper_zab.getText());
-				psign.setPriem_lek(tppriem_lek.getText());
-				psign.setPrim_gorm(tpprim_gorm.getText());
-				psign.setRazv(tprazv.getText());
-				psign.setUslov(tpuslov.getText());
 				psign.setVred(getVrPr());
 				
 				try {
@@ -296,7 +292,6 @@ public class FormSign extends JFrame {
 		lblFarm.setVisible(false);
 		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
-		lblAnamnz.setVisible(false);
 		tprazv.setBorder(UIManager.getBorder("TextField.border"));
 		tpuslov.setBorder(UIManager.getBorder("TextField.border"));
 		tpper_zab.setBorder(UIManager.getBorder("TextField.border"));
@@ -312,7 +307,6 @@ public class FormSign extends JFrame {
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpanamnz = new JEditorPane();
-		tpanamnz.setVisible(false);
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 pallerg = new ShablonTextPanel(3);
@@ -380,8 +374,10 @@ public class FormSign extends JFrame {
 		);
 		
 		JLabel label = new JLabel("Аллергоанамнез");
+		label.setVisible(false);
 		
 		 tpallerg = new ShablonTextField(3, 67, listShablon);
+		 tpallerg.setVisible(false);
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_pallerg = new GroupLayout(pallerg);
 		gl_pallerg.setHorizontalGroup(
@@ -494,15 +490,7 @@ public class FormSign extends JFrame {
 			tpallerg.setText(psign.allerg);
 			tpanamnz.setText(psign.vitae);
 			tpfarm.setText(psign.farmkol);
-			tpgemotrans.setText(psign.gemotrans);
-			tpginek.setText(psign.ginek);
-			tpnasl.setText(psign.nasl);
-			tpper_oper.setText(psign.per_oper);
-			tpper_zab.setText(psign.per_zab);
-			tppriem_lek.setText(psign.priem_lek);
-			tpprim_gorm.setText(psign.prim_gorm);
-			tprazv.setText(psign.razv);
-			tpuslov.setText(psign.uslov);
+			tpanamnz.setText(psign.vitae);
 			
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
