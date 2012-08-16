@@ -53,15 +53,6 @@ public class FormSign extends JFrame {
 	private JRadioButton rbotr;
 	private String vrp;
 	private ShablonTextField tpallerg;
-	private ShablonTextField tprazv;
-	private ShablonTextField tpuslov;
-	private ShablonTextField tpper_zab;
-	private ShablonTextField tpper_oper;
-	private ShablonTextField tpgemotrans;
-	private ShablonTextField tpnasl;
-	private ShablonTextField tpginek;
-	private ShablonTextField tppriem_lek;
-	private ShablonTextField tpprim_gorm;
 	private ShablonTextPanel pallerg;
 	public static List<IntegerClassifier> pokNames;
 
@@ -98,33 +89,8 @@ public class FormSign extends JFrame {
 				}
 			}
 		});
-		
-		
-		final JLabel lblIstJiz = new JLabel("История жизни");
-		lblIstJiz.setVisible(false);
-		
-		tprazv = new ShablonTextField(4, 15, listShablon);
-		tprazv.setVisible(false);
-		
-		 tpuslov = new ShablonTextField(4, 16, listShablon);
-		 tpuslov.setVisible(false);
-		 
-		  tpper_zab =  new ShablonTextField(4, 17, listShablon);
-		  tpper_zab.setVisible(false);
-		  
-		  tpper_oper = new ShablonTextField(4, 18, listShablon);
-		  
-		   tpgemotrans = new ShablonTextField(4, 19, listShablon);
-		   
-		    tpnasl = new ShablonTextField(4, 20, listShablon);
-		    
-		    tpginek = new ShablonTextField(4, 21, listShablon);
 		    
 			final JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
-			
-		     tppriem_lek = new ShablonTextField(5, 22, listShablon);
-		     
-		      tpprim_gorm = new ShablonTextField(5, 23, listShablon);
 		      
 		      JScrollPane spSh = new JScrollPane();
 		      
@@ -292,15 +258,6 @@ public class FormSign extends JFrame {
 		lblFarm.setVisible(false);
 		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
-		tprazv.setBorder(UIManager.getBorder("TextField.border"));
-		tpuslov.setBorder(UIManager.getBorder("TextField.border"));
-		tpper_zab.setBorder(UIManager.getBorder("TextField.border"));
-		tpper_oper.setBorder(UIManager.getBorder("TextField.border"));
-		tpgemotrans.setBorder(UIManager.getBorder("TextField.border"));
-		tpnasl.setBorder(UIManager.getBorder("TextField.border"));
-		tpginek.setBorder(UIManager.getBorder("TextField.border"));
-		tppriem_lek.setBorder(UIManager.getBorder("TextField.border"));
-		tpprim_gorm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpfarm = new JEditorPane();
 		tpfarm.setVisible(false);
@@ -321,17 +278,7 @@ public class FormSign extends JFrame {
 							.addComponent(lblFarm, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
 							.addComponent(tpanamnz, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
 							.addComponent(lblAnamnz, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblIstJiz, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tprazv, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpuslov, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpper_zab, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpper_oper, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpgemotrans, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpnasl, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpginek, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(lblFarm1, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tppriem_lek, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpprim_gorm, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
+							.addComponent(lblFarm1, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE))
 						.addComponent(pallerg, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addGap(1557))
 		);
@@ -348,29 +295,9 @@ public class FormSign extends JFrame {
 					.addComponent(lblFarm)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblIstJiz)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tprazv, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpuslov, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpper_zab, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpper_oper, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpgemotrans, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpnasl, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpginek, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(607)
 					.addComponent(lblFarm1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tppriem_lek, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpprim_gorm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addGap(18))
+					.addGap(184))
 		);
 		
 		JLabel label = new JLabel("Аллергоанамнез");
