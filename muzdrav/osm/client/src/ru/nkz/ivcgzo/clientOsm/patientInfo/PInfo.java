@@ -207,8 +207,17 @@ public class PInfo extends JFrame {
 								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
 								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
 								addLineToDetailInfo("Вредные привычки", psign.getVred());
+								addHeader("Вредные привычки");
+								if (psign.getVred().charAt(0) == '1') addHeader("курение");
+								if (psign.getVred().charAt(1) == '1') addHeader("алкоголь");
+								if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
+								/*vrp = psign.getVred();
+			cbk.setSelected(vrp.charAt(0) == '1');
+			cba.setSelected(vrp.charAt(1) == '1');
+			cbn.setSelected(vrp.charAt(2) == '1');*/
 								eptxt.setText(sb.toString());
 							} catch (PatientNotFoundException e1) {
+								System.out.println("hren");
 								e1.printStackTrace();
 							}
 		 				}
