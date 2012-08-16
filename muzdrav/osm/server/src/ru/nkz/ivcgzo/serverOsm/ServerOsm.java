@@ -811,6 +811,12 @@ public class ServerOsm extends Server implements Iface {
 	public void DeleteRdSl(int idDispb, int npasp) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_sl WHERE idDispb = ? and npasp = ?", false, idDispb, npasp);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
@@ -818,18 +824,39 @@ public class ServerOsm extends Server implements Iface {
 	public void DeleteRdDin(int idDispb, int iD) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_din WHERE idDispb = ? and iD = ?", false, idDispb,iD);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
+	/*	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+*/
 	@Override
-	public void UpdateRdSl(int npasp, int lgota) throws KmiacServerException,
+	public void UpdateRdSl(int idDispb) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+//			sme.execPreparedT("UPDATE p_rd_sl SET idDispb = ?, npasp = ?, dataosl = ?, abort = ?, shet = ?,datam = ?, yavka1 = ? WHERE  idDispb = ?", false, idDispb, rdSlTypes, 5, 6, 7, 11, 13, 12, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
 	@Override
-	public void UpdateRdDin(int idDispb, int iD) throws KmiacServerException,
+	public void UpdateRdDin(int iD) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
 		
@@ -850,14 +877,20 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public void DeleteRdInf(int idDispb, int npasp)
+	public void DeleteRdInf(int npasp)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_inf WHERE npasp = ? ", false, npasp);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
+	
 	}
 
 	@Override
-	public void UpdateRdInf(int npasp, int lgota) throws KmiacServerException,
+	public void UpdateRdInf(int npasp) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
 		
@@ -1844,6 +1877,41 @@ sb.append("<br>Подпись ____________");
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
 			return rsmRdSl.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+	@Override
+	public List<IntegerClassifier> get_n_z00() throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_z00 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_z11() throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_z11 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_r0z() throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_r0z ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
