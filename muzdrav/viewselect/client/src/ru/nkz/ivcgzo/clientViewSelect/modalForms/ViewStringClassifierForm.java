@@ -123,46 +123,14 @@ public class ViewStringClassifierForm extends ModalForm {
 					declineResults();
 			}
 		});
-		setFilterModel();
 		tblStrClass.setFillsViewportHeight(true);
 		spnStrClass.setViewportView(tblStrClass);
 		contentPane.setLayout(gl_contentPane);
 	}
 	
 	private void setFilterModel() {
-		tblStrClass.setModel(tblStrClass.new CustomTableModel() {
-			private static final long serialVersionUID = -4774136922669712220L;
-			
-			private int[] indexes = new int[] {};
-			private int indexesCount = indexes.length;
-			private String previousString;
-			
-			@Override
-			public int getRowCount() {
-				if (indexes.length != super.getRowCount())
-					indexes = new int[super.getRowCount()];
-				if (tbFilter.getText().equals(previousString))
-					return indexesCount;
-				
-				previousString = tbFilter.getText().toLowerCase();
-				indexesCount = 0;
-				for (int i = 0; i < super.getRowCount(); i++) {
-					for (int j = 0; j < super.getColumnCount(); j++) {
-						if (super.getValueAt(i,  j).toString().toLowerCase().indexOf(previousString) > -1) {
-							indexes[indexesCount++] = i;
-							break;
-						}
-					}
-				}
-				
-				return indexesCount;
-			}
-			
-			@Override
-			public Object getValueAt(int rowIndex, int columnIndex) {
-				return super.getValueAt(indexes[rowIndex], columnIndex);
-			}
-		});
+		tblStrClass.setModel(new FilterModel());
+		filter();
 	}
 	
 	private void filter() {
@@ -175,7 +143,7 @@ public class ViewStringClassifierForm extends ModalForm {
 	
 	@Override
 	public void acceptResults() {
-		results = tblStrClass.getSelectedItem();
+		results = ((FilterModel) tblStrClass.getModel()).getSelectedItem();
 		if (results == null)
 			return;
 		
@@ -193,10 +161,56 @@ public class ViewStringClassifierForm extends ModalForm {
 	public void prepare(StringClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) {
 		try {
 			tblStrClass.setData(MainForm.ccm.getStringClassifier(cls, ord, fld));
+			setFilterModel();
 		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(MainForm.conMan.getClient().getFrame(), e.getMessage(), "Ошибка загрузки классификатора", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
+		}
+	}
+	
+	private class FilterModel extends CustomTable<StringClassifier, StringClassifier._Fields>.CustomTableModel {
+		private static final long serialVersionUID = -4774136922669712220L;
+		
+		private int[] indexes = new int[] {};
+		private int indexesCount = indexes.length;
+		private String previousString;
+		
+		public FilterModel() {
+			tblStrClass.super();
+		}
+		
+		@Override
+		public int getRowCount() {
+			if (indexes.length != super.getRowCount())
+				indexes = new int[super.getRowCount()];
+			if (tbFilter.getText().equals(previousString))
+				return indexesCount;
+			
+			previousString = tbFilter.getText().toLowerCase();
+			indexesCount = 0;
+			for (int i = 0; i < super.getRowCount(); i++) {
+				for (int j = 0; j < super.getColumnCount(); j++) {
+					if (super.getValueAt(i,  j).toString().toLowerCase().indexOf(previousString) > -1) {
+						indexes[indexesCount++] = i;
+						break;
+					}
+				}
+			}
+			
+			return indexesCount;
+		}
+		
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			return super.getValueAt(indexes[rowIndex], columnIndex);
+		}
+		
+		public StringClassifier getSelectedItem() {
+			if (tblStrClass.getSelectedRow() > -1)
+				return tblStrClass.getData().get(indexes[tblStrClass.getSortedRowIndex()]);
+			else
+				return null;
 		}
 	}
 }
