@@ -112,56 +112,6 @@ public class Vvod extends JFrame {
 	private JTextField tfves;
 	private JTextField tfchss;
 	private JEditorPane tpJalob;
-	private ShablonTextField tpJalobd;
-	private ShablonTextField tpJalobkrov;
-	private ShablonTextField tpJalobp;
-	private ShablonTextField tpJalobmoch;
-	private ShablonTextField tpJalobendo;
-	private ShablonTextField tpJalobnerv;
-	private ShablonTextField tpJalobopor;
-	private ShablonTextField tpJaloblih;
-	private ShablonTextField tpJalobobh;
-	private ShablonTextField tpJalobproch;
-	private ShablonTextField tpNachzab;
-	private ShablonTextField tpSympt;
-	private ShablonTextField tpOtnbol;
-	private ShablonTextField tpPssit;
-	private ShablonTextField tpObsost;
-	private ShablonTextField tpKoj;
-	private ShablonTextField tpSliz;
-	private ShablonTextField tpPodkkl;
-	private ShablonTextField tpLimf;
-	private ShablonTextField tpKostmysh;
-	private ShablonTextField tpNervnps;
-	private ShablonTextField tpTelo;
-	private ShablonTextField tpSust;
-	private ShablonTextField tpDyh;
-	private ShablonTextField tpGrkl;
-	private ShablonTextField tpPerkl;
-	private ShablonTextField tpAusl;
-	private ShablonTextField tpBronho;
-	private ShablonTextField tpArter;
-	private ShablonTextField tpObls;
-	private ShablonTextField tpPerks;
-	private ShablonTextField tpAuss;
-	private ShablonTextField tpPolrta;
-	private ShablonTextField tpJivot;
-	private ShablonTextField tpPalpjivot;
-	private ShablonTextField tpJkt;
-	private ShablonTextField tpPalpjel;
-	private ShablonTextField tpPalppodjel;
-	private ShablonTextField tpPechen;
-	private ShablonTextField tpJelch;
-	private ShablonTextField tpSelez;
-	private ShablonTextField tpOblzad;
-	private ShablonTextField tpPoyasn;
-	private ShablonTextField tpPochki;
-	private ShablonTextField tpMoch;
-	private ShablonTextField tpMoljel;
-	private ShablonTextField tpGrjel;
-	private ShablonTextField tpMatka;
-	private ShablonTextField tpNarpolov;
-	private ShablonTextField tpChitov;
 	private JEditorPane tpFizObsl;
 	private ShablonTextField tpLocalis;
 	private ShablonTextField tpOcenka;
@@ -237,8 +187,8 @@ public class Vvod extends JFrame {
 		 sign = new FormSign();
 		 MainForm.instance.addChildFrame(sign);
 		 
-		 postber = new FormPostBer();
-		 MainForm.instance.addChildFrame(postber);
+		// postber = new FormPostBer();
+		 //MainForm.instance.addChildFrame(postber);
 		 
 		setBounds(100, 100, 1029, 962);
 		
@@ -338,77 +288,15 @@ public class Vvod extends JFrame {
 		tpJalob = new JEditorPane();
 		tpJalob.setBorder(UIManager.getBorder("TextField.border"));
 		
-		 tpJalobd = new ShablonTextField(1, 1, listShablon);
-		 tpJalobd.setVisible(false);
-		tpJalobd.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobkrov = new ShablonTextField(1, 2, listShablon);
-		 tpJalobkrov.setVisible(false);
-		tpJalobkrov.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobp = new ShablonTextField(1, 3, listShablon);
-		 tpJalobp.setVisible(false);
-		tpJalobp.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobendo = new ShablonTextField(1, 5, listShablon);
-		 tpJalobendo.setVisible(false);
-		
-		 tpJalobnerv = new ShablonTextField(1, 6, listShablon);
-		 tpJalobnerv.setVisible(false);
-		tpJalobnerv.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobopor = new ShablonTextField(1, 7, listShablon);
-		 tpJalobopor.setVisible(false);
-		tpJalobopor.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJaloblih = new ShablonTextField(1, 8, listShablon);
-		 tpJaloblih.setVisible(false);
-		tpJaloblih.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobobh = new ShablonTextField(1, 9, listShablon);
-		 tpJalobobh.setVisible(false);
-		tpJalobobh.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobproch = new ShablonTextField(1, 10, listShablon);
-		 tpJalobproch.setVisible(false);
-		tpJalobproch.setBorder(UIManager.getBorder("TextField.border"));
-		
-		tpJalobendo.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJalobmoch = new ShablonTextField(1, 4, listShablon);
-		 tpJalobmoch.setVisible(false);
-		tpJalobmoch.setBorder(UIManager.getBorder("TextField.border"));
-		
 		GroupLayout gl_panJalob = new GroupLayout(panJalob);
 		gl_panJalob.setHorizontalGroup(
 			gl_panJalob.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panJalob.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panJalob.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panJalob.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(tpJalob, GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
-							.addComponent(lblJalob, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tpJalobd.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tpJalobkrov.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tpJalobd,GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tpJalobkrov,GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
-						.addComponent(tpJalobp.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobp, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobmoch.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobmoch, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobendo.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobendo, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobnerv.getLabel(), GroupLayout.PREFERRED_SIZE, 190, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobnerv, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobopor.getLabel(), GroupLayout.PREFERRED_SIZE, 190, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobopor, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJaloblih.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJaloblih, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobobh.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobobh, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobproch.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJalobproch, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(0, Short.MAX_VALUE))
+					.addGroup(gl_panJalob.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(tpJalob, GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+						.addComponent(lblJalob, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(12, Short.MAX_VALUE))
 		);
 		gl_panJalob.setVerticalGroup(
 			gl_panJalob.createParallelGroup(Alignment.LEADING)
@@ -416,47 +304,7 @@ public class Vvod extends JFrame {
 					.addComponent(lblJalob)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpJalob, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobd.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobd, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobkrov.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobkrov, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJalobp.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobp, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJalobmoch.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobmoch, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addComponent(tpJalobendo.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobendo, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJalobnerv.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobnerv, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJalobopor.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobopor, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJaloblih.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJaloblih, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJalobobh.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobobh, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJalobproch.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalobproch, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addContainerGap(22, Short.MAX_VALUE))
+					.addContainerGap(927, Short.MAX_VALUE))
 		);
 		panJalob.setLayout(gl_panJalob);
 		Jalob.setLayout(gl_Jalob);
@@ -478,22 +326,6 @@ public class Vvod extends JFrame {
 		JPanel panAnamnes = new JPanel();
 		spAnamnesis.setColumnHeaderView(panAnamnes);
 		
-		 tpNachzab = new ShablonTextField(2, 11, listShablon);
-		 tpNachzab.setVisible(false);
-		tpNachzab.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpOtnbol = new ShablonTextField(2, 13, listShablon);
-		 tpOtnbol.setVisible(false);
-		tpOtnbol.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpSympt = new ShablonTextField(2, 12, listShablon);
-		 tpSympt.setVisible(false);
-		tpSympt.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPssit = new ShablonTextField(2, 14, listShablon);
-		 tpPssit.setVisible(false);
-		tpPssit.setBorder(UIManager.getBorder("TextField.border"));
-		
 		JLabel lblIstZab = new JLabel("История заболевания");
 		
 		 tpIstZab = new JEditorPane();
@@ -504,17 +336,9 @@ public class Vvod extends JFrame {
 				.addGroup(gl_panAnamnes.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panAnamnes.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpNachzab, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSympt.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSympt, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOtnbol.getLabel(), GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOtnbol, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPssit, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNachzab.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPssit.getLabel(), GroupLayout.PREFERRED_SIZE, 271, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblIstZab, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
-						.addContainerGap(315, Short.MAX_VALUE))
+					.addContainerGap(315, Short.MAX_VALUE))
 		);
 		gl_panAnamnes.setVerticalGroup(
 			gl_panAnamnes.createParallelGroup(Alignment.LEADING)
@@ -522,23 +346,7 @@ public class Vvod extends JFrame {
 					.addComponent(lblIstZab)
 					.addGap(6)
 					.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addGap(9)
-					.addComponent(tpNachzab.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpNachzab, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpSympt.getLabel())
-					.addGap(6)
-					.addComponent(tpSympt, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpOtnbol.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpOtnbol, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPssit.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPssit, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(441, Short.MAX_VALUE))
+					.addContainerGap(871, Short.MAX_VALUE))
 		);
 		panAnamnes.setLayout(gl_panAnamnes);
 		pAnanmnesis.setLayout(gl_pAnanmnesis);
@@ -646,38 +454,6 @@ public class Vvod extends JFrame {
 		 tpStPraes = new JEditorPane();
 		tpStPraes.setBorder(UIManager.getBorder("TextField.border"));
 		
-		 tpObsost = new ShablonTextField(6, 24, listShablon);
-		 tpObsost.setVisible(false);
-		tpObsost.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpKoj = new ShablonTextField(6, 25, listShablon);
-		 tpKoj.setVisible(false);
-		tpKoj.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpSliz = new ShablonTextField(6, 26, listShablon);
-		 tpSliz.setVisible(false);
-		tpSliz.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPodkkl = new ShablonTextField(6, 27, listShablon);
-		 tpPodkkl.setVisible(false);
-		tpPodkkl.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpLimf = new ShablonTextField(6, 28, listShablon);
-		 tpLimf.setVisible(false);
-		tpLimf.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpKostmysh = new ShablonTextField(6, 29, listShablon);
-		 tpKostmysh.setVisible(false);
-		tpKostmysh.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpNervnps = new ShablonTextField(6, 30, listShablon);
-		 tpNervnps.setVisible(false);
-		 tpNervnps.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpTelo = new ShablonTextField(6, 36, listShablon);
-		 tpTelo.setVisible(false);
-		tpTelo.setBorder(UIManager.getBorder("TextField.border"));
-		
 		GroupLayout gl_panPraesense = new GroupLayout(panPraesense);
 		gl_panPraesense.setHorizontalGroup(
 			gl_panPraesense.createParallelGroup(Alignment.LEADING)
@@ -685,24 +461,8 @@ public class Vvod extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panPraesense.createParallelGroup(Alignment.LEADING)
 						.addComponent(tpStPraes, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblStPraes)
-						.addComponent(tpObsost, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpKoj, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpKoj.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpObsost.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSliz.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSliz, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPodkkl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPodkkl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpLimf.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpLimf, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpKostmysh.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpKostmysh, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNervnps.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNervnps, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpTelo.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpTelo, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(0, Short.MAX_VALUE))
+						.addComponent(lblStPraes))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_panPraesense.setVerticalGroup(
 			gl_panPraesense.createParallelGroup(Alignment.LEADING)
@@ -711,40 +471,7 @@ public class Vvod extends JFrame {
 					.addComponent(lblStPraes)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpStPraes, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpObsost.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpObsost, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpKoj.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpKoj, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpSliz.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpSliz, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPodkkl.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPodkkl, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpLimf.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpLimf, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpKostmysh.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpKostmysh, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpNervnps.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpNervnps, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpTelo.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpTelo, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addContainerGap(15, Short.MAX_VALUE))
+					.addContainerGap(962, Short.MAX_VALUE))
 		);
 		panPraesense.setLayout(gl_panPraesense);
 		pStatuspr.setLayout(gl_pStatuspr);
@@ -774,118 +501,6 @@ public class Vvod extends JFrame {
 		tpFizObsl = new JEditorPane();
 		tpFizObsl.setBorder(UIManager.getBorder("TextField.border"));
 		
-		 tpSust = new ShablonTextField(7, 37, listShablon);
-		 tpSust.setVisible(false);
-		tpSust.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpDyh = new ShablonTextField(7, 38, listShablon);
-		 tpDyh.setVisible(false);
-		tpDyh.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpGrkl = new ShablonTextField(7, 39, listShablon);
-		 tpGrkl.setVisible(false);
-		tpGrkl.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPerkl = new ShablonTextField(7, 40, listShablon);
-		 tpPerkl.setVisible(false);
-		tpPerkl.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpAusl = new ShablonTextField(7, 41, listShablon);
-		 tpAusl.setVisible(false);
-		tpAusl.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpBronho = new ShablonTextField(7, 42, listShablon);
-		 tpBronho.setVisible(false);
-		tpBronho.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpArter = new ShablonTextField(7, 43, listShablon);
-		 tpArter.setVisible(false);
-		tpArter.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpObls = new ShablonTextField(7, 44, listShablon);
-		 tpObls.setVisible(false);
-		tpObls.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPerks = new ShablonTextField(7, 45, listShablon);
-		 tpPerks.setVisible(false);
-		tpPerks.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpAuss = new ShablonTextField(7, 46, listShablon);
-		 tpAuss.setVisible(false);
-		tpAuss.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPolrta = new ShablonTextField(7, 47, listShablon);
-		 tpPolrta.setVisible(false);
-		tpPolrta.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJivot = new ShablonTextField(7, 48, listShablon);
-		 tpJivot.setVisible(false);
-		tpJivot.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPalpjivot = new ShablonTextField(7, 49, listShablon);
-		 tpPalpjivot.setVisible(false);
-		tpPalpjivot.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJkt = new ShablonTextField(7, 50, listShablon);
-		 tpJkt.setVisible(false);
-		tpJkt.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPalpjel = new ShablonTextField(7, 51, listShablon);
-		 tpPalpjel.setVisible(false);
-		tpPalpjel.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPalppodjel = new ShablonTextField(7, 52, listShablon);
-		 tpPalppodjel.setVisible(false);
-		tpPalppodjel.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPechen = new ShablonTextField(7, 53, listShablon);
-		 tpPechen.setVisible(false);
-		tpPechen.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpJelch = new ShablonTextField(7, 54, listShablon);
-		 tpJelch.setVisible(false);
-		tpJelch.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpSelez = new ShablonTextField(7, 55, listShablon);
-		 tpSelez.setVisible(false);
-		tpSelez.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpOblzad = new ShablonTextField(7, 56, listShablon);
-		 tpOblzad.setVisible(false);
-		tpOblzad.setBorder(UIManager.getBorder("TextField.border"));
-				
-		 tpPoyasn = new ShablonTextField(7, 57, listShablon);
-		 tpPoyasn.setVisible(false);
-		tpPoyasn.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpPochki = new ShablonTextField(7, 58, listShablon);
-		 tpPochki.setVisible(false);
-		tpPochki.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpMoch = new ShablonTextField(7, 59, listShablon);
-		 tpMoch.setVisible(false);
-		tpMoch.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpMoljel = new ShablonTextField(7, 60, listShablon);
-		 tpMoljel.setVisible(false);
-		tpMoljel.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpGrjel = new ShablonTextField(7, 61, listShablon);
-		 tpGrjel.setVisible(false);
-		tpGrjel.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpMatka = new ShablonTextField(7, 62, listShablon);
-		 tpMatka.setVisible(false);
-		tpMatka.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpNarpolov = new ShablonTextField(7, 63, listShablon);
-		 tpNarpolov.setVisible(false);
-		tpNarpolov.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 tpChitov = new ShablonTextField(7, 64, listShablon);
-		 tpChitov.setVisible(false);
-		tpChitov.setBorder(UIManager.getBorder("TextField.border"));
-		
 		GroupLayout gl_panFiz = new GroupLayout(panFiz);
 		gl_panFiz.setHorizontalGroup(
 			gl_panFiz.createParallelGroup(Alignment.LEADING)
@@ -893,64 +508,8 @@ public class Vvod extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panFiz.createParallelGroup(Alignment.LEADING)
 						.addComponent(tpFizObsl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSust.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSust, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpDyh.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpDyh, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpGrkl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpGrkl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPerkl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPerkl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpAusl.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpAusl, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpBronho.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpBronho, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpArter.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpArter, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpObls.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpObls, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPerks.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPerks, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpAuss.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpAuss, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPolrta.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPolrta, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJivot.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJivot, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalpjivot.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalpjivot, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJkt.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJkt, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalpjel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalpjel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalppodjel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPalppodjel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPechen.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPechen, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJelch.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpJelch, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSelez.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpSelez, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOblzad.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpOblzad, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPoyasn.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPoyasn, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPochki.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpPochki, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMoch.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMoch, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMoljel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMoljel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpGrjel.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpGrjel, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMatka.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpMatka, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNarpolov.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpNarpolov, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpChitov.getLabel(), GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpChitov, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblfizik, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(0, Short.MAX_VALUE))
+					.addContainerGap(12, Short.MAX_VALUE))
 		);
 		gl_panFiz.setVerticalGroup(
 			gl_panFiz.createParallelGroup(Alignment.LEADING)
@@ -959,119 +518,7 @@ public class Vvod extends JFrame {
 					.addComponent(lblfizik)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpFizObsl, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpSust.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpSust, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpDyh.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpDyh, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpGrkl.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpGrkl, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPerkl.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPerkl, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpAusl.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpAusl, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpBronho.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpBronho, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpArter.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpArter, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpObls.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpObls, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPerks.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPerks, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpAuss.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpAuss, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPolrta.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPolrta, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJivot.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJivot, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPalpjivot.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPalpjivot, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJkt.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJkt, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPalpjel.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPalpjel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPalppodjel.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPalppodjel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPechen.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPechen, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpJelch.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJelch, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpSelez.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpSelez, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpOblzad.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpOblzad, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPoyasn.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPoyasn, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpPochki.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpPochki, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpMoch.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpMoch, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpMoljel.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpMoljel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpGrjel.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpGrjel, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpMatka.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpMatka, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpNarpolov.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpNarpolov, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tpChitov.getLabel())
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpChitov, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(15, Short.MAX_VALUE))
+					.addContainerGap(3263, Short.MAX_VALUE))
 		);
 		panFiz.setLayout(gl_panFiz);
 		pfizikob.setLayout(gl_pfizikob);
@@ -1314,7 +761,7 @@ public class Vvod extends JFrame {
 		butBer.setActionCommand("Наблюдение за беременными");
 		butBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				postber.setVisible(true);
+				//postber.setVisible(true);
 				}
 		});
 		GroupLayout gl_panel;
