@@ -262,9 +262,6 @@ public class FormRdDin extends JFrame {
 		
 		JLabel LDataSl = new JLabel("Дата следующего посещения");
 		
-//		final JSpinner SDataPos = new JSpinner();
-//		SDataPos.setModel(new SpinnerDateModel(new Date(rddin.datapos), null, null, Calendar.DAY_OF_YEAR));
-//        rddin.setDatapos((int) SDataPos.getModel().getValue());
 		SDataPos = new CustomDateEditor();
 		
         final JSpinner SSrok = new JSpinner();
@@ -521,6 +518,24 @@ public class FormRdDin extends JFrame {
 		tablePos.setFillsViewportHeight(true);
 		scrollPane.setViewportView(tablePos);
 	}
+	public void onConnect() {
+		try {
+		    CBDiag.setData(MainForm.tcl.get_n_db6());
+			CBPolPl.setData(MainForm.tcl.get_n_db1());
+			CBPredPl.setData(MainForm.tcl.get_n_db2());
+  	        CBCerd.setData(MainForm.tcl.get_n_db3());
+			CBSerd1.setData(MainForm.tcl.get_n_db4());
+			CBOteki.setData(MainForm.tcl.get_n_db5());
+			
+			
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		}
+	}
+
 	};
 
 

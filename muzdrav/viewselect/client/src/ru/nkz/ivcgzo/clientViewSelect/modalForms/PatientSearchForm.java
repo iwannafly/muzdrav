@@ -1,15 +1,12 @@
-package ru.nkz.ivcgzo.clientViewSelect;
+package ru.nkz.ivcgzo.clientViewSelect.modalForms;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +30,14 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.clientViewSelect.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientSearchParams;
-import sun.awt.ModalityEvent;
-import sun.awt.ModalityListener;
-import sun.awt.SunToolkit;
 
-public class PatientSearchForm extends JFrame {
+public class PatientSearchForm extends ModalForm {
 	private static final long serialVersionUID = -8340824528321653697L;
-	private List<PatientBriefInfo> results, fullResults; 
+	private List<PatientBriefInfo> fullResults; 
 	
 	private static int heightWithOptionalParams = 340;
 	private static int heightWithoutOptionalParams = 240;
@@ -68,8 +63,6 @@ public class PatientSearchForm extends JFrame {
 	private CustomTable<PatientBriefInfo, PatientBriefInfo._Fields> tblResults;
 	private JPanel pnlResults;
 	private JButton btnAcceptResults;
-	private boolean resultsAccepted;
-	private ModalityListener modListener;
 	private boolean legibleSearch;
 	private JPanel pnlOptionalParams;
 	
@@ -78,55 +71,8 @@ public class PatientSearchForm extends JFrame {
 	 */
 	public PatientSearchForm() {
 		initialize();
-		
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				if (!resultsAccepted)
-					results = null;
-				
-				resultsAccepted = false;
-			}
-		});
 	}
 
-	public void setModalityListener() {
-		if (modListener == null)
-			if (Toolkit.getDefaultToolkit() instanceof SunToolkit) {
-				modListener = new ModalityListener() {
-					
-					@Override
-					public void modalityPushed(ModalityEvent arg0) {
-					}
-					
-					@Override
-					public void modalityPopped(ModalityEvent arg0) {
-						if (!resultsAccepted)
-							results = null;
-					
-						resultsAccepted = false;
-					}
-				};
-				
-				((SunToolkit) Toolkit.getDefaultToolkit()).addModalityListener(modListener);
-			}
-	}
-	
-	public void removeModalityListener() {
-		if (modListener != null)
-			if (Toolkit.getDefaultToolkit() instanceof SunToolkit) {
-				((SunToolkit)Toolkit.getDefaultToolkit()).removeModalityListener(modListener);
-				modListener = null;
-			}
-	}
-	
-	private void closeForm() {
-		if (modListener != null)
-			setVisible(false);
-		else
-			PatientSearchForm.this.dispatchEvent(new WindowEvent(PatientSearchForm.this, WindowEvent.WINDOW_CLOSING));
-	}
-	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -190,16 +136,7 @@ public class PatientSearchForm extends JFrame {
 		btnAcceptResults = new JButton("Выбор");
 		btnAcceptResults.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (rbtOnePat.isSelected()) {
-					results = new ArrayList<>();
-					results.add(tblResults.getSelectedItem());
-				} else {
-					results = fullResults;
-				}
-				
-				resultsAccepted = true;
-				
-				closeForm();
+				acceptResults();
 			}
 		});
 		btnAcceptResults.setEnabled(false);
@@ -269,14 +206,14 @@ public class PatientSearchForm extends JFrame {
 				try {
 					fullResults = MainForm.tcl.searchPatient(createSearchParams());
 					results = fullResults;
-					btnAcceptResults.setEnabled(results.size() > 0);
-					tblResults.setData(results);
+					btnAcceptResults.setEnabled(fullResults.size() > 0);
+					tblResults.setData(fullResults);
 					if (btnAcceptResults.isEnabled())
 						tblResults.requestFocusInWindow();
 					if (chbAutoClose.isEnabled() && chbAutoClose.isSelected()) {
-						if (rbtManyPat.isSelected() && (results.size() > 0))
+						if (rbtManyPat.isSelected() && (fullResults.size() > 0))
 							btnAcceptResults.doClick();
-						else if (rbtOnePat.isSelected() && (results.size() == 1))
+						else if (rbtOnePat.isSelected() && (fullResults.size() == 1))
 							btnAcceptResults.doClick();
 					}
 				} catch (KmiacServerException e1) {
@@ -518,6 +455,29 @@ public class PatientSearchForm extends JFrame {
 		setOptionalParamsEnabledState(true);
 	}
 	
+	@Override
+	public void acceptResults() {
+		if (rbtOnePat.isSelected()) {
+			List<PatientBriefInfo> tmpRes = new ArrayList<>();
+			
+			tmpRes.add(tblResults.getSelectedItem());
+			results = tmpRes;
+		} else {
+			results = fullResults;
+		}
+		
+		super.acceptResults();
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<PatientBriefInfo> getResults() {
+		if (results != null)
+			return (List<PatientBriefInfo>) results;
+		
+		return null;
+	}
+	
 	private PatientSearchParams createSearchParams() {
 		PatientSearchParams params = new PatientSearchParams();
 		
@@ -539,8 +499,9 @@ public class PatientSearchForm extends JFrame {
 		return params;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<PatientBriefInfo> getSearchResults() {
-		return results;
+		return (List<PatientBriefInfo>) results;
 	}
 	
 	public void clearFields() {
