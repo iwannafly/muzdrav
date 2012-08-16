@@ -335,7 +335,7 @@ public class Vvod extends JFrame {
 		
 		final JLabel lblJalob = new JLabel("Жалобы");
 		
-		tpJalob = new ShablonTextField(1, 1, listShablon);
+		tpJalob = new JEditorPane();
 		tpJalob.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobd = new ShablonTextField(1, 1, listShablon);

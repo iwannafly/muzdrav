@@ -472,7 +472,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void setPriem(Priem pr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_priem SET sl_ob = ?, n_is = ?, n_kons = ?, n_proc = ?, n_lek = ?,  t_chss = ?, t_temp = ?, t_ad = ?, t_rost = ?, t_ves = ?, t_st_localis = ?, t_ocenka = ?, t_jalob = ?, t_status_praesense = ?, t_fiz_obsl = ? WHERE id_obr = ? AND npasp = ? AND id_pos = ? ", false, pr, priemTypes,3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 0, 1, 2);
+			sme.execPreparedT("UPDATE p_priem SET sl_ob = ?, n_is = ?, n_kons = ?, n_proc = ?, n_lek = ?, t_chss = ?, t_temp = ?, t_ad = ?, t_rost = ?, t_ves = ?, t_st_localis = ?, t_ocenka = ?, t_jalob = ?, t_status_praesense = ?, t_fiz_obsl = ? WHERE id_obr = ? AND npasp = ? AND id_pos = ? ", false, pr, priemTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 0, 1, 2);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -771,7 +771,12 @@ public class ServerOsm extends Server implements Iface {
 	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		return null;
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where idDisp = ? and npasp = ? ", idDispb, npasp)) {
+			return rsmRdDin.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+
 	}
 
 	@Override
@@ -793,7 +798,13 @@ public class ServerOsm extends Server implements Iface {
 	public void AddRdDin(RdDinStruct RdDin) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
-		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_rd_din (id_rd_sl, id_pvizit,  npasp,  srok, grr,  ball, oj,  hdm,  dspos, art1,  art2, art3, art4,   oteki, spl,  chcc, poplp, predpl, serd,  serd1, id_pos,ves) VALUES (?, ?,  ?,  ?, ?,  ?, ?,  ?,  ?, ?,  ?, ?, ?,  ?, ?,  ?, ?, ?, ?, ?, ?,?) ", false, RdDin, rdDinTypes, 0, 1, 2, 3, 4, 5, 6, 7,  8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+
 	}
 
 	@Override
@@ -829,7 +840,13 @@ public class ServerOsm extends Server implements Iface {
 	public void AddRdInf(RdInfStruct rdInf) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
-		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_rd_inf (npasp, obr, sem, votec, grotec, photec, dataz, fiootec, mrotec, telotec, vredotec, osoco, uslpr) VALUES (?, ?,  ?,  ?, ?,  ?, ?,  ?,  ?, ?,  ?, ?, ?) ", false, rdInf, rdInfTypes, 0, 1, 2, 3, 4, 5, 6, 7,  8, 9, 10, 11, 12);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	
 	}
 
 	@Override
