@@ -846,12 +846,6 @@ public class ServerOsm extends Server implements Iface {
 	public void UpdateRdSl(int idDispb) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("UPDATE p_rd_sl SET idDispb = ?, npasp = ?, dataosl = ?, abort = ?, shet = ?,datam = ?, yavka1 = ? WHERE  idDispb = ?", false, idDispb, rdSlTypes, 5, 6, 7, 11, 13, 12, 0);
-			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
-			throw new KmiacServerException();
-		}
 		
 	}
 
