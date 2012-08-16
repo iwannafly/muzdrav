@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;

@@ -446,7 +446,7 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
 				getPsign(sign.npasp);
-				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ? WHERE npasp = ? ", false, sign, psignTypes, 1, 2, 3, 4, 5, 6, 0);
+				sme.execPreparedT("UPDATE p_sign SET grup = ?, ph = ?, allerg = ?, farmkol = ?, vitae = ?, vred = ? WHERE npasp = ? ", false, sign, psignTypes,	1, 2, 3, 4, 5, 6, 0);
 				sme.setCommit();
 			} catch (PsignNotFoundException e) {
 				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6);
@@ -492,32 +492,12 @@ public class ServerOsm extends Server implements Iface {
 //	}
 //
 	@Override
-	public List<StringClassifier> getP0c() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0c ")) {
-			return rsmStrClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
 	public PatientCommonInfo getPatientCommonInfo(int npasp) throws KmiacServerException, PatientNotFoundException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM patient WHERE npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmPatComInfo.map(acrs.getResultSet());
 			else
 				throw new PatientNotFoundException();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
-	public List<IntegerClassifier> getAp0() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_ap0 ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
@@ -618,45 +598,6 @@ public class ServerOsm extends Server implements Iface {
 		}
 	}
 	
-	@Override
-	public List<IntegerClassifier> getAq0() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_aq0 ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
-	public List<StringClassifier> get_n_s00() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_s00 ")) {
-			return rsmStrClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
-	public List<IntegerClassifier> getOpl() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_opl ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
-	public List<IntegerClassifier> get_n_p0e1() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0e1 ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			throw new KmiacServerException();
-		}
-	}
-
 	@Override
 	public List<StringClassifier> get_n_nz1(int c_p0e1) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT nz.pcod, nz.name FROM n_nz1 nz JOIN n_ldi nl ON (nl.c_nz1 = nz.pcod) WHERE nl.c_p0e1 = ? ", c_p0e1)) {

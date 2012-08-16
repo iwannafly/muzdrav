@@ -30,11 +30,14 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.clientOsm.Vvod;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
@@ -152,9 +155,9 @@ public class PInfo extends JFrame {
 		 				addLineToDetailInfo("Дата рождения", info.isSetDatar(), DateFormat.getDateInstance().format(new Date(info.getDatar())));
 		 				addLineToDetailInfo("Серия полиса ОМС", info.getPoms_ser());
 		 				addLineToDetailInfo("Номер полиса ОМС", info.getPoms_nom());
-		 				addLineToDetailInfo("Пол", getValueFromClassifier(Classifiers.n_z30, info.isSetPol(), info.getPol()));
-		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(Classifiers.n_am0, info.isSetJitel(), info.getJitel()));
-		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(Classifiers.n_az9, info.isSetSgrp(), info.getSgrp()));
+		 				addLineToDetailInfo("Пол", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z30), info.isSetPol(), info.getPol()));
+		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_am0), info.isSetJitel(), info.getJitel()));
+		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_az9), info.isSetSgrp(), info.getSgrp()));
 		 				addLineToDetailInfo("Область (прописка)", info.getAdp_obl());
 		 				addLineToDetailInfo("Город (прописка)", info.getAdp_gorod());
 		 				addLineToDetailInfo("Улица (прописка)", info.getAdp_ul());
@@ -169,17 +172,17 @@ public class PInfo extends JFrame {
 		 				addLineToDetailInfo("Квартира (проживание)", info.getAdm_kv());
 		 				//addLineToDetailInfo("Место работы", getValueFromClassifier(Classifiers.n_z43, info.isSetMrab()(), info.getName_mr());
 		 				addLineToDetailInfo("Тип места работы", info.getNcex());
-		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPoms_strg(), info.getPoms_strg()));
+		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_kas), info.isSetPoms_strg(), info.getPoms_strg()));
 		 				addLineToDetailInfo("Тип документа ОМС", info.getPoms_tdoc());
 		 				addLineToDetailInfo("Номер договора ОМС", info.getPoms_ndog());
-		 				addLineToDetailInfo("Страховая организация ДМС", getValueFromClassifier(Classifiers.n_kas, info.isSetPdms_strg(), info.getPdms_strg()));
+		 				addLineToDetailInfo("Страховая организация ДМС", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_kas), info.isSetPdms_strg(), info.getPdms_strg()));
 		 				addLineToDetailInfo("Серия полиса ДМС", info.getPdms_ser());
 		 				addLineToDetailInfo("Номер полиса ДМС", info.getPdms_nom());
 		 				addLineToDetailInfo("Номер договора ДМС", info.getPdms_ndog());
-		 				addLineToDetailInfo("Поликлиника прикрепления", getValueFromClassifier(Classifiers.n_n00, info.isSetCpol_pr(), info.getCpol_pr()));
-		 				addLineToDetailInfo("Территория прикрепления", getValueFromClassifier(Classifiers.n_l01, info.isSetTerp(), info.getTerp()));
+		 				addLineToDetailInfo("Поликлиника прикрепления", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00), info.isSetCpol_pr(), info.getCpol_pr()));
+		 				addLineToDetailInfo("Территория прикрепления", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTerp(), info.getTerp()));
 		 				addLineToDetailInfo("Дата прикрепления", info.isSetDatapr(), DateFormat.getDateInstance().format(new Date(info.getDatapr())));
-		 				addLineToDetailInfo("Тип удостоверения личности", getValueFromClassifier(Classifiers.n_az0, info.isSetTdoc(), info.getTdoc()));
+		 				addLineToDetailInfo("Тип удостоверения личности", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_az0), info.isSetTdoc(), info.getTdoc()));
 		 				addLineToDetailInfo("Серия документа", info.getDocser());
 		 				addLineToDetailInfo("Номер документа", info.getDocnum());
 		 				addLineToDetailInfo("Дата выдачи документа", info.isSetDatadoc(), DateFormat.getDateInstance().format(new Date(info.getDatadoc())));
@@ -188,8 +191,8 @@ public class PInfo extends JFrame {
 		 				addLineToDetailInfo("СНИЛС", info.getSnils());
 		 				addLineToDetailInfo("Профессия", info.getProf());
 		 				addLineToDetailInfo("Телефон", info.getTel());
-		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(Classifiers.n_l02, info.isSetRegion_liv(), info.getRegion_liv()));
-		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(Classifiers.n_l01, info.isSetTer_liv(), info.getTer_liv()));
+		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l02), info.isSetRegion_liv(), info.getRegion_liv()));
+		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTer_liv(), info.getTer_liv()));
 		 				eptxt.setText(sb.toString());
 
 						} catch (PatientNotFoundException e1) {
@@ -238,7 +241,7 @@ public class PInfo extends JFrame {
 		 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
 					addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
 	 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
-					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(MainForm.tcl.get_n_s00(),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
+					addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
 					addLineIf("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
 					addLineIf("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
 					addLineIf("Инвалидизующий диагноз: да", pdiag.isSetPrizi(), pdiag.getPrizi());
@@ -251,8 +254,8 @@ public class PInfo extends JFrame {
 		 			Pvizit pvizit = pvizitNode.pvizit;
 		 			AnamZab anamnez =  MainForm.tcl.getAnamZab(pvizit.getId(),pvizit.getNpasp());
 		 			//addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
-					addLineToDetailInfo("Цель обращения", getValueFromClassifier(MainForm.tcl.getP0c(), pvizit.isSetCobr(), pvizit.getCobr()));
-					addLineToDetailInfo("Должность", getValueFromClassifier(Classifiers.n_s00, pvizit.isSetCdol(), pvizit.getCdol()));
+					addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
+					addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
 		 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
 										//addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
 					//addHeader("Анамнез заболевания");
@@ -271,8 +274,8 @@ public class PInfo extends JFrame {
 	 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 	 					addLineToDetailInfo("Статус",getValueFromClassifier(MainForm.tcl.getVdi(), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
 	 				}
-	 				addLineToDetailInfo("Исход", getValueFromClassifier(MainForm.tcl.getAq0(), pvizit.isSetIshod(), pvizit.getIshod()));
-					addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pvizit.isSetRezult(), pvizit.getRezult()));
+	 				addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetIshod(), pvizit.getIshod()));
+					addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetRezult(), pvizit.getRezult()));
 					addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 		 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
 
@@ -285,7 +288,7 @@ public class PInfo extends JFrame {
 		 			PvizitAmb pam = pvizitAmbNode.pam;
 						Priem priem =  MainForm.tcl.getPriem(pam.getNpasp(),pam.getId());
 						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
-						addLineToDetailInfo("Должность",getValueFromClassifier(Classifiers.n_s00, pam.isSetCdol(), pam.getCdol()));
+						addLineToDetailInfo("Должность",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pam.isSetCdol(), pam.getCdol()));
 						addLineToDetailInfo("Врач",pam.isSetFio_vr(),pam.getFio_vr());
 						//addHeader("Жалобы");
 						//addLineToDetailInfo("Жалобы",priem.isSetT_jalob(), priem.getT_jalob());
@@ -302,7 +305,7 @@ public class PInfo extends JFrame {
 						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
 						//addHeader("Оценка данных анамнеза и объективного исследования");
 						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
-						addLineToDetailInfo("Результат", getValueFromClassifier(MainForm.tcl.getAp0(), pam.isSetRezult(), pam.getRezult()));
+						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 					} catch (PriemNotFoundException e1) {
 						e1.printStackTrace();

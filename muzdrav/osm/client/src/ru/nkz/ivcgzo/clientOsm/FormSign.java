@@ -52,8 +52,8 @@ public class FormSign extends JFrame {
 	private JRadioButton rbpol;
 	private JRadioButton rbotr;
 	private String vrp;
-	private ShablonTextField tpallerg;
-	private ShablonTextPanel pallerg;
+	private JEditorPane tpallerg;
+	private JPanel pallerg;
 	public static List<IntegerClassifier> pokNames;
 
 	/**
@@ -255,18 +255,16 @@ public class FormSign extends JFrame {
 		
 		
 		final JLabel lblFarm = new JLabel("Фармакологический анамнез");
-		lblFarm.setVisible(false);
 		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
 		
 		tpfarm = new JEditorPane();
-		tpfarm.setVisible(false);
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpanamnz = new JEditorPane();
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
-		 pallerg = new ShablonTextPanel(3);
+		 pallerg = new JPanel();
 		GroupLayout gl_pAnamn = new GroupLayout(pAnamn);
 		gl_pAnamn.setHorizontalGroup(
 			gl_pAnamn.createParallelGroup(Alignment.LEADING)
@@ -301,10 +299,8 @@ public class FormSign extends JFrame {
 		);
 		
 		JLabel label = new JLabel("Аллергоанамнез");
-		label.setVisible(false);
 		
-		 tpallerg = new ShablonTextField(3, 67, listShablon);
-		 tpallerg.setVisible(false);
+		 tpallerg = new JEditorPane();
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_pallerg = new GroupLayout(pallerg);
 		gl_pallerg.setHorizontalGroup(
@@ -403,7 +399,7 @@ public class FormSign extends JFrame {
 		public void showPsign() {
 		try {
 			psign = MainForm.tcl.getPsign(Vvod.zapVr.npasp);
-			
+			if (psign!=null){
 			BGgrk.clearSelection();
 			rb1g.setSelected(psign.grup.charAt(0) == '1');
 			rb2g.setSelected(psign.grup.charAt(0) == '2');
@@ -422,7 +418,7 @@ public class FormSign extends JFrame {
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
 			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');
+			cbn.setSelected(vrp.charAt(2) == '1');}
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (PsignNotFoundException e1) {
