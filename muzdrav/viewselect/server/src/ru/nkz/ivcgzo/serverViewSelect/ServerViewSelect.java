@@ -86,10 +86,10 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView(String className) throws TException {
 		// TODO Auto-generated method stub
-		final String sqlQuery = "SELECT pcod, name FROM + ?";
+		final String sqlQuery = "SELECT pcod, name FROM " + className;
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIVS =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, className)) {
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmIVS.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             throw new TException(e);

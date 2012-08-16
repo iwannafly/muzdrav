@@ -36,23 +36,17 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-<<<<<<< HEAD
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-=======
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
->>>>>>> 9f735d4e4924a1a4f79baaa34a1ba2369b721f9e
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
-<<<<<<< HEAD
-=======
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewStringClassifierForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
->>>>>>> 9f735d4e4924a1a4f79baaa34a1ba2369b721f9e
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -74,11 +68,6 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 		initModalForms();
 		
-<<<<<<< HEAD
-		//setFrame(new ViewTablePcodIntForm());
-
-=======
->>>>>>> 9f735d4e4924a1a4f79baaa34a1ba2369b721f9e
 		initialize();
 		setFrame(frame);
 		instance = this;
@@ -223,6 +212,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					  }
 					else {
 						  ViewTablePcodStringForm VSPSForm = new ViewTablePcodStringForm();
+						  MainForm.instance.addChildFrame(VSPSForm);
 						  VSPSForm.tableFill(className);
 						  VSPSForm.setVisible(true);
 					}
@@ -268,10 +258,6 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 			tcl = thrClient;
 			try { 
 				table.setData(tcl.getVSStringClassifierView("n_spr"));
-<<<<<<< HEAD
-
-=======
->>>>>>> 9f735d4e4924a1a4f79baaa34a1ba2369b721f9e
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 

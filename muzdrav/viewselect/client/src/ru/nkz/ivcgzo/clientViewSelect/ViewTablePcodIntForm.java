@@ -31,11 +31,19 @@ public class ViewTablePcodIntForm extends ViewSelectForm {
 	public ViewTablePcodIntForm() {
 		createGUI();
 		initialize();
+		setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
 	}
 		/**
 		 * Initialize the contents of the frame.
 		 */
 	private void initialize() {
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 		
 		tfSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
