@@ -6,8 +6,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -27,11 +31,19 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 	public ViewTablePcodStringForm() {
 		createGUI();
 		initialize();
+		setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
 	}
 		/**
 		 * Initialize the contents of the frame.
 		 */
 	private void initialize() {
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 		
 		tfSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -125,7 +125,7 @@ public class ServerOsm extends Server implements Iface {
 		zapVrTypes = new Class<?>[] {                  Integer.class, Integer.class, Time.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class};
 		
 		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "recomend");
-		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class};
+		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class};
 		
 		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr");
 		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
@@ -329,7 +329,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 0);
+			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ?, cobr = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 3, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -811,6 +811,12 @@ public class ServerOsm extends Server implements Iface {
 	public void DeleteRdSl(int idDispb, int npasp) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_sl WHERE idDispb = ? and npasp = ?", false, idDispb, npasp);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
@@ -818,20 +824,47 @@ public class ServerOsm extends Server implements Iface {
 	public void DeleteRdDin(int idDispb, int iD) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_din WHERE idDispb = ? and iD = ?", false, idDispb,iD);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
+		
+	}
+
+	/*	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+*/
+	@Override
+	public void UpdateRdSl(RdSlStruct Dispb) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_rd_sl SET npasp = ?, datay = ?, dataosl = ?, abort = ?, shet = ?, datam = ?, yavka1 = ?, ishod = ?,datasn = ?, datazs = ?,kolrod = ?, deti = ?, kont = ?, vesd = ?, dsp = ?,dsr = ?,dtrosh = ?, cext = ?, indsol = ?, prmen = ?,dataz = ?, datasert = ?, nsert = ?, ssert = ?, oslab = ?, plrod = ?, prrod = ?, vozmen = ?, oslrod = ?, polj = ?, dataab = ?, srokab = ?, cdiag = ?, cvera = ? WHERE id = ?", false, Dispb, rdSlTypes, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
 	@Override
-	public void UpdateRdSl(int npasp, int lgota) throws KmiacServerException,
+	public void UpdateRdDin(RdDinStruct din) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void UpdateRdDin(int idDispb, int iD) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_rd_din SET npasp = ?, srok = ?, grr = ?, ball = ?, oj = ?, hdm = ?, dspos = ?, art1 = ?, art2 = ?, art3 = ?,art4 = ?, oteki = ?, spl = ?, chcc = ?, polpl = ?, predpl = ?, serd = ?, serd1 = ?, ves = ?  WHERE id_pvizit = ?", false, din, rdDinTypes, 2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,21,1);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
@@ -850,16 +883,28 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public void DeleteRdInf(int idDispb, int npasp)
+	public void DeleteRdInf(int npasp)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_inf WHERE npasp = ? ", false, npasp);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+		}
+	
 	}
 
 	@Override
-	public void UpdateRdInf(int npasp, int lgota) throws KmiacServerException,
+	public void UpdateRdInf(RdInfStruct inf) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_rd_inf SET obr = ?,sem = ?, votec = ?, grotec = ?, photec = ?, dataz = ?, fiootec = ?, mrotec = ?, telotec = ?, vredotec = ?, osoco = ?, uslpr = ? WHERE npasp = ?", false, inf, rdInfTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0);
+			sme.setCommit();
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
 		
 	}
 
@@ -1844,6 +1889,41 @@ sb.append("<br>Подпись ____________");
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
 			return rsmRdSl.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+	@Override
+	public List<IntegerClassifier> get_n_z00() throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_z00 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> get_n_z11() throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_z11 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_r0z() throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_r0z ")) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}

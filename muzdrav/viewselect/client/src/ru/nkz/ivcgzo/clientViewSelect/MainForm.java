@@ -7,6 +7,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -34,6 +36,7 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
@@ -54,6 +57,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	private JFrame frame;
 	private JTextField tfSearch;
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
+	public static Client<ThriftViewSelect.Client> instance;
 	public PatientSearchForm srcFrm;
 	public ViewMkbTreeForm mkbFrm;
 	public ViewIntegerClassifierForm intFrm;
@@ -66,6 +70,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 		initialize();
 		setFrame(frame);
+		instance = this;
 	}
 
 	/**
@@ -89,6 +94,12 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		frame.setTitle("Нормативно-справочная информация");
 		frame.setBounds(100, 100, 750, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 		
 		ButtonGroup group = new ButtonGroup();
 		
@@ -194,13 +205,15 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		    	  try {
 					if (tcl.isClassifierPcodInteger(className)) {
 						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
-						  ViewTablePcodIntForm.tableFill(className);
+						  MainForm.instance.addChildFrame(VSPIForm);
+						  VSPIForm.tableFill(className);
 						  VSPIForm.setVisible(true);
 						//System.out.print(className);
 					  }
 					else {
 						  ViewTablePcodStringForm VSPSForm = new ViewTablePcodStringForm();
-						  ViewTablePcodStringForm.tableFill(className);
+						  MainForm.instance.addChildFrame(VSPSForm);
+						  VSPSForm.tableFill(className);
 						  VSPSForm.setVisible(true);
 					}
 				} catch (TException e1) {
