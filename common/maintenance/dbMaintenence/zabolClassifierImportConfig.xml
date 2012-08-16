@@ -86,6 +86,7 @@
 		<table srcName="Z00" dstName="n_z00" />
 		<table srcName="Z01" dstName="n_z01" />
 		<table srcName="Z10" dstName="n_z10" />
+		<table srcName="Z11" dstName="n_z11" />
 		<table srcName="Z30" dstName="n_z30" />
 		<table srcName="Z42" dstName="n_z42" />
 		<table srcName="Z43" dstName="n_z43" />
