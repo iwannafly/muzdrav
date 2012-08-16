@@ -291,9 +291,6 @@ addWindowListener(new WindowAdapter() {
 			rdsl.setVesd((int) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
 			rdsl.setOslrod(oslrod);
-//			rdsl.setOslab(CBOslAb.setData(MainForm.tcl.get_n_db9()));
-//			rdsl.setPlrod(CBRod.setData(MainForm.tcl.get_n_db8()));
-//			rdsl.setIshod(CBPrishSn.setData(MainForm.tcl.get_n_db7()));
 			if (CBOslAb.getSelectedPcod() != null)
 				rdsl.setOslab(CBOslAb.getSelectedPcod());
 				else rdsl.unsetOslab();
@@ -545,11 +542,6 @@ addWindowListener(new WindowAdapter() {
 		
 		TNKart = new JTextField();
 		TNKart.setColumns(10);
-//		TNKart.setText(rdsl.getNkart());	
-		
-//		final JSpinner SDataPos = new JSpinner();
-//		SDataPos.setModel(new SpinnerDateModel(new Date(rdsl.datay),new Date(), new Date(), Calendar.DAY_OF_YEAR));
-//		rdsl.setDatay((long) SDataPos.getModel().getValue());
 		SDataPos = new CustomDateEditor();
 		
 		final JSpinner SParRod = new JSpinner();
@@ -560,9 +552,6 @@ addWindowListener(new WindowAdapter() {
 		SKolBer.setModel(new SpinnerNumberModel(0, 0, 50, 1));
 		rdsl.setShet((int) SKolBer.getModel().getValue());
 		
-//		final JSpinner SDataOsl = new JSpinner();
-//		SDataOsl.setModel(new SpinnerDateModel(new Date(rdsl.dataosl), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
-//		rdsl.setDataosl((long) SDataOsl.getModel().getValue());
 		SDataOsl = new CustomDateEditor();
 		
 		SDataSert = new CustomDateEditor();
@@ -571,13 +560,8 @@ addWindowListener(new WindowAdapter() {
 		SYavka.setModel(new SpinnerNumberModel(rdsl.yavka1,2, 40,1));
 		rdsl.setYavka1((int) SYavka.getModel().getValue());
 		
-//		final JSpinner SDataM = new JSpinner();
-//		SDataM.setModel(new SpinnerDateModel(new Date(rdsl.dataM), null, System.currentTimeMillis(), Calendar.DAY_OF_YEAR));
-//		rdsl.setDataM((long) SDataM.getModel().getValue());
 		SDataM = new CustomDateEditor();
 		
-//		final JSpinner SDataRod = new JSpinner();
-//		SDataRod.setModel(new SpinnerDateModel(new Date(rdsl.datay+(40-rdsl.yavka1)*7), System.currentTimeMillis(),(System.currentTimeMillis()+280), Calendar.DAY_OF_YEAR));
 		SDataRod = new CustomDateEditor();
 		SDataRod.setColumns(10);
 		Calendar cal1 = Calendar.getInstance();
