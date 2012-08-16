@@ -1,34 +1,18 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-
-import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientManager.common.Client;
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 
 public class ViewTablePcodIntForm extends ViewSelectForm {
@@ -111,9 +95,9 @@ public class ViewTablePcodIntForm extends ViewSelectForm {
 		     } );
 		}
 
-	public static void tableFill(){
+	public static void tableFill(String className){
 		try { 
-			table.setData(MainForm.tcl.getVSIntegerClassifierView("n_c00"));
+			table.setData(MainForm.tcl.getVSIntegerClassifierView(className));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 

@@ -334,41 +334,49 @@ public class Vvod extends JFrame {
 		spJalob.setViewportView(panJalob);
 		
 		final JLabel lblJalob = new JLabel("Жалобы");
-		lblJalob.setVisible(false);
 		
-		tpJalob = new ShablonTextField(1, 1, listShablon);
-		tpJalob.setVisible(false);
+		tpJalob = new JEditorPane();
 		tpJalob.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobd = new ShablonTextField(1, 1, listShablon);
+		 tpJalobd.setVisible(false);
 		tpJalobd.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobkrov = new ShablonTextField(1, 2, listShablon);
+		 tpJalobkrov.setVisible(false);
 		tpJalobkrov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobp = new ShablonTextField(1, 3, listShablon);
+		 tpJalobp.setVisible(false);
 		tpJalobp.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobendo = new ShablonTextField(1, 5, listShablon);
+		 tpJalobendo.setVisible(false);
 		
 		 tpJalobnerv = new ShablonTextField(1, 6, listShablon);
+		 tpJalobnerv.setVisible(false);
 		tpJalobnerv.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobopor = new ShablonTextField(1, 7, listShablon);
+		 tpJalobopor.setVisible(false);
 		tpJalobopor.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJaloblih = new ShablonTextField(1, 8, listShablon);
+		 tpJaloblih.setVisible(false);
 		tpJaloblih.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobobh = new ShablonTextField(1, 9, listShablon);
+		 tpJalobobh.setVisible(false);
 		tpJalobobh.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobproch = new ShablonTextField(1, 10, listShablon);
+		 tpJalobproch.setVisible(false);
 		tpJalobproch.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpJalobendo.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJalobmoch = new ShablonTextField(1, 4, listShablon);
+		 tpJalobmoch.setVisible(false);
 		tpJalobmoch.setBorder(UIManager.getBorder("TextField.border"));
 		
 		GroupLayout gl_panJalob = new GroupLayout(panJalob);
@@ -471,22 +479,24 @@ public class Vvod extends JFrame {
 		spAnamnesis.setColumnHeaderView(panAnamnes);
 		
 		 tpNachzab = new ShablonTextField(2, 11, listShablon);
+		 tpNachzab.setVisible(false);
 		tpNachzab.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpOtnbol = new ShablonTextField(2, 13, listShablon);
+		 tpOtnbol.setVisible(false);
 		tpOtnbol.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpSympt = new ShablonTextField(2, 12, listShablon);
+		 tpSympt.setVisible(false);
 		tpSympt.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPssit = new ShablonTextField(2, 14, listShablon);
+		 tpPssit.setVisible(false);
 		tpPssit.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JLabel lblIstZab = new JLabel("История заболевания");
-		lblIstZab.setVisible(false);
 		
 		 tpIstZab = new JEditorPane();
-		 tpIstZab.setVisible(false);
 		tpIstZab.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_panAnamnes = new GroupLayout(panAnamnes);
 		gl_panAnamnes.setHorizontalGroup(
@@ -632,34 +642,40 @@ public class Vvod extends JFrame {
 		sppraesense.setViewportView(panPraesense);
 		
 		final JLabel lblStPraes = new JLabel("Status praesense");
-		lblStPraes.setVisible(false);
 		
 		 tpStPraes = new JEditorPane();
-		 tpStPraes.setVisible(false);
 		tpStPraes.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpObsost = new ShablonTextField(6, 24, listShablon);
+		 tpObsost.setVisible(false);
 		tpObsost.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpKoj = new ShablonTextField(6, 25, listShablon);
+		 tpKoj.setVisible(false);
 		tpKoj.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpSliz = new ShablonTextField(6, 26, listShablon);
+		 tpSliz.setVisible(false);
 		tpSliz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPodkkl = new ShablonTextField(6, 27, listShablon);
+		 tpPodkkl.setVisible(false);
 		tpPodkkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpLimf = new ShablonTextField(6, 28, listShablon);
+		 tpLimf.setVisible(false);
 		tpLimf.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpKostmysh = new ShablonTextField(6, 29, listShablon);
+		 tpKostmysh.setVisible(false);
 		tpKostmysh.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpNervnps = new ShablonTextField(6, 30, listShablon);
+		 tpNervnps.setVisible(false);
 		 tpNervnps.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpTelo = new ShablonTextField(6, 36, listShablon);
+		 tpTelo.setVisible(false);
 		tpTelo.setBorder(UIManager.getBorder("TextField.border"));
 		
 		GroupLayout gl_panPraesense = new GroupLayout(panPraesense);
@@ -754,94 +770,120 @@ public class Vvod extends JFrame {
 		spFizik.setViewportView(panFiz);
 		
 		final JLabel lblfizik = new JLabel("Физикальное обследование");
-		lblfizik.setVisible(false);
 		
 		tpFizObsl = new JEditorPane();
-		tpFizObsl.setVisible(false);
 		tpFizObsl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpSust = new ShablonTextField(7, 37, listShablon);
+		 tpSust.setVisible(false);
 		tpSust.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpDyh = new ShablonTextField(7, 38, listShablon);
+		 tpDyh.setVisible(false);
 		tpDyh.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpGrkl = new ShablonTextField(7, 39, listShablon);
+		 tpGrkl.setVisible(false);
 		tpGrkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPerkl = new ShablonTextField(7, 40, listShablon);
+		 tpPerkl.setVisible(false);
 		tpPerkl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpAusl = new ShablonTextField(7, 41, listShablon);
+		 tpAusl.setVisible(false);
 		tpAusl.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpBronho = new ShablonTextField(7, 42, listShablon);
+		 tpBronho.setVisible(false);
 		tpBronho.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpArter = new ShablonTextField(7, 43, listShablon);
+		 tpArter.setVisible(false);
 		tpArter.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpObls = new ShablonTextField(7, 44, listShablon);
+		 tpObls.setVisible(false);
 		tpObls.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPerks = new ShablonTextField(7, 45, listShablon);
+		 tpPerks.setVisible(false);
 		tpPerks.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpAuss = new ShablonTextField(7, 46, listShablon);
+		 tpAuss.setVisible(false);
 		tpAuss.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPolrta = new ShablonTextField(7, 47, listShablon);
+		 tpPolrta.setVisible(false);
 		tpPolrta.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJivot = new ShablonTextField(7, 48, listShablon);
+		 tpJivot.setVisible(false);
 		tpJivot.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPalpjivot = new ShablonTextField(7, 49, listShablon);
+		 tpPalpjivot.setVisible(false);
 		tpPalpjivot.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJkt = new ShablonTextField(7, 50, listShablon);
+		 tpJkt.setVisible(false);
 		tpJkt.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPalpjel = new ShablonTextField(7, 51, listShablon);
+		 tpPalpjel.setVisible(false);
 		tpPalpjel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPalppodjel = new ShablonTextField(7, 52, listShablon);
+		 tpPalppodjel.setVisible(false);
 		tpPalppodjel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPechen = new ShablonTextField(7, 53, listShablon);
+		 tpPechen.setVisible(false);
 		tpPechen.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpJelch = new ShablonTextField(7, 54, listShablon);
+		 tpJelch.setVisible(false);
 		tpJelch.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpSelez = new ShablonTextField(7, 55, listShablon);
+		 tpSelez.setVisible(false);
 		tpSelez.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpOblzad = new ShablonTextField(7, 56, listShablon);
+		 tpOblzad.setVisible(false);
 		tpOblzad.setBorder(UIManager.getBorder("TextField.border"));
 				
 		 tpPoyasn = new ShablonTextField(7, 57, listShablon);
+		 tpPoyasn.setVisible(false);
 		tpPoyasn.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpPochki = new ShablonTextField(7, 58, listShablon);
+		 tpPochki.setVisible(false);
 		tpPochki.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpMoch = new ShablonTextField(7, 59, listShablon);
+		 tpMoch.setVisible(false);
 		tpMoch.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpMoljel = new ShablonTextField(7, 60, listShablon);
+		 tpMoljel.setVisible(false);
 		tpMoljel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpGrjel = new ShablonTextField(7, 61, listShablon);
+		 tpGrjel.setVisible(false);
 		tpGrjel.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpMatka = new ShablonTextField(7, 62, listShablon);
+		 tpMatka.setVisible(false);
 		tpMatka.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpNarpolov = new ShablonTextField(7, 63, listShablon);
+		 tpNarpolov.setVisible(false);
 		tpNarpolov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 tpChitov = new ShablonTextField(7, 64, listShablon);
+		 tpChitov.setVisible(false);
 		tpChitov.setBorder(UIManager.getBorder("TextField.border"));
 		
 		GroupLayout gl_panFiz = new GroupLayout(panFiz);
@@ -1285,7 +1327,7 @@ public class Vvod extends JFrame {
 					try {
 						priem = new Priem();
 						anamZab = new AnamZab();
-						priem.setId(pvizit.getId());
+						priem.setId_pvizit(pvizit.getId());
 						priem.setNpasp(pvizit.getNpasp());
 						priem.setIdpos(pvizitAmb.getId());
 						priem.setT_ad(getTextOrNull(tfad.getText()));
@@ -1293,52 +1335,6 @@ public class Vvod extends JFrame {
 						priem.setT_rost(getTextOrNull(tfrost.getText()));
 						priem.setT_ves(getTextOrNull(tfves.getText()));
 						priem.setT_st_localis(getTextOrNull(tpLocalis.getText()));
-						priem.setT_jalob_d(getTextOrNull(tpJalobd.getText()));
-						priem.setT_jalob_krov(getTextOrNull(tpJalobkrov.getText()));
-						priem.setT_jalob_p(getTextOrNull(tpJalobp.getText()));
-						priem.setT_jalob_moch(getTextOrNull(tpJalobmoch.getText()));
-						priem.setT_jalob_endo(getTextOrNull(tpJalobendo.getText()));
-						priem.setT_jalob_nerv(getTextOrNull(tpJalobnerv.getText()));
-						priem.setT_jalob_opor(getTextOrNull(tpJalobopor.getText()));
-						priem.setT_jalob_lih(getTextOrNull(tpJaloblih.getText()));
-						priem.setT_jalob_obh(getTextOrNull(tpJalobobh.getText()));
-						priem.setT_jalob_proch(getTextOrNull(tpJalobproch.getText()));
-						priem.setT_ob_sost(getTextOrNull(tpObsost.getText()));
-						priem.setT_koj_pokr(getTextOrNull(tpKoj.getText()));
-						priem.setT_sliz(getTextOrNull(tpSliz.getText()));
-						priem.setT_podk_kl(getTextOrNull(tpPodkkl.getText()));
-						priem.setT_limf_uzl(getTextOrNull(tpLimf.getText()));
-						priem.setT_kost_mysh(getTextOrNull(tpKostmysh.getText()));
-						priem.setT_nervn_ps(getTextOrNull(tpNervnps.getText()));
-						priem.setT_telo(getTextOrNull(tpTelo.getText()));
-						priem.setT_sust(getTextOrNull(tpSust.getText()));
-						priem.setT_dyh(getTextOrNull(tpDyh.getText()));
-						priem.setT_gr_kl(getTextOrNull(tpGrkl.getText()));
-						priem.setT_perk_l(getTextOrNull(tpPerkl.getText()));
-						priem.setT_aus_l(getTextOrNull(tpAusl.getText()));
-						priem.setT_bronho(getTextOrNull(tpBronho.getText()));
-						priem.setT_arter(getTextOrNull(tpArter.getText()));
-						priem.setT_obl_s(getTextOrNull(tpObls.getText()));
-						priem.setT_perk_s(getTextOrNull(tpPerks.getText()));
-						priem.setT_aus_s(getTextOrNull(tpAuss.getText()));
-						priem.setT_pol_rta(getTextOrNull(tpPolrta.getText()));
-						priem.setT_jivot(getTextOrNull(tpJivot.getText()));
-						priem.setT_palp_jivot(getTextOrNull(tpPalpjivot.getText()));
-						priem.setT_jel_kish(getTextOrNull(tpJkt.getText()));
-						priem.setT_palp_jel(getTextOrNull(tpPalpjel.getText()));
-						priem.setT_palp_podjjel(getTextOrNull(tpPalppodjel.getText()));
-						priem.setT_pechen(getTextOrNull(tpPechen.getText()));
-						priem.setT_jelch(getTextOrNull(tpJelch.getText()));
-						priem.setT_selez(getTextOrNull(tpSelez.getText()));
-						priem.setT_obl_zad(getTextOrNull(tpOblzad.getText()));
-						priem.setT_poyasn(getTextOrNull(tpPoyasn.getText()));
-						priem.setT_pochk(getTextOrNull(tpPochki.getText()));
-						priem.setT_moch(getTextOrNull(tpMoch.getText()));
-						priem.setT_mol_jel(getTextOrNull(tpMoljel.getText()));
-						priem.setT_gr_jel(getTextOrNull(tpGrjel.getText()));
-						priem.setT_matka(getTextOrNull(tpMatka.getText()));
-						priem.setT_nar_polov(getTextOrNull(tpNarpolov.getText()));
-						priem.setT_chitov(getTextOrNull(tpChitov.getText()));
 						priem.setT_ocenka(getTextOrNull(tpOcenka.getText()));
 						priem.setT_jalob(getTextOrNull(tpJalob.getText()));
 						priem.setT_status_praesense(getTextOrNull(tpStPraes.getText()));
@@ -1346,10 +1342,7 @@ public class Vvod extends JFrame {
 						
 						anamZab.setId_pvizit(pvizit.getId());
 						anamZab.setNpasp(pvizit.getNpasp());
-						anamZab.setT_nachalo_zab(getTextOrNull(tpNachzab.getText()));
-						anamZab.setT_sympt(getTextOrNull(tpSympt.getText()));
-						anamZab.setT_otn_bol(getTextOrNull(tpOtnbol.getText()));
-						anamZab.setT_ps_syt(getTextOrNull(tpPssit.getText()));
+						anamZab.setT_ist_zab(getTextOrNull(tpIstZab.getText()));
 						
 						pvizit.setZakl(getTextOrNull(tpzakl.getText()));
 						pvizit.setRecomend(getTextOrNull(tprecom.getText()));
@@ -1698,62 +1691,14 @@ mi3.addActionListener(new ActionListener() {
 						else
 							vid_opl.setSelectedItem(null);
 						tpJalob.setText(priem.getT_jalob());	
-						tpJalobd.setText(priem.getT_jalob_d());	
-						tpJalobkrov.setText(priem.getT_jalob_krov());	
-						tpJalobp.setText(priem.getT_jalob_p());	
-						tpJalobmoch.setText(priem.getT_jalob_moch());	
-						tpJalobendo.setText(priem.getT_jalob_endo());	
-						tpJalobnerv.setText(priem.getT_jalob_nerv());	
-						tpJalobopor.setText(priem.getT_jalob_opor());	
-						tpJaloblih.setText(priem.getT_jalob_lih());	
-						tpJalobobh.setText(priem.getT_jalob_obh());	
-						tpJalobproch.setText(priem.getT_jalob_proch());	
-						tpNachzab.setText(anamZab.getT_nachalo_zab());	
-						tpSympt.setText(anamZab.getT_sympt());	
-						tpOtnbol.setText(anamZab.getT_sympt());	
-						tpPssit.setText(anamZab.getT_ps_syt());	
 						tfad.setText(priem.getT_ad());	
 						tftemp.setText(priem.getT_temp());	
 						tfchss.setText(priem.getT_chss());	
 						tfrost.setText(priem.getT_rost());	
 						tfves.setText(priem.getT_ves());	
-						tpObsost.setText(priem.getT_ob_sost());	
-						tpKoj.setText(priem.getT_koj_pokr());	
-						tpSliz.setText(priem.getT_sliz());	
-						tpPodkkl.setText(priem.getT_podk_kl());	
-						tpLimf.setText(priem.getT_limf_uzl());	
-						tpKostmysh.setText(priem.getT_kost_mysh());	
-						tpNervnps.setText(priem.getT_nervn_ps());	
-						tpSust.setText(priem.getT_sust());	
-						tpDyh.setText(priem.getT_sust());	
-						tpGrkl.setText(priem.getT_sust());	
-						tpPerkl.setText(priem.getT_perk_l());	
-						tpAusl.setText(priem.getT_aus_l());	
-						tpBronho.setText(priem.getT_bronho());	
-						tpArter.setText(priem.getT_arter());	
-						tpObls.setText(priem.getT_obl_s());	
-						tpPerks.setText(priem.getT_perk_s());	
-						tpAuss.setText(priem.getT_aus_s());	
-						tpPolrta.setText(priem.getT_pol_rta());	
-						tpJivot.setText(priem.getT_jivot());	
-						tpPalpjivot.setText(priem.getT_palp_jivot());	
-						tpJkt.setText(priem.getT_jel_kish());	
-						tpPalpjel.setText(priem.getT_palp_jel());	
-						tpPalppodjel.setText(priem.getT_palp_podjjel());	
-						tpPechen.setText(priem.getT_pechen());	
-						tpJelch.setText(priem.getT_jelch());	
-						tpSelez.setText(priem.getT_selez());	
-						tpOblzad.setText(priem.getT_obl_zad());	
-						tpPoyasn.setText(priem.getT_poyasn());	
-						tpPochki.setText(priem.getT_pochk());	
-						tpMoch.setText(priem.getT_moch());	
-						tpMoljel.setText(priem.getT_mol_jel());	
-						tpGrjel.setText(priem.getT_gr_jel());	
-						tpMatka.setText(priem.getT_matka());	
-						tpNarpolov.setText(priem.getT_nar_polov());	
-						tpChitov.setText(priem.getT_chitov());	
 						tpLocalis.setText(priem.getT_st_localis());	
-						tpOcenka.setText(priem.getT_ocenka());	
+						tpOcenka.setText(priem.getT_ocenka());
+						tpIstZab.setText(anamZab.getT_ist_zab());
 
 					}
 				}
@@ -2235,6 +2180,19 @@ mi3.addActionListener(new ActionListener() {
 				    );
 				    pDisp.setLayout(gl_pDisp);
 				    pds.setLayout(gl_pds);
+		
+		JPanel pNazn = new JPanel();
+		tabbedPane.addTab("Назначенное лечение", null, pNazn, null);
+		GroupLayout gl_pNazn = new GroupLayout(pNazn);
+		gl_pNazn.setHorizontalGroup(
+			gl_pNazn.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 538, Short.MAX_VALUE)
+		);
+		gl_pNazn.setVerticalGroup(
+			gl_pNazn.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 494, Short.MAX_VALUE)
+		);
+		pNazn.setLayout(gl_pNazn);
 
 		
 		JPanel pprint = new JPanel();
