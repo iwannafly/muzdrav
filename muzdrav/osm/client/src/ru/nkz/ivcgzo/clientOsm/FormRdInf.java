@@ -544,22 +544,6 @@ public class FormRdInf extends JFrame {
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
 		Sbutton.addActionListener(new ActionListener() {
-/*			private int codobr (int codobr){
-				if (CBObr.getSelectedItem().equals("Высшее")){codobr = 1;}
-				if (CBObr.getSelectedItem().equals("Незаконченное высшее")){codobr = 2;}
-				if (CBObr.getSelectedItem().equals("Среднее специальное")){codobr = 3;}
-				if (CBObr.getSelectedItem().equals("Среднее")){codobr = 4;}
-				if (CBObr.getSelectedItem().equals("Начальное")){codobr = 5;}
-				if (CBObr.getSelectedItem().equals("")){codobr = 0;}
-							return codobr;
-			};
- 		    private int codsem (int codsem){
-				if (CBObr.getSelectedItem().equals("Регистрированный")){codsem = 1;}
-				if (CBObr.getSelectedItem().equals("Не регистрированный")){codsem = 2;}
-				if (CBObr.getSelectedItem().equals("Одна")){codsem = 3;}
-				if (CBObr.getSelectedItem().equals("")){codsem = 0;}
-							return codsem;
-			};*/
 			private int oslrod (int oslrod){
 		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
 		            if (ChBots.isSelected()){oslrod=oslrod+2;}
@@ -589,12 +573,21 @@ rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
 //rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
 //rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
+//rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
 rdinf.setOsoco(oslrod);
 rdinf.setUslpr(uslj);
 rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
-//rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
 rdinf.setPhOtec(TPhf.getText());
+if (CBObr.getSelectedPcod() != null)
+	rdinf.setObr(CBObr.getSelectedPcod());
+	else rdinf.unsetObr();
+if (CBSem.getSelectedPcod() != null)
+	rdinf.setSem(CBSem.getSelectedPcod());
+	else rdinf.unsetSem();
+if (CBGrOtec.getSelectedPcod() != null)
+	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
+	else rdinf.unsetGrotec();
 			}
 		});
 	}
@@ -602,5 +595,19 @@ rdinf.setPhOtec(TPhf.getText());
 	protected void setRdInfData(RdInfStruct rdinf2) {
 		// TODO Auto-generated method stub
 		
+	}
+	public void onConnect() {
+		try {
+			CBObr.setData(MainForm.tcl.get_n_z00());
+			CBSem.setData(MainForm.tcl.get_n_z11());
+			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
+			
+			
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		}
 	}
 }

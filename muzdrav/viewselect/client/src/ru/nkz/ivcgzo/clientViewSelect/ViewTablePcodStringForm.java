@@ -1,8 +1,5 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -11,31 +8,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableModel;
-
-import com.sun.org.apache.bcel.internal.generic.ObjectType;
-
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-
-import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientManager.common.Client;
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 
 public class ViewTablePcodStringForm extends ViewSelectForm {
@@ -45,19 +26,25 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 	 */
 	private static final long serialVersionUID = 8600318603287809954L;
 	public static ThriftViewSelect.Client tcl;
-	//public JTextField tfSearch;
-	//public JScrollPane spClassifier;
-
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
 	
 	public ViewTablePcodStringForm() {
 		createGUI();
 		initialize();
+		setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
 	}
 		/**
 		 * Initialize the contents of the frame.
 		 */
 	private void initialize() {
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
+		
 		tfSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				table.requestFocus();
@@ -77,7 +64,6 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 			  }
 	       });
 			
-			
 		table = new CustomTable<>(false, true, StringClassifier.class, 0, "Код", 1, "Наименование");
 		table.getColumnModel().getColumn(0).setWidth(aws/3);
 		table.setAutoCreateRowSorter(true);
@@ -86,7 +72,6 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		spClassifier.setViewportView(table);
-		
 		
 		table.addMouseListener(new MouseAdapter(){
 		     public void mouseClicked(MouseEvent e){
@@ -123,9 +108,9 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 	}
 
 	// Заполнение таблицы
-	public static void tableFill(){
+	public static void tableFill(String className){
 		try { 
-			table.setData(MainForm.tcl.getVSStringClassifierView("n_c00"));
+			table.setData(MainForm.tcl.getVSStringClassifierView(className));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
