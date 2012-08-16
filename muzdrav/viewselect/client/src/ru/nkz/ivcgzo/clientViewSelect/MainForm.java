@@ -7,6 +7,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -32,13 +34,10 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
-<<<<<<< HEAD
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-=======
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
->>>>>>> b3320eb80464629161c561f59adc50dd67f13aef
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -48,6 +47,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	private JFrame frame;
 	private JTextField tfSearch;
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
+	public static Client<ThriftViewSelect.Client> instance;
 	public PatientSearchForm srcFrm;
 	public ViewMkbTreeForm mkbFrm;
 
@@ -56,15 +56,11 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 		initModalForms();
 		
-<<<<<<< HEAD
-		//setFrame(new ViewTablePcodStringForm());
-=======
-//		setFrame(new ViewTablePcodStringForm());
->>>>>>> b3320eb80464629161c561f59adc50dd67f13aef
 		//setFrame(new ViewTablePcodIntForm());
 
 		initialize();
 		setFrame(frame);
+		instance = this;
 	}
 
 	/**
@@ -88,6 +84,12 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		frame.setTitle("Нормативно-справочная информация");
 		frame.setBounds(100, 100, 750, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 		
 		ButtonGroup group = new ButtonGroup();
 		
@@ -193,13 +195,14 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		    	  try {
 					if (tcl.isClassifierPcodInteger(className)) {
 						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
-						  ViewTablePcodIntForm.tableFill(className);
+						  MainForm.instance.addChildFrame(VSPIForm);
+						  VSPIForm.tableFill(className);
 						  VSPIForm.setVisible(true);
 						//System.out.print(className);
 					  }
 					else {
 						  ViewTablePcodStringForm VSPSForm = new ViewTablePcodStringForm();
-						  ViewTablePcodStringForm.tableFill(className);
+						  VSPSForm.tableFill(className);
 						  VSPSForm.setVisible(true);
 					}
 				} catch (TException e1) {
@@ -243,15 +246,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
 			try { 
-<<<<<<< HEAD
 				table.setData(tcl.getVSStringClassifierView("n_spr"));
-=======
-//				if (tcl.isClassifierPcodInteger("n_l01")) System.out.print("ololo");
-				//ViewTablePcodIntForm.tableFill();
-				//else ViewTablePcodStringForm.tableFill();
-//				ViewTablePcodStringForm.tableFill();
-				//NSForm.
->>>>>>> b3320eb80464629161c561f59adc50dd67f13aef
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
