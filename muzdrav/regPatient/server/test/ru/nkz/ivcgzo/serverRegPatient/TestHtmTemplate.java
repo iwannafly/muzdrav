@@ -15,6 +15,20 @@ public class TestHtmTemplate {
 
     @Test
     public final void getTemplateText_isValueCorrect() {
+        try {
+            htmTemplate.replaceLabels(false,"==1==","==2==","==3==", "", "==5==");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         System.out.println(htmTemplate.getTemplateText());
     }
+
+    @Test
+    public final void getLabels_isListSizeCorrect() {
+        System.out.println(htmTemplate.getLabels().size());
+        for (String curLabel:htmTemplate.getLabels()){
+            System.out.println(curLabel);
+        }        
+    }
+    
 }
