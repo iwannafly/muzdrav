@@ -27,6 +27,7 @@ import javax.swing.event.DocumentListener;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.ModalForm;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -70,6 +71,8 @@ public class PatientSearchForm extends ModalForm {
 	 * Create the application.
 	 */
 	public PatientSearchForm() {
+		super(true);
+		
 		initialize();
 	}
 

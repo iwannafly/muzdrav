@@ -16,6 +16,7 @@ import javax.swing.tree.TreePath;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.ModalForm;
 import ru.nkz.ivcgzo.clientViewSelect.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -37,6 +38,8 @@ public class ViewMkbTreeForm extends ModalForm {
 	 * Create the frame.
 	 */
 	public ViewMkbTreeForm() {
+		super(true);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 800, 600);
 		contentPane = new JPanel();
@@ -113,9 +116,9 @@ public class ViewMkbTreeForm extends ModalForm {
 			} catch (TException e) {
 				e.printStackTrace();
 				MainForm.conMan.reconnect(e);
-			} else {
+			} else
 				((DefaultTreeModel) tree.getModel()).reload();
-			}
+		tree.setSelectionPath(new TreePath(new Object[] {tree.getModel().getRoot(), tree.getModel().getChild(tree.getModel().getRoot(), 0)}));
 		if (pcod != null && pcod.length() > 2)
 			selectPcod(pcod);
 	}
