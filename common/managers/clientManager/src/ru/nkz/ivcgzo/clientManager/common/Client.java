@@ -29,6 +29,7 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	public T thrClient;
 	private JFrame frame;
 	private IClient parent;
+	private JDialog dialog;
 	private ModalExclusionType prevModalType;
 	private List<JFrame> childList;
 	
@@ -90,7 +91,10 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 * @param parent - родительский плагин-клиент
 	 */
 	public JDialog prepareModal(IClient parent) {
-		JDialog dialog = new JDialog(getFrame());
+		if (dialog != null)
+			throw new RuntimeException("Modal dialog already prepared.");
+		
+		dialog = new JDialog(getFrame());
 		
 		this.parent = parent;
 		prevModalType = getFrame().getModalExclusionType();
@@ -105,7 +109,8 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 			dialog.setModal(true);
 			dialog.setContentPane(getFrame().getContentPane());
 			dialog.revalidate();
-			dialog.setLocationRelativeTo(parent.getFrame());
+			if (!(getFrame() instanceof ModalForm) || (((ModalForm) getFrame()).getModalLocationRelativeToParent()))
+					dialog.setLocationRelativeTo(parent.getFrame());
 			conMan.setClient(this);
 			conMan.connect();
 		} catch (TException e) {
@@ -126,6 +131,8 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 		parent.getFrame().setModalExclusionType(prevModalType);
 		disposeChildren();
 		conMan.disconnect(getPort());
+		dialog.dispose();
+		dialog = null;
 	}
 	
 	private void setDisconnectOnFrameClose() {

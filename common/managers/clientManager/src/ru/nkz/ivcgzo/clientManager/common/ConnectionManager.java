@@ -33,7 +33,12 @@ import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 
+import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
+import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer;
@@ -95,6 +100,14 @@ public class ConnectionManager {
 	public void setClient(IClient client) {
 		this.client = client;
 		this.mainForm = client.getFrame();
+	}
+	
+	/**
+	 * Получение модуля, для которого будет проверяться актуальность подключений и
+	 * наличие обновлений.
+	 */
+	public IClient getClient() {
+		return client;
 	}
 	
 	private void addToCommon(int port) {
@@ -438,6 +451,70 @@ public class ConnectionManager {
 		
 		if (srcRes != null)
 			return (StringClassifier) srcRes;
+		
+		return null;
+	}
+	
+	/**
+	 * Показ формы с отсортированным классификатором, в котором код - число.
+	 * @param cls - название классификатора
+	 * @param ord - порядок сортировки
+	 * @param fld - поля для сортировки
+	 * @return выбранное значение или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public IntegerClassifier showIntegerClassifierSelector(IntegerClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) {
+		Object res = viewClient.showModal(client, 7, cls, ord, fld);
+		
+		if (res != null)
+			return (IntegerClassifier) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Показ формы с неотсортированным классификатором, в котором код - число.
+	 * @param cls - название классификатора
+	 * @return выбранное значение или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public IntegerClassifier showIntegerClassifierSelector(IntegerClassifiers cls) {
+		Object res = viewClient.showModal(client, 8, cls);
+		
+		if (res != null)
+			return (IntegerClassifier) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Показ формы с отсортированным классификатором, в котором код - строка.
+	 * @param cls - название классификатора
+	 * @param ord - порядок сортировки
+	 * @param fld - поля для сортировки
+	 * @return выбранное значение или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public StringClassifier showStringClassifierSelector(StringClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) {
+		Object res = viewClient.showModal(client, 9, cls, ord, fld);
+		
+		if (res != null)
+			return (StringClassifier) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Показ формы с неотсортированным классификатором, в котором код - строка.
+	 * @param cls - название классификатора
+	 * @return выбранное значение или <code>null</code>, если
+	 * пользователь закрыл форму
+	 */
+	public StringClassifier showStringClassifierSelector(StringClassifiers cls) {
+		Object res = viewClient.showModal(client, 10, cls);
+		
+		if (res != null)
+			return (StringClassifier) res;
 		
 		return null;
 	}

@@ -33,7 +33,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
 	private ClassifierManager ccm;
-	public String className = "n_c00";
+	//public String className = "n_c00";
 	
 	private TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 
