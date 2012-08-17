@@ -356,10 +356,28 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						disposeModal();
 					}
 					
-				case 3: //ld int
-				case 4: //ld int wo prms
-				case 5: //ld str
-				case 6: //ld str wo prms
+				case 3:
+				case 4:
+				case 5:
+				case 6:
+					try {
+						conMan.setClient(this);
+						conMan.connect(getPort());
+						
+						switch ((int) params[0]) {
+						case 3:
+							return ccm.getIntegerClassifier((IntegerClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
+						case 4:
+							return ccm.getIntegerClassifier((IntegerClassifiers) params[1]);
+						case 5:
+							return ccm.getStringClassifier((StringClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
+						case 6:
+							return ccm.getStringClassifier((StringClassifiers) params[1]);
+						}
+					} catch (Exception e) {
+						conMan.disconnect(getPort());
+						conMan.setClient(parent);
+					}
 				case 7:
 				case 8:
 					setFrame(intFrm);

@@ -51,15 +51,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
@@ -106,16 +108,22 @@ public class Vvod extends JFrame {
 	private FormPostBer postber;
 	private JPanel pzakl;
 	private JPanel Jalob;
+	private JEditorPane tpJalob;
 	private JTextField tftemp;
 	private JTextField tfad;
 	private JTextField tfrost;
 	private JTextField tfves;
 	private JTextField tfchss;
-	private JEditorPane tpJalob;
+//	private JEditorPane tpFizObsl;
+//	private ShablonTextField tpLocalis;
+//	private ShablonTextField tpOcenka;
+	private JEditorPane tpIstZab;
+//	private JEditorPane tpObosnov;
+//	private JEditorPane tpodiag;
+
 	private JEditorPane tpFizObsl;
 	private ShablonTextField tpLocalis;
 	private ShablonTextField tpOcenka;
-	private JEditorPane tpIstZab;
 	private JEditorPane tpObosnov;
 	private JEditorPane tpodiag;
 	private ThriftStringClassifierCombobox<StringClassifier> c_obr;
@@ -261,7 +269,7 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-		 Jalob = new ShablonTextPanel(1);
+		 Jalob = new JPanel();
 		
 		 Jalob.setAutoscrolls(true);
 		tabbedPane.addTab("Жалобы", null, Jalob, null);
@@ -271,42 +279,21 @@ public class Vvod extends JFrame {
 		GroupLayout gl_Jalob = new GroupLayout(Jalob);
 		gl_Jalob.setHorizontalGroup(
 			gl_Jalob.createParallelGroup(Alignment.TRAILING)
-				.addComponent(spJalob, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 841, Short.MAX_VALUE)
+				.addGroup(Alignment.LEADING, gl_Jalob.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spJalob, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		gl_Jalob.setVerticalGroup(
 			gl_Jalob.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_Jalob.createSequentialGroup()
-					.addComponent(spJalob, GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-					.addGap(16))
-		);
-		
-		JPanel panJalob = new JPanel();
-		spJalob.setViewportView(panJalob);
-		
-		final JLabel lblJalob = new JLabel("Жалобы");
-		
-		tpJalob = new JEditorPane();
-		tpJalob.setBorder(UIManager.getBorder("TextField.border"));
-		
-		GroupLayout gl_panJalob = new GroupLayout(panJalob);
-		gl_panJalob.setHorizontalGroup(
-			gl_panJalob.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panJalob.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panJalob.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(tpJalob, GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
-						.addComponent(lblJalob, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(12, Short.MAX_VALUE))
+					.addComponent(spJalob, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(314, Short.MAX_VALUE))
 		);
-		gl_panJalob.setVerticalGroup(
-			gl_panJalob.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panJalob.createSequentialGroup()
-					.addComponent(lblJalob)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpJalob, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(927, Short.MAX_VALUE))
-		);
-		panJalob.setLayout(gl_panJalob);
+		
+		 tpJalob = new JEditorPane();
+		spJalob.setViewportView(tpJalob);
 		Jalob.setLayout(gl_Jalob);
 		
 		ShablonTextPanel pAnanmnesis = new ShablonTextPanel(2);
@@ -316,39 +303,21 @@ public class Vvod extends JFrame {
 		GroupLayout gl_pAnanmnesis = new GroupLayout(pAnanmnesis);
 		gl_pAnanmnesis.setHorizontalGroup(
 			gl_pAnanmnesis.createParallelGroup(Alignment.LEADING)
-				.addComponent(spAnamnesis, GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
+				.addGroup(gl_pAnanmnesis.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spAnamnesis, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		gl_pAnanmnesis.setVerticalGroup(
 			gl_pAnanmnesis.createParallelGroup(Alignment.LEADING)
-				.addComponent(spAnamnesis, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+				.addGroup(gl_pAnanmnesis.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spAnamnesis, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(318, Short.MAX_VALUE))
 		);
-		
-		JPanel panAnamnes = new JPanel();
-		spAnamnesis.setColumnHeaderView(panAnamnes);
-		
-		JLabel lblIstZab = new JLabel("История заболевания");
 		
 		 tpIstZab = new JEditorPane();
-		tpIstZab.setBorder(UIManager.getBorder("TextField.border"));
-		GroupLayout gl_panAnamnes = new GroupLayout(panAnamnes);
-		gl_panAnamnes.setHorizontalGroup(
-			gl_panAnamnes.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panAnamnes.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panAnamnes.createParallelGroup(Alignment.LEADING)
-						.addComponent(lblIstZab, GroupLayout.PREFERRED_SIZE, 175, GroupLayout.PREFERRED_SIZE)
-						.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 497, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(315, Short.MAX_VALUE))
-		);
-		gl_panAnamnes.setVerticalGroup(
-			gl_panAnamnes.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panAnamnes.createSequentialGroup()
-					.addComponent(lblIstZab)
-					.addGap(6)
-					.addComponent(tpIstZab, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(871, Short.MAX_VALUE))
-		);
-		panAnamnes.setLayout(gl_panAnamnes);
+		spAnamnesis.setViewportView(tpIstZab);
 		pAnanmnesis.setLayout(gl_pAnanmnesis);
 		
 		ShablonTextPanel pStatuspr = new ShablonTextPanel(6);
@@ -525,16 +494,16 @@ public class Vvod extends JFrame {
 		
 		JLabel lblvid_opl = new JLabel("Вид оплаты");
 		
-		 vid_opl = new ThriftIntegerClassifierCombobox<>(true);
+		 vid_opl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_opl);
 		
 		JLabel lblcobr = new JLabel("Цель обращения");
 		
-		c_obr = new ThriftStringClassifierCombobox<>(true);
+		c_obr = new ThriftStringClassifierCombobox<>(StringClassifiers.n_p0c);
 		JLabel lblrez = new JLabel("Результат");
 		
-		cbrez = new ThriftIntegerClassifierCombobox<>(true);
+		cbrez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq0);
 		
-		cbMobsp = new ThriftIntegerClassifierCombobox<>(true);
+		cbMobsp = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abs);
 		
 		JLabel lblmobs = new JLabel("Место обслуживания");
 		 
@@ -1227,7 +1196,17 @@ mi3.addActionListener(new ActionListener() {
 		GroupBox2.add(jbzakl);
 		
 		JScrollPane spDiag = new JScrollPane();
-		TabDiag = new CustomTable<>(true,true,PdiagAmb.class,7,"Дата",3,"Код МКБ");
+		TabDiag = new CustomTable<>(false,true,PdiagAmb.class,7,"Дата",3,"Код МКБ");
+		TabDiag.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					if (TabDiag.getSelectedItem() != null) {
+						TabDiag.getSelectedItem().setDiag(ConnectionManager.instance.showMkbTreeForm("Диагнозы", TabDiag.getSelectedItem().diag).pcod);
+						TabDiag.updateSelectedItem();
+					}
+			}
+		});
 		TabDiag.setDateField(0);
 		spDiag.setViewportView(TabDiag);
 		TabDiag.setFillsViewportHeight(true);
@@ -1309,7 +1288,7 @@ mi3.addActionListener(new ActionListener() {
 		});			
 		
 				
-				 vid_travm = new ThriftIntegerClassifierCombobox<>(true);
+				 vid_travm = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_ai0);
 				 
 				 JLabel lblvidtravm = new JLabel("Вид травмы");
 				 
@@ -1320,16 +1299,21 @@ mi3.addActionListener(new ActionListener() {
 				 	public void actionPerformed(ActionEvent e) {
 				 		TabDiag.requestFocus();
 				  		try {
-					  		diagamb = new PdiagAmb();
-					  		diagamb.setId_obr(zapVr.getId_pvizit());
-					  		diagamb.setNpasp(zapVr.getNpasp());
-					  		diagamb.setDatap(System.currentTimeMillis());
-					  		diagamb.setDatad(System.currentTimeMillis());
-					  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
-					  		diagamb.setCdol(MainForm.authInfo.getCdol());
-					  		diagamb.setPredv(true);
-							diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
-				 			TabDiag.addItem(diagamb);
+				  			StringClassifier mkb = MainForm.conMan.showMkbTreeForm("Диагноз", "");
+				  			
+				  			if (mkb != null) {
+						  		diagamb = new PdiagAmb();
+						  		diagamb.setId_obr(zapVr.getId_pvizit());
+						  		diagamb.setNpasp(zapVr.getNpasp());
+						  		diagamb.setDatap(System.currentTimeMillis());
+						  		diagamb.setDatad(System.currentTimeMillis());
+						  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
+						  		diagamb.setCdol(MainForm.authInfo.getCdol());
+						  		diagamb.setPredv(true);
+								diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
+								diagamb.setDiag(mkb.pcod);
+					 			TabDiag.addItem(diagamb);
+				  			}
 						} catch (KmiacServerException e1) {
 							e1.printStackTrace();
 						} catch (TException e1) {
@@ -1343,7 +1327,7 @@ mi3.addActionListener(new ActionListener() {
 				 
 				 JLabel lblObstreg = new JLabel("Обстоятельства регистрации");
 				 
-				  cbObstreg = new ThriftIntegerClassifierCombobox<>(true);
+				  cbObstreg = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abv);
 				  
 				  JPanel pStady = new JPanel();
 				  pStady.setBorder(new TitledBorder(null, "\u0421\u0442\u0430\u0434\u0438\u044F \u0437\u0430\u0431\u043E\u043B\u0435\u0432\u0430\u043D\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLACK));
@@ -1561,7 +1545,7 @@ mi3.addActionListener(new ActionListener() {
 				  
 				  JLabel lblDish = new JLabel("Исход д/у");
 				  
-				   cbDish = new ThriftIntegerClassifierCombobox<>(true);
+				   cbDish = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abb);
 				   cbDish.setEnabled(false);
 				   
 				   JLabel lblDvz = new JLabel("Дата взятия на д/у");
@@ -1572,7 +1556,7 @@ mi3.addActionListener(new ActionListener() {
 				   
 				   JLabel lblDGrup = new JLabel("Группа д/у");
 				   
-				    cbDgrup = new ThriftIntegerClassifierCombobox<>(true);
+				    cbDgrup = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abc);
 				    cbDgrup.setEnabled(false);
 				    
 				    JLabel lblDatDIsh = new JLabel("Дата установления исхода");
@@ -1745,7 +1729,7 @@ rbPokaz.addActionListener(new ActionListener() {
 		
 		JLabel lblVidIssl = new JLabel("Вид исследования");
 		
-		cbVidIssl = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+		cbVidIssl = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_p0e1);
 		cbVidIssl.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (cbVidIssl.getSelectedItem()!= null){
@@ -2118,7 +2102,7 @@ rbPokaz.addActionListener(new ActionListener() {
 		
 		JLabel label_1 = new JLabel("Исход");
 		
-		cbish = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+		cbish = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_ap0);
 		GroupLayout gl_pzakl = new GroupLayout(pzakl);
 		gl_pzakl.setHorizontalGroup(
 			gl_pzakl.createParallelGroup(Alignment.LEADING)
@@ -2189,17 +2173,7 @@ rbPokaz.addActionListener(new ActionListener() {
 	
 	public void onConnect() {
 		try {
-			TabPos.setStringClassifierSelector(2, Classifiers.n_s00);
-			c_obr.setData(MainForm.tcl.getP0c());
-			cbrez.setData(MainForm.tcl.getAq0());
-			cbish.setData(MainForm.tcl.getAp0());
-			cbMobsp.setData(MainForm.tcl.get_n_abs());
-			cbObstreg.setData(MainForm.tcl.get_n_abv());
-			cbDgrup.setData(MainForm.tcl.get_n_abc());
-			cbDish.setData(MainForm.tcl.get_n_abb());
-			vid_opl.setData(MainForm.tcl.getOpl());
-			vid_travm.setData(MainForm.tcl.get_n_ai0());
-			cbVidIssl.setData(MainForm.tcl.get_n_p0e1());
+			TabPos.setStringClassifierSelector(2, ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00));
 			cbMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
 			cbN00.setData(MainForm.tcl.get_n_m00(MainForm.authInfo.clpu));
 			

@@ -333,7 +333,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	/**
 	 * Возвращает фактический индекс строки в сортированной таблице.
 	 */
-	private int getSortedRowIndex() {
+	public int getSortedRowIndex() {
 		if (this.getSelectedRow() > -1)
 			if (sortable)
 				return this.convertRowIndexToModel(this.getSelectedRow());

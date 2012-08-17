@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.GroupLayout;
@@ -54,6 +55,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
  * @author bsv798
  */
 public class ConnectionManager {
+	public static ConnectionManager instance;
 	private Map<Integer, TTransport> transports;
 	private Map<Integer, KmiacServer.Client> connections;
 	private Map<Integer, TTransport> commonTransports;
@@ -80,6 +82,8 @@ public class ConnectionManager {
 	 * @throws NoSuchMethodException 
 	 */
 	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
+		instance = this;
+		
 		transports = new HashMap<>();
 		connections = new HashMap<>();
 		commonTransports = new HashMap<>();
@@ -518,4 +522,65 @@ public class ConnectionManager {
 		
 		return null;
 	}
+	
+	/**
+	 * Загрузка отсортированного классификатора, в котором код - число.
+	 * @param cls - название классификатора
+	 * @param ord - порядок сортировки
+	 * @param fld - поля для сортировки
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IntegerClassifier> getIntegerClassifier(IntegerClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) {
+		Object res = viewClient.showModal(client, 3, cls, ord, fld);
+		
+		if (res != null)
+			return (List<IntegerClassifier>) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Загрузка неотсортированного классификатора, в котором код - число.
+	 * @param cls - название классификатора
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IntegerClassifier> getIntegerClassifier(IntegerClassifiers cls) {
+		Object res = viewClient.showModal(client, 4, cls);
+		
+		if (res != null)
+			return (List<IntegerClassifier>) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Загрузка отсортированного классификатора, в котором код - строка.
+	 * @param cls - название классификатора
+	 * @param ord - порядок сортировки
+	 * @param fld - поля для сортировки
+	 */
+	@SuppressWarnings("unchecked")
+	public List<StringClassifier> getStringClassifier(StringClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) {
+		Object res = viewClient.showModal(client, 5, cls, ord, fld);
+		
+		if (res != null)
+			return (List<StringClassifier>) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Загрузка неотсортированного классификатора, в котором код - строка.
+	 * @param cls - название классификатора
+	 */
+	@SuppressWarnings("unchecked")
+	public List<StringClassifier> getStringClassifier(StringClassifiers cls) {
+		Object res = viewClient.showModal(client, 6, cls);
+		
+		if (res != null)
+			return (List<StringClassifier>) res;
+		
+		return null;
+	}
+	
 }

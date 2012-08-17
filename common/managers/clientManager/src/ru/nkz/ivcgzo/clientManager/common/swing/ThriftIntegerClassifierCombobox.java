@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +15,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 
 /**
  * Параметризированный класс для работы с комбобоксами swing. В качестве параметра должна
@@ -26,29 +32,45 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extends JComboBox<IntegerClassifier> {
 	private static final long serialVersionUID = 8540397050277967316L;
 	private List<IntegerClassifier> items;
+	private IntegerClassifiers classifier;
+	private boolean classifierLoaded;
 	private Searcher searcher;
 	private StringComboBoxModel model;
+	
+	/**
+	 * Конструктор комбобокса с неотсортированным классификатором.
+	 * @param classifierName - название классификатора для автоматической
+	 * загрузки
+	 */
+	public ThriftIntegerClassifierCombobox(IntegerClassifiers classifierName) {
+		this(classifierName, true, null);
+	}
 	
 	/**
 	 * Конструктор комбобокса.
 	 * @param searcheable - включать ли поиск по первым буквам
 	 */
 	public ThriftIntegerClassifierCombobox(boolean searcheable) {
-		this(searcheable, new ArrayList<IntegerClassifier>());
+		this(null, searcheable, null);
 	}
 	
 	/**
 	 * Конструктор комбобокса.
+	 * @param classifierName - название классификатора для автоматической
+	 * загрузки
 	 * @param searcheable - включать ли поиск по первым буквам
 	 * @param list - список из thrift-структур для отображения
 	 */
-	public ThriftIntegerClassifierCombobox(boolean searcheable, List<IntegerClassifier> list) {
+	public ThriftIntegerClassifierCombobox(IntegerClassifiers classifierName, boolean searcheable, List<IntegerClassifier> list) {
+		classifier = classifierName;
 		if (searcheable) {
 			setEditable(true);
 			searcher = new Searcher();
 		}
 		setModel();
 		setData(list);
+		if (classifier != null)
+			setFormListeners();
 	}
 	
 	private void setModel() {
@@ -60,6 +82,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<IntegerClassifier> list) {
+		classifierLoaded = list != null;
 		if (list == null)
 			list = new ArrayList<>();
 			
@@ -69,6 +92,56 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		}
 		setSelectedItem(null);
 		model.fireContentsChanged();
+	}
+	
+	private void setFormListeners() {
+		MouseAdapter ma = new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					loadClassifier();
+					IntegerClassifier res = ConnectionManager.instance.showIntegerClassifierSelector(classifier);
+					
+					if (res != null)
+						setSelectedPcod(res.pcod);
+				}
+			}
+		};
+		
+		if (searcher == null)
+			addMouseListener(ma);
+		else
+			((CustomTextField) getEditor()).addMouseListener(ma);
+		
+		addPopupMenuListener(new PopupMenuListener() {
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+				loadClassifier();
+			}
+			
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+			}
+			
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent e) {
+			}
+		});
+	}
+	
+	/**
+	 * Загрузка классификатора, указанного в конструкторе
+	 */
+	public void loadClassifier() {
+		if (!classifierLoaded)
+			reloadClassifier();
+	}
+	
+	/**
+	 * Перезагрузка классификатора, указанного в конструкторе
+	 */
+	public void reloadClassifier() {
+		setData(ConnectionManager.instance.getIntegerClassifier(classifier));
 	}
 	
 	/**
@@ -100,6 +173,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 */
 	public void setSelectedPcod(int pcod) {
 		IntegerClassifier selItem = null;
+		
+		loadClassifier();
 		
 		for (IntegerClassifier item : items) {
 			if (item.pcod == pcod) {
@@ -213,6 +288,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 						String editText = editor.getText();
 						String editTextLow = editText.toLowerCase();
 						String lastSelTextLow = (lastSelected != null) ? lastSelected.name.toLowerCase() : "";
+						loadClassifier();
 						if (editText.length() == 0) {
 							searching = true;
 							cmb.setSelectedItem(null);
