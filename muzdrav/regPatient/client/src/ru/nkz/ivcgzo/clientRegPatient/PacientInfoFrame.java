@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientRegPatient;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +49,8 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -2754,6 +2758,16 @@ public class PacientInfoFrame extends JFrame {
         JButton btnPrint_ambk = new JButton("Амбул.карты");
         btnPrint_ambk.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
+        	    Gosp g = new Gosp();
+        	    String servPath;
+                try {
+                    servPath = MainForm.tcl.printMedCart(g, PersonalInfo);
+                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
+                } catch (TException | IOException | FileNotFoundException | OpenFileException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
         	}
         });
         btnPrint_ambk.setToolTipText("Печать титульного листа амбулаторной карты");
