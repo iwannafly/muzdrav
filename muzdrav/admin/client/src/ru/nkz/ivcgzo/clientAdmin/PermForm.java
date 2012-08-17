@@ -166,7 +166,7 @@ public class PermForm extends JDialog {
 
 		gbPerm.setLayout(gl_gbPerm);
 		
-		tbLog = new CustomTextField();
+		tbLog = new CustomTextField(true, true, false);
 		tbLog.setColumns(10);
 		
 		JLabel lblLog = new JLabel("Логин");
@@ -190,7 +190,7 @@ public class PermForm extends JDialog {
 			}
 		});
 		
-		tbPass = new CustomTextField();
+		tbPass = new CustomTextField(true, true, false);
 		tbPass.setEditable(false);
 		tbPass.setColumns(10);
 		
