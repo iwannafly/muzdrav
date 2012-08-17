@@ -55,6 +55,7 @@
 		<table srcName="MNN" dstName="n_mnn" />
 		<table srcName="N00" dstName="n_n00" />
 		<table srcName="NSI_OBST" dstName="n_nsi_obst" />
+		<table srcName="NSILPU" dstName="n_nsilpu" />
 		<table srcName="NSIPOL" dstName="n_nsipol" />
 		<table srcName="NZ1" dstName="n_nz1" />
 		<table srcName="OBST" dstName="n_obst" />
