@@ -230,7 +230,7 @@ public class ViewMkbTreeForm extends ModalForm {
 		
 		@Override
 		public String toString() {
-			return name;
+			return String.format("(%s) %s", kod_mkb, name.substring(0, name.length() - 10));
 		}
 	}
 	
@@ -243,7 +243,7 @@ public class ViewMkbTreeForm extends ModalForm {
 		
 		@Override
 		public String toString() {
-			return String.format("%s (%s)", name, pcod);
+			return String.format("(%s) %s", pcod, name);
 		}
 	}
 	
@@ -256,7 +256,7 @@ public class ViewMkbTreeForm extends ModalForm {
 		
 		@Override
 		public String toString() {
-			return String.format("%s (%s)", name, pcod);
+			return String.format("%-7s %s", pcod, name);
 		}
 	}
 	
@@ -269,7 +269,7 @@ public class ViewMkbTreeForm extends ModalForm {
 		
 		@Override
 		public String toString() {
-			return String.format("%s (%s)", name, pcod);
+			return String.format("%-7s %s", pcod, name);
 		}
 	}
 	
