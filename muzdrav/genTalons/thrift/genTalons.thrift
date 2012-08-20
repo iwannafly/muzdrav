@@ -43,7 +43,8 @@ struct Norm{
 	2:i32 vidp,
 	3:i32 dlit,
 	4:i32 cpol,
-	5:i32 id
+	5:i32 id,
+	6:string name_vidp
 }
 
 struct Nrasp{
@@ -55,7 +56,10 @@ struct Nrasp{
 	6:i32 cxema,
 	7:string cdol,
 	8:i32 cpol,
-	9:i32 id
+	9:i32 id,
+	10:bool pfd,
+	11:i64 timep_n,
+	12:i64 timep_k
 }
 
 struct Rasp{
@@ -69,7 +73,8 @@ struct Rasp{
 	8:i32 vidp,
 	9:string cdol,
 	10:i32 cpol,
-	11:i32 id
+	11:i32 id,
+	12:bool pfd
 }
 
 struct Vidp{
@@ -80,121 +85,279 @@ struct Vidp{
 
 struct Talon{
 	1:i32 id,
-	2:i32 ntalon,
-	3:i32 nrasp,
+	2:optional i32 ntalon,
+	3:optional i32 nrasp,
 	4:i32 pcod_sp,
 	5:string cdol,
-	6:i32 cdol_kem,
+	6:optional i32 cdol_kem,
 	7:i32 vidp,
-	8:i64 timepn,
-	9:i64 timepk
-	10:i64 datapt,
-	11:i64 datap,
-	12:i64 timep,
+	8:optional i64 timepn,
+	9:optional i64 timepk
+	10:optional i64 datapt,
+	11:optional i64 datap,
+	12:optional i64 timep,
 	13:i32 cpol
+}
+/*
+struct Report1{
+	1:i32 cpol,
+	2:optional i32 pcod,
+	3:optional string cdol,
+	4:i64 datan,
+	5:i64 datak,
+	6:i32 npp
+}
+*/
+
+/**
+ * Специальность не найдена
+ */
+exception SpecNotFoundException {
+}
+
+/**
+ * Календарь не найден
+ */
+exception CalendNotFoundException {
+}
+
+/**
+ * Врач не найден
+ */
+exception VrachNotFoundException {
+}
+
+/**
+ * Норма не найдена
+ */
+exception NormNotFoundException {
+}
+
+/**
+ * Неприёмные дни не найдены
+ */
+exception NdvNotFoundException {
+}
+
+/**
+ * График приёма (по дням недели) не найден
+ */
+exception NraspNotFoundException {
+}
+ 
+/**
+ * График приёма не найден
+ */
+exception RaspNotFoundException {
+}
+
+/**
+ * Талоны на приём не найдены
+ */
+exception TalonNotFoundException {
+}
+
+/**
+ * Вид приёма не найден
+ */
+exception VidpNotFoundException {
+}
+
+/**
+ * День недели не найден
+ */
+exception AztNotFoundException {
 }
 
 service ThriftGenTalons extends kmiacServer.KmiacServer {
 	/**
 	*Возвращает информацию о врачебных специальностях (datau пусто)
 	*/
-	list<Spec> getAllSpecForPolikliniki(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+	list<Spec> getAllSpecForPolikliniki(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse,
+            2: SpecNotFoundException snfe);
 
 	/**
 	*Возвращает код и ФИО врачей по врачебной должности
 	*/
-	list<Vrach> getVrachForCurrentSpec(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
-
-	/**
-	*Возвращает календарь на текущий год
-	*/
-	list<Calend> getCalendar(1:i32 cyear) throws (1: kmiacServer.KmiacServerException kse);
+	list<Vrach> getVrachForCurrentSpec(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse,
+            2: VrachNotFoundException vnfe);
 
 	/**
 	*Возвращает длительность приема специалистом в поликлинике
 	*/
-	list<Norm> getNorm(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Norm> getNorm(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse,
+            2: NormNotFoundException nnfe);
 
 	/**
 	*Возвращает неприемные дни врача
 	*/
-	list<Ndv> getNdv(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Ndv> getNdv(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1:kmiacServer.KmiacServerException kse, 
+            2: NdvNotFoundException nnfe);
 
 	/**
 	*Возвращает график приема врача в поликлинике
-	* сортировать denn,vidp
+	* сортировать denn,vidp,cxema
 	*/
-	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema) throws (1: kmiacServer.KmiacServerException kse);
+	list<Nrasp> getNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i32 cxema) throws (1: kmiacServer.KmiacServerException kse,
+            2: NraspNotFoundException nnfe);
 
 	/**
 	*Возвращает расписание работы врача в поликлинике
 	*/
-	list<Rasp> getRasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Rasp> getRasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1:kmiacServer.KmiacServerException kse, 
+            2:RaspNotFoundException rnfe);
 
 	/**
 	*Возвращает талоны на прием в поликлинике
 	*/
-	list<Talon> getTalon(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i64 datap) throws (1: kmiacServer.KmiacServerException kse);
+	list<Talon> getTalon(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol, 4:i64 datap) throws (1:kmiacServer.KmiacServerException kse,
+            2: TalonNotFoundException tnfe);
 
 	/**
 	*Возвращает виды приема
 	*/
-	list<Vidp> getVidp() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getVidp() throws (1: kmiacServer.KmiacServerException kse, 2: VidpNotFoundException vnfe);
 
 	/**
-        * Добавляет записи в табл расписание работы врача
-        * @param Nrasp - thrift-объект с информацией о расписании
-        */
-	void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+	*Возвращает дни недели (select pcod, name from n_azt)
+	*/
+	list<classifier.IntegerClassifier> getAzt() throws (1: kmiacServer.KmiacServerException kse, 2: AztNotFoundException anfe);
 
 	/**
-        * Добавляет записи в табл ndv
-        * @param Ndv - thrift-объект с информацией о нерабочих днях
-        */
+	*Возвращает календарь на текущую дату
+	*/
+	Calend getCalendar(1:i64 datacal) throws (1: kmiacServer.KmiacServerException kse, 
+            2: CalendNotFoundException cnfe);
+
+	/**
+	 * Добавляет записи в табл расписание работы врача
+	 * @param Nrasp - thrift-объект с информацией о расписании
+	 */  
+    	void addNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	* Добавляет записи в табл ndv
+    	* @param Ndv - thrift-объект с информацией о нерабочих днях
+	*/
 	void addNdv(1: Ndv ndv) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-        * Добавляет записи в табл norm
+	* Добавляет записи в табл norm
         * @param Norm - thrift-объект с информацией о нормах длительности приема
         */
-	void addNorm(1: list<Norm> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+	void addNorm(1: list<Norm> norm) throws (1: kmiacServer.KmiacServerException kse);
 
-	/**
+ 	/**
         * Удаляет расписание работы врача
-        */
+	*/
 	void deleteNrasp(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-        * Удаляет строку в табл ndv
-        */
+	* Удаляет строку в табл ndv
+	*/
 	void deleteNdv(1:i32 id) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-        * Сохраняет изменения в табл расписание работы врача
-        * @param Nrasp - thrift-объект с информацией о расписании
-        */
+	* Сохраняет изменения в табл расписание работы врача
+	* @param Nrasp - thrift-объект с информацией о расписании
+	*/
 	void updateNrasp(1: list<Nrasp> nrasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-        * Сохраняет изменения в табл norm
-        * @param Norm - thrift-объект с информацией о расписании
+	* Сохраняет изменения в табл norm
+	* @param Norm - thrift-объект с информацией о расписании
+	*/
+	void updateNorm(1: list<Norm> norm) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	* Сохраняет изменения в табл ndv
+	* @param Ndv - thrift-объект с информацией о расписании
+	*/
+	void updateNdv(1:list<Ndv> ndv) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	*Возвращает график приема всех врачей в поликлинике
+	* сортировать denn,vidp,cxema
+	*/
+	list<Nrasp> getNraspCpodr(1:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse, 
+            2: NraspNotFoundException nnfe);
+
+	/**
+	*Возвращает график приема конкретной специальности в поликлинике
+	* сортировать denn,vidp,cxema
+	*/
+	list<Nrasp> getNraspCdol(1:i32 cpodr, 2:string cdol) throws (1: kmiacServer.KmiacServerException kse, 
+            2: NraspNotFoundException nnfe);
+
+	/**
+	*Возвращает график приема конкретного врача в поликлинике
+	* сортировать denn,vidp,cxema
+	*/
+	list<Nrasp> getNraspVrach(1:i32 cpodr, 2:i32 pcodvrach, 3:string cdol) throws (1: kmiacServer.KmiacServerException kse,
+            2: NraspNotFoundException nnfe);
+
+	/**
+        * Добавляет записи в табл расписание работы врача
+        * @param Rasp - thrift-объект с информацией о расписании
         */
-	void updateNorm(1: list<Norm> nrasp) throws (1: kmiacServer.KmiacServerException kse);
+	void addRasp(1: list<Rasp> rasp) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет расписание работы врача всего подразделения за период (where datap >=datan and datap<=datak)
+        */
+	void deleteRaspCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет расписание работы врача по специальности за период (where datap >=datan and datap<=datak)
+        */
+	void deleteRaspCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет расписание работы врача по специальности за период (where datap >=datan and datap<=datak)
+        */
+	void deleteRaspVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	*Возвращает количество талонов
+	*/
+	i32 getTalonCountCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1:
+            kmiacServer.KmiacServerException kse)
 
+	/**
+	*Возвращает количество талонов
+	*/
+	i32 getTalonCountCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1:
+            kmiacServer.KmiacServerException kse)
 
+	/**
+	*Возвращает количество талонов
+	*/
+	i32 getTalonCountVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет талоны всего подразделения за период (where datap >=datan and datap<=datak)
+        * если prv=2 или 3  делаем prv=4, остальные удаляем
+        */
+	void deleteTalonCpodr(1:i64 datan, 2:i64 datak, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет талоны по специальности за период (where datap >=datan and datap<=datak)
+        * если prv=2 или 3  делаем prv=4, остальные удаляем
+        */
+	void deleteTalonCdol(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Удаляет талоны по специальности за период (where datap >=datan and datap<=datak)
+        * если prv=2 или 3  делаем prv=4, остальные удаляем
+        */
+	void deleteTalonVrach(1:i64 datan, 2:i64 datak, 3:i32 cpodr, 4:i32 pcodvrach, 5:string cdol) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+        * Добавляет записи в табл талонов
+        * @param Talon - thrift-объект с информацией о талонах
+        */
+	void addTalons(1: list<Talon> talon) throws (1: kmiacServer.KmiacServerException kse);
 
-
-
-
-
-
-
+/*	string printReport(1: Report1 rep1) throws (1: kmiacServer.KmiacServerException kse);
+*/
 }

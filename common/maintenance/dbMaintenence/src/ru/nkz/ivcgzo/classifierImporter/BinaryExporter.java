@@ -107,26 +107,17 @@ public class BinaryExporter {
 				turple[i] = dateToBytes(data.getDate(i + 1));
 				break;
 			default:
-				throw new SQLException(String.format("Unsupportes data type: %d.", meta.getColumnType(i + 1)));
+				throw new SQLException(String.format("Unsupported data type: %d.", meta.getColumnType(i + 1)));
 			}
 		}
 		return turple;
 	}
 	
 	private byte[] numericToFloat(double number, int scale) {
-//		if (scale < 25)
-//			return numericToBytes(Float.floatToIntBits((float) number), 10);
-//		else
 		return numericToBytes(Double.doubleToLongBits(number), 11);
 	}
 	
 	private byte[] numericToBytes(long number, int precision) {
-//		if (precision < 6) {
-//			byte[] buf = new byte[2];
-//			buf[0] = (byte) (number >> 0x08);
-//			buf[1] = (byte) (number);
-//			return buf;
-//		} else 
 		if (precision < 11) {
 			byte[] buf = new byte[4];
 			buf[0] = (byte) (number >> 0x18);
@@ -160,7 +151,10 @@ public class BinaryExporter {
 	}
 	
 	private byte[] dateToBytes(Date date) {
-		return numericToBytes((date.getTime() - mills2000Yrs) / millsOneDay, 10);
+		if (date == null)
+			return null;
+		else
+			return numericToBytes((date.getTime() - mills2000Yrs) / millsOneDay, 10);
 	}
 	
 	private void putTurple(RandomAccessFile raf, byte[][] turple) throws IOException {

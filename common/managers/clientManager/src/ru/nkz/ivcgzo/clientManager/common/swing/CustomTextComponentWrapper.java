@@ -14,6 +14,9 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.BadLocationException;
@@ -86,6 +89,36 @@ public class CustomTextComponentWrapper {
 			
 			isSetTextSelectionOnFocus = true;
 		}
+	}
+	
+	public void setUpperCase() {
+		textComponent.getDocument().addDocumentListener(new DocumentListener() {
+			boolean running;
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				if (!running) {
+					running = true;
+					SwingUtilities.invokeLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							textComponent.setText(textComponent.getText().toUpperCase());
+							
+							running = false;
+						}
+					});
+				}
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+			}
+		});
 	}
 	
 	/**

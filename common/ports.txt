@@ -10,5 +10,6 @@ base port + 0	auth
 7	viewSelect
 8	genTalons
 9	outputInfo
+10  reception
 
 55201	libUpd

@@ -24,12 +24,13 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	public static UserAuthInfo authInfo;
 	public static int accessParam;
 	private Class<T> thrClass;
-	private static int appId;
-	private static int thrPort;
+	private int appId;
+	private int thrPort;
 	public T thrClient;
 	private JFrame frame;
 	private IClient parent;
-	private ModalExclusionType parentModalType;
+	private JDialog dialog;
+	private ModalExclusionType prevModalType;
 	private List<JFrame> childList;
 	
 	public Client(ConnectionManager conMan, UserAuthInfo authInfo, Class<T> thrClass, int appId, int thrPort, int accessParam, String... params) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -37,8 +38,8 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 		Client.authInfo = authInfo;
 		Client.accessParam = accessParam;
 		this.thrClass = thrClass;
-		Client.appId = appId;
-		Client.thrPort = thrPort;
+		this.appId = appId;
+		this.thrPort = thrPort;
 		childList = new ArrayList<>();
 		
 		conMan.add(thrClass, thrPort);
@@ -90,23 +91,31 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 * @param parent - родительский плагин-клиент
 	 */
 	public JDialog prepareModal(IClient parent) {
-		JDialog dialog = new JDialog(parent.getFrame());
+		if (dialog != null)
+			throw new RuntimeException("Modal dialog already prepared.");
+		
+		dialog = new JDialog(getFrame());
 		
 		this.parent = parent;
-		parentModalType = parent.getFrame().getModalExclusionType();
+		prevModalType = getFrame().getModalExclusionType();
 		
-		parent.getFrame().setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+		this.getFrame().setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		
 		try {
+			dialog.setMinimumSize(getFrame().getMinimumSize());
+			dialog.setBounds(getFrame().getBounds());
+			dialog.setTitle(getFrame().getTitle());
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setModal(true);
 			dialog.setContentPane(getFrame().getContentPane());
-			dialog.pack();
-			dialog.setLocationRelativeTo(parent.getFrame());
+			dialog.revalidate();
+			if (!(getFrame() instanceof ModalForm) || (((ModalForm) getFrame()).getModalLocationRelativeToParent()))
+					dialog.setLocationRelativeTo(parent.getFrame());
 			conMan.setClient(this);
 			conMan.connect();
 		} catch (TException e) {
 			e.printStackTrace();
+			conMan.setClient(parent);
 			conMan.reconnect(e);
 		}
 		
@@ -118,10 +127,12 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 * плагин-серверов.
 	 */
 	public void disposeModal() {
-		disposeChildren();
-		conMan.remove(getPort());
 		conMan.setClient(parent);
-		parent.getFrame().setModalExclusionType(parentModalType);
+		parent.getFrame().setModalExclusionType(prevModalType);
+		disposeChildren();
+		conMan.disconnect(getPort());
+		dialog.dispose();
+		dialog = null;
 	}
 	
 	private void setDisconnectOnFrameClose() {

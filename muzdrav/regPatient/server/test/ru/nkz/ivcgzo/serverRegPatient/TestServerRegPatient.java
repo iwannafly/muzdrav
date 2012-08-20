@@ -32,13 +32,14 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
+import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 
 /**
  * @author Avdeev Alexander
  */
 public class TestServerRegPatient {
     private String conn = String.format("jdbc:postgresql://%s:%s/%s",
-            "10.0.0.66", "5432", "zabol");
+            "10.0.0.242", "5432", "zabol");
     private ISqlSelectExecutor sse;
     private ITransactedSqlExecutor tse;
     private ServerRegPatient testServer;
@@ -329,7 +330,7 @@ public class TestServerRegPatient {
     @Test
     public final void addSign_isSignActuallyAdded()
             throws TException {
-        Sign s =new Sign();
+        Sign s = new Sign();
         s.setNpasp(26006);
         s.setGrup("9");
         s.setPh("1");
@@ -357,6 +358,32 @@ public class TestServerRegPatient {
         testServer.updatePatient(patientFullInfo);
         //assertEquals(afterAddId, 0);
     }
+
+    @Test
+    public final void updateOgrn_isActuallyUpdated() throws TException {
+        int npasp = 5;
+        testServer.updateOgrn(npasp);
+    }
+
+    @Test
+    public final void getSmocod_isValueCorrect() throws TException, SmocodNotFoundException {
+        String expectedSmocod = "06500";
+        int pcod = 366;
+        String ogrn = "1027739099772";
+        String smocod = testServer.getSmocod(ogrn, pcod);
+        assertEquals("smocod value = ", expectedSmocod, smocod);
+    }
+
+    @Test
+    public final void printMedCard_isTemplateCorrect() throws TException, PatientNotFoundException {
+        int npasp = 8;
+        Gosp gosp = new Gosp();
+        PatientFullInfo patientFullInfo =
+                testServer.getPatientFullInfo(npasp);
+        String pathToTemplate = testServer.printMedCart(gosp, patientFullInfo);
+        System.out.println(pathToTemplate);        
+    }
+
 //    @Test
 //    public final void isAgentExist_isThrowAlreadyExistException()
 //            throws TException, AgentNotFoundException, AgentAlreadyExistException {
