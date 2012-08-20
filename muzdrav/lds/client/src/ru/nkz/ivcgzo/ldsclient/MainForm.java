@@ -55,6 +55,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 			public void actionPerformed(ActionEvent arg0) {				
 				winPat.frame.setVisible(true);
 				winPat.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				winPat.filtPat();
 			}
 		});
 		mnNewMenu.add(mntmNewMenuItem);
@@ -98,6 +99,8 @@ public class MainForm extends Client<LDSThrift.Client> {
 				cbrez.setData(MainForm.tcl.getAp0());
 				cbish.setData(MainForm.tcl.getAq0());*/
 
+				//winPat.cBpcisl.setData(ltc.GetKlasS_ot01(authInfo.cpodr));
+				winPat.cBpcisl.setData(ltc.GetKlasS_ot01(2000004));
 				winPat.cBprichina.setData(ltc.GetKlasCpos2());
 				winPat.cBpopl.setData(ltc.GetKlasPopl());
 				winPat.cBnapravl.setData(ltc.GetKlasNapr());

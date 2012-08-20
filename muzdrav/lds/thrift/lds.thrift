@@ -166,7 +166,7 @@ exception S_ot01NotFoundException {
 
 
 service LDSThrift extends kmiacServer.KmiacServer {
-	list<ObInfIsl> GetObInfIslt(1: i32 npasp);
+	list<ObInfIsl> GetObInfIslt(1: i32 npasp, 2: i32 kodotd);
 	ObInfIsl GetIsl(1: i32 npasp) throws (1: IslNotFoundException ine);
 	i32 AddIsl(1: ObInfIsl info)throws (1: IslExistsException iee);
 	void UpdIsl(1: ObInfIsl info)throws (1: IslExistsException iee);
@@ -194,7 +194,8 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void DelS_ot01D(1: i32 cotd, 2: string pcod, 3: string c_obst, 4: string c_nz1);
 	
 
-    	list<Patient> getPatient(1: Patient pat) throws (1: PatientNotFoundException pnfe);
+    	list<Patient> getPatient(1: string npasp) throws (1: PatientNotFoundException pnfe);
+    	list<Patient> getPatDat(1: i64 datap 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	
@@ -203,6 +204,9 @@ service LDSThrift extends kmiacServer.KmiacServer {
 
 
 	list <classifier.IntegerClassifier> GetKlasCpos2();
+	list <classifier.StringClassifier>  GetKlasS_ot01(1: i32 cotd);
+	list <classifier.StringClassifier>  GetKlasIsS_ot01(1: i32 cotd, 2: string organ);
+	list <classifier.StringClassifier>  GetKlasMetS_ot01(1: i32 cotd, 2: string organ, 3: string isl);
 	list <classifier.IntegerClassifier> GetKlasPopl();
 	list <classifier.IntegerClassifier> GetKlasNapr();
 	list <classifier.IntegerClassifier> GetKlasO00(1: i32 clpu);
@@ -211,5 +215,5 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
 	list <classifier.IntegerClassifier> GetKlasP0e1();
-	list <classifier.StringClassifier> GetKlasNz1();
+	list <classifier.StringClassifier>  GetKlasNz1();
 }
