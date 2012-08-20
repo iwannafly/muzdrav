@@ -1,10 +1,13 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +44,18 @@ import ru.nkz.ivcgzo.thriftRegPatient.LgotaAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.LgotaNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
 import ru.nkz.ivcgzo.thriftRegPatient.NambkAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
+import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 
@@ -158,7 +166,7 @@ public class ServerRegPatient extends Server implements Iface {
     //  datapr      dataot      ishod
         Date.class, Date.class, Integer.class
     };
-    //Отражение таблицы p_kov (кроме поля name - это поле классификатора n_lkn)
+    // Отражение таблицы p_kov (кроме поля name - это поле классификатора n_lkn)
     private static final Class<?>[] LGOTA_TYPES = new Class<?>[] {
     //  id             npasp          lgot          datal
         Integer.class, Integer.class, Integer.class, Date.class,
@@ -421,6 +429,33 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+/////////////////////////////////// Check OS Type /////////////////////////////
+
+    private boolean isWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //windows
+        return (os.indexOf("win") >= 0);
+    }
+
+    private boolean isUnix() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //linux or unix
+        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
+    }
+
+////////////////////////////// Other ///////////////////////////////////////////
+
+    private String setReportPath() {
+        if (isWindows()) {
+            return "C:\\Temp\\MedCardAmbPriem_t.htm";
+        } else if (isUnix()) {
+            return System.getProperty("user.home")
+                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
+        } else {
+            return "MedCardAmbPriem_t.htm";
+        }
+    }
+
 ////////////////////////////////////////////////////////////////////////
 //                       Public Methods                               //
 ////////////////////////////////////////////////////////////////////////
@@ -626,6 +661,71 @@ public class ServerRegPatient extends Server implements Iface {
                 return rsmGosp.map(rs);
             } else {
                 throw new GospNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final String getOgrn(final String smocod) throws TException, OgrnNotFoundException {
+        String sqlQuery = "SELECT ogrn FROM n_smorf WHERE smocod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, smocod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("ogrn");
+            } else {
+                throw new OgrnNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final int getRegionLive(final int pcod) throws TException, RegionLiveNotFoundException {
+        String sqlQuery = "SELECT c_ffomc FROM n_l02 WHERE pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getInt("c_ffomc");
+            } else {
+                throw new RegionLiveNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final int getTerLive(final int pcod) throws TException, TerLiveNotFoundException {
+        String sqlQuery = "SELECT ter FROM n_l00 WHERE pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getInt("ter");
+            } else {
+                throw new TerLiveNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final String getSmocod(final String ogrn, final int pcod) throws TException,
+            SmocodNotFoundException {
+        String sqlQuery = "SELECT smocod FROM n_smorf WHERE ogrn = ? AND pcod = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, ogrn, pcod)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("smocod");
+            } else {
+                throw new SmocodNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1032,8 +1132,17 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+
     @Override
-    public final void testConnection() throws TException {
+    public final void updateOgrn(final int npasp) throws TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("UPDATE p_preds SET name_str = null, ogrn_str = null WHERE npasp=?",
+                    false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
     }
 
 //////////////////////// Configuration Methods ////////////////////////////////////
@@ -1047,6 +1156,10 @@ public class ServerRegPatient extends Server implements Iface {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException();
         }
+    }
+
+    @Override
+    public final void testConnection() throws TException {
     }
 
 ////////////////////////// Classifiers ////////////////////////////////////
@@ -1244,5 +1357,75 @@ public class ServerRegPatient extends Server implements Iface {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new TException(e);
         }
+    }
+
+    @Override
+    public final List<StringClassifier> getSmorf(final int kodsmo)
+            throws SmorfNotFoundException, TException {
+        final String sqlQuery = "SELECT smocod, nam_smop FROM n_smorf WHERE pcod = ?";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSmorf =
+                new TResultSetMapper<>(StringClassifier.class, "smocod", "nam_smop");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, kodsmo)) {
+            return rsmSmorf.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final String printMedCart(final Gosp gosp, final PatientFullInfo pat)
+            throws TException {
+        final String reportPath = setReportPath();
+        try (OutputStreamWriter osw =
+                new OutputStreamWriter(new FileOutputStream(reportPath), "utf-8")) {
+//            AutoCloseableResultSet acrs;
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
+            String gender;
+            if (pat.getPol() == 1) {
+                gender = "мужской";
+            } else if (pat.getPol() == 0) {
+                gender = "женский";
+            } else {
+                gender = "";
+            }
+            HtmTemplate htmTemplate =
+                    new HtmTemplate("/home/as/Work/muzdrav_reports/MedCardAmbPriem.htm");
+            System.out.println(htmTemplate.getLabelsCount());
+            htmTemplate.replaceLabels(true,
+                "",
+                "",
+                pat.getNambk().getNambk(),
+                "",
+                pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
+                String.valueOf(pat.getPolis_oms().getStrg()),
+                pat.getSnils(),
+                "",
+                pat.getFam(),
+                pat.getIm(),
+                pat.getOt(),
+                gender,
+                dateFormat.format(new Date(pat.getDatar())),
+                pat.getAdmAddress().getCity()
+                    + "," + pat.getAdmAddress().getStreet() + " "
+                    + pat.getAdmAddress().getHouse()
+                    + " - " + pat.getAdmAddress().getFlat(),
+                pat.getAdpAddress().getCity()
+                    + "," + pat.getAdpAddress().getStreet() + " "
+                    + pat.getAdpAddress().getHouse()
+                    + " - " + pat.getAdpAddress().getFlat(),
+                pat.getTel()
+            );
+            osw.write(htmTemplate.getTemplateText());
+            return reportPath;
+        } catch (Exception e) {
+            throw new  TException(e); // тут должен быть кмиац сервер иксепшн
+        }
+    }
+
+    @Override
+    public final String printAmbCart(final PatientFullInfo pat) throws TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

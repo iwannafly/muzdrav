@@ -24,7 +24,6 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.clientOsm.patientInfo.Classifiers;
 import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -32,6 +31,7 @@ import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JCheckBox;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
@@ -80,17 +80,41 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			}
 		});
 		
+		final JCheckBox cbzpr = new JCheckBox("Вернуться к записанным на прием");
+		cbzpr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
+					Calendar calendar = GregorianCalendar.getInstance();
+					calendar.setTimeInMillis(System.currentTimeMillis());
+					frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
+
+					table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+					conMan.reconnect(e);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+		cbzpr.setEnabled(false);
 		JButton btnSearch = new JButton("Поиск");
-		btnSearch.setVisible(false);
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int[] res = conMan.showPatientSearchForm("Поиск ранее записанных на прием пациентов", false, false);
+				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, false);
 				
 				try {
-					if (res == null)
-						table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
-					else
+					if (res == null){
+						cbzpr.setEnabled(false);
+						table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));}
+					else{
+						frame.setTitle("Найденные пациенты");
+						cbzpr.setEnabled(true);
 						table.setData(tcl.getZapVrSrc(Arrays.toString(res).replace('[', '(').replace(']', ')')));
+					}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -109,36 +133,37 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				pInf.update(table.getSelectedItem().getNpasp());
 			}
 		});
+		
+		
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
+			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSearch)
-							.addPreferredGap(ComponentPlacement.RELATED, 455, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnNewButton)
+							.addGap(18)
 							.addComponent(btnView)
-							.addGap(15)
-							.addComponent(btnNewButton)))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(cbzpr)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 411, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnNewButton)
-								.addComponent(btnSearch))
-							.addContainerGap())
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-							.addComponent(btnView)
-							.addGap(12))))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnSearch)
+						.addComponent(btnNewButton)
+						.addComponent(btnView)
+						.addComponent(cbzpr))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(18))
 		);
 		
 		table = new CustomTable<>(false, true, ZapVr.class, 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
@@ -158,10 +183,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		if (conn instanceof ThriftOsm.Client) {
 			tcl = thrClient;
 			try {
-				if (!Classifiers.load(tcl)) {
-					JOptionPane.showMessageDialog(frame, "Ошибка загрузки классификаторов", "Необработанная ошибка", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
 				//table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
 				table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
 				if (pInf == null)

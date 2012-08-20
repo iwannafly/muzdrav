@@ -1,5 +1,15 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,24 +17,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableRowSorter;
@@ -32,46 +30,32 @@ import javax.swing.table.TableRowSorter;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientManager.common.Client;
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
-import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
-import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
-import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
-import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewStringClassifierForm;
-import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
-import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
+import ru.nkz.ivcgzo.clientManager.common.Client;
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
-public class MainForm extends Client<ThriftViewSelect.Client> {
-	public static ThriftViewSelect.Client tcl;
-	public static ClassifierManager ccm;
+public class NSForm extends Client<ThriftViewSelect.Client> {
+
 	private JFrame frame;
 	private JTextField tfSearch;
+	public static ThriftViewSelect.Client tcl;
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
-	public static Client<ThriftViewSelect.Client> instance;
-	public PatientSearchForm srcFrm;
-	public ViewMkbTreeForm mkbFrm;
-	public ViewIntegerClassifierForm intFrm;
-	public ViewStringClassifierForm strFrm;
 
-	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
+	/**
+	 * Launch the application.
+	 */
+	public NSForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
-		
-		initModalForms();
-		
+
 		initialize();
 		setFrame(frame);
-		instance = this;
+		//setFrame(new ViewTablePcodStringForm());
+		//setFrame(new ViewTablePcodIntForm());
 	}
+
 
 	/**
 	 * Create the application.
@@ -94,12 +78,6 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		frame.setTitle("Нормативно-справочная информация");
 		frame.setBounds(100, 100, 750, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent e) {
-				//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-				}
-		});
 		
 		ButtonGroup group = new ButtonGroup();
 		
@@ -205,15 +183,13 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		    	  try {
 					if (tcl.isClassifierPcodInteger(className)) {
 						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
-						  MainForm.instance.addChildFrame(VSPIForm);
-						  VSPIForm.tableFill(className);
+						  ViewTablePcodIntForm.tableFill(className);
 						  VSPIForm.setVisible(true);
 						//System.out.print(className);
 					  }
 					else {
 						  ViewTablePcodStringForm VSPSForm = new ViewTablePcodStringForm();
-						  MainForm.instance.addChildFrame(VSPSForm);
-						  VSPSForm.tableFill(className);
+						  ViewTablePcodStringForm.tableFill(className);
 						  VSPSForm.setVisible(true);
 					}
 				} catch (TException e1) {
@@ -265,7 +241,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		}
 		
 	}
-
+	
 	// Быстрый поиск по таблице
     private void search()
     {
@@ -300,125 +276,4 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		
 	}
 	
-	private void initModalForms() {
-		if (ccm == null)
-			ccm = new ClassifierManager();
-		
-		srcFrm = new PatientSearchForm();
-		mkbFrm = new ViewMkbTreeForm();
-		intFrm = new ViewIntegerClassifierForm();
-		strFrm = new ViewStringClassifierForm();
-	}
-	
-	@Override
-	public Object showModal(IClient parent, Object... params) {
-		if (conMan != null && parent != null)
-			if (params.length > 0) {
-				JDialog dialog = null;
-				switch ((int) params[0]) {
-				case 1:
-					setFrame(srcFrm);
-					srcFrm.setTitle((String) params[1]);
-					dialog = prepareModal(parent);
-					if ((boolean) params[2])
-						srcFrm.clearFields();
-					srcFrm.setOptionalParamsEnabledState(!(boolean) params[3]);
-					srcFrm.setModalityListener();
-					dialog.setVisible(true);
-					try {
-						List<PatientBriefInfo> srcResList = srcFrm.getSearchResults();
-						if (srcResList != null) {
-							int[] res = new int[srcResList.size()];
-							for (int i = 0; i < srcResList.size(); i++)
-								res[i] = srcResList.get(i).npasp;
-							
-							return res;
-						}
-					} finally {
-						setFrame(frame);
-						srcFrm.removeModalityListener();
-						disposeModal();
-					}
-					break;
-					
-				case 2:
-					setFrame(mkbFrm);
-					mkbFrm.setTitle((String) params[1]);
-					dialog = prepareModal(parent);
-					mkbFrm.prepare((String) params[2]);
-					mkbFrm.setModalityListener();
-					dialog.setVisible(true);
-					try {
-						return mkbFrm.getResults();
-					} finally {
-						setFrame(frame);
-						mkbFrm.removeModalityListener();
-						disposeModal();
-					}
-					
-				case 3:
-				case 4:
-				case 5:
-				case 6:
-					try {
-						conMan.setClient(this);
-						conMan.connect(getPort());
-						
-						switch ((int) params[0]) {
-						case 3:
-							return ccm.getIntegerClassifier((IntegerClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
-						case 4:
-							return ccm.getIntegerClassifier((IntegerClassifiers) params[1]);
-						case 5:
-							return ccm.getStringClassifier((StringClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
-						case 6:
-							return ccm.getStringClassifier((StringClassifiers) params[1]);
-						}
-					} catch (Exception e) {
-						conMan.disconnect(getPort());
-						conMan.setClient(parent);
-					}
-				case 7:
-				case 8:
-					setFrame(intFrm);
-					intFrm.rightSnapWindow();
-					dialog = prepareModal(parent);
-					intFrm.setModalityListener();
-					if ((int) params[0] == 7)
-						intFrm.prepare((IntegerClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
-					else
-						intFrm.prepare((IntegerClassifiers) params[1], ClassifierSortOrder.none, null);
-					dialog.setVisible(true);
-					try {
-						return intFrm.getResults();
-					} finally {
-						setFrame(frame);
-						intFrm.removeModalityListener();
-						disposeModal();
-					}
-					
-				case 9:
-				case 10:
-					setFrame(strFrm);
-					strFrm.rightSnapWindow();
-					dialog = prepareModal(parent);
-					strFrm.setModalityListener();
-					if ((int) params[0] == 9)
-						strFrm.prepare((StringClassifiers) params[1], (ClassifierSortOrder) params[2], (ClassifierSortFields) params[3]);
-					else
-						strFrm.prepare((StringClassifiers) params[1], ClassifierSortOrder.none, null);
-					dialog.setVisible(true);
-					try {
-						return strFrm.getResults();
-					} finally {
-						setFrame(frame);
-						strFrm.removeModalityListener();
-						disposeModal();
-					}
-					
-				}
-			}
-		
-		return null;
-	}
 }

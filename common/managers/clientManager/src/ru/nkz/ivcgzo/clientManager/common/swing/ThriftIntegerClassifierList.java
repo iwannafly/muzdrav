@@ -45,6 +45,9 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<IntegerClassifier> list) {
+		if (list == null)
+			list = new ArrayList<>();
+			
 		items = new ArrayList<>(list.size());
 		for (IntegerClassifier item : list) {
 			items.add(new IntegerClassifierItem(item));

@@ -11,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestQueryGenerator.class, TestServerRegPatient.class })
+@SuiteClasses({ TestQueryGenerator.class, TestServerRegPatient.class, TestHtmTemplate.class })
 public class TestSuiteServerRegPatientProject {
 
 }

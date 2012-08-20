@@ -333,7 +333,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	/**
 	 * Возвращает фактический индекс строки в сортированной таблице.
 	 */
-	private int getSortedRowIndex() {
+	public int getSortedRowIndex() {
 		if (this.getSelectedRow() > -1)
 			if (sortable)
 				return this.convertRowIndexToModel(this.getSelectedRow());
@@ -450,69 +450,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 */
 	private void setModel() {
 		lst = new ArrayList<>();
-		this.setModel(new AbstractTableModel() {
-			private static final long serialVersionUID = -7716830847522898209L;
-
-			@Override
-			public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-				try {
-					if (lst.get(rowIndex) != null)
-						if (aValue != null)
-							if (aValue.toString().length() == 0)
-								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
-							else if (colTypes[colOrder[columnIndex]] == Date.class || colTypes[colOrder[columnIndex]] == Time.class)
-								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], ((Date)aValue).getTime());
-							else
-								lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], aValue);
-						else
-							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
-					itemUpd = true;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			@Override
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return editableCols[colOrder[columnIndex]];
-			}
-			
-			@Override
-			public Object getValueAt(int rowIndex, int columnIndex) {
-				try {
-					if (lst.get(rowIndex).isSet(thrFields[colIdx[colOrder[columnIndex]]]))
-						if (colTypes[colOrder[columnIndex]] == Date.class || colTypes[colOrder[columnIndex]] == Time.class)
-							return new Date((long)lst.get(rowIndex).getFieldValue(thrFields[colIdx[colOrder[columnIndex]]]));
-						else
-							return lst.get(rowIndex).getFieldValue(thrFields[colIdx[colOrder[columnIndex]]]);
-					else
-						return null;
-				} catch (Exception e) {
-					e.printStackTrace();
-					return null;
-				}
-			}
-			
-			@Override
-			public int getRowCount() {
-				return lst.size();
-			}
-			
-			@Override
-			public String getColumnName(int columnIndex) {
-				return colNames[colOrder[columnIndex]];
-			}
-			
-			@Override
-			public int getColumnCount() {
-				return colCount;
-			}
-			
-			@Override
-			public Class<?> getColumnClass(int columnIndex) {
-				return colTypes[colOrder[columnIndex]];
-			}
-		});
+		this.setModel(new CustomTableModel());
 
 		if (sortable) {
 			this.setRowSorter(new TableRowSorter<>((TableModel)this.getModel()));
@@ -603,7 +541,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow - 1;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsDeleted(selRow, selRow);
+			getModel().fireTableRowsDeleted(updRow, updRow);
 			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
@@ -613,16 +551,16 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				selRow = updRow;
 			}
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsInserted(selRow, selRow);
+			getModel().fireTableRowsInserted(updRow, updRow);
 			selRow = convertRowIndexToView(selRow);
-			this.changeSelection(selRow, 0, false, false);
+			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			this.editCellAt(selRow, 0);
 			break;
 		case 2: //update
 			getSelectionModel().setValueIsAdjusting(true);
-			getModel().fireTableRowsUpdated(selRow, selRow);
-			this.changeSelection(selRow, 0, false, false);
+			getModel().fireTableRowsUpdated(updRow, updRow);
+			this.changeSelection(selRow, selCol, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			break;
 		}
@@ -731,6 +669,71 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		for (int i = 0; i < colOrder.length; i++) {
 			this.getColumnModel().getColumn(colOrder[i]).setPreferredWidth(wdt[i]);
 		}
+	}
+	
+	public class CustomTableModel extends AbstractTableModel {
+		private static final long serialVersionUID = -7716830847522898209L;
+
+		@Override
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			try {
+				if (lst.get(rowIndex) != null)
+					if (aValue != null)
+						if (aValue.toString().length() == 0)
+							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
+						else if (colTypes[colOrder[columnIndex]] == Date.class || colTypes[colOrder[columnIndex]] == Time.class)
+							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], ((Date)aValue).getTime());
+						else
+							lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], aValue);
+					else
+						lst.get(rowIndex).setFieldValue(thrFields[colIdx[colOrder[columnIndex]]], null);
+				itemUpd = true;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return editableCols[colOrder[columnIndex]];
+		}
+		
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			try {
+				if (lst.get(rowIndex).isSet(thrFields[colIdx[colOrder[columnIndex]]]))
+					if (colTypes[colOrder[columnIndex]] == Date.class || colTypes[colOrder[columnIndex]] == Time.class)
+						return new Date((long)lst.get(rowIndex).getFieldValue(thrFields[colIdx[colOrder[columnIndex]]]));
+					else
+						return lst.get(rowIndex).getFieldValue(thrFields[colIdx[colOrder[columnIndex]]]);
+				else
+					return null;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
+		@Override
+		public int getRowCount() {
+			return lst.size();
+		}
+		
+		@Override
+		public String getColumnName(int columnIndex) {
+			return colNames[colOrder[columnIndex]];
+		}
+		
+		@Override
+		public int getColumnCount() {
+			return colCount;
+		}
+		
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			return colTypes[colOrder[columnIndex]];
+		}
+		
 	}
 }
 

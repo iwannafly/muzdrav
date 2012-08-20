@@ -262,91 +262,113 @@ exception NambkAlreadyExistException {
 exception SmorfNotFoundException {
 }
 
+exception OgrnNotFoundException {
+}
+
+exception RegionLiveNotFoundException {
+}
+
+exception TerLiveNotFoundException {
+}
+
+exception SmocodNotFoundException {
+}
+
 service ThriftRegPatient extends kmiacServer.KmiacServer {
     
-	/**
+    /**
      * Возвращает краткие сведения
      * о всех пациентах, удовлетворяющих введенным данным.
      * @param patient - информация о пациентах, по которой производится поиск
      * @return список thrift-объектов, содержащих краткую информацию о пациентах
      * @throws PatientNotFoundException
      */
-	list<PatientBrief> getAllPatientBrief(1:PatientBrief patient) throws (1: PatientNotFoundException pnfe),
+    list<PatientBrief> getAllPatientBrief(1:PatientBrief patient) throws (1: PatientNotFoundException pnfe),
 	
-	/**
+    /**
      * Возвращает полные сведения о пациенте с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return thrift-объект, содержащий полную информацию о пациенте
      * @throws PatientNotFoundException
      */
-	PatientFullInfo getPatientFullInfo(1:i32 npasp) throws (1: PatientNotFoundException pnfe),
+    PatientFullInfo getPatientFullInfo(1:i32 npasp) throws (1: PatientNotFoundException pnfe),
 	
-	/**
+    /**
      * Возвращает сведения о представителе пациента с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return thrift-объект, содержащий информацию о представителе пациента
      * @throws AgentNotFoundException
      */
-	Agent getAgent(1:i32 npasp) throws (1: AgentNotFoundException anfe),
+    Agent getAgent(1:i32 npasp) throws (1: AgentNotFoundException anfe),
 	
-	/**
+    /**
      * Возвращает сведения о льготах пациента с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return список thrift-объектов, содержащих информацию о льготах пациента
      * @throws LgotaNotFoundException
      */
-	list<Lgota> getLgota(1:i32 npasp) throws (1: LgotaNotFoundException lnfe),
+    list<Lgota> getLgota(1:i32 npasp) throws (1: LgotaNotFoundException lnfe),
 	
-	/**
+    /**
      * Возвращает сведения о категориях пациента с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return список thrift-объектов, содержащих информацию о категориях пациента
      * @throws KontingentNotFoundException
      */
-	list<Kontingent> getKontingent(1:i32 npasp) throws (1: KontingentNotFoundException knfe),
+    list<Kontingent> getKontingent(1:i32 npasp) throws (1: KontingentNotFoundException knfe),
 	
-	/**
+    /**
      * Возвращает особую информацию о пациенте с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return thrift-объект, содержащий особую информацию о пациенте
      * @throws SignNotFoundException
      */
-	Sign getSign(1:i32 npasp) throws (1: SignNotFoundException snfe),
+    Sign getSign(1:i32 npasp) throws (1: SignNotFoundException snfe),
 	
-	/**
+    /**
      * Возвращает записи о всех госпитализациях пациента с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return список thrift-объектов, содержащих информацию о госпитализациях пациента
      * @throws GospNotFoundException
      */
-	list<AllGosp> getAllGosp(1:i32 npasp) throws (1: GospNotFoundException gnfe),
+    list<AllGosp> getAllGosp(1:i32 npasp) throws (1: GospNotFoundException gnfe),
 	
-	/**
+    /**
      * Возвращает запись госпитализации пациента с указанным идентификатором
      * госпитализации
      * @param id - уникальный идентификатор госпитализации
      * @return thrift-объект, содержащий особую информацию о госпитализации пациента
      * @throws GospNotFoundException
      */
-	Gosp getGosp(1:i32 id) throws (1: GospNotFoundException gnfe),
-
-	void deletePatient(1:i32 npasp),
-	void deleteNambk(1:i32 npasp, 2:i32 cpol),
-	void deleteLgota(1:i32 id),
-	void deleteKont(1:i32 id),
-	void deleteAgent(1:i32 npasp),
-	void deleteSign(1:i32 npasp),
-	void deleteGosp(1:i32 id),
-
+    Gosp getGosp(1:i32 id) throws (1: GospNotFoundException gnfe),
+	
 	/**
+	 * Печать медицинской карты приемного отделения
+	 */
+	string printMedCart(1: Gosp gosp, 2: PatientFullInfo pat),
+	
+	/**
+	 * Печать амбулаторный карты
+	 */
+	string printAmbCart(1:PatientFullInfo pat),
+
+    void deletePatient(1:i32 npasp),
+    void deleteNambk(1:i32 npasp, 2:i32 cpol),
+    void deleteLgota(1:i32 id),
+    void deleteKont(1:i32 id),
+    void deleteAgent(1:i32 npasp),
+    void deleteSign(1:i32 npasp),
+    void deleteGosp(1:i32 id),
+
+    /**
      * Добавляет информацию о пациенте в БД
      * @param patinfo - thrift-объект с информацией о пациенте
      * @return целочисленный первичный ключ id, сгенерированный при добавлении
      * @throws PatientAlreadyExistException
      */
-	i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
+    i32 addPatient(1:PatientFullInfo patinfo) throws (1:PatientAlreadyExistException paee),
 	
-	/**
+    /**
      * Добавляет сведения о льготах пациента
      * @param lgota - сведения о льготах пациента
      * @return объект класса Info, в котором:
@@ -356,9 +378,9 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	 * </ul>
      * @throws LgotaAlreadyExistException
      */
-	Info addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
+    Info addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee),
 	
-	/**
+    /**
      * Добавляет информацию о категории пациента в БД
      * @param kont - информация о категории пациента
      * @return объект класса Info, в котором:
@@ -368,48 +390,72 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	 * </ul>
      * @throws KontingentAlreadyExistException
      */
-	Info addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
+    Info addKont(1:Kontingent kont) throws (1:KontingentAlreadyExistException kaee),
 	
-	/**
+    /**
      * Добавляет или обновляет информацию о представителе пациента в БД,
      * в зависимости от наличия данного представителя пациента в базе.
      * @param agent - информация о представителе пациента
      */
-	void addOrUpdateAgent(1:Agent agent),
+    void addOrUpdateAgent(1:Agent agent),
 	
-	/**
+    /**
      * Добавляет или обновляет особую информацию о пациенте в БД,
      * в зависимости от наличия в базе.
      * @param sign - особая информация о пациенте
      */
-	void addOrUpdateSign(1:Sign sign),
+    void addOrUpdateSign(1:Sign sign),
 	
-	/**
+    /**
      * Добавляет запись госпитализации в БД
      * @param gosp - особая информация о представителе пациента
      * @throws GospAlreadyExistException
      */
-	i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
+    i32 addGosp(1:Gosp gosp) throws (1:GospAlreadyExistException gaee),
 	
-	/**
+    /**
      * Добавляет запись об амбулаторной карте в БД
      * @param nambk - thrift-объект с информацией об амбулаторной карте
      * @throws NambkAlreadyExistException
      */
-	void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
+    void addNambk(1:Nambk nambk) throws (1:NambkAlreadyExistException naee),
 
-	void updatePatient(1:PatientFullInfo patinfo),
-	void updateNambk(1:Nambk nambk),
-	void updateLgota(1:Lgota lgota),
-	void updateKont(1:Kontingent kont),
-	void updateGosp(1:Gosp gosp),
+    void updatePatient(1:PatientFullInfo patinfo),
+    void updateNambk(1:Nambk nambk),
+    void updateLgota(1:Lgota lgota),
+    void updateKont(1:Kontingent kont),
+    void updateGosp(1:Gosp gosp),
+
+    /**
+     * Обновляет информацию в табл. preds поля name_str, ogrn_str если изменилось СМО и если есть запись в этой табл.
+     * update preds set name_str=null, ogrn_str=null where npasp=?
+     */
+    void updateOgrn(1:i32 npasp),
+	
+	/**
+	* Возвращает ОГРН
+	* select ogrn from n_smorf where smocod=?
+     	*/
+	string getOgrn(1:string smocod) throws (1:OgrnNotFoundException onfe),
 
 	/**
-	* Обновляет информацию в табл. preds поля name_str, ogrn_str если изменилось СМО и если есть запись в этой табл.
-	* update preds set name_str=null, ogrn_str=null where npasp=?
+	* Возвращает код СМО
+	* select smocod from n_smorf where ogrn=?
      	*/
-	void updateOgrn(1:i32 npasp),
-	
+	string getSmocod(1:string ogrn, 2:i32 pcod) throws (1:SmocodNotFoundException snfe),
+
+	/**
+	* Возвращает регион проживания
+	* select c_ffomc from n_l02 where pcod=?
+     	*/
+	i32 getRegionLive(1:i32 pcod) throws (1:RegionLiveNotFoundException rlnfe),
+
+	/**
+	* Возвращает территорию проживания
+	* select ter from n_l00 where pcod=?
+     	*/
+	i32 getTerLive(1:i32 pcod) throws (1:TerLiveNotFoundException tlnfe),
+
 /*Классификаторы*/
 	
 	/**
@@ -490,6 +536,5 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Классификатор N_SMORF (N_SMORF(pcod))
 	 */
-	list<classifier.IntegerClassifier> getSMORF(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe)
-
+	list<classifier.StringClassifier> getSmorf(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe)
 }

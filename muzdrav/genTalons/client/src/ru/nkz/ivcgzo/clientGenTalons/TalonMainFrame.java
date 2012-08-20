@@ -46,6 +46,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
@@ -55,6 +56,8 @@ import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
+import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
+//import ru.nkz.ivcgzo.thriftGenTalon
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
@@ -373,6 +376,7 @@ public class TalonMainFrame extends JFrame {
 		JScrollPane sp_rasp = new JScrollPane();
 		
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема",10,"перерыв",11,"");
+//		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
 		tbl_rasp.setPreferredWidths(100,90,60,60,30,30,50,50);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
@@ -1257,9 +1261,30 @@ public class TalonMainFrame extends JFrame {
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);	
 	}
+
+	public void fillTable() {
+	}
 	
 	public void onConnect() {
 		treevrach.setModel(new DefaultTreeModel(createNodes()));
+		
+		try {
+			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+			tbl_norm.setIntegerClassifierSelector(0, MainForm.tcl.getVidp());
+			tbl_talon.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+		} catch (KmiacServerException kse){
+		} catch (VidpNotFoundException vnfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		try {
+			MainForm.tcl.getAzt();
+			tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAzt());
+		} catch (KmiacServerException kse){
+		} catch (AztNotFoundException anfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	  private DefaultMutableTreeNode createNodes() {

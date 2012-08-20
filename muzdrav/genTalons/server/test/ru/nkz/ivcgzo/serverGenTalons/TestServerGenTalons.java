@@ -16,7 +16,9 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Calend;
 import ru.nkz.ivcgzo.thriftGenTalon.CalendNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
@@ -31,7 +33,6 @@ import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
-import ru.nkz.ivcgzo.thriftGenTalon.Vidp;
 import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.thriftGenTalon.VrachNotFoundException;
@@ -169,8 +170,8 @@ public class TestServerGenTalons {
     @Test
     public final void getVidp_isListSizeCorrect()
             throws KmiacServerException, TException, VidpNotFoundException {
-        final int expectedListSize = 5;
-        java.util.List <Vidp> testVidp =
+        final int expectedListSize = 3;
+        java.util.List <IntegerClassifier> testVidp =
                 testServer.getVidp();
         assertEquals("list size", expectedListSize, testVidp.size());
     }
@@ -231,5 +232,12 @@ public class TestServerGenTalons {
     @Test
     public final void deleteTalonVrach_IsActuallyDeleted() throws KmiacServerException, TException {
         testServer.deleteTalonVrach(new Date(112,2,26).getTime(), new Date(112,2,28).getTime(), 2000004, 6, "9");
+    }
+
+    @Test
+    public final void getAzt_IsListSizeCorrect() throws KmiacServerException, TException, AztNotFoundException {
+        int expectedSize = 7;
+        List<IntegerClassifier> testList = testServer.getAzt();
+        assertEquals("list Azt size", expectedSize, testList.size());
     }
 }

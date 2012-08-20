@@ -11,10 +11,10 @@ public class CustomTextField extends JTextField {
 	private CustomTextComponentWrapper ctcWrapper;
 	
 	public CustomTextField() {
-		this(true, true);
+		this(true, true, true);
 	}
 	
-	public CustomTextField(boolean selectOnFocus, boolean popupMenu) {
+	public CustomTextField(boolean selectOnFocus, boolean popupMenu, boolean upperCase) {
 		super();
 		
 		ctcWrapper = new CustomTextComponentWrapper(this);
@@ -23,6 +23,8 @@ public class CustomTextField extends JTextField {
 			ctcWrapper.setTextSelectionOnFocus();
 		if (popupMenu)
 			ctcWrapper.setPopupMenu();
+		if (upperCase)
+			ctcWrapper.setUpperCase();
 	}
 	
 	public boolean isEmpty () {
