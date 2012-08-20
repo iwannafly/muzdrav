@@ -449,8 +449,8 @@ public class ServerRegPatient extends Server implements Iface {
         if (isWindows()) {
             return "C:\\Temp\\MedCardAmbPriem_t.htm";
         } else if (isUnix()) {
-            return System.getProperty("user.home") +
-                    "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
+            return System.getProperty("user.home")
+                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
         } else {
             return "MedCardAmbPriem_t.htm";
         }
@@ -1379,7 +1379,7 @@ public class ServerRegPatient extends Server implements Iface {
         final String reportPath = setReportPath();
         try (OutputStreamWriter osw =
                 new OutputStreamWriter(new FileOutputStream(reportPath), "utf-8")) {
-            AutoCloseableResultSet acrs;
+//            AutoCloseableResultSet acrs;
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
             String gender;
             if (pat.getPol() == 1) {
@@ -1390,7 +1390,8 @@ public class ServerRegPatient extends Server implements Iface {
                 gender = "";
             }
             HtmTemplate htmTemplate =
-                    new HtmTemplate("home/as/Work/muzdrav_reports/MedCardAmbPriem.htm");
+                    new HtmTemplate("/home/as/Work/muzdrav_reports/MedCardAmbPriem.htm");
+            System.out.println(htmTemplate.getLabelsCount());
             htmTemplate.replaceLabels(true,
                 "",
                 "",

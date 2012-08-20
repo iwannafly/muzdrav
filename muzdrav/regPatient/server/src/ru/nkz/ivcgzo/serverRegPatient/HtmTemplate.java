@@ -159,7 +159,7 @@ public class HtmTemplate {
      * <b>labelIndex</b> и после <b>endIndex</b> остаются без изменений.
      * Для нормальной работы метода необходимы следующие условия:
      * <ul>
-     *     <li><b>startIndex</b> больше  0</l1>
+     *     <li><b>startIndex</b> больше или равен 0</l1>
      *     <li><b>startIndex</b> меньше <b>endIndex</b></li>
      *     <li><b>endIndex</b> меньше количества меток в шаблоне</li>
      *     <li>количество переданных элементов равно количеству индексов от
@@ -197,7 +197,11 @@ public class HtmTemplate {
      */
     public final void replaceLabel(final int labelIndex, final String value) throws Exception {
         if (labelIndex <= labels.size()) {
-            template = template.replace(labels.get(labelIndex), value);
+            if ((value != null) && (value != "null")) {
+                template = template.replace(labels.get(labelIndex), value);
+            } else {
+                template = template.replace(labels.get(labelIndex), "");
+            }
         } else {
             throw new Exception("В документе нет метки с таким индексом");
         }
@@ -212,7 +216,11 @@ public class HtmTemplate {
      */
     public final void replaceLabel(final String labelName, final String value) throws Exception {
         if (labels.contains(labelName)) {
-            template = template.replace(labelName, value);
+            if ((value != null) && (value != "null")) {
+                template = template.replace(labelName, value);
+            } else {
+                template = template.replace(labelName, "");
+            }
         } else {
             throw new Exception("В документе нет метки с таким именем");
         }
