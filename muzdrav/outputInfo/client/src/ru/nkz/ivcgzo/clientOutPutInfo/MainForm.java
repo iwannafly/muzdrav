@@ -442,7 +442,8 @@ public class MainForm {
 								node_3.add(new DefaultMutableTreeNode("Форма №1, раздел 2, таблица 1 (врачи и ср.медработники)"));
 								node_3.add(new DefaultMutableTreeNode("Форма №1, раздел 2, таблица 2 (общ)"));
 								node_3.add(new DefaultMutableTreeNode("Форма №1, раздел 2, таблица 2 (врачи и ср.медработники)"));
-								node_3.add(new DefaultMutableTreeNode("Св"));
+								node_3.add(new DefaultMutableTreeNode("Сведения о работе, таблица 1 (общ)"));
+								node_3.add(new DefaultMutableTreeNode("Сведения о работе, таблица 1 (врачи и ср.медработники)"));
 							node_2.add(node_3);
 						node_1.add(node_2);
 						node_2 = new DefaultMutableTreeNode(" Запросы");
