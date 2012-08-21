@@ -475,7 +475,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<StringClassifier> GetKlasMetS_ot01(int cotd, String organ,
 			String isl) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select (n_stoim.c_obst) as pcod, n_nsi_obst.(nameobst) as name from s_ot01 JOIN n_stoim ON (s_ot01.pcod = n_stoim.pcod) JOIN n_nsi_obst ON (s_ot01.c_obst = n_nsi_obst.obst) where (s_ot01.cotd = ?) and (s_ot01.c_nz1 = ?) and (s_ot01.pcod = ?)", cotd, organ, isl)){
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select (n_stoim.c_obst) as pcod, (n_nsi_obst.nameobst) as name from s_ot01 JOIN n_stoim ON (s_ot01.pcod = n_stoim.pcod) JOIN n_nsi_obst ON (s_ot01.c_obst = n_nsi_obst.obst) where (s_ot01.c_obst = n_stoim.c_obst) and (s_ot01.cotd = ?) and (s_ot01.c_nz1 = ?) and (s_ot01.pcod = ?)", cotd, organ, isl)){
 			return rsmStrClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);

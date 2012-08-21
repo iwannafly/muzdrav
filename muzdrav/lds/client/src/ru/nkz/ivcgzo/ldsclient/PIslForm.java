@@ -52,7 +52,7 @@ public class PIslForm {
 	private JTextField tFkodm;
 	private JTextField tFkods;
 	private JTextField tFdiag;
-	private CustomTable<ObInfIsl, ObInfIsl._Fields> table;
+	private CustomTable<ObInfIsl, ObInfIsl._Fields> tn_ldi;
 	private JTable table_1;
 	private JTextField tFkodisl;
 	private JTextField tFrez_name;
@@ -70,6 +70,7 @@ public class PIslForm {
 	private JTextField textField_3;
 	private JTextField textField_4;
 	private JTextField textField_5;
+	private JTable table;
 	
 	/**
 	 * Create the application.
@@ -149,7 +150,7 @@ public class PIslForm {
 			public void valueChanged(ListSelectionEvent arg0) {
 			
 				try {
-					table.setData(MainForm.ltc.GetObInfIslt(tpatient.getSelectedItem().npasp, MainForm.authInfo.cpodr));
+					tn_ldi.setData(MainForm.ltc.GetObInfIslt(tpatient.getSelectedItem().npasp, MainForm.authInfo.cpodr));
 				} catch (TException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -170,14 +171,6 @@ public class PIslForm {
 		
 		JSplitPane splitPane_1 = new JSplitPane();
 		splitPane_1.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		//splitPane_1.setLeftComponent()
-		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		splitPane_1.setLeftComponent(scrollPane_1);
-		
-		table = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 5, "Исследование", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16,"Код медсес.", 17, "Код санит.", 18, "Дата за полнения");
-		table.setFillsViewportHeight(true);
-		scrollPane_1.setViewportView(table);
 		
 		JSplitPane splitPane_2 = new JSplitPane();
 		splitPane_2.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -196,7 +189,7 @@ public class PIslForm {
 				 try {
 					//cBkodisl.setData(MainForm.ltc.GetKlasIsS_ot01(MainForm.authInfo.cpodr, cBpcisl.getSelectedPcod()));
 					 cBkodisl.setData(MainForm.ltc.GetKlasIsS_ot01(2000004, cBpcisl.getSelectedPcod()));
-					 System.out.print(cBpcisl.getSelectedPcod());
+					// System.out.print(cBpcisl.getSelectedPcod());
 				} catch (TException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -589,6 +582,7 @@ public class PIslForm {
 		
 		textField_4 = new JTextField();
 		textField_4.setEnabled(false);
+		textField_4.setVisible(false);
 		textField_4.setColumns(10);
 		
 		textField_5 = new JTextField();
@@ -603,26 +597,6 @@ public class PIslForm {
 		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
 		gl_panel_4.setHorizontalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addGap(10)
-					.addComponent(label)
-					.addGap(4)
-					.addComponent(tFkodisl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(6)
-					.addComponent(cBkodisl, GroupLayout.PREFERRED_SIZE, 389, GroupLayout.PREFERRED_SIZE))
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addGap(10)
-					.addComponent(label_1)
-					.addGap(4)
-					.addComponent(spkol, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-					.addGap(4)
-					.addComponent(label_3)
-					.addGap(4)
-					.addComponent(cBrez, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
-					.addGap(10)
-					.addComponent(label_4)
-					.addGap(6)
-					.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE))
 				.addGroup(gl_panel_4.createSequentialGroup()
 					.addGap(10)
 					.addComponent(label_8)
@@ -706,6 +680,27 @@ public class PIslForm {
 					.addComponent(button)
 					.addGap(42)
 					.addComponent(button_1))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING, false)
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addComponent(label)
+							.addGap(4)
+							.addComponent(tFkodisl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cBkodisl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
+							.addComponent(label_1)
+							.addGap(4)
+							.addComponent(spkol, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(label_3)
+							.addGap(4)
+							.addComponent(cBrez, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+							.addGap(10)
+							.addComponent(label_4)
+							.addGap(6)
+							.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE))))
 		);
 		gl_panel_4.setVerticalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -830,27 +825,12 @@ public class PIslForm {
 		tabbedPane.addTab("Лаборатория", null, layeredPane_2, null);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(0, 0, 664, 350);
+		panel_2.setBounds(0, 0, 804, 461);
 		layeredPane_2.add(panel_2);
 		
 		JScrollPane scrollPane_2 = new JScrollPane();
-		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
-		gl_panel_2.setHorizontalGroup(
-			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-		);
-		gl_panel_2.setVerticalGroup(
-			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 350, Short.MAX_VALUE)
-		);
-		
-		table_1 = new JTable();
-		scrollPane_2.setViewportView(table_1);
-		panel_2.setLayout(gl_panel_2);
 		
 		JPanel panel_3 = new JPanel();
-		panel_3.setBounds(0, 352, 664, 48);
-		layeredPane_2.add(panel_3);
 		
 		JLabel lblNewLabel_23 = new JLabel("Метод исследования");
 		
@@ -875,6 +855,23 @@ public class PIslForm {
 					.addContainerGap(23, Short.MAX_VALUE))
 		);
 		panel_3.setLayout(gl_panel_3);
+		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
+		gl_panel_2.setHorizontalGroup(
+			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 804, Short.MAX_VALUE)
+				.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 804, Short.MAX_VALUE)
+		);
+		gl_panel_2.setVerticalGroup(
+			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
+					.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE))
+		);
+		
+		table_1 = new JTable();
+		scrollPane_2.setViewportView(table_1);
+		panel_2.setLayout(gl_panel_2);
 		GroupLayout gl_panel2 = new GroupLayout(panel2);
 		gl_panel2.setHorizontalGroup(
 			gl_panel2.createParallelGroup(Alignment.LEADING)
@@ -898,6 +895,66 @@ public class PIslForm {
 					.addGap(5)
 					.addComponent(splitPane_1, GroupLayout.DEFAULT_SIZE, 748, Short.MAX_VALUE))
 		);
+		
+		JPanel panel_5 = new JPanel();
+		splitPane_1.setLeftComponent(panel_5);
+		
+		JPanel panel_6 = new JPanel();
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
+		gl_panel_5.setHorizontalGroup(
+			gl_panel_5.createParallelGroup(Alignment.TRAILING)
+				.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+				.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+		);
+		gl_panel_5.setVerticalGroup(
+			gl_panel_5.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_5.createSequentialGroup()
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE))
+		);
+		
+		JButton btnNewButton_1 = new JButton("Добавить");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+				
+			}
+		});
+		
+		JButton btnNewButton_2 = new JButton("Сохранить");
+		
+		JButton btnNewButton_4 = new JButton("Удалить");
+		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
+		gl_panel_6.setHorizontalGroup(
+			gl_panel_6.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_6.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(btnNewButton_1)
+					.addPreferredGap(ComponentPlacement.RELATED, 315, Short.MAX_VALUE)
+					.addComponent(btnNewButton_2)
+					.addGap(239)
+					.addComponent(btnNewButton_4)
+					.addContainerGap())
+		);
+		gl_panel_6.setVerticalGroup(
+			gl_panel_6.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_6.createSequentialGroup()
+					.addGroup(gl_panel_6.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnNewButton_1)
+						.addComponent(btnNewButton_4)
+						.addComponent(btnNewButton_2))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		panel_6.setLayout(gl_panel_6);
+		
+		tn_ldi = new CustomTable<>(false, true, ObInfIsl.class, 2, "Код отделения", 3, "№ пробы", 4, "Орган. и системы", 5, "Исследование", 6, "Дата пост.", 7, "Дата выпол.", 8, "Причина", 9, "Обстоятельства", 10, "Направлен", 11, "Код направ. ЛПУ", 12, "ФИО направ. врача", 13, "Вид оплаты", 14, "Диагноз", 15, "Код врача", 16,"Код медсес.", 17, "Код санит.", 18, "Дата за полнения");
+		tn_ldi.setFillsViewportHeight(true);
+		scrollPane_1.setViewportView(tn_ldi);
+		panel_5.setLayout(gl_panel_5);
 		panel1.setLayout(gl_panel1);
 		frame.getContentPane().setLayout(groupLayout);
 		
@@ -910,7 +967,7 @@ public class PIslForm {
 			
 		//			tpatient.setData(MainForm.ltc.getPatDat(System.currentTimeMillis(), MainForm.authInfo.cpodr));
 			
-			table.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
+			tn_ldi.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
 		//	table.setData(MainForm.ltc.GetObInfIslt(tpatient.getSelectedItem().npasp, MainForm.authInfo.cpodr));
 			
 		} catch (PatientNotFoundException e) {
