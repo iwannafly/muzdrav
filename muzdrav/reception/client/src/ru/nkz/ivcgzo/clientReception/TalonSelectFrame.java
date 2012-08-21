@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.Talon;
+import ru.nkz.ivcgzo.thriftReception.Talon._Fields;
 import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 
@@ -38,7 +39,7 @@ public class TalonSelectFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
     // Tables
-    private CustomTable tbTalonSelect;
+    private CustomTable<Talon, _Fields> tbTalonSelect;
     private JTable tbTalonDelete;
     // Panels
     private JPanel pnPatientInfo;
@@ -284,7 +285,13 @@ public class TalonSelectFrame extends JFrame {
             );
             cbxDoctor.setSelectedIndex(0);
             try {
-                tbTalonSelect.setData(MainForm.tcl.getTalon(cbxPoliclinic.getSelectedItem().getPcod(), cbxSpeciality.getSelectedItem().getPcod(), cbxDoctor.getSelectedItem().getPcod()));
+                tbTalonSelect.setData(
+                    MainForm.tcl.getTalon(
+                        cbxPoliclinic.getSelectedItem().getPcod(),
+                        cbxSpeciality.getSelectedItem().getPcod(),
+                        cbxDoctor.getSelectedItem().getPcod()
+                    )
+                );
             } catch (TalonNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

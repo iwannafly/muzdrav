@@ -330,7 +330,7 @@ public class TestServerRegPatient {
     @Test
     public final void addSign_isSignActuallyAdded()
             throws TException {
-        Sign s =new Sign();
+        Sign s = new Sign();
         s.setNpasp(26006);
         s.setGrup("9");
         s.setPh("1");
@@ -372,6 +372,16 @@ public class TestServerRegPatient {
         String ogrn = "1027739099772";
         String smocod = testServer.getSmocod(ogrn, pcod);
         assertEquals("smocod value = ", expectedSmocod, smocod);
+    }
+
+    @Test
+    public final void printMedCard_isTemplateCorrect() throws TException, PatientNotFoundException {
+        int npasp = 8;
+        Gosp gosp = new Gosp();
+        PatientFullInfo patientFullInfo =
+                testServer.getPatientFullInfo(npasp);
+        String pathToTemplate = testServer.printMedCart(gosp, patientFullInfo);
+        System.out.println(pathToTemplate);        
     }
 
 //    @Test

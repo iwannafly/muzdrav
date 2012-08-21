@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.ldsclient;
 
+import javax.sound.midi.SysexMessage;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -16,12 +17,27 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
 import ru.nkz.ivcgzo.ldsThrift.Patient;
+import ru.nkz.ivcgzo.ldsThrift.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+//import sun.text.resources.FormatData;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 public class PIslForm {
 
@@ -40,6 +56,9 @@ public class PIslForm {
 	private JTable table_1;
 	private JTextField tFkodisl;
 	private JTextField tFrez_name;
+	public ThriftStringClassifierCombobox<StringClassifier> cBpcisl;
+	public ThriftStringClassifierCombobox<StringClassifier> cBkodisl;
+	public ThriftStringClassifierCombobox<StringClassifier> cBpcod_m;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBprichina;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBpopl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBnapravl;
@@ -64,7 +83,7 @@ public class PIslForm {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 795, 760);
+		frame.setBounds(100, 100, 861, 849);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		JPanel panel = new JPanel();
@@ -81,19 +100,77 @@ public class PIslForm {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 666, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(732, Short.MAX_VALUE))
+					.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 755, Short.MAX_VALUE))
 		);
+		
+		JButton btnNewButton = new JButton("Поиск");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				int[] npasp = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, false);
+				
+				if (npasp != null){
+					try {
+						tpatient.setData(MainForm.ltc.getPatient(Arrays.toString(npasp).replace(']', ')').replace('[', '(')));
+					} catch (PatientNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} 
+			}
+		});
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(19)
+					.addComponent(btnNewButton)
+					.addContainerGap(705, Short.MAX_VALUE))
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(btnNewButton)
+					.addContainerGap(20, Short.MAX_VALUE))
+		);
+		panel.setLayout(gl_panel);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		splitPane.setLeftComponent(scrollPane);
 		
-		tpatient = new CustomTable<>(false, true, Patient.class, 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения");
+		tpatient = new CustomTable<>(false, true, Patient.class, 0, "Код", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения");
+		
+		tpatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent arg0) {
+			
+				try {
+					table.setData(MainForm.ltc.GetObInfIslt(tpatient.getSelectedItem().npasp, MainForm.authInfo.cpodr));
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		
+		
+		tpatient.setDateField(4);
 		scrollPane.setViewportView(tpatient);
+
+		
+		
+		JPanel panel1 = new JPanel();
+		splitPane.setRightComponent(panel1);		
+		
 		
 		JSplitPane splitPane_1 = new JSplitPane();
 		splitPane_1.setOrientation(JSplitPane.VERTICAL_SPLIT);
-		splitPane.setRightComponent(splitPane_1);
+		//splitPane_1.setLeftComponent()
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		splitPane_1.setLeftComponent(scrollPane_1);
@@ -111,7 +188,26 @@ public class PIslForm {
 		
 		JLabel lblNewLabel = new JLabel("Органы и системы");
 		
-		JComboBox cBpcisl = new JComboBox();
+		cBpcisl = new ThriftStringClassifierCombobox<>(true);
+		cBpcisl.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				if (cBpcisl.getSelectedItem() != null){
+				 try {
+					//cBkodisl.setData(MainForm.ltc.GetKlasIsS_ot01(MainForm.authInfo.cpodr, cBpcisl.getSelectedPcod()));
+					 cBkodisl.setData(MainForm.ltc.GetKlasIsS_ot01(2000004, cBpcisl.getSelectedPcod()));
+					 System.out.print(cBpcisl.getSelectedPcod());
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				}
+				
+			}
+		});
+	
+		
+		
 		
 		JLabel lblNewLabel_1 = new JLabel("Дата поступления");
 		
@@ -354,8 +450,14 @@ public class PIslForm {
 		);
 		panel_1.setLayout(gl_panel_1);
 		
+		
+		JPanel panel2 = new JPanel();
+		splitPane_2.setRightComponent(panel2);
+		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		splitPane_2.setRightComponent(tabbedPane);
+		
+		/*JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		splitPane_2.setRightComponent(tabbedPane);*/
 		
 		JLayeredPane layeredPane = new JLayeredPane();
 		tabbedPane.addTab("Диагностика", null, layeredPane, null);
@@ -364,11 +466,13 @@ public class PIslForm {
 		GroupLayout gl_layeredPane = new GroupLayout(layeredPane);
 		gl_layeredPane.setHorizontalGroup(
 			gl_layeredPane.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+				.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 804, Short.MAX_VALUE)
 		);
 		gl_layeredPane.setVerticalGroup(
 			gl_layeredPane.createParallelGroup(Alignment.LEADING)
-				.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+				.addGroup(gl_layeredPane.createSequentialGroup()
+					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 494, Short.MAX_VALUE)
+					.addGap(2))
 		);
 		
 		JButton brez_name = new JButton(">>");
@@ -378,7 +482,23 @@ public class PIslForm {
 		tFkodisl = new JTextField();
 		tFkodisl.setColumns(10);
 		
-		JComboBox cBkodisl = new JComboBox();
+		cBkodisl = new ThriftStringClassifierCombobox<>(true);
+		cBkodisl.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				try {
+					if ((cBpcisl.getSelectedItem() != null) && (cBkodisl.getSelectedItem() != null)){
+						//cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod()));
+						cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(2000004, cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod()));
+						//System.out.print(cBpcisl.getSelectedPcod() + "  " + cBkodisl.getSelectedPcod());
+						
+					}
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 		
 		JLabel label_1 = new JLabel("Количество");
 		
@@ -397,7 +517,7 @@ public class PIslForm {
 		
 		JButton button_4 = new JButton("Выбрать");
 		
-		JComboBox cBpcod_m = new JComboBox();
+		cBpcod_m = new ThriftStringClassifierCombobox<>(true);
 		
 		JLabel label_7 = new JLabel("Заключение");
 		
@@ -484,110 +604,113 @@ public class PIslForm {
 		gl_panel_4.setHorizontalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
-							.addGap(4)
-							.addComponent(tFkodisl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
-							.addComponent(cBkodisl, GroupLayout.PREFERRED_SIZE, 389, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
-							.addGap(4)
-							.addComponent(spkol, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-							.addGap(4)
-							.addComponent(label_3)
-							.addGap(4)
-							.addComponent(cBrez, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
-							.addGap(10)
-							.addComponent(label_4)
-							.addGap(6)
-							.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(94)
-							.addComponent(button_3)
-							.addGap(41)
-							.addComponent(button_4))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_7)
-							.addGap(18)
-							.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, 415, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(brez_name, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_8)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tPop_name))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_2, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
-							.addGap(41)
-							.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_5, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-								.addComponent(label_6, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE))
-							.addGap(4)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE))
-							.addGap(6)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(94)
-							.addComponent(button, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
-							.addGap(42)
-							.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_9, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
-							.addGap(41)
-							.addComponent(textPane_1, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_10, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-								.addComponent(label_11, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE))
-							.addGap(4)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE))
-							.addGap(6)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(button_8, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button_9, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(94)
-							.addComponent(button_6, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
-							.addGap(42)
-							.addComponent(button_7, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_12, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
-							.addGap(41)
-							.addComponent(textPane_2, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_13, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-								.addComponent(label_14, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE))
-							.addGap(4)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(textField_4, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-								.addComponent(textField_5, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE))
-							.addGap(6)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(button_12, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button_13, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(94)
-							.addComponent(button_10, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
-							.addGap(42)
-							.addComponent(button_11, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(149, Short.MAX_VALUE))
+					.addGap(10)
+					.addComponent(label)
+					.addGap(4)
+					.addComponent(tFkodisl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(6)
+					.addComponent(cBkodisl, GroupLayout.PREFERRED_SIZE, 389, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addComponent(label_1)
+					.addGap(4)
+					.addComponent(spkol, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+					.addGap(4)
+					.addComponent(label_3)
+					.addGap(4)
+					.addComponent(cBrez, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+					.addGap(10)
+					.addComponent(label_4)
+					.addGap(6)
+					.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addComponent(label_8)
+					.addGap(4)
+					.addComponent(tPop_name, GroupLayout.PREFERRED_SIZE, 506, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(104)
+					.addComponent(button_3)
+					.addGap(41)
+					.addComponent(button_4))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addComponent(label_7)
+					.addGap(18)
+					.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, 415, GroupLayout.PREFERRED_SIZE)
+					.addGap(6)
+					.addComponent(brez_name, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addComponent(label_12)
+					.addGap(41)
+					.addComponent(textPane_2, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
+					.addGap(6)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(label_13)
+						.addComponent(label_14))
+					.addGap(4)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(textField_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField_5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(button_12, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button_13, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(104)
+					.addComponent(button_10)
+					.addGap(42)
+					.addComponent(button_11))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addComponent(label_9)
+					.addGap(41)
+					.addComponent(textPane_1, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
+					.addGap(6)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(label_10)
+						.addComponent(label_11))
+					.addGap(4)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(button_8, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button_9, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(104)
+					.addComponent(button_6)
+					.addGap(42)
+					.addComponent(button_7))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(10)
+					.addComponent(label_2)
+					.addGap(41)
+					.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
+					.addGap(6)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(label_5)
+						.addComponent(label_6))
+					.addGap(4)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(104)
+					.addComponent(button)
+					.addGap(42)
+					.addComponent(button_1))
 		);
 		gl_panel_4.setVerticalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
+					.addGap(11)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(3)
@@ -608,23 +731,26 @@ public class PIslForm {
 							.addGap(3)
 							.addComponent(label_4))
 						.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(18)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(66)
+							.addGap(48)
 							.addComponent(label_8))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(18)
-							.addComponent(tPop_name, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(tPop_name, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
+					.addGap(6)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addComponent(button_3)
 						.addComponent(button_4))
 					.addGap(10)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_7)
-						.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addGap(4)
+							.addComponent(label_7))
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addGap(1)
+							.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addComponent(brez_name))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(6)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(35)
@@ -695,8 +821,7 @@ public class PIslForm {
 					.addGap(6)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addComponent(button)
-						.addComponent(button_1))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(button_1)))
 		);
 		panel_4.setLayout(gl_panel_4);
 		layeredPane.setLayout(gl_layeredPane);
@@ -750,6 +875,53 @@ public class PIslForm {
 					.addContainerGap(23, Short.MAX_VALUE))
 		);
 		panel_3.setLayout(gl_panel_3);
+		GroupLayout gl_panel2 = new GroupLayout(panel2);
+		gl_panel2.setHorizontalGroup(
+			gl_panel2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel2.createSequentialGroup()
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_panel2.setVerticalGroup(
+			gl_panel2.createParallelGroup(Alignment.LEADING)
+				.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 515, Short.MAX_VALUE)
+		);
+		panel2.setLayout(gl_panel2);
+		GroupLayout gl_panel1 = new GroupLayout(panel1);
+		gl_panel1.setHorizontalGroup(
+			gl_panel1.createParallelGroup(Alignment.LEADING)
+				.addComponent(splitPane_1)
+		);
+		gl_panel1.setVerticalGroup(
+			gl_panel1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel1.createSequentialGroup()
+					.addGap(5)
+					.addComponent(splitPane_1, GroupLayout.DEFAULT_SIZE, 748, Short.MAX_VALUE))
+		);
+		panel1.setLayout(gl_panel1);
 		frame.getContentPane().setLayout(groupLayout);
+		
+	
 	}
+	
+	public void filtPat() {
+		try {
+			tpatient.setData(MainForm.ltc.getPatDat(new SimpleDateFormat("dd.MM.yyyy").parse("14.08.2012").getTime(), 2000004));
+			
+		//			tpatient.setData(MainForm.ltc.getPatDat(System.currentTimeMillis(), MainForm.authInfo.cpodr));
+			
+			table.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
+		//	table.setData(MainForm.ltc.GetObInfIslt(tpatient.getSelectedItem().npasp, MainForm.authInfo.cpodr));
+			
+		} catch (PatientNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}	
 }
