@@ -31,7 +31,9 @@ import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 
@@ -207,20 +209,78 @@ public class FormRdInf extends JFrame {
 		contentPane.add(panel);
 		
 		LObr = new JLabel("Образование");
-		CBObr = new ThriftIntegerClassifierCombobox<>(true);
-		
+		CBObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z00);
+	
 		LSem = new JLabel("Семейное положение");
-		CBSem = new ThriftIntegerClassifierCombobox<>(true);		
+		CBSem = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z11);		
+	
 		JPanel panel_1 = new JPanel();
 		
 		JPanel panel_2 = new JPanel();
 		
 		JPanel panel_3 = new JPanel();
-		
-		JButton Sbutton = new JButton("");
+			JButton Sbutton = new JButton("");
 		Sbutton.setToolTipText("Сохранить");
 		Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-		
+		Sbutton.addActionListener(new ActionListener() {
+	    private AbstractButton ChBAss;
+	    private AbstractButton ChBots;
+	    private AbstractButton ChBInv;
+	    private AbstractButton ChBMnd;
+	    private AbstractButton ChBLrp;
+	    private AbstractButton ChBCnd;
+	    private AbstractButton ChBNer;
+	    private AbstractButton ChBNmls;
+	    private AbstractButton ChBSelo;
+	    private AbstractButton ChBGorod;
+	    private AbstractButton ChBBomg;
+	    private AbstractButton ChBSmok;
+	    private AbstractButton ChBAlk;
+	    private AbstractButton ChBNark;
+		private int oslrod (int oslrod){
+				if (ChBAss.isSelected()){oslrod=oslrod+1;}
+		            if (ChBots.isSelected()){oslrod=oslrod+2;}
+		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
+		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
+		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
+		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
+		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
+		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
+			return oslrod;	
+			};
+			private int uslj (int uslj){
+		           if (ChBSelo.isSelected()){uslj=uslj+1;}
+		            if (ChBots.isSelected()){uslj=uslj+2;}
+		            if (ChBGorod.isSelected()){uslj=uslj+4;}
+		            if (ChBBomg.isSelected()){uslj=uslj+8;}
+			return uslj;
+			};
+			private int otec (int otec){
+		           if (ChBSmok.isSelected()){otec=otec+1;}
+		            if (ChBAlk.isSelected()){otec=otec+2;}
+		            if (ChBNark.isSelected()){otec=otec+4;}
+			return otec;	
+			};
+			public void actionPerformed(ActionEvent arg0) {
+rdinf.setFioOtec(TFio.getText());
+rdinf.setMrOtec(TMrab.getText());
+rdinf.setOsoco(oslrod);
+rdinf.setUslpr(uslj);
+rdinf.setVredOtec(otec);
+rdinf.setTelOtec(TTelef.getText());
+rdinf.setPhOtec(TPhf.getText());
+if (CBObr.getSelectedPcod() != null)
+	rdinf.setObr(CBObr.getSelectedPcod());
+	else rdinf.unsetObr();
+if (CBSem.getSelectedPcod() != null)
+	rdinf.setSem(CBSem.getSelectedPcod());
+	else rdinf.unsetSem();
+if (CBGrOtec.getSelectedPcod() != null)
+	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
+	else rdinf.unsetGrotec();
+			}
+		});
+	
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Новая запись");
 		btnNewButton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
@@ -228,8 +288,8 @@ public class FormRdInf extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					RdInfStruct rdinf = new RdInfStruct();
-					rdinf.setNpasp(npasp);
-					MainForm.tcl.AddRdInf(rdinf);
+ 		            MainForm.tcl.AddRdInf(rdinf);
+					rdinf.setNpasp(Vvod.zapVr.getNpasp());
 					setRdInfData(rdinf);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -358,8 +418,8 @@ public class FormRdInf extends JFrame {
 		TPhf = new JTextField();
 		TPhf.setText(rdinf.phOtec);
 		
-		CBGrOtec = new ThriftStringClassifierCombobox<>(true);
-		
+		CBGrOtec = new ThriftStringClassifierCombobox<>(StringClassifiers.n_r0z);
+
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -543,6 +603,9 @@ public class FormRdInf extends JFrame {
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
+/*		JButton Sbutton = new JButton("");
+	Sbutton.setToolTipText("Сохранить");
+	Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		Sbutton.addActionListener(new ActionListener() {
 			private int oslrod (int oslrod){
 		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
@@ -589,7 +652,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
 	else rdinf.unsetGrotec();
 			}
-		});
+		});*/
 	}
 
 	protected void setRdInfData(RdInfStruct rdinf2) {

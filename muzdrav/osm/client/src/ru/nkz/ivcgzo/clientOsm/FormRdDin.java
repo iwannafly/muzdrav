@@ -32,7 +32,10 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
+
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JTextPane;
@@ -100,12 +103,6 @@ public class FormRdDin extends JFrame {
 		setContentPane(contentPane);
 		rddin = new RdDinStruct();
 		patient = new PatientCommonInfo();
-/*       CBDiag.setData(MainForm.tcl.get_n_db6());
-		CBPolPl.setData(MainForm.tcl.get_n_db1());
-		CBPredPl.setData(MainForm.tcl.get_n_db2());
-        CBCerd.setData(MainForm.tcl.get_n_db3());
-		CBSerd1.setData(MainForm.tcl.get_n_db4());
-		CBOteki.setData(MainForm.tcl.get_n_db5());*/
 		if (rddin.isSetPredpl())
 			CBPredPl.setSelectedPcod(rddin.getPredpl());
 		else
@@ -175,13 +172,13 @@ public class FormRdDin extends JFrame {
 		SChcc.setModel(new SpinnerNumberModel(new Integer(rddin.chcc), new Integer(60), null, new Integer(1)));
         rddin.setChcc((int) SChcc.getModel().getValue());
 		
-		CBPolPl = new ThriftIntegerClassifierCombobox<>(true);
+		CBPolPl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
 		
-		CBPredPl = new ThriftIntegerClassifierCombobox<>(true);
+		CBPredPl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db2);
 		
-		CBCerd = new ThriftIntegerClassifierCombobox<>(true);
+		CBCerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);
 		
-		CBSerd1 = new ThriftIntegerClassifierCombobox<>(true);
+		CBSerd1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db4);
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
@@ -280,7 +277,7 @@ public class FormRdDin extends JFrame {
 		SVdm.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 		rddin.setHdm((int) SVdm.getModel().getValue());
 		
-//		CBDiag = new ThriftIntegerClassifierCombobox<>(true);
+		CBDiag = new ThriftStringClassifierCombobox<>(StringClassifiers.n_db6);
 		
 		final JSpinner SPsad = new JSpinner();
 		SPsad.setModel(new SpinnerNumberModel(new Integer(rddin.art2), null ,new Integer(120),new Integer(1)));
@@ -298,7 +295,7 @@ public class FormRdDin extends JFrame {
 		STolP.setModel(new SpinnerNumberModel(new Integer(rddin.spl), new Integer(1), null, new Integer(1)));
 		rddin.setSpl((int) STolP.getModel().getValue());
 		
-		CBOteki = new ThriftIntegerClassifierCombobox<>(true);
+		CBOteki = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db5);
 		
 //		final JSpinner SDataSl = new JSpinner();
 //		SDataSl.setModel(new SpinnerDateModel(new Date(1335373200000L), null, null, Calendar.DAY_OF_YEAR));
@@ -347,6 +344,8 @@ public class FormRdDin extends JFrame {
 		Nbutton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				RdDinStruct rddin = new RdDinStruct();
+				setDefaultValues(rddin);
 			}
 		});
 		
@@ -517,6 +516,13 @@ public class FormRdDin extends JFrame {
 		tablePos.setDateField(2);
 		tablePos.setFillsViewportHeight(true);
 		scrollPane.setViewportView(tablePos);
+	}
+	protected void setDefaultValues(RdDinStruct rddin2) {
+		// TODO Auto-generated method stub
+	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
+	rddin.setNpasp(Vvod.zapVr.getNpasp());
+	rddin.setArt1(120);
+	rddin.setArt2(80);
 	}
 	public void onConnect() {
 		try {

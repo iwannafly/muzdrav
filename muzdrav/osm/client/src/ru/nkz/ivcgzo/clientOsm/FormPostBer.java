@@ -18,6 +18,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
 import javax.swing.SpinnerNumberModel;
@@ -31,11 +33,16 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 
 import javax.swing.JScrollPane;
@@ -225,7 +232,9 @@ addWindowListener(new WindowAdapter() {
 				try {
 					RdSlStruct rdsl = new RdSlStruct();
 					setDefaultValues(rdsl);
-					MainForm.tcl.AddRdSl(rdsl);
+					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
+					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+					rdsl.setNpasp(Vvod.zapVr.getNpasp());
 					setPostBerData(rdsl);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -259,9 +268,9 @@ addWindowListener(new WindowAdapter() {
 				return iw3;
 			};
 			public void actionPerformed(ActionEvent arg0) {
-				patient.setFam((String) fam.getText());
+	/*			patient.setFam((String) fam.getText());
 				patient.setIm((String)im.getText());
-				patient.setOt((String) ot.getText());
+				patient.setOt((String) ot.getText());*/
 			rdsl.setAbort((int) SKolAb.getModel().getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
 			rdsl.setDataM( SDataM.getDate().getTime());
@@ -300,7 +309,16 @@ addWindowListener(new WindowAdapter() {
 				rdsl.setIshod(CBPrishSn.getSelectedPcod());
 				else rdsl.unsetIshod();
 			
+			try {
+				MainForm.tcl.UpdateRdSl(rdsl);
+			} catch (KmiacServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+	} 		
 		});
 		JButton button = new JButton("Дополнительная информация");
 		button.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
@@ -323,6 +341,18 @@ addWindowListener(new WindowAdapter() {
 		JButton ButDelete = new JButton("");
 		ButDelete.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		ButDelete.setToolTipText("Удалить");
+		ButDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					MainForm.tcl.DeleteRdSl(rdsl.getId(), rdsl.getNpasp());
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+					MainForm.conMan.reconnect(e);
+				}
+			}
+		});
+		
 		
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
@@ -596,11 +626,11 @@ addWindowListener(new WindowAdapter() {
 //		rdsl.setDatasn((long) SDataSn.getModel().getValue());
 		SDataSn = new CustomDateEditor();
 		
-		CBPrishSn = new ThriftIntegerClassifierCombobox<>(true);
+		CBPrishSn = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db7);
 		
-		CBRod = new ThriftIntegerClassifierCombobox<>(true);
+		CBRod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db8);
 		
-		CBOslAb = new ThriftStringClassifierCombobox<>(true);
+		CBOslAb = new ThriftStringClassifierCombobox<>(StringClassifiers.n_db9);
 		
 		JLabel lblNewLabel = new JLabel("Дата выдачи Родового сертификата");
 		
