@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.PatientSearchParams;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
+import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
 
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
@@ -54,6 +55,7 @@ public class ServerViewSelect extends Server implements Iface {
 //			getIntegerClassifier(IntegerClassifiers.n_edd);
 //			getIntegerClassifier(IntegerClassifiers.n_edd);
 //			getMkb_0();
+//			getPolp_0();
 //		} catch (KmiacServerException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
@@ -214,5 +216,10 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<mkb_0> getMkb_0() throws KmiacServerException {
 		return ccm.getMkbTreeClassifier();
+	}
+
+	@Override
+	public List<polp_0> getPolp_0() throws KmiacServerException {
+		return ccm.getPolpTreeClassifier();
 	}
 }
