@@ -15,11 +15,13 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
+import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
 
 public class ClassifierManager {
 	private Map<Integer, List<IntegerClassifier>> intClassList;
 	private Map<Integer, List<StringClassifier>> strClassList;
 	private List<mkb_0> mkbTreeClass;
+	private List<polp_0> polpTreeClass;
 	
 	public ClassifierManager() {
 		intClassList = new HashMap<>();
@@ -71,5 +73,12 @@ public class ClassifierManager {
 			mkbTreeClass = MainForm.tcl.getMkb_0();
 		
 		return mkbTreeClass;
+	}
+	
+	public List<polp_0> getPolpTreeClassifier() throws KmiacServerException, TException {
+		if (polpTreeClass == null)
+			polpTreeClass = MainForm.tcl.getPolp_0();
+		
+		return polpTreeClass;
 	}
 }

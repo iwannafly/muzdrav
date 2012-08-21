@@ -36,7 +36,6 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 	 */
 	public SqlSelectExecutor(String connString, String user, String pass) throws SQLException {
 		conn = DriverManager.getConnection(connString, user, pass);
-		conn.setAutoCommit(false);
 		conn.setReadOnly(true);
 		
 		this.connString = connString;

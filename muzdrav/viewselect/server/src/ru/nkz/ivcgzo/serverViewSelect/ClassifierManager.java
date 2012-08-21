@@ -20,6 +20,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_1;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_2;
+import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
+import ru.nkz.ivcgzo.thriftViewSelect.polp_1;
 
 public class ClassifierManager {
 	private static final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClass = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
@@ -28,6 +30,7 @@ public class ClassifierManager {
 	private Map<Integer, List<IntegerClassifier>> intClassList;
 	private Map<Integer, List<StringClassifier>> strClassList;
 	private List<mkb_0> mkbTreeClass;
+	private List<polp_0> polpTreeClass;
 	
 	public ClassifierManager(ISqlSelectExecutor executor) {
 		sse = executor;
@@ -138,7 +141,7 @@ public class ClassifierManager {
 		String sql1 = "SELECT b.pcod, b.klass, b.name FROM n_a00 a JOIN n_b00 b ON (b.klass = a.pcod) ORDER BY b.pcod ";
 		String sql2 = "SELECT c.pcod, c.name FROM n_c00 c ORDER BY c.pcod ";
 		
-		try (AutoCloseableResultSet acrs0 = sse.execPreparedQuery(sql0); 
+		try (AutoCloseableResultSet acrs0 = sse.execQuery(sql0); 
 				AutoCloseableResultSet acrs1 = sse.execPreparedQuery(sql1);
 				AutoCloseableResultSet acrs2 = sse.execPreparedQuery(sql2) ) {
 			ResultSet rs0 = acrs0.getResultSet();
@@ -176,5 +179,36 @@ public class ClassifierManager {
 		} catch (SQLException e) {
 			throw new KmiacServerException("Error loading mkb tree classifier.");
 		}
+	}
+	
+	public List<polp_0> getPolpTreeClassifier() throws KmiacServerException {
+		if (polpTreeClass != null)
+			return polpTreeClass;
+		
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT np.kdate, n0.name AS nameate, np.kdlpu, nl.name AS namelpu, np.kdpodr, np.namepodr FROM n_nsipol np JOIN n_l01 n0 ON (n0.pcod = np.kdate) JOIN n_nsilpu nl ON (nl.kdate = np.kdate AND nl.pcod = np.kdlpu) ORDER BY np.kdate, np.kdlpu, np.kdpodr ")) {
+			polpTreeClass = new ArrayList<>();
+			
+			ResultSet rs = acrs.getResultSet(); rs.next();
+			while (!rs.isAfterLast()) {
+				List<polp_1> polp1List = new ArrayList<>();
+				polp_0 polp0 = new polp_0(rs.getInt(1), rs.getString(2), polp1List);
+				while (!rs.isAfterLast() && polp0.getKdate() == rs.getInt(1)) {
+					List<IntegerClassifier> polp2List = new ArrayList<>();
+					polp_1 polp1 = new polp_1(rs.getInt(3), rs.getString(4), polp2List);
+					while (!rs.isAfterLast() && polp1.getKdlpu() == rs.getInt(3)) {
+						if (polp1.getKdlpu() != rs.getInt(5))
+							polp2List.add(new IntegerClassifier(rs.getInt(5), rs.getString(6)));
+						rs.next();
+					}
+					polp1List.add(polp1);
+				}
+				polpTreeClass.add(polp0);
+			}
+			
+			return polpTreeClass;
+		} catch (SQLException e) {
+			throw new KmiacServerException("Error loading polp tree classifier.");
+		}
+		
 	}
 }

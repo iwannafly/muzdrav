@@ -41,6 +41,7 @@ import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewPolpTreeForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewStringClassifierForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
@@ -62,6 +63,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ViewMkbTreeForm mkbFrm;
 	public ViewIntegerClassifierForm intFrm;
 	public ViewStringClassifierForm strFrm;
+	public ViewPolpTreeForm polpFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -308,6 +310,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		mkbFrm = new ViewMkbTreeForm();
 		intFrm = new ViewIntegerClassifierForm();
 		strFrm = new ViewStringClassifierForm();
+		polpFrm = new ViewPolpTreeForm();
 	}
 	
 	@Override
@@ -413,6 +416,21 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					} finally {
 						setFrame(frame);
 						strFrm.removeModalityListener();
+						disposeModal();
+					}
+					
+				case 11:
+					setFrame(polpFrm);
+					polpFrm.setTitle((String) params[1]);
+					dialog = prepareModal(parent);
+					polpFrm.prepare((int) params[2], (int) params[3], (int) params[4]);
+					polpFrm.setModalityListener();
+					dialog.setVisible(true);
+					try {
+						return polpFrm.getResults();
+					} finally {
+						setFrame(frame);
+						polpFrm.removeModalityListener();
 						disposeModal();
 					}
 					

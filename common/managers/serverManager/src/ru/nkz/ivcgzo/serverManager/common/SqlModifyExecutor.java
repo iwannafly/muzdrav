@@ -30,6 +30,7 @@ public class SqlModifyExecutor extends SqlSelectExecutor implements ISqlModifyEx
 			throws SQLException {
 		super(connString, user, pass);
 		
+		conn.setAutoCommit(false);
 		conn.setReadOnly(false);
 		
 		this.man = man;

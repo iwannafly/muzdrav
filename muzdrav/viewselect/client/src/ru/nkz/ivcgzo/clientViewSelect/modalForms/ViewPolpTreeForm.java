@@ -1,6 +1,10 @@
 package ru.nkz.ivcgzo.clientViewSelect.modalForms;
 
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -18,26 +22,18 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ModalForm;
 import ru.nkz.ivcgzo.clientViewSelect.MainForm;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
-import ru.nkz.ivcgzo.thriftViewSelect.mkb_1;
-import ru.nkz.ivcgzo.thriftViewSelect.mkb_2;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
+import ru.nkz.ivcgzo.thriftViewSelect.polp_1;
 
-public class ViewMkbTreeForm extends ModalForm {
-	private static final long serialVersionUID = -162973903323760204L;
-	private List<mkb_0> mkbTree;
+public class ViewPolpTreeForm extends ModalForm {
+	private static final long serialVersionUID = -2721787454937988306L;
+	private List<polp_0> polpTree;
 	private JPanel contentPane;
 	private JTree tree;
 	
-	/**
-	 * Create the frame.
-	 */
-	public ViewMkbTreeForm() {
+	public ViewPolpTreeForm() {
 		super(true);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -88,10 +84,13 @@ public class ViewMkbTreeForm extends ModalForm {
 	public void acceptResults() {
 		Object sel = tree.getSelectionPath().getLastPathComponent();
 		
-		if (sel instanceof mkb_2)
-			results = new StringClassifier(((mkb_2) sel).pcod, ((mkb_2) sel).name);
-		else if (sel instanceof StringClassifier)
-			results = sel;
+		if (sel instanceof polp_1)
+			if (((polp_1) sel).getPolp2Size() == 0)
+				results = new int[] { ((polp_0) tree.getSelectionPath().getParentPath().getLastPathComponent()).kdate, ((polp_1) sel).kdlpu, ((polp_1) sel).kdlpu };
+			else
+				return;
+		else if (sel instanceof IntegerClassifier)
+			results = new int[] { ((polp_0) tree.getSelectionPath().getParentPath().getParentPath().getLastPathComponent()).kdate, ((polp_1) tree.getSelectionPath().getParentPath().getLastPathComponent()).kdlpu, ((IntegerClassifier) sel).pcod };
 		else
 			return;
 		
@@ -99,17 +98,17 @@ public class ViewMkbTreeForm extends ModalForm {
 	}
 	
 	@Override
-	public StringClassifier getResults() {
+	public int[] getResults() {
 		if (results != null)
-			return (StringClassifier) results;
+			return (int[]) results;
 		
 		return null;
 	}
 	
-	public void prepare(String pcod) {
-		if (mkbTree == null)
+	public void prepare(int kdAte, int kdLpu, int kdPol) {
+		if (polpTree == null)
 			try {
-				mkbTree = MainForm.ccm.getMkbTreeClassifier();
+				polpTree = MainForm.ccm.getPolpTreeClassifier();
 				setModel();
 			} catch (KmiacServerException e) {
 				e.printStackTrace();
@@ -118,9 +117,7 @@ public class ViewMkbTreeForm extends ModalForm {
 				MainForm.conMan.reconnect(e);
 			} else
 				((DefaultTreeModel) tree.getModel()).reload();
-		tree.setSelectionPath(new TreePath(new Object[] {tree.getModel().getRoot(), tree.getModel().getChild(tree.getModel().getRoot(), 0)}));
-		if (pcod != null && pcod.length() > 2)
-			selectPcod(pcod);
+		selectPcod(kdAte, kdLpu, kdPol);
 	}
 	
 	private void setModel() {
@@ -131,22 +128,20 @@ public class ViewMkbTreeForm extends ModalForm {
 
 			@Override
 			public boolean isLeaf(Object node) {
-				if (node instanceof mkb_2)
-					return ((mkb_2) node).mlb3.size() == 0;
+				if (node instanceof polp_1)
+					return ((polp_1) node).getPolp2Size() == 0;
 				else
-					return node instanceof StringClassifier;
+					return node instanceof IntegerClassifier;
 			}
 			
 			@Override
 			public int getChildCount(Object parent) {
 				if (parent instanceof DefaultMutableTreeNode)
-					return mkbTree.size();
-				else if (parent instanceof mkb_0)
-					return ((mkb_0) parent).mlb1.size();
-				else if (parent instanceof mkb_1)
-					return ((mkb_1) parent).mkb2.size();
-				else if (parent instanceof mkb_2)
-					return ((mkb_2) parent).mlb3.size();
+					return polpTree.size();
+				else if (parent instanceof polp_0)
+					return ((polp_0) parent).getPolp1Size();
+				else if (parent instanceof polp_1)
+					return ((polp_1) parent).getPolp2Size();
 				else
 					return -1;
 			}
@@ -154,13 +149,11 @@ public class ViewMkbTreeForm extends ModalForm {
 			@Override
 			public Object getChild(Object parent, int index) {
 				if (parent instanceof DefaultMutableTreeNode)
-					return new Mkb0Str(mkbTree.get(index));
-				else if (parent instanceof mkb_0)
-					return new Mkb1Str(((mkb_0) parent).mlb1.get(index));
-				else if (parent instanceof mkb_1)
-					return new Mkb2Str(((mkb_1) parent).mkb2.get(index));
-				else if (parent instanceof mkb_2)
-					return new StringClassifierStr(((mkb_2) parent).mlb3.get(index));
+					return new Polp0Str(polpTree.get(index));
+				else if (parent instanceof polp_0)
+					return new Polp1Str(((polp_0) parent).polp1.get(index));
+				else if (parent instanceof polp_1)
+					return new IntegerClassifierStr(((polp_1) parent).polp2.get(index));
 				else
 					return null;
 			}
@@ -168,44 +161,36 @@ public class ViewMkbTreeForm extends ModalForm {
 			@Override
 			public int getIndexOfChild(Object parent, Object child) {
 				if (parent instanceof DefaultMutableTreeNode)
-					return mkbTree.indexOf(child);
-				else if (parent instanceof mkb_0)
-					return ((mkb_0) parent).mlb1.indexOf(child);
-				else if (parent instanceof mkb_1)
-					return ((mkb_1) parent).mkb2.indexOf(child);
-				else if (parent instanceof mkb_2)
-					return ((mkb_2) parent).mlb3.indexOf(child);
+					return polpTree.indexOf(child);
+				else if (parent instanceof polp_0)
+					return ((polp_0) parent).polp1.indexOf(child);
+				else if (parent instanceof polp_1)
+					return ((polp_1) parent).polp2.indexOf(child);
 				else
 					return -1;
 			}
 		});
 	}
 	
-	private void selectPcod(String pcod) {
-		String grup = pcod.substring(0, 3);
+	private void selectPcod(int kdAte, int kdLpu, int kdPol) {
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
 		for (int i = 0; i < tree.getModel().getChildCount(root); i++) {
-			mkb_0 mkb0 = (mkb_0) tree.getModel().getChild(root, i);
-			if (grup.compareTo(mkb0.kod_mkb.substring(0, 3)) >=0) {
-				for (int j = 0; j < mkb0.mlb1.size(); j++) {
-					mkb_1 mkb1 = mkb0.mlb1.get(j);
-					if (grup.compareTo(mkb1.pcod.substring(0, 3)) >=0) {
-						for (int k = 0; k < mkb1.mkb2.size(); k++) {
-							mkb_2 mkb2 = mkb1.mkb2.get(k);
-							if (mkb2.pcod.startsWith(grup)) {
-								if (mkb2.pcod.equals(pcod)) {
-									scrollToPath(new TreePath(new Object[] {root, mkb0, mkb1, mkb2}));
+			polp_0 polp0 = (polp_0) tree.getModel().getChild(root, i);
+			if (polp0.kdate == kdAte) {
+				for (int j = 0; j < polp0.getPolp1Size(); j++) {
+					polp_1 polp1 = polp0.polp1.get(j);
+					if (polp1.kdlpu == kdLpu) {
+						if (polp1.getPolp2Size() == 0) {
+							scrollToPath(new TreePath(new Object[] {root, polp0, polp1}));
+							return;
+						} else
+							for (int k = 0; k < polp1.getPolp2Size(); k++) {
+								IntegerClassifier ic = polp1.polp2.get(k);
+								if (ic.pcod == kdPol) {
+									scrollToPath(new TreePath(new Object[] {root, polp0, polp1, ic}));
 									return;
-								} else
-									for (int l = 0; l < mkb2.mlb3.size(); l++) {
-										StringClassifier sc = mkb2.mlb3.get(l);
-										if (sc.pcod.equals(pcod)) {
-											scrollToPath(new TreePath(new Object[] {root, mkb0, mkb1, mkb2, sc}));
-											return;
-										}
-									}
+								}
 							}
-						}
 					}
 				}
 			}
@@ -221,55 +206,43 @@ public class ViewMkbTreeForm extends ModalForm {
 		bounds.y -= (tree.getPreferredSize().height - bounds.height) / 4;
 		tree.scrollRectToVisible(bounds);
 	}
-	class Mkb0Str extends mkb_0 {
-		private static final long serialVersionUID = -6810587469602995591L;
+	
+	class Polp0Str extends polp_0 {
+		private static final long serialVersionUID = 8055500323615642093L;
 
-		public Mkb0Str(mkb_0 mkb0) {
-			super(mkb0);
+		public Polp0Str(polp_0 polp0) {
+			super(polp0);
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("(%s) %s", kod_mkb, name.substring(0, name.length() - 10));
+			return name;
 		}
 	}
 	
-	class Mkb1Str extends mkb_1 {
-		private static final long serialVersionUID = -8624222080103892087L;
+	class Polp1Str extends polp_1 {
+		private static final long serialVersionUID = -5101784151738094228L;
 
-		public Mkb1Str(mkb_1 mkb1) {
-			super(mkb1);
+		public Polp1Str(polp_1 polp1) {
+			super(polp1);
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("(%s) %s", pcod, name);
+			return name;
 		}
 	}
 	
-	class Mkb2Str extends mkb_2 {
-		private static final long serialVersionUID = -7935255434023824208L;
+	class IntegerClassifierStr extends IntegerClassifier {
+		private static final long serialVersionUID = 7623741381685241843L;
 
-		public Mkb2Str(mkb_2 mkb2) {
-			super(mkb2);
+		public IntegerClassifierStr(IntegerClassifier ic) {
+			super(ic);
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("%-7s %s", pcod, name);
-		}
-	}
-	
-	class StringClassifierStr extends StringClassifier {
-		private static final long serialVersionUID = 1325517499227792334L;
-		
-		public StringClassifierStr(StringClassifier sc) {
-			super(sc);
-		}
-		
-		@Override
-		public String toString() {
-			return String.format("%-7s %s", pcod, name);
+			return name;
 		}
 	}
 	

@@ -583,4 +583,21 @@ public class ConnectionManager {
 		return null;
 	}
 	
+	/**
+	 * Вызов формы с древовидным отображением поликлиник прикрепления.
+	 * @param title - заголовок формы
+	 * @param kdAte - текущий код территории
+	 * @param kdLpu - текущий код ЛПУ
+	 * @param kdPol - текущий код поликлиники
+	 * @return массив из трех значений: код территории прикрепления, код ЛПУ и
+	 * код поликлиники или <code>null</code>, если пользователь закрыл форму
+	 */
+	public int[] showPolpTreeForm(String title, int kdAte, int kdLpu, int kdPol) {
+		Object res = viewClient.showModal(client, 11, title, kdAte, kdLpu, kdPol);
+		
+		if (res != null)
+			return (int[]) res;
+		
+		return null;
+	}
 }
