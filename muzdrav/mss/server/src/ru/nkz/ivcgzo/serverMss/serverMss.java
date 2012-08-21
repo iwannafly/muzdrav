@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.serverMss;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -21,9 +22,11 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftMss.MestnNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.MssNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.MssdopNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.P_smert;
+import ru.nkz.ivcgzo.thriftMss.PatientMestn;
 import ru.nkz.ivcgzo.thriftMss.Psmertdop;
 import ru.nkz.ivcgzo.thriftMss.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftMss.PatientNotFoundException;
@@ -41,6 +44,8 @@ public class serverMss extends Server implements Iface {
 	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> mssClass;
 	private TResultSetMapper<StringClassifier, StringClassifier._Fields> mssStrClas;
 	private static Class<?>[] intcTypes;
+	private TResultSetMapper<PatientMestn,PatientMestn._Fields> mssMestn;
+	private static Class<?>[] mestnTypes;
 
 	
 	public serverMss(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -48,32 +53,35 @@ public class serverMss extends Server implements Iface {
 		
 		mssDoc = new TResultSetMapper<>(P_smert.class, "id", "npasp", "ser", "nomer", "vid", "datav", "datas", "vrems", 
 				"ads_obl", "ads_raion", "ads_gorod", "ads_ul", "ads_dom", "ads_korp", "ads_kv", "ads_mestn", 
-				"nastupila", "semp", "obraz", "zan", "proiz", "datatr", "vid_tr", "obst", "ustan", "cvrach",
+				"nastupila", "semp", "obraz", "zan", "proiz", "datatr", "vid_tr", "vrem_tr", "obst", "ustan", "cvrach",
 				"cdol", "osn", "psm_a", "psm_an", "psm_ak", "psm_ad", "psm_b", "psm_bn", "psm_bk", "psm_bd",
 				"psm_v", "psm_vn", "psm_vk", "psm_vd", "psm_g", "psm_gn", "psm_gk", "psm_gd", "psm_p", "psm_pn",
 				"psm_pk", "psm_pd", "psm_p1", "psm_p1n", "psm_p1k", "psm_p1d", "psm_p2", "psm_p2n", "psm_p2k",
 				"psm_p2d", "dtp", "umerla", "cuser", "clpu", "fio_r", "don", "ves", "nreb", "mrojd", "fam_m", 
-				"im_m", "ot_m", "datarm", "dataz", "fio_pol", "sdok", "ndok", "dvdok", "kvdok", "gpol", "upol", 
-				"dpol", "kpol");
-		mssTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class,
-				String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,
-				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Integer.class, Integer.class,
-				String.class, Integer.class, String.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class,
-				String.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class, String.class, String.class,
-				Integer.class, String.class, String.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class,
-				String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class,
-				String.class, String.class, Date.class, Date.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class,
-				String.class, String.class};
+				"im_m", "ot_m", "datarm", "dataz", "fio_pol", "vdok", "sdok", "ndok", "dvdok", "kvdok", 
+				"vz_ser", "vz_nomer", "vz_data");
+		mssTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Time.class,
+				String.class, String.class, String.class, String.class, String.class, String.class, String.class, Integer.class,
+				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Time.class, String.class, Integer.class,
+				Integer.class,String.class, Integer.class, String.class, String.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Integer.class,
+				String.class, String.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Integer.class, String.class, String.class,
+				Integer.class, Integer.class, String.class, String.class, Integer.class, Integer.class, String.class, String.class, Integer.class,
+				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class,
+				String.class, Date.class, Date.class, String.class, Integer.class, String.class, String.class, Date.class, String.class, 
+				Integer.class, Integer.class, Date.class};
 		
-		mssPatient = new TResultSetMapper<>(PatientCommonInfo.class, "npasp","fam", "im", "ot", "datar", "pol", "adm_obl", "adm_gorod", "adm_dom", "adm_korp", "adm_kvart", "mrab", "name_mr");
-		patTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,Date.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,String.class};
+		mssPatient = new TResultSetMapper<>(PatientCommonInfo.class, "npasp","fam", "im", "ot", "datar", "pol", "adm_obl", "adm_gorod", "adm_ul", "adm_dom", "adm_korp", "adm_kv", "region_liv");
+		patTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,Date.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class};
 		
 		mssDop = new TResultSetMapper<>(Psmertdop.class, "cpodr", "cslu", "prizn", "nomer_n", "nomer_k", "nomer_t");
 		dopTypes = new Class<?>[] {Integer.class,Integer.class,Boolean.class,Integer.class,Integer.class,Integer.class};
 		
 		mssClass = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		intcTypes = new Class<?>[] {Integer.class, String.class};
-	
+		
+		mssMestn = new TResultSetMapper<>(PatientMestn.class, "vid_np", "c_ffomc", "nam_kem");
+		mestnTypes = new Class<?>[] {Integer.class, Integer.class, String.class};
+	 
 	}
 
 	@Override
@@ -125,13 +133,13 @@ public class serverMss extends Server implements Iface {
 				
 				sql = "UPDATE p_smert SET ser = ?, nomer = ?, vid = ?, datav = ?, datas = ?, vrems = ?, " + 
 						"ads_obl = ?, ads_raion = ?, ads_gorod = ?, ads_ul = ?, ads_dom = ?, ads_korp = ?, ads_kv = ?, ads_mestn = ?, " + 
-						"nastupila = ?, semp = ?, obraz = ?, zan = ?, proiz = ?, datatr = ?, vid_tr = ?, obst = ?, ustan = ?, cvrach = ?, " + 
+						"nastupila = ?, semp = ?, obraz = ?, zan = ?, proiz = ?, datatr = ?, vid_tr = ?, vrem_tr = ?, obst = ?, ustan = ?, cvrach = ?, " + 
 						"cdol = ?, osn = ?, psm_a = ?, psm_an = ?, psm_ak = ?, psm_ad = ?, psm_b = ?, psm_bn = ?, psm_bk = ?, psm_bd = ?, " + 
 						"psm_v = ?, psm_vn = ?, psm_vk = ?, psm_vd = ?, psm_g = ?, psm_gn = ?, psm_gk = ?, psm_gd = ?, psm_p = ?, psm_pn = ?, " + 
 						"psm_pk = ?, psm_pd = ?, psm_p1 = ?, psm_p1n = ?, psm_p1k = ?, psm_p1d = ?, psm_p2 = ?, psm_p2n = ?, psm_p2k = ?, " + 
 						"psm_p2d = ?, dtp = ?, umerla = ?, cuser = ?, clpu = ?, fio_r = ?, don = ?, ves = ?, nreb = ?, mrojd = ?, fam_m = ?, " + 
-						"im_m = ?, ot_m = ?, datarm = ?, dataz = ?, fio_pol = ?, sdok = ?, ndok = ?, dvdok = ?, kvdok = ?, gpol = ?, upol = ?, " + 
-						"dpol = ?, kpol = ?, vdok = ? WHERE npasp = ?";
+						"im_m = ?, ot_m = ?, datarm = ?, dataz = ?, fio_pol = ?, vdok = ?, sdok = ?, ndok = ?, dvdok = ?, kvdok = ?, " + 
+						"vz_ser = ?, vz_nomer = ?, vz_datav = ?  WHERE npasp = ?";
 
 				sme.execPreparedT(sql, false, npasp, mssTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 1);
 				sme.setCommit();
@@ -139,13 +147,13 @@ public class serverMss extends Server implements Iface {
 				try {
 					sql = "INSERT INTO p_smert (npasp, ser, nomer, vid, datav, datas, vrems, " + 
 						"ads_obl, ads_raion, ads_gorod, ads_ul, ads_dom, ads_korp, ads_kv, ads_mestn, " + 
-						"nastupila, semp, obraz, zan, proiz, datatr, vid_tr, obst, ustan, cvrach, " + 
+						"nastupila, semp, obraz, zan, proiz, datatr, vid_tr, vrem_tr, obst, ustan, cvrach, " + 
 						"cdol, osn, psm_a, psm_an, psm_ak, psm_ad, psm_b, psm_bn, psm_bk, psm_bd, " + 
 						"psm_v, psm_vn, psm_vk, psm_vd, psm_g, psm_gn, psm_gk, psm_gd, psm_p, psm_pn, " + 
 						"psm_pk, psm_pd, psm_p1, psm_p1n, psm_p1k, psm_p1d, psm_p2, psm_p2n, psm_p2k, " + 
 						"psm_p2d, dtp, umerla, cuser, clpu, fio_r, don, ves, nreb, mrojd, fam_m, " + 
-						"im_m, ot_m, datarm, dataz, fio_pol, sdok, ndok, dvdok, kvdok, gpol, upol, " + 
-						"dpol, kpol, vdok) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+						"im_m, ot_m, datarm, dataz, fio_pol, vdok, sdok, ndok, dvdok, kvdok, " + 
+						"vz_ser, vz_nomer, vz_datav) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 					sme.execPreparedT(sql, false, npasp, mssTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79);
@@ -176,8 +184,8 @@ public class serverMss extends Server implements Iface {
 	@Override
 	public PatientCommonInfo getPatientCommonInfo(int npasp)
 			throws KmiacServerException, TException, PatientNotFoundException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, pol,adm_obl,adm_gorod, adm_dom,adm_korp," +
-				"adm_kvart, mrab, name_mr FROM patient WHERE npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, pol,adm_obl,adm_gorod, adm_ul, adm_dom, adm_korp, " +
+				"adm_kv, region_liv FROM patient WHERE npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())
 				return mssPatient.map(acrs.getResultSet());
 			else
@@ -394,4 +402,19 @@ public class serverMss extends Server implements Iface {
 	}
 
 
-}
+	@Override
+	public PatientMestn getL00(int c_ffomc, String nam_kem)
+			throws MestnNotFoundException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT vid_np, c_ffomc, nam_kem  FROM n_l00 WHERE (c_ffomc = ?) and (nam_kem = ?)", c_ffomc, nam_kem)) {
+			if (acrs.getResultSet().next())
+				return mssMestn.map(acrs.getResultSet());
+			else
+				throw new MestnNotFoundException();
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}
+	}
+
+
+

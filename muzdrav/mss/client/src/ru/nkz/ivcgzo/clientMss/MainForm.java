@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
@@ -35,7 +37,12 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftMss.MestnNotFoundException;
+import ru.nkz.ivcgzo.thriftMss.MssNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.P_smert;
+import ru.nkz.ivcgzo.thriftMss.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftMss.PatientMestn;
+import ru.nkz.ivcgzo.thriftMss.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 import javax.swing.JCheckBox;
 import javax.swing.BoxLayout;
@@ -48,6 +55,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	public static Client<ThriftMss.Client> instance; 
 	private JFrame frame;
 	private final ButtonGroup BtnGroup_ms = new ButtonGroup();
+	private final ButtonGroup BtnGroup_mjit = new ButtonGroup();
 	private final ButtonGroup BtnGroup_don = new ButtonGroup();
 	private JTextField tfAds_obl;
 	private JTextField tfAds_raion;
@@ -81,6 +89,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField tfAdm_dom;
 	private JTextField tfAdm_korp;
 	private JTextField tfAdm_kv;
+	private JRadioButton rdbtnMjit_gor;
+	private JRadioButton rdbtnMjit_selo;
 	private JRadioButton rdbtnMs_gor;
 	private JRadioButton rdbtnMs_selo;
 	private JRadioButton rdbtn_don_don;
@@ -147,6 +157,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbUmerla;
 	
 	private P_smert Patientsmert;
+	private PatientCommonInfo PatientAdres;
+	private PatientMestn PatMestn;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -185,6 +197,177 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel);
 		
+		JButton btnNewButton = new JButton("Поиск");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, false);
+				tfDatav.setValue(null);
+				if (res != null) {
+					try {
+						PatientAdres = MainForm.tcl.getPatientCommonInfo(res[0]);
+						if (PatientAdres.getFam() != null) {
+						//	JOptionPane.showMessageDialog(frame, String.format("НАЙДЕН %d", res[0]));
+							
+							tfFam.setText(PatientAdres.getFam().trim());
+						}
+						if (PatientAdres.getIm() != null) {
+							tfIm.setText(PatientAdres.im.trim());
+						}
+						if (PatientAdres.getOt() != null) {
+							tfOt.setText(PatientAdres.ot.trim());
+						}
+						if (PatientAdres.getPol() == 1) 
+							tfPol.setText("мужской");
+						if (PatientAdres.getPol() == 2)
+							tfPol.setText("женский");
+						if (PatientAdres.isSetDatar()) {
+							tfDatar.setDate(PatientAdres.datar);
+						}
+						if (PatientAdres.getAdm_obl() != null) {
+							tfAdm_obl.setText(PatientAdres.adm_obl.trim());
+							tfAds_obl.setText(PatientAdres.adm_obl.trim());
+						}
+						if (PatientAdres.getAdm_gorod() != null) {
+							tfAdm_gorod.setText(PatientAdres.adm_gorod.trim());
+							tfAds_gorod.setText(PatientAdres.adm_gorod.trim());
+						}
+						if (PatientAdres.getAdm_ul() != null) {
+							tfAdm_ul.setText(PatientAdres.adm_ul.trim());
+							tfAds_ul.setText(PatientAdres.adm_ul.trim());
+						}
+						if (PatientAdres.getAdm_dom() != null) {
+							tfAdm_dom.setText(PatientAdres.adm_dom.trim());
+							tfAds_dom.setText(PatientAdres.adm_dom.trim());
+						}
+						if (PatientAdres.getAdm_korp() != null) {
+							tfAdm_korp.setText(PatientAdres.adm_korp.trim());
+							tfAds_korp.setText(PatientAdres.adm_korp.trim());
+						}
+						if (PatientAdres.getAdm_kv() != null) {
+							tfAdm_kv.setText(PatientAdres.adm_kv.trim());
+							tfAds_kv.setText(PatientAdres.adm_kv.trim());
+						}
+						int region = PatientAdres.getRegion_liv();
+						//System.out.println(PatientAdres.adm_gorod);
+						try {
+							PatMestn = MainForm.tcl.getL00(region, PatientAdres.adm_gorod.trim());
+							//System.out.println(PatMestn.vid_np);
+
+						} catch (MestnNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} 
+						if ((PatMestn.getVid_np() == 1) || (PatMestn.getVid_np() == 2)) {
+							rdbtnMjit_gor.setSelected(true);
+							rdbtnMs_gor.setSelected(true);
+							rdbtnMjit_selo.setSelected(false);
+							rdbtnMs_selo.setSelected(false);
+						}
+						if ((PatMestn.getVid_np() != 1) && (PatMestn.getVid_np() != 2)) {
+							rdbtnMjit_selo.setSelected(true);
+							rdbtnMs_selo.setSelected(true);
+						}
+						try {
+						Patientsmert = MainForm.tcl.getPsmert(res[0]);
+						tfSer.setText(String.valueOf(Patientsmert.ser));
+						tfNomer.setText(String.valueOf(Patientsmert.nomer));
+						if (Patientsmert.isSetDatav()) tfDatav.setDate(Patientsmert.datav);
+						if (Patientsmert.getVid() != 0) cmbVid.setSelectedPcod(Patientsmert.vid);
+						tfVz_ser.setText(String.valueOf(Patientsmert.vz_ser));
+						tfVz_nomer.setText(String.valueOf(Patientsmert.vz_nomer));
+						if (Patientsmert.isSetVz_datav()) tfVz_datav.setDate(Patientsmert.vz_datav);
+						if (Patientsmert.isSetDatas()) tfDatas.setDate(Patientsmert.datas);
+						if (Patientsmert.isSetVrems()) tfVrems.setTime(Patientsmert.vrems);
+						//if (Patientsmert.getAdm_raion() != null) tfAdm_raion.setText(Patientsmert.adm_raion);
+						if (Patientsmert.getAds_obl() != null) tfAds_obl.setText(Patientsmert.ads_obl);
+						if (Patientsmert.getAds_raion() != null) tfAds_raion.setText(Patientsmert.ads_raion);
+						if (Patientsmert.getAds_gorod() != null) tfAds_gorod.setText(Patientsmert.ads_gorod);
+						if (Patientsmert.getAds_ul() != null) tfAds_ul.setText(Patientsmert.ads_ul);
+						if (Patientsmert.getAds_dom() != null) tfAds_dom.setText(Patientsmert.ads_dom);
+						if (Patientsmert.getAds_korp() != null) tfAds_korp.setText(Patientsmert.ads_korp);
+						if (Patientsmert.getAds_kv() != null) tfAds_kv.setText(Patientsmert.ads_kv);
+						if (Patientsmert.getAds_mestn() == 1) rdbtnMs_gor.setSelected(true);
+						if (Patientsmert.getAds_mestn() == 2) rdbtnMs_selo.setSelected(true);
+						if (Patientsmert.getSemp() != 0) cmb_semp.setSelectedPcod(Patientsmert.semp);
+						if (Patientsmert.getObraz() != 0) cmb_obraz.setSelectedPcod(Patientsmert.obraz);
+						if (Patientsmert.getZan() != 0) cmb_zan.setSelectedPcod(Patientsmert.zan);
+						if (Patientsmert.getDon() == 1) rdbtn_don_don.setSelected(true);
+						if (Patientsmert.getDon() == 2) rdbtn_don_ned.setSelected(true);
+						if (Patientsmert.getDon() == 3) rdbtn_don_peren.setSelected(true);
+						if (Patientsmert.getVes() != 0) tfves.setText(String.valueOf(Patientsmert.ves));
+						if (Patientsmert.getNreb() != 0) tfNreb.setText(String.valueOf(Patientsmert.nreb));
+						if (Patientsmert.getFam_m() != null) tfFam_m.setText(Patientsmert.fam_m);
+						if (Patientsmert.getIm_m() != null) tfIm_m.setText(Patientsmert.im_m);
+						if (Patientsmert.getOt_m() != null) tfOt_m.setText(Patientsmert.ot_m);
+						if (Patientsmert.getMrojd() != null) tfMrojd.setText(Patientsmert.mrojd);
+						if (Patientsmert.isSetDatarm()) tfdatarm.setDate(Patientsmert.datarm);
+						if (Patientsmert.getNastupila() != 0) cmbNastupila.setSelectedPcod(Patientsmert.nastupila);
+						if (Patientsmert.getProiz() != 0) cmbProiz.setSelectedPcod(Patientsmert.proiz);
+						if (Patientsmert.getVid_tr() != 0) cmbVid_tr.setSelectedPcod(Patientsmert.vid_tr);
+						if (Patientsmert.isSetDatatr()) tfDatatr.setDate(Patientsmert.datatr);
+						if (Patientsmert.isSetVrem_tr()) tfVrem_tr.setTime(Patientsmert.vrem_tr);
+						if (Patientsmert.getObst() != null) tfObst.setText(Patientsmert.obst);
+						if (Patientsmert.getUstan() != 0) cmbUstan.setSelectedPcod(Patientsmert.ustan);
+						//if (Patientsmert.getCvrach() != 0) tfCvrach.setSelectedPcod(Patientsmert.cvrach);
+						if (Patientsmert.getPsm_a() != null) tfPsm_a.setText(Patientsmert.psm_a);
+						if (Patientsmert.getPsm_an() != null) tfPsm_an.setText(Patientsmert.psm_an);
+						if (Patientsmert.getPsm_ak() != 0) tfPsm_ak.setText(String.valueOf(Patientsmert.psm_ak));
+						if (Patientsmert.getPsm_ad() != 0) cmbPsm_ad.setSelectedPcod(Patientsmert.psm_ad);
+						if (Patientsmert.getPsm_b() != null) tfPsm_b.setText(Patientsmert.psm_b);
+						if (Patientsmert.getPsm_bn() != null) tfPsm_bn.setText(Patientsmert.psm_bn);
+						if (Patientsmert.getPsm_bk() != 0) tfPsm_bk.setText(String.valueOf(Patientsmert.psm_bk));
+						if (Patientsmert.getPsm_bd() != 0) cmbPsm_bd.setSelectedPcod(Patientsmert.psm_bd);
+						if (Patientsmert.getPsm_v() != null) tfPsm_v.setText(Patientsmert.psm_v);
+						if (Patientsmert.getPsm_vn() != null) tfPsm_vn.setText(Patientsmert.psm_vn);
+						if (Patientsmert.getPsm_vk() != 0) tfPsm_vk.setText(String.valueOf(Patientsmert.psm_vk));
+						if (Patientsmert.getPsm_vd() != 0) cmbPsm_vd.setSelectedPcod(Patientsmert.psm_vd);
+						if (Patientsmert.getPsm_g() != null) tfPsm_g.setText(Patientsmert.psm_g);
+						if (Patientsmert.getPsm_gn() != null) tfPsm_gn.setText(Patientsmert.psm_gn);
+						if (Patientsmert.getPsm_gk() != 0) tfPsm_gk.setText(String.valueOf(Patientsmert.psm_gk));
+						if (Patientsmert.getPsm_gd() != 0) cmbPsm_ag.setSelectedPcod(Patientsmert.psm_gd);
+						if (Patientsmert.getPsm_p() != null) tfPsm_p.setText(Patientsmert.psm_p);
+						if (Patientsmert.getPsm_pn() != null) tfPsm_pn.setText(Patientsmert.psm_pn);
+						if (Patientsmert.getPsm_pk() != 0) tfPsm_pk.setText(String.valueOf(Patientsmert.psm_pk));
+						if (Patientsmert.getPsm_pd() != 0) cmbPsm_pd.setSelectedPcod(Patientsmert.psm_pd);
+						if (Patientsmert.getPsm_p1() != null) tfPsm_p1.setText(Patientsmert.psm_p1);
+						if (Patientsmert.getPsm_p1n() != null) tfPsm_p1n.setText(Patientsmert.psm_p1n);
+						if (Patientsmert.getPsm_p1k() != 0) tfPsm_p1k.setText(String.valueOf(Patientsmert.psm_p1k));
+						if (Patientsmert.getPsm_p1d() != 0) cmbPsm_p1d.setSelectedPcod(Patientsmert.psm_p1d);
+						if (Patientsmert.getPsm_p2() != null) tfPsm_p2.setText(Patientsmert.psm_p2);
+						if (Patientsmert.getPsm_p2n() != null) tfPsm_p2n.setText(Patientsmert.psm_p2n);
+						if (Patientsmert.getPsm_p2k() != 0) tfPsm_p2k.setText(String.valueOf(Patientsmert.psm_p2k));
+						if (Patientsmert.getPsm_p2d() != 0) cmbPsm_p2d.setSelectedPcod(Patientsmert.psm_p2d);
+						if (Patientsmert.getDtp() == 1) { chckbxDtp30.setSelected(true);
+						chckbxDtp7.setSelected(false);}
+						if (Patientsmert.getDtp() == 2) { chckbxDtp30.setSelected(true);
+						chckbxDtp7.setSelected(true);}
+						if (Patientsmert.getCuser() != 0) tfZapolnil.setText(String.valueOf(Patientsmert.cuser));
+						if (Patientsmert.getFio_pol() != null) tfFam_pol.setText(Patientsmert.fio_pol.trim());
+						if (Patientsmert.getVdok() != 0) cmbVdok.setSelectedPcod(Patientsmert.vdok);
+						if (Patientsmert.getSdok() != null) tfSdok.setText(Patientsmert.sdok.trim());
+						if (Patientsmert.getNdok() != null) tfNdok.setText(Patientsmert.ndok.trim());
+						if (Patientsmert.getKvdok() != null) tfKvdok.setText(Patientsmert.kvdok.trim());
+						if (Patientsmert.isSetDvdok()) tfDvdok.setDate(Patientsmert.dvdok);
+						//System.out.println(res[0]);
+					} catch (MssNotFoundException e1) {
+						System.out.println("NO" );
+					//	JOptionPane.showMessageDialog(frame, String.format("Нет информации на пациента %d", res[0]));
+					}
+					} catch (TException e1) {
+						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (PatientNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		panel.add(btnNewButton);
+		
 		JButton btnSave = new JButton("Сохранить");
 		btnSave.setVerticalAlignment(SwingConstants.TOP);
 		panel.add(btnSave);
@@ -192,17 +375,26 @@ public class MainForm extends Client<ThriftMss.Client> {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 					Patientsmert = new P_smert();
-					Patientsmert.setSer(Integer.valueOf(tfSer.getText()));
-					Patientsmert.setNomer(Integer.valueOf(tfNomer.getText()));
+					if (tfSer.getText().isEmpty()) Patientsmert.setSer(32); 
+					else
+						Patientsmert.setSer(Integer.valueOf(tfSer.getText()));
+					if (tfNomer.getText().isEmpty()) Patientsmert.setNomer(0);
+					else
+						Patientsmert.setNomer(Integer.valueOf(tfNomer.getText()));
 					if (cmbVid.getSelectedItem() != null) Patientsmert.setVid(cmbVid.getSelectedPcod());
-					Patientsmert.setDatav(tfDatav.getDate().getTime());
-					Patientsmert.setVz_ser(Integer.valueOf(tfVz_ser.getText()));
-					Patientsmert.setVz_nomer(Integer.valueOf(tfVz_nomer.getText()));
-					Patientsmert.setVz_datav(tfVz_datav.getDate().getTime());
-					Patientsmert.setDatas(tfDatas.getDate().getTime());
-					Patientsmert.setVrems(tfVrems.getTime().toString());
+					else
+						Patientsmert.setVid(0);
+					if (tfDatav.getDate() != null) Patientsmert.setDatav(tfDatav.getDate().getTime());
+					if (tfVz_ser.getText().isEmpty()) Patientsmert.setVz_ser(0);
+					else
+						Patientsmert.setVz_ser(Integer.valueOf(tfVz_ser.getText()));
+					if (tfVz_nomer.getText().isEmpty()) Patientsmert.setVz_nomer(0);
+					else
+						Patientsmert.setVz_nomer(Integer.valueOf(tfVz_nomer.getText()));
+					if (tfVz_datav.getDate() != null) Patientsmert.setVz_datav(tfVz_datav.getDate().getTime());
+					if (tfDatas.getDate() != null) Patientsmert.setDatas(tfDatas.getDate().getTime());
+					if (tfVrems.getTime() != null) Patientsmert.setVrems(tfVrems.getTime().getTime());
 					Patientsmert.setAds_obl(tfAds_obl.getText().trim());
 					Patientsmert.setAds_raion(tfAds_raion.getText().trim());
 					Patientsmert.setAds_gorod(tfAds_gorod.getText().trim());
@@ -218,17 +410,17 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (rdbtn_don_don.isSelected()) Patientsmert.setDon(1);
 					if (rdbtn_don_ned.isSelected()) Patientsmert.setDon(2);
 					if (rdbtn_don_peren.isSelected()) Patientsmert.setDon(3);
-					Patientsmert.setVes(Integer.valueOf(tfves.getText()));
-					Patientsmert.setNreb(Integer.valueOf(tfNreb.getText()));
+					if (!tfves.getText().isEmpty()) Patientsmert.setVes(Integer.valueOf(tfves.getText()));
+					if (!tfNreb.getText().isEmpty()) Patientsmert.setNreb(Integer.valueOf(tfNreb.getText()));
 					Patientsmert.setFam_m(tfFam_m.getText().trim());
 					Patientsmert.setIm_m(tfIm_m.getText().trim());
 					Patientsmert.setOt_m(tfOt_m.getText().trim());
 					Patientsmert.setMrojd(tfMrojd.getText().trim());
-					Patientsmert.setDatarm(tfdatarm.getDate().getTime());
+					if (tfdatarm.getDate() != null) Patientsmert.setDatarm(tfdatarm.getDate().getTime());
 					if (cmbNastupila.getSelectedItem() != null) Patientsmert.setNastupila(cmbNastupila.getSelectedPcod());
 					if (cmbProiz.getSelectedItem() != null) Patientsmert.setProiz(cmbProiz.getSelectedPcod());
-					Patientsmert.setDatatr(tfDatatr.getDate().getTime());
-					Patientsmert.setVrem_tr(tfVrem_tr.getTime().toString());
+					if (tfDatatr.getDate() != null) Patientsmert.setDatatr(tfDatatr.getDate().getTime());
+					if (tfVrem_tr.getTime() != null) Patientsmert.setVrem_tr(tfVrem_tr.getTime().getTime());
 					if (cmbVid_tr.getSelectedItem() != null) Patientsmert.setVid_tr(cmbVid_tr.getSelectedPcod());
 					Patientsmert.setObst(tfObst.getText().trim());
 					if (cmbUstan.getSelectedItem() != null) Patientsmert.setUstan(cmbUstan.getSelectedPcod());
@@ -237,32 +429,32 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (cmbOsn.getSelectedItem() != null) Patientsmert.setOsn(cmbOsn.getSelectedPcod());
 					Patientsmert.setPsm_a(tfPsm_a.getText().trim());
 					Patientsmert.setPsm_an(tfPsm_an.getText().trim());
-					Patientsmert.setPsm_ak(Integer.valueOf(tfPsm_ak.getText()));
-				//	if (cmbPsm_ad.getSelectedItem() != null) Patientsmert.setPsm_ad(cmbPsm_ad.getSelectedPcod());
+					if (!tfPsm_ak.getText().isEmpty()) Patientsmert.setPsm_ak(Integer.valueOf(tfPsm_ak.getText()));
+					if (cmbPsm_ad.getSelectedItem() != null) Patientsmert.setPsm_ad(cmbPsm_ad.getSelectedPcod());
 					Patientsmert.setPsm_b(tfPsm_b.getText().trim());
 					Patientsmert.setPsm_bn(tfPsm_bn.getText().trim());
-					Patientsmert.setPsm_bk(Integer.valueOf(tfPsm_bk.getText()));
-				//	if (cmbPsm_bd.getSelectedItem() != null) Patientsmert.setPsm_bd(cmbPsm_bd.getSelectedPcod());
+					if (!tfPsm_bk.getText().isEmpty()) Patientsmert.setPsm_bk(Integer.valueOf(tfPsm_bk.getText()));
+					if (cmbPsm_bd.getSelectedItem() != null) Patientsmert.setPsm_bd(cmbPsm_bd.getSelectedPcod());
 					Patientsmert.setPsm_v(tfPsm_v.getText().trim());
 					Patientsmert.setPsm_vn(tfPsm_vn.getText().trim());
-					Patientsmert.setPsm_vk(Integer.valueOf(tfPsm_vk.getText()));
-				//	if (cmbPsm_vd.getSelectedItem() != null) Patientsmert.setPsm_vd(cmbPsm_vd.getSelectedPcod());
+					if (!tfPsm_vk.getText().isEmpty()) Patientsmert.setPsm_vk(Integer.valueOf(tfPsm_vk.getText()));
+					if (cmbPsm_vd.getSelectedItem() != null) Patientsmert.setPsm_vd(cmbPsm_vd.getSelectedPcod());
 					Patientsmert.setPsm_g(tfPsm_g.getText().trim());
 					Patientsmert.setPsm_gn(tfPsm_gn.getText().trim());
-					Patientsmert.setPsm_gk(Integer.valueOf(tfPsm_gk.getText()));
-				//	if (cmbPsm_ag.getSelectedItem() != null) Patientsmert.setPsm_gd(cmbPsm_ag.getSelectedPcod());
+					if (!tfPsm_gk.getText().isEmpty()) Patientsmert.setPsm_gk(Integer.valueOf(tfPsm_gk.getText()));
+					if (cmbPsm_ag.getSelectedItem() != null) Patientsmert.setPsm_gd(cmbPsm_ag.getSelectedPcod());
 					Patientsmert.setPsm_p(tfPsm_p.getText().trim());
 					Patientsmert.setPsm_pn(tfPsm_pn.getText().trim());
-					Patientsmert.setPsm_pk(Integer.valueOf(tfPsm_pk.getText()));
-				//	if (cmbPsm_pd.getSelectedItem() != null) Patientsmert.setPsm_pd(cmbPsm_pd.getSelectedPcod());
+					if (!tfPsm_pk.getText().isEmpty()) Patientsmert.setPsm_pk(Integer.valueOf(tfPsm_pk.getText()));
+					if (cmbPsm_pd.getSelectedItem() != null) Patientsmert.setPsm_pd(cmbPsm_pd.getSelectedPcod());
 					Patientsmert.setPsm_p1(tfPsm_p1.getText().trim());
 					Patientsmert.setPsm_p1n(tfPsm_p1n.getText().trim());
-					Patientsmert.setPsm_p1k(Integer.valueOf(tfPsm_p1k.getText()));
-				//	if (cmbPsm_p1d.getSelectedItem() != null) Patientsmert.setPsm_p1d(cmbPsm_p1d.getSelectedPcod());
+					if (!tfPsm_p1k.getText().isEmpty()) Patientsmert.setPsm_p1k(Integer.valueOf(tfPsm_p1k.getText()));
+					if (cmbPsm_p1d.getSelectedItem() != null) Patientsmert.setPsm_p1d(cmbPsm_p1d.getSelectedPcod());
 					Patientsmert.setPsm_p2(tfPsm_p2.getText().trim());
 					Patientsmert.setPsm_p2n(tfPsm_p2n.getText().trim());
-					Patientsmert.setPsm_p2k(Integer.valueOf(tfPsm_p2k.getText()));
-				//	if (cmbPsm_p2d.getSelectedItem() != null) Patientsmert.setPsm_p2d(cmbPsm_p2d.getSelectedPcod());
+					if (!tfPsm_p2k.getText().isEmpty()) Patientsmert.setPsm_p2k(Integer.valueOf(tfPsm_p2k.getText()));
+					if (cmbPsm_p2d.getSelectedItem() != null) Patientsmert.setPsm_p2d(cmbPsm_p2d.getSelectedPcod());
 					if (chckbxDtp30.isSelected()) Patientsmert.setDtp(1);
 					if (chckbxDtp7.isSelected()) Patientsmert.setDtp(2);
 					if (cmbUmerla.getSelectedItem() != null) Patientsmert.setUmerla(cmbUmerla.getSelectedPcod());
@@ -270,8 +462,10 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (cmbVdok.getSelectedItem() != null) Patientsmert.setVdok(cmbVdok.getSelectedPcod());
 					Patientsmert.setSdok(tfSdok.getText().trim());
 					Patientsmert.setNdok(tfNdok.getText().trim());
-					Patientsmert.setDvdok(tfDvdok.getDate().getTime());
+					if (tfDvdok.getDate() != null) Patientsmert.setDvdok(tfDvdok.getDate().getTime());
 					Patientsmert.setKvdok(tfKvdok.getText().trim());
+					System.out.println("STROKA" );
+					MainForm.tcl.setPsmert(Patientsmert);
 				} catch (Exception e1) {
 					e1.printStackTrace();						
 				}						
@@ -422,13 +616,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_24 = new JLabel("Заполняется для детей, умерших в возрасте от 168 час. до 1 года");
 		
-		JRadioButton rdbtn_don_don = new JRadioButton("доношенный (37-41 недель)");
+		rdbtn_don_don = new JRadioButton("доношенный (37-41 недель)");
 		BtnGroup_don.add(rdbtn_don_don);
 		
-		JRadioButton rdbtn_don_ned = new JRadioButton("недоношенный (менее 37 недель)");
+		rdbtn_don_ned = new JRadioButton("недоношенный (менее 37 недель)");
 		BtnGroup_don.add(rdbtn_don_ned);
 		
-		JRadioButton rdbtn_don_peren = new JRadioButton("переношенный (42 недель и более)");
+		rdbtn_don_peren = new JRadioButton("переношенный (42 недель и более)");
 		BtnGroup_don.add(rdbtn_don_peren);
 		
 		JLabel lblNewLabel_26 = new JLabel("вес при рождении (грамм)\r\n");
@@ -576,10 +770,10 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_20 = new JLabel("Местность");
 		
-		JRadioButton rdbtnMs_gor = new JRadioButton("городская");
+		rdbtnMs_gor = new JRadioButton("городская");
 		BtnGroup_ms.add(rdbtnMs_gor);
 		
-		JRadioButton rdbtnMs_selo = new JRadioButton("сельская");
+		rdbtnMs_selo = new JRadioButton("сельская");
 		BtnGroup_ms.add(rdbtnMs_selo);
 		
 		JLabel lblNewLabel_21 = new JLabel("*Семейное положение");
@@ -647,9 +841,11 @@ public class MainForm extends Client<ThriftMss.Client> {
 		tfAdm_kv = new JTextField();
 		tfAdm_kv.setColumns(10);
 		
-		JRadioButton rdbtnMjit_gor = new JRadioButton("городская");
+		rdbtnMjit_gor = new JRadioButton("городская");
+		BtnGroup_mjit.add(rdbtnMjit_gor);
 		
-		JRadioButton rdbtnMjit_selo = new JRadioButton("сельская");
+		rdbtnMjit_selo = new JRadioButton("сельская");
+		BtnGroup_mjit.add(rdbtnMjit_selo);
 		
 		JLabel lblNewLabel_7 = new JLabel("Место постоянного жительства:");
 		lblNewLabel_7.setFont(new Font("Tahoma", Font.BOLD, 11));
