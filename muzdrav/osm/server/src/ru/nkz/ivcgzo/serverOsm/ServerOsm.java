@@ -31,6 +31,7 @@ import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
+import ru.nkz.ivcgzo.thriftOsm.PNapr;
 import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
@@ -116,6 +117,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private final Class<?>[] rdDinTypes;
+	private final TResultSetMapper<PNapr, PNapr._Fields> rsmPnapr;
+	private final Class<?>[] pnaprTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -187,6 +190,9 @@ public class ServerOsm extends Server implements Iface {
 
 		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "oteki",       "spl",         "chcc",        "poplp",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+
+		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",   "vid_doc",      "text",       "preds",       "zaved",       "name"      );
+		pnaprTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 
 	}
 
@@ -862,6 +868,7 @@ public class ServerOsm extends Server implements Iface {
 		}
 	}
 
+
 	@Override
 	public List<PokazMet> getPokazMet(String metod) throws KmiacServerException, TException {
 		String sql = "SELECT no.obst AS c_obst, nl.name_n, ns.pcod, ns.stoim " + 
@@ -922,7 +929,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\111.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\111.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -992,7 +999,7 @@ public class ServerOsm extends Server implements Iface {
 			
 			acrs.close();
 			osw.write(sb.toString());
-			return "c:\\111.htm";
+			return "e:\\111.htm";
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1000,7 +1007,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printIsslPokaz(IsslPokaz ip) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\NaprIsslPokaz.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\NaprIsslPokaz.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1071,7 +1078,7 @@ public class ServerOsm extends Server implements Iface {
 			
 			acrs.close();
 			osw.write(sb.toString());
-			return "c:\\NaprIsslPokaz.htm";
+			return "e:\\NaprIsslPokaz.htm";
 		} catch (SQLException | IOException | KmiacServerException e) {
 			throw new KmiacServerException();
 		}
@@ -1106,7 +1113,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printNapr(Napr na) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\napr.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\napr.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1167,7 +1174,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>МП");
 			acrs.close();
 							osw.write(sb.toString());
-							return "c:\\napr.htm";
+							return "e:\\napr.htm";
 						} catch (SQLException | IOException e) {
 							throw new KmiacServerException();
 						}
@@ -1176,7 +1183,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printNaprKons(NaprKons nk) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\naprKons.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\naprKons.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1237,7 +1244,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>МП");
 			acrs.close();
 							osw.write(sb.toString());
-							return "c:\\naprKons.htm";
+							return "e:\\naprKons.htm";
 						} catch (SQLException | IOException  e) {
 							throw new KmiacServerException();
 						}
@@ -1245,7 +1252,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printVypis(Vypis vp) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\vypis.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\vypis.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1303,12 +1310,10 @@ public class ServerOsm extends Server implements Iface {
 					}
 				sb.append("<br>	7. Краткий анамнез, диагностические исследования, течение болезни<br>");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select t_nachalo_zab,t_sympt,t_otn_bol,t_ps_syt from p_anam_zab where id_pvizit=?", vp.getPvizit_id()); 
+				acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", vp.getPvizit_id()); 
 if (acrs.getResultSet().next()) {
 				if (acrs.getResultSet().getString(1)!=null) sb.append(String.format("%s.", acrs.getResultSet().getString(1)));
-if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("%s.", acrs.getResultSet().getString(2)));
-if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("%s.", acrs.getResultSet().getString(3)));
-if (acrs.getResultSet().getString(4)!=null) sb.append(String.format("%s.", acrs.getResultSet().getString(4)));}
+}
 
 				acrs.close();
 				acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_p0e1.pcod , n_p0e1.name , n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav " +
@@ -1337,7 +1342,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
-			return "c:\\vypis.htm";
+			return "e:\\vypis.htm";
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1345,7 +1350,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public String printKek(int npasp, int pvizitId) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kek.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\kek.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1392,7 +1397,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
-			return "c:\\kek.htm";}
+			return "e:\\kek.htm";}
 		 catch (SQLException | IOException e) {
 			throw new KmiacServerException();
 		}
@@ -1452,6 +1457,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
+		
 	}
 
 	@Override
@@ -1649,7 +1655,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	
 	@Override
 	public String printProtokol(Protokol pk) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\protokol.htm"), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\protokol.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1665,77 +1671,30 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append(String.format("<br><b>Цель обращения </b>%s", acrs.getResultSet().getString(3)));}
 				
 				acrs.close();
-				acrs = sse.execPreparedQuery("select t_nachalo_zab,t_sympt,t_otn_bol,t_ps_syt from p_anam_zab where id_pvizit=?", pk.getPvizit_id()); 
+				acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", pk.getPvizit_id()); 
 				if (acrs.getResultSet().next()) {
 			sb.append("<br><b>	Анамнез заболевания</b><br>");
-					if (acrs.getResultSet().getString(1)!=null) sb.append(String.format("<i>Начало заболевания </i> %s.", acrs.getResultSet().getString(1)));
-					if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Симптомы </i> %s.", acrs.getResultSet().getString(2)));
-					if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>Отношение больного </i> %s.", acrs.getResultSet().getString(3)));
-					if (acrs.getResultSet().getString(4)!=null) sb.append(String.format("<i>Психологическая ситуация в связи с болезнью </i> %s.", acrs.getResultSet().getString(4)));
+					if (acrs.getResultSet().getString(1)!=null) sb.append(String.format(" %s.", acrs.getResultSet().getString(1)));
 				}				
-					
 					acrs.close();
 					acrs = sse.execPreparedQuery("select p_vizit_amb.*,p_priem.*,n_abs.name,n_opl.name,n_ap0.name from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) left join n_opl on(p_vizit_amb.opl=n_opl.pcod) left join n_ap0 on(p_vizit_amb.rezult=n_ap0.pcod) where p_vizit_amb.id_obr=? order by id ", pk.getPvizit_id());
 					if (acrs.getResultSet().next()) {
 						sb.append("<br><b>Осмотр: </b><br>");
 						do {
 							sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(4)));
-							if (acrs.getResultSet().getString(84)!=null) sb.append(String.format("<i>Место обслуживания </i> %s <br>", acrs.getResultSet().getString(84)));
-							if (acrs.getResultSet().getString(86)!=null) sb.append(String.format("<i>Способ оплаты </i> %s <br>", acrs.getResultSet().getString(86)));
-							if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Жалобы: система пищеварения </i> %s <br>", acrs.getResultSet().getString(30)));
-							if (acrs.getResultSet().getString(28)!=null) sb.append(String.format("<i>Жалобы: дыхательная система </i> %s <br>", acrs.getResultSet().getString(28)));
-							if (acrs.getResultSet().getString(29)!=null) sb.append(String.format("<i>Жалобы: система кровообращения </i> %s <br>", acrs.getResultSet().getString(29)));
-							if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Жалобы: система пищеварения </i> %s <br>", acrs.getResultSet().getString(30)));
-							if (acrs.getResultSet().getString(31)!=null) sb.append(String.format("<i>Жалобы: мочеполовая система </i> %s <br>", acrs.getResultSet().getString(31)));
-							if (acrs.getResultSet().getString(32)!=null) sb.append(String.format("<i>Жалобы: эндокринная система </i> %s <br>", acrs.getResultSet().getString(32)));
-							if (acrs.getResultSet().getString(33)!=null) sb.append(String.format("<i>Жалобы: нервная система и органы чувств </i> %s <br>", acrs.getResultSet().getString(33)));
-							if (acrs.getResultSet().getString(34)!=null) sb.append(String.format("<i>Жалобы: опорно-двигательная система </i> %s <br>", acrs.getResultSet().getString(34)));
-							if (acrs.getResultSet().getString(35)!=null) sb.append(String.format("<i>Жалобы: лихорадка </i> %s <br>", acrs.getResultSet().getString(35)));
-							if (acrs.getResultSet().getString(36)!=null) sb.append(String.format("<i>Жалобы: общего характера </i> %s <br>", acrs.getResultSet().getString(36)));
-							if (acrs.getResultSet().getString(37)!=null) sb.append(String.format("<i>Жалобы: прочие </i> %s <br>", acrs.getResultSet().getString(37)));
-							if (acrs.getResultSet().getString(38)!=null) sb.append(String.format("<i>Общее состояние </i> %s <br>", acrs.getResultSet().getString(38)));
-							if (acrs.getResultSet().getString(39)!=null) sb.append(String.format("<i>Кожные покровы </i> %s <br>", acrs.getResultSet().getString(39)));
-							if (acrs.getResultSet().getString(40)!=null) sb.append(String.format("<i>Видимые слизистые </i> %s <br>", acrs.getResultSet().getString(40)));
-							if (acrs.getResultSet().getString(41)!=null) sb.append(String.format("<i>Подкожная клетчатка </i> %s <br>", acrs.getResultSet().getString(41)));
-							if (acrs.getResultSet().getString(42)!=null) sb.append(String.format("<i>Лимфатические узлы </i> %s <br>", acrs.getResultSet().getString(42)));
-							if (acrs.getResultSet().getString(43)!=null) sb.append(String.format("<i>Костно-мышечная система </i> %s <br>", acrs.getResultSet().getString(43)));
-							if (acrs.getResultSet().getString(44)!=null) sb.append(String.format("<i>Нервно-психический статус </i> %s <br>", acrs.getResultSet().getString(44)));
-							if (acrs.getResultSet().getString(45)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(45)));
-							if (acrs.getResultSet().getString(46)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(46)));
-							if (acrs.getResultSet().getString(47)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(47)));
-							if (acrs.getResultSet().getString(48)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(49)));
-							if (acrs.getResultSet().getString(50)!=null) sb.append(String.format("<i>Телосложение </i> %s <br>", acrs.getResultSet().getString(50)));
-							if (acrs.getResultSet().getString(51)!=null) sb.append(String.format("<i>Суставы </i> %s <br>", acrs.getResultSet().getString(51)));
-							if (acrs.getResultSet().getString(52)!=null) sb.append(String.format("<i>Дыхание </i> %s <br>", acrs.getResultSet().getString(52)));
-							if (acrs.getResultSet().getString(53)!=null) sb.append(String.format("<i>Грудная клетка </i> %s <br>", acrs.getResultSet().getString(53)));
-							if (acrs.getResultSet().getString(54)!=null) sb.append(String.format("<i>Перкуссия легких </i> %s <br>", acrs.getResultSet().getString(54)));
-							if (acrs.getResultSet().getString(55)!=null) sb.append(String.format("<i>Аускультация легких </i> %s <br>", acrs.getResultSet().getString(55)));
-							if (acrs.getResultSet().getString(56)!=null) sb.append(String.format("<i>Бронхофония </i> %s <br>", acrs.getResultSet().getString(56)));
-							if (acrs.getResultSet().getString(57)!=null) sb.append(String.format("<i>Артерии и шейные вены </i> %s <br>", acrs.getResultSet().getString(57)));
-							if (acrs.getResultSet().getString(58)!=null) sb.append(String.format("<i>Область сердца </i> %s <br>", acrs.getResultSet().getString(58)));
-							if (acrs.getResultSet().getString(59)!=null) sb.append(String.format("<i>Перкуссия сердца </i> %s <br>", acrs.getResultSet().getString(59)));
-							if (acrs.getResultSet().getString(60)!=null) sb.append(String.format("<i>Аускультация сердца </i> %s <br>", acrs.getResultSet().getString(60)));
-							if (acrs.getResultSet().getString(61)!=null) sb.append(String.format("<i>Полость рта </i> %s <br>", acrs.getResultSet().getString(61)));
-							if (acrs.getResultSet().getString(62)!=null) sb.append(String.format("<i>Живот </i> %s <br>", acrs.getResultSet().getString(62)));
-							if (acrs.getResultSet().getString(63)!=null) sb.append(String.format("<i>Пальпация живота </i> %s <br>", acrs.getResultSet().getString(63)));
-							if (acrs.getResultSet().getString(64)!=null) sb.append(String.format("<i>Пальпация, перкуссия и аускультация ЖКТ </i> %s <br>", acrs.getResultSet().getString(64)));
-							if (acrs.getResultSet().getString(65)!=null) sb.append(String.format("<i>Пальпация желудка </i> %s <br>", acrs.getResultSet().getString(65)));
-							if (acrs.getResultSet().getString(66)!=null) sb.append(String.format("<i>Пальпация поджелудочной железы </i> %s <br>", acrs.getResultSet().getString(66)));
-							if (acrs.getResultSet().getString(67)!=null) sb.append(String.format("<i>Печень </i> %s <br>", acrs.getResultSet().getString(67)));
-							if (acrs.getResultSet().getString(68)!=null) sb.append(String.format("<i>Желчный пузырь </i> %s <br>", acrs.getResultSet().getString(68)));
-							if (acrs.getResultSet().getString(69)!=null) sb.append(String.format("<i>Селезенка </i> %s <br>", acrs.getResultSet().getString(69)));
-							if (acrs.getResultSet().getString(70)!=null) sb.append(String.format("<i>Область заднего прохода </i> %s <br>", acrs.getResultSet().getString(70)));
-							if (acrs.getResultSet().getString(71)!=null) sb.append(String.format("<i>Поясничная область </i> %s <br>", acrs.getResultSet().getString(71)));
-							if (acrs.getResultSet().getString(72)!=null) sb.append(String.format("<i>Почки </i> %s <br>", acrs.getResultSet().getString(72)));
-							if (acrs.getResultSet().getString(73)!=null) sb.append(String.format("<i>Мочевой пузырь </i> %s <br>", acrs.getResultSet().getString(73)));
-							if (acrs.getResultSet().getString(74)!=null) sb.append(String.format("<i>Молочные железы </i> %s <br>", acrs.getResultSet().getString(74)));
-							if (acrs.getResultSet().getString(75)!=null) sb.append(String.format("<i>Грудные железы мужчин </i> %s <br>", acrs.getResultSet().getString(75)));
-							if (acrs.getResultSet().getString(76)!=null) sb.append(String.format("<i>Матка и ее придатки </i> %s <br>", acrs.getResultSet().getString(76)));
-							if (acrs.getResultSet().getString(77)!=null) sb.append(String.format("<i>Наружные половые органы </i> %s <br>", acrs.getResultSet().getString(77)));
-							if (acrs.getResultSet().getString(78)!=null) sb.append(String.format("<i>Щитовидная железа </i> %s <br>", acrs.getResultSet().getString(78)));
-							if (acrs.getResultSet().getString(79)!=null) sb.append(String.format("<i>Status Localis </i> %s <br>", acrs.getResultSet().getString(79)));
-							if (acrs.getResultSet().getString(80)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(80)));
-							if (acrs.getResultSet().getString(85)!=null) sb.append(String.format("<i>Результат </i> %s <br>", acrs.getResultSet().getString(86)));
+							if (acrs.getResultSet().getString(37)!=null) sb.append(String.format("<i>Место обслуживания </i> %s <br>", acrs.getResultSet().getString(37)));
+							if (acrs.getResultSet().getString(38)!=null) sb.append(String.format("<i>Способ оплаты </i> %s <br>", acrs.getResultSet().getString(38)));
+							if (acrs.getResultSet().getString(33)!=null) sb.append(String.format("<i>Жалобы: </i> %s <br>", acrs.getResultSet().getString(33)));
+							if (acrs.getResultSet().getString(27)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(27)));
+							if (acrs.getResultSet().getString(28)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(28)));
+							if (acrs.getResultSet().getString(29)!=null) sb.append(String.format("<i>Рост </i> %s <br>", acrs.getResultSet().getString(29)));
+							if (acrs.getResultSet().getString(30)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(30)));
+							if (acrs.getResultSet().getString(36)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(36)));
+							if (acrs.getResultSet().getString(34)!=null) sb.append(String.format("<i>Status praesense </i> %s <br>", acrs.getResultSet().getString(34)));
+							if (acrs.getResultSet().getString(35)!=null) sb.append(String.format("<i>Физикальное обследование </i> %s <br>", acrs.getResultSet().getString(35)));
+							if (acrs.getResultSet().getString(31)!=null) sb.append(String.format("<i>Localis status </i> %s <br>", acrs.getResultSet().getString(31)));
+							if (acrs.getResultSet().getString(32)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(32)));
+							if (acrs.getResultSet().getString(39)!=null) sb.append(String.format("<i>Результат </i> %s <br>", acrs.getResultSet().getString(39)));
 						} while (acrs.getResultSet().next());
 					}
 					
@@ -1797,7 +1756,7 @@ sb.append(String.format("%s %s %s",acrs.getResultSet().getString(1),acrs.getResu
 sb.append("<br>Подпись ____________");
 		acrs.close();
 			osw.write(sb.toString());
-			return "c:\\protokol.htm";}
+			return "e:\\protokol.htm";}
 		 catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1869,12 +1828,254 @@ sb.append("<br>Подпись ____________");
 		}
 	}
 
-//	@Override
-//	public RdInfStruct getRdInfInfo(int npasp) throws KmiacServerException,
-//			TException {
-//		// TODO Auto-generated method stub
+	@Override
+	public List<PNapr> getPnapr(int idpvizit) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_napr join n_vr_doc on(p_napr.vid_doc=n_vr_doc.pcod) where p_napr.id_pvizit = ?", idpvizit)) {
+			return rsmPnapr.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
 
-//	}
+	@Override
+	public int AddPnapr(PNapr pn) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into p_napr (id_pvizit, vid_doc, text, preds, zaved) VALUES (?, ?, ?, ?, ?) ", true, pn, pnaprTypes, 1, 2, 3, 4, 5);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (InterruptedException | SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public String printMSK() throws KmiacServerException, TException {
+			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\msk.htm"), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+				sb.append("<title>Направление на МСЭК</title>");
+				sb.append("</head>");
+				sb.append("<body>");
+				sb.append("<p align=\"center\" >Министерство здравоохранения");
+				sb.append("и социального развития");
+				sb.append("<br>Российской Федерации");
+				sb.append("<br>_________________________________________________________________________________________");
+				sb.append("<br>(наименование и адрес организации, оказывающей лечебно-профилактическую помощь)");
+				sb.append("<br>");
+				sb.append("<br>НАПРАВЛЕНИЕ НА МЕДИКО-СОЦИАЛЬЛЬНУЮ ЭКСПЕРТИЗУ ОРГАНИЗАЦИЕЙ, <br>ОКАЗЫВАЮЩЕЙ ЛЕЧЕБНО-ПРОФИЛАКТИЧЕСКУЮ ПОМОЩЬ");
+				sb.append("</p>");
+				sb.append("<br>Дата выдачи '__' _______ 20__ г.");
+				sb.append("<br>");
+				sb.append("1. Фамилия,имя, отчество гражданина, направляемого на медико-социальную экспертизу (далее гражданин):______________________");
+				sb.append("<br>");
+				sb.append("2. Дата рождения: ______________");
+				sb.append("3. Пол: ______________");
+				sb.append("<br>");
+				sb.append("4. Фамилия, имя, отчество законного представителя гражданина (заполняется при наличии законного представителя): ________________");
+				sb.append("<br>");
+				sb.append("5. Адрес места жительства гражданина (при отсутствии места жительства указывается адрес пребывания, фактического проживания на территории Российской Федерации): ___________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("6. Инвалидом не является, инвалид первой, второй, третьей группы, категория 'ребенок-инвалид' (нужное подчеркнуть)");
+				sb.append("<br>");
+				sb.append("7. Степень ограничения к трудовой деятельности (заполняется при повторном направлении): _____________________________________________________________");
+				sb.append("<br>");
+				sb.append("8. Степень утраты профессиональной трудоспособности в процентах (заполняется при повторном направлении) _____________________________________________");
+				sb.append("<br>");
+				sb.append("9. Направляется первично, повторно (нужное подчеркнуть)");
+				sb.append("<br>");
+				sb.append("10. Кем работает на момент направления на медикл-социальную эксперизу (указать должность, профессию, специальность, квалификацию и стаж работы по указанной должности, профессии, специальности, квалификации; в отношении неработающих граждан сделать запись 'не работает')__________________________________________________");
+				sb.append("<br>");
+				sb.append("11. Наименование и адрес организации, в которой работает гражданин: ________________________________________________________");
+				sb.append("<br>");
+				sb.append("12. Условия и характер выполняемого труда: ______________________________________________________________________");
+				sb.append("<br>");
+				sb.append("13. Основная профессия (специальность): _________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("14. квалификация по основной професии (класс, разряд, категория, звание): ______________________________________");
+				sb.append("<br>");
+				sb.append("15. Наименование и адрес образовательного учреждения: ___________________________________________");
+				sb.append("<br>");
+				sb.append("16. Группа, класс, курс (указываемое подчеркнуть): ________________________");
+				sb.append("<br>");
+				sb.append("17. Профессия (специальность), для получения которой производится обучение: ______________________________");
+				sb.append("<br>");
+				sb.append("18. Наблюдается в организациях, оказывающих лечебно-профилактическую помощь, с ____ года.");
+				sb.append("<br>");
+				sb.append("19. История заболевания (начало, развитие, течение, частота и длительность обострений, проведенные лечебно-оздоровительные и реабилитационные мероприятия и их эффективность):");
+				sb.append("_________________________________________________________________________________________________________________");
+				sb.append("<dd>(подробно описывается при первичном направлении, при повторном направлении отражается динамика  за период между освидетельствованиями, детально описываются выявленные за этот период нвоые случаи заболеваний, приведшим к стойким нарушениям функций организма)</dd>");
+				sb.append("<br>");
+				sb.append("20. Анамнез жизни (пречисляются перенесенные в прошлом заболевания, травмы, отравления, операции, заболевания, по которым отягощена наследственность"); 
+				sb.append(", дополнительно в отношении ребенка указывается, как протекали беременность и роды у матери, сроки формирования психомоторынх навыков, самообслуживания, показательно-игровой деятельности, навыков опрятности и ухода за собой, как протекало раннее развитие (по возрасту, с отставанием, с опережением)): ________________________________________________________________________________________________________________________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("21. Частота и длительность временной нетрудоспособности (сведения за последние 12 месяцев)");
+				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> ");
+				sb.append("<tr bgcolor=\"#F5E8FF\"><th style=\"font: 16px times new roman;\">№</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">Дата (число, месяц, год) начала временной нетрудоспособности</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">Дата (число, месяц, год) окончания временной нетрудоспособности</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">Число дней (месяцев и дней) временной нетрудоспособности</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">Диагноз</th>");
+				sb.append("</tr>");
+				sb.append("</table>");
+				sb.append("<br>");
+				sb.append("22. Результаты проведенных мероприятий по медицинской реабилитации в соответствии с индивидуальной программой реабилитации инвалида (заполняется при повторном направлении, указываются конкретные виды восстановительноц терапии, реконструктивной хирургии, санаторно-курортного лечения, технических средств медиицнской реабилитации, в том числе протезирования и ортезирования, а также сроки, в которые они были предоставлены; перечисляются функции организма, которые удалось комепнсировать или восстановить полностью или частично, либо делается отметка, что положительные результаты отсутствуют):");
+				sb.append("__________________________________________________________________________________________________________________________________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("23. Состояние гражданина при направлении на медико-социальную экспертизу (указываются жалобы, даннеы осмотра лечащим врачом и врачами других специальностей):_____________________________________");
+				sb.append("<br>");
+				sb.append("24. Результаты дополнительных методов исследования (указываются результаты проведенных лабораторных, рентгенологичесских, эндоскопических, ультразвуковых, психологических, функциональных и других видов исследований):");
+				sb.append("_____________________________________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("25. масса тела (кг)______________, рост (м) ___________, индекс массы тела___________.");
+				sb.append("<br>");
+				sb.append("26. Оценка физического развития: нормальное, отклонение (дефицит массы тела, избыток массы тела, низкий рост, высокий рост) (нужное подчеркнуть).");
+				sb.append("<br>");
+				sb.append("27. оценка психофизиологчиеской выносливости: норма, отклонение (нужное подчеркнуть).");
+				sb.append("<br>");
+				sb.append("28. оценка эмоциональной устойчивости: норма, отклонение (нужное подчеркнуть).");
+				sb.append("<br>");
+				sb.append("29. Диагноз при направлении на медико-социальную экспертизу:"); 
+				sb.append("<br>");
+				sb.append("а) код основного заболевания по МКБ:__________________________________");
+				sb.append("<br>");
+				sb.append("б) основное заболевание:__________________________________");
+				sb.append("<br>");
+				sb.append("в) сопутствующие заболевания: _____________________________________");
+				sb.append("<br>");
+				sb.append("г) осложнения: ___________________________________________________");
+				sb.append("<br>");
+				sb.append("30. Клинический прогноз: благоприятный, относительно благоприятный, сомнительный (неопределенный), неблагоприятный (нужное подчеркнуть).");
+				sb.append("<br>");
+				sb.append("31. Реабилитационный потенциал: высокий, удовлетворительный, низкий (нужное подчеркнуть).");
+				sb.append("<br>");
+				sb.append("32. Реабилитационный прогноз: благоприятный, относительно благоприятный, сомнительный (неопределенный), неблагоприятный (нужное подчерукнуть).");
+				sb.append("<br>");
+				sb.append("33. Цель направления на медико-социальную экспертизу (нужное подчеркнуть): для установления инвалидности, степени ограничения способности к трудовой деятельности, степени утраты профессиональной трудоспособностив процентах, для разработки (коррекции) индивидуальной программы реабилитации инвалида (программы реабилитации пострадавшего в результате несчастного случая на производстве и профессионального заболевания), для другого (указать):");
+				sb.append("______________________________________________________________________________________________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("34. Рекомендуемые мероприятия по медицинской реабилитации для формирования или коррекции индивидуальной программы реабилитации инвалида, программы реабилитации пострадавшего в результате несчастного случая на производстве и професионального заболевания (указываются конкретные виды восстановительной терапии, включая лекарственное обеспечение при лечении заболевания, ставшего причиной инвалидности; реконструктивной хирургии, включая лекарственное обеспечение при лечении заболевания, ставшего причиной инвалидности; технических средств медицинской реабилитации, в том числе протезирования и ортезирования; заключение о санаторно-курортном лечениис предписанием профиля, кратности, срока и сезона рекомендуемого лечения, о нуждаемостив специальном медицинском уходе лиц, пострадавших в результате несчастных случаев на производстве и профессиональных заболеваний, о нуждаемости в лекарственных средствах для лечения последствий несчастных случаев на производстве и профессиональных заболеваний, другие виды медицинской реабилитации)");
+				sb.append("_______________________________________________________________________________________________________________________________________________________________");
+				sb.append("<br>");
+				sb.append("Председатель врачебной комиссии _________________ (подпись) ________________(расшифровка)");
+				sb.append("<br>");
+				sb.append("Члены врачебной комисии _________________ (подпись) ________________(расшифровка)");
+				sb.append("<br>");
+				sb.append("_________________ (подпись) ________________(расшифровка)");
+				sb.append("<br>");
+				sb.append("_________________ (подпись) ________________(расшифровка)");
+				sb.append("</body>");
+				osw.write(sb.toString());
+				return "e:\\msk.htm";
+		} catch (IOException  e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public String printKartaBer() throws KmiacServerException, TException {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\kartl.htm"), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+				sb.append("<title>Обменная карта беременной</title>");
+				sb.append("</head>");
+				sb.append("<body>");
+				sb.append("<h3 align=center>ОБМЕННАЯ КАРТА<br></h3>");
+				sb.append("<p align=center>Родильного дома, родильного отделения</p>");
+				sb.append("<p align=center>Заполняется врачом женской консультации.</p>");
+				sb.append("<p align=center><b>(Данная карта выдается на руки на 32-ой неделе беременности)</b></p>");
+				sb.append("<br>");
+				sb.append("1. Фамилия, имя, отчество __________________________________________________________________________________<br>");
+				sb.append("2. Возраст _____ лет 3. Адрес и телефон ____________________________________________________________________");
+				sb.append("<br>4. Перенесенные общие, гинекологические заболевания или операции ___________________________________________");
+				sb.append("<br>5. Особенности течения прежних беременностей, родов, послеродового периода _________________________________");
+				sb.append("<br>6. Данная беременность ____ (по счету). Роды ____ (по счету)");
+				sb.append("<br>");
+				sb.append("7. Количество абортов ____ (всего). В  каком году ___________ и на каком сроке _______________");
+				sb.append("8. Были ли преждевременные роды : ДА _____ / НЕТ _____ . Если ДА, то в каком году _____________<br>");
+				sb.append("9. Дата последней менструации ____________________________________________<br>");
+				sb.append("10. Срок текущей беременности составляет ___________________ недель при первом посещении женской консультации (дата)___________ года<br>");
+				sb.append("11. Количество посещений ____________<br>");
+				sb.append("12. Первое шевеление плода (дата) _________________________");
+				sb.append("13. Возможные особенности течения беременности _______________________________________");
+				sb.append("<br>14. Размеры таза (при первом посещении)");
+				sb.append("<br>D.Sp____ D.Gr_____ D.troch__________");
+				sb.append("<br>C.ext____ C.diag_____ C.vera__________");
+				sb.append("<br>Вес____ Вес_____ ");
+				sb.append("<br>15. Положение плода ____________________________");
+				sb.append("<br>Предлежащая часть плода: головка, ягодицы, не определяется ____________________________");
+				sb.append("<br>Сердцебинение плода: ясное, ритмичное, ударов _________ в 1 минуту слева, справа _________");
+				sb.append("<br>16. Лабораторные и другие исследования");
+				sb.append("<br>RW<sub>1</sub>: \"____\" _____________ 20______ года <br>HBS<sub>1</sub>: \"____\" ____________ 20______ года");
+				sb.append("<br>RW<sub>2</sub>: \"____\" _____________ 20______ года <br>HBS<sub>2</sub>: \"____\" ____________ 20______ года");
+				sb.append("<br>RW<sub>3</sub>: \"____\" _____________ 20______ года <br>HCV<sub>1</sub>: \"____\" ____________ 20______ года");
+				sb.append("<br>ВИЧ<sub>1</sub>: \"____\" _____________ 20______ года <br>HCV<sub>2</sub>: \"____\" ____________ 20______ года");
+				sb.append("<br>ВИЧ<sub>2</sub>: \"____\" _____________ 20______ года");
+				sb.append("<br>Резус положительный/отрицательный/тип крови");
+				sb.append("<br>Титр антител:_________");
+				sb.append("<br>Группа крови:_________");
+				sb.append("<br>Резус-принадлежность крови мужа:__________");
+				sb.append("<br>Токсоплазмоз: РСК, кожная проба __________");
+				sb.append("<br><b>Клинические анлизы</b>");
+				sb.append("<br>Крови _____________________________");
+				sb.append("<br>Мочи ______________________________");
+				sb.append("<br>Анализ содержимого влагалища (мазок) _______________________________");
+				sb.append("<br>Кал на яйца-глист _________________________");
+				sb.append("<br>17. Школа матерей _________________");
+				sb.append("<br>18. Дата выдачи листка нетрудоспособности по дородовому отпуску \"______\" _________ 20___ г.");
+				sb.append("<br>19. Дата предполагаемых родов \"______\" _________ 20___ г.");
+				sb.append("<br>Подпись врача акушера-гинеколога ________________");
+				sb.append("<br><b>Дневник последующих посещений");
+				sb.append("</b>");
+				sb.append("<br>Прибавка в весе во время беременности _________________");
+				sb.append("<br>Предполагаемый вес плода ________________");
+				sb.append("<br>");
+				sb.append("<br>");
+				sb.append("<TABLE BORDER=2>");
+				sb.append("<TR>");
+				sb.append("<TD rowspan=2 align=center>Дата</TD>");
+				sb.append("<TD colspan=4>Данные обследования</TD>");
+				sb.append("<TD rowspan=2 align=center>Подпись врача</TD>");
+				sb.append("</TR>");
+				sb.append("<TR>");
+				sb.append("<TD>АД</TD>");
+				sb.append("<TD>Вес</TD>");
+				sb.append("<TD>Hb.</TD>");
+				sb.append("<TD>ан.мочи</TD>");
+				sb.append("</TR>");
+				sb.append("<TR>");
+				sb.append("<TD>111</TD>");
+				sb.append("<TD>222</TD>");
+				sb.append("<TD>333</TD>");
+				sb.append("<TD>444</TD>");
+				sb.append("<TD>333</TD>");
+				sb.append("<TD>444</TD>");
+				sb.append("</TR>");
+				sb.append("</TABLE>");
+				sb.append("<br>УЗИ Дата \"___\" _____________ 20___ г.");
+				sb.append("<br>Заключение: _____________________________________________________");
+				sb.append("<br>1. Заключение терапевта _________________________________________");
+				sb.append("<br>2. Закючение окулиста ___________________________________________");
+				sb.append("</body>"); 
+				osw.write(sb.toString());
+				return "e:\\kart.html";
+		} catch (IOException  e) {
+			throw new KmiacServerException();
+		}
+	
+	}
+
 
 
 }

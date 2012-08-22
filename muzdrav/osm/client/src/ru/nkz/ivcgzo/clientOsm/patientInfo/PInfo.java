@@ -41,6 +41,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
+import ru.nkz.ivcgzo.thriftOsm.PNapr;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
@@ -209,15 +210,10 @@ public class PInfo extends JFrame {
 								addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
 								addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
 								addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-								addLineToDetailInfo("Вредные привычки", psign.getVred());
 								addHeader("Вредные привычки");
 								if (psign.getVred().charAt(0) == '1') addHeader("курение");
 								if (psign.getVred().charAt(1) == '1') addHeader("алкоголь");
 								if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
-								/*vrp = psign.getVred();
-			cbk.setSelected(vrp.charAt(0) == '1');
-			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');*/
 								eptxt.setText(sb.toString());
 							} catch (PatientNotFoundException e1) {
 								System.out.println("hren");
@@ -273,6 +269,12 @@ public class PInfo extends JFrame {
 	 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 	 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 	 					addLineToDetailInfo("Статус",getValueFromClassifier(MainForm.tcl.getVdi(), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
+	 				}
+	 				addHeader("Выписанные документы");//getPdiagAmb
+	 				for (PNapr pnapr : MainForm.tcl.getPnapr(pvizit.getId())) {
+	 	 				addLineToDetailInfo("Наименование",pnapr.isSetName(),pnapr.getName());
+	 					addLineToDetailInfo("Обоснование",pnapr.isSetText(),pnapr.getText());
+	 					addLineToDetailInfo("Врач",pnapr.isSetZaved(),pnapr.getZaved());
 	 				}
 	 				addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetIshod(), pvizit.getIshod()));
 					addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetRezult(), pvizit.getRezult()));
