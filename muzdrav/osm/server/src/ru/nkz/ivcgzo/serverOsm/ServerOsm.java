@@ -183,7 +183,7 @@ public class ServerOsm extends Server implements Iface {
 		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Boolean.class, Boolean.class};
 	
 		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit");
-		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class};
+		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr");
 		rdInfTypes = new Class<?>[] {                        Integer.class, String.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class};
@@ -715,15 +715,48 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp)
-			throws KmiacServerException, TException {
+	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where idDisp = ? and npasp = ? ", idDispb, npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pvizit = ? and npasp = ? ", idDispb, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
 
+	}
+
+	@Override
+	public RdInfStruct getRdInfInfo(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_r0z ")) {
+			if (acrs.getResultSet().next())
+				return rsmRdInf.map(acrs.getResultSet());
+			else
+				throw new KmiacServerException("rd inf not found");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public RdSlStruct getRdSlInfo(int idDispb, int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where id_pvizit = ? and npasp = ? ", idDispb, npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmRdSl.map(acrs.getResultSet());
+			else
+				throw new KmiacServerException("rd sl inf not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<RdSlStruct> getRdSlInfoList(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
+			return rsmRdSl.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
@@ -1784,15 +1817,6 @@ sb.append("<br>Подпись ____________");
 	}
 
 	@Override
-	public List<RdSlStruct> getRdSlInfo(int npasp) throws KmiacServerException,
-			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
-			return rsmRdSl.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			throw new KmiacServerException();
-		}
-	}
-	@Override
 	public List<IntegerClassifier> get_n_z00() throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
@@ -2075,7 +2099,6 @@ sb.append("<br>Подпись ____________");
 		}
 	
 	}
-
 
 
 }

@@ -18,6 +18,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
 import javax.swing.SpinnerNumberModel;
@@ -31,11 +33,16 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 
 import javax.swing.JScrollPane;
@@ -148,59 +155,6 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-		rdsl = new RdSlStruct();
-		patient = new PatientCommonInfo();
-		if (rdsl.vesd == 0)
-			setDefaultValues(rdsl);
-		oslrod =rdsl.getOslrod();
-		if ((oslrod-128)<0){
-		or8=0; iw1=oslrod;	
-		}else {
-		or8=1; iw1=oslrod-128;	
-		}
-		if ((iw1-64)<0){
-		or7=0; 
-		}else {
-		or7=1; iw1=iw1-64;	
-		}
-		if ((iw1-32)<0){
-		or6=0; 
-		}else {
-		or6=1; iw1=iw1-32;	
-		}
-		if ((iw1-16)<0){
-		or5=0; 
-		}else {
-		or5=1; iw1=iw1-16;	
-		}
-		if ((iw1-8)<0){
-		or4=0; 	
-		}else {
-		or4=1; iw1=iw1-8;	
-		}
-		if ((iw1-4)<0){
-		or3=0; 
-		}else {
-		or3=1; iw1=iw1-4;	
-		}
-		if ((iw1-2)<0){
-		or2=0; 
-		}else {
-		or2=1; iw1=iw1-2;	
-		}
-		or1=iw1; 
-		if (rdsl.isSetOslab())
-			CBOslAb.setSelectedPcod(rdsl.getOslab());
-		else
-			CBOslAb.setSelectedItem(null);
-		if (rdsl.isSetIshod())
-			CBPrishSn.setSelectedPcod(rdsl.getIshod());
-		else
-			CBPrishSn.setSelectedItem(null);
-		if (rdsl.isSetPlrod())
-			CBRod.setSelectedPcod(rdsl.getPlrod());
-		else
-			CBRod.setSelectedItem(null);
 addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
@@ -223,9 +177,11 @@ addWindowListener(new WindowAdapter() {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					RdSlStruct rdsl = new RdSlStruct();
-					setDefaultValues(rdsl);
-					MainForm.tcl.AddRdSl(rdsl);
+					rdsl = new RdSlStruct();
+					setDefaultValues();
+					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
+					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+					rdsl.setNpasp(Vvod.zapVr.getNpasp());
 					setPostBerData(rdsl);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -259,10 +215,10 @@ addWindowListener(new WindowAdapter() {
 				return iw3;
 			};
 			public void actionPerformed(ActionEvent arg0) {
-				patient.setFam((String) fam.getText());
+	/*			patient.setFam((String) fam.getText());
 				patient.setIm((String)im.getText());
-				patient.setOt((String) ot.getText());
-			rdsl.setAbort((int) SKolAb.getModel().getValue());
+				patient.setOt((String) ot.getText());*/
+			rdsl.setAbort((int) SKolAb.getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
 			rdsl.setDataM( SDataM.getDate().getTime());
 			rdsl.setDataosl( SDataOsl.getDate().getTime());
@@ -300,14 +256,30 @@ addWindowListener(new WindowAdapter() {
 				rdsl.setIshod(CBPrishSn.getSelectedPcod());
 				else rdsl.unsetIshod();
 			
+			try {
+				MainForm.tcl.UpdateRdSl(rdsl);
+			} catch (KmiacServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+	} 		
 		});
 		JButton button = new JButton("Дополнительная информация");
 		button.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				inform = new FormRdInf();
-			inform.setVisible(true);
+				try {
+					inform = new FormRdInf();
+					inform.setVisible(true);
+					inform.onConnect();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка открытия доп. инф.", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
@@ -323,23 +295,35 @@ addWindowListener(new WindowAdapter() {
 		JButton ButDelete = new JButton("");
 		ButDelete.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		ButDelete.setToolTipText("Удалить");
+		ButDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					MainForm.tcl.DeleteRdSl(rdsl.getId(), rdsl.getNpasp());
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+					MainForm.conMan.reconnect(e);
+				}
+			}
+		});
+		
 		
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		fam.setColumns(10);
-		fam.setText(patient.getFam());
+//		fam.setText(Vvod.zapVr.fam);
 		
 		im = new JTextField();
 		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		im.setText("");
 		im.setColumns(10);
-		im.setText(patient.getIm());
+//		im.setText(Vvod.zapVr.im);
 		
 		ot = new JTextField();
 		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		ot.setText("");
 		ot.setColumns(10);
-		ot.setText(patient.getOt());
+//		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
@@ -420,7 +404,7 @@ addWindowListener(new WindowAdapter() {
 		JLabel LpolJ = new JLabel("Половая жизнь со скольки лет");
 		
 		final JCheckBox CBKontr = new JCheckBox("Контрацепция");
-		CBKontr.setSelected(rdsl.kont == true);
+//		CBKontr.setSelected(rdsl.kont == true);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(212, 208, 200));
@@ -448,28 +432,28 @@ addWindowListener(new WindowAdapter() {
 		SRost = new JSpinner();
 
 		final JSpinner SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(rdsl.vesd, 40,250,1));
-		rdsl.setVesd((int) SVes.getModel().getValue());
+		SVes.setModel(new SpinnerNumberModel(0, 0, 250, 1));
+//		rdsl.setVesd((int) SVes.getModel().getValue());
 		
 		final JSpinner SDsp = new JSpinner();
-		SDsp.setModel(new SpinnerNumberModel(rdsl.dsp, 24, 27,1));
-		rdsl.setDsp((int) SDsp.getModel().getValue());
+		SDsp.setModel(new SpinnerNumberModel(0,0, 27,1));
+//		rdsl.setDsp((int) SDsp.getModel().getValue());
 		
 		final JSpinner SDcr = new JSpinner();
-		SDcr.setModel(new SpinnerNumberModel(rdsl.dsr, 27, 30, 1));
-		rdsl.setDsr((int) SDsp.getModel().getValue());
+		SDcr.setModel(new SpinnerNumberModel(0,0, 30, 1));
+//		rdsl.setDsr((int) SDsp.getModel().getValue());
 		
 		final JSpinner SDtroch = new JSpinner();
-		SDtroch.setModel(new SpinnerNumberModel(rdsl.dTroch,30,33,1));
-		rdsl.setDTroch((int) SDtroch.getModel().getValue());
+		SDtroch.setModel(new SpinnerNumberModel(0,0,33,1));
+//		rdsl.setDTroch((int) SDtroch.getModel().getValue());
 		
 		final JSpinner SCext = new JSpinner();
-		SCext.setModel(new SpinnerNumberModel(rdsl.cext,25, 35, 1));
-		rdsl.setCext((int) SCext.getModel().getValue());
+		SCext.setModel(new SpinnerNumberModel(0,0, 35, 1));
+//		rdsl.setCext((int) SCext.getModel().getValue());
 		
 		final JSpinner SindSol = new JSpinner();
-		SindSol.setModel(new SpinnerNumberModel(rdsl.indsol, 13, 20,1));
-		rdsl.setIndsol((int) SindSol.getModel().getValue());
+		SindSol.setModel(new SpinnerNumberModel(0, 0, 20,1));
+//		rdsl.setIndsol((int) SindSol.getModel().getValue());
 		
 		final JCheckBox CBKrov = new JCheckBox("Кровотечение");
 		CBKrov.setSelected(or1 == 1);
@@ -545,50 +529,48 @@ addWindowListener(new WindowAdapter() {
 		
 		final JSpinner SParRod = new JSpinner();
 		SParRod.setModel(new SpinnerNumberModel(0, 0, 20, 1));
-		rdsl.setKolrod((int) SParRod.getModel().getValue());
+//		rdsl.setKolrod((int) SParRod.getModel().getValue());
 		
 		final JSpinner SKolBer = new JSpinner();
 		SKolBer.setModel(new SpinnerNumberModel(0, 0, 50, 1));
-		rdsl.setShet((int) SKolBer.getModel().getValue());
+//		rdsl.setShet((int) SKolBer.getModel().getValue());
 		
 		SDataOsl = new CustomDateEditor();
 		
 		SDataSert = new CustomDateEditor();
 
 		final JSpinner SYavka = new JSpinner();
-		SYavka.setModel(new SpinnerNumberModel(rdsl.yavka1,2, 40,1));
-		rdsl.setYavka1((int) SYavka.getModel().getValue());
+		SYavka.setModel(new SpinnerNumberModel(0,0, 40,1));
+//		rdsl.setYavka1((int) SYavka.getModel().getValue());
 		
 		SDataM = new CustomDateEditor();
 		
 		SDataRod = new CustomDateEditor();
 		SDataRod.setColumns(10);
-		Calendar cal1 = Calendar.getInstance();
-		cal1.setTimeInMillis(rdsl.getDatay());
-		cal1.add(Calendar.DAY_OF_MONTH, (280-(rdsl.getYavka1()*7)));
+//		Calendar cal1 = Calendar.getInstance();
+//		cal1.setTimeInMillis(rdsl.getDatay());
+//		cal1.add(Calendar.DAY_OF_MONTH, (280-(rdsl.getYavka1()*7)));
 //		SDataRod.setDate(cal1);
 		
 		final JSpinner SKolAb = new JSpinner();
-		SKolAb.setModel(new SpinnerNumberModel(rdsl.abort, 0, 50, 1));
-		rdsl.setAbort((int) SKolAb.getModel().getValue());
+		SKolAb.setModel(new SpinnerNumberModel(0, 0, 50, 1));
+//		rdsl.setAbort((int) SKolAb.getModel().getValue());
 		
 		final JSpinner SVozMen = new JSpinner();
-		SVozMen.setModel(new SpinnerNumberModel(rdsl.vozmen , 8, 30, 1));
-		rdsl.setVozmen((int) SVozMen.getModel().getValue());
-		SVozMen.setModel(new SpinnerNumberModel(rdsl.vozmen , 8, 30, 1));
-		rdsl.setVozmen((int) SVozMen.getModel().getValue());
+		SVozMen.setModel(new SpinnerNumberModel(8 , 8, 30, 1));
+//		rdsl.setVozmen((int) SVozMen.getModel().getValue());
 		
 		final JSpinner SMenC = new JSpinner();
-		SMenC.setModel(new SpinnerNumberModel(rdsl.prmen, 20,  60, 1));
-		rdsl.setPrmen((int) SMenC.getModel().getValue());
+		SMenC.setModel(new SpinnerNumberModel(20, 20,  60, 1));
+//		rdsl.setPrmen((int) SMenC.getModel().getValue());
 		
 		final JSpinner SKolDet = new JSpinner();
 		SKolDet.setModel(new SpinnerNumberModel(0, 0, 20, 1));
-		rdsl.setDeti((int) SKolDet.getModel().getValue());
+//		rdsl.setDeti((int) SKolDet.getModel().getValue());
 		
 		final JSpinner SPolJ = new JSpinner();
-		SPolJ.setModel(new SpinnerNumberModel(rdsl.polj, 9, 40, 1));
-		rdsl.setPolj((int) SPolJ.getModel().getValue());
+		SPolJ.setModel(new SpinnerNumberModel(9, 9, 40, 1));
+//		rdsl.setPolj((int) SPolJ.getModel().getValue());
 		
 //		final JSpinner SDataSn = new JSpinner();
 //		SDataSn.setBackground(new Color(212, 208, 200));
@@ -596,11 +578,11 @@ addWindowListener(new WindowAdapter() {
 //		rdsl.setDatasn((long) SDataSn.getModel().getValue());
 		SDataSn = new CustomDateEditor();
 		
-		CBPrishSn = new ThriftIntegerClassifierCombobox<>(true);
+		CBPrishSn = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db7);
 		
-		CBRod = new ThriftIntegerClassifierCombobox<>(true);
+		CBRod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db8);
 		
-		CBOslAb = new ThriftStringClassifierCombobox<>(true);
+		CBOslAb = new ThriftStringClassifierCombobox<>(StringClassifiers.n_db9);
 		
 		JLabel lblNewLabel = new JLabel("Дата выдачи Родового сертификата");
 		
@@ -621,8 +603,8 @@ addWindowListener(new WindowAdapter() {
 		JLabel lblNewLabel_4 = new JLabel("Срок");
 		
 		final JSpinner SSrokA = new JSpinner();
-		SSrokA.setModel(new SpinnerNumberModel(rdsl.srokab,0, 40,1 ));
-		rdsl.setSrokab((int) SSrokA.getModel().getValue());
+		SSrokA.setModel(new SpinnerNumberModel(0,0, 40,1 ));
+//		rdsl.setSrokab((int) SSrokA.getModel().getValue());
 
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
@@ -968,29 +950,36 @@ addWindowListener(new WindowAdapter() {
 		contentPane.setLayout(gl_contentPane);
 	}
 	
-	private void setDefaultValues(RdSlStruct rdsl2) {
+	private void setDefaultValues() {
 		// TODO Auto-generated method stub
-	if (rdsl.cext == 0) rdsl.setCext(25);
-	if (rdsl.dsp == 0) rdsl.setDsp(25);
-	if (rdsl.dsr == 0) rdsl.setDsr(28);
-	if (rdsl.dTroch == 0) rdsl.setDTroch(31);
-	if (rdsl.indsol == 0) rdsl.setIndsol(15);
-	if (rdsl.kolrod == 0) rdsl.setKolrod(0);
-	if (rdsl.shet == 0){ rdsl.setShet(0);} 
-	else {rdsl.setShet(rdsl.shet+1);}
-	if (rdsl.abort == 0) rdsl.setAbort(0);
-	if (rdsl.deti == 0) rdsl.setDeti(0);
-	if (rdsl.yavka1 == 0) rdsl.setYavka1(4);
-	if (rdsl.vozmen == 0) rdsl.setVozmen(11);
-	if (rdsl.prmen == 0) rdsl.setPrmen(28);
-	if (rdsl.polj == 0) rdsl.setPolj(18);
-	//if (rdsl.rost == 0) rdsl.setRost(160);
-	if (rdsl.vesd == 0) rdsl.setVesd(60);
-	    rdsl.setOslab("");
+	try {
+		rdsl.setNpasp(Vvod.zapVr.npasp);
+		rdsl.setCext(25);
+		rdsl.setDsp(25);
+		rdsl.setDsr(28);
+		rdsl.setDTroch(31);
+		rdsl.setIndsol(15);
+		rdsl.setKolrod(0);
+		rdsl.setShet(1);
+		rdsl.setAbort(0);
+		rdsl.setDeti(0);
+		rdsl.setYavka1(4);
+		rdsl.setVozmen(11);
+		rdsl.setPrmen(28);
+		rdsl.setPolj(18);
+//		rdsl.setRost(160);
+		rdsl.setVesd(60);
+		rdsl.setOslab("");
 		rdsl.setDataM(System.currentTimeMillis());
 		rdsl.setDatay(System.currentTimeMillis());
 		rdsl.setDataosl(System.currentTimeMillis());
 		rdsl.setDatasn(System.currentTimeMillis());
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка создания записи", JOptionPane.ERROR_MESSAGE);
+		
+	}
 	
 	}
 
@@ -1034,12 +1023,64 @@ addWindowListener(new WindowAdapter() {
 		
 		return null;
 	}
+	private void method2() throws KmiacServerException{
+		try {
+			rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.id_pvizit, Vvod.zapVr.npasp);
+if (rdsl.vesd == 0)
+			setDefaultValues();
+oslrod =rdsl.getOslrod();
+if ((oslrod-128)<0){
+or8=0; iw1=oslrod;	
+}else {
+or8=1; iw1=oslrod-128;	
+}
+if ((iw1-64)<0){
+or7=0; 
+}else {
+or7=1; iw1=iw1-64;	
+}
+if ((iw1-32)<0){
+or6=0; 
+}else {
+or6=1; iw1=iw1-32;	
+}
+if ((iw1-16)<0){
+or5=0; 
+}else {
+or5=1; iw1=iw1-16;	
+}
+if ((iw1-8)<0){
+or4=0; 	
+}else {
+or4=1; iw1=iw1-8;	
+}
+if ((iw1-4)<0){
+or3=0; 
+}else {
+or3=1; iw1=iw1-4;	
+}
+if ((iw1-2)<0){
+or2=0; 
+}else {
+or2=1; iw1=iw1-2;	
+}
+or1=iw1;
+		}catch (KmiacServerException e) {
+	e.printStackTrace();
+} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		} 
+	}
+	
 	public void onConnect() {
 		try {
+			
 			CBOslAb.setData(MainForm.tcl.get_n_db9());
 			CBRod.setData(MainForm.tcl.get_n_db8());
 			CBPrishSn.setData(MainForm.tcl.get_n_db7());
-			
+		method2();	
 			
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
