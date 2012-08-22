@@ -431,6 +431,16 @@ struct Vypis {
 	5: optional string clpu_name;
 }
 
+struct PNapr {
+	1: i32 id;
+	2: i32 idpvizit;
+	3: i32 vid_doc;
+	4: string text;
+	5: i32 preds;
+	6: i32 zaved;
+	7: string name;
+}
+
 
 exception PvizitNotFoundException {
 }
@@ -496,6 +506,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
+
+	list<PNapr> getPnapr(1: i32 idpvizit) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 	
 
 	/*Исследования*/
@@ -515,6 +528,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
+	string printMSK()  throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
@@ -563,9 +577,10 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getPokNames() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
-	list<RdSlStruct> getRdSlInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	list<RdDinStruct> getRdDinInfo(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	/*RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: RdInfNotFoundException rnfe);*/
+	RdSlStruct getRdSlInfo(1: i32 idDispb, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdSlStruct> getRdSlInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdDinStruct> getRdDinInfo(1: i32 idDispb, 2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -579,6 +594,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
 
 	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	
+	string printKartaBer() throws (1: kmiacServer.KmiacServerException kse);
 
 
 }
