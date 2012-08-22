@@ -715,9 +715,9 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<RdDinStruct> getRdDinInfo(int idDispb, int npasp) throws KmiacServerException, TException {
+	public List<RdDinStruct> getRdDinInfo(int id_pos, int npasp) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pvizit = ? and npasp = ? ", idDispb, npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pos = ? and npasp = ? ", id_pos, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -739,8 +739,8 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public RdSlStruct getRdSlInfo(int idDispb, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where id_pvizit = ? and npasp = ? ", idDispb, npasp)) {
+	public RdSlStruct getRdSlInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where id_pvizit = ? and npasp = ? ", id_pvizit, npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmRdSl.map(acrs.getResultSet());
 			else
@@ -788,11 +788,11 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public void DeleteRdSl(int idDispb, int npasp) throws KmiacServerException,
+	public void DeleteRdSl(int id_pvizit, int npasp) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM p_rd_sl WHERE idDispb = ? and npasp = ?", false, idDispb, npasp);
+			sme.execPrepared("DELETE FROM p_rd_sl WHERE id_pvizit = ? and npasp = ?", false, id_pvizit, npasp);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();
@@ -801,11 +801,11 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public void DeleteRdDin(int idDispb, int iD) throws KmiacServerException,
+	public void DeleteRdDin(int id_pos, int iD) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM p_rd_din WHERE idDispb = ? and iD = ?", false, idDispb,iD);
+			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pos = ? and iD = ?", false, id_pos,iD);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new KmiacServerException();

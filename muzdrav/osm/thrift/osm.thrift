@@ -256,7 +256,7 @@ struct RdDinStruct{
 	18: optional i32 predpl;
 	19: optional i32 serd;
 	20: optional i32 serd1;
-	21: optional i32 n_pos;
+	21: optional i32 id_pos;
 	22: optional i32 ves;
 }
 
@@ -577,15 +577,15 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getPokNames() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
-	RdSlStruct getRdSlInfo(1: i32 idDispb, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<RdSlStruct> getRdSlInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	list<RdDinStruct> getRdDinInfo(1: i32 idDispb, 2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdDinStruct> getRdDinInfo(1: i32 id_pos, 2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
 
-	void DeleteRdSl(1:i32 idDispb,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void DeleteRdDin(1:i32 idDispb,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteRdDin(1:i32 id_pos,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
 
 	void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
