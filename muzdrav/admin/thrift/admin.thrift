@@ -33,26 +33,6 @@ struct UserIdPassword {
 	2: string password;
 }
 
-struct ShablonRazd {
-	1: i32 id;
-	2: string name;
-}
-
-struct ShablonPok {
-	1: i32 id;
-	2: i32 id_razd;
-	3: string name;
-	4: bool checked;
-}
-
-struct ShablonText {
-	1: i32 id;
-	2: i32 id_razd;
-	3: i32 id_pok;
-	4: string pcod_s00;
-	5: string text;
-}
-
 
 /**
  * Врач с такими данными уже существует.
@@ -166,44 +146,4 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	 * Устанавливает разрешения пользователя.
 	 */
 	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
-
-	/**
-	 * Получает список разделов шаблонов.
-	 */
-	list<ShablonRazd> getShabRazd();
-
-	/**
-	 * Получает список показателей шаблонов.
-	 */
-	list<ShablonPok> getShabPok(1: i32 id_razd, 2: string cdol);
-
-	/**
-	 * Устанавливает доступность показателя шаблона для кода должности.
-	 */
-	void setShabPok(1: ShablonPok shPok, 2: string cdol);
-
-	/**
-	 * Устанавливает доступность показателей для всего раздела.
-	 */
-	void setShabPokGrup(1: ShablonRazd shRazd, 2: string cdol, 3: bool value);
-
-	/**
-	 * Получает тексты шаблонов для показателя шаблона и кода должности в независимости от доступности.
-	 */
-	list<ShablonText> getShablonTextsEdit(1: ShablonPok shPok, 2: string cdol);
-
-	/**
-	 * Получает тексты шаблонов для показателя шаблона и кода должности.
-	 */
-	list<ShablonText> getShablonTexts(1: ShablonPok shPok, 2: string cdol);
-
-	/**
-	 * Добавляет шаблон.
-	 */
-	i32 addShablonText(1: ShablonText shText);
-
-	/**
-	 * Обновляет шаблон.
-	 */
-	void updateShablonText(1: ShablonText shText);
 }

@@ -85,7 +85,6 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 			tcl = thrClient;
 			try {
 				tpUser.onConnect();
-				tpShablon.setCdolList(tcl.get_n_s00());
 			} catch (TException e) {
 				e.printStackTrace();
 				conMan.reconnect(e);
