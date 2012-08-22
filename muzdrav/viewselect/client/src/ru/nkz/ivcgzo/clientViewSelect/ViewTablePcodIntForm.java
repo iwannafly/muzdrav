@@ -1,29 +1,22 @@
 package ru.nkz.ivcgzo.clientViewSelect;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-
-import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientManager.common.Client;
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 
 public class ViewTablePcodIntForm extends ViewSelectForm {
@@ -38,11 +31,19 @@ public class ViewTablePcodIntForm extends ViewSelectForm {
 	public ViewTablePcodIntForm() {
 		createGUI();
 		initialize();
+		setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
 	}
 		/**
 		 * Initialize the contents of the frame.
 		 */
 	private void initialize() {
+		
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 		
 		tfSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -71,14 +72,53 @@ public class ViewTablePcodIntForm extends ViewSelectForm {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		spClassifier.setViewportView(table);
+		
+		table.addMouseListener(new MouseAdapter(){
+		     public void mouseClicked(MouseEvent e){
+		      if (e.getClickCount() == 2){
+		    	  // Вывод значения на консоль
+		    	  System.out.print(getViewTableValues().getName());
+		    	  System.out.println();
+		   
+		         }
+		      }
+		     } );
+		
+		table.addKeyListener(new KeyListener(){
+			public void keyPressed(KeyEvent e){
+				if(e.getKeyCode()== KeyEvent.VK_ENTER){ 
+		    	  // Вывод значения на консоль
+		    	  System.out.print(getViewTableValues().getName());
+		    	  System.out.println();
+		         }
+		      }
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		     } );
 		}
 
-	public static void tableFill(){
+	public static void tableFill(String className){
 		try { 
-			table.setData(MainForm.tcl.getVSIntegerClassifierView());
+			table.setData(MainForm.tcl.getVSIntegerClassifierView(className));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
+	}
+	
+	// Запоминание выбранных ячеек
+	public IntegerClassifier getViewTableValues() {
+		return table.getSelectedItem();
+	
 	}
 	
     private void search()

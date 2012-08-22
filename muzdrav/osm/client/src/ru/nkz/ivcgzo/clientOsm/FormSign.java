@@ -18,6 +18,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -51,17 +52,8 @@ public class FormSign extends JFrame {
 	private JRadioButton rbpol;
 	private JRadioButton rbotr;
 	private String vrp;
-	private ShablonTextField tpallerg;
-	private ShablonTextField tprazv;
-	private ShablonTextField tpuslov;
-	private ShablonTextField tpper_zab;
-	private ShablonTextField tpper_oper;
-	private ShablonTextField tpgemotrans;
-	private ShablonTextField tpnasl;
-	private ShablonTextField tpginek;
-	private ShablonTextField tppriem_lek;
-	private ShablonTextField tpprim_gorm;
-	private ShablonTextPanel pallerg;
+	private JEditorPane tpallerg;
+	private JPanel pallerg;
 	public static List<IntegerClassifier> pokNames;
 
 	/**
@@ -97,29 +89,8 @@ public class FormSign extends JFrame {
 				}
 			}
 		});
-		
-		
-		final JLabel lblIstJiz = new JLabel("История жизни");
-		
-		tprazv = new ShablonTextField(4, 15, listShablon);
-		
-		 tpuslov = new ShablonTextField(4, 16, listShablon);
-		 
-		  tpper_zab =  new ShablonTextField(4, 17, listShablon);
-		  
-		  tpper_oper = new ShablonTextField(4, 18, listShablon);
-		  
-		   tpgemotrans = new ShablonTextField(4, 19, listShablon);
-		   
-		    tpnasl = new ShablonTextField(4, 20, listShablon);
-		    
-		    tpginek = new ShablonTextField(4, 21, listShablon);
 		    
 			final JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
-			
-		     tppriem_lek = new ShablonTextField(5, 22, listShablon);
-		     
-		      tpprim_gorm = new ShablonTextField(5, 23, listShablon);
 		      
 		      JScrollPane spSh = new JScrollPane();
 		      
@@ -209,19 +180,11 @@ public class FormSign extends JFrame {
 				if (rbotr.isSelected()) {
 					psign.setPh("-");
 				}
-
+				
+				psign.setVitae(tpanamnz.getText());
 				psign.setAllerg(tpallerg.getText());
 				psign.setFarmkol(tpfarm.getText());
 				psign.setVitae(tpanamnz.getText());
-				psign.setGemotrans(tpgemotrans.getText());
-				psign.setGinek(tpginek.getText());
-				psign.setNasl(tpnasl.getText());
-				psign.setPer_oper(tpper_oper.getText());
-				psign.setPer_zab(tpper_zab.getText());
-				psign.setPriem_lek(tppriem_lek.getText());
-				psign.setPrim_gorm(tpprim_gorm.getText());
-				psign.setRazv(tprazv.getText());
-				psign.setUslov(tpuslov.getText());
 				psign.setVred(getVrPr());
 				
 				try {
@@ -292,29 +255,16 @@ public class FormSign extends JFrame {
 		
 		
 		final JLabel lblFarm = new JLabel("Фармакологический анамнез");
-		lblFarm.setVisible(false);
 		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
-		lblAnamnz.setVisible(false);
-		tprazv.setBorder(UIManager.getBorder("TextField.border"));
-		tpuslov.setBorder(UIManager.getBorder("TextField.border"));
-		tpper_zab.setBorder(UIManager.getBorder("TextField.border"));
-		tpper_oper.setBorder(UIManager.getBorder("TextField.border"));
-		tpgemotrans.setBorder(UIManager.getBorder("TextField.border"));
-		tpnasl.setBorder(UIManager.getBorder("TextField.border"));
-		tpginek.setBorder(UIManager.getBorder("TextField.border"));
-		tppriem_lek.setBorder(UIManager.getBorder("TextField.border"));
-		tpprim_gorm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpfarm = new JEditorPane();
-		tpfarm.setVisible(false);
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
 		tpanamnz = new JEditorPane();
-		tpanamnz.setVisible(false);
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
-		 pallerg = new ShablonTextPanel(3);
+		 pallerg = new JPanel();
 		GroupLayout gl_pAnamn = new GroupLayout(pAnamn);
 		gl_pAnamn.setHorizontalGroup(
 			gl_pAnamn.createParallelGroup(Alignment.LEADING)
@@ -326,17 +276,7 @@ public class FormSign extends JFrame {
 							.addComponent(lblFarm, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
 							.addComponent(tpanamnz, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
 							.addComponent(lblAnamnz, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblIstJiz, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tprazv, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpuslov, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpper_zab, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpper_oper, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpgemotrans, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpnasl, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpginek, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(lblFarm1, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tppriem_lek, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(tpprim_gorm, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE))
+							.addComponent(lblFarm1, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE))
 						.addComponent(pallerg, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addGap(1557))
 		);
@@ -353,34 +293,14 @@ public class FormSign extends JFrame {
 					.addComponent(lblFarm)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblIstJiz)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tprazv, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpuslov, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpper_zab, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpper_oper, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpgemotrans, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpnasl, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpginek, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(607)
 					.addComponent(lblFarm1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tppriem_lek, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpprim_gorm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addGap(18))
+					.addGap(184))
 		);
 		
 		JLabel label = new JLabel("Аллергоанамнез");
 		
-		 tpallerg = new ShablonTextField(3, 67, listShablon);
+		 tpallerg = new JEditorPane();
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_pallerg = new GroupLayout(pallerg);
 		gl_pallerg.setHorizontalGroup(
@@ -479,7 +399,7 @@ public class FormSign extends JFrame {
 		public void showPsign() {
 		try {
 			psign = MainForm.tcl.getPsign(Vvod.zapVr.npasp);
-			
+			if (psign!=null){
 			BGgrk.clearSelection();
 			rb1g.setSelected(psign.grup.charAt(0) == '1');
 			rb2g.setSelected(psign.grup.charAt(0) == '2');
@@ -493,20 +413,12 @@ public class FormSign extends JFrame {
 			tpallerg.setText(psign.allerg);
 			tpanamnz.setText(psign.vitae);
 			tpfarm.setText(psign.farmkol);
-			tpgemotrans.setText(psign.gemotrans);
-			tpginek.setText(psign.ginek);
-			tpnasl.setText(psign.nasl);
-			tpper_oper.setText(psign.per_oper);
-			tpper_zab.setText(psign.per_zab);
-			tppriem_lek.setText(psign.priem_lek);
-			tpprim_gorm.setText(psign.prim_gorm);
-			tprazv.setText(psign.razv);
-			tpuslov.setText(psign.uslov);
+			tpanamnz.setText(psign.vitae);
 			
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
 			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');
+			cbn.setSelected(vrp.charAt(2) == '1');}
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (PsignNotFoundException e1) {

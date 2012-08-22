@@ -46,6 +46,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenTalon.AztNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Ndv;
 import ru.nkz.ivcgzo.thriftGenTalon.NdvNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Norm;
@@ -55,6 +56,8 @@ import ru.nkz.ivcgzo.thriftGenTalon.NraspNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
+import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
+//import ru.nkz.ivcgzo.thriftGenTalon
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
@@ -63,6 +66,9 @@ import javax.swing.JProgressBar;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.border.BevelBorder;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.MatteBorder;
+import java.awt.Color;
 
 public class TalonMainFrame extends JFrame {
 
@@ -370,6 +376,7 @@ public class TalonMainFrame extends JFrame {
 		JScrollPane sp_rasp = new JScrollPane();
 		
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема",10,"перерыв",11,"");
+//		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
 		tbl_rasp.setPreferredWidths(100,90,60,60,30,30,50,50);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
@@ -836,26 +843,26 @@ public class TalonMainFrame extends JFrame {
 		tbMain.addTab("Журнал талонов", null, tbTalon, null);
 		
 		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel_5.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0424\u043E\u0440\u043C\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435 \u0442\u0430\u043B\u043E\u043D\u043E\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_10 = new JPanel();
-		panel_10.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		panel_10.setBorder(new TitledBorder(null, "\u041F\u0440\u043E\u0441\u043C\u043E\u0442\u0440 \u0442\u0430\u043B\u043E\u043D\u043E\u0432", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_tbTalon = new GroupLayout(tbTalon);
 		gl_tbTalon.setHorizontalGroup(
-			gl_tbTalon.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_tbTalon.createSequentialGroup()
+			gl_tbTalon.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_tbTalon.createSequentialGroup()
 					.addGap(25)
 					.addGroup(gl_tbTalon.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_10, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
-						.addComponent(panel_5, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
+						.addComponent(panel_5, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE)
+						.addComponent(panel_10, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 738, Short.MAX_VALUE))
 					.addGap(73))
 		);
 		gl_tbTalon.setVerticalGroup(
 			gl_tbTalon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbTalon.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
+					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_10, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
 					.addContainerGap())
 		);
@@ -879,7 +886,6 @@ public class TalonMainFrame extends JFrame {
         cmb_month.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
-				//if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 	                nmonth = cmb_month.getSelectedIndex()+1;
 	                ChangeDatap();
@@ -889,10 +895,10 @@ public class TalonMainFrame extends JFrame {
         cmb_month.setMaximumRowCount(12);
 
         sp_god = new JSpinner();
+        sp_god.setModel(new SpinnerNumberModel(new Integer(2012), new Integer(2012), null, new Integer(1)));
         sp_god.addChangeListener(new ChangeListener() {
         	public void stateChanged(ChangeEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
-//				if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 	                nyear = Integer.valueOf(sp_god.getValue().toString());
 					ChangeDatap();
@@ -900,6 +906,7 @@ public class TalonMainFrame extends JFrame {
         	}
         });
 		sp_day = new JSpinner();
+		sp_day.setModel(new SpinnerNumberModel(2, 1, 31, 1));
 		sp_day.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
@@ -939,7 +946,7 @@ public class TalonMainFrame extends JFrame {
 						.addGroup(gl_panel_10.createSequentialGroup()
 							.addGap(24)
 							.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
-								.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
+								.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 164, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_panel_10.createSequentialGroup()
 									.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, 59, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -962,12 +969,12 @@ public class TalonMainFrame extends JFrame {
 						.addComponent(sp_day, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(sp_god, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 328, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
 		tbl_talon =new CustomTable<>(true, true, Talon.class, 11,"Время", 6,"Вид приема");
-		tbl_talon.setPreferredWidths(50,90);
+		tbl_talon.setPreferredWidths(70,90);
 		tbl_talon.setTimeField(0);
 		tbl_talon.setFillsViewportHeight(true);
 		scrollPane_1.setViewportView(tbl_talon);
@@ -1113,10 +1120,11 @@ public class TalonMainFrame extends JFrame {
 
 		cmb_sv = new JComboBox(items1);
 		cmb_sv.addActionListener(new ActionListener() {
+			@SuppressWarnings({ "rawtypes", "unused" })
 			public void actionPerformed(ActionEvent e) {
 				JComboBox cb = (JComboBox) e.getSource();
 				String tmpName = (String) cb.getSelectedItem ();
-				System.out.println(tmpName);
+//				System.out.println(tmpName);
 			}
 		});
 		
@@ -1128,7 +1136,8 @@ public class TalonMainFrame extends JFrame {
 		JButton btnSvod = new JButton("Создать сводку");
 		btnSvod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				SvodkiUnit.Svodki(cmb_sv.getSelectedIndex(), tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
+				System.out.println(cmb_sv.getSelectedIndex()+1);
+//				SvodkiUnit.Svodki(+cmb_sv.getSelectedIndex()+1, tf_sv1.getDate().getTime(), tf_sv2.getDate().getTime(), curVrach, curSpec);
 				//cmb_sv
 			}
 		});
@@ -1188,7 +1197,6 @@ public class TalonMainFrame extends JFrame {
 		treevrach.setVisibleRowCount(50);
 		treevrach.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
-//				Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
 		 		Object lastPath = e.getPath().getLastPathComponent();
 		 		if (lastPath == null) return;
 				try {
@@ -1253,15 +1261,35 @@ public class TalonMainFrame extends JFrame {
 		panel.setLayout(gl_panel);
 		contentPane.setLayout(gl_contentPane);	
 	}
+
+	public void fillTable() {
+	}
 	
 	public void onConnect() {
 		treevrach.setModel(new DefaultTreeModel(createNodes()));
+		
+		try {
+			tbl_rasp.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+			tbl_norm.setIntegerClassifierSelector(0, MainForm.tcl.getVidp());
+			tbl_talon.setIntegerClassifierSelector(1, MainForm.tcl.getVidp());
+		} catch (KmiacServerException kse){
+		} catch (VidpNotFoundException vnfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		try {
+			MainForm.tcl.getAzt();
+			tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.getAzt());
+		} catch (KmiacServerException kse){
+		} catch (AztNotFoundException anfe){
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 	  private DefaultMutableTreeNode createNodes() {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень дерева");
 		try {
-//			List<Spec> specList = MainForm.tcl.getAllSpecForPolikliniki(20);
 			for (Spec spec : MainForm.tcl.getAllSpecForPolikliniki(MainForm.authInfo.cpodr))
 				root.add(new SpecTreeNode(spec));
 		} catch (Exception e) {
@@ -1315,29 +1343,13 @@ public class TalonMainFrame extends JFrame {
 					NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 2);
 					if (!NraspInfo.isEmpty())
 						cxm_3.setSelected(true);
-					
 				}
-				
 			}
-//			if (!NraspInfo.isEmpty()){
-//				cxm_1.setSelected(true);
-//			}else{
-//				NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 1);
-//				if (!NraspInfo.isEmpty()){
-//					cxm_2.setSelected(true);
-//				} else{
-//					NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, 2);
-//					if (!NraspInfo.isEmpty()){
-//						cxm_3.setSelected(true);
-//					}
-//				}
-//			}
             if (NraspInfo.size() > 0) {
     			tbl_rasp.setData(NraspInfo);
     			ShowOtmetka();
     			ShowTimePause();
             }
-
 		} catch (NraspNotFoundException nnfe3) {
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1445,7 +1457,6 @@ public class TalonMainFrame extends JFrame {
 				tf_day5_p1.setTime(NraspInfo.get(i).getTimep_n());
 				tf_day5_p2.setTime(NraspInfo.get(i).getTimep_k());
 			}
-			
 		}
 	}
 
@@ -1461,7 +1472,7 @@ public class TalonMainFrame extends JFrame {
 			String strDat = numday+"."+nummonth+"."+String.valueOf(nyear);
 			Date dat = frm.parse(strDat);
 			getDatep = dat.getTime();
-		    System.out.println(strDat+ ",   "+ dat+ ",   "+ getDatep);
+//		    System.out.println(strDat+ ",   "+ dat+ ",   "+ getDatep);
 			ChangeTalonInfo();
 		} catch (ParseException e) {
 			e.printStackTrace();

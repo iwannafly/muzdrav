@@ -6,7 +6,6 @@ import javax.swing.JScrollPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSplitPane;
-import javax.swing.JComboBox;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import java.awt.Color;
@@ -20,6 +19,7 @@ import javax.swing.border.TitledBorder;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -27,6 +27,9 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
+import ru.nkz.ivcgzo.thriftReception.Talon;
+import ru.nkz.ivcgzo.thriftReception.Talon._Fields;
+import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 
 /**
@@ -36,7 +39,7 @@ public class TalonSelectFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
     // Tables
-    private JTable tbTalonSelect;
+    private CustomTable<Talon, _Fields> tbTalonSelect;
     private JTable tbTalonDelete;
     // Panels
     private JPanel pnPatientInfo;
@@ -244,7 +247,8 @@ public class TalonSelectFrame extends JFrame {
     }
 
     private void fillTalonSelectPane() {
-        tbTalonSelect = new JTable();
+        tbTalonSelect = new CustomTable<Talon, Talon._Fields>(false, false, Talon.class, 1,
+                "Номер талона", 3, "Время начала приёма");
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
@@ -279,6 +283,19 @@ public class TalonSelectFrame extends JFrame {
                     cbxSpeciality.getSelectedItem().getPcod()
                 )
             );
+            cbxDoctor.setSelectedIndex(0);
+            try {
+                tbTalonSelect.setData(
+                    MainForm.tcl.getTalon(
+                        cbxPoliclinic.getSelectedItem().getPcod(),
+                        cbxSpeciality.getSelectedItem().getPcod(),
+                        cbxDoctor.getSelectedItem().getPcod()
+                    )
+                );
+            } catch (TalonNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         } catch (KmiacServerException | PoliclinicNotFoundException
                 | TException | SpecNotFoundException | VrachNotFoundException e) {
             e.printStackTrace();

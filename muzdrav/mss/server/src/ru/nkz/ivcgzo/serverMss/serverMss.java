@@ -59,7 +59,7 @@ public class serverMss extends Server implements Iface {
 				"psm_pk", "psm_pd", "psm_p1", "psm_p1n", "psm_p1k", "psm_p1d", "psm_p2", "psm_p2n", "psm_p2k",
 				"psm_p2d", "dtp", "umerla", "cuser", "clpu", "fio_r", "don", "ves", "nreb", "mrojd", "fam_m", 
 				"im_m", "ot_m", "datarm", "dataz", "fio_pol", "vdok", "sdok", "ndok", "dvdok", "kvdok", 
-				"vz_ser", "vz_nomer", "vz_data");
+				"vz_ser", "vz_nomer", "vz_datav");
 		mssTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Time.class,
 				String.class, String.class, String.class, String.class, String.class, String.class, String.class, Integer.class,
 				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Time.class, String.class, Integer.class,
@@ -155,7 +155,7 @@ public class serverMss extends Server implements Iface {
 						"im_m, ot_m, datarm, dataz, fio_pol, vdok, sdok, ndok, dvdok, kvdok, " + 
 						"vz_ser, vz_nomer, vz_datav) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 					sme.execPreparedT(sql, false, npasp, mssTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79);
 					sme.setCommit();
 				} catch (Exception e1) {

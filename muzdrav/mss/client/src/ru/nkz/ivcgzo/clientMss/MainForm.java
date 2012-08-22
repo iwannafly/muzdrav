@@ -160,6 +160,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private PatientCommonInfo PatientAdres;
 	private PatientMestn PatMestn;
 	
+	private int patId = 0;
+	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
@@ -200,14 +202,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JButton btnNewButton = new JButton("Поиск");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, false);
+				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);
 				tfDatav.setValue(null);
 				if (res != null) {
 					try {
+						patId = res[0];
 						PatientAdres = MainForm.tcl.getPatientCommonInfo(res[0]);
-						if (PatientAdres.getFam() != null) {
-						//	JOptionPane.showMessageDialog(frame, String.format("НАЙДЕН %d", res[0]));
-							
+						if (PatientAdres.getFam() != null) {					
 							tfFam.setText(PatientAdres.getFam().trim());
 						}
 						if (PatientAdres.getIm() != null) {
@@ -348,9 +349,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 						if (Patientsmert.getNdok() != null) tfNdok.setText(Patientsmert.ndok.trim());
 						if (Patientsmert.getKvdok() != null) tfKvdok.setText(Patientsmert.kvdok.trim());
 						if (Patientsmert.isSetDvdok()) tfDvdok.setDate(Patientsmert.dvdok);
-						//System.out.println(res[0]);
-					} catch (MssNotFoundException e1) {
-						System.out.println("NO" );
+						} catch (MssNotFoundException e1) {
+						//System.out.println("NO" );
 					//	JOptionPane.showMessageDialog(frame, String.format("Нет информации на пациента %d", res[0]));
 					}
 					} catch (TException e1) {
@@ -376,6 +376,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					Patientsmert = new P_smert();
+					Patientsmert.setNpasp(patId);
 					if (tfSer.getText().isEmpty()) Patientsmert.setSer(32); 
 					else
 						Patientsmert.setSer(Integer.valueOf(tfSer.getText()));
@@ -464,7 +465,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					Patientsmert.setNdok(tfNdok.getText().trim());
 					if (tfDvdok.getDate() != null) Patientsmert.setDvdok(tfDvdok.getDate().getTime());
 					Patientsmert.setKvdok(tfKvdok.getText().trim());
-					System.out.println("STROKA" );
+					//System.out.println("STROKA" );
 					MainForm.tcl.setPsmert(Patientsmert);
 				} catch (Exception e1) {
 					e1.printStackTrace();						
@@ -1425,7 +1426,6 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		tfSdok = new JTextField();
 		tfSdok.setColumns(10);
-		
 		
 		JLabel lblNewLabel_49 = new JLabel("серия");
 		

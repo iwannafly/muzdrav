@@ -25,7 +25,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -44,8 +43,8 @@ import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 public class MainForm {
 	private JFrame frame;
 	private JPanel pnlLogin;
-	private JTextField tbLogin;
-	private JTextField tbPass;
+	private CustomTextField tbLogin;
+	private CustomTextField tbPass;
 	private JButton btnEnter;
 	
 	private JPanel pnlSysSelect;
@@ -117,7 +116,7 @@ public class MainForm {
 		lblName.setFont(new Font("Tahoma", Font.PLAIN, 24));
 		lblName.setHorizontalAlignment(SwingConstants.CENTER);
 		
-		tbLogin = new CustomTextField();
+		tbLogin = new CustomTextField(true, true, false);
 		tbLogin.setText("log");
 		tbLogin.setColumns(10);
 		tbLogin.addKeyListener(new KeyAdapter() {
@@ -130,7 +129,7 @@ public class MainForm {
 		
 		JLabel lblLogin = new JLabel("Логин");
 		
-		tbPass = new CustomTextField();
+		tbPass = new CustomTextField(true, true, false);
 		tbPass.setText("pas");
 		tbPass.setColumns(10);
 		tbPass.addKeyListener(new KeyAdapter() {
@@ -226,7 +225,11 @@ public class MainForm {
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				else
 					try {
-						plug = conMan.getPluginLoader().loadPluginByIndex(lbxAvailSys.getSelectedIndex());
+						//FIXME что-нибудь сделать с этим костылем
+						if (conMan.getPluginLoader().getPluginList().get(lbxAvailSys.getSelectedIndex()).getId() == conMan.getViewClient().getId())
+							plug = conMan.getViewClient();
+						else
+							plug = conMan.getPluginLoader().loadPluginByIndex(lbxAvailSys.getSelectedIndex());
 						conMan.setClient(plug);
 						plug.showNormal();
 						conMan.connect();
