@@ -1,57 +1,86 @@
 package ru.nkz.ivcgzo.clientReception;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.swing.table.AbstractTableModel;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 
-import ru.nkz.ivcgzo.thriftReception.Talon;
+import org.apache.thrift.TException;
 
-public final class TalonTableModel extends AbstractTableModel {
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 
-    private static final long serialVersionUID = 1499800387887121736L;
-    private DateChecker dateController;
-    private List<Talon> mondayTalonList;
-    private List<Talon> tuesdayTalonList;
-    private List<Talon> wednesdayTalonList;
-    private List<Talon> thursdayTalonList;
-    private List<Talon> fridayTalonList;
-    private List<Talon> saturdayTalonList;
-    private List<Talon> sundayTalonList;
+public final class TalonTableModel implements TableModel {
+    private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
+    private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private static final String[] DAY_NAMES = {
+        "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"
+    };
+    private TalonList talonList;
 
-    private TalonTableModel() {
-
+    public TalonTableModel(final int cpol, final String cdol, final int pcod) {
+        try {
+            talonList = new TalonList(MainForm.tcl.getTalon(cpol, cdol, pcod));
+        } catch (TalonNotFoundException e) {
+            talonList = new TalonList();
+        } catch (KmiacServerException | TException e) {
+            e.printStackTrace();
+        }
     }
 
-    private int calcMaxTalonListSize() {
-        int[] maxSizeArray = {
-            mondayTalonList.size(), tuesdayTalonList.size(), wednesdayTalonList.size(),
-            thursdayTalonList.size(), fridayTalonList.size(), saturdayTalonList.size(),
-            sundayTalonList.size()
-        };
-        int max = maxSizeArray[0];
-        for (int i = 1; i < maxSizeArray.length; i++) {
-            if (maxSizeArray[i] > max) {
-                max = maxSizeArray[i];   // new maximum
-            }
-        }
-        return max;
+    public TalonList getTalonList() {
+        return talonList;
     }
 
     @Override
     public int getRowCount() {
-        return calcMaxTalonListSize();
+        return talonList.getMaximumListSize();
     }
 
     @Override
     public int getColumnCount() {
-        // TODO Auto-generated method stub
         return 7;
     }
 
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
-        // TODO Auto-generated method stub
-        return null;
+        String displayedTime = "";
+        if ((talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex)) != null) {
+            displayedTime = DEFAULT_TIME_FORMAT.format(
+                    talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex));
+        }
+        return displayedTime; //talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex);
+    }
+
+    @Override
+    public String getColumnName(final int columnIndex) {
+        return DAY_NAMES[columnIndex];
+    }
+
+    @Override
+    public Class<?> getColumnClass(final int columnIndex) {
+        return String.class;
+    }
+
+    @Override
+    public boolean isCellEditable(final int rowIndex, final int columnIndex) {
+        return false;
+    }
+
+    @Override
+    public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
+    }
+
+    @Override
+    public void addTableModelListener(final TableModelListener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeTableModelListener(final TableModelListener listener) {
+        listeners.remove(listener);
     }
 
 }
