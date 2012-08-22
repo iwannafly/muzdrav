@@ -9,6 +9,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
@@ -19,7 +21,6 @@ import javax.swing.border.TitledBorder;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -27,9 +28,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
-import ru.nkz.ivcgzo.thriftReception.Talon;
-import ru.nkz.ivcgzo.thriftReception.Talon._Fields;
-import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 
 /**
@@ -39,7 +37,7 @@ public class TalonSelectFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
     // Tables
-    private CustomTable<Talon, _Fields> tbTalonSelect;
+    private JTable tbTalonSelect;
     private JTable tbTalonDelete;
     // Panels
     private JPanel pnPatientInfo;
@@ -196,7 +194,40 @@ public class TalonSelectFrame extends JFrame {
     private void fillTalonTypePanel() {
         cbxPoliclinic = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxSpeciality = new ThriftStringClassifierCombobox<StringClassifier>(true);
+        cbxSpeciality.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    if (cbxSpeciality.getSelectedItem() != null) {
+                        cbxDoctor.setData(
+                                MainForm.tcl.getVrach(
+                                    cbxPoliclinic.getSelectedItem().getPcod(),
+                                    cbxSpeciality.getSelectedItem().getPcod()
+                            )
+                        );
+                        cbxDoctor.setSelectedIndex(0);
+                    }
+                } catch (KmiacServerException | VrachNotFoundException
+                        | TException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
         cbxDoctor = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxDoctor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (cbxDoctor.getSelectedItem() != null) {
+                    TalonTableModel tbtModel = new TalonTableModel(
+                           cbxPoliclinic.getSelectedItem().getPcod(),
+                           cbxSpeciality.getSelectedItem().getPcod(),
+                           cbxDoctor.getSelectedItem().getPcod()
+                    );
+                    tbTalonSelect.setModel(tbtModel);
+                }
+            }
+        });
         btnUpdate = new JButton("Обновить");
         glPnTalonType = new GroupLayout(pnTalonType);
         fillTalonTypeGroupLayout();
@@ -247,8 +278,8 @@ public class TalonSelectFrame extends JFrame {
     }
 
     private void fillTalonSelectPane() {
-        tbTalonSelect = new CustomTable<Talon, Talon._Fields>(false, false, Talon.class, 1,
-                "Номер талона", 3, "Время начала приёма");
+        tbTalonSelect = new JTable();
+        tbTalonSelect.setDefaultRenderer(String.class, new TalonTableCellRenderer());
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
@@ -277,27 +308,21 @@ public class TalonSelectFrame extends JFrame {
             cbxPoliclinic.setSelectedIndex(0);
             cbxSpeciality.setData(MainForm.tcl.getSpec(cbxPoliclinic.getSelectedItem().getPcod()));
             cbxSpeciality.setSelectedIndex(0);
-            cbxDoctor.setData(
-                MainForm.tcl.getVrach(
-                    cbxPoliclinic.getSelectedItem().getPcod(),
-                    cbxSpeciality.getSelectedItem().getPcod()
-                )
-            );
-            cbxDoctor.setSelectedIndex(0);
-            try {
-                tbTalonSelect.setData(
-                    MainForm.tcl.getTalon(
-                        cbxPoliclinic.getSelectedItem().getPcod(),
-                        cbxSpeciality.getSelectedItem().getPcod(),
-                        cbxDoctor.getSelectedItem().getPcod()
-                    )
-                );
-            } catch (TalonNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+//            cbxDoctor.setData(
+//                MainForm.tcl.getVrach(
+//                    cbxPoliclinic.getSelectedItem().getPcod(),
+//                    cbxSpeciality.getSelectedItem().getPcod()
+//                )
+//            );
+//            cbxDoctor.setSelectedIndex(0);
+//            TalonTableModel tbtModel = new TalonTableModel(
+//                cbxPoliclinic.getSelectedItem().getPcod(),
+//                cbxSpeciality.getSelectedItem().getPcod(),
+//                cbxDoctor.getSelectedItem().getPcod()
+//            );
+//            tbTalonSelect.setModel(tbtModel);
         } catch (KmiacServerException | PoliclinicNotFoundException
-                | TException | SpecNotFoundException | VrachNotFoundException e) {
+                | TException | SpecNotFoundException e) {
             e.printStackTrace();
         }
     }

@@ -23,12 +23,11 @@ struct Talon {
 	1:i32 id;
 	2:i32 ntalon;
 	3:i32 vidp;
-	4:optional i64 timepn;
-	5:optional i64 timepk;
-	6:optional i64 datap;
-	7:optional i32 npasp;
-    8:optional i64 dataz;
-    9:optional i32 prv;
+	4:optional i64 timep;
+	5:optional i64 datap;
+	6:optional i32 npasp;
+    7:optional i64 dataz;
+    8:optional i32 prv;
 }
 
 /**
