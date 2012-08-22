@@ -78,6 +78,7 @@ public class FormSign extends JFrame {
 		setBounds(100, 100, 1011, 726);
 		
 		final JScrollPane spAnamn = new JScrollPane();
+		spAnamn.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		spAnamn.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		final ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
@@ -397,32 +398,38 @@ public class FormSign extends JFrame {
 		}
 		
 		public void showPsign() {
+			BGgrk.clearSelection();
+			BGRez.clearSelection();
+			cbk.setSelected(false);
+			cba.setSelected(false);
+			cbn.setSelected(false);
+			tpallerg.setText("");
+			tpfarm.setText("");
+			tpanamnz.setText("");
 		try {
 			psign = MainForm.tcl.getPsign(Vvod.zapVr.npasp);
-			if (psign!=null){
-			BGgrk.clearSelection();
+			
 			rb1g.setSelected(psign.grup.charAt(0) == '1');
 			rb2g.setSelected(psign.grup.charAt(0) == '2');
 			rb3g.setSelected(psign.grup.charAt(0) == '3');
 			rb4g.setSelected(psign.grup.charAt(0) == '4');
 			
-			BGRez.clearSelection();
 			rbpol.setSelected(psign.ph.charAt(0) == '+');
 			rbotr.setSelected(psign.ph.charAt(0) == '-');
 			
 			tpallerg.setText(psign.allerg);
 			tpanamnz.setText(psign.vitae);
 			tpfarm.setText(psign.farmkol);
-			tpanamnz.setText(psign.vitae);
 			
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
 			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');}
+			cbn.setSelected(vrp.charAt(2) == '1');
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (PsignNotFoundException e1) {
-			e1.printStackTrace();
+			psign = new Psign();
+			psign.setNpasp(Vvod.zapVr.npasp);
 		} catch (TException e1) {
 			MainForm.conMan.reconnect(e1);
 		}

@@ -127,84 +127,12 @@ public class FormRdInf extends JFrame {
 		});
 		setTitle("Дополнительная информация о беременной");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 500);
+		setBounds(100, 100, 800, 537);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
-		rdinf = new RdInfStruct();
-		patient = new PatientCommonInfo();
 		
-/*		patient.setFam((String) fam.getText());
-		patient.setIm((String)im.getText());
-		patient.setOt((String) ot.getText());*/
-		oslrod = rdinf.getOsoco();
-		if ((oslrod-128)<0){
-		or8=0; iw1=oslrod;	
-		}else {
-		or8=1; iw1=oslrod-128;	
-		}
-		if ((iw1-64)<0){
-		or7=0; 
-		}else {
-		or7=1; iw1=iw1-64;	
-		}
-		if ((iw1-32)<0){
-		or6=0; 
-		}else {
-		or6=1; iw1=iw1-32;	
-		}
-		if ((iw1-16)<0){
-		or5=0; 
-		}else {
-		or5=1; iw1=iw1-16;	
-		}
-		if ((iw1-8)<0){
-		or4=0; 	
-		}else {
-		or4=1; iw1=iw1-8;	
-		}
-		if ((iw1-4)<0){
-		or3=0; 
-		}else {
-		or3=1; iw1=iw1-4;	
-		}
-		if ((iw1-2)<0){
-		or2=0; 
-		}else {
-		or2=1; iw1=iw1-2;	
-		}
-		or1=iw1; 
-		
-		uslj = rdinf.getUslpr();
-		if ((uslj-8)<0){
-		us4=0; 	
-		}else {
-		us4=1; iw2=uslj-8;	
-		}
-		if ((iw2-4)<0){
-		us3=0; 
-		}else {
-		us3=1; iw2=iw2-4;	
-		}
-		if ((iw2-2)<0){
-		us2=0; 
-		}else {
-		us2=1; iw2=iw2-2;	
-		}
-		us1=iw2; 
-		otec = rdinf.getVredOtec();
-		if ((otec-4)<0){
-		ot3=0; 
-		}else {
-		ot3=1; iw2=otec-4;	
-		}
-		if ((iw2-2)<0){
-		ot2=0; 
-		}else {
-		ot2=1; iw2=iw2-2;	
-		}
-		ot1=iw2; 
 		JPanel panel = new JPanel();
 		contentPane.add(panel);
 		
@@ -222,64 +150,6 @@ public class FormRdInf extends JFrame {
 			JButton Sbutton = new JButton("");
 		Sbutton.setToolTipText("Сохранить");
 		Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-		Sbutton.addActionListener(new ActionListener() {
-	    private AbstractButton ChBAss;
-	    private AbstractButton ChBots;
-	    private AbstractButton ChBInv;
-	    private AbstractButton ChBMnd;
-	    private AbstractButton ChBLrp;
-	    private AbstractButton ChBCnd;
-	    private AbstractButton ChBNer;
-	    private AbstractButton ChBNmls;
-	    private AbstractButton ChBSelo;
-	    private AbstractButton ChBGorod;
-	    private AbstractButton ChBBomg;
-	    private AbstractButton ChBSmok;
-	    private AbstractButton ChBAlk;
-	    private AbstractButton ChBNark;
-		private int oslrod (int oslrod){
-				if (ChBAss.isSelected()){oslrod=oslrod+1;}
-		            if (ChBots.isSelected()){oslrod=oslrod+2;}
-		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
-		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
-		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
-		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
-		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
-		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
-			};
-			private int uslj (int uslj){
-		           if (ChBSelo.isSelected()){uslj=uslj+1;}
-		            if (ChBots.isSelected()){uslj=uslj+2;}
-		            if (ChBGorod.isSelected()){uslj=uslj+4;}
-		            if (ChBBomg.isSelected()){uslj=uslj+8;}
-			return uslj;
-			};
-			private int otec (int otec){
-		           if (ChBSmok.isSelected()){otec=otec+1;}
-		            if (ChBAlk.isSelected()){otec=otec+2;}
-		            if (ChBNark.isSelected()){otec=otec+4;}
-			return otec;	
-			};
-			public void actionPerformed(ActionEvent arg0) {
-rdinf.setFioOtec(TFio.getText());
-rdinf.setMrOtec(TMrab.getText());
-rdinf.setOsoco(oslrod);
-rdinf.setUslpr(uslj);
-rdinf.setVredOtec(otec);
-rdinf.setTelOtec(TTelef.getText());
-rdinf.setPhOtec(TPhf.getText());
-if (CBObr.getSelectedPcod() != null)
-	rdinf.setObr(CBObr.getSelectedPcod());
-	else rdinf.unsetObr();
-if (CBSem.getSelectedPcod() != null)
-	rdinf.setSem(CBSem.getSelectedPcod());
-	else rdinf.unsetSem();
-if (CBGrOtec.getSelectedPcod() != null)
-	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
-	else rdinf.unsetGrotec();
-			}
-		});
 	
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Новая запись");
@@ -290,7 +160,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 					RdInfStruct rdinf = new RdInfStruct();
  		            MainForm.tcl.AddRdInf(rdinf);
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
-					setRdInfData(rdinf);
+					setRdInfData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormRdInf.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -561,6 +431,55 @@ if (CBGrOtec.getSelectedPcod() != null)
 		final JCheckBox ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
 		ChBNmls.setSelected(or8 ==1);
 
+		Sbutton.addActionListener(new ActionListener() {
+		private int oslrod (int oslrod){
+				if (ChBAss.isSelected()){oslrod=oslrod+1;}
+		            if (ChBots.isSelected()){oslrod=oslrod+2;}
+		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
+		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
+		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
+		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
+		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
+		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
+			return oslrod;	
+			};
+			private int uslj (int uslj){
+		           if (ChBSelo.isSelected()){uslj=uslj+1;}
+		            if (ChBots.isSelected()){uslj=uslj+2;}
+		            if (ChBGorod.isSelected()){uslj=uslj+4;}
+		            if (ChBBomg.isSelected()){uslj=uslj+8;}
+			return uslj;
+			};
+			private int otec (){
+				int otec = 0;
+				if (ChBSmok.isSelected())
+					otec=otec+1;
+				if (ChBAlk.isSelected())
+					otec=otec+2;
+				if (ChBNark.isSelected())
+					otec=otec+4;
+				return otec;	
+			};
+			public void actionPerformed(ActionEvent arg0) {
+rdinf.setFioOtec(TFio.getText());
+rdinf.setMrOtec(TMrab.getText());
+rdinf.setOsoco(oslrod);
+rdinf.setUslpr(uslj);
+rdinf.setVredOtec(otec());
+rdinf.setTelOtec(TTelef.getText());
+rdinf.setPhOtec(TPhf.getText());
+if (CBObr.getSelectedPcod() != null)
+	rdinf.setObr(CBObr.getSelectedPcod());
+	else rdinf.unsetObr();
+if (CBSem.getSelectedPcod() != null)
+	rdinf.setSem(CBSem.getSelectedPcod());
+	else rdinf.unsetSem();
+if (CBGrOtec.getSelectedPcod() != null)
+	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
+	else rdinf.unsetGrotec();
+			}
+		});
+		
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -603,61 +522,94 @@ if (CBGrOtec.getSelectedPcod() != null)
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
-/*		JButton Sbutton = new JButton("");
-	Sbutton.setToolTipText("Сохранить");
-	Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-		Sbutton.addActionListener(new ActionListener() {
-			private int oslrod (int oslrod){
-		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
-		            if (ChBots.isSelected()){oslrod=oslrod+2;}
-		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
-		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
-		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
-		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
-		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
-		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
-			};
-			private int uslj (int uslj){
-		           if (ChBSelo.isSelected()){uslj=uslj+1;}
-		            if (ChBots.isSelected()){uslj=uslj+2;}
-		            if (ChBGorod.isSelected()){uslj=uslj+4;}
-		            if (ChBBomg.isSelected()){uslj=uslj+8;}
-			return uslj;
-			};
-			private int otec (int otec){
-		           if (ChBSmok.isSelected()){otec=otec+1;}
-		            if (ChBAlk.isSelected()){otec=otec+2;}
-		            if (ChBNark.isSelected()){otec=otec+4;}
-			return otec;	
-			};
-			public void actionPerformed(ActionEvent arg0) {
-rdinf.setFioOtec(TFio.getText());
-rdinf.setMrOtec(TMrab.getText());
-//rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
-//rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
-//rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
-rdinf.setOsoco(oslrod);
-rdinf.setUslpr(uslj);
-rdinf.setVredOtec(otec);
-rdinf.setTelOtec(TTelef.getText());
-rdinf.setPhOtec(TPhf.getText());
-if (CBObr.getSelectedPcod() != null)
-	rdinf.setObr(CBObr.getSelectedPcod());
-	else rdinf.unsetObr();
-if (CBSem.getSelectedPcod() != null)
-	rdinf.setSem(CBSem.getSelectedPcod());
-	else rdinf.unsetSem();
-if (CBGrOtec.getSelectedPcod() != null)
-	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
-	else rdinf.unsetGrotec();
-			}
-		});*/
 	}
 
-	protected void setRdInfData(RdInfStruct rdinf2) {
+	private void method1() {
+		try {
+			rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+//		patient = new PatientCommonInfo();
+//		
+//		patient.setFam((String) fam.getText());
+//		patient.setIm((String)im.getText());
+//		patient.setOt((String) ot.getText());
+			oslrod = rdinf.getOsoco();
+			if ((oslrod-128)<0){
+			or8=0; iw1=oslrod;	
+			}else {
+			or8=1; iw1=oslrod-128;	
+			}
+			if ((iw1-64)<0){
+			or7=0; 
+			}else {
+			or7=1; iw1=iw1-64;	
+			}
+			if ((iw1-32)<0){
+			or6=0; 
+			}else {
+			or6=1; iw1=iw1-32;	
+			}
+			if ((iw1-16)<0){
+			or5=0; 
+			}else {
+			or5=1; iw1=iw1-16;	
+			}
+			if ((iw1-8)<0){
+			or4=0; 	
+			}else {
+			or4=1; iw1=iw1-8;	
+			}
+			if ((iw1-4)<0){
+			or3=0; 
+			}else {
+			or3=1; iw1=iw1-4;	
+			}
+			if ((iw1-2)<0){
+			or2=0; 
+			}else {
+			or2=1; iw1=iw1-2;	
+			}
+			or1=iw1; 
+			
+			uslj = rdinf.getUslpr();
+			if ((uslj-8)<0){
+			us4=0; 	
+			}else {
+			us4=1; iw2=uslj-8;	
+			}
+			if ((iw2-4)<0){
+			us3=0; 
+			}else {
+			us3=1; iw2=iw2-4;	
+			}
+			if ((iw2-2)<0){
+			us2=0; 
+			}else {
+			us2=1; iw2=iw2-2;	
+			}
+			us1=iw2; 
+			otec = rdinf.getVredOtec();
+			if ((otec-4)<0){
+			ot3=0; 
+			}else {
+			ot3=1; iw2=otec-4;	
+			}
+			if ((iw2-2)<0){
+			ot2=0; 
+			}else {
+			ot2=1; iw2=iw2-2;	
+			}
+			ot1=iw2;
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			MainForm.conMan.reconnect(e);
+		}
+	}
+
+	protected void setRdInfData() {
 		// TODO Auto-generated method stub
-		
+	rdinf.setNpasp(Vvod.zapVr.npasp);	
 	}
 	public void onConnect() {
 		try {
@@ -665,7 +617,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 			CBSem.setData(MainForm.tcl.get_n_z11());
 			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
 			
-			
+			method1();
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
