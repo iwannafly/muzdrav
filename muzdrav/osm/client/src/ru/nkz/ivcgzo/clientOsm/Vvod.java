@@ -195,8 +195,8 @@ public class Vvod extends JFrame {
 		 sign = new FormSign();
 		 MainForm.instance.addChildFrame(sign);
 		 
-		// postber = new FormPostBer();
-		 //MainForm.instance.addChildFrame(postber);
+		 postber = new FormPostBer();
+		 MainForm.instance.addChildFrame(postber);
 		 
 		setBounds(100, 100, 1029, 962);
 		
@@ -730,7 +730,7 @@ public class Vvod extends JFrame {
 		butBer.setActionCommand("Наблюдение за беременными");
 		butBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//postber.setVisible(true);
+				postber.setVisible(true);
 				}
 		});
 		GroupLayout gl_panel;

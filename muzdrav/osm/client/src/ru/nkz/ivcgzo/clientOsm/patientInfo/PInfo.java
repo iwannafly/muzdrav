@@ -455,7 +455,7 @@ public class PInfo extends JFrame {
 					posinfo.add(new PvizitTreeNode(pvizit));
 			for (PdiagZ pdiag : MainForm.tcl.getPdiagzProsm(npasp))
 				diaginfo.add(new PdiagTreeNode(pdiag));
-			for (RdSlStruct rdsl : MainForm.tcl.getRdSlInfo(npasp)) 
+			for (RdSlStruct rdsl : MainForm.tcl.getRdSlInfoList(npasp)) 
 				berinfo.add(new RdslTreeNode(rdsl));
 
 		} catch (KmiacServerException e) {
