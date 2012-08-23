@@ -99,7 +99,21 @@ public class FormRdInf extends JFrame {
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
-
+	 JCheckBox ChBNark;
+     JCheckBox ChBAlk;
+     JCheckBox ChBSmok;
+     JCheckBox ChBNmls;
+     JCheckBox ChBNer;
+     JCheckBox ChBInv;
+     JCheckBox ChBBots;
+     JCheckBox ChBAss;
+     JCheckBox ChBLrp;
+     JCheckBox ChBMnd;
+     JCheckBox ChBCnd;
+     JCheckBox ChBBomg;
+     JCheckBox ChBGorod;
+     JCheckBox ChBOtsb;
+     JCheckBox ChBSelo;
 	/**
 	 * Launch the application.
 	 */
@@ -175,17 +189,17 @@ public class FormRdInf extends JFrame {
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		fam.setColumns(10);
-		fam.setText(patient.getFam());
+		fam.setText(Vvod.zapVr.getFam());
 		
 		im = new JTextField();
 		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		im.setColumns(10);
-		im.setText(patient.getIm());
+		im.setText(Vvod.zapVr.getIm());
 		
 		ot = new JTextField();
 		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		ot.setColumns(10);
-		ot.setText(patient.getOt());
+		ot.setText(Vvod.zapVr.getOth());
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -263,27 +277,21 @@ public class FormRdInf extends JFrame {
 		JLabel LTel = new JLabel("Телефон");
 		
 		final JCheckBox ChBSmok = new JCheckBox("Курение");
-		ChBSmok.setSelected(ot1 ==1);
 		
 		final JCheckBox ChBAlk = new JCheckBox("Алкоголизм");
-		ChBAlk.setSelected(ot2 ==1);
 		
 		final JCheckBox ChBNark = new JCheckBox("Наркомания");
-		ChBNark.setSelected(ot3 ==1);
 		
 		TFio = new JTextField();
-		TFio.setText(rdinf.fioOtec);
 		
 		JSpinner SVozr = new JSpinner();
 		SVozr.setModel(new SpinnerNumberModel(new Integer(rdinf.vOtec), null, null, new Integer(1)));
 		rdinf.setVOtec((int) SVozr.getModel().getValue());
 		
 		TMrab = new JTextField();
-		TMrab.setText(rdinf.mrOtec);
 		
 		TTelef = new JTextField();
 		TTelef.setText(rdinf.telOtec);
-//		TGrk.setText(rdinf.grOtec);
 		
 		TPhf = new JTextField();
 		TPhf.setText(rdinf.phOtec);
@@ -363,16 +371,12 @@ public class FormRdInf extends JFrame {
 		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		final JCheckBox ChBSelo = new JCheckBox("Сельская жительница");
-		ChBSelo.setSelected(us1 ==1);
 		
 		final JCheckBox ChBOtsB = new JCheckBox("Отсутствие благоустройства");
-		ChBOtsB.setSelected(us2 ==1);
 		
 		final JCheckBox ChBGorod = new JCheckBox("Городская жительница");
-		ChBGorod.setSelected(us3 ==1);
 		
 		final JCheckBox ChBBomg = new JCheckBox("БОМЖ");
-		ChBBomg.setSelected(us4 ==1);
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
@@ -404,32 +408,21 @@ public class FormRdInf extends JFrame {
 		
 		JLabel lblNewLabel = new JLabel("Отягощающие социальные обязательства");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
-/*		final JCheckBox CBKrov = new JCheckBox("Кровотечение");
-		CBKrov.setSelected(or1 == 1);
-*/		
 		final JCheckBox ChBAss = new JCheckBox("Асоциальная личность");
-		ChBAss.setSelected(or1 ==1);
 		
 		final JCheckBox ChBots = new JCheckBox("Очаг туберкулеза в семье");
-		ChBots.setSelected(or2 ==1);
 		
 		final JCheckBox ChBInv = new JCheckBox("Инвалидность");
-		ChBInv.setSelected(or3 ==1);
 		
 		final JCheckBox ChBMnd = new JCheckBox("Многодетная семья");
-		ChBMnd.setSelected(or4 ==1);
 		
 		final JCheckBox ChBLrp = new JCheckBox("Лишение родительских прав");
-		ChBLrp.setSelected(or5 ==1);
 		
 		final JCheckBox ChBCnd = new JCheckBox("Семья с низким достатком");
-		ChBCnd.setSelected(or6 ==1);
 		
 		final JCheckBox ChBNer = new JCheckBox("Неработающие");
-		ChBNer.setSelected(or7 ==1);
 		
 		final JCheckBox ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
-		ChBNmls.setSelected(or8 ==1);
 
 		Sbutton.addActionListener(new ActionListener() {
 		private int oslrod (int oslrod){
@@ -525,91 +518,103 @@ if (CBGrOtec.getSelectedPcod() != null)
 	}
 
 	private void method1() {
-		try {
-			rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
-//		patient = new PatientCommonInfo();
-//		
-//		patient.setFam((String) fam.getText());
-//		patient.setIm((String)im.getText());
-//		patient.setOt((String) ot.getText());
-			oslrod = rdinf.getOsoco();
-			if ((oslrod-128)<0){
-			or8=0; iw1=oslrod;	
-			}else {
-			or8=1; iw1=oslrod-128;	
-			}
-			if ((iw1-64)<0){
-			or7=0; 
-			}else {
-			or7=1; iw1=iw1-64;	
-			}
-			if ((iw1-32)<0){
-			or6=0; 
-			}else {
-			or6=1; iw1=iw1-32;	
-			}
-			if ((iw1-16)<0){
-			or5=0; 
-			}else {
-			or5=1; iw1=iw1-16;	
-			}
-			if ((iw1-8)<0){
-			or4=0; 	
-			}else {
-			or4=1; iw1=iw1-8;	
-			}
-			if ((iw1-4)<0){
-			or3=0; 
-			}else {
-			or3=1; iw1=iw1-4;	
-			}
-			if ((iw1-2)<0){
-			or2=0; 
-			}else {
-			or2=1; iw1=iw1-2;	
-			}
-			or1=iw1; 
-			
-			uslj = rdinf.getUslpr();
-			if ((uslj-8)<0){
-			us4=0; 	
-			}else {
-			us4=1; iw2=uslj-8;	
-			}
-			if ((iw2-4)<0){
-			us3=0; 
-			}else {
-			us3=1; iw2=iw2-4;	
-			}
-			if ((iw2-2)<0){
-			us2=0; 
-			}else {
-			us2=1; iw2=iw2-2;	
-			}
-			us1=iw2; 
-			otec = rdinf.getVredOtec();
-			if ((otec-4)<0){
-			ot3=0; 
-			}else {
-			ot3=1; iw2=otec-4;	
-			}
-			if ((iw2-2)<0){
-			ot2=0; 
-			}else {
-			ot2=1; iw2=iw2-2;	
-			}
-			ot1=iw2;
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-			MainForm.conMan.reconnect(e);
+		if ((oslrod-128)<0){
+		or8=0; iw1=oslrod;	
+		}else {
+		or8=1; iw1=oslrod-128;	
 		}
+		if ((iw1-64)<0){
+		or7=0; 
+		}else {
+		or7=1; iw1=iw1-64;	
+		}
+		if ((iw1-32)<0){
+		or6=0; 
+		}else {
+		or6=1; iw1=iw1-32;	
+		}
+		if ((iw1-16)<0){
+		or5=0; 
+		}else {
+		or5=1; iw1=iw1-16;	
+		}
+		if ((iw1-8)<0){
+		or4=0; 	
+		}else {
+		or4=1; iw1=iw1-8;	
+		}
+		if ((iw1-4)<0){
+		or3=0; 
+		}else {
+		or3=1; iw1=iw1-4;	
+		}
+		if ((iw1-2)<0){
+		or2=0; 
+		}else {
+		or2=1; iw1=iw1-2;	
+		}
+		or1=iw1; 
+		
+		if ((uslj-8)<0){
+		us4=0; 	
+		}else {
+		us4=1; iw2=uslj-8;	
+		}
+		if ((iw2-4)<0){
+		us3=0; 
+		}else {
+		us3=1; iw2=iw2-4;	
+		}
+		if ((iw2-2)<0){
+		us2=0; 
+		}else {
+		us2=1; iw2=iw2-2;	
+		}
+		us1=iw2; 
+		if ((otec-4)<0){
+		ot3=0; 
+		}else {
+		ot3=1; iw2=otec-4;	
+		}
+		if ((iw2-2)<0){
+		ot2=0; 
+		}else {
+		ot2=1; iw2=iw2-2;	
+		}
+		ot1=iw2;
 	}
 
-	protected void setRdInfData() {
+	protected void setRdInfData() throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-	rdinf.setNpasp(Vvod.zapVr.npasp);	
+	try {
+		rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+		oslrod = rdinf.getOsoco();
+		uslj = rdinf.getUslpr();
+		otec = rdinf.getVredOtec();
+		method1();
+		TFio.setText(rdinf.fioOtec);
+		TMrab.setText(rdinf.mrOtec);
+//		CBObr.setd
+		ChBNark.setSelected(ot3 == 1);
+		ChBAlk.setSelected(ot2 == 1);
+		ChBSmok.setSelected(ot1 == 1);
+		ChBNmls.setSelected(or8 == 1);
+		ChBNer.setSelected(or7 == 1);
+		ChBInv.setSelected(or3 == 1);
+		ChBBots.setSelected(or2 == 1);
+		ChBAss.setSelected(or1 == 1);
+		ChBLrp.setSelected(or5 == 1);
+		ChBMnd.setSelected(or4 == 1);
+		ChBCnd.setSelected(or6 == 1);
+		ChBBomg.setSelected(us4 == 1);
+		ChBGorod.setSelected(us3 == 1);
+		ChBOtsb.setSelected(us2 == 1);
+		ChBSelo.setSelected(us1 == 1);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
 	}
 	public void onConnect() {
 		try {
@@ -617,7 +622,6 @@ if (CBGrOtec.getSelectedPcod() != null)
 			CBSem.setData(MainForm.tcl.get_n_z11());
 			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
 			
-			method1();
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {

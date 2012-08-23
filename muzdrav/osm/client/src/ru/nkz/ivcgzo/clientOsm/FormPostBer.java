@@ -232,7 +232,7 @@ addWindowListener(new WindowAdapter() {
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
 			rdsl.setNsert(getTextOrNull(TNSert.getText()));
 			rdsl.setDatay(SDataPos.getDate().getTime());
-//			rdsl.setKont();
+			rdsl.setKont(CBKontr.isSelected());
 			rdsl.setDeti((int) SKolDet.getModel().getValue());
 			rdsl.setDsp((int) ((JSpinner) SDsp.getModel()).getValue());
 			rdsl.setDsr((int) SDcr.getModel().getValue());
@@ -311,19 +311,19 @@ addWindowListener(new WindowAdapter() {
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		fam.setColumns(10);
-//		fam.setText(Vvod.zapVr.fam);
+		fam.setText(Vvod.zapVr.fam);
 		
 		im = new JTextField();
 		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		im.setText("");
 		im.setColumns(10);
-//		im.setText(Vvod.zapVr.im);
+		im.setText(Vvod.zapVr.im);
 		
 		ot = new JTextField();
 		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		ot.setText("");
 		ot.setColumns(10);
-//		ot.setText(Vvod.zapVr.oth);
+		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
@@ -985,36 +985,54 @@ addWindowListener(new WindowAdapter() {
 
 	private void setPostBerData(RdSlStruct rdsl) {
 		//SRost.setValue(rdsl.getRost());
-		SVes.setValue(rdsl.getVesd());
-		SDcp.setValue(rdsl.getDsp());
-		SDcr.setValue(rdsl.getDsr());
-		SDtroch.setValue(rdsl.getDTroch());
-		SCext.setValue(rdsl.getCext());
-		SindSol.setValue(rdsl.getIndsol());
-		SDataPos.setDate(rdsl.getDatay());
-		SDataSn.setDate(rdsl.getDatasn());
-		SDataRod.setDate(rdsl.getDataZs());
-		SDataSert.setDate(rdsl.getDatasert());
-		TSSert.setText(rdsl.ssert);
-		TNSert.setText(rdsl.nsert);
-		SParRod.setValue(rdsl.getKolrod());
-		SKolBer.setValue(rdsl.getShet());
-		TDataab.setDate(rdsl.getDataab());
-  	    SDataRod.setDate(rdsl.getDataZs());
-		SDataSert.setDate(rdsl.getDatasert());
-		TSSert.setText(rdsl.ssert);
-		TNSert.setText(rdsl.nsert);
-		SParRod.setValue(rdsl.getKolrod());
-		SKolBer.setValue(rdsl.getShet());
-		SDataOsl.setDate(rdsl.getDataosl());
-		SYavka.setValue(rdsl.getYavka1());
-		SDataM.setDate(rdsl.getDataM());
-		SKolAb.setValue(rdsl.getAbort());
-		SVozMen.setValue(rdsl.getVozmen());
-		SMenC.setValue(rdsl.getPrmen());
-		SKolDet.setValue(rdsl.getDeti());
-		SPolJ.setValue(rdsl.getPolj());
-		SSrokA.setValue(rdsl.getSrokab());
+		try {
+			rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.id_pvizit, Vvod.zapVr.npasp);
+			SVes.setValue(rdsl.getVesd());
+			SDcp.setValue(rdsl.getDsp());
+			SDcr.setValue(rdsl.getDsr());
+			SDtroch.setValue(rdsl.getDTroch());
+			SCext.setValue(rdsl.getCext());
+			SindSol.setValue(rdsl.getIndsol());
+			SDataPos.setDate(rdsl.getDatay());
+			SDataSn.setDate(rdsl.getDatasn());
+			SDataRod.setDate(rdsl.getDataZs());
+			SDataSert.setDate(rdsl.getDatasert());
+			TSSert.setText(rdsl.ssert);
+			TNSert.setText(rdsl.nsert);
+			SParRod.setValue(rdsl.getKolrod());
+			SKolBer.setValue(rdsl.getShet());
+			TDataab.setDate(rdsl.getDataab());
+			SDataRod.setDate(rdsl.getDataZs());
+			SDataSert.setDate(rdsl.getDatasert());
+			TSSert.setText(rdsl.ssert);
+			TNSert.setText(rdsl.nsert);
+			SParRod.setValue(rdsl.getKolrod());
+			SKolBer.setValue(rdsl.getShet());
+			SDataOsl.setDate(rdsl.getDataosl());
+			SYavka.setValue(rdsl.getYavka1());
+			SDataM.setDate(rdsl.getDataM());
+			SKolAb.setValue(rdsl.getAbort());
+			SVozMen.setValue(rdsl.getVozmen());
+			SMenC.setValue(rdsl.getPrmen());
+			SKolDet.setValue(rdsl.getDeti());
+			SPolJ.setValue(rdsl.getPolj());
+			SSrokA.setValue(rdsl.getSrokab());
+			oslrod = rdsl.getOslrod();
+			method2();
+			CBKrov.setSelected(or1 == 1);
+			CBEkl.setSelected(or2 == 1);
+			CBGnoin.setSelected(or3 == 1);
+			CBTromb.setSelected(or4 == 1);
+			CBKesar.setSelected(or5 == 1);
+			CBAkush.setSelected(or6 == 1);
+			CBIiiiv.setSelected(or7 == 1);
+			CBRazrProm.setSelected(or8 == 1);
+			CBKontr.setSelected(rdsl.isKont());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка ссылки на запись", JOptionPane.ERROR_MESSAGE);
+		}
 }
 	private String getTextOrNull(String str) {
 		if (str != null)
@@ -1023,55 +1041,43 @@ addWindowListener(new WindowAdapter() {
 		
 		return null;
 	}
-	private void method2() throws KmiacServerException{
-		try {
-			rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.id_pvizit, Vvod.zapVr.npasp);
-if (rdsl.vesd == 0)
-			setDefaultValues();
-oslrod =rdsl.getOslrod();
-if ((oslrod-128)<0){
-or8=0; iw1=oslrod;	
-}else {
-or8=1; iw1=oslrod-128;	
-}
-if ((iw1-64)<0){
-or7=0; 
-}else {
-or7=1; iw1=iw1-64;	
-}
-if ((iw1-32)<0){
-or6=0; 
-}else {
-or6=1; iw1=iw1-32;	
-}
-if ((iw1-16)<0){
-or5=0; 
-}else {
-or5=1; iw1=iw1-16;	
-}
-if ((iw1-8)<0){
-or4=0; 	
-}else {
-or4=1; iw1=iw1-8;	
-}
-if ((iw1-4)<0){
-or3=0; 
-}else {
-or3=1; iw1=iw1-4;	
-}
-if ((iw1-2)<0){
-or2=0; 
-}else {
-or2=1; iw1=iw1-2;	
-}
-or1=iw1;
-		}catch (KmiacServerException e) {
-	e.printStackTrace();
-} catch (TException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			MainForm.conMan.reconnect(e);
-		} 
+	private void method2(){
+		if ((oslrod-128)<0){
+		or8=0; iw1=oslrod;	
+		}else {
+		or8=1; iw1=oslrod-128;	
+		}
+		if ((iw1-64)<0){
+		or7=0; 
+		}else {
+		or7=1; iw1=iw1-64;	
+		}
+		if ((iw1-32)<0){
+		or6=0; 
+		}else {
+		or6=1; iw1=iw1-32;	
+		}
+		if ((iw1-16)<0){
+		or5=0; 
+		}else {
+		or5=1; iw1=iw1-16;	
+		}
+		if ((iw1-8)<0){
+		or4=0; 	
+		}else {
+		or4=1; iw1=iw1-8;	
+		}
+		if ((iw1-4)<0){
+		or3=0; 
+		}else {
+		or3=1; iw1=iw1-4;	
+		}
+		if ((iw1-2)<0){
+		or2=0; 
+		}else {
+		or2=1; iw1=iw1-2;	
+		}
+		or1=iw1; 
 	}
 	
 	public void onConnect() {
