@@ -740,6 +740,7 @@ public class PacientInfoFrame extends JFrame {
 					
 					if (res != null) {
 	       				tf_Cpol.setText(Integer.toString(res[2]));
+	       				PersonalInfo.setTerp(res[0]);
 					}
 				}
 			}
@@ -1184,8 +1185,8 @@ public class PacientInfoFrame extends JFrame {
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_10.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 648, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(19, Short.MAX_VALUE))
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)
+					.addGap(291))
 		);
 		gl_panel_10.setVerticalGroup(
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
@@ -1336,39 +1337,39 @@ public class PacientInfoFrame extends JFrame {
         JPanel panel_12 = new JPanel();
         GroupLayout gl_tpKateg = new GroupLayout(tpKateg);
         gl_tpKateg.setHorizontalGroup(
-            gl_tpKateg.createParallelGroup(Alignment.TRAILING)
-                .addGroup(Alignment.LEADING, gl_tpKateg.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(gl_tpKateg.createParallelGroup(Alignment.LEADING)
-                        .addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE))
-                    .addContainerGap(19, Short.MAX_VALUE))
+        	gl_tpKateg.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_tpKateg.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(gl_tpKateg.createParallelGroup(Alignment.LEADING)
+        				.addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(panel_12, GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE))
+        			.addGap(291))
         );
         gl_tpKateg.setVerticalGroup(
-            gl_tpKateg.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_tpKateg.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(389, Short.MAX_VALUE))
+        	gl_tpKateg.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_tpKateg.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.UNRELATED)
+        			.addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
+        			.addContainerGap(389, Short.MAX_VALUE))
         );
 
         JScrollPane scrollPane_2 = new JScrollPane();
         GroupLayout gl_panel_12 = new GroupLayout(panel_12);
         gl_panel_12.setHorizontalGroup(
-            gl_panel_12.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_12.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(scrollPane_2, GroupLayout.PREFERRED_SIZE, 648, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        	gl_panel_12.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_panel_12.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)
+        			.addContainerGap())
         );
         gl_panel_12.setVerticalGroup(
-            gl_panel_12.createParallelGroup(Alignment.TRAILING)
-                .addGroup(gl_panel_12.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
-                    .addContainerGap())
+        	gl_panel_12.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(gl_panel_12.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(scrollPane_2, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+        			.addContainerGap())
         );
 
         tbl_kateg =new CustomTable<>(true, true, Kontingent.class, 3,"Дата",2,"Категория");
@@ -2535,8 +2536,20 @@ public class PacientInfoFrame extends JFrame {
         panel_31.setLayout(gl_panel_31);
 
         tf_diag_p = new JTextField();
+        tf_diag_p.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent arg0) {
+        		if (arg0.getClickCount() == 2) {
+        			StringClassifier res = MainForm.conMan.showMkbTreeForm("диагнозы", tf_diag_p.getText());
+        			
+        			if (res != null) {
+        				tf_diag_p.setText(res.pcod);
+        				ta_diag_p.setText(res.name);
+        			}
+        		}
+        	}
+        });
         tf_diag_p.setColumns(10);
-
         ta_diag_p = new JTextArea();
         ta_diag_p.setFont(new Font("Monospaced", Font.PLAIN, 12));
         ta_diag_p.setWrapStyleWord(true);
@@ -3498,6 +3511,12 @@ public class PacientInfoFrame extends JFrame {
             }
             else{
                 MainForm.tcl.updateGosp(Id_gosp);
+                newPriem.setNist(Id_gosp.getNist());
+                newPriem.setDatap(Id_gosp.getDatap());
+                newPriem.setCotd(Id_gosp.getCotd());
+                newPriem.setDiag_p(Id_gosp.getDiag_p());
+                newPriem.setNamed_p(Id_gosp.getNamed_p());
+                tbl_priem.updateSelectedItem();
             }
         } catch (Exception e) {
             e.printStackTrace();
