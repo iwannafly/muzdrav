@@ -200,4 +200,48 @@ public class ThriftIntegerClassifierListCheckbox extends ThriftIntegerClassifier
 		
 		return list;
 	}
+	
+	/**
+	 * Отмечает все строки.
+	 */
+	public void selectAllItems() {
+		selectAllItems(true);
+	}
+	
+	/**
+	 * Снимает отметки со всех строк.
+	 */
+	public void unselectAllItems() {
+		selectAllItems(false);
+	}
+	
+	private void selectAllItems(boolean val) {
+		for (int i = 0; i < boxes.length; i++)
+			boxes[i].setSelected(val);
+		repaint();
+	}
+	
+	/**
+	 * Отмечает строки, указанные в списке.
+	 */
+	public void selectItems(List<IntegerClassifier> list) {
+		selectItems(list, true);
+	}
+	
+	/**
+	 * Снимает отметки со строк, указанных в списке.
+	 */
+	public void unselectItems(List<IntegerClassifier> list) {
+		selectItems(list, false);
+	}
+	
+	private void selectItems(List<IntegerClassifier> list, boolean value) {
+		for (IntegerClassifier ic : list)
+			for (int i = 0; i < getModel().getSize(); i++)
+				if (ic.pcod == getModel().getElementAt(i).pcod) {
+					boxes[i].setSelected(value);
+					break;
+				}
+		repaint();
+	}
 }

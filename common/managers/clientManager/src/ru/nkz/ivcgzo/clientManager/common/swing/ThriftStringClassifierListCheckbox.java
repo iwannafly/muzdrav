@@ -200,4 +200,48 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 		
 		return list;
 	}
+	
+	/**
+	 * Отмечает все строки.
+	 */
+	public void selectAllItems() {
+		selectAllItems(true);
+	}
+	
+	/**
+	 * Снимает отметки со всех строк.
+	 */
+	public void unselectAllItems() {
+		selectAllItems(false);
+	}
+	
+	private void selectAllItems(boolean val) {
+		for (int i = 0; i < boxes.length; i++)
+			boxes[i].setSelected(val);
+		repaint();
+	}
+	
+	/**
+	 * Отмечает строки, указанные в списке.
+	 */
+	public void selectItems(List<StringClassifier> list) {
+		selectItems(list, true);
+	}
+	
+	/**
+	 * Снимает отметки со строк, указанных в списке.
+	 */
+	public void unselectItems(List<StringClassifier> list) {
+		selectItems(list, false);
+	}
+	
+	private void selectItems(List<StringClassifier> list, boolean value) {
+		for (StringClassifier ic : list)
+			for (int i = 0; i < getModel().getSize(); i++)
+				if (ic.pcod.equals(getModel().getElementAt(i).pcod)) {
+					boxes[i].setSelected(value);
+					break;
+				}
+		repaint();
+	}
 }

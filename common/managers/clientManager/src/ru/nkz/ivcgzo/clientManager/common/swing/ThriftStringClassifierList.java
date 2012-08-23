@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +68,14 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 		for (StringClassifier item : list) {
 			items.add(new StringClassifierItem(item));
 		}
+		selectFirstItem();
 		model.fireContentsChanged();
+	}
+	
+	private void selectFirstItem() {
+		if (items.size() > 0)
+			setSelectedIndex(0);
+		scrollRectToVisible(new Rectangle());
 	}
 	
 	/**
@@ -82,7 +90,8 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	 * Перезагрузка классификатора, указанного в конструкторе
 	 */
 	public void reloadClassifier() {
-		setData(ConnectionManager.instance.getStringClassifier(classifier));
+		if (classifier != null)
+			setData(ConnectionManager.instance.getStringClassifier(classifier));
 	}
 	
 	/**
