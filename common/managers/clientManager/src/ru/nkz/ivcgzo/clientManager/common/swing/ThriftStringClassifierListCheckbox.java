@@ -14,6 +14,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 
 /**
  * Параметризированный класс для работы со списками swing. В качестве параметра должна
@@ -28,16 +29,39 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 	
 	/**
 	 * Конструктор списка.
+	 */
+	public ThriftStringClassifierListCheckbox() {
+		super();
+		
+		init();
+	}
+	
+	/**
+	 * Конструктор списка.
 	 * @param list - список из thrift-структур для отображения
 	 */
 	public ThriftStringClassifierListCheckbox(List<StringClassifier> l) {
 		super(l);
 		
+		init();
+	}
+	
+	/**
+	 * Конструктор списка.
+	 * @param classifierName - название классификатора для загрузки
+	 */
+	public ThriftStringClassifierListCheckbox(StringClassifiers classifierName) {
+		super(classifierName);
+		
+		init();
+	}
+	
+	private void init() {
 		setCellRenderer();
 		setMouseListener();
 		setKeyListener();
 	}
-
+	
 	@Override
 	public void setData(List<StringClassifier> list) {
 		super.setData(list);

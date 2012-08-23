@@ -6,7 +6,9 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 
 /**
  * Параметризированный класс для работы со списками swing. В качестве параметра должна
@@ -19,12 +21,15 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	private static final long serialVersionUID = 677069909690689690L;
 	private List<StringClassifier> items;
 	private StringListModel model;
+	private StringClassifiers classifier;
+	private boolean classifierLoaded;
 	
 	/**
 	 * Конструктор списка.
 	 */
 	public ThriftStringClassifierList() {
-		this(new ArrayList<StringClassifier>());
+		setModel();
+		setData(null);
 	}
 	
 	/**
@@ -32,8 +37,17 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	 * @param list - список из thrift-структур для отображения
 	 */
 	public ThriftStringClassifierList(List<StringClassifier> list) {
-		setModel();
+		this();
 		setData(list);
+	}
+	
+	/**
+	 * Конструктор списка.
+	 * @param classifierName - название классификатора для загрузки
+	 */
+	public ThriftStringClassifierList(StringClassifiers classifierName) {
+		this();
+		this.classifier = classifierName;
 	}
 	
 	private void setModel() {
@@ -45,6 +59,7 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<StringClassifier> list) {
+		classifierLoaded = list != null;
 		if (list == null)
 			list = new ArrayList<>();
 			
@@ -53,6 +68,21 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 			items.add(new StringClassifierItem(item));
 		}
 		model.fireContentsChanged();
+	}
+	
+	/**
+	 * Загрузка классификатора, указанного в конструкторе
+	 */
+	public void loadClassifier() {
+		if (!classifierLoaded)
+			reloadClassifier();
+	}
+	
+	/**
+	 * Перезагрузка классификатора, указанного в конструкторе
+	 */
+	public void reloadClassifier() {
+		setData(ConnectionManager.instance.getStringClassifier(classifier));
 	}
 	
 	/**
