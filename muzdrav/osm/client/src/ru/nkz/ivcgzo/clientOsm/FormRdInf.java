@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -99,7 +100,22 @@ public class FormRdInf extends JFrame {
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
-
+	private JCheckBox ChBNark;
+	private JCheckBox ChBAlk;
+	private JCheckBox ChBSmok;
+	private JCheckBox ChBNmls;
+	private JCheckBox ChBNer;
+	private JCheckBox ChBInv;
+	private JCheckBox ChBBots;
+	private JCheckBox ChBAss;
+	private JCheckBox ChBLrp;
+	private JCheckBox ChBMnd;
+	private JCheckBox ChBCnd;
+	private JCheckBox ChBBomg;
+	private JCheckBox ChBGorod;
+	private JCheckBox ChBOtsb;
+	private JCheckBox ChBSelo;
+	private JCheckBox ChBots;
 	/**
 	 * Launch the application.
 	 */
@@ -127,84 +143,12 @@ public class FormRdInf extends JFrame {
 		});
 		setTitle("Дополнительная информация о беременной");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 500);
+		setBounds(100, 100, 800, 537);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new GridLayout(1, 0, 0, 0));
-		rdinf = new RdInfStruct();
-		patient = new PatientCommonInfo();
 		
-/*		patient.setFam((String) fam.getText());
-		patient.setIm((String)im.getText());
-		patient.setOt((String) ot.getText());*/
-		oslrod = rdinf.getOsoco();
-		if ((oslrod-128)<0){
-		or8=0; iw1=oslrod;	
-		}else {
-		or8=1; iw1=oslrod-128;	
-		}
-		if ((iw1-64)<0){
-		or7=0; 
-		}else {
-		or7=1; iw1=iw1-64;	
-		}
-		if ((iw1-32)<0){
-		or6=0; 
-		}else {
-		or6=1; iw1=iw1-32;	
-		}
-		if ((iw1-16)<0){
-		or5=0; 
-		}else {
-		or5=1; iw1=iw1-16;	
-		}
-		if ((iw1-8)<0){
-		or4=0; 	
-		}else {
-		or4=1; iw1=iw1-8;	
-		}
-		if ((iw1-4)<0){
-		or3=0; 
-		}else {
-		or3=1; iw1=iw1-4;	
-		}
-		if ((iw1-2)<0){
-		or2=0; 
-		}else {
-		or2=1; iw1=iw1-2;	
-		}
-		or1=iw1; 
-		
-		uslj = rdinf.getUslpr();
-		if ((uslj-8)<0){
-		us4=0; 	
-		}else {
-		us4=1; iw2=uslj-8;	
-		}
-		if ((iw2-4)<0){
-		us3=0; 
-		}else {
-		us3=1; iw2=iw2-4;	
-		}
-		if ((iw2-2)<0){
-		us2=0; 
-		}else {
-		us2=1; iw2=iw2-2;	
-		}
-		us1=iw2; 
-		otec = rdinf.getVredOtec();
-		if ((otec-4)<0){
-		ot3=0; 
-		}else {
-		ot3=1; iw2=otec-4;	
-		}
-		if ((iw2-2)<0){
-		ot2=0; 
-		}else {
-		ot2=1; iw2=iw2-2;	
-		}
-		ot1=iw2; 
 		JPanel panel = new JPanel();
 		contentPane.add(panel);
 		
@@ -222,64 +166,6 @@ public class FormRdInf extends JFrame {
 			JButton Sbutton = new JButton("");
 		Sbutton.setToolTipText("Сохранить");
 		Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-		Sbutton.addActionListener(new ActionListener() {
-	    private AbstractButton ChBAss;
-	    private AbstractButton ChBots;
-	    private AbstractButton ChBInv;
-	    private AbstractButton ChBMnd;
-	    private AbstractButton ChBLrp;
-	    private AbstractButton ChBCnd;
-	    private AbstractButton ChBNer;
-	    private AbstractButton ChBNmls;
-	    private AbstractButton ChBSelo;
-	    private AbstractButton ChBGorod;
-	    private AbstractButton ChBBomg;
-	    private AbstractButton ChBSmok;
-	    private AbstractButton ChBAlk;
-	    private AbstractButton ChBNark;
-		private int oslrod (int oslrod){
-				if (ChBAss.isSelected()){oslrod=oslrod+1;}
-		            if (ChBots.isSelected()){oslrod=oslrod+2;}
-		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
-		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
-		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
-		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
-		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
-		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
-			};
-			private int uslj (int uslj){
-		           if (ChBSelo.isSelected()){uslj=uslj+1;}
-		            if (ChBots.isSelected()){uslj=uslj+2;}
-		            if (ChBGorod.isSelected()){uslj=uslj+4;}
-		            if (ChBBomg.isSelected()){uslj=uslj+8;}
-			return uslj;
-			};
-			private int otec (int otec){
-		           if (ChBSmok.isSelected()){otec=otec+1;}
-		            if (ChBAlk.isSelected()){otec=otec+2;}
-		            if (ChBNark.isSelected()){otec=otec+4;}
-			return otec;	
-			};
-			public void actionPerformed(ActionEvent arg0) {
-rdinf.setFioOtec(TFio.getText());
-rdinf.setMrOtec(TMrab.getText());
-rdinf.setOsoco(oslrod);
-rdinf.setUslpr(uslj);
-rdinf.setVredOtec(otec);
-rdinf.setTelOtec(TTelef.getText());
-rdinf.setPhOtec(TPhf.getText());
-if (CBObr.getSelectedPcod() != null)
-	rdinf.setObr(CBObr.getSelectedPcod());
-	else rdinf.unsetObr();
-if (CBSem.getSelectedPcod() != null)
-	rdinf.setSem(CBSem.getSelectedPcod());
-	else rdinf.unsetSem();
-if (CBGrOtec.getSelectedPcod() != null)
-	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
-	else rdinf.unsetGrotec();
-			}
-		});
 	
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Новая запись");
@@ -290,7 +176,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 					RdInfStruct rdinf = new RdInfStruct();
  		            MainForm.tcl.AddRdInf(rdinf);
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
-					setRdInfData(rdinf);
+					setRdInfData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormRdInf.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -305,17 +191,17 @@ if (CBGrOtec.getSelectedPcod() != null)
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		fam.setColumns(10);
-		fam.setText(patient.getFam());
+//		fam.setText(Vvod.zapVr.getFam());
 		
 		im = new JTextField();
 		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		im.setColumns(10);
-		im.setText(patient.getIm());
+//		im.setText(Vvod.zapVr.getIm());
 		
 		ot = new JTextField();
 		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		ot.setColumns(10);
-		ot.setText(patient.getOt());
+//		ot.setText(Vvod.zapVr.getOth());
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -392,28 +278,22 @@ if (CBGrOtec.getSelectedPcod() != null)
 		
 		JLabel LTel = new JLabel("Телефон");
 		
-		final JCheckBox ChBSmok = new JCheckBox("Курение");
-		ChBSmok.setSelected(ot1 ==1);
+		ChBSmok = new JCheckBox("Курение");
 		
-		final JCheckBox ChBAlk = new JCheckBox("Алкоголизм");
-		ChBAlk.setSelected(ot2 ==1);
+		ChBAlk = new JCheckBox("Алкоголизм");
 		
-		final JCheckBox ChBNark = new JCheckBox("Наркомания");
-		ChBNark.setSelected(ot3 ==1);
+		ChBNark = new JCheckBox("Наркомания");
 		
 		TFio = new JTextField();
-		TFio.setText(rdinf.fioOtec);
 		
 		JSpinner SVozr = new JSpinner();
 		SVozr.setModel(new SpinnerNumberModel(new Integer(rdinf.vOtec), null, null, new Integer(1)));
 		rdinf.setVOtec((int) SVozr.getModel().getValue());
 		
 		TMrab = new JTextField();
-		TMrab.setText(rdinf.mrOtec);
 		
 		TTelef = new JTextField();
 		TTelef.setText(rdinf.telOtec);
-//		TGrk.setText(rdinf.grOtec);
 		
 		TPhf = new JTextField();
 		TPhf.setText(rdinf.phOtec);
@@ -489,20 +369,16 @@ if (CBGrOtec.getSelectedPcod() != null)
 		);
 		panel_3.setLayout(gl_panel_3);
 		
-		final JLabel label = new JLabel("Условия проживания");
+		JLabel label = new JLabel("Условия проживания");
 		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		final JCheckBox ChBSelo = new JCheckBox("Сельская жительница");
-		ChBSelo.setSelected(us1 ==1);
+		ChBSelo = new JCheckBox("Сельская жительница");
 		
-		final JCheckBox ChBOtsB = new JCheckBox("Отсутствие благоустройства");
-		ChBOtsB.setSelected(us2 ==1);
+		ChBOtsb = new JCheckBox("Отсутствие благоустройства");
 		
-		final JCheckBox ChBGorod = new JCheckBox("Городская жительница");
-		ChBGorod.setSelected(us3 ==1);
+		ChBGorod = new JCheckBox("Городская жительница");
 		
-		final JCheckBox ChBBomg = new JCheckBox("БОМЖ");
-		ChBBomg.setSelected(us4 ==1);
+		ChBBomg = new JCheckBox("БОМЖ");
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
@@ -512,7 +388,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(ChBBomg)
 						.addComponent(ChBGorod)
-						.addComponent(ChBOtsB)
+						.addComponent(ChBOtsb)
 						.addComponent(ChBSelo)
 						.addComponent(label))
 					.addContainerGap(82, Short.MAX_VALUE))
@@ -524,7 +400,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBSelo)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(ChBOtsB)
+					.addComponent(ChBOtsb)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBGorod)
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -534,33 +410,71 @@ if (CBGrOtec.getSelectedPcod() != null)
 		
 		JLabel lblNewLabel = new JLabel("Отягощающие социальные обязательства");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
-/*		final JCheckBox CBKrov = new JCheckBox("Кровотечение");
-		CBKrov.setSelected(or1 == 1);
-*/		
-		final JCheckBox ChBAss = new JCheckBox("Асоциальная личность");
-		ChBAss.setSelected(or1 ==1);
+		ChBAss = new JCheckBox("Асоциальная личность");
 		
-		final JCheckBox ChBots = new JCheckBox("Очаг туберкулеза в семье");
-		ChBots.setSelected(or2 ==1);
+		ChBots = new JCheckBox("Очаг туберкулеза в семье");
 		
-		final JCheckBox ChBInv = new JCheckBox("Инвалидность");
-		ChBInv.setSelected(or3 ==1);
+		ChBInv = new JCheckBox("Инвалидность");
 		
-		final JCheckBox ChBMnd = new JCheckBox("Многодетная семья");
-		ChBMnd.setSelected(or4 ==1);
+		ChBMnd = new JCheckBox("Многодетная семья");
 		
-		final JCheckBox ChBLrp = new JCheckBox("Лишение родительских прав");
-		ChBLrp.setSelected(or5 ==1);
+		ChBLrp = new JCheckBox("Лишение родительских прав");
 		
-		final JCheckBox ChBCnd = new JCheckBox("Семья с низким достатком");
-		ChBCnd.setSelected(or6 ==1);
+		ChBCnd = new JCheckBox("Семья с низким достатком");
 		
-		final JCheckBox ChBNer = new JCheckBox("Неработающие");
-		ChBNer.setSelected(or7 ==1);
+		ChBNer = new JCheckBox("Неработающие");
 		
-		final JCheckBox ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
-		ChBNmls.setSelected(or8 ==1);
+		ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
 
+		Sbutton.addActionListener(new ActionListener() {
+		private int oslrod (int oslrod){
+				if (ChBAss.isSelected()){oslrod=oslrod+1;}
+		            if (ChBots.isSelected()){oslrod=oslrod+2;}
+		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
+		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
+		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
+		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
+		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
+		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
+			return oslrod;	
+			};
+			private int uslj (int uslj){
+		           if (ChBSelo.isSelected()){uslj=uslj+1;}
+		            if (ChBots.isSelected()){uslj=uslj+2;}
+		            if (ChBGorod.isSelected()){uslj=uslj+4;}
+		            if (ChBBomg.isSelected()){uslj=uslj+8;}
+			return uslj;
+			};
+			private int otec (){
+				int otec = 0;
+				if (ChBSmok.isSelected())
+					otec=otec+1;
+				if (ChBAlk.isSelected())
+					otec=otec+2;
+				if (ChBNark.isSelected())
+					otec=otec+4;
+				return otec;	
+			};
+			public void actionPerformed(ActionEvent arg0) {
+rdinf.setFioOtec(TFio.getText());
+rdinf.setMrOtec(TMrab.getText());
+rdinf.setOsoco(oslrod);
+rdinf.setUslpr(uslj);
+rdinf.setVredOtec(otec());
+rdinf.setTelOtec(TTelef.getText());
+rdinf.setPhOtec(TPhf.getText());
+if (CBObr.getSelectedPcod() != null)
+	rdinf.setObr(CBObr.getSelectedPcod());
+	else rdinf.unsetObr();
+if (CBSem.getSelectedPcod() != null)
+	rdinf.setSem(CBSem.getSelectedPcod());
+	else rdinf.unsetSem();
+if (CBGrOtec.getSelectedPcod() != null)
+	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
+	else rdinf.unsetGrotec();
+			}
+		});
+		
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -603,68 +517,118 @@ if (CBGrOtec.getSelectedPcod() != null)
 		);
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
-/*		JButton Sbutton = new JButton("");
-	Sbutton.setToolTipText("Сохранить");
-	Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-		Sbutton.addActionListener(new ActionListener() {
-			private int oslrod (int oslrod){
-		           if (ChBAss.isSelected()){oslrod=oslrod+1;}
-		            if (ChBots.isSelected()){oslrod=oslrod+2;}
-		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
-		            if (ChBMnd.isSelected()){oslrod=oslrod+8;}
-		            if (ChBLrp.isSelected()){oslrod=oslrod+16;}
-		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
-		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
-		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
-			};
-			private int uslj (int uslj){
-		           if (ChBSelo.isSelected()){uslj=uslj+1;}
-		            if (ChBots.isSelected()){uslj=uslj+2;}
-		            if (ChBGorod.isSelected()){uslj=uslj+4;}
-		            if (ChBBomg.isSelected()){uslj=uslj+8;}
-			return uslj;
-			};
-			private int otec (int otec){
-		           if (ChBSmok.isSelected()){otec=otec+1;}
-		            if (ChBAlk.isSelected()){otec=otec+2;}
-		            if (ChBNark.isSelected()){otec=otec+4;}
-			return otec;	
-			};
-			public void actionPerformed(ActionEvent arg0) {
-rdinf.setFioOtec(TFio.getText());
-rdinf.setMrOtec(TMrab.getText());
-//rdinf.setObr(CBObr.setData(MainForm.tcl.getn_z00()));
-//rdinf.setSem(CBSem.setData(MainForm.tcl.getn_z11()));
-//rdinf.setGrOtec(CBGrOtec.setData(MainForm.tcl.getn_R0z()));//классификатор
-rdinf.setOsoco(oslrod);
-rdinf.setUslpr(uslj);
-rdinf.setVredOtec(otec);
-rdinf.setTelOtec(TTelef.getText());
-rdinf.setPhOtec(TPhf.getText());
-if (CBObr.getSelectedPcod() != null)
-	rdinf.setObr(CBObr.getSelectedPcod());
-	else rdinf.unsetObr();
-if (CBSem.getSelectedPcod() != null)
-	rdinf.setSem(CBSem.getSelectedPcod());
-	else rdinf.unsetSem();
-if (CBGrOtec.getSelectedPcod() != null)
-	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
-	else rdinf.unsetGrotec();
-			}
-		});*/
 	}
 
-	protected void setRdInfData(RdInfStruct rdinf2) {
+	private void method1() {
+		if ((oslrod-128)<0){
+		or8=0; iw1=oslrod;	
+		}else {
+		or8=1; iw1=oslrod-128;	
+		}
+		if ((iw1-64)<0){
+		or7=0; 
+		}else {
+		or7=1; iw1=iw1-64;	
+		}
+		if ((iw1-32)<0){
+		or6=0; 
+		}else {
+		or6=1; iw1=iw1-32;	
+		}
+		if ((iw1-16)<0){
+		or5=0; 
+		}else {
+		or5=1; iw1=iw1-16;	
+		}
+		if ((iw1-8)<0){
+		or4=0; 	
+		}else {
+		or4=1; iw1=iw1-8;	
+		}
+		if ((iw1-4)<0){
+		or3=0; 
+		}else {
+		or3=1; iw1=iw1-4;	
+		}
+		if ((iw1-2)<0){
+		or2=0; 
+		}else {
+		or2=1; iw1=iw1-2;	
+		}
+		or1=iw1; 
+		
+		if ((uslj-8)<0){
+		us4=0; 	
+		}else {
+		us4=1; iw2=uslj-8;	
+		}
+		if ((iw2-4)<0){
+		us3=0; 
+		}else {
+		us3=1; iw2=iw2-4;	
+		}
+		if ((iw2-2)<0){
+		us2=0; 
+		}else {
+		us2=1; iw2=iw2-2;	
+		}
+		us1=iw2; 
+		if ((otec-4)<0){
+		ot3=0; 
+		}else {
+		ot3=1; iw2=otec-4;	
+		}
+		if ((iw2-2)<0){
+		ot2=0; 
+		}else {
+		ot2=1; iw2=iw2-2;	
+		}
+		ot1=iw2;
+	}
+
+	protected void setRdInfData() throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
+	try {
+		rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+		oslrod = rdinf.getOsoco();
+		uslj = rdinf.getUslpr();
+		otec = rdinf.getVredOtec();
+		method1();
+		TFio.setText(rdinf.fioOtec);
+		TMrab.setText(rdinf.mrOtec);
+//		CBObr.setd
+		ChBNark.setSelected(ot3 == 1);
+		ChBAlk.setSelected(ot2 == 1);
+		ChBSmok.setSelected(ot1 == 1);
+		ChBNmls.setSelected(or8 == 1);
+		ChBNer.setSelected(or7 == 1);
+		ChBInv.setSelected(or3 == 1);
+		ChBBots.setSelected(or2 == 1);
+		ChBAss.setSelected(or1 == 1);
+		ChBLrp.setSelected(or5 == 1);
+		ChBMnd.setSelected(or4 == 1);
+		ChBCnd.setSelected(or6 == 1);
+		ChBBomg.setSelected(us4 == 1);
+		ChBGorod.setSelected(us3 == 1);
+		ChBOtsb.setSelected(us2 == 1);
+		ChBSelo.setSelected(us1 == 1);
+	} catch (Exception e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 		
 	}
-	public void onConnect() {
+	public void onConnect() throws PatientNotFoundException {
 		try {
+			PatientCommonInfo inf;
+		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
+//						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
+fam.setText(inf.getFam());
+im.setText(inf.getIm());
+ot.setText(inf.getOt());
 			CBObr.setData(MainForm.tcl.get_n_z00());
 			CBSem.setData(MainForm.tcl.get_n_z11());
 			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
-			
 			
 		} catch (KmiacServerException e) {
 			e.printStackTrace();

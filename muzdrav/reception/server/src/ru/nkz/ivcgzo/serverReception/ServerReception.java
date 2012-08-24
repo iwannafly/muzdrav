@@ -74,7 +74,7 @@ public class ServerReception extends Server implements Iface {
         "pcod", "name", "vcolor"
     };
     private static final String[] TALON_FIELD_NAMES = {
-        "id", "ntalon", "vidp", "timepn", "timepk", "datap", "npasp", "dataz", "prv"
+        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv"
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -246,9 +246,9 @@ public class ServerReception extends Server implements Iface {
         // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "SELECT id, ntalon, vidp, timepn, timepk, datap, npasp, dataz, prv "
+        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv "
                 + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? AND datap >= ? "
-                + "AND prv = ?;";
+                + "AND prv = ? ORDER BY datap, timep;";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec), prv)) {
             List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
