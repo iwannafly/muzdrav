@@ -344,7 +344,7 @@ addWindowListener(new WindowAdapter() {
 				try{
 					String servPath = MainForm.tcl.printKartaBer();
 					String cliPath;
-					cliPath = File.createTempFile("obm_kart", ".htm").getAbsolutePath();
+					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
 			}

@@ -2001,7 +2001,7 @@ sb.append("<br>Подпись ____________");
 
 	@Override
 	public String printKartaBer() throws KmiacServerException, TException {
-				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\kartl.htm"), "utf-8")) {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -2090,7 +2090,7 @@ sb.append("<br>Подпись ____________");
 				sb.append("<br>2. Закючение окулиста ___________________________________________");
 				sb.append("</body>"); 
 				osw.write(sb.toString());
-				return "e:\\kart.html";
+				return "c:\\kart1.html";
 		} catch (IOException  e) {
 			throw new KmiacServerException();
 		}

@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.StringReader;
 import java.text.DateFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ import ru.nkz.ivcgzo.thriftOsm.Metod;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
 import ru.nkz.ivcgzo.thriftOsm.PNapr;
+import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
@@ -94,6 +96,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
 import java.awt.Font;
+import java.awt.event.InputMethodListener;
+import java.awt.event.InputMethodEvent;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
@@ -153,11 +157,9 @@ public class Vvod extends JFrame {
 	private JButton PosDelete;
 	private JButton BSearch;
 	private JTextField tfKab;
-	private JRadioButton rbMetodIssl;
 	private JRadioButton rbPokaz;
-	public ThriftIntegerClassifierCombobox<IntegerClassifier> cbVidIssl;
+	public ThriftStringClassifierCombobox<StringClassifier> cbVidIssl;
 	public ThriftStringClassifierCombobox<StringClassifier> cbOrgan;
-	public CustomTable<Metod, Metod._Fields> tabMetod;
 	private CustomTable<PokazMet, PokazMet._Fields> tabPokazMet;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cbMesto;
 	private JScrollPane spPokaz;
@@ -1608,21 +1610,36 @@ mi3.addActionListener(new ActionListener() {
 		JPanel pNaprIssl = new JPanel();
 		tabPrint.addTab("Направление на исследование", null, pNaprIssl, null);
 		
-		final JLabel lblmet = new JLabel("Методы");
-		
-		final JScrollPane spMetod = new JScrollPane();
-		
 		final JLabel lblPokazMet = new JLabel("Показатели");
 		
 		final JScrollPane spPokazMet = new JScrollPane();
 		
-		final JLabel lblMesto = new JLabel("Место");
+		final JLabel lblMesto = new JLabel("Лаборатория");
 		
 		cbMesto = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+		cbMesto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (cbMesto.getSelectedItem()!= null){
+				try {
+				
+					cbVidIssl.setSelectedItem(null);
+					cbVidIssl.setData(MainForm.tcl.get_n_nz1(cbMesto.getSelectedItem().pcod));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			}
+		});
 		
 		final JLabel lblKab = new JLabel("Каб.");
+		lblKab.setVisible(false);
 		
 		tfKab = new JTextField();
+		tfKab.setVisible(false);
 		tfKab.setColumns(10);
 		
 		final JScrollPane spPokaz = new JScrollPane();
@@ -1635,11 +1652,7 @@ rbPokaz = new JRadioButton("Показатели");
 rbPokaz.setVisible(false);
 rbPokaz.addActionListener(new ActionListener() {
  	public void actionPerformed(ActionEvent e) {
- 		rbMetodIssl.setSelected(false);
-	 	lblmet.setVisible(false);
-	 	spMetod.setVisible(false);
-	 	spPokazMet.setVisible(false);
-	 	tabMetod.setVisible(false);
+ 	 	spPokazMet.setVisible(false);
 	 	lblPokazMet.setVisible(false);
 	 	spPokazMet.setVisible(false);
 	 	tabPokazMet.setVisible(false);
@@ -1657,61 +1670,52 @@ rbPokaz.addActionListener(new ActionListener() {
 		cbOrgan.setVisible(false);
 		cbOrgan.addActionListener(new ActionListener() {
 		 	public void actionPerformed(ActionEvent e) {
-				try {
-					if (cbOrgan.getSelectedItem() != null)
-					tabPokaz.setData(MainForm.tcl.getPokaz(cbVidIssl.getSelectedItem().pcod,cbOrgan.getSelectedItem().pcod));
-				} catch (KmiacServerException e1) {
-					e1.printStackTrace();
-				} catch (TException e1) {
-					e1.printStackTrace();
-				}	
+//				try {
+//					if (cbOrgan.getSelectedItem() != null)
+//					tabPokaz.setData(MainForm.tcl.getPokaz(cbVidIssl.getSelectedItem().pcod,cbOrgan.getSelectedItem().pcod));
+//				} catch (KmiacServerException e1) {
+//					e1.printStackTrace();
+//				} catch (TException e1) {
+//					e1.printStackTrace();
+//				}	
 }
 		 });
 		
+		JLabel lblVidIssl = new JLabel("Органы и системы");
 		
-		
-		 rbMetodIssl = new JRadioButton("Методы исследований");
-		 rbMetodIssl.setVisible(false);
-		 rbMetodIssl.addActionListener(new ActionListener() {
-			 	public void actionPerformed(ActionEvent arg0) {
-			 	rbPokaz.setSelected(false);	
-			 	spPokaz.setVisible(false);
-			 	tabPokaz.setVisible(false);
-			 	lblOrgan.setVisible(false);
-			 	cbOrgan.setVisible(false);
-			 	cbVidIssl.setVisible(true);
-			 	lblmet.setVisible(true);
-			 	spMetod.setVisible(true);
-			 	tabMetod.setVisible(true);
-			 	lblPokazMet.setVisible(true);
-			 	spPokazMet.setVisible(true);
-			 	tabPokazMet.setVisible(true);
-			 	}
-			 });
-		
-		JLabel lblVidIssl = new JLabel("Вид исследования");
-		
-		cbVidIssl = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_p0e1);
+		cbVidIssl = new ThriftStringClassifierCombobox<StringClassifier>(true);
 		cbVidIssl.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (cbVidIssl.getSelectedItem()!= null){
-					try {
-//						if (rbMetodIssl.isSelected()){//
-								tabMetod.setData(MainForm.tcl.getMetod(cbVidIssl.getSelectedItem().pcod));
-//						}
-						if (rbPokaz.isSelected()){
-							cbOrgan.setSelectedItem(null);
-							cbOrgan.setData(MainForm.tcl.get_n_nz1(cbVidIssl.getSelectedItem().pcod));	
-								}
-						} catch (KmiacServerException e) {
-							e.printStackTrace();
-						} catch (TException e) {
-							MainForm.conMan.reconnect(e);
-							
-						}
-					}
-										
+					
+				try {
+					tabPokazMet.setData(MainForm.tcl.getPokazMet(cbVidIssl.getSelectedItem().pcod));
+				} catch (KmiacServerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
+				}
+//				if (cbVidIssl.getSelectedItem()!= null){
+//					try {
+////						if (rbMetodIssl.isSelected()){//
+//								tabMetod.setData(MainForm.tcl.getMetod(cbVidIssl.getSelectedItem().pcod));
+////						}
+//						if (rbPokaz.isSelected()){
+//							cbOrgan.setSelectedItem(null);
+//							cbOrgan.setData(MainForm.tcl.get_n_nz1(cbVidIssl.getSelectedItem().pcod));	
+//								}
+//						} catch (KmiacServerException e) {
+//							e.printStackTrace();
+//						} catch (TException e) {
+//							MainForm.conMan.reconnect(e);
+//							
+//						}
+//					}
+//										
+			}
 		});
 		
 		JButton butPrint = new JButton("Печать");
@@ -1719,19 +1723,30 @@ rbPokaz.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
 	//				if (rbMetodIssl.isSelected()){
-					if ((cbVidIssl.getSelectedItem() != null) && (tabMetod.getSelectedItem() != null)) {
+					if ((cbVidIssl.getSelectedItem() != null) ) {
+						
 						List<String> selItems = new ArrayList<>();
 						for (PokazMet pokazMet : tabPokazMet.getData()) {
 							if (pokazMet.vybor)
 								selItems.add(pokazMet.getPcod());
 						}
 						if (selItems.size() != 0) {
+							P_isl_ld pisl = new P_isl_ld();
+							pisl.setNpasp(Vvod.zapVr.getNpasp());
+							pisl.setPcisl(cbVidIssl.getSelectedPcod());
+							pisl.setNapravl(2);
+							pisl.setNaprotd(MainForm.authInfo.getCpodr());
+							pisl.setDatan(System.currentTimeMillis());
+							pisl.setVrach(MainForm.authInfo.getPcod());
+							pisl.setDataz(System.currentTimeMillis());
+							pisl.setPvizit_id(TabPos.getSelectedItem().getId_obr());
+							pisl.setNisl(MainForm.tcl.AddPisl(pisl));
 							IsslMet isslmet = new IsslMet();
 							isslmet.setPvizitId(TabPos.getSelectedItem().getId_obr());
-							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
+//							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
 							isslmet.setNpasp(Vvod.zapVr.getNpasp());
-							isslmet.setKodMetod(tabMetod.getSelectedItem().getObst());
+//							isslmet.setKodMetod(tabMetod.getSelectedItem().getObst());
 							isslmet.setPokaz(selItems);
 							if (cbMesto.getSelectedItem()!=null)isslmet.setMesto(cbMesto.getSelectedItem().getName());
 							isslmet.setKab(getTextOrNull(tfKab.getText()));
@@ -1753,7 +1768,7 @@ rbPokaz.addActionListener(new ActionListener() {
 							if (selItems.size() != 0) {
 								IsslPokaz pokaz = new IsslPokaz();
 								pokaz.setPvizitId(TabPos.getSelectedItem().getId_obr());
-								pokaz.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
+//								pokaz.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 								pokaz.setUserId(MainForm.authInfo.getUser_id());
 								pokaz.setClpu_name(MainForm.authInfo.getClpu_name());
 								pokaz.setCpodr_name(MainForm.authInfo.getCpodr_name());
@@ -1785,88 +1800,84 @@ rbPokaz.addActionListener(new ActionListener() {
 		gl_pNaprIssl.setHorizontalGroup(
 			gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pNaprIssl.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(rbMetodIssl, GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
-							.addGap(683))
-						.addGroup(Alignment.TRAILING, gl_pNaprIssl.createSequentialGroup()
-							.addComponent(spMetod, GroupLayout.PREFERRED_SIZE, 532, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
-						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(lblPokazMet, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
-						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.TRAILING)
-								.addComponent(lblmet, Alignment.LEADING)
-								.addGroup(gl_pNaprIssl.createSequentialGroup()
-									.addComponent(lblVidIssl)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+							.addContainerGap()
+							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 									.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
-										.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
-										.addComponent(lblOrgan, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
+										.addGroup(gl_pNaprIssl.createSequentialGroup()
+											.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+												.addGroup(gl_pNaprIssl.createSequentialGroup()
+													.addComponent(lblMesto)
+													.addPreferredGap(ComponentPlacement.RELATED)
+													.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE))
+												.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.TRAILING)
+													.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
+													.addGroup(gl_pNaprIssl.createSequentialGroup()
+														.addComponent(lblVidIssl)
+														.addPreferredGap(ComponentPlacement.UNRELATED)
+														.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
+														.addGap(125))))
+											.addPreferredGap(ComponentPlacement.RELATED, 6, Short.MAX_VALUE))
+										.addGroup(gl_pNaprIssl.createSequentialGroup()
+											.addComponent(lblPokazMet, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+											.addPreferredGap(ComponentPlacement.RELATED)))
+									.addGroup(gl_pNaprIssl.createSequentialGroup()
+										.addComponent(butPrint)
+										.addPreferredGap(ComponentPlacement.RELATED)))
+								.addGroup(gl_pNaprIssl.createSequentialGroup()
+									.addComponent(lblKab)
+									.addPreferredGap(ComponentPlacement.RELATED)))
+							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_pNaprIssl.createSequentialGroup()
+									.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+										.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
+										.addComponent(lblOrgan, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, 332, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_pNaprIssl.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+									.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 408, GroupLayout.PREFERRED_SIZE))))
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(butPrint)
-							.addContainerGap(887, Short.MAX_VALUE))
-						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(lblMesto)
-							.addGap(18)
-							.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, 302, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
-						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(lblKab)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap(843, Short.MAX_VALUE))
-						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 530, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())))
+							.addGap(112)
+							.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
 		);
 		gl_pNaprIssl.setVerticalGroup(
 			gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pNaprIssl.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-						.addComponent(rbMetodIssl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
+						.addComponent(rbPokaz, GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblMesto)
+								.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
 								.addComponent(cbVidIssl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(lblVidIssl))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblmet))
-						.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-							.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblOrgan)))
-					.addGap(8)
+							.addComponent(lblPokazMet)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)))
 					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_pNaprIssl.createSequentialGroup()
-							.addComponent(spMetod, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblPokazMet))
-						.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
-					.addGap(3)
-					.addComponent(spPokazMet, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
-					.addGap(36)
-					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblMesto)
-						.addComponent(cbMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblKab)
-						.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(115)
-					.addComponent(butPrint)
-					.addGap(22))
+							.addGroup(gl_pNaprIssl.createParallelGroup(Alignment.BASELINE)
+								.addComponent(cbOrgan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblOrgan))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(spPokaz, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pNaprIssl.createSequentialGroup()
+							.addGap(18)
+							.addComponent(butPrint)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblKab)))
+					.addGap(240)
+					.addComponent(tfKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(127))
 		);
 		
 		tabPokaz = new CustomTable<>(false, true, Pokaz.class, 0,"Код показателя",1,"Наименование",2,"Стоимость",5,"Выбор");
@@ -1874,31 +1885,10 @@ rbPokaz.addActionListener(new ActionListener() {
 		spPokaz.setViewportView(tabPokaz);
 		tabPokaz.setFillsViewportHeight(true);
 		
-		tabPokazMet = new CustomTable<>(false,true,PokazMet.class,0,"Код",1,"Наименование",2,"Стоимость",4,"Выбор");
-		tabPokazMet.setEditableFields(true, 3);
+		tabPokazMet = new CustomTable<>(false,true,PokazMet.class,0,"Код",1,"Наименование",2,"Выбор");
+		tabPokazMet.setEditableFields(true, 2);
 		spPokazMet.setViewportView(tabPokazMet);
-		tabPokazMet.setFillsViewportHeight(true);
-		
-		tabMetod = new CustomTable<>(false,true,Metod.class,0,"Код",1,"Наименование");;
-		spMetod.setViewportView(tabMetod);
-		tabMetod.setFillsViewportHeight(true);
-		tabMetod.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				if (!arg0.getValueIsAdjusting()){
-					if (tabMetod.getSelectedItem()!=null){
-						try {
-							tabPokazMet.setData(MainForm.tcl.getPokazMet(tabMetod.getSelectedItem().getObst()));
-						} catch (KmiacServerException e) {
-							e.printStackTrace();
-						} catch (TException e) {
-							MainForm.conMan.reconnect(e);
-						}
-					}
-				}	
-			}
-		});
+		tabPokazMet.setFillsViewportHeight(true);;
 		
 
 		pNaprIssl.setLayout(gl_pNaprIssl);
