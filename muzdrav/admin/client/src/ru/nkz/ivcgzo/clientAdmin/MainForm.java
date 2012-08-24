@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
@@ -20,6 +22,7 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private final boolean adminMode;
 	public static ThriftServerAdmin.Client tcl;
 	private JFrame frame;
+	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
 	private ShablonPanel tpShablon;
 
@@ -43,7 +46,14 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		frame.setBounds(100, 100, 600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (tabbedPane.getSelectedIndex() == 1)
+					tpShablon.prepareShTextFields();
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)

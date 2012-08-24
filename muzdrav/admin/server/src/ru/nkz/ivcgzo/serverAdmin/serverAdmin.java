@@ -19,14 +19,17 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
+import ru.nkz.ivcgzo.serverManager.common.ResultSetMapper;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRab;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabNotFoundException;
+import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin.Iface;
 import ru.nkz.ivcgzo.thriftServerAdmin.UserIdPassword;
@@ -393,6 +396,82 @@ public class serverAdmin extends Server implements Iface {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getReqShOsmList() throws KmiacServerException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_shablon WHERE prizn = true ORDER BY pcod ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting required template osm list");
+		}
+	}
+
+	@Override
+	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException, TException {
+		int shId = sho.id;
+		
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT id FROM sh_osm WHERE id = ? ", sho.id)) {
+			if (acrs.getResultSet().next()) {
+				sme.execPrepared("UPDATE sh_osm SET name = ?, diag = ?, cdin = ?, cslu = ? WHERE id = ? ", false, sho.name, sho.diag, sho.cDin, sho.cslu, shId);
+				sme.execPrepared("DELETE FROM sh_osm_text WHERE id_sh_osm = ? ", false, shId);
+				sme.execPrepared("DELETE FROM sh_ot_spec WHERE id_sh_osm = ? ", false, shId);
+			} else {
+				sme.execPrepared("INSERT INTO sh_osm (name, diag, cdin, cslu) VALUES (?, ?, ?, ?) ", true, sho.name, sho.diag, sho.cDin, sho.cslu);
+				shId = sme.getGeneratedKeys().getInt("id");
+			}
+			for (IntegerClassifier txt : sho.textList)
+				sme.execPrepared("INSERT INTO sh_osm_text (id_sh_osm, id_n_shablon, sh_text) VALUES (?, ?, ?) ", false, shId, txt.pcod, txt.name);
+			for (Integer spc : sho.specList)
+				sme.execPrepared("INSERT INTO sh_ot_spec (id_sh_osm, cspec) VALUES (?, ?) ", false, shId, spc);
+			sme.setCommit();
+			
+			return shId;
+		} catch (SQLException | InterruptedException e) {
+			throw new TException(e);
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getAllShablonOsm() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id AS pcod, name FROM sh_osm ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting all templates osm list");
+		}
+	}
+
+	@Override
+	public ShablonOsm getShablonOsm(int id) throws KmiacServerException, TException {
+		AutoCloseableResultSet acrs = null;
+		
+		try {
+			acrs = sse.execPreparedQuery("SELECT name, diag, cdin, cslu FROM sh_osm WHERE id = ? ", id);
+			if (acrs.getResultSet().next()) {
+				ShablonOsm shOsm = new ShablonOsm(id, acrs.getResultSet().getString(1), acrs.getResultSet().getString(2).trim(), acrs.getResultSet().getInt(3), acrs.getResultSet().getInt(4), null, null);
+				acrs.close();
+				
+				acrs = sse.execPreparedQuery("SELECT cspec FROM sh_ot_spec WHERE id_sh_osm = ? ", id);
+				shOsm.setSpecList(ResultSetMapper.mapToList(Integer.class, acrs.getResultSet()));
+				acrs.close();
+				
+				acrs = sse.execPreparedQuery("SELECT id_n_shablon AS pcod, sh_text AS name FROM sh_osm_text WHERE id_sh_osm = ? ", id);
+				shOsm.setTextList(rsmIntClas.mapToList(acrs.getResultSet()));
+				
+				return shOsm;
+			} else {
+				throw new SQLException("No templates with specified id");
+			}
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting all templates osm list");
+		} finally {
+			if (acrs != null)
+				acrs.close();
 		}
 	}
 

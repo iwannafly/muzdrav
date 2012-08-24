@@ -33,6 +33,15 @@ struct UserIdPassword {
 	2: string password;
 }
 
+struct ShablonOsm {
+	1: i32 id;
+	2: string name;
+	3: string diag;
+	4: i32 cDin;
+	5: i32 cslu;
+	6: list<i32> specList;
+	7: list<classifier.IntegerClassifier> textList;
+}
 
 /**
  * Врач с такими данными уже существует.
@@ -146,4 +155,9 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	 * Устанавливает разрешения пользователя.
 	 */
 	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
+
+	list<classifier.IntegerClassifier> getReqShOsmList() throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getAllShablonOsm() throws (1: kmiacServer.KmiacServerException kse);
+	ShablonOsm getShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }
