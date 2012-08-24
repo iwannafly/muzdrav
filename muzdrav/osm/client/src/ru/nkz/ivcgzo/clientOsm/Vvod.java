@@ -81,6 +81,8 @@ import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import ru.nkz.ivcgzo.thriftOsm.Prez_d;
+import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
 import ru.nkz.ivcgzo.thriftOsm.PriemNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Protokol;
@@ -1724,23 +1726,39 @@ rbPokaz.addActionListener(new ActionListener() {
 				try {
 	//				if (rbMetodIssl.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) ) {
-						
+						String tip = MainForm.tcl.getVidIssl(cbMesto.getSelectedItem().pcod);
+						P_isl_ld pisl = new P_isl_ld();
+						Prez_d prezd = new Prez_d();
+						Prez_l prezl = new Prez_l();
+						pisl.setNpasp(Vvod.zapVr.getNpasp());
+						pisl.setPcisl(cbVidIssl.getSelectedPcod());
+						pisl.setNapravl(2);
+						pisl.setNaprotd(MainForm.authInfo.getCpodr());
+						pisl.setDatan(System.currentTimeMillis());
+						pisl.setVrach(MainForm.authInfo.getPcod());
+						pisl.setDataz(System.currentTimeMillis());
+						pisl.setPvizit_id(TabPos.getSelectedItem().getId_obr());
+						pisl.setNisl(MainForm.tcl.AddPisl(pisl));
 						List<String> selItems = new ArrayList<>();
 						for (PokazMet pokazMet : tabPokazMet.getData()) {
-							if (pokazMet.vybor)
+							if (pokazMet.vybor){
+								if (tip=="Л"){
+									prezl.setNpasp(pisl.getNpasp());
+									prezl.setNisl(pisl.getNisl());
+									prezl.setCpok(pokazMet.pcod);
+									prezl.setId(MainForm.tcl.AddPrezl(prezl));	
+								}
+								else{
+									prezd.setNpasp(pisl.getNpasp());
+									prezd.setNisl(pisl.getNisl());
+									prezd.setKodisl(pokazMet.pcod);
+									prezd.setId(MainForm.tcl.AddPrezd(prezd));
+								}
+								
 								selItems.add(pokazMet.getPcod());
+								}
 						}
 						if (selItems.size() != 0) {
-							P_isl_ld pisl = new P_isl_ld();
-							pisl.setNpasp(Vvod.zapVr.getNpasp());
-							pisl.setPcisl(cbVidIssl.getSelectedPcod());
-							pisl.setNapravl(2);
-							pisl.setNaprotd(MainForm.authInfo.getCpodr());
-							pisl.setDatan(System.currentTimeMillis());
-							pisl.setVrach(MainForm.authInfo.getPcod());
-							pisl.setDataz(System.currentTimeMillis());
-							pisl.setPvizit_id(TabPos.getSelectedItem().getId_obr());
-							pisl.setNisl(MainForm.tcl.AddPisl(pisl));
 							IsslMet isslmet = new IsslMet();
 							isslmet.setPvizitId(TabPos.getSelectedItem().getId_obr());
 //							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());

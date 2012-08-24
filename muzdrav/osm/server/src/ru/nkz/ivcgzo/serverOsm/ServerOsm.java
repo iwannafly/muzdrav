@@ -158,11 +158,11 @@ public class ServerOsm extends Server implements Iface {
 		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id");
 		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class};
 		
-		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "npasp",       "nisl",        "kodisl",     "stoim");
-		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, String.class, Double.class};
+		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl");
+		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class};
 		
-		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "npasp",       "nisl",        "cpok",       "stoim");
-		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, String.class, Double.class};
+		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "id",          "npasp",       "nisl",        "cpok");
+		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class};
 		
 		rsmMetod = new TResultSetMapper<>(Metod.class, "obst",       "name_obst",  "c_p0e1",      "pcod");
 		metodTypes = new Class<?>[] {                  String.class, String.class, Integer.class, String.class};
@@ -938,20 +938,24 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public void AddPrezd(Prez_d di) throws KmiacServerException, TException {
+	public int AddPrezd(Prez_d di) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl, stoim) VALUES (?, ?, ?, ?) ", false, di, prezdTypes, 0, 1, 2, 3);
+			sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl) VALUES (?, ?, ?) ", true, di, prezdTypes, 1, 2, 3);
+			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
+			return id;
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
 		}
 	}
 
 	@Override
-	public void AddPrezl(Prez_l li) throws KmiacServerException, TException {
+	public int AddPrezl(Prez_l li) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok, stoim) VALUES (?, ?, ?, ?) ", false, li, prezlTypes, 0, 1, 2, 3);
+			sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok) VALUES (?, ?, ?) ", true, li, prezlTypes, 1, 2, 3);
+			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
+			return id;
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
 		}
@@ -2095,6 +2099,18 @@ sb.append("<br>Подпись ____________");
 			throw new KmiacServerException();
 		}
 	
+	}
+
+	@Override
+	public String getVidIssl(int pcod) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select tip from n_lds where pcod = ? ", pcod)) {
+			if (acrs.getResultSet().next()) 
+				return acrs.getResultSet().getString(1);
+			else
+				return "";
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
 	}
 
 
