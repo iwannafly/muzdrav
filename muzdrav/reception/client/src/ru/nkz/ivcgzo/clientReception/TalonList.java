@@ -170,4 +170,33 @@ public class TalonList {
         }
     }
 
+    private Talon safeGetTalon(final List<Talon> dayTalons, final int index) {
+        if (index < dayTalons.size()) {
+            return dayTalons.get(index);
+        } else {
+            return null;
+        }
+    }
+
+    public final Talon getTalonByDay(final int index, final int dayOfWeek) {
+        switch (dayOfWeek) {
+            case 0:
+                return safeGetTalon(mondayTalonList, index);
+            case 1:
+                return safeGetTalon(tuesdayTalonList, index);
+            case 2:
+                return safeGetTalon(wednesdayTalonList, index);
+            case 3:
+                return safeGetTalon(thursdayTalonList, index);
+            case 4:
+                return safeGetTalon(fridayTalonList, index);
+            case 5:
+                return safeGetTalon(saturdayTalonList, index);
+            case 6:
+                return safeGetTalon(sundayTalonList, index);
+            default:
+                return null;
+        }
+    }
+
 }

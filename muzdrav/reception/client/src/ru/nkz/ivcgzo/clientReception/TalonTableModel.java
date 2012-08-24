@@ -15,8 +15,9 @@ import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 public final class TalonTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
     private static final String[] DAY_NAMES = {
-        "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"
+        "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"
     };
     private TalonList talonList;
 
@@ -41,7 +42,7 @@ public final class TalonTableModel implements TableModel {
 
     @Override
     public int getColumnCount() {
-        return 7;
+        return talonList.getWeekDays().length;
     }
 
     @Override
@@ -56,7 +57,8 @@ public final class TalonTableModel implements TableModel {
 
     @Override
     public String getColumnName(final int columnIndex) {
-        return DAY_NAMES[columnIndex];
+        return String.format("%s %s", DAY_NAMES[columnIndex],
+                DEFAULT_DATE_FORMAT.format(talonList.getWeekDays()[columnIndex]));
     }
 
     @Override
