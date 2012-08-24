@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -99,21 +100,22 @@ public class FormRdInf extends JFrame {
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
-	 JCheckBox ChBNark;
-     JCheckBox ChBAlk;
-     JCheckBox ChBSmok;
-     JCheckBox ChBNmls;
-     JCheckBox ChBNer;
-     JCheckBox ChBInv;
-     JCheckBox ChBBots;
-     JCheckBox ChBAss;
-     JCheckBox ChBLrp;
-     JCheckBox ChBMnd;
-     JCheckBox ChBCnd;
-     JCheckBox ChBBomg;
-     JCheckBox ChBGorod;
-     JCheckBox ChBOtsb;
-     JCheckBox ChBSelo;
+	private JCheckBox ChBNark;
+	private JCheckBox ChBAlk;
+	private JCheckBox ChBSmok;
+	private JCheckBox ChBNmls;
+	private JCheckBox ChBNer;
+	private JCheckBox ChBInv;
+	private JCheckBox ChBBots;
+	private JCheckBox ChBAss;
+	private JCheckBox ChBLrp;
+	private JCheckBox ChBMnd;
+	private JCheckBox ChBCnd;
+	private JCheckBox ChBBomg;
+	private JCheckBox ChBGorod;
+	private JCheckBox ChBOtsb;
+	private JCheckBox ChBSelo;
+	private JCheckBox ChBots;
 	/**
 	 * Launch the application.
 	 */
@@ -189,17 +191,17 @@ public class FormRdInf extends JFrame {
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		fam.setColumns(10);
-		fam.setText(Vvod.zapVr.getFam());
+//		fam.setText(Vvod.zapVr.getFam());
 		
 		im = new JTextField();
 		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		im.setColumns(10);
-		im.setText(Vvod.zapVr.getIm());
+//		im.setText(Vvod.zapVr.getIm());
 		
 		ot = new JTextField();
 		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		ot.setColumns(10);
-		ot.setText(Vvod.zapVr.getOth());
+//		ot.setText(Vvod.zapVr.getOth());
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -276,11 +278,11 @@ public class FormRdInf extends JFrame {
 		
 		JLabel LTel = new JLabel("Телефон");
 		
-		final JCheckBox ChBSmok = new JCheckBox("Курение");
+		ChBSmok = new JCheckBox("Курение");
 		
-		final JCheckBox ChBAlk = new JCheckBox("Алкоголизм");
+		ChBAlk = new JCheckBox("Алкоголизм");
 		
-		final JCheckBox ChBNark = new JCheckBox("Наркомания");
+		ChBNark = new JCheckBox("Наркомания");
 		
 		TFio = new JTextField();
 		
@@ -367,16 +369,16 @@ public class FormRdInf extends JFrame {
 		);
 		panel_3.setLayout(gl_panel_3);
 		
-		final JLabel label = new JLabel("Условия проживания");
+		JLabel label = new JLabel("Условия проживания");
 		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		final JCheckBox ChBSelo = new JCheckBox("Сельская жительница");
+		ChBSelo = new JCheckBox("Сельская жительница");
 		
-		final JCheckBox ChBOtsB = new JCheckBox("Отсутствие благоустройства");
+		ChBOtsb = new JCheckBox("Отсутствие благоустройства");
 		
-		final JCheckBox ChBGorod = new JCheckBox("Городская жительница");
+		ChBGorod = new JCheckBox("Городская жительница");
 		
-		final JCheckBox ChBBomg = new JCheckBox("БОМЖ");
+		ChBBomg = new JCheckBox("БОМЖ");
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
@@ -386,7 +388,7 @@ public class FormRdInf extends JFrame {
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(ChBBomg)
 						.addComponent(ChBGorod)
-						.addComponent(ChBOtsB)
+						.addComponent(ChBOtsb)
 						.addComponent(ChBSelo)
 						.addComponent(label))
 					.addContainerGap(82, Short.MAX_VALUE))
@@ -398,7 +400,7 @@ public class FormRdInf extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBSelo)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(ChBOtsB)
+					.addComponent(ChBOtsb)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBGorod)
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -408,21 +410,21 @@ public class FormRdInf extends JFrame {
 		
 		JLabel lblNewLabel = new JLabel("Отягощающие социальные обязательства");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		final JCheckBox ChBAss = new JCheckBox("Асоциальная личность");
+		ChBAss = new JCheckBox("Асоциальная личность");
 		
-		final JCheckBox ChBots = new JCheckBox("Очаг туберкулеза в семье");
+		ChBots = new JCheckBox("Очаг туберкулеза в семье");
 		
-		final JCheckBox ChBInv = new JCheckBox("Инвалидность");
+		ChBInv = new JCheckBox("Инвалидность");
 		
-		final JCheckBox ChBMnd = new JCheckBox("Многодетная семья");
+		ChBMnd = new JCheckBox("Многодетная семья");
 		
-		final JCheckBox ChBLrp = new JCheckBox("Лишение родительских прав");
+		ChBLrp = new JCheckBox("Лишение родительских прав");
 		
-		final JCheckBox ChBCnd = new JCheckBox("Семья с низким достатком");
+		ChBCnd = new JCheckBox("Семья с низким достатком");
 		
-		final JCheckBox ChBNer = new JCheckBox("Неработающие");
+		ChBNer = new JCheckBox("Неработающие");
 		
-		final JCheckBox ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
+		ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
 
 		Sbutton.addActionListener(new ActionListener() {
 		private int oslrod (int oslrod){
@@ -616,8 +618,14 @@ if (CBGrOtec.getSelectedPcod() != null)
 	}
 		
 	}
-	public void onConnect() {
+	public void onConnect() throws PatientNotFoundException {
 		try {
+			PatientCommonInfo inf;
+		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
+//						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
+fam.setText(inf.getFam());
+im.setText(inf.getIm());
+ot.setText(inf.getOt());
 			CBObr.setData(MainForm.tcl.get_n_z00());
 			CBSem.setData(MainForm.tcl.get_n_z11());
 			CBGrOtec.setData(MainForm.tcl.get_n_r0z());

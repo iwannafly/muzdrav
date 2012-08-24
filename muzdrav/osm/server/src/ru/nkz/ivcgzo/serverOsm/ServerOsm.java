@@ -167,8 +167,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmMetod = new TResultSetMapper<>(Metod.class, "obst",       "name_obst",  "c_p0e1",      "pcod");
 		metodTypes = new Class<?>[] {                  String.class, String.class, Integer.class, String.class};
 		
-		rsmPokazMet = new TResultSetMapper<>(PokazMet.class, "pcod",       "name_n",     "stoim",      "c_obst");
-		pokazMetTypes = new Class<?>[] {                     String.class, String.class, Double.class, String.class};
+		rsmPokazMet = new TResultSetMapper<>(PokazMet.class, "pcod",       "name_n");
+		pokazMetTypes = new Class<?>[] {                     String.class, String.class};
 		
 		rsmPokaz = new TResultSetMapper<>(Pokaz.class, "pcod",       "name_n",     "stoim",      "c_p0e1",      "c_n_nz1");
 		pokazTypes = new Class<?>[] {                  String.class, String.class, Double.class, Integer.class, String.class};
@@ -606,7 +606,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<StringClassifier> get_n_nz1(int cotd) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT nz.pcod, nz.name FROM n_nz1 nz WHERE nz.pcod = ? ", cotd)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT n_nz1.pcod, n_nz1.name FROM n_nz1 JOIN s_ot01 ON (n_nz1.pcod=s_ot01.c_nz1) WHERE s_ot01.cotd = ? ", cotd)) {
 			return rsmStrClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -827,7 +827,7 @@ public class ServerOsm extends Server implements Iface {
 			TException {
 		// TODO Auto-generated method stub
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_rd_sl SET npasp = ?, datay = ?, dataosl = ?, abort = ?, shet = ?, datam = ?, yavka1 = ?, ishod = ?,datasn = ?, datazs = ?,kolrod = ?, deti = ?, kont = ?, vesd = ?, dsp = ?,dsr = ?,dtrosh = ?, cext = ?, indsol = ?, prmen = ?,dataz = ?, datasert = ?, nsert = ?, ssert = ?, oslab = ?, plrod = ?, prrod = ?, vozmen = ?, oslrod = ?, polj = ?, dataab = ?, srokab = ?, cdiag = ?, cvera = ? WHERE id = ?", false, Dispb, rdSlTypes, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34, 0);
+			sme.execPreparedT("UPDATE p_rd_sl SET npasp = ?, datay = ?, dataosl = ?, abort = ?, shet = ?, datam = ?, yavka1 = ?, ishod = ?,datasn = ?, datazs = ?,kolrod = ?, deti = ?, kont = ?, vesd = ?, dsp = ?,dsr = ?,dtrosh = ?, cext = ?, indsol = ?, prmen = ?,dataz = ?, datasert = ?, nsert = ?, ssert = ?, oslab = ?, plrod = ?, prrod = ?, vozmen = ?, oslrod = ?, polj = ?, dataab = ?, srokab = ?, cdiag = ?, cvera = ? WHERE id_pvizit = ?", false, Dispb, rdSlTypes, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,32,33,34, 0);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -903,12 +903,9 @@ public class ServerOsm extends Server implements Iface {
 
 
 	@Override
-	public List<PokazMet> getPokazMet(String metod) throws KmiacServerException, TException {
-		String sql = "SELECT no.obst AS c_obst, nl.name_n, ns.pcod, ns.stoim " + 
-					"FROM n_nsi_obst no JOIN n_stoim ns ON (ns.c_obst = no.obst) JOIN n_ldi nl ON (ns.pcod = nl.pcod) " +
-					"WHERE no.obst = ? " +
-					"ORDER BY no.obst, ns.pcod ";
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, metod)) {
+	public List<PokazMet> getPokazMet(String c_nz1) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT n_ldi.pcod, n_ldi.name_n FROM n_ldi JOIN s_ot01 ON (s_ot01.pcod=n_ldi.pcod) WHERE s_ot01.c_nz1 = ? ORDER BY n_ldi.pcod ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, c_nz1)) {
 			return rsmPokazMet.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -1557,9 +1554,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<PdiagAmb> getPdiagAmbProsm(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE npasp = ? AND predv = FALSE ", npasp)) {
-			return rsmPdiagAmb.mapToList(acrs.getResultSet());
+	public PdiagAmb getPdiagAmbProsm(int idObr) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_pvizit = ? AND predv = FALSE AND diag_stat=1", idObr)) {
+			return rsmPdiagAmb.map(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
@@ -2004,7 +2001,7 @@ sb.append("<br>Подпись ____________");
 
 	@Override
 	public String printKartaBer() throws KmiacServerException, TException {
-				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\kartl.htm"), "utf-8")) {
+				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -2093,12 +2090,13 @@ sb.append("<br>Подпись ____________");
 				sb.append("<br>2. Закючение окулиста ___________________________________________");
 				sb.append("</body>"); 
 				osw.write(sb.toString());
-				return "e:\\kart.html";
+				return "c:\\kart1.html";
 		} catch (IOException  e) {
 			throw new KmiacServerException();
 		}
 	
 	}
+
 
 
 }
