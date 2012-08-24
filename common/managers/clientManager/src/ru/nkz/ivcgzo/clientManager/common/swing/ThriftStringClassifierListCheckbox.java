@@ -2,6 +2,8 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Component;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -26,6 +28,8 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierList<StringClassifier> {
 	private static final long serialVersionUID = -1232286636830958779L;
 	private JCheckBox[] boxes;
+	private ActionListener boxListener;
+	private ThriftStringClassifierListCheckboxActionListener actionListener;
 	
 	/**
 	 * Конструктор списка.
@@ -60,6 +64,13 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 		setCellRenderer();
 		setMouseListener();
 		setKeyListener();
+		
+		boxListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				notifyActionListener(e);
+			}
+		};
 	}
 	
 	@Override
@@ -67,8 +78,10 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 		super.setData(list);
 		
 		boxes = new JCheckBox[getModel().getSize()];
-		for (int i = 0; i < boxes.length; i++)
+		for (int i = 0; i < boxes.length; i++) {
 			boxes[i] = new JCheckBox(list.get(i).name);
+			boxes[i].addActionListener(boxListener);
+		}
 	}
 	
 	private void setCellRenderer() {
@@ -158,6 +171,36 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 		});
 	}
 	
+	private void notifyActionListener(ActionEvent e) {
+		if (actionListener != null) {
+			int idx = getSelectedIndex();
+
+			actionListener.actionPerformed(new ThriftStringClassifierListCheckboxActionEvent(boxes[idx].isSelected(), getModel().getElementAt(idx)));
+		}
+	}
+	
+	public class ThriftStringClassifierListCheckboxActionEvent {
+		private boolean selected;
+		private StringClassifier value;
+		
+		public ThriftStringClassifierListCheckboxActionEvent(boolean selected, StringClassifier value) {
+			this.selected = selected;
+			this.value = value;
+		}
+		
+		public boolean isSelected() {
+			return selected;
+		}
+		
+		public StringClassifier getValue() {
+			return value;
+		}
+	}
+	
+	public interface ThriftStringClassifierListCheckboxActionListener {
+		public void actionPerformed(ThriftStringClassifierListCheckboxActionEvent e);
+	}
+	
 //	FIXME this focus frame applies for windows only
 //	@Override
 //	public void paint(Graphics g) {
@@ -176,6 +219,13 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 //			BasicGraphicsUtils.drawDashedRect(g, bounds.x, bounds.y, bounds.width, bounds.height);
 //		}
 //	}
+	
+	/**
+	 * Устанавливает слушателя, реагирующего на изменение меток строк. 
+	 */
+	public void setCheckboxActionListener(ThriftStringClassifierListCheckboxActionListener lst) {
+		actionListener = lst;
+	}
 	
 	/**
 	 * Получает список отмеченных строк.
@@ -243,5 +293,27 @@ public class ThriftStringClassifierListCheckbox extends ThriftStringClassifierLi
 					break;
 				}
 		repaint();
+	}
+	
+	/**
+	 * Проверяет, все ли строки отмечены. 
+	 */
+	public boolean isAllItemsSelected() {
+		return isAllItemsSelected(true);
+	}
+	
+	/**
+	 * Проверяет, все ли строки не отмечены. 
+	 */
+	public boolean isAllItemsUnselected() {
+		return isAllItemsSelected(false);
+	}
+	
+	private boolean isAllItemsSelected(boolean val) {
+		for (int i = 0; i < boxes.length; i++)
+			if (boxes[i].isSelected() != val)
+				return false;
+		
+		return true;
 	}
 }
