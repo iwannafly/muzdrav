@@ -54,7 +54,7 @@ public class ClassifierManager {
 	}
 	
 	public List<IntegerClassifier> getIntegerClassifier(IntegerClassifiers cls) throws KmiacServerException, TException {
-		return getIntegerClassifier(cls, ClassifierSortOrder.none, null);
+		return getIntegerClassifier(cls, ClassifierSortOrder.ascending, ClassifierSortFields.name);
 	}
 	
 	public List<StringClassifier> getStringClassifier(StringClassifiers cls, ClassifierSortOrder ord, ClassifierSortFields fld) throws KmiacServerException, TException {
@@ -67,7 +67,7 @@ public class ClassifierManager {
 	}
 	
 	public List<StringClassifier> getStringClassifier(StringClassifiers cls) throws KmiacServerException, TException {
-		return getStringClassifier(cls, ClassifierSortOrder.none, null);
+		return getStringClassifier(cls, ClassifierSortOrder.ascending, ClassifierSortFields.name);
 	}
 	
 	public List<mkb_0> getMkbTreeClassifier() throws KmiacServerException, TException {

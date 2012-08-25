@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientOsm;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -41,6 +42,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -63,6 +65,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
@@ -76,7 +79,6 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import java.awt.Font;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -150,6 +152,7 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	public static JButton btnPosAdd;
+	private CustomTable<Pmer, Pmer._Fields> TabDispHron;
 	
 	/**
 	 * Create the dialog.
@@ -184,7 +187,7 @@ public class Vvod extends JFrame {
 		JButton btnProsm = new JButton("Просмотр");
 		btnProsm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainForm.pInf.update(zapVr.getNpasp());
+				MainForm.conMan.showPatientInfoForm(zapVr.getNpasp());
 			}
 		});
 		
@@ -316,16 +319,30 @@ public class Vvod extends JFrame {
 			}
 		});
 		
+		JButton btnRecPriem = new JButton("Запись на прием");
+		btnRecPriem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+                try {
+					IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
+					client.showModal(MainForm.instance, zapVr.npasp, zapVr.im, zapVr.fam, zapVr.oth, zapVr.datar);
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(Vvod.this, "Не удалось отобразить форму записи на прием", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
-						.addComponent(pnlTalon, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
-						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 996, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(pnlTalon, GroupLayout.DEFAULT_SIZE, 982, Short.MAX_VALUE)
+						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 982, Short.MAX_VALUE)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(btnRecPriem, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnAnam, GroupLayout.PREFERRED_SIZE, 136, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnProsm, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
@@ -340,6 +357,7 @@ public class Vvod extends JFrame {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnRecPriem)
 						.addComponent(btnAnam)
 						.addComponent(btnProsm)
 						.addComponent(btnBer)
@@ -349,7 +367,7 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(pnlTalon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
 					.addGap(11))
 		);
 		
@@ -1374,25 +1392,10 @@ public class Vvod extends JFrame {
 		
 		cmbKonsVidNapr = new JComboBox<>();
 		cmbKonsVidNapr.setModel(new DefaultComboBoxModel<>(new String[] {"госпитализацию", "консультацию", "обследование"}));
-		cmbKonsVidNapr.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					if (cmbKonsVidNapr.getSelectedIndex() > 0)
-						cmbKonsMesto.setData(MainForm.tcl.get_n_n00());
-				}
-				 catch (KmiacServerException e1) {
-					e1.printStackTrace();
-				} catch (TException e1) {
-					MainForm.conMan.reconnect(e1);
-				}
-			}
-		});
 		
 		JLabel lblKonsVidNapr = new JLabel("на");
 		
-		cmbKonsMesto = new ThriftIntegerClassifierCombobox<>(true);
+		cmbKonsMesto = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_n00);
 		
 		JLabel lblKonsMesto = new JLabel("Куда");
 		
@@ -1586,6 +1589,31 @@ public class Vvod extends JFrame {
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
 		pnlZakl.setLayout(gl_pnlZakl);
+		
+		JPanel pnlDispHron = new JPanel();
+		tabbedPane.addTab("Дисп.хрон", null, pnlDispHron, null);
+		
+		JScrollPane spDisp = new JScrollPane();
+		GroupLayout gl_pnlDispHron = new GroupLayout(pnlDispHron);
+		gl_pnlDispHron.setHorizontalGroup(
+			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisp, GroupLayout.PREFERRED_SIZE, 526, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(64, Short.MAX_VALUE))
+		);
+		gl_pnlDispHron.setVerticalGroup(
+			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisp, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(326, Short.MAX_VALUE))
+		);
+		
+		TabDispHron = new CustomTable<>(true, true, Pmer.class, 14, "Мероприятие", 5, "План.дата", 6, "Факт.дата");;
+		spDisp.setViewportView(TabDispHron);
+		TabDispHron.setFillsViewportHeight(true);
+		pnlDispHron.setLayout(gl_pnlDispHron);
 		
 		panel_2.setLayout(gl_panel_2);
 		
@@ -1956,6 +1984,8 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+			TabDispHron.setData(MainForm.tcl.getPmer(25));
+//			TabDispHron.setIntegerClassifierSelector(3, MainForm.tcl.);
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {

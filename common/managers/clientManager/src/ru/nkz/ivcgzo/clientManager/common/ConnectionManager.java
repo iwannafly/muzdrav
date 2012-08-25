@@ -646,6 +646,14 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Вызов формы с информацией на пациента.
+	 * @param npasp - уникальный номер пациента
+	 */
+	public void showPatientInfoForm(int npasp) {
+		viewClient.showModal(client, 17, npasp);
+	}
+	
+	/**
 	 * Открывает сгенерированный отчет в офисном редакторе.
 	 * @param path - путь к отчету
 	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>

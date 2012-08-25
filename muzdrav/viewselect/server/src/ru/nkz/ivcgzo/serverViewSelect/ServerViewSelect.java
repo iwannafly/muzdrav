@@ -24,8 +24,19 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientCommonInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientDiagAmbInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientDiagZInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientIsslInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientNaprInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientPriemInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientSearchParams;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientSignInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitAmbInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.RdSlInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
@@ -34,33 +45,37 @@ import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
 
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
-	private ClassifierManager ccm;
-	//public String className = "n_c00";
-	
-	private TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
+	private final ClassifierManager ccm;
+	private final TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
+	private final TResultSetMapper<PatientCommonInfo, PatientCommonInfo._Fields> rsmPatComInfo;
+	private final TResultSetMapper<PatientSignInfo, PatientSignInfo._Fields> rsmPsign;
+	private final TResultSetMapper<PatientVizitInfo, PatientVizitInfo._Fields> rsmPvizit;
+	private final TResultSetMapper<RdSlInfo, RdSlInfo._Fields> rsmRdSl;
+	private final TResultSetMapper<PatientDiagZInfo, PatientDiagZInfo._Fields> rsmPdiagZ;
+	private final TResultSetMapper<PatientVizitAmbInfo, PatientVizitAmbInfo._Fields> rsmPvizitAmb;
+	private final TResultSetMapper<PatientPriemInfo, PatientPriemInfo._Fields> rsmPriem;
+	private final TResultSetMapper<PatientNaprInfo, PatientNaprInfo._Fields> rsmPnapr;
+	private final TResultSetMapper<PatientDiagAmbInfo, PatientDiagAmbInfo._Fields> rsmPdiagAmb;
+	private final TResultSetMapper<PatientIsslInfo, PatientIsslInfo._Fields> rsmIsslInfo;
+	private final TResultSetMapper<PatientAnamZabInfo, PatientAnamZabInfo._Fields> rsmAnamZab;
 
-	//public String className;
-	
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
 		rsmPatBrief = new TResultSetMapper<>(PatientBriefInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom");
+		rsmPatComInfo = new TResultSetMapper<>(PatientCommonInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom", "pol", "jitel", "sgrp", "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_korp", "adp_kv", "adm_obl", "adm_gorod", "adm_ul", "adm_dom", "adm_korp", "adm_kv", "name_mr", "ncex", "poms_strg", "poms_tdoc", "poms_ndog", "pdms_strg", "pdms_ser", "pdms_nom", "pdms_ndog", "cpol_pr", "terp", "datapr", "tdoc", "docser", "docnum", "datadoc", "odoc", "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv", "mrab");
+		rsmPsign = new TResultSetMapper<>(PatientSignInfo.class, "npasp", "grup", "ph", "allerg", "farmkol", "vitae", "vred");
+		rsmPvizit = new TResultSetMapper<>(PatientVizitInfo.class, "id", "npasp", "cpol", "cobr", "datao", "ishod", "rezult", "talon", "cod_sp", "cdol", "cuser", "zakl", "dataz", "recomend");
+		rsmRdSl = new TResultSetMapper<>(RdSlInfo.class, "id", "npasp", "datay", "dataosl", "abort", "shet", "datam", "yavka1", "ishod", "datasn", "datazs", "kolrod", "deti", "kont", "vesd", "dsp", "dsr", "dtroch", "cext", "indsol", "prmen", "dataz", "datasert", "nsert", "ssert", "oslab", "plrod", "prrod", "vozmen", "oslrod", "polj", "dataab", "srokab", "cdiagt", "cvera", "id_pvizit", "rost");
+		rsmPdiagZ = new TResultSetMapper<>(PatientDiagZInfo.class, "id", "id_diag_amb", "npasp", "diag", "cpodr", "d_vz", "d_grup", "ishod", "dataish", "datag", "datad", "diag_s", "d_grup_s", "cod_sp", "cdol_ot", "nmvd", "xzab", "stady", "disp", "pat", "prizb", "prizi", "named", "nameC00");
+		rsmPvizitAmb = new TResultSetMapper<>(PatientVizitAmbInfo.class, "id", "id_obr", "npasp", "datap", "cod_sp", "cdol", "diag", "mobs", "rezult", "opl", "stoim", "uet", "datak", "kod_rez", "k_lr", "n_sp", "pr_opl", "pl_extr", "vpom", "fio_vr", "dataz");
+		rsmPriem = new TResultSetMapper<>(PatientPriemInfo.class, "id_obr","npasp", "id_pos", "sl_ob", "n_is", "n_kons", "n_proc", "n_lek", "t_chss", "t_temp", "t_ad", "t_rost", "t_ves", "t_st_localis", "t_ocenka", "t_jalob", "t_status_praesense", "t_fiz_obsl");
+		rsmPnapr = new TResultSetMapper<>(PatientNaprInfo.class, "id", "idpvizit", "vid_doc", "text", "preds", "zaved", "name");
+		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "datap", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
+		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav");
+		rsmAnamZab = new TResultSetMapper<>(PatientAnamZabInfo.class, "id_pvizit", "npasp", "t_ist_zab");
 		
 		ccm = new ClassifierManager(sse);
-		
-//		try {
-//			getIntegerClassifier(IntegerClassifiers.n_aba);
-//			getIntegerClassifier(IntegerClassifiers.n_aba);
-//			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.descending, ClassifierSortFields.pcod);
-//			getIntegerClassifierSorted(IntegerClassifiers.n_aba, ClassifierSortOrder.ascending, ClassifierSortFields.pcodName);
-//			getIntegerClassifier(IntegerClassifiers.n_edd);
-//			getIntegerClassifier(IntegerClassifiers.n_edd);
-//			getMkb_0();
-//			getPolp_0();
-//		} catch (KmiacServerException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
 
 	@Override
@@ -88,7 +103,6 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> getVSIntegerClassifierView(String className) throws TException {
-		// TODO Auto-generated method stub
 		final String sqlQuery = "SELECT pcod, name FROM " + className;
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIVS =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
@@ -101,7 +115,6 @@ public class ServerViewSelect extends Server implements Iface {
 	
 	@Override
 	public List<StringClassifier> getVSStringClassifierView(String className) throws TException {
-		// TODO Auto-generated method stub
 		final String sqlQuery = "SELECT pcod, name FROM " + className;
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSVS =
                 new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
@@ -114,7 +127,6 @@ public class ServerViewSelect extends Server implements Iface {
 	
 	@Override
 	public boolean isClassifierEditable(String className) throws TException {
-		// TODO Auto-generated method stub
 		if (className.charAt(0)=='c')
 			return true;
 		else return false;
@@ -122,7 +134,6 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public boolean isClassifierPcodInteger(String className) throws TException {
-		// TODO Auto-generated method stub
 		String sqlQueryGetType = "SELECT data_type FROM information_schema.columns where table_name = ? AND column_name = ?";
 		try (AutoCloseableResultSet arcs = sse.execPreparedQuery(sqlQueryGetType, className, "pcod")) {
 			if (arcs.getResultSet().next()){
@@ -227,5 +238,126 @@ public class ServerViewSelect extends Server implements Iface {
 	@Override
 	public List<mrab_0> getMrab_0() throws KmiacServerException {
 		return ccm.getMrabTreeClassifier();
+	}
+	
+	///////////////////////// patient info ///////////////////////////////
+	
+	@Override
+	public PatientCommonInfo getPatientCommonInfo(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM patient WHERE npasp = ? ", npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmPatComInfo.map(acrs.getResultSet());
+			else
+				throw new SQLException("Patient common info not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public PatientSignInfo getPatientSignInfo(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_sign WHERE npasp = ? ", npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmPsign.map(acrs.getResultSet());
+			else
+				throw new SQLException("Patient sign info not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<PatientVizitInfo> getPatientVizitInfoList(int npasp, long datan, long datak) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE npasp = ? AND datao BETWEEN ? AND ? ", npasp, new Date(datan), new Date(datak))) {
+			return rsmPvizit.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<RdSlInfo> getRdSlInfoList(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
+			return rsmRdSl.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<PatientDiagZInfo> getPatientDiagZInfoList(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_diag WHERE npasp = ? ", npasp)) {
+			return rsmPdiagZ.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<PatientVizitAmbInfo> getPatientVizitAmbInfoList(int pvizitId) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ORDER BY pva.datap", pvizitId)) {
+			return rsmPvizitAmb.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public PatientPriemInfo getPatientPriemInfo(int npasp, int pvizitAmbId) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_priem WHERE npasp = ? AND id_pos = ? ", npasp, pvizitAmbId)) {
+			if (acrs.getResultSet().next())
+				return rsmPriem.map(acrs.getResultSet());
+			else
+				throw new SQLException("Patient priem info not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<PatientNaprInfo> getPatientNaprInfoList(int pvizitId) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_napr join n_vr_doc on(p_napr.vid_doc=n_vr_doc.pcod) where p_napr.id_pvizit = ?", pvizitId)) {
+			return rsmPnapr.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<PatientDiagAmbInfo> getPatientDiagAmbInfoList(int pvizitId) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_obr = ? ", pvizitId)) {
+			return rsmPdiagAmb.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<PatientIsslInfo> getPatientIsslInfoList(int pvizitId) throws KmiacServerException, TException {
+		String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, p_rez_l.zpok, p_isl_ld.datav " +
+			     "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " + 
+				 "WHERE p_isl_ld.pvizit_id = ? " +
+				 "UNION " +
+				 "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav " + 
+				 "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " + 
+				 "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+				 "WHERE p_isl_ld.pvizit_id = ? ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, pvizitId, pvizitId)) {
+			return rsmIsslInfo.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public PatientAnamZabInfo getPatientAnamZabInfo(int pvizitId, int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_anam_zab WHERE id_pvizit = ? AND npasp = ? ", pvizitId, npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmAnamZab.map(acrs.getResultSet());
+			else
+				throw new SQLException("Patient anamnesis not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
 	}
 }

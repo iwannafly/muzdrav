@@ -76,6 +76,10 @@ public class ClassifierManager {
 		case n_l02:
 			fldPcod = "c_ffomc";
 			break;
+		case n_z00:
+			fldPcod = "pcod_s";
+			fldName = "name_s";
+			break;
 		default:
 			break;
 		}
