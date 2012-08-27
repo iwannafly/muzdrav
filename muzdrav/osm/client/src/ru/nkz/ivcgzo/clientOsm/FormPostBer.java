@@ -150,13 +150,16 @@ addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 try {
-	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getNpasp());
+	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getId_pvizit());
 	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-	setDefaultValues();
-	rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-	rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-	rdsl.setNpasp(Vvod.zapVr.getNpasp());
-setPostBerData(rdsl);
+//	setDefaultValues();
+//	rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
+//	rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//	rdsl.setNpasp(Vvod.zapVr.getNpasp());
+	setPostBerData();
+	fam.setText(Vvod.zapVr.getFam());
+	im.setText(Vvod.zapVr.getIm());
+	ot.setText(Vvod.zapVr.getOth());
 } catch (KmiacServerException | TException e) {
 	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
 	// TODO Auto-generated catch block
@@ -178,27 +181,18 @@ setPostBerData(rdsl);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					PatientCommonInfo inf;
-					inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-//									tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-			fam.setText(inf.getFam());
-			im.setText(inf.getIm());
-			ot.setText(inf.getOt());
 					rdsl = new RdSlStruct();
 					setDefaultValues();
 					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
 					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
 					rdsl.setNpasp(Vvod.zapVr.getNpasp());
-					setPostBerData(rdsl);
+					setPostBerData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
 					e1.printStackTrace();
 					MainForm.conMan.reconnect(e1);
-				} catch (PatientNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 			}
 		});
@@ -230,17 +224,23 @@ setPostBerData(rdsl);
 				patient.setOt((String) ot.getText());*/
 			rdsl.setAbort((int) SKolAb.getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
+ 			if (SDataM.getDate() != null)
 			rdsl.setDataM( SDataM.getDate().getTime());
+ 			if (SDataOsl.getDate() != null)
 			rdsl.setDataosl( SDataOsl.getDate().getTime());
+ 			if (SDataSn.getDate() != null)
 			rdsl.setDatasn( SDataSn.getDate().getTime());
+ 			if (SDataRod.getDate() != null)
 			rdsl.setDatasn( SDataRod.getDate().getTime());
+ 			if (SDataSert.getDate() != null)
 			rdsl.setDatasert( SDataSert.getDate().getTime());
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
 			rdsl.setNsert(getTextOrNull(TNSert.getText()));
-			rdsl.setDatasn( TDataab.getDate().getTime());
-			rdsl.setDatasert( SDataSert.getDate().getTime());
+ 			if (TDataab.getDate() != null)
+			rdsl.setDataab( TDataab.getDate().getTime());
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
 			rdsl.setNsert(getTextOrNull(TNSert.getText()));
+ 			if (SDataPos.getDate() != null)
 			rdsl.setDatay(SDataPos.getDate().getTime());
 			rdsl.setKont(CBKontr.isSelected());
 			rdsl.setDeti((int) SKolDet.getModel().getValue());
@@ -1001,11 +1001,9 @@ setPostBerData(rdsl);
 	
 	}
 
-	private void setPostBerData(RdSlStruct rdsl) {
+	private void setPostBerData() {
 		//SRost.setValue(rdsl.getRost());
 		try {
-			JOptionPane.showMessageDialog(FormPostBer.this,  "Выбор данных для показа");
-			rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.id_pvizit, Vvod.zapVr.npasp);
 			SVes.setValue(rdsl.getVesd());
 			SDsp.setValue(rdsl.getDsp());
 			SDcr.setValue(rdsl.getDsr());
