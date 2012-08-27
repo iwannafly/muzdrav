@@ -36,6 +36,8 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+//import ru.nkz.ivcgzo.clientOsm.MainForm;
+//import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
@@ -48,6 +50,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -205,7 +208,10 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		    	  //System.out.print(getViewTableValues().getName());
 		    	  String className = table.getSelectedItem().pcod;
 		    	  try {
-					if (tcl.isClassifierPcodInteger(className)) {
+		    		if (className.equals("n_c00")) {
+		    			conMan.showMkbTreeForm("Диагноз", "");
+		    		  }
+		    		else if (tcl.isClassifierPcodInteger(className)) {
 						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
 						  MainForm.instance.addChildFrame(VSPIForm);
 						  VSPIForm.tableFill(className);
@@ -219,8 +225,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						  VSPSForm.setVisible(true);
 					}
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+						conMan.reconnect(e1);
 				}
 		   
 		         }
