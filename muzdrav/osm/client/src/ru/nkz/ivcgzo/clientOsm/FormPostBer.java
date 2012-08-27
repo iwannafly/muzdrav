@@ -125,24 +125,10 @@ public class FormPostBer extends JFrame {
 	private ThriftStringClassifierCombobox<StringClassifier> CBOslAb;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBRod;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPrishSn;
-//    private JTextField SDataRod;
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					FormPostBer frame = new FormPostBer();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-	protected AbstractButton CBKontr;
-//	protected AbstractButton SDsp;
+	private JCheckBox CBKontr;
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
@@ -163,13 +149,23 @@ public class FormPostBer extends JFrame {
 addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
-//			rdsl.getAbort(SKolAb.value);
-	//	SKolAb.get(rdsl.abort);
-			}
+try {
+	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getgetNpasp());
+	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+	setDefaultValues();
+	rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
+	rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+	rdsl.setNpasp(Vvod.zapVr.getNpasp());
+setPostBerData(rdsl);
+} catch (KmiacServerException | TException e) {
+	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}			}
 		});
 		setTitle("Постановка на учет по беременности");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 800);
+		setBounds(100, 100, 850, 700);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -1008,6 +1004,7 @@ addWindowListener(new WindowAdapter() {
 	private void setPostBerData(RdSlStruct rdsl) {
 		//SRost.setValue(rdsl.getRost());
 		try {
+			JOptionPane.showMessageDialog(FormPostBer.this,  "Выбор данных для показа");
 			rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.id_pvizit, Vvod.zapVr.npasp);
 			SVes.setValue(rdsl.getVesd());
 			SDsp.setValue(rdsl.getDsp());
