@@ -90,7 +90,7 @@
 		<table srcName="Z11" dstName="n_z11" />
 		<table srcName="Z30" dstName="n_z30" />
 		<table srcName="Z42" dstName="n_z42" />
-		<table srcName="Z43" dstName="n_z43" />
+		<table srcName="Z43N" dstName="n_z43" />
 		<table srcName="Z43_GR" dstName="n_z43_gr" />
 		<table srcName="Z60" dstName="n_z60" />
 		<table srcName="Z70" dstName="n_z70" />
