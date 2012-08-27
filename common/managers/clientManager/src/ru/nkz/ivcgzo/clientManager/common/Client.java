@@ -130,7 +130,8 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 		conMan.setClient(parent);
 		parent.getFrame().setModalExclusionType(prevModalType);
 		disposeChildren();
-		conMan.disconnect(getPort());
+		if (this != parent)
+			conMan.disconnect(getPort());
 		dialog.dispose();
 		dialog = null;
 	}

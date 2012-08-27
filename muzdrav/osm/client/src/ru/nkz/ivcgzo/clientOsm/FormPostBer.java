@@ -150,7 +150,7 @@ addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 try {
-	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getgetNpasp());
+	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getNpasp());
 	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 	setDefaultValues();
 	rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
