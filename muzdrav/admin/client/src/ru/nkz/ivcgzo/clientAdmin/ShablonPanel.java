@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.GroupLayout.ParallelGroup;
@@ -17,8 +16,8 @@ import javax.swing.GroupLayout.SequentialGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -35,6 +34,7 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox.ThriftIntegerClassifierListCheckboxActionEvent;
@@ -51,10 +51,7 @@ public class ShablonPanel extends JPanel {
 	private ThriftIntegerClassifierList trSearch;
 	private CustomTextField tbName;
 	private CustomTextField tbDiag;
-	private JRadioButton rbDyn1;
-	private JRadioButton rbDyn2;
-	private JRadioButton rbDyn3;
-	private ButtonGroup bgDyn;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbDyn;
 	private JCheckBox cbSluPol;
 	private JCheckBox cbSluStat;
 	private ThriftIntegerClassifierListCheckbox ltSpec;
@@ -64,7 +61,6 @@ public class ShablonPanel extends JPanel {
 	private DocumentListener textListener;
 	private JButton btSaveAsNew;
 	private JButton btSave;
-	private int selDyn;
 	private ShablonOsm shOsm;
 	private boolean fillingUI;
 	
@@ -165,8 +161,10 @@ public class ShablonPanel extends JPanel {
 				if (e.getClickCount() == 2) {
 					StringClassifier res = MainForm.conMan.showMkbTreeForm("Диагноз для шаблона", tbDiag.getText());
 					
-					if (res != null)
+					if (res != null) {
 						tbDiag.setText(res.pcod);
+						tbName.setText(res.name);
+					}
 				}
 			}
 		});
@@ -174,13 +172,15 @@ public class ShablonPanel extends JPanel {
 		
 		JLabel lbDiag = new JLabel("Диагноз");
 		
-		JPanel pnDyn = new JPanel();
-		
 		JPanel gbAvail = new JPanel();
 		gbAvail.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Доступность", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel gbText = new JPanel();
 		gbText.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Тексты", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JLabel lblNewLabel = new JLabel("Динамика");
+		
+		cbDyn = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_din, false, null);
 		GroupLayout gl_gbEdit = new GroupLayout(gbEdit);
 		gl_gbEdit.setHorizontalGroup(
 			gl_gbEdit.createParallelGroup(Alignment.LEADING)
@@ -191,18 +191,20 @@ public class ShablonPanel extends JPanel {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_gbEdit.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_gbEdit.createSequentialGroup()
-							.addComponent(tbDiag, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tbDiag, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(pnDyn, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addComponent(tbName, GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)))
+							.addComponent(cbDyn, 0, 305, Short.MAX_VALUE))
+						.addComponent(tbName, GroupLayout.DEFAULT_SIZE, 485, Short.MAX_VALUE)))
 				.addGroup(gl_gbEdit.createSequentialGroup()
-					.addComponent(btSaveAsNew, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+					.addComponent(btSaveAsNew, GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btSave, GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE))
+					.addComponent(btSave, GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE))
 				.addGroup(gl_gbEdit.createSequentialGroup()
 					.addComponent(gbAvail, GroupLayout.PREFERRED_SIZE, 202, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE))
+					.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE))
 		);
 		gl_gbEdit.setVerticalGroup(
 			gl_gbEdit.createParallelGroup(Alignment.TRAILING)
@@ -211,11 +213,11 @@ public class ShablonPanel extends JPanel {
 						.addComponent(tbName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lbName))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_gbEdit.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(pnDyn, 0, 0, Short.MAX_VALUE)
-						.addGroup(gl_gbEdit.createParallelGroup(Alignment.BASELINE)
-							.addComponent(tbDiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lbDiag)))
+					.addGroup(gl_gbEdit.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tbDiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbDiag)
+						.addComponent(lblNewLabel)
+						.addComponent(cbDyn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_gbEdit.createParallelGroup(Alignment.BASELINE)
 						.addComponent(gbAvail, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
@@ -242,7 +244,7 @@ public class ShablonPanel extends JPanel {
 		GroupLayout gl_pnText = new GroupLayout(pnText);
 		gl_pnText.setHorizontalGroup(
 			gl_pnText.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 400, Short.MAX_VALUE)
+				.addGap(0, 200, Short.MAX_VALUE)
 		);
 		gl_pnText.setVerticalGroup(
 			gl_pnText.createParallelGroup(Alignment.LEADING)
@@ -294,58 +296,6 @@ public class ShablonPanel extends JPanel {
 		spSpec.setViewportView(ltSpec);
 		gbAvail.setLayout(gl_gbAvail);
 		
-		ActionListener rbDynActLst = new ActionListener() {
-			Object prevSelComp;
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (((JRadioButton) e.getSource()).isSelected()) {
-					if (e.getSource() == prevSelComp) {
-						bgDyn.clearSelection();
-						selDyn = 0;
-					} else {
-						selDyn = Integer.parseInt(((JRadioButton) e.getSource()).getName());
-					}
-					prevSelComp = e.getSource();
-				}
-			}
-		};
-		
-		rbDyn1 = new JRadioButton("Динамика");
-		rbDyn1.setName("1");
-		rbDyn1.addActionListener(rbDynActLst);
-		
-		rbDyn2 = new JRadioButton("Улучшение");
-		rbDyn2.setName("2");
-		rbDyn2.addActionListener(rbDynActLst);
-		
-		rbDyn3 = new JRadioButton("Выписной");
-		rbDyn3.setName("3");
-		rbDyn3.addActionListener(rbDynActLst);
-		
-		bgDyn = new ButtonGroup();
-		bgDyn.add(rbDyn1);
-		bgDyn.add(rbDyn2);
-		bgDyn.add(rbDyn3);
-		
-		GroupLayout gl_pnDyn = new GroupLayout(pnDyn);
-		gl_pnDyn.setHorizontalGroup(
-			gl_pnDyn.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnDyn.createSequentialGroup()
-					.addComponent(rbDyn1, GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
-					.addGap(29)
-					.addComponent(rbDyn2, GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
-					.addGap(28)
-					.addComponent(rbDyn3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		gl_pnDyn.setVerticalGroup(
-			gl_pnDyn.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnDyn.createParallelGroup(Alignment.BASELINE)
-					.addComponent(rbDyn1, GroupLayout.PREFERRED_SIZE, 21, Short.MAX_VALUE)
-					.addComponent(rbDyn3, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-					.addComponent(rbDyn2, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
-		);
-		pnDyn.setLayout(gl_pnDyn);
 		gbEdit.setLayout(gl_gbEdit);
 		setLayout(groupLayout);
 	}
@@ -372,8 +322,8 @@ public class ShablonPanel extends JPanel {
 					.addGroup(Alignment.TRAILING, gl.createSequentialGroup()
 						.addContainerGap()
 						.addGroup(gl.createParallelGroup(Alignment.TRAILING)
-							.addComponent(sp, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
-							.addComponent(lbl, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE))
+							.addComponent(sp, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+							.addComponent(lbl, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
 						.addContainerGap())
 			);
 			gl.setVerticalGroup(
@@ -434,7 +384,7 @@ public class ShablonPanel extends JPanel {
 				shPanList.add(stp);
 				
 				glPnText.setHorizontalGroup(
-						horzGroup.addComponent(stp, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+						horzGroup.addComponent(stp, GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
 				);
 				
 				glPnText.setVerticalGroup(
@@ -459,7 +409,7 @@ public class ShablonPanel extends JPanel {
 	private void clearFields() {
 		tbName.clear();
 		tbDiag.clear();
-		bgDyn.clearSelection();
+		cbDyn.setSelectedPcod(0);
 		cbSluPol.setSelected(false);
 		cbSluStat.setSelected(false);
 	}
@@ -483,7 +433,7 @@ public class ShablonPanel extends JPanel {
 	private void fillShablonFromUI() {
 		shOsm.setName(tbName.getText());
 		shOsm.setDiag(tbDiag.getText());
-		shOsm.setCDin(selDyn);
+		shOsm.setCDin(cbDyn.getSelectedPcod());
 		shOsm.setCslu((cbSluPol.isSelected() ? 1 : 0) | (((cbSluStat.isSelected()) ? 1 : 0) << 1));
 		
 		List<Integer> specList = new ArrayList<>();
@@ -528,8 +478,7 @@ public class ShablonPanel extends JPanel {
 			shOsm = MainForm.tcl.getShablonOsm(id);
 			fillUIFromShablon();
 		} catch (KmiacServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -541,21 +490,7 @@ public class ShablonPanel extends JPanel {
 		try {
 			tbName.setText(shOsm.name);
 			tbDiag.setText(shOsm.diag);
-			switch (shOsm.cDin) {
-			case 1:
-				rbDyn1.setSelected(true);
-				break;
-			case 2:
-				rbDyn2.setSelected(true);
-				break;
-			case 3:
-				rbDyn3.setSelected(true);
-				break;
-			default:
-				bgDyn.clearSelection();
-				break;
-			}
-			
+			cbDyn.setSelectedPcod(shOsm.cDin);
 			cbSluPol.setSelected((shOsm.cslu & 1) == 1);
 			cbSluStat.setSelected((shOsm.cslu & 2) == 2);
 			
