@@ -439,6 +439,12 @@ struct PNapr {
 	7: string name;
 }
 
+struct KartaBer {
+	1: optional i32 npasp;
+	2: optional i32 id_pvizit;
+	3: optional i32 id_pos;
+	4: optional i32 id_rd_sl;
+}
 
 exception PvizitNotFoundException {
 }
@@ -527,7 +533,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
-	string printMSK()  throws (1: kmiacServer.KmiacServerException kse);
+	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
@@ -594,7 +600,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	
-	string printKartaBer() throws (1: kmiacServer.KmiacServerException kse);
+	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 
 }

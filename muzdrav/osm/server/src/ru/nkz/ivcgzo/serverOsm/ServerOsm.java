@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
+import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 import ru.nkz.ivcgzo.thriftOsm.Metod;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
@@ -1479,13 +1480,14 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<IsslInfo> getIsslInfo(int pvizit_id) throws KmiacServerException, TException {
-		String sql = "SELECT il.nisl, p0.pcod AS cp0e1, p0.name AS np0e1, ld.pcod AS cldi, ld.name_n AS nldi, rl.zpok, il.datav " + 
-					"FROM p_isl_ld il JOIN p_rez_l rl ON (rl.nisl = il.nisl) JOIN n_ldi ld ON (ld.pcod = rl.cpok) JOIN n_p0e1 p0 ON (p0.pcod = il.cisl) " +
-					"WHERE il.pvizit_id = ? " +
-					"UNION " +
-					"SELECT il.nisl, p0.pcod AS cp0e1, p0.name AS np0e1, ld.pcod AS cldi, ld.name_n AS nldi, rz.name, il.datav " +
-					"FROM p_isl_ld il JOIN p_rez_d rd ON (rd.nisl = il.nisl) JOIN n_ldi ld ON (ld.pcod = rd.kodisl) JOIN n_arez rz ON (rz.pcod = rd.rez) JOIN n_p0e1 p0 ON (p0.pcod = il.cisl) " +
-					"WHERE il.pvizit_id = ? ";
+		String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, p_rez_l.zpok, p_isl_ld.datav " +
+				     " FROM p_isl_ld  JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " + 
+					 "WHERE p_isl_ld.pvizit_id = ? " +
+					 "UNION " +
+					 "SELECT p_isl_ld.nisl,  n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav " + 
+					 "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " + 
+					 "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+					 "WHERE p_isl_ld.pvizit_id = ? ";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, pvizit_id, pvizit_id)) {
 			return rsmIsslInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
@@ -1876,7 +1878,7 @@ sb.append("<br>Подпись ____________");
 	}
 
 	@Override
-	public String printMSK() throws KmiacServerException, TException {
+	public String printMSK(int npasp) throws KmiacServerException, TException {
 			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("e:\\msk.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -1894,14 +1896,17 @@ sb.append("<br>Подпись ____________");
 				sb.append("<br>_________________________________________________________________________________________");
 				sb.append("<br>(наименование и адрес организации, оказывающей лечебно-профилактическую помощь)");
 				sb.append("<br>");
-				sb.append("<br>НАПРАВЛЕНИЕ НА МЕДИКО-СОЦИАЛЬЛЬНУЮ ЭКСПЕРТИЗУ ОРГАНИЗАЦИЕЙ, <br>ОКАЗЫВАЮЩЕЙ ЛЕЧЕБНО-ПРОФИЛАКТИЧЕСКУЮ ПОМОЩЬ");
+				sb.append("<br>НАПРАВЛЕНИЕ НА МЕДИКО-СОЦИАЛЬНУЮ ЭКСПЕРТИЗУ ОРГАНИЗАЦИЕЙ, <br>ОКАЗЫВАЮЩЕЙ ЛЕЧЕБНО-ПРОФИЛАКТИЧЕСКУЮ ПОМОЩЬ");
 				sb.append("</p>");
-				sb.append("<br>Дата выдачи '__' _______ 20__ г.");
+				sb.append("<br>Дата выдачи ");
+				sb.append(String.format(" %1$td.%1$tm.%1$tY", new Date(System.currentTimeMillis())));
 				sb.append("<br>");
-				sb.append("1. Фамилия,имя, отчество гражданина, направляемого на медико-социальную экспертизу (далее гражданин):______________________");
-				sb.append("<br>");
-				sb.append("2. Дата рождения: ______________");
-				sb.append("3. Пол: ______________");
+				sb.append("1. Фамилия,имя, отчество гражданина, направляемого на медико-социальную экспертизу (далее гражданин): ");
+				acrs = sse.execPreparedQuery("select fam,im,ot,datar,n_z30.name from patient join n_z30 on(patient.pol=n_z30.pcod) where npasp=?", npasp);
+				if (acrs.getResultSet().next()) 
+				{	sb.append(String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("<br>2. Дата рождения: </b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(4)));
+					sb.append(String.format("<br>3. Пол:  %s", acrs.getResultSet().getString(5)));}
 				sb.append("<br>");
 				sb.append("4. Фамилия, имя, отчество законного представителя гражданина (заполняется при наличии законного представителя): ________________");
 				sb.append("<br>");
@@ -1998,13 +2003,13 @@ sb.append("<br>Подпись ____________");
 				sb.append("</body>");
 				osw.write(sb.toString());
 				return "e:\\msk.htm";
-		} catch (IOException  e) {
+		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
 	}
 
 	@Override
-	public String printKartaBer() throws KmiacServerException, TException {
+	public String printKartaBer(KartaBer kb) throws KmiacServerException, TException {
 				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
@@ -2021,8 +2026,15 @@ sb.append("<br>Подпись ____________");
 				sb.append("<p align=center>Заполняется врачом женской консультации.</p>");
 				sb.append("<p align=center><b>(Данная карта выдается на руки на 32-ой неделе беременности)</b></p>");
 				sb.append("<br>");
-				sb.append("1. Фамилия, имя, отчество __________________________________________________________________________________<br>");
-				sb.append("2. Возраст _____ лет 3. Адрес и телефон ____________________________________________________________________");
+				acrs = sse.execPreparedQuery("select fam,im,ot,datar,(current_date-datar)/365,adm_ul,adm_dom,adm_kv,tel from patient where npasp=?", kb.getNpasp());
+				if (acrs.getResultSet().next()) 
+				{sb.append("1. Фамилия, имя, отчество ");
+				sb.append(String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+				sb.append("<br>2. Возраст:" );
+				sb.append(String.format("%s", acrs.getResultSet().getDate(5)));
+				sb.append("3. Адрес и телефон");
+				sb.append(String.format("%s %s - %s, %s", acrs.getResultSet().getString(6), acrs.getResultSet().getString(7), acrs.getResultSet().getString(8), acrs.getResultSet().getString(9)));
+				}
 				sb.append("<br>4. Перенесенные общие, гинекологические заболевания или операции ___________________________________________");
 				sb.append("<br>5. Особенности течения прежних беременностей, родов, послеродового периода _________________________________");
 				sb.append("<br>6. Данная беременность ____ (по счету). Роды ____ (по счету)");
@@ -2095,7 +2107,7 @@ sb.append("<br>Подпись ____________");
 				sb.append("</body>"); 
 				osw.write(sb.toString());
 				return "c:\\kart1.html";
-		} catch (IOException  e) {
+		} catch (SQLException|IOException  e) {
 			throw new KmiacServerException();
 		}
 	
