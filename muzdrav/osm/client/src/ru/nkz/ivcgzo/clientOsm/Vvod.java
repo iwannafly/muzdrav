@@ -104,8 +104,8 @@ import java.awt.event.InputMethodEvent;
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
 	public static ZapVr zapVr;
-	private static Pvizit pvizit;
-	private static PvizitAmb pvizitAmb;
+	public static Pvizit pvizit;
+	public static PvizitAmb pvizitAmb;
 	private static PdiagAmb diagamb;
 	private static PdiagZ pdiag;
 	private static Priem priem;

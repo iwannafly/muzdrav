@@ -335,9 +335,13 @@ try {
 		JButton BPeshOK = new JButton("Печать обменной карты");
 		BPeshOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-	/*			try{
+				try{
 					KartaBer kartaber = new KartaBer();
-					String servPath = MainForm.tcl.printKartaBer();
+					kartaber.setId_pos(Vvod.pvizitAmb.getId());
+					kartaber.setId_pvizit(Vvod.pvizit.getId());
+					kartaber.setNpasp(Vvod.zapVr.getNpasp());
+					kartaber.setId_rd_sl(0);
+					String servPath = MainForm.tcl.printKartaBer(kartaber);
 					String cliPath;
 					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -348,7 +352,7 @@ try {
 				MainForm.conMan.reconnect(e1);
 			} catch (Exception e1) {
 				e1.printStackTrace();
-			}*/
+			}
 			}
 		});
 		BPeshOK.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));

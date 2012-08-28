@@ -2030,9 +2030,9 @@ sb.append("<br>Подпись ____________");
 				if (acrs.getResultSet().next()) 
 				{sb.append("1. Фамилия, имя, отчество ");
 				sb.append(String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-				sb.append("<br>2. Возраст:" );
-				sb.append(String.format("%s", acrs.getResultSet().getDate(5)));
-				sb.append("3. Адрес и телефон");
+				sb.append("<br>2. Возраст: " );
+				sb.append(String.format("%s", acrs.getResultSet().getString(5)));
+				sb.append("3. Адрес и телефон: ");
 				sb.append(String.format("%s %s - %s, %s", acrs.getResultSet().getString(6), acrs.getResultSet().getString(7), acrs.getResultSet().getString(8), acrs.getResultSet().getString(9)));
 				}
 				sb.append("<br>4. Перенесенные общие, гинекологические заболевания или операции ___________________________________________");
