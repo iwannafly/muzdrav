@@ -37,6 +37,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
@@ -334,7 +335,8 @@ try {
 		JButton BPeshOK = new JButton("Печать обменной карты");
 		BPeshOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try{
+	/*			try{
+					KartaBer kartaber = new KartaBer();
 					String servPath = MainForm.tcl.printKartaBer();
 					String cliPath;
 					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
@@ -346,7 +348,7 @@ try {
 				MainForm.conMan.reconnect(e1);
 			} catch (Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 			}
 		});
 		BPeshOK.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
