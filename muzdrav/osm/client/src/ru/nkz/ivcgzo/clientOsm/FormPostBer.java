@@ -37,6 +37,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
@@ -152,10 +153,6 @@ addWindowListener(new WindowAdapter() {
 try {
 	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getId_pvizit());
 	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-//	setDefaultValues();
-//	rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-//	rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-//	rdsl.setNpasp(Vvod.zapVr.getNpasp());
 	setPostBerData();
 	fam.setText(Vvod.zapVr.getFam());
 	im.setText(Vvod.zapVr.getIm());
@@ -184,8 +181,9 @@ try {
 					rdsl = new RdSlStruct();
 					setDefaultValues();
 					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-					rdsl.setNpasp(Vvod.zapVr.getNpasp());
+//					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//					rdsl.setNpasp(Vvod.zapVr.getNpasp());
+					rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 					setPostBerData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -337,7 +335,8 @@ try {
 		JButton BPeshOK = new JButton("Печать обменной карты");
 		BPeshOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try{
+	/*			try{
+					KartaBer kartaber = new KartaBer();
 					String servPath = MainForm.tcl.printKartaBer();
 					String cliPath;
 					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
@@ -349,7 +348,7 @@ try {
 				MainForm.conMan.reconnect(e1);
 			} catch (Exception e1) {
 				e1.printStackTrace();
-			}
+			}*/
 			}
 		});
 		BPeshOK.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
@@ -969,7 +968,8 @@ try {
 	private void setDefaultValues() {
 		// TODO Auto-generated method stub
 	try {
-		rdsl.setNpasp(Vvod.zapVr.npasp);
+		rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+		rdsl.setNpasp(Vvod.zapVr.getNpasp());
 		rdsl.setCext(25);
 		rdsl.setDsp(25);
 		rdsl.setDsr(28);

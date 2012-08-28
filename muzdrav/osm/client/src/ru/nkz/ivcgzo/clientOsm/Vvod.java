@@ -861,7 +861,7 @@ mi4.addActionListener(new ActionListener() {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		try{
-				String servPath = MainForm.tcl.printMSK();
+				String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
 				String cliPath;
 				cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
 				MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -1700,23 +1700,6 @@ rbPokaz.addActionListener(new ActionListener() {
 					e.printStackTrace();
 				}
 				}
-//				if (cbVidIssl.getSelectedItem()!= null){
-//					try {
-////						if (rbMetodIssl.isSelected()){//
-//								tabMetod.setData(MainForm.tcl.getMetod(cbVidIssl.getSelectedItem().pcod));
-////						}
-//						if (rbPokaz.isSelected()){
-//							cbOrgan.setSelectedItem(null);
-//							cbOrgan.setData(MainForm.tcl.get_n_nz1(cbVidIssl.getSelectedItem().pcod));	
-//								}
-//						} catch (KmiacServerException e) {
-//							e.printStackTrace();
-//						} catch (TException e) {
-//							MainForm.conMan.reconnect(e);
-//							
-//						}
-//					}
-//										
 			}
 		});
 		
@@ -1724,7 +1707,6 @@ rbPokaz.addActionListener(new ActionListener() {
 		butPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-	//				if (rbMetodIssl.isSelected()){
 					if ((cbVidIssl.getSelectedItem() != null) ) {
 						String tip = MainForm.tcl.getVidIssl(cbMesto.getSelectedItem().pcod);
 						P_isl_ld pisl = new P_isl_ld();
