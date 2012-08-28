@@ -1,0 +1,4 @@
+<shabImpConfig>
+	<srcBase type="oracle" host="oracle.ivcgzo.nkz.ru" port="1521" schema="ORCL" name="KONT" login="talon" password="xtalon" tempDir="\\10.0.0.186\SomeSharedResource" />
+	<dstBase host="10.0.0.242" port="5432" schema="public" name="zabol" login="postgres" password="postgres" tempDir="\\10.0.0.186\SomeSharedResource" />
+</shabImpConfig>
