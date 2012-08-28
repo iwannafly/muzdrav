@@ -284,7 +284,7 @@ public class FormRdDin extends JFrame {
 		SSrok.setModel(new SpinnerNumberModel(4, 0, 42, 1));
 		
 		SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(new Integer(60), null, null, new Integer(1)));
+		SVes.setModel(new SpinnerNumberModel(new Double(60), null, null, new Double(0)));
 		
 		SOkrj = new JSpinner();
 		SOkrj.setModel(new SpinnerNumberModel(new Integer(60), null, null, new Integer(1)));
@@ -327,7 +327,7 @@ public class FormRdDin extends JFrame {
 		rddin.setOj((int) SOkrj.getModel().getValue());
 		rddin.setSpl((int) STolP.getModel().getValue());
 		rddin.setSrok((int) SSrok.getModel().getValue());
-		rddin.setVes((int) SVes.getModel().getValue());
+		rddin.setVes((double) SVes.getModel().getValue());
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
 			else rddin.unsetPredpl();

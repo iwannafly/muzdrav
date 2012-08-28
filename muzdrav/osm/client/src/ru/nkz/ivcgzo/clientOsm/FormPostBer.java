@@ -251,7 +251,7 @@ try {
 			rdsl.setPolj((int) SPolJ.getModel().getValue());
 			rdsl.setPrmen((int) SMenC.getModel().getValue());
 //			rdsl.setRost((int) SRost.getModel().getValue());
-			rdsl.setVesd((int) SVes.getModel().getValue());
+			rdsl.setVesd((Double) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
 			rdsl.setOslrod(oslrod);
 			if (CBOslAb.getSelectedPcod() != null)
@@ -474,7 +474,7 @@ try {
 		SRost = new JSpinner();
 
 		SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(0, 0, 250, 1));
+		SVes.setModel(new SpinnerNumberModel(0.0, 0.0, 250.0, 0.0));
 //		rdsl.setVesd((int) SVes.getModel().getValue());
 		
 		SDsp = new JSpinner();

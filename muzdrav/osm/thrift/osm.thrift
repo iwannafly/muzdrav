@@ -211,7 +211,7 @@ struct RdSlStruct{
         12: optional i32 kolrod;
 	13: optional i32 deti;
 	14: optional bool kont;
-	15: optional i32 vesd;
+	15: optional double vesd;
 	16: optional i32 dsp;
 	17: optional i32 dsr;
 	18: optional i32 dTroch;
@@ -257,7 +257,7 @@ struct RdDinStruct{
 	19: optional i32 serd;
 	20: optional i32 serd1;
 	21: optional i32 id_pos;
-	22: optional i32 ves;
+	22: optional double ves;
 }
 
 /*. Rd_Inf*/
