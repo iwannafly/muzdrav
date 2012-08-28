@@ -152,10 +152,6 @@ addWindowListener(new WindowAdapter() {
 try {
 	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getId_pvizit());
 	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-//	setDefaultValues();
-//	rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-//	rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-//	rdsl.setNpasp(Vvod.zapVr.getNpasp());
 	setPostBerData();
 	fam.setText(Vvod.zapVr.getFam());
 	im.setText(Vvod.zapVr.getIm());
@@ -184,8 +180,9 @@ try {
 					rdsl = new RdSlStruct();
 					setDefaultValues();
 					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-					rdsl.setNpasp(Vvod.zapVr.getNpasp());
+//					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//					rdsl.setNpasp(Vvod.zapVr.getNpasp());
+					rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 					setPostBerData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -969,7 +966,8 @@ try {
 	private void setDefaultValues() {
 		// TODO Auto-generated method stub
 	try {
-		rdsl.setNpasp(Vvod.zapVr.npasp);
+		rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+		rdsl.setNpasp(Vvod.zapVr.getNpasp());
 		rdsl.setCext(25);
 		rdsl.setDsp(25);
 		rdsl.setDsr(28);
