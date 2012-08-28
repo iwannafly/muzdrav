@@ -101,6 +101,18 @@ public class FormRdDin extends JFrame {
 	 * Create the frame.
 	 */
 	public FormRdDin() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				JOptionPane.showMessageDialog(FormRdDin.this,  Vvod.zapVr.getId_pvizit());
+		//		rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+		//		setPostBerData();
+		//		rddin = MainForm.tcl.getRdDinInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+				fam.setText(Vvod.zapVr.getFam());
+				im.setText(Vvod.zapVr.getIm());
+				ot.setText(Vvod.zapVr.getOth());
+			}
+		});
 		setTitle("Динамика диспансерного наблюдения за беременной");
 		addComponentListener(new ComponentAdapter() {
 			@Override
