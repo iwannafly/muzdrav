@@ -244,7 +244,9 @@ try {
 //			rdsl.setRost((int) SRost.getModel().getValue());
 			rdsl.setVesd((Double) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
-           	oslrod=0;
+           	rdsl.setCdiagt((int) SCDiag.getModel().getValue());
+           	rdsl.setCvera((int) SCvera.getModel().getValue());
+			oslrod=0;
 			getoslrod(oslrod);
 			rdsl.setOslrod(oslrod);
 			if (CBOslAb.getSelectedPcod() != null)
@@ -1044,6 +1046,8 @@ try {
 			SKolDet.setValue(rdsl.getDeti());
 			SPolJ.setValue(rdsl.getPolj());
 			SSrokA.setValue(rdsl.getSrokab());
+			SCDiag.setValue(rdsl.getCdiagt());
+			SCvera.setValue(rdsl.getCvera());
 			oslrod = rdsl.getOslrod();
 			if(rdsl.isSetOslab())
 			CBOslAb.setSelectedPcod(rdsl.getOslab());
@@ -1054,6 +1058,7 @@ try {
 			if (rdsl.isSetIshod())
 			CBPrishSn.setSelectedPcod(rdsl.getIshod());
 			else CBPrishSn.setSelectedItem(null);
+//			TNKart.setText(rdsl.getId());
 			method2();
 			CBKrov.setSelected(or1 == 1);
 			CBEkl.setSelected(or2 == 1);
