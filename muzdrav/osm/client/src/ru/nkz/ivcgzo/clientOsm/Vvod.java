@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
@@ -36,6 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
@@ -43,6 +45,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
@@ -89,6 +92,7 @@ import ru.nkz.ivcgzo.thriftOsm.Protokol;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import javax.swing.ScrollPaneConstants;
@@ -100,6 +104,7 @@ import javax.swing.ImageIcon;
 import java.awt.Font;
 import java.awt.event.InputMethodListener;
 import java.awt.event.InputMethodEvent;
+import javax.swing.JList;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
@@ -173,6 +178,7 @@ public class Vvod extends JFrame {
 	private JPopupMenu pmvizit;
 	private JLabel tfPatient;
 	private int idpv;
+	private JList shlist;
 	
 	/**
 	 * Create the frame.
@@ -198,16 +204,6 @@ public class Vvod extends JFrame {
 		 MainForm.instance.addChildFrame(postber);
 		 
 		setBounds(100, 100, 1029, 962);
-		
-		final ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
-		listShablon.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					ShablonTextField.instance.setText(listShablon.getSelectedValue().getName());
-				}
-			}
-		});
 
 		JScrollPane scrollPane = new JScrollPane();
 		GroupLayout gl_contentPane = new GroupLayout(getContentPane());
@@ -942,8 +938,9 @@ mi4.addActionListener(new ActionListener() {
 							.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 499, Short.MAX_VALUE))
 						.addContainerGap())
 			);
-		
-		spShab.setViewportView(listShablon);
+			
+			 shlist = new JList(List1());
+			spShab.setViewportView(shlist);
 		
 		TabPos = new CustomTable<>(false,false,PvizitAmb.class,3,"Дата",19,"ФИО врача",5,"Должность");
 		TabPos.setDateField(0);
@@ -2201,5 +2198,24 @@ rbPokaz.addActionListener(new ActionListener() {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+	
+	private  ListModel List1(){
+		DefaultListModel model = new DefaultListModel();
+		try {
+			for (Shablon element : MainForm.tcl.getShablon()) {
+				model.addElement(element.getName());
+			} 
+			
+		} catch (KmiacServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		return model;
 	}
 }

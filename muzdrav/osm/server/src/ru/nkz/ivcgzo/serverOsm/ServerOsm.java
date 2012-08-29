@@ -2133,7 +2133,7 @@ sb.append("<br>Подпись ____________");
 
 	@Override
 	public List<Shablon> getShablon() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select sh_ot_spec.id_sh_osm,n_spec.name,n_s00.name,sh_osm.name,n_shablon.name,sh_osm.diag,sh_osm_text.sh_text from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm,sh_osm.name,sh_osm.diag,sh_osm_text.sh_text,sh_ot_spec.cspec from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
 		{
 			return rsmSh.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
@@ -2144,8 +2144,12 @@ sb.append("<br>Подпись ____________");
 	@Override
 	public List<Shablon> getShPoisk(String tf) throws KmiacServerException,
 			TException {
-		// TODO Auto-generated method stub
-		return null;
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like '%бильные%') or  (sh_osm.diag like '%014.9%') or (sh_osm_text.sh_text like '%обследование%')order by name")) 
+		{
+			return rsmSh.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 
 
