@@ -151,7 +151,6 @@ addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 try {
-	JOptionPane.showMessageDialog(FormPostBer.this,  Vvod.zapVr.getId_pvizit());
 	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 	setPostBerData();
 	fam.setText(Vvod.zapVr.getFam());
@@ -199,9 +198,7 @@ try {
 		ButSave.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		ButSave.setToolTipText("Сохранить");
 		ButSave.addActionListener(new ActionListener() {
-			private AbstractButton sVozMen;
             private int getoslrod(int oslrod){
-            	oslrod=0;
             if (CBKrov.isSelected()){oslrod=oslrod+1;}
             if (CBEkl.isSelected()){oslrod=oslrod+2;}
             if (CBGnoin.isSelected()){oslrod=oslrod+4;}
@@ -212,14 +209,8 @@ try {
             if (CBRazrProm.isSelected()){oslrod=oslrod+128;}
 			return oslrod;	
             };
-			private int kontrac(int iw3){
-				if (CBKontr.isSelected()){iw3 = 1;}
-				return iw3;
-			};
 			public void actionPerformed(ActionEvent arg0) {
-	/*			patient.setFam((String) fam.getText());
-				patient.setIm((String)im.getText());
-				patient.setOt((String) ot.getText());*/
+				try {
 			rdsl.setAbort((int) SKolAb.getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
  			if (SDataM.getDate() != null)
@@ -253,6 +244,8 @@ try {
 //			rdsl.setRost((int) SRost.getModel().getValue());
 			rdsl.setVesd((Double) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
+           	oslrod=0;
+			getoslrod(oslrod);
 			rdsl.setOslrod(oslrod);
 			if (CBOslAb.getSelectedPcod() != null)
 				rdsl.setOslab(CBOslAb.getSelectedPcod());
@@ -264,7 +257,7 @@ try {
 				rdsl.setIshod(CBPrishSn.getSelectedPcod());
 				else rdsl.unsetIshod();
 			
-			try {
+				JOptionPane.showMessageDialog(FormPostBer.this, "Ошибка обновления");
 				MainForm.tcl.UpdateRdSl(rdsl);
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
@@ -1015,16 +1008,27 @@ try {
 			SCext.setValue(rdsl.getCext());
 			SindSol.setValue(rdsl.getIndsol());
 			SDataPos.setDate(rdsl.getDatay());
+			if (rdsl.getDatay() == 0)
+			SDataPos.setText(null);
 			SDataSn.setDate(rdsl.getDatasn());
+			if (rdsl.getDatasn() == 0)
+			SDataSn.setText(null);
 			SDataRod.setDate(rdsl.getDataZs());
+			if (rdsl.getDataZs() == 0)
+			SDataRod.setText(null);
 			SDataSert.setDate(rdsl.getDatasert());
+			if (rdsl.getDatasert() == 0)
+			SDataSert.setText(null);
 			TSSert.setText(rdsl.ssert);
 			TNSert.setText(rdsl.nsert);
 			SParRod.setValue(rdsl.getKolrod());
 			SKolBer.setValue(rdsl.getShet());
 			TDataab.setDate(rdsl.getDataab());
-			SDataRod.setDate(rdsl.getDataZs());
+			if (rdsl.getDataab() == 0)
+			TDataab.setText(null);
 			SDataSert.setDate(rdsl.getDatasert());
+			if (rdsl.getDatasert() == 0)
+			SDataSert.setText(null);
 			TSSert.setText(rdsl.ssert);
 			TNSert.setText(rdsl.nsert);
 			SParRod.setValue(rdsl.getKolrod());
@@ -1032,6 +1036,8 @@ try {
 			SDataOsl.setDate(rdsl.getDataosl());
 			SYavka.setValue(rdsl.getYavka1());
 			SDataM.setDate(rdsl.getDataM());
+			if (rdsl.getDataM() == 0)
+			SDataM.setText(null);
 			SKolAb.setValue(rdsl.getAbort());
 			SVozMen.setValue(rdsl.getVozmen());
 			SMenC.setValue(rdsl.getPrmen());
@@ -1039,6 +1045,15 @@ try {
 			SPolJ.setValue(rdsl.getPolj());
 			SSrokA.setValue(rdsl.getSrokab());
 			oslrod = rdsl.getOslrod();
+			if(rdsl.isSetOslab())
+			CBOslAb.setSelectedPcod(rdsl.getOslab());
+			else CBOslAb.setSelectedItem(null);
+			if (rdsl.isSetPlrod())
+			CBRod.setSelectedPcod(rdsl.getPlrod());
+			else CBRod.setSelectedItem(null);
+			if (rdsl.isSetIshod())
+			CBPrishSn.setSelectedPcod(rdsl.getIshod());
+			else CBPrishSn.setSelectedItem(null);
 			method2();
 			CBKrov.setSelected(or1 == 1);
 			CBEkl.setSelected(or2 == 1);
