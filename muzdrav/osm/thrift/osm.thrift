@@ -446,6 +446,15 @@ struct KartaBer {
 	4: optional i32 id_rd_sl;
 }
 
+struct Shablon{
+	1: i32 id;
+	2: string name;
+	3: string diag;
+	4: string text;
+	5: string cdol;
+	6: i32 spec;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -602,5 +611,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
+/*Shablon*/
+	list<Shablon> getShablon() throws (1: kmiacServer.KmiacServerException kse);
+	list<Shablon> getShPoisk(1: string tf) throws (1: kmiacServer.KmiacServerException kse);
 
 }
