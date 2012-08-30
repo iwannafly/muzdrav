@@ -159,11 +159,12 @@ public class ClassifierImporter {
 				String procLine;
 				while ((procLine = br.readLine()) != null) {
 					lastLine = procLine;
-					int errIdx = procLine.indexOf("ERROR:  ");
+					int errIdx = procLine.indexOf("psql:");
 					if (errIdx > -1)
 						errorMsg += procLine + System.lineSeparator();
 				}
-
+				if (!lastLine.equals("ROLLBACK"))
+					errorMsg = "";
 			} catch (IOException e) {
 				psqlProcess.destroy();
 				throw new IOException("Can't open psql input stream.", e);
