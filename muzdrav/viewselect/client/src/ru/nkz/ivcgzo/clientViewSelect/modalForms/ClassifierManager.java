@@ -85,8 +85,8 @@ public class ClassifierManager {
 	}
 	
 	public List<mrab_0> getMrabTreeClassifier() throws KmiacServerException, TException {
-		if (polpTreeClass == null)
-			polpTreeClass = MainForm.tcl.getPolp_0();
+		if (mrabTreeClass == null)
+			mrabTreeClass = MainForm.tcl.getMrab_0();
 		
 		return mrabTreeClass;
 	}

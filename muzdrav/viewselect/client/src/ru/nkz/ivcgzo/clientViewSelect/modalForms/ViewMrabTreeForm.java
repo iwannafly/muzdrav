@@ -25,12 +25,9 @@ import ru.nkz.ivcgzo.clientViewSelect.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.mrab_0;
-import ru.nkz.ivcgzo.thriftViewSelect.mrab_0;
-import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
-import ru.nkz.ivcgzo.thriftViewSelect.polp_1;
 
 public class ViewMrabTreeForm extends ModalForm {
-	private static final long serialVersionUID = -2721787454937988306L;
+	private static final long serialVersionUID = -6938526745673602604L;
 	private List<mrab_0> mrabTree;
 	private JPanel contentPane;
 	private JTree tree;
@@ -86,14 +83,8 @@ public class ViewMrabTreeForm extends ModalForm {
 	public void acceptResults() {
 		Object sel = tree.getSelectionPath().getLastPathComponent();
 		
-		//if (sel instanceof mrab_1)
-		//	if (((mrab_1) sel).getmrab2Size() == 0)
-		//		results = new int[] { ((mrab_0) tree.getSelectionPath().getParentPath().getLastPathComponent()).kdate, ((mrab_1) sel).kdlpu, ((mrab_1) sel).kdlpu };
-		//	else
-		//		return;
-		//else 
 		if (sel instanceof IntegerClassifier)
-			results = new int[] { ((mrab_0) tree.getSelectionPath().getParentPath().getParentPath().getLastPathComponent()).pGruppa, ((IntegerClassifier) sel).pcod };
+			results = new int[] { ((mrab_0) tree.getSelectionPath().getParentPath().getLastPathComponent()).pGruppa, ((IntegerClassifier) sel).pcod };
 		else
 			return;
 		
@@ -127,11 +118,6 @@ public class ViewMrabTreeForm extends ModalForm {
 		tree.setRootVisible(false);
 		tree.setShowsRootHandles(true);
 		tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("Root")) {
-			
-
-			/**
-			 * 
-			 */
 			private static final long serialVersionUID = -1143272828997564673L;
 
 			@Override
@@ -148,8 +134,6 @@ public class ViewMrabTreeForm extends ModalForm {
 					return mrabTree.size();
 				else if (parent instanceof mrab_0)
 					return ((mrab_0) parent).getMrab1Size();
-				//else if (parent instanceof mrab_1)
-				//	return ((mrab_1) parent).getmrab2Size();
 				else
 					return -1;
 			}
@@ -158,8 +142,6 @@ public class ViewMrabTreeForm extends ModalForm {
 			public Object getChild(Object parent, int index) {
 				if (parent instanceof DefaultMutableTreeNode)
 					return new mrab0Str(mrabTree.get(index));
-				//else if (parent instanceof mrab_0)
-				//	return new mrab1Str(((mrab_0) parent).mrab1.get(index));
 				else if (parent instanceof mrab_0)
 					return new IntegerClassifierStr(((mrab_0) parent).mrab1.get(index));
 				else
@@ -172,8 +154,6 @@ public class ViewMrabTreeForm extends ModalForm {
 					return mrabTree.indexOf(child);
 				else if (parent instanceof mrab_0)
 					return ((mrab_0) parent).mrab1.indexOf(child);
-				//else if (parent instanceof mrab_1)
-				//	return ((mrab_1) parent).mrab2.indexOf(child);
 				else
 					return -1;
 			}
@@ -188,17 +168,8 @@ public class ViewMrabTreeForm extends ModalForm {
 				for (int j = 0; j < mrab0.getMrab1Size(); j++) {
 					IntegerClassifier mrab1 = mrab0.mrab1.get(j);
 					if (mrab1.pcod == pMrab) {
-						//if (polp1.getPolp2Size() == 0) {
-							scrollToPath(new TreePath(new Object[] {root, mrab0, mrab1}));
-							return;
-						//}// else
-							//for (int k = 0; k < polp1.getPolp2Size(); k++) {
-								//IntegerClassifier ic = polp1.polp2.get(k);
-								//if (ic.pcod == kdPol) {
-								//	scrollToPath(new TreePath(new Object[] {root, polp0, polp1, ic}));
-								//	return;
-								//}
-							//}
+						scrollToPath(new TreePath(new Object[] {root, mrab0, mrab1}));
+						return;
 					}
 				}
 			}
@@ -216,7 +187,7 @@ public class ViewMrabTreeForm extends ModalForm {
 	}
 	
 	class mrab0Str extends mrab_0 {
-		private static final long serialVersionUID = 8055500323615642093L;
+		private static final long serialVersionUID = 3067173142200244435L;
 
 		public mrab0Str(mrab_0 mrab0) {
 			super(mrab0);
@@ -228,21 +199,8 @@ public class ViewMrabTreeForm extends ModalForm {
 		}
 	}
 	
-	/**class mrab1Str extends mrab_1 {
-		private static final long serialVersionUID = -5101784151738094228L;
-
-		public mrab1Str(mrab_1 mrab1) {
-			super(mrab1);
-		}
-		
-		@Override
-		public String toString() {
-			return name;
-		}
-	}*/
-	
 	class IntegerClassifierStr extends IntegerClassifier {
-		private static final long serialVersionUID = 7623741381685241843L;
+		private static final long serialVersionUID = 6546159306809230995L;
 
 		public IntegerClassifierStr(IntegerClassifier ic) {
 			super(ic);
