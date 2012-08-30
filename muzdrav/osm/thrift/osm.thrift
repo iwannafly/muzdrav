@@ -224,7 +224,7 @@ struct RdSlStruct{
 	25: optional string ssert;
 	26: optional string oslab;
 	27: optional i32 plrod;
-	28: optional string prroid;
+	28: optional string prrod;
 	29: optional i32 vozmen;
 	30: optional i32 oslrod;
 	31: optional i32 polj;

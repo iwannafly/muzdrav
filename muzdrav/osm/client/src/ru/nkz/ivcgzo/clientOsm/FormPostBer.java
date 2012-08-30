@@ -211,6 +211,7 @@ try {
             };
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					rdsl.setId_pvizit(Vvod.zapVr.id_pvizit);
 			rdsl.setAbort((int) SKolAb.getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
  			if (SDataM.getDate() != null)
@@ -258,8 +259,8 @@ try {
 			if (CBPrishSn.getSelectedPcod() != null)
 				rdsl.setIshod(CBPrishSn.getSelectedPcod());
 				else rdsl.unsetIshod();
-			
-				JOptionPane.showMessageDialog(FormPostBer.this, "Ошибка обновления");
+	System.out.println(rdsl);		
+		//		JOptionPane.showMessageDialog(FormPostBer.this, "Ошибка обновления");
 				MainForm.tcl.UpdateRdSl(rdsl);
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
