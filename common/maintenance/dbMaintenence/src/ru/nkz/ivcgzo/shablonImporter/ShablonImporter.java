@@ -43,7 +43,7 @@ public class ShablonImporter {
 				PreparedStatement stmOsmSpec = dstConn.createPreparedStatement("INSERT INTO sh_ot_spec VALUES (?, ?) ", false);
 				PreparedStatement stmOsmTxt = dstConn.createPreparedStatement("INSERT INTO sh_osm_text VALUES (?, ?, ?) ", false);
 				Statement stmw = dstConn.createStatement()) {
-			ResultSet rsr = stmr.executeQuery(String.format("SELECT * FROM %s.SHPOL ", srcConn.databaseParams.name));
+			ResultSet rsr = stmr.executeQuery(String.format("SELECT * FROM %s.SHABLON ", srcConn.databaseParams.name));
 			
 			dstConn.rollback();
 			stmw.execute("DELETE FROM sh_osm_text ");
