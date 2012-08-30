@@ -2120,18 +2120,6 @@ sb.append("<br>Подпись ____________");
 	}
 
 	@Override
-	public String getVidIssl(int pcod) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select tip from n_lds where pcod = ? ", pcod)) {
-			if (acrs.getResultSet().next()) 
-				return acrs.getResultSet().getString(1);
-			else
-				return "";
-		} catch (SQLException e) {
-			throw new TException(e);
-		}
-	}
-
-	@Override
 	public List<Shablon> getShablon() throws KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm,sh_osm.name,sh_osm.diag,sh_osm_text.sh_text,sh_ot_spec.cspec from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
 		{
@@ -2150,6 +2138,18 @@ sb.append("<br>Подпись ____________");
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
+	}
+
+	@Override
+	public List<StringClassifier> get_vid_issl(int clab) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, tip as name  from n_lds where pcod=?", clab)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+
 	}
 
 
