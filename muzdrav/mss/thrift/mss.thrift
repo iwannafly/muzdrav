@@ -83,7 +83,8 @@ struct P_smert{
 	77: optional string kvdok,
 	78: optional i32 vz_ser,
         79: optional i32 vz_nomer,
-        80: optional i64 vz_datav
+        80: optional i64 vz_datav,
+	81: optional string adm_raion
 }
 
 struct PatientCommonInfo {
@@ -116,6 +117,20 @@ struct Psmertdop {
 	 5: i32 nomer_k,
 	 6: i32 nomer_t
 	 
+}
+
+struct UserFio {
+	 1: i32 pcod,
+	 2: string fam,
+	 3: string im,
+	 4: string ot
+		 
+}
+
+/**
+ * пользователь не найден
+ */
+exception UserNotFoundException {
 }
 
 /**
@@ -178,6 +193,11 @@ service ThriftMss extends kmiacServer.KmiacServer {
  */
 	i32 setPsmertdop(1: Psmertdop cpodr);
 
+/**
+ * заполнивший медицинское свидетельство о смерти
+ */
+	UserFio getUserFio(1:i32 pcod) throws (1: UserNotFoundException nfio);
+
 
 	list<classifier.IntegerClassifier> get_n_z60() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_z10() throws (1: kmiacServer.KmiacServerException kse);
@@ -192,4 +212,6 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_u50() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_p07() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_az0() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> gets_vrach(1:i32 clpu, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> gets_dolj(1:i32 clpu, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 }

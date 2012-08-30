@@ -44,6 +44,8 @@ import ru.nkz.ivcgzo.thriftMss.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftMss.PatientMestn;
 import ru.nkz.ivcgzo.thriftMss.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
+import ru.nkz.ivcgzo.thriftMss.UserFio;
+import ru.nkz.ivcgzo.thriftMss.UserNotFoundException;
 import javax.swing.JCheckBox;
 import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
@@ -101,7 +103,6 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private CustomDateEditor tfDatatr;
 	private CustomTimeEditor tfVrem_tr;
 	private JTextField tfObst;
-	private JTextField tfCvrach;
 	private JTextField tfPsm_a;
 	private JTextArea tfPsm_an;
 	private JTextField tfPsm_ak;
@@ -135,6 +136,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private JTextField tKpol;
 	private JCheckBox chckbxDtp30;
 	private JCheckBox chckbxDtp7;
+	private JPanel panel_6;
 	
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVid;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_semp;
@@ -144,7 +146,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbProiz;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVid_tr;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbUstan;
-	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbCdol;
+	private ThriftStringClassifierCombobox <StringClassifier> cmbCdol;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbOsn;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_ad;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_bd;
@@ -155,12 +157,23 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbPsm_p2d;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbVdok;
 	private ThriftIntegerClassifierCombobox <IntegerClassifier> cmbUmerla;
+	private ThriftIntegerClassifierCombobox <IntegerClassifier> tfCvrach;
 	
 	private P_smert Patientsmert;
 	private PatientCommonInfo PatientAdres;
 	private PatientMestn PatMestn;
+	private UserFio UFio;
 	
 	private int patId = 0;
+	private float ktime = 0;
+	private long drojd;
+	private long dsmert;
+	private boolean aBool = false;
+	private int cuserId = 0;
+	private int cuserPodr = 0;
+	private int cuserCslu = 0;
+	private int cuserClpu = 0;
+	private String cuserFio;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -174,7 +187,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 			cmbProiz = new ThriftIntegerClassifierCombobox<>(true);
 			cmbVid_tr = new ThriftIntegerClassifierCombobox<>(true);
 			cmbUstan = new ThriftIntegerClassifierCombobox<>(true);
-			cmbCdol = new ThriftIntegerClassifierCombobox<>(true);
+			cmbCdol = new ThriftStringClassifierCombobox<>(true);
 			cmbOsn = new ThriftIntegerClassifierCombobox<>(true);
 			cmbPsm_ad = new ThriftIntegerClassifierCombobox<>(true);
 			cmbPsm_bd = new ThriftIntegerClassifierCombobox<>(true);
@@ -185,7 +198,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 			cmbPsm_p2d = new ThriftIntegerClassifierCombobox<>(true);
 			cmbUmerla = new ThriftIntegerClassifierCombobox<>(true);
 			cmbVdok = new ThriftIntegerClassifierCombobox<>(true);
-			
+			tfCvrach = new ThriftIntegerClassifierCombobox<>(true);
 		}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -200,11 +213,24 @@ public class MainForm extends Client<ThriftMss.Client> {
 		frame.getContentPane().add(panel);
 		
 		JButton btnNewButton = new JButton("Поиск");
+		btnNewButton.setToolTipText("Поиск и выбор пациента");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);
 				tfDatav.setValue(null);
-				if (res != null) {
+				cuserId = MainForm.authInfo.getPcod();
+				cuserClpu = MainForm.authInfo.getClpu();
+				cuserCslu = MainForm.authInfo.getCslu();
+				cuserPodr = MainForm.authInfo.getCpodr();
+				
+					try {
+						UFio = MainForm.tcl.getUserFio(cuserId);
+						cuserFio = UFio.getFam().trim() + ' '+ UFio.getIm().trim()+ ' ' + UFio.getOt().trim();
+					} catch (UserNotFoundException | TException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+					if (res != null) {
 					try {
 						patId = res[0];
 						PatientAdres = MainForm.tcl.getPatientCommonInfo(res[0]);
@@ -223,6 +249,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 							tfPol.setText("женский");
 						if (PatientAdres.isSetDatar()) {
 							tfDatar.setDate(PatientAdres.datar);
+							drojd = PatientAdres.datar;
 						}
 						if (PatientAdres.getAdm_obl() != null) {
 							tfAdm_obl.setText(PatientAdres.adm_obl.trim());
@@ -279,7 +306,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 						if (Patientsmert.isSetVz_datav()) tfVz_datav.setDate(Patientsmert.vz_datav);
 						if (Patientsmert.isSetDatas()) tfDatas.setDate(Patientsmert.datas);
 						if (Patientsmert.isSetVrems()) tfVrems.setTime(Patientsmert.vrems);
-						//if (Patientsmert.getAdm_raion() != null) tfAdm_raion.setText(Patientsmert.adm_raion);
+						if (Patientsmert.getAdm_raion() != null) tfAdm_raion.setText(Patientsmert.adm_raion);
 						if (Patientsmert.getAds_obl() != null) tfAds_obl.setText(Patientsmert.ads_obl);
 						if (Patientsmert.getAds_raion() != null) tfAds_raion.setText(Patientsmert.ads_raion);
 						if (Patientsmert.getAds_gorod() != null) tfAds_gorod.setText(Patientsmert.ads_gorod);
@@ -309,7 +336,9 @@ public class MainForm extends Client<ThriftMss.Client> {
 						if (Patientsmert.isSetVrem_tr()) tfVrem_tr.setTime(Patientsmert.vrem_tr);
 						if (Patientsmert.getObst() != null) tfObst.setText(Patientsmert.obst);
 						if (Patientsmert.getUstan() != 0) cmbUstan.setSelectedPcod(Patientsmert.ustan);
-						//if (Patientsmert.getCvrach() != 0) tfCvrach.setSelectedPcod(Patientsmert.cvrach);
+						if (Patientsmert.getOsn() != 0) cmbOsn.setSelectedPcod(Patientsmert.osn);
+						if (Patientsmert.getCvrach() != 0) tfCvrach.setSelectedPcod(Patientsmert.cvrach);
+						if (Patientsmert.getCdol() != null) cmbCdol.setSelectedPcod(Patientsmert.cdol);
 						if (Patientsmert.getPsm_a() != null) tfPsm_a.setText(Patientsmert.psm_a);
 						if (Patientsmert.getPsm_an() != null) tfPsm_an.setText(Patientsmert.psm_an);
 						if (Patientsmert.getPsm_ak() != 0) tfPsm_ak.setText(String.valueOf(Patientsmert.psm_ak));
@@ -342,13 +371,23 @@ public class MainForm extends Client<ThriftMss.Client> {
 						chckbxDtp7.setSelected(false);}
 						if (Patientsmert.getDtp() == 2) { chckbxDtp30.setSelected(true);
 						chckbxDtp7.setSelected(true);}
-						if (Patientsmert.getCuser() != 0) tfZapolnil.setText(String.valueOf(Patientsmert.cuser));
+						if (Patientsmert.getCuser() != 0) cuserId = Patientsmert.getCuser(); 
 						if (Patientsmert.getFio_pol() != null) tfFam_pol.setText(Patientsmert.fio_pol.trim());
 						if (Patientsmert.getVdok() != 0) cmbVdok.setSelectedPcod(Patientsmert.vdok);
 						if (Patientsmert.getSdok() != null) tfSdok.setText(Patientsmert.sdok.trim());
 						if (Patientsmert.getNdok() != null) tfNdok.setText(Patientsmert.ndok.trim());
 						if (Patientsmert.getKvdok() != null) tfKvdok.setText(Patientsmert.kvdok.trim());
 						if (Patientsmert.isSetDvdok()) tfDvdok.setDate(Patientsmert.dvdok);
+						aBool = changeValue();
+						try {
+							UFio = MainForm.tcl.getUserFio(cuserId);
+							cuserFio = UFio.getFam().trim() + ' '+ UFio.getIm().trim()+ ' ' + UFio.getOt().trim();
+							tfZapolnil.setText(cuserFio);
+						} catch (UserNotFoundException | TException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+						//panel_6.setVisible(aBool);
 						} catch (MssNotFoundException e1) {
 						//System.out.println("NO" );
 					//	JOptionPane.showMessageDialog(frame, String.format("Нет информации на пациента %d", res[0]));
@@ -369,6 +408,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		panel.add(btnNewButton);
 		
 		JButton btnSave = new JButton("Сохранить");
+		btnSave.setToolTipText("Сохранить информацию о пациенте");
 		btnSave.setVerticalAlignment(SwingConstants.TOP);
 		panel.add(btnSave);
 		btnSave.addActionListener (new ActionListener() {
@@ -396,6 +436,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (tfVz_datav.getDate() != null) Patientsmert.setVz_datav(tfVz_datav.getDate().getTime());
 					if (tfDatas.getDate() != null) Patientsmert.setDatas(tfDatas.getDate().getTime());
 					if (tfVrems.getTime() != null) Patientsmert.setVrems(tfVrems.getTime().getTime());
+					Patientsmert.setAdm_raion(tfAdm_raion.getText().trim());
 					Patientsmert.setAds_obl(tfAds_obl.getText().trim());
 					Patientsmert.setAds_raion(tfAds_raion.getText().trim());
 					Patientsmert.setAds_gorod(tfAds_gorod.getText().trim());
@@ -408,6 +449,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (cmb_semp.getSelectedItem() != null) Patientsmert.setSemp(cmb_semp.getSelectedPcod());
 					if (cmb_obraz.getSelectedItem() != null) Patientsmert.setObraz(cmb_obraz.getSelectedPcod());
 					if (cmb_zan.getSelectedItem() != null) Patientsmert.setZan(cmb_zan.getSelectedPcod());
+					aBool = changeValue();
+					if (aBool == true) { 
 					if (rdbtn_don_don.isSelected()) Patientsmert.setDon(1);
 					if (rdbtn_don_ned.isSelected()) Patientsmert.setDon(2);
 					if (rdbtn_don_peren.isSelected()) Patientsmert.setDon(3);
@@ -418,6 +461,27 @@ public class MainForm extends Client<ThriftMss.Client> {
 					Patientsmert.setOt_m(tfOt_m.getText().trim());
 					Patientsmert.setMrojd(tfMrojd.getText().trim());
 					if (tfdatarm.getDate() != null) Patientsmert.setDatarm(tfdatarm.getDate().getTime());
+					}
+					else {
+						if (Patientsmert.isSetDon()) Patientsmert.setDon(0);
+						if (Patientsmert.isSetVes()) Patientsmert.setVes(0);
+						if (Patientsmert.isSetNreb()) Patientsmert.setNreb(0);
+						if (Patientsmert.isSetFam_m()) Patientsmert.setFam_m("");
+						if (Patientsmert.isSetIm_m()) Patientsmert.setIm_m("");
+						if (Patientsmert.isSetOt_m()) Patientsmert.setOt_m("");
+						if (Patientsmert.isSetMrojd()) Patientsmert.setMrojd("");
+						if (Patientsmert.isSetDatarm()) Patientsmert.setDatarm(0);
+						rdbtn_don_don.setSelected(false);
+						rdbtn_don_ned.setSelected(false);
+						rdbtn_don_peren.setSelected(false);
+						tfves.setText("");
+						tfNreb.setText("");
+						tfFam_m.setText("");
+						tfIm_m.setText("");
+						tfOt_m.setText("");
+						tfMrojd.setText("");
+						tfdatarm.setText("");
+					}
 					if (cmbNastupila.getSelectedItem() != null) Patientsmert.setNastupila(cmbNastupila.getSelectedPcod());
 					if (cmbProiz.getSelectedItem() != null) Patientsmert.setProiz(cmbProiz.getSelectedPcod());
 					if (tfDatatr.getDate() != null) Patientsmert.setDatatr(tfDatatr.getDate().getTime());
@@ -425,8 +489,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (cmbVid_tr.getSelectedItem() != null) Patientsmert.setVid_tr(cmbVid_tr.getSelectedPcod());
 					Patientsmert.setObst(tfObst.getText().trim());
 					if (cmbUstan.getSelectedItem() != null) Patientsmert.setUstan(cmbUstan.getSelectedPcod());
-					//Patientsmert.setCvrach(Integer.valueOf(tfCvrach.getText()));
-					//if (cmbCdol.getSelectedItem() != null) Patientsmert.setCdol(cmbCcdol.getSelectedPcod());
+					if (tfCvrach.getSelectedItem() != null) Patientsmert.setCvrach(tfCvrach.getSelectedPcod());
+					if (cmbCdol.getSelectedItem() != null) Patientsmert.setCdol(cmbCdol.getSelectedPcod());
 					if (cmbOsn.getSelectedItem() != null) Patientsmert.setOsn(cmbOsn.getSelectedPcod());
 					Patientsmert.setPsm_a(tfPsm_a.getText().trim());
 					Patientsmert.setPsm_an(tfPsm_an.getText().trim());
@@ -459,6 +523,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (chckbxDtp30.isSelected()) Patientsmert.setDtp(1);
 					if (chckbxDtp7.isSelected()) Patientsmert.setDtp(2);
 					if (cmbUmerla.getSelectedItem() != null) Patientsmert.setUmerla(cmbUmerla.getSelectedPcod());
+					Patientsmert.setCuser(cuserId);
 					Patientsmert.setFio_pol(tfFam_pol.getText().trim());
 					if (cmbVdok.getSelectedItem() != null) Patientsmert.setVdok(cmbVdok.getSelectedPcod());
 					Patientsmert.setSdok(tfSdok.getText().trim());
@@ -475,6 +540,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		
 		JButton btnDelete = new JButton("Удалить");
+		btnDelete.setToolTipText("Удалить информацию о пациенте");
 		btnDelete.setVerticalAlignment(SwingConstants.TOP);
 		panel.add(btnDelete);
 		
@@ -491,9 +557,9 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JPanel panel_5 = new JPanel();
 		panel_5.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JPanel panel_6 = new JPanel();
+		panel_6 = new JPanel();
 		panel_6.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
+				
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 	
@@ -789,57 +855,83 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JLabel lblNewLabel = new JLabel("Фамилия\r\n");
 		
 		tfFam = new JTextField();
+		tfFam.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tfFam.setEditable(false);
 		tfFam.setColumns(10);
 		
 		JLabel lblNewLabel_1 = new JLabel("Имя");
 		
 		tfIm = new JTextField();
+		tfIm.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tfIm.setEditable(false);
 		tfIm.setColumns(10);
 		
 		JLabel lblNewLabel_2 = new JLabel("Отчество");
 		
 		tfOt = new JTextField();
+		tfOt.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tfOt.setEditable(false);
 		tfOt.setColumns(10);
 		
 		JLabel lblNewLabel_3 = new JLabel("Пол");
 		
 		tfPol = new JTextField();
+		tfPol.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tfPol.setEditable(false);
 		tfPol.setColumns(10);
 		
 		JLabel lblNewLabel_4 = new JLabel("Дата рождения\r\n");
 		
 		tfDatar = new CustomDateEditor();
+		tfDatar.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tfDatar.setEditable(false);
 		tfDatar.setColumns(10);
 		
 		JLabel lblNewLabel_5 = new JLabel("Дата смерти");
 		
 		tfDatas = new CustomDateEditor();
 		tfDatas.setColumns(10);
-		
+		//tfDatas.addActionListener(new ActionListener() {
+		//	
+		//	@Override
+		//	public void actionPerformed(ActionEvent e) {
+		//		aBool = changeValue();
+		//		System.out.println("data");
+		//		//panel_6.setVisible(aBool);
+		//		
+		//	}
+		//});
+				
 		JLabel lblNewLabel_6 = new JLabel("время");
 		
 		tfVrems = new CustomTimeEditor();
 		tfVrems.setColumns(10);
 		
 		tfAdm_obl = new JTextField();
+		tfAdm_obl.setEditable(false);
 		tfAdm_obl.setColumns(10);
 		
 		tfAdm_raion = new JTextField();
 		tfAdm_raion.setColumns(10);
 		
 		tfAdm_gorod = new JTextField();
+		tfAdm_gorod.setEditable(false);
 		tfAdm_gorod.setColumns(10);
 		
 		tfAdm_ul = new JTextField();
+		tfAdm_ul.setEditable(false);
 		tfAdm_ul.setColumns(10);
 		
 		tfAdm_dom = new JTextField();
+		tfAdm_dom.setEditable(false);
 		tfAdm_dom.setColumns(10);
 		
 		tfAdm_korp = new JTextField();
+		tfAdm_korp.setEditable(false);
 		tfAdm_korp.setColumns(10);
 		
 		tfAdm_kv = new JTextField();
+		tfAdm_kv.setEditable(false);
 		tfAdm_kv.setColumns(10);
 		
 		rdbtnMjit_gor = new JRadioButton("городская");
@@ -1078,8 +1170,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		JLabel lblNewLabel_34 = new JLabel("врач: ФИО");
 		
-		tfCvrach = new JTextField();
-		tfCvrach.setColumns(10);
+		//tfCvrach = new JTextField();
+		//tfCvrach.setColumns(10);
 		
 		JLabel lblNewLabel_35 = new JLabel("должность");
 		
@@ -1088,7 +1180,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 		
 		
 		JLabel lblNewLabel_37 = new JLabel("Причины смерти:");
-		lblNewLabel_37.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNewLabel_37.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel lblNewLabel_38 = new JLabel("Длительность пат. процесса");
 		
@@ -1182,13 +1274,14 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JLabel lblNewLabel_46 = new JLabel("Заполнил свидетельство");
 		
 		tfZapolnil = new JTextField();
+		tfZapolnil.setEditable(false);
 		tfZapolnil.setColumns(10);
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel_2.createSequentialGroup()
 							.addComponent(lblNewLabel_44)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -1201,7 +1294,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 								.addGroup(gl_panel_2.createSequentialGroup()
 									.addComponent(lblNewLabel_45)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(cmbUmerla, 0, 348, Short.MAX_VALUE))
+									.addComponent(cmbUmerla, 0, 381, Short.MAX_VALUE))
 								.addGroup(gl_panel_2.createSequentialGroup()
 									.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
@@ -1221,13 +1314,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 										.addComponent(tfPsm_b, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-										.addComponent(tfPsm_p2n, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(tfPsm_p1n, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(tfPsm_pn, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(tfPsm_gn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(tfPsm_vn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(tfPsm_bn, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-										.addComponent(tfPsm_an, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))))
+										.addComponent(tfPsm_p2n, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+										.addComponent(tfPsm_p1n, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+										.addComponent(tfPsm_pn, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+										.addComponent(tfPsm_gn, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+										.addComponent(tfPsm_vn, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+										.addComponent(tfPsm_bn, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE)
+										.addComponent(tfPsm_an, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 513, Short.MAX_VALUE))))
 							.addGap(10)
 							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(tfPsm_p2k, 0, 0, Short.MAX_VALUE)
@@ -1250,11 +1343,11 @@ public class MainForm extends Client<ThriftMss.Client> {
 						.addGroup(gl_panel_2.createSequentialGroup()
 							.addComponent(lblNewLabel_46)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tfZapolnil, GroupLayout.PREFERRED_SIZE, 311, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
-						.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
-							.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
-								.addGroup(Alignment.LEADING, gl_panel_2.createSequentialGroup()
+							.addComponent(tfZapolnil, GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
+							.addGap(311))
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_2.createSequentialGroup()
 									.addComponent(lblNewLabel_11)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(cmbNastupila, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE)
@@ -1262,7 +1355,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 									.addComponent(lblNewLabel_12)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(cmbProiz, GroupLayout.PREFERRED_SIZE, 384, GroupLayout.PREFERRED_SIZE))
-								.addGroup(Alignment.LEADING, gl_panel_2.createSequentialGroup()
+								.addGroup(gl_panel_2.createSequentialGroup()
 									.addComponent(lblNewLabel_18)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(tfDatatr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -1275,15 +1368,15 @@ public class MainForm extends Client<ThriftMss.Client> {
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(cmbVid_tr, GroupLayout.PREFERRED_SIZE, 284, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel_2.createSequentialGroup()
-									.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
-										.addGroup(Alignment.LEADING, gl_panel_2.createSequentialGroup()
+									.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_panel_2.createSequentialGroup()
 											.addComponent(lblNewLabel_35)
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(cmbCdol, GroupLayout.PREFERRED_SIZE, 247, GroupLayout.PREFERRED_SIZE)
+											.addComponent(cmbCdol, GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
 											.addGap(18)
 											.addComponent(lblNewLabel_36)
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(cmbOsn, GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
+											.addComponent(cmbOsn, GroupLayout.DEFAULT_SIZE, 302, Short.MAX_VALUE))
 										.addGroup(gl_panel_2.createSequentialGroup()
 											.addComponent(lblNewLabel_33)
 											.addPreferredGap(ComponentPlacement.RELATED)
@@ -1291,7 +1384,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 											.addGap(18)
 											.addComponent(lblNewLabel_34)
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(tfCvrach, GroupLayout.PREFERRED_SIZE, 401, GroupLayout.PREFERRED_SIZE))
+											.addComponent(tfCvrach, GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE))
 										.addGroup(gl_panel_2.createSequentialGroup()
 											.addComponent(lblNewLabel_32)
 											.addPreferredGap(ComponentPlacement.RELATED)
@@ -1334,8 +1427,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_35)
 						.addComponent(cmbCdol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel_36)
-						.addComponent(cmbOsn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cmbOsn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_36))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel_37)
@@ -1601,7 +1694,6 @@ public class MainForm extends Client<ThriftMss.Client> {
 			cmbUstan.setData(MainForm.tcl.get_n_z80());
 			cmbOsn.setData(MainForm.tcl.get_n_z90());
 			cmbUmerla.setData(MainForm.tcl.get_n_u50());
-			//cmbCdol.setData(MainForm.tcl.get_s_mrab());
 			cmbPsm_ad.setData(MainForm.tcl.get_n_p07());
 			cmbPsm_bd.setData(MainForm.tcl.get_n_p07());
 			cmbPsm_vd.setData(MainForm.tcl.get_n_p07());
@@ -1610,11 +1702,27 @@ public class MainForm extends Client<ThriftMss.Client> {
 			cmbPsm_p1d.setData(MainForm.tcl.get_n_p07());
 			cmbPsm_p2d.setData(MainForm.tcl.get_n_p07());
 			cmbVdok.setData(MainForm.tcl.get_n_az0());
-
+			cuserClpu = MainForm.authInfo.getClpu();
+			cuserCslu = MainForm.authInfo.getCslu();
+			cuserPodr = MainForm.authInfo.getCpodr();
+			tfCvrach.setData(MainForm.tcl.gets_vrach(cuserClpu, cuserCslu, cuserPodr));
+			cmbCdol.setData(MainForm.tcl.gets_dolj(cuserClpu, cuserCslu, cuserPodr));
+			
 		} catch (KmiacServerException | TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+
+		public boolean changeValue() {
+		boolean aBool = false;			
+		if ((tfDatas.getDate() != null) || (tfDatar.getDate() != null)) {
+						dsmert = tfDatas.getDate().getTime();
+						ktime = (dsmert - drojd)/3600000;
+						if (ktime >= 168 && ktime <= 8766) aBool = true;
+		}
+						return aBool;		
 		
 	}
 }

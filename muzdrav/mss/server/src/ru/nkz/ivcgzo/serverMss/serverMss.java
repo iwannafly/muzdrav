@@ -32,6 +32,8 @@ import ru.nkz.ivcgzo.thriftMss.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftMss.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss.Iface;
+import ru.nkz.ivcgzo.thriftMss.UserFio;
+import ru.nkz.ivcgzo.thriftMss.UserNotFoundException;
 
 public class serverMss extends Server implements Iface {
 	private TServer thrServ;
@@ -44,9 +46,12 @@ public class serverMss extends Server implements Iface {
 	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> mssClass;
 	private TResultSetMapper<StringClassifier, StringClassifier._Fields> mssStrClas;
 	private static Class<?>[] intcTypes;
+	private static Class<?>[] strcTypes;
 	private TResultSetMapper<PatientMestn,PatientMestn._Fields> mssMestn;
 	private static Class<?>[] mestnTypes;
-
+	private TResultSetMapper<UserFio,UserFio._Fields> mssUser;
+	private static Class<?>[] userTypes;
+	
 	
 	public serverMss(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -59,7 +64,7 @@ public class serverMss extends Server implements Iface {
 				"psm_pk", "psm_pd", "psm_p1", "psm_p1n", "psm_p1k", "psm_p1d", "psm_p2", "psm_p2n", "psm_p2k",
 				"psm_p2d", "dtp", "umerla", "cuser", "clpu", "fio_r", "don", "ves", "nreb", "mrojd", "fam_m", 
 				"im_m", "ot_m", "datarm", "dataz", "fio_pol", "vdok", "sdok", "ndok", "dvdok", "kvdok", 
-				"vz_ser", "vz_nomer", "vz_datav");
+				"vz_ser", "vz_nomer", "vz_datav", "adm_raion");
 		mssTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Time.class,
 				String.class, String.class, String.class, String.class, String.class, String.class, String.class, Integer.class,
 				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Time.class, String.class, Integer.class,
@@ -68,7 +73,7 @@ public class serverMss extends Server implements Iface {
 				Integer.class, Integer.class, String.class, String.class, Integer.class, Integer.class, String.class, String.class, Integer.class,
 				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class,
 				String.class, Date.class, Date.class, String.class, Integer.class, String.class, String.class, Date.class, String.class, 
-				Integer.class, Integer.class, Date.class};
+				Integer.class, Integer.class, Date.class, String.class};
 		
 		mssPatient = new TResultSetMapper<>(PatientCommonInfo.class, "npasp","fam", "im", "ot", "datar", "pol", "adm_obl", "adm_gorod", "adm_ul", "adm_dom", "adm_korp", "adm_kv", "region_liv");
 		patTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,Date.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class};
@@ -79,9 +84,14 @@ public class serverMss extends Server implements Iface {
 		mssClass = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		intcTypes = new Class<?>[] {Integer.class, String.class};
 		
+		mssStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
+		strcTypes = new Class<?>[] {String.class, String.class};
+	
 		mssMestn = new TResultSetMapper<>(PatientMestn.class, "vid_np", "c_ffomc", "nam_kem");
 		mestnTypes = new Class<?>[] {Integer.class, Integer.class, String.class};
-	 
+	
+		mssUser = new TResultSetMapper<>(UserFio.class, "pcod", "fam", "im", "ot");
+		userTypes = new Class<?>[] {Integer.class, String.class, String.class, String.class};
 	}
 
 	@Override
@@ -139,9 +149,9 @@ public class serverMss extends Server implements Iface {
 						"psm_pk = ?, psm_pd = ?, psm_p1 = ?, psm_p1n = ?, psm_p1k = ?, psm_p1d = ?, psm_p2 = ?, psm_p2n = ?, psm_p2k = ?, " + 
 						"psm_p2d = ?, dtp = ?, umerla = ?, cuser = ?, clpu = ?, fio_r = ?, don = ?, ves = ?, nreb = ?, mrojd = ?, fam_m = ?, " + 
 						"im_m = ?, ot_m = ?, datarm = ?, dataz = ?, fio_pol = ?, vdok = ?, sdok = ?, ndok = ?, dvdok = ?, kvdok = ?, " + 
-						"vz_ser = ?, vz_nomer = ?, vz_datav = ?  WHERE npasp = ?";
+						"vz_ser = ?, vz_nomer = ?, vz_datav = ?, adm_raion = ?  WHERE npasp = ?";
 
-				sme.execPreparedT(sql, false, npasp, mssTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 1);
+				sme.execPreparedT(sql, false, npasp, mssTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 1);
 				sme.setCommit();
 			} catch (MssNotFoundException e) {
 				try {
@@ -153,10 +163,10 @@ public class serverMss extends Server implements Iface {
 						"psm_pk, psm_pd, psm_p1, psm_p1n, psm_p1k, psm_p1d, psm_p2, psm_p2n, psm_p2k, " + 
 						"psm_p2d, dtp, umerla, cuser, clpu, fio_r, don, ves, nreb, mrojd, fam_m, " + 
 						"im_m, ot_m, datarm, dataz, fio_pol, vdok, sdok, ndok, dvdok, kvdok, " + 
-						"vz_ser, vz_nomer, vz_datav) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
+						"vz_ser, vz_nomer, vz_datav, adm_raion) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-					sme.execPreparedT(sql, false, npasp, mssTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79);
+						"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+					sme.execPreparedT(sql, false, npasp, mssTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80);
 					sme.setCommit();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
@@ -288,7 +298,7 @@ public class serverMss extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> get_n_z00() throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z00 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod_s AS pcod, name_s AS name FROM n_z00 ")) {
 			return mssClass.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -414,7 +424,44 @@ public class serverMss extends Server implements Iface {
 			throw new TException(e);
 		}
 	}
+
+	@Override
+	public UserFio getUserFio(int pcod) throws UserNotFoundException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, fam, im, ot From s_vrach where pcod = ?", pcod)) {
+			if (acrs.getResultSet().next())
+				return mssUser.map(acrs.getResultSet());
+			else
+				throw new UserNotFoundException();
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+		
+		}
+
+	@Override
+	public List<IntegerClassifier> gets_vrach(int clpu, int cslu, int cpodr) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT s.pcod, s.fam||' '||s.im||' '||s.ot as name FROM s_vrach s, s_mrab r where s.pcod=r.pcod and r.priznd = 1 and r.clpu = ? and r.cslu = ? and r.cpodr = ?",clpu,cslu,cpodr)) {
+			return mssClass.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
+
+	@Override
+	public List<StringClassifier> gets_dolj(int clpu, int cslu, int cpodr)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT s.pcod, s.name FROM n_s00 s, s_mrab r where s.pcod=r.cdol and r.priznd = 1 and r.clpu = ? and r.cslu = ? and r.cpodr = ?",clpu,cslu,cpodr)) {
+			return mssStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+		
+}
 
 
 
