@@ -224,7 +224,7 @@ struct RdSlStruct{
 	25: optional string ssert;
 	26: optional string oslab;
 	27: optional i32 plrod;
-	28: optional string prroid;
+	28: optional string prrod;
 	29: optional i32 vozmen;
 	30: optional i32 oslrod;
 	31: optional i32 polj;
@@ -523,7 +523,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PNapr> getPnapr(1: i32 idpvizit) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
-	string getVidIssl(1: i32 pcod);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
@@ -579,6 +578,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_z00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_z11() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_r0z() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_vid_issl(1: i32 clab) throws (1: kmiacServer.KmiacServerException kse);
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);

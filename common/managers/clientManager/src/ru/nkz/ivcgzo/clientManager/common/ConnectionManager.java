@@ -600,4 +600,21 @@ public class ConnectionManager {
 		
 		return null;
 	}
+	
+	/**
+	 * Вызов формы с древовидным отображением мест работы.
+	 * @param title - заголовок формы
+	 * @param pGruppa - текущий код группы
+	 * @param pMrab - текущий код места работы
+	 * @return массив из двух значений: код группы и
+	 * код места работы или <code>null</code>, если пользователь закрыл форму
+	 */
+	public int[] showMrabTreeForm(String title, int pGruppa, int pMrab) {
+		Object res = viewClient.showModal(client, 12, title, pGruppa, pMrab);
+		
+		if (res != null)
+			return (int[]) res;
+		
+		return null;
+	}
 }
