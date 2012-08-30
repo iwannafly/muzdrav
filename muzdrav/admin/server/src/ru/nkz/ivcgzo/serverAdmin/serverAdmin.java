@@ -410,7 +410,7 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException, TException {
+	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException {
 		int shId = sho.id;
 		
 		try (SqlModifyExecutor sme = tse.startTransaction();
@@ -431,12 +431,13 @@ public class serverAdmin extends Server implements Iface {
 			
 			return shId;
 		} catch (SQLException | InterruptedException e) {
-			throw new TException(e);
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error saving template osm");
 		}
 	}
 
 	@Override
-	public List<IntegerClassifier> getAllShablonOsm() throws KmiacServerException, TException {
+	public List<IntegerClassifier> getAllShablonOsm() throws KmiacServerException {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id AS pcod, name FROM sh_osm ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
@@ -446,7 +447,7 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public ShablonOsm getShablonOsm(int id) throws KmiacServerException, TException {
+	public ShablonOsm getShablonOsm(int id) throws KmiacServerException {
 		AutoCloseableResultSet acrs = null;
 		
 		try {
@@ -472,6 +473,32 @@ public class serverAdmin extends Server implements Iface {
 		} finally {
 			if (acrs != null)
 				acrs.close();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> getShablonOsmDiagList(String srcStr) throws KmiacServerException {
+		String sql = "SELECT DISTINCT c00.pcod, c00.name FROM sh_osm sho JOIN n_c00 c00 ON (c00.pcod = sho.diag) ";
+		if (srcStr != null) {
+			srcStr = '%' + srcStr + '%';
+			sql += "WHERE (sho.name LIKE ?) OR (c00.pcod LIKE ?) OR (c00.name LIKE ?) ";
+		}
+		sql += "ORDER BY c00.pcod ";
+		try (AutoCloseableResultSet acrs = (srcStr != null) ? sse.execPreparedQuery(sql, srcStr, srcStr, srcStr) : sse.execQuery(sql)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates osm diag list");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShablonOsmListByDiag(String diag) throws KmiacServerException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, name FROM sh_osm WHERE (diag = ?) ", diag)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates osm list by diag code");
 		}
 	}
 
