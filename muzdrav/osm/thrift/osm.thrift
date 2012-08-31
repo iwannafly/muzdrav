@@ -451,8 +451,6 @@ struct Shablon{
 	2: string name;
 	3: string diag;
 	4: string text;
-	5: string cdol;
-	6: i32 spec;
 }
 
 exception PvizitNotFoundException {

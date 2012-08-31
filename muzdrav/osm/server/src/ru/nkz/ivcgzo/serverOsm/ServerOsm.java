@@ -198,8 +198,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",    "vid_doc",     "text",       "preds",       "zaved",       "name");
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 		
-		rsmSh = new TResultSetMapper<>(Shablon.class, "id",          "name",       "diag",       "text",       "cdol",       "spec");
-		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class, String.class, String.class};
+		rsmSh = new TResultSetMapper<>(Shablon.class, "id",          "name",       "diag",       "text");
+		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class};
 		
 	}
 
@@ -2193,7 +2193,7 @@ sb.append("<br>Подпись ____________");
 	@Override
 	public List<Shablon> getShPoisk(String tf) throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like '%бильные%') or  (sh_osm.diag like '%014.9%') or (sh_osm_text.sh_text like '%обследование%')order by name")) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select sh_osm.id,sh_osm.name,sh_osm.diag,sh_osm_text.sh_text from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like ?) or  (sh_osm.diag like ?) or (sh_osm_text.sh_text like ?)order by name",'%'+tf+'%','%'+tf+'%','%'+tf+'%')) 
 		{
 			return rsmSh.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
