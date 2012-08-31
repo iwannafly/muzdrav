@@ -21,21 +21,27 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox.ThriftIntegerClassifierListCheckboxActionEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox.ThriftIntegerClassifierListCheckboxActionListener;
@@ -48,7 +54,7 @@ import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 public class ShablonPanel extends JPanel {
 	private static final long serialVersionUID = 3633761920972893528L;
 	private CustomTextField tbSearch;
-	private ThriftIntegerClassifierList trSearch;
+	private SearchTree trSearch;
 	private CustomTextField tbName;
 	private CustomTextField tbDiag;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbDyn;
@@ -99,6 +105,22 @@ public class ShablonPanel extends JPanel {
 		splitPane.setLeftComponent(gbSearch);
 		
 		tbSearch = new CustomTextField(true, true, false);
+		tbSearch.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				trSearch.requestUpdate(tbSearch.getText());
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				trSearch.requestUpdate(tbSearch.getText());
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				trSearch.requestUpdate(tbSearch.getText());
+			}
+		});
 		tbSearch.setColumns(10);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -116,15 +138,7 @@ public class ShablonPanel extends JPanel {
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE))
 		);
 		
-		trSearch = new ThriftIntegerClassifierList();
-		trSearch.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					loadShablon(trSearch.getSelectedValue().getPcod());
-				}
-			}
-		});
+		trSearch = new SearchTree();
 		scrollPane.setViewportView(trSearch);
 		gbSearch.setLayout(gl_gbSearch);
 		
@@ -395,7 +409,7 @@ public class ShablonPanel extends JPanel {
 							.addPreferredGap(ComponentPlacement.RELATED))
 				);
 			}
-			trSearch.setData(MainForm.tcl.getAllShablonOsm());
+			trSearch.updateNow(tbSearch.getText());
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
@@ -412,6 +426,10 @@ public class ShablonPanel extends JPanel {
 		cbDyn.setSelectedPcod(0);
 		cbSluPol.setSelected(false);
 		cbSluStat.setSelected(false);
+		ltSpec.unselectAllItems();
+		
+		for (ShablonTextPanel txtPan : shPanList)
+			txtPan.clearText();
 	}
 	
 	private void saveShablonAsNew() {
@@ -516,6 +534,145 @@ public class ShablonPanel extends JPanel {
 			checkInput();
 		} finally {
 			fillingUI = false;
+		}
+	}
+	
+	private class SearchTree extends JTree {
+		private static final long serialVersionUID = -6009216318295458571L;
+		private Timer timer;
+		private String srcStr;
+		
+		public SearchTree() {
+			setShowsRootHandles(true);
+			setRootVisible(false);
+			
+			setExpandedChange();
+			setSelectionChange();
+			setTimer();
+		}
+		
+		private void setExpandedChange() {
+			addTreeExpansionListener(new TreeExpansionListener() {
+				@Override
+				public void treeExpanded(TreeExpansionEvent event) {
+					Object lp = event.getPath().getLastPathComponent();
+					
+					if (lp instanceof StrClassTreeNode) {
+						StrClassTreeNode node = (StrClassTreeNode) lp;
+						
+						try {
+							node.removeAllChildren();
+							for (IntegerClassifier ic : MainForm.tcl.getShablonOsmListByDiag(node.getCode()))
+								node.add(new IntClassTreeNode(ic));
+							((DefaultTreeModel) getModel()).reload(node);
+						} catch (KmiacServerException e) {
+							collapsePath(new TreePath(lp));
+							JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки шаблонов на данный диагноз", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						} catch (TException e) {
+							collapsePath(new TreePath(lp));
+							MainForm.conMan.reconnect(e);
+						}
+					}
+				}
+				
+				@Override
+				public void treeCollapsed(TreeExpansionEvent event) {
+				}
+			});
+		}
+		
+		private void setSelectionChange() {
+			getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+				@Override
+				public void valueChanged(TreeSelectionEvent e) {
+					if (e.getNewLeadSelectionPath() != null) {
+						Object lp = e.getNewLeadSelectionPath().getLastPathComponent();
+						
+						if (lp instanceof IntClassTreeNode)
+							loadShablon(((IntClassTreeNode) lp).getCode());
+					}
+				}
+			});
+		}
+		
+		private void setTimer() {
+			timer = new Timer(500, new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					update();
+				}
+			});
+		}
+		
+		public void requestUpdate(String srcStr) {
+			timer.stop();
+			this.srcStr = srcStr;
+			timer.start();
+		}
+		
+		public void updateNow(String srcStr) {
+			this.srcStr = srcStr;
+			update();
+		}
+		
+		private void update() {
+			timer.stop();
+			clearFields();
+			
+			if (srcStr.length() < 3)
+				srcStr = null;
+			
+			try {
+				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
+				
+				for (StringClassifier sc : MainForm.tcl.getShablonOsmDiagList(srcStr)) {
+					StrClassTreeNode node = new StrClassTreeNode(sc);
+					
+					node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
+					root.add(node);
+				}
+				setModel(new DefaultTreeModel(root));
+			} catch (KmiacServerException e) {
+				JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			} catch (TException e) {
+				MainForm.conMan.reconnect(e);
+			}
+		}
+		
+		private class StrClassTreeNode extends DefaultMutableTreeNode {
+			private static final long serialVersionUID = -5329915904305848896L;
+			private StringClassifier sc;
+			
+			public StrClassTreeNode(StringClassifier sc) {
+				this.sc = sc;
+			}
+			
+			public String getCode() {
+				return sc.pcod;
+			}
+			
+			@Override
+			public String toString() {
+				return String.format("%s %s", sc.pcod.trim(), sc.name);
+			}
+		}
+		
+		private class IntClassTreeNode extends DefaultMutableTreeNode {
+			private static final long serialVersionUID = 542109909158320095L;
+			private IntegerClassifier ic;
+			
+			public IntClassTreeNode(IntegerClassifier ic) {
+				this.ic = ic;
+			}
+			
+			public int getCode() {
+				return ic.pcod;
+			}
+			
+			@Override
+			public String toString() {
+				return ic.name;
+			}
 		}
 	}
 }

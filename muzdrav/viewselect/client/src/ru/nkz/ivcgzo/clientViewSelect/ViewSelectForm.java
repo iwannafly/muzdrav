@@ -33,7 +33,7 @@ public class ViewSelectForm extends JFrame {
 		aws=dm.width/3;
 		ahs=dm.height;
 		setTitle("Выбор из классификатора");
-		setBounds(dm.width-aws, 0, aws, ahs);
+		//setBounds(dm.width-aws, 0, aws, ahs);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
