@@ -216,7 +216,6 @@ public class PInfo extends JFrame {
 								if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
 								eptxt.setText(sb.toString());
 							} catch (PatientNotFoundException e1) {
-								System.out.println("hren");
 								e1.printStackTrace();
 							}
 		 				}

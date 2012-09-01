@@ -198,7 +198,7 @@ public class ServerOsm extends Server implements Iface {
 		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",    "vid_doc",     "text",       "preds",       "zaved",       "name");
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 		
-		rsmSh = new TResultSetMapper<>(Shablon.class, "id",          "name",       "diag",       "text");
+		rsmSh = new TResultSetMapper<>(Shablon.class, "id",         "diag",        "din",        "next_osm");
 		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class};
 		
 	}
@@ -2119,32 +2119,31 @@ sb.append("<br>Подпись ____________");
 	
 	}
 
-	@Override
-	public List<Shablon> getShablon() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm,sh_osm.name,sh_osm.diag,sh_osm_text.sh_text,sh_ot_spec.cspec from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
+	public List<IntegerClassifier> getShablon() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm as pcod,sh_osm.name as name from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
 		{
-			return rsmSh.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
 	}
 
 	@Override
-	public List<Shablon> getShPoisk(String tf) throws KmiacServerException,
+	public List<IntegerClassifier> getShPoisk(String tf) throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select sh_osm.id,sh_osm.name,sh_osm.diag,sh_osm_text.sh_text from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like ?) or  (sh_osm.diag like ?) or (sh_osm_text.sh_text like ?)order by name",'%'+tf+'%','%'+tf+'%','%'+tf+'%')) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_osm.id as pcod,sh_osm.name as name from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like ?) or  (sh_osm.diag like ?) or (sh_osm_text.sh_text like ?)order by name",'%'+tf+'%','%'+tf+'%','%'+tf+'%')) 
 		{
-			return rsmSh.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
 	}
 
 	@Override
-	public List<StringClassifier> get_vid_issl(int clab) throws KmiacServerException,
+	public List<IntegerClassifier> get_vid_issl() throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, tip as name  from n_lds where pcod=?", clab)) {
-			return rsmStrClas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, tip as name  from n_lds")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
@@ -2152,6 +2151,20 @@ sb.append("<br>Подпись ____________");
 
 	}
 
+	@Override
+	public Shablon getSh(int id_sh) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select sh_osm.id,sh_osm.diag,n_din.name,sh_osm.next from sh_osm join n_din on (sh_osm.cdin=n_din.pcod)  where sh_osm.id=?", id_sh)) {
+			if (acrs.getResultSet().next())
+				return rsmSh.map(acrs.getResultSet());
+			else 
+				return new Shablon();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+	}
+
+}
 
 
 }
