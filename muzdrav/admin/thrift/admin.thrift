@@ -162,4 +162,5 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	ShablonOsm getShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getShablonOsmDiagList(1: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShablonOsmListByDiag(1: string diag) throws (1: kmiacServer.KmiacServerException kse);
+	void deleteShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

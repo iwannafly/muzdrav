@@ -469,7 +469,7 @@ public class serverAdmin extends Server implements Iface {
 			}
 		} catch (SQLException e) {
 			System.err.println(e.getCause());
-			throw new KmiacServerException("Error getting all templates osm list");
+			throw new KmiacServerException("Error loading osm template");
 		} finally {
 			if (acrs != null)
 				acrs.close();
@@ -499,6 +499,19 @@ public class serverAdmin extends Server implements Iface {
 		} catch (SQLException e) {
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error getting templates osm list by diag code");
+		}
+	}
+
+	@Override
+	public void deleteShablonOsm(int id) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+				sme.execPrepared("DELETE FROM sh_osm_text WHERE id_sh_osm = ? ", false, id);
+				sme.execPrepared("DELETE FROM sh_ot_spec WHERE id_sh_osm = ? ", false, id);
+				sme.execPrepared("DELETE FROM sh_osm WHERE id = ? ", false, id);
+				sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error deleting template osm");
 		}
 	}
 
