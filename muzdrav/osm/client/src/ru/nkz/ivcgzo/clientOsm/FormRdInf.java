@@ -116,6 +116,7 @@ public class FormRdInf extends JFrame {
 	private JCheckBox ChBOtsb;
 	private JCheckBox ChBSelo;
 	private JCheckBox ChBots;
+	private JSpinner SVozr;
 	/**
 	 * Launch the application.
 	 */
@@ -136,6 +137,17 @@ public class FormRdInf extends JFrame {
 	 * Create the frame.
 	 */
 	public FormRdInf() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+			try {
+				rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+			} catch (KmiacServerException | TException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}
+		});
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
@@ -287,8 +299,8 @@ public class FormRdInf extends JFrame {
 		TFio = new JTextField();
 		
 		JSpinner SVozr = new JSpinner();
-		SVozr.setModel(new SpinnerNumberModel(new Integer(rdinf.vOtec), null, null, new Integer(1)));
-		rdinf.setVOtec((int) SVozr.getModel().getValue());
+		SVozr.setModel(new SpinnerNumberModel(0, 0, 80, 1));
+//		rdinf.setVOtec((int) SVozr.getModel().getValue());
 		
 		TMrab = new JTextField();
 		
