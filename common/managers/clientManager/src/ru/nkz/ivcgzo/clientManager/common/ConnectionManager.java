@@ -617,4 +617,32 @@ public class ConnectionManager {
 		
 		return null;
 	}
+	
+	/**
+	 * Получение из классификатора имени по его коду.
+	 * @param cls - название классификатора
+	 * @param pcod - код для поиска имени
+	 */
+	public String getNameFromPcodInteger(IntegerClassifiers cls, int pcod) {
+		Object res = viewClient.showModal(client, 13, cls, pcod);
+		
+		if (res != null)
+			return (String) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Получение из классификатора имени по его коду.
+	 * @param cls - название классификатора
+	 * @param pcod - код для поиска имени
+	 */
+	public String getNameFromPcodString(StringClassifiers cls, String pcod) {
+		Object res = viewClient.showModal(client, 14, cls, pcod);
+		
+		if (res != null)
+			return (String) res;
+		
+		return null;
+	}
 }

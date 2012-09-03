@@ -462,6 +462,25 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						mrabFrm.removeModalityListener();
 						disposeModal();
 					}
+					
+				case 13:
+				case 14:
+				case 15:
+				case 16:
+					try {
+						conMan.setClient(this);
+						conMan.connect(getPort());
+						
+						switch ((int) params[0]) {
+						case 13:
+							return ccm.getNameFromPcodInteger((IntegerClassifiers) params[1], (int) params[2]);
+						case 14:
+							return ccm.getNameFromPcodString((StringClassifiers) params[1], (String) params[2]);
+						}
+					} catch (Exception e) {
+						conMan.disconnect(getPort());
+						conMan.setClient(parent);
+					}
 			}}
 		
 		return null;
