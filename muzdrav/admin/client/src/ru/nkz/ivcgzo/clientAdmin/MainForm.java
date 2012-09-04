@@ -17,6 +17,7 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
+import java.awt.Dimension;
 
 public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private final boolean adminMode;
@@ -41,6 +42,7 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setMinimumSize(new Dimension(896, 128));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientAdmin/resources/icon_2_32x32.png")));
 		frame.setTitle(configuration.appName);
 		frame.setBounds(100, 100, 600, 600);

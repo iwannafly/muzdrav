@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.GroupLayout;
@@ -48,6 +49,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheck
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 
@@ -55,6 +57,8 @@ public class ShablonPanel extends JPanel {
 	private static final long serialVersionUID = 3633761920972893528L;
 	private CustomTextField tbSearch;
 	private SearchTree trSearch;
+	private JButton btDelete;
+	private JButton btCreate;
 	private CustomTextField tbName;
 	private CustomTextField tbDiag;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cbDyn;
@@ -69,6 +73,8 @@ public class ShablonPanel extends JPanel {
 	private JButton btSave;
 	private ShablonOsm shOsm;
 	private boolean fillingUI;
+	private String prevDiagCode;
+	private String diagName;
 	
 	public ShablonPanel() {
 		textListener = new DocumentListener() {
@@ -87,6 +93,7 @@ public class ShablonPanel extends JPanel {
 				checkInput();
 			}
 		};
+		prevDiagCode = "";
 		
 		JSplitPane splitPane = new JSplitPane();
 		GroupLayout groupLayout = new GroupLayout(this);
@@ -101,7 +108,7 @@ public class ShablonPanel extends JPanel {
 		
 		JPanel gbSearch = new JPanel();
 		gbSearch.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Поиск", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		gbSearch.setMinimumSize(new Dimension(128, 128));
+		gbSearch.setMinimumSize(new Dimension(256, 128));
 		splitPane.setLeftComponent(gbSearch);
 		
 		tbSearch = new CustomTextField(true, true, false);
@@ -124,18 +131,46 @@ public class ShablonPanel extends JPanel {
 		tbSearch.setColumns(10);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		
+		btDelete = new JButton("Удалить");
+		btDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					trSearch.removeSelected();
+				} catch (KmiacServerException e1) {
+					JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					MainForm.conMan.reconnect(e1);
+				}
+			}
+		});
+		
+		btCreate = new JButton("Создать");
+		btCreate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				trSearch.createNew();
+			}
+		});
 		GroupLayout gl_gbSearch = new GroupLayout(gbSearch);
 		gl_gbSearch.setHorizontalGroup(
 			gl_gbSearch.createParallelGroup(Alignment.LEADING)
 				.addComponent(tbSearch, GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
 				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+				.addGroup(gl_gbSearch.createSequentialGroup()
+					.addComponent(btDelete, GroupLayout.PREFERRED_SIZE, 51, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(btCreate, GroupLayout.PREFERRED_SIZE, 51, Short.MAX_VALUE))
 		);
 		gl_gbSearch.setVerticalGroup(
 			gl_gbSearch.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_gbSearch.createSequentialGroup()
 					.addComponent(tbSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE))
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_gbSearch.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btDelete)
+						.addComponent(btCreate)))
 		);
 		
 		trSearch = new SearchTree();
@@ -144,7 +179,7 @@ public class ShablonPanel extends JPanel {
 		
 		JPanel gbEdit = new JPanel();
 		gbEdit.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Редактирование", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		gbEdit.setMinimumSize(new Dimension(128, 128));
+		gbEdit.setMinimumSize(new Dimension(512, 128));
 		splitPane.setRightComponent(gbEdit);
 		
 		btSaveAsNew = new JButton("Сохранить как новый");
@@ -157,7 +192,7 @@ public class ShablonPanel extends JPanel {
 		btSave = new JButton("Сохранить");
 		btSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				saveShablon();
+				saveShablon(false);
 			}
 		});
 		
@@ -430,19 +465,22 @@ public class ShablonPanel extends JPanel {
 		
 		for (ShablonTextPanel txtPan : shPanList)
 			txtPan.clearText();
+		
+		btDelete.setEnabled(false);
 	}
 	
 	private void saveShablonAsNew() {
 		shOsm = new ShablonOsm();
-		saveShablon();
+		saveShablon(true);
 	}
 	
-	private void saveShablon() {
+	private void saveShablon(boolean saveAsNew) {
 		fillShablonFromUI();
 		try {
 			shOsm.setId(MainForm.tcl.saveShablonOsm(shOsm));
-		} catch (KmiacServerException e) {
-			
+			trSearch.updateSavedNode(saveAsNew);
+		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
+			JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -486,9 +524,15 @@ public class ShablonPanel extends JPanel {
 			enb &= !tbDiag.isEmpty();
 			enb &= !ltSpec.isAllItemsUnselected();
 		}
+		if (enb)
+			if (!prevDiagCode.equals(tbDiag.getText())) {
+				prevDiagCode = tbDiag.getText();
+				diagName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, prevDiagCode);
+			}
+		enb &= diagName != null;
 		
 		btSave.setEnabled(enb);
-		btSaveAsNew.setEnabled(enb);
+		btSaveAsNew.setEnabled(enb & (trSearch.newNode == null));
 	}
 	
 	private void loadShablon(int id) {
@@ -496,7 +540,7 @@ public class ShablonPanel extends JPanel {
 			shOsm = MainForm.tcl.getShablonOsm(id);
 			fillUIFromShablon();
 		} catch (KmiacServerException e) {
-			JOptionPane.showMessageDialog(this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -531,6 +575,7 @@ public class ShablonPanel extends JPanel {
 			ltSpec.scrollRectToVisible(new Rectangle());
 			
 			fillingUI = false;
+			btDelete.setEnabled(true);
 			checkInput();
 		} finally {
 			fillingUI = false;
@@ -541,6 +586,8 @@ public class ShablonPanel extends JPanel {
 		private static final long serialVersionUID = -6009216318295458571L;
 		private Timer timer;
 		private String srcStr;
+		private boolean changingNodes;
+		private IntClassTreeNode newNode;
 		
 		public SearchTree() {
 			setShowsRootHandles(true);
@@ -557,22 +604,23 @@ public class ShablonPanel extends JPanel {
 				public void treeExpanded(TreeExpansionEvent event) {
 					Object lp = event.getPath().getLastPathComponent();
 					
-					if (lp instanceof StrClassTreeNode) {
-						StrClassTreeNode node = (StrClassTreeNode) lp;
-						
-						try {
-							node.removeAllChildren();
-							for (IntegerClassifier ic : MainForm.tcl.getShablonOsmListByDiag(node.getCode()))
-								node.add(new IntClassTreeNode(ic));
-							((DefaultTreeModel) getModel()).reload(node);
-						} catch (KmiacServerException e) {
-							collapsePath(new TreePath(lp));
-							JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки шаблонов на данный диагноз", "Ошибка", JOptionPane.ERROR_MESSAGE);
-						} catch (TException e) {
-							collapsePath(new TreePath(lp));
-							MainForm.conMan.reconnect(e);
+					if (!changingNodes)
+						if (lp instanceof StrClassTreeNode) {
+							StrClassTreeNode node = (StrClassTreeNode) lp;
+							
+							try {
+								node.removeAllChildren();
+								for (IntegerClassifier ic : MainForm.tcl.getShablonOsmListByDiag(node.getCode()))
+									node.add(new IntClassTreeNode(ic));
+								((DefaultTreeModel) getModel()).reload(node);
+							} catch (KmiacServerException e) {
+								collapsePath(new TreePath(lp));
+								JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки шаблонов на данный диагноз", "Ошибка", JOptionPane.ERROR_MESSAGE);
+							} catch (TException e) {
+								collapsePath(new TreePath(lp));
+								MainForm.conMan.reconnect(e);
+							}
 						}
-					}
 				}
 				
 				@Override
@@ -585,11 +633,20 @@ public class ShablonPanel extends JPanel {
 			getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
 				@Override
 				public void valueChanged(TreeSelectionEvent e) {
+					if (!changingNodes)
+						removeUnsavedNode();
 					if (e.getNewLeadSelectionPath() != null) {
 						Object lp = e.getNewLeadSelectionPath().getLastPathComponent();
 						
 						if (lp instanceof IntClassTreeNode)
-							loadShablon(((IntClassTreeNode) lp).getCode());
+							if (!changingNodes)
+								loadShablon(((IntClassTreeNode) lp).getCode());
+							else
+								fillUIFromShablon();
+						else
+							clearFields();
+					} else {
+						clearFields();
 					}
 				}
 			});
@@ -602,6 +659,11 @@ public class ShablonPanel extends JPanel {
 					update();
 				}
 			});
+		}
+		
+		@Override
+		public DefaultTreeModel getModel() {
+			return (DefaultTreeModel) super.getModel();
 		}
 		
 		public void requestUpdate(String srcStr) {
@@ -636,6 +698,165 @@ public class ShablonPanel extends JPanel {
 				JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			} catch (TException e) {
 				MainForm.conMan.reconnect(e);
+			}
+		}
+		
+		public void removeSelected() throws KmiacServerException, TException {
+			if (getSelectionPath() != null)
+				if (getSelectionPath().getLastPathComponent() != null)
+					if (getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode) {
+						if (shOsm.id > 0)
+							MainForm.tcl.deleteShablonOsm(shOsm.id);
+						
+						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+						StrClassTreeNode parent = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
+						IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
+						int childIndex = parent.getIndex(child);
+						
+						changingNodes = true;
+						try {
+							getModel().removeNodeFromParent(child);
+							if (parent.getChildCount() > 0) {
+								if (childIndex >= parent.getChildCount())
+									childIndex = parent.getChildCount() - 1;
+								setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
+							} else {
+								getModel().removeNodeFromParent(parent);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							newNode = null;
+							changingNodes = false;
+						}
+					}
+			
+		}
+		
+		public void createNew() {
+			DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+			StrClassTreeNode parent = null;
+			TreePath path;
+			
+			removeUnsavedNode();
+			
+			shOsm = new ShablonOsm().setName("Без названия").setSpecList(new ArrayList<Integer>()).setTextList(new ArrayList<IntegerClassifier>());
+			
+			if (getSelectionPath() != null)
+				if (getSelectionPath().getLastPathComponent() != null)
+					if (getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode) {
+						parent = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
+					} else if (getSelectionPath().getLastPathComponent() instanceof StrClassTreeNode) {
+						parent = (StrClassTreeNode) getSelectionPath().getLastPathComponent();
+						expandPath(new TreePath(parent));
+					}
+			if (parent == null) {
+				parent = new StrClassTreeNode(new StringClassifier("Нет", "диагноза"));
+				getModel().insertNodeInto(parent, root, root.getChildCount());
+			}
+			shOsm.setDiag(parent.getCode());
+			
+			changingNodes = true;
+			try {
+				newNode = new IntClassTreeNode(new IntegerClassifier(0, shOsm.name));
+				parent.add(newNode);
+				getModel().reload(parent);
+				path = new TreePath(new Object[] {root, parent, newNode});
+				setSelectionPath(path);
+				scrollPathToVisible(path);
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				changingNodes = false;
+			}
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void updateSavedNode(boolean saveAsNew) {
+			IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
+			StrClassTreeNode parent = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
+			DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+			TreePath path;
+			
+			newNode = null;
+			if (!saveAsNew && parent.getCode().equals(shOsm.diag)) {
+				child.ic.setName(shOsm.name);
+				getModel().reload(child);
+			} else {
+				if (!saveAsNew)
+					getModel().removeNodeFromParent(child);
+				if (parent.getChildCount() == 0)
+					getModel().removeNodeFromParent(parent);
+				parent = null;
+				for (Enumeration<StrClassTreeNode> iterator = root.children(); iterator.hasMoreElements();) {
+					StrClassTreeNode elem = iterator.nextElement();
+					
+					if (elem.getCode().equals(shOsm.diag)) {
+						parent = elem;
+						break;
+					}
+				}
+				
+				if (parent == null) {
+					child.ic.setName(shOsm.name);
+					parent = new StrClassTreeNode(new StringClassifier(shOsm.diag, "Название диагноза"));
+					getModel().insertNodeInto(parent, root, root.getChildCount());
+					getModel().insertNodeInto(child, parent, parent.getChildCount());
+				} else {
+					expandPath(new TreePath(parent));
+					child = null;
+					for (Enumeration<IntClassTreeNode> iterator = parent.children(); iterator.hasMoreElements();) {
+						IntClassTreeNode elem = iterator.nextElement();
+						
+						if (elem.getCode() == shOsm.id) {
+							child = elem;
+							break;
+						}
+					}
+					if (child == null) {
+						child = new IntClassTreeNode(new IntegerClassifier(shOsm.id, shOsm.name));
+						getModel().insertNodeInto(child, parent, parent.getChildCount());
+					}
+				}
+				
+				changingNodes = true;
+				try {
+					parent.sc.setName(diagName);
+					path = new TreePath(new Object[] {root, parent, child});
+					setSelectionPath(path);
+					scrollPathToVisible(path);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					changingNodes = false;
+				}
+			}
+		}
+		
+		private void removeUnsavedNode() {
+			if (newNode != null) {
+				if (newNode.getCode() == 0) {
+					try {
+						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+						StrClassTreeNode parent = (StrClassTreeNode) newNode.getParent();
+						int childIndex = parent.getIndex(newNode);
+						
+						changingNodes = true;
+						getModel().removeNodeFromParent(newNode);
+						if (parent.getChildCount() > 0) {
+							if (childIndex >= parent.getChildCount())
+								childIndex = parent.getChildCount() - 1;
+							setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
+						} else {
+							getModel().removeNodeFromParent(parent);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						newNode = null;
+						changingNodes = false;
+					}
+				}
 			}
 		}
 		
