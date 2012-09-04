@@ -840,12 +840,12 @@ public class PacientInfoFrame extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (arg0.getClickCount() == 2) {
-					int[] res = MainForm.conMan.showMrabTreeForm("место работы", 0, 0);
+					IntegerClassifier res = MainForm.conMan.showMrabTreeForm("место работы", 0);
 					
 					if (res != null) {
-	       				tfMr.setText(Integer.toString(res[1]));
-	       				PersonalInfo.setMrab(Integer.toString(res[1]));
-	       				//tfMrname.setText(res.name);
+	       				tfMr.setText(Integer.toString(res.pcod));
+	       				PersonalInfo.setMrab(res.name);
+	       				tfMrname.setText(res.name);
 	       				
 					}
 				}
