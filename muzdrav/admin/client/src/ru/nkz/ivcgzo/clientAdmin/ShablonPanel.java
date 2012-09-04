@@ -108,7 +108,7 @@ public class ShablonPanel extends JPanel {
 		
 		JPanel gbSearch = new JPanel();
 		gbSearch.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Поиск", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		gbSearch.setMinimumSize(new Dimension(128, 128));
+		gbSearch.setMinimumSize(new Dimension(256, 128));
 		splitPane.setLeftComponent(gbSearch);
 		
 		tbSearch = new CustomTextField(true, true, false);
@@ -179,7 +179,7 @@ public class ShablonPanel extends JPanel {
 		
 		JPanel gbEdit = new JPanel();
 		gbEdit.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Редактирование", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		gbEdit.setMinimumSize(new Dimension(128, 128));
+		gbEdit.setMinimumSize(new Dimension(512, 128));
 		splitPane.setRightComponent(gbEdit);
 		
 		btSaveAsNew = new JButton("Сохранить как новый");
@@ -192,7 +192,7 @@ public class ShablonPanel extends JPanel {
 		btSave = new JButton("Сохранить");
 		btSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				saveShablon();
+				saveShablon(false);
 			}
 		});
 		
@@ -471,14 +471,14 @@ public class ShablonPanel extends JPanel {
 	
 	private void saveShablonAsNew() {
 		shOsm = new ShablonOsm();
-		saveShablon();
+		saveShablon(true);
 	}
 	
-	private void saveShablon() {
+	private void saveShablon(boolean saveAsNew) {
 		fillShablonFromUI();
 		try {
 			shOsm.setId(MainForm.tcl.saveShablonOsm(shOsm));
-			trSearch.updateSavedNode();
+			trSearch.updateSavedNode(saveAsNew);
 		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
 			JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
@@ -727,7 +727,7 @@ public class ShablonPanel extends JPanel {
 							e.printStackTrace();
 						} finally {
 							newNode = null;
-							changingNodes = true;
+							changingNodes = false;
 						}
 					}
 			
@@ -772,18 +772,19 @@ public class ShablonPanel extends JPanel {
 		}
 		
 		@SuppressWarnings("unchecked")
-		public void updateSavedNode() {
+		public void updateSavedNode(boolean saveAsNew) {
 			IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
 			StrClassTreeNode parent = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
 			TreePath path;
 			
 			newNode = null;
-			child.ic.setName(shOsm.name);
-			if (parent.getCode().equals(shOsm.diag)) {
+			if (!saveAsNew && parent.getCode().equals(shOsm.diag)) {
+				child.ic.setName(shOsm.name);
 				getModel().reload(child);
 			} else {
-				getModel().removeNodeFromParent(child);
+				if (!saveAsNew)
+					getModel().removeNodeFromParent(child);
 				if (parent.getChildCount() == 0)
 					getModel().removeNodeFromParent(parent);
 				parent = null;
@@ -797,11 +798,13 @@ public class ShablonPanel extends JPanel {
 				}
 				
 				if (parent == null) {
+					child.ic.setName(shOsm.name);
 					parent = new StrClassTreeNode(new StringClassifier(shOsm.diag, "Название диагноза"));
 					getModel().insertNodeInto(parent, root, root.getChildCount());
 					getModel().insertNodeInto(child, parent, parent.getChildCount());
 				} else {
 					expandPath(new TreePath(parent));
+					child = null;
 					for (Enumeration<IntClassTreeNode> iterator = parent.children(); iterator.hasMoreElements();) {
 						IntClassTreeNode elem = iterator.nextElement();
 						
@@ -809,6 +812,10 @@ public class ShablonPanel extends JPanel {
 							child = elem;
 							break;
 						}
+					}
+					if (child == null) {
+						child = new IntClassTreeNode(new IntegerClassifier(shOsm.id, shOsm.name));
+						getModel().insertNodeInto(child, parent, parent.getChildCount());
 					}
 				}
 				
