@@ -198,8 +198,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",    "vid_doc",     "text",       "preds",       "zaved",       "name");
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 		
-		rsmSh = new TResultSetMapper<>(Shablon.class, "id",          "name",       "diag",       "text",       "cdol",       "spec");
-		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class, String.class, String.class};
+		rsmSh = new TResultSetMapper<>(Shablon.class, "id",         "diag",        "din",        "next_osm");
+		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class};
 		
 	}
 
@@ -261,7 +261,7 @@ public class ServerOsm extends Server implements Iface {
 //		List<PokazMet> pokMet = getPokazMet("50.01.001");
 //		List<Pokaz> pok = getPokaz(1, "05");
 		
-//		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.");
 //		List<Pvizit> pvl = getPvizitInfo(2, sdf.parse("01.01.2012").getTime(), sdf.parse("02.02.2012").getTime());
 //		List<PvizitAmb> pal = getPvizitAmb(6);
 		
@@ -2016,58 +2016,110 @@ sb.append("<br>Подпись ____________");
 
 	@Override
 	public String printKartaBer(KartaBer kb) throws KmiacServerException, TException {
-				try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
-			AutoCloseableResultSet acrs;
-			
+		AutoCloseableResultSet acrs = null, acrs2 = null;
+		Date dataRod = null;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
 			StringBuilder sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 			sb.append("<head>");
 				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
 				sb.append("<title>Обменная карта беременной</title>");
-				sb.append("</head>");
-				sb.append("<body>");
+			sb.append("</head>");
+			sb.append("<body>");
 				sb.append("<h3 align=center>ОБМЕННАЯ КАРТА<br></h3>");
 				sb.append("<p align=center>Родильного дома, родильного отделения</p>");
 				sb.append("<p align=center>Заполняется врачом женской консультации.</p>");
 				sb.append("<p align=center><b>(Данная карта выдается на руки на 32-ой неделе беременности)</b></p>");
 				sb.append("<br>");
-				acrs = sse.execPreparedQuery("select fam,im,ot,datar,(current_date-datar)/365,adm_ul,adm_dom,adm_kv,tel from patient where npasp=?", kb.getNpasp());
-				if (acrs.getResultSet().next()) 
-				{sb.append("1. Фамилия, имя, отчество ");
-				sb.append(String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-				sb.append("<br>2. Возраст: " );
-				sb.append(String.format("%s", acrs.getResultSet().getString(5)));
-				sb.append("3. Адрес и телефон: ");
-				sb.append(String.format("%s %s - %s, %s", acrs.getResultSet().getString(6), acrs.getResultSet().getString(7), acrs.getResultSet().getString(8), acrs.getResultSet().getString(9)));
+				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, (current_date - datar) / 365, adm_ul, adm_dom, adm_kv, tel FROM patient WHERE npasp = ?", kb.getNpasp());
+				if (acrs.getResultSet().next()) {
+					sb.append(String.format("1. Фамилия, имя, отчество: %s %s %s<br>", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("2. Возраст: %d<br>", acrs.getResultSet().getInt(5)));
+					sb.append(String.format("3. Адрес и телефон: %s %s - %s", acrs.getResultSet().getString(6), acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
+					if (acrs.getResultSet().getString(9) != null)
+						sb.append(String.format(", %s<br>", acrs.getResultSet().getString(9)));
+					sb.append("<br>");
 				}
-				sb.append("<br>4. Перенесенные общие, гинекологические заболевания или операции ___________________________________________");
-				sb.append("<br>5. Особенности течения прежних беременностей, родов, послеродового периода _________________________________");
-				sb.append("<br>6. Данная беременность ____ (по счету). Роды ____ (по счету)");
-				sb.append("<br>");
-				sb.append("7. Количество абортов ____ (всего). В  каком году ___________ и на каком сроке _______________");
-				sb.append("8. Были ли преждевременные роды : ДА _____ / НЕТ _____ . Если ДА, то в каком году _____________<br>");
-				sb.append("9. Дата последней менструации ____________________________________________<br>");
-				sb.append("10. Срок текущей беременности составляет ___________________ недель при первом посещении женской консультации (дата)___________ года<br>");
-				sb.append("11. Количество посещений ____________<br>");
-				sb.append("12. Первое шевеление плода (дата) _________________________");
-				sb.append("13. Возможные особенности течения беременности _______________________________________");
-				sb.append("<br>14. Размеры таза (при первом посещении)");
-				sb.append("<br>D.Sp____ D.Gr_____ D.troch__________");
-				sb.append("<br>C.ext____ C.diag_____ C.vera__________");
-				sb.append("<br>Вес____ Вес_____ ");
-				sb.append("<br>15. Положение плода ____________________________");
-				sb.append("<br>Предлежащая часть плода: головка, ягодицы, не определяется ____________________________");
-				sb.append("<br>Сердцебинение плода: ясное, ритмичное, ударов _________ в 1 минуту слева, справа _________");
-				sb.append("<br>16. Лабораторные и другие исследования");
-				sb.append("<br>RW<sub>1</sub>: \"____\" _____________ 20______ года <br>HBS<sub>1</sub>: \"____\" ____________ 20______ года");
-				sb.append("<br>RW<sub>2</sub>: \"____\" _____________ 20______ года <br>HBS<sub>2</sub>: \"____\" ____________ 20______ года");
-				sb.append("<br>RW<sub>3</sub>: \"____\" _____________ 20______ года <br>HCV<sub>1</sub>: \"____\" ____________ 20______ года");
-				sb.append("<br>ВИЧ<sub>1</sub>: \"____\" _____________ 20______ года <br>HCV<sub>2</sub>: \"____\" ____________ 20______ года");
-				sb.append("<br>ВИЧ<sub>2</sub>: \"____\" _____________ 20______ года");
-				sb.append("<br>Резус положительный/отрицательный/тип крови");
-				sb.append("<br>Титр антител:_________");
-				sb.append("<br>Группа крови:_________");
+				acrs.close();
+				
+				acrs = sse.execPreparedQuery("SELECT shet, kolrod, abort, datam, (current_date - datay) / 7, datay, dataosl, dsp, dsr, dtroch, cext, cdiagt, cvera, rost, vesd, datazs, prrod, oslrod, dataab, srokab FROM p_rd_sl WHERE id_pvizit = ? ", kb.getId_pvizit());
+				//                                   1     2       3      4       5                          6      7        8    9    10      11    12      13     14    15    16      17     18      19      20
+				if (acrs.getResultSet().next()) {
+					sb.append("4. Перенесенные общие, гинекологические заболевания или операции: ");
+					acrs2 = sse.execPreparedQuery("SELECT ps.vitae, db9.name FROM p_rd_sl sl LEFT OUTER JOIN p_sign ps ON (ps.npasp = sl.npasp) LEFT OUTER JOIN n_db9 db9 ON (db9.pcod = sl.oslab) WHERE id_pvizit = ? AND (ps.vitae IS NOT NULL OR db9.name IS NOT NULL) ", kb.getId_pvizit());
+					if (acrs2.getResultSet().next()) {
+						if (acrs2.getResultSet().getString(1) != null)
+							sb.append(String.format("%s;<br>", acrs2.getResultSet().getString(1)));
+						if (acrs2.getResultSet().getString(2) != null)
+							sb.append(String.format("осложнения после аборта: %s;<br>", acrs2.getResultSet().getString(2)));
+					} else
+						sb.append("нет<br>");
+					acrs2.close();
+					
+					sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s; %d<br>", acrs.getResultSet().getString(17), acrs.getResultSet().getInt(18)));
+					sb.append(String.format("6. Данная беременность %d (по счету), роды %d (по счету)<br>", acrs.getResultSet().getInt(1), acrs.getResultSet().getInt(2)));
+					sb.append(String.format("7. Количество абортов %d (всего). Последний в %tY году на сроке %d недель<br>", acrs.getResultSet().getInt(3), acrs.getResultSet().getDate(19), acrs.getResultSet().getInt(20)));
+					sb.append("8. Были ли преждевременные роды: ДА _____ / НЕТ _____ . Если ДА, то в каком году _____________<br>");
+					sb.append(String.format("9. Дата последней менструации: %1$td %1$tb %1$tY<br>", acrs.getResultSet().getDate(4)));
+					sb.append(String.format("10. Срок текущей беременности составляет %d недель при первом посещении женской консультации %2$td %2$tb %2$tY года<br>", acrs.getResultSet().getInt(5), acrs.getResultSet().getDate(6)));
+					
+					acrs2 = sse.execPreparedQuery("SELECT COUNT(id_pvizit) FROM p_rd_din WHERE id_pvizit = ?", kb.getId_pvizit());
+					if (acrs2.getResultSet().next())
+						sb.append(String.format("11. Количество посещений: %d<br>", acrs2.getResultSet().getInt(1)));
+					acrs2.close();
+					
+					sb.append(String.format("12. Первое шевеление плода: %1$td %1$tb %1$tY<br>", acrs.getResultSet().getDate(7)));
+					
+					sb.append("13. Возможные особенности течения беременности: ");
+					acrs2 = sse.execPreparedQuery("SELECT db6.name, db5.name FROM p_rd_din din LEFT OUTER JOIN n_db6 db6 ON (db6.pcod = din.dspos) LEFT OUTER JOIN n_db5 db5 ON (db5.pcod = din.oteki) WHERE id_pvizit = ? AND (db6.name IS NOT NULL OR db5.name IS NOT NULL) ", kb.getId_pvizit());
+					if (acrs2.getResultSet().next()) {
+						do {
+							String str = "";
+							
+							if (acrs2.getResultSet().getString(1) != null)
+								str += String.format("диагноз: %s; ", acrs2.getResultSet().getString(1));
+							if (acrs2.getResultSet().getString(2) != null)
+								str += String.format("отеки: %s; ", acrs2.getResultSet().getString(2));
+							if (str.length() > 0)
+								sb.append(str + "<br>");
+						} while (acrs2.getResultSet().next());
+					} else
+						sb.append("нет<br>");
+					acrs2.close();
+					
+					sb.append("14. Размеры таза (при первом посещении)<br>");
+					sb.append(String.format("D.Sp %d D.Cr %d D.troch %d<br>", acrs.getResultSet().getInt(8), acrs.getResultSet().getInt(9), acrs.getResultSet().getInt(10)));
+					sb.append(String.format("C.ext %d C.diag %d C.vera %d<br>", acrs.getResultSet().getInt(11), acrs.getResultSet().getInt(12), acrs.getResultSet().getInt(13)));
+					sb.append(String.format("Рост %d Вес %f<br>", acrs.getResultSet().getInt(14), acrs.getResultSet().getDouble(15)));
+					dataRod = acrs.getResultSet().getDate(16);
+				}
+				acrs.close();
+				
+				acrs = sse.execPreparedQuery("SELECT db1.name, db2.name, db3.name, db4.name, chcc FROM p_rd_din din JOIN n_db1 db1 ON (db1.pcod = din.polpl) JOIN n_db2 db2 ON (db2.pcod = din.predpl) JOIN n_db3 db3 ON (db3.pcod = din.serd1) JOIN n_db4 db4 ON (db4.pcod = din.serd) WHERE id_pvizit = ? ORDER BY id_rd_sl DESC ", kb.getId_pvizit());
+				if (acrs.getResultSet().next()) {
+					sb.append(String.format("15. Положение плода: %s<br>", acrs.getResultSet().getString(1)));
+					sb.append(String.format("Предлежащая часть плода: %s<br>", acrs.getResultSet().getString(2)));
+					sb.append(String.format("Сердцебинение плода: %s, %s, %d ударов в 1 минуту слева, справа _________<br>", acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), acrs.getResultSet().getInt(5)));
+				}
+				acrs.close();
+				
+				sb.append("16. Лабораторные и другие исследования<br>");
+				sb.append("RW<sub>1</sub>: \"____\" _____________ 20______ года <br>HBS<sub>1</sub>: \"____\" ____________ 20______ года<br>");
+				sb.append("RW<sub>2</sub>: \"____\" _____________ 20______ года <br>HBS<sub>2</sub>: \"____\" ____________ 20______ года<br>");
+				sb.append("RW<sub>3</sub>: \"____\" _____________ 20______ года <br>HCV<sub>1</sub>: \"____\" ____________ 20______ года<br>");
+				sb.append("ВИЧ<sub>1</sub>: \"____\" _____________ 20______ года <br>HCV<sub>2</sub>: \"____\" ____________ 20______ года<br>");
+				sb.append("ВИЧ<sub>2</sub>: \"____\" _____________ 20______ года<br>");
+				
+				acrs = sse.execPreparedQuery("SELECT ph, grup FROM p_sign WHERE npasp = ? ", kb.getNpasp());
+				if (acrs.getResultSet().next()) {
+					sb.append(String.format("Резус: %s<br>", acrs.getResultSet().getString(1)));
+					sb.append("Титр антител:_________<br>");
+					sb.append(String.format("Группа крови: %s<br>", acrs.getResultSet().getString(2)));
+				}
+				acrs.close();
+				
 				sb.append("<br>Резус-принадлежность крови мужа:__________");
 				sb.append("<br>Токсоплазмоз: РСК, кожная проба __________");
 				sb.append("<br><b>Клинические анлизы</b>");
@@ -2076,8 +2128,11 @@ sb.append("<br>Подпись ____________");
 				sb.append("<br>Анализ содержимого влагалища (мазок) _______________________________");
 				sb.append("<br>Кал на яйца-глист _________________________");
 				sb.append("<br>17. Школа матерей _________________");
-				sb.append("<br>18. Дата выдачи листка нетрудоспособности по дородовому отпуску \"______\" _________ 20___ г.");
-				sb.append("<br>19. Дата предполагаемых родов \"______\" _________ 20___ г.");
+				sb.append("<br>18. Дата выдачи листка нетрудоспособности по дородовому отпуску \"______\" _________ 20___ г.<br>");
+				
+				if (dataRod != null)
+					sb.append(String.format("19. Дата предполагаемых родов %1$td %1$tb %1$tY г.", dataRod));
+				
 				sb.append("<br>Подпись врача акушера-гинеколога ________________");
 				sb.append("<br><b>Дневник последующих посещений");
 				sb.append("</b>");
@@ -2110,41 +2165,46 @@ sb.append("<br>Подпись ____________");
 				sb.append("<br>Заключение: _____________________________________________________");
 				sb.append("<br>1. Заключение терапевта _________________________________________");
 				sb.append("<br>2. Закючение окулиста ___________________________________________");
-				sb.append("</body>"); 
-				osw.write(sb.toString());
-				return "c:\\kart1.html";
+			sb.append("</body>"); 
+			sb.append("</html>");
+			
+			osw.write(sb.toString());
+			return "c:\\kart1.html";
 		} catch (SQLException|IOException  e) {
 			throw new KmiacServerException();
+		} finally {
+			if (acrs != null)
+				acrs.close();
+			if (acrs2 != null)
+				acrs2.close();
 		}
-	
 	}
 
-	@Override
-	public List<Shablon> getShablon() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm,sh_osm.name,sh_osm.diag,sh_osm_text.sh_text,sh_ot_spec.cspec from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
+	public List<IntegerClassifier> getShablon() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm as pcod,sh_osm.name as name from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
 		{
-			return rsmSh.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
 	}
 
 	@Override
-	public List<Shablon> getShPoisk(String tf) throws KmiacServerException,
+	public List<IntegerClassifier> getShPoisk(String tf) throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like '%бильные%') or  (sh_osm.diag like '%014.9%') or (sh_osm_text.sh_text like '%обследование%')order by name")) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_osm.id as pcod,sh_osm.name as name from sh_osm join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) where (sh_osm.name like ?) or  (sh_osm.diag like ?) or (sh_osm_text.sh_text like ?)order by name",'%'+tf+'%','%'+tf+'%','%'+tf+'%')) 
 		{
-			return rsmSh.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
 	}
 
 	@Override
-	public List<StringClassifier> get_vid_issl(int clab) throws KmiacServerException,
+	public List<IntegerClassifier> get_vid_issl() throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, tip as name  from n_lds where pcod=?", clab)) {
-			return rsmStrClas.mapToList(acrs.getResultSet());
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, tip as name  from n_lds")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
@@ -2152,6 +2212,20 @@ sb.append("<br>Подпись ____________");
 
 	}
 
+	@Override
+	public Shablon getSh(int id_sh) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select sh_osm.id,sh_osm.diag,n_din.name,sh_osm.next from sh_osm join n_din on (sh_osm.cdin=n_din.pcod)  where sh_osm.id=?", id_sh)) {
+			if (acrs.getResultSet().next())
+				return rsmSh.map(acrs.getResultSet());
+			else 
+				return new Shablon();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+	}
+
+}
 
 
 }

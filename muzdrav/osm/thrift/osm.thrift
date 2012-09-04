@@ -448,11 +448,9 @@ struct KartaBer {
 
 struct Shablon{
 	1: i32 id;
-	2: string name;
-	3: string diag;
-	4: string text;
-	5: string cdol;
-	6: i32 spec;
+	2: string diag;
+	3: string din;
+	4: string next_osm;
 }
 
 exception PvizitNotFoundException {
@@ -578,7 +576,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_z00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_z11() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_r0z() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.StringClassifier> get_vid_issl(1: i32 clab) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
@@ -612,7 +610,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Shablon*/
-	list<Shablon> getShablon() throws (1: kmiacServer.KmiacServerException kse);
-	list<Shablon> getShPoisk(1: string tf) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShablon() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShPoisk(1: string tf) throws (1: kmiacServer.KmiacServerException kse);
+	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 }

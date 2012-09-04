@@ -34,4 +34,12 @@ public class CustomTextField extends JTextField {
 	public void clear() {
 		setText(null);
 	}
+	
+	/**
+	 * Установка раскладки, которая будет включаться при получении
+	 * компонентом фокуса. 
+	 */
+	public void setDefaultLanguage(CustomTextComponentWrapper.DefaultLanguage defLang) {
+		ctcWrapper.setDefaultLanguage(defLang);
+	}
 }
