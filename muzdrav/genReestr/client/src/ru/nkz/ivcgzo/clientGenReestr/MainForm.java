@@ -13,6 +13,7 @@ import ru.nkz.ivcgzo.thriftGenReestr.ThriftGenReestr;
 public class MainForm extends Client<ThriftGenReestr.Client> {
     public static ThriftGenReestr.Client tcl;
     public static Client<ThriftGenReestr.Client> instance;
+    private ReestrForm reestrform;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException, UnsupportedLookAndFeelException {
 		super(conMan, authInfo, ThriftGenReestr.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -29,6 +30,10 @@ public class MainForm extends Client<ThriftGenReestr.Client> {
 	 * @throws ClassNotFoundException 
 	 */
 	private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
+		reestrform = new ReestrForm();
+		reestrform.pack();
+		reestrform.setExtendedState(reestrform.MAXIMIZED_BOTH);
+		setFrame(reestrform);
 	}
 
 	@Override

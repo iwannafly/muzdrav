@@ -517,7 +517,9 @@ public class PacientInfoFrame extends JFrame {
 				        btnDel.addActionListener(new ActionListener() {
 				        	public void actionPerformed(ActionEvent arg0) {
 				              try {
-				            	  MainForm.tcl.deletePatient(curPatientId);
+//				            	MainForm.tcl.deletePatient(curPatientId, MainForm.authInfo.cpodr);
+					            	MainForm.tcl.deletePatient(curPatientId);
+				   				NewPatient();
 				              } catch (TException e) {
 				            	  e.printStackTrace();
 				              }
@@ -3116,12 +3118,6 @@ public class PacientInfoFrame extends JFrame {
             tfDr.setValue(null);
             tf_Adm_dom.setText(null);
             tf_Adm_kv.setText(null);
-//FIXME            tf_Adm_obl.setText(null);
-//            tf_Adm_gorod.setText(null);
-//            tf_Adm_ul.setText(null);
-//            tf_Adp_obl.setText(null);
-//            tf_Adp_gorod.setText(null);
-//            tf_Adp_ul.setText(null);
             tf_Adp_dom.setText(null);
             tf_Adp_kv.setText(null);
             tfMrname.setText(null);
@@ -3149,6 +3145,12 @@ public class PacientInfoFrame extends JFrame {
             cmb_tdoc.setSelectedIndex(-1);
             cmb_oms_smo.setSelectedIndex(-1);
             cmb_dms_smo.setSelectedIndex(-1);
+            cmb_adm_obl.setSelectedIndex(-1);
+            cmb_adm_gorod.setSelectedIndex(-1);
+            cmb_adm_ul.setSelectedIndex(-1);
+            cmb_adp_obl.setSelectedIndex(-1);
+            cmb_adp_gorod.setSelectedIndex(-1);
+            cmb_adp_ul.setSelectedIndex(-1);
         } catch (Exception e) {
             e.printStackTrace();
         }
