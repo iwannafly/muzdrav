@@ -35,6 +35,7 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -619,6 +620,10 @@ public class ShablonPanel extends JPanel {
 		public SearchTree() {
 			setShowsRootHandles(true);
 			setRootVisible(false);
+			DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) getCellRenderer();
+			renderer.setLeafIcon(null);
+			renderer.setClosedIcon(null);
+			renderer.setOpenIcon(null);
 			
 			setExpandedChange();
 			setSelectionChange();
