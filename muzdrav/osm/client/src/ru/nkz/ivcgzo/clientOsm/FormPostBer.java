@@ -1149,9 +1149,9 @@ try {
 			PatientCommonInfo inf;
 		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
 //						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-fam.setText(inf.getFam());
-im.setText(inf.getIm());
-ot.setText(inf.getOt());
+//fam.setText(inf.getFam());
+//im.setText(inf.getIm());
+//ot.setText(inf.getOt());
 			CBOslAb.setData(MainForm.tcl.get_n_db9());
 			CBRod.setData(MainForm.tcl.get_n_db8());
 			CBPrishSn.setData(MainForm.tcl.get_n_db7());

@@ -114,22 +114,6 @@ public class FormRdInf extends JFrame {
 	private JCheckBox ChBots;
 	
 	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					FormRdInf frame = new FormRdInf();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
 	 * Create the frame.
 	 */
 	public FormRdInf() {
@@ -138,19 +122,14 @@ public class FormRdInf extends JFrame {
 			public void windowOpened(WindowEvent arg0) {
 			try {
 				rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+				setRdInfData();
 				fam.setText(Vvod.zapVr.getFam());
 				im.setText(Vvod.zapVr.getIm());
 				ot.setText(Vvod.zapVr.getOth());
-				setRdInfData();
 } catch (KmiacServerException | TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			}
-		});
-		addComponentListener(new ComponentAdapter() {
-			@Override
-			public void componentShown(ComponentEvent arg0) {
 			}
 		});
 		setTitle("Дополнительная информация о беременной");
@@ -310,7 +289,7 @@ public class FormRdInf extends JFrame {
 		
 		TFio = new JTextField();
 		
-		JSpinner SVozr = new JSpinner();
+		SVozr = new JSpinner();
 		SVozr.setModel(new SpinnerNumberModel(0, 0, 80, 1));
 		
 		TMrab = new JTextField();
@@ -448,7 +427,8 @@ public class FormRdInf extends JFrame {
 		ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
 
 		Sbutton.addActionListener(new ActionListener() {
-		private int oslrod (int oslrod){
+		private void calcoslrod (){
+			oslrod = 0;
 				if (ChBAss.isSelected()){oslrod=oslrod+1;}
 		            if (ChBots.isSelected()){oslrod=oslrod+2;}
 		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
@@ -457,33 +437,39 @@ public class FormRdInf extends JFrame {
 		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
 		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
 		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
 			};
-			private int uslj (int uslj){
-		           if (ChBSelo.isSelected()){uslj=uslj+1;}
-		            if (ChBots.isSelected()){uslj=uslj+2;}
+			private void calcuslj (){
+				uslj = 0;
+		            if (ChBSelo.isSelected())uslj=uslj+1;
+		            if (ChBOtsb.isSelected()){uslj=uslj+2;}
 		            if (ChBGorod.isSelected()){uslj=uslj+4;}
 		            if (ChBBomg.isSelected()){uslj=uslj+8;}
-			return uslj;
+		            System.out.println(uslj);		
 			};
-			private int otec (){
-				int otec = 0;
+			private void calcotec (){
+				 otec = 0;
 				if (ChBSmok.isSelected())
 					otec=otec+1;
 				if (ChBAlk.isSelected())
 					otec=otec+2;
 				if (ChBNark.isSelected())
 					otec=otec+4;
-				return otec;	
-			};
+				};
 			public void actionPerformed(ActionEvent arg0) {
+				try {
+					System.out.println("Запись");		
 rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
+calcoslrod();
 rdinf.setOsoco(oslrod);
+calcuslj();
 rdinf.setUslpr(uslj);
-rdinf.setVredOtec(otec());
+calcotec();
+rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
 rdinf.setPhOtec(TPhf.getText());
+rdinf.setVOtec((int) (SVozr.getModel().getValue()));
+rdinf.setDataz(System.currentTimeMillis());
 if (CBObr.getSelectedPcod() != null)
 	rdinf.setObr(CBObr.getSelectedPcod());
 	else rdinf.unsetObr();
@@ -493,6 +479,12 @@ if (CBSem.getSelectedPcod() != null)
 if (CBGrOtec.getSelectedPcod() != null)
 	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
 	else rdinf.unsetGrotec();
+System.out.println(rdinf);		
+	MainForm.tcl.UpdateRdInf(rdinf);
+} catch (KmiacServerException | TException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
 			}
 		});
 		
@@ -578,8 +570,8 @@ if (CBGrOtec.getSelectedPcod() != null)
 		}
 		or1=iw1; 
 		
-		if ((uslj-8)<0){
-		us4=0; 	
+	if ((uslj-8)<0){
+		us4=0; iw2=uslj;	
 		}else {
 		us4=1; iw2=uslj-8;	
 		}
@@ -595,7 +587,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 		}
 		us1=iw2; 
 		if ((otec-4)<0){
-		ot3=0; 
+		ot3=0; iw2=otec;
 		}else {
 		ot3=1; iw2=otec-4;	
 		}
@@ -605,7 +597,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 		ot2=1; iw2=iw2-2;	
 		}
 		ot1=iw2;
-	}
+}
 
 	protected void setRdInfData() throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
@@ -637,12 +629,12 @@ if (CBGrOtec.getSelectedPcod() != null)
 		ChBNmls.setSelected(or8 == 1);
 		ChBSelo.setSelected(us1 == 1);
 		ChBOtsb.setSelected(us2 == 1);
-		ChBGorod.setSelected(us3 == 1);
+	    ChBGorod.setSelected(us3 == 1);
 		ChBBomg.setSelected(us4 == 1);
-		ChBSmok.setSelected(ot1 == 1);
+	    ChBSmok.setSelected(ot1 == 1);
 		ChBAlk.setSelected(ot2 == 1);
 		ChBNark.setSelected(ot3 == 1);
-			SVozr.setValue(rdinf.vOtec);
+			SVozr.setValue(rdinf.getVOtec());
 		} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -656,9 +648,9 @@ if (CBGrOtec.getSelectedPcod() != null)
 fam.setText(inf.getFam());
 im.setText(inf.getIm());
 ot.setText(inf.getOt());
-//			CBObr.setData(MainForm.tcl.get_n_z00());
-//			CBSem.setData(MainForm.tcl.get_n_z11());
-//			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
+			CBObr.setData(MainForm.tcl.get_n_z00());
+			CBSem.setData(MainForm.tcl.get_n_z11());
+			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
 			
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
