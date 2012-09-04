@@ -203,7 +203,30 @@ public class ShablonPanel extends JPanel {
 		JLabel lbName = new JLabel("Название");
 		
 		tbDiag = new CustomTextField();
-		tbDiag.getDocument().addDocumentListener(textListener);
+		tbDiag.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				textListener.removeUpdate(e);
+				updateName();
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				textListener.insertUpdate(e);
+				updateName();
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				textListener.changedUpdate(e);
+				updateName();
+			}
+			
+			private void updateName() {
+				if (diagName != null)
+					tbName.setText(diagName);
+			}
+		});
 		tbDiag.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -466,6 +489,8 @@ public class ShablonPanel extends JPanel {
 		for (ShablonTextPanel txtPan : shPanList)
 			txtPan.clearText();
 		
+		btSave.setEnabled(false);
+		btSaveAsNew.setEnabled(false);
 		btDelete.setEnabled(false);
 	}
 	
@@ -528,6 +553,7 @@ public class ShablonPanel extends JPanel {
 			if (!prevDiagCode.equals(tbDiag.getText())) {
 				prevDiagCode = tbDiag.getText();
 				diagName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, prevDiagCode);
+
 			}
 		enb &= diagName != null;
 		
