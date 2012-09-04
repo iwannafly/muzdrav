@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientAdmin;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -77,6 +78,7 @@ public class ShablonPanel extends JPanel {
 	private boolean fillingUI;
 	private String prevDiagCode;
 	private String diagName;
+	private Font defFont;
 	
 	public ShablonPanel() {
 		textListener = new DocumentListener() {
@@ -114,6 +116,7 @@ public class ShablonPanel extends JPanel {
 		splitPane.setLeftComponent(gbSearch);
 		
 		tbSearch = new CustomTextField(true, true, false);
+		defFont = tbSearch.getFont();
 		tbSearch.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -206,30 +209,7 @@ public class ShablonPanel extends JPanel {
 		
 		tbDiag = new CustomTextField();
 		tbDiag.setDefaultLanguage(DefaultLanguage.English);
-		tbDiag.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				textListener.removeUpdate(e);
-				updateName();
-			}
-			
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				textListener.insertUpdate(e);
-				updateName();
-			}
-			
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				textListener.changedUpdate(e);
-				updateName();
-			}
-			
-			private void updateName() {
-				if (diagName != null)
-					tbName.setText(diagName);
-			}
-		});
+		tbDiag.getDocument().addDocumentListener(textListener);
 		tbDiag.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -410,8 +390,10 @@ public class ShablonPanel extends JPanel {
 			);
 			
 			txt = new JTextArea();
+			txt.setFont(defFont);
 			txt.getDocument().addDocumentListener(textListener);
 			txt.setLineWrap(true);
+			txt.setWrapStyleWord(true);
 			sp.setViewportView(txt);
 			setLayout(gl);
 			
@@ -425,6 +407,7 @@ public class ShablonPanel extends JPanel {
 		
 		public void setText(String text) {
 			txt.setText(text);
+			txt.setCaretPosition(0);
 		}
 		
 		public void clearText() {
@@ -579,10 +562,11 @@ public class ShablonPanel extends JPanel {
 		
 		try {
 			tbName.setText(shOsm.name);
+			tbName.setCaretPosition(0);
 			tbDiag.setText(shOsm.diag);
 			cbDyn.setSelectedPcod(shOsm.cDin);
-			cbSluPol.setSelected((shOsm.cslu & 1) == 1);
-			cbSluStat.setSelected((shOsm.cslu & 2) == 2);
+			cbSluStat.setSelected((shOsm.cslu & 1) == 1);
+			cbSluPol.setSelected((shOsm.cslu & 2) == 2);
 			
 			List<IntegerClassifier> icList = new ArrayList<>();
 			for (Integer ic : shOsm.specList)
