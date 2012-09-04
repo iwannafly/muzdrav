@@ -44,6 +44,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper.DefaultLanguage;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox.ThriftIntegerClassifierListCheckboxActionEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierListCheckbox.ThriftIntegerClassifierListCheckboxActionListener;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -203,6 +204,7 @@ public class ShablonPanel extends JPanel {
 		JLabel lbName = new JLabel("Название");
 		
 		tbDiag = new CustomTextField();
+		tbDiag.setDefaultLanguage(DefaultLanguage.English);
 		tbDiag.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -549,12 +551,11 @@ public class ShablonPanel extends JPanel {
 			enb &= !tbDiag.isEmpty();
 			enb &= !ltSpec.isAllItemsUnselected();
 		}
-		if (enb)
-			if (!prevDiagCode.equals(tbDiag.getText())) {
-				prevDiagCode = tbDiag.getText();
-				diagName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, prevDiagCode);
-
-			}
+		
+		if (!prevDiagCode.equals(tbDiag.getText()))
+			prevDiagCode = tbDiag.getText();
+			diagName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, prevDiagCode);
+			
 		enb &= diagName != null;
 		
 		btSave.setEnabled(enb);
