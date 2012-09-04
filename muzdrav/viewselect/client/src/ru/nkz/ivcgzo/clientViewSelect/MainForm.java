@@ -217,7 +217,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		    			conMan.showPolpTreeForm("Поликлиники Кемеровской Области", -1, -1, -1);
 		    		}
 		    		else if (className.equals("n_z43")) {
-		    			conMan.showMrabTreeForm("Место работы", -1, -1);
+		    			conMan.showMrabTreeForm("Место работы", -1);
 		    		}
 		    		else if (tcl.isClassifierPcodInteger(className)) {
 						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
@@ -452,7 +452,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					setFrame(mrabFrm);
 					mrabFrm.setTitle((String) params[1]);
 					dialog = prepareModal(parent);
-					mrabFrm.prepare((int) params[2], (int) params[3]);
+					mrabFrm.prepare((int) params[2]);
 					mrabFrm.setModalityListener();
 					dialog.setVisible(true);
 					try {
