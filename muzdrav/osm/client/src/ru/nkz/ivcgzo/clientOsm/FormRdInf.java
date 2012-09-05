@@ -66,8 +66,9 @@ public class FormRdInf extends JFrame {
 	private JTextField TMrab;
 	private JTextField TTelef;
 	private JTextField TPhf;
+	private JSpinner SVozr;
     private RdInfStruct rdinf;
-	private PatientCommonInfo patient;
+//	private PatientCommonInfo patient;
     private int oslrod;
     private int or1;
     private int or2;
@@ -89,11 +90,6 @@ public class FormRdInf extends JFrame {
     private int ot1;
     private int ot2;
     private int ot3;
-    private int codobr;
-    private String namobr;
-    private int codsem;
-    private String namsem;
-	private int npasp;
 	private ThriftStringClassifierCombobox<StringClassifier> CBGrOtec;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBObr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSem;
@@ -116,34 +112,29 @@ public class FormRdInf extends JFrame {
 	private JCheckBox ChBOtsb;
 	private JCheckBox ChBSelo;
 	private JCheckBox ChBots;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					FormRdInf frame = new FormRdInf();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	
 	/**
 	 * Create the frame.
 	 */
 	public FormRdInf() {
-		addComponentListener(new ComponentAdapter() {
+		addWindowListener(new WindowAdapter() {
 			@Override
-			public void componentShown(ComponentEvent arg0) {
+			public void windowOpened(WindowEvent arg0) {
+			try {
+				rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+				setRdInfData();
+				fam.setText(Vvod.zapVr.getFam());
+				im.setText(Vvod.zapVr.getIm());
+				ot.setText(Vvod.zapVr.getOth());
+} catch (KmiacServerException | TException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			}
 		});
 		setTitle("Дополнительная информация о беременной");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 537);
+		setBounds(100, 100, 850, 700);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -176,6 +167,18 @@ public class FormRdInf extends JFrame {
 					RdInfStruct rdinf = new RdInfStruct();
  		            MainForm.tcl.AddRdInf(rdinf);
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
+					//присвоить начальные значения
+					rdinf.setDataz(System.currentTimeMillis());
+					rdinf.setFioOtec(Vvod.zapVr.fam);
+					rdinf.setGrotec(null);
+					rdinf.setMrOtec(null);
+					rdinf.setObr(3);
+					rdinf.setOsoco(0);
+					rdinf.setPhOtec(null);
+					rdinf.setTelOtec(null);
+					rdinf.setUslpr(4);
+					rdinf.setVOtec(0);
+					rdinf.setVredOtec(0);
 					setRdInfData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -218,9 +221,8 @@ public class FormRdInf extends JFrame {
 							.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(Sbutton, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
-						.addComponent(panel_1, 0, 0, Short.MAX_VALUE)
-						.addGroup(gl_panel.createSequentialGroup()
+						.addComponent(panel_1, Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(LSem)
 								.addComponent(LObr))
@@ -228,7 +230,8 @@ public class FormRdInf extends JFrame {
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(CBObr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(55)))
+							.addGap(55))
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE)
 					.addGap(77))
@@ -256,11 +259,11 @@ public class FormRdInf extends JFrame {
 								.addComponent(Sbutton)
 								.addComponent(btnNewButton))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE))
-						.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-					.addContainerGap())
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE))
+						.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE))
+					.addGap(99))
 		);
 		
 		JLabel lblNewLabel_1 = new JLabel("Информация об отце ребенка");
@@ -286,17 +289,14 @@ public class FormRdInf extends JFrame {
 		
 		TFio = new JTextField();
 		
-		JSpinner SVozr = new JSpinner();
-		SVozr.setModel(new SpinnerNumberModel(new Integer(rdinf.vOtec), null, null, new Integer(1)));
-		rdinf.setVOtec((int) SVozr.getModel().getValue());
+		SVozr = new JSpinner();
+		SVozr.setModel(new SpinnerNumberModel(0, 0, 80, 1));
 		
 		TMrab = new JTextField();
 		
 		TTelef = new JTextField();
-		TTelef.setText(rdinf.telOtec);
 		
 		TPhf = new JTextField();
-		TPhf.setText(rdinf.phOtec);
 		
 		CBGrOtec = new ThriftStringClassifierCombobox<>(StringClassifiers.n_r0z);
 
@@ -319,11 +319,10 @@ public class FormRdInf extends JFrame {
 								.addComponent(Lph))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+								.addComponent(TTelef, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
 								.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING)
-									.addComponent(TPhf, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-									.addComponent(TMrab, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
-									.addComponent(TTelef, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
+								.addComponent(TPhf, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+								.addComponent(TMrab, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
 									.addComponent(CBGrOtec, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 									.addComponent(SVozr, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))))
@@ -365,7 +364,7 @@ public class FormRdInf extends JFrame {
 					.addComponent(ChBAlk)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBNark)
-					.addContainerGap(61, Short.MAX_VALUE))
+					.addContainerGap(89, Short.MAX_VALUE))
 		);
 		panel_3.setLayout(gl_panel_3);
 		
@@ -391,7 +390,7 @@ public class FormRdInf extends JFrame {
 						.addComponent(ChBOtsb)
 						.addComponent(ChBSelo)
 						.addComponent(label))
-					.addContainerGap(82, Short.MAX_VALUE))
+					.addContainerGap(273, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -403,8 +402,9 @@ public class FormRdInf extends JFrame {
 					.addComponent(ChBOtsb)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBGorod)
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(ChBBomg))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(ChBBomg)
+					.addContainerGap(86, Short.MAX_VALUE))
 		);
 		panel_2.setLayout(gl_panel_2);
 		
@@ -427,7 +427,8 @@ public class FormRdInf extends JFrame {
 		ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
 
 		Sbutton.addActionListener(new ActionListener() {
-		private int oslrod (int oslrod){
+		private void calcoslrod (){
+			oslrod = 0;
 				if (ChBAss.isSelected()){oslrod=oslrod+1;}
 		            if (ChBots.isSelected()){oslrod=oslrod+2;}
 		            if (ChBInv.isSelected()){oslrod=oslrod+4;}
@@ -436,33 +437,39 @@ public class FormRdInf extends JFrame {
 		            if (ChBCnd.isSelected()){oslrod=oslrod+32;}
 		            if (ChBNer.isSelected()){oslrod=oslrod+64;}
 		            if (ChBNmls.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
 			};
-			private int uslj (int uslj){
-		           if (ChBSelo.isSelected()){uslj=uslj+1;}
-		            if (ChBots.isSelected()){uslj=uslj+2;}
+			private void calcuslj (){
+				uslj = 0;
+		            if (ChBSelo.isSelected())uslj=uslj+1;
+		            if (ChBOtsb.isSelected()){uslj=uslj+2;}
 		            if (ChBGorod.isSelected()){uslj=uslj+4;}
 		            if (ChBBomg.isSelected()){uslj=uslj+8;}
-			return uslj;
+		            System.out.println(uslj);		
 			};
-			private int otec (){
-				int otec = 0;
+			private void calcotec (){
+				 otec = 0;
 				if (ChBSmok.isSelected())
 					otec=otec+1;
 				if (ChBAlk.isSelected())
 					otec=otec+2;
 				if (ChBNark.isSelected())
 					otec=otec+4;
-				return otec;	
-			};
+				};
 			public void actionPerformed(ActionEvent arg0) {
+				try {
+					System.out.println("Запись");		
 rdinf.setFioOtec(TFio.getText());
 rdinf.setMrOtec(TMrab.getText());
+calcoslrod();
 rdinf.setOsoco(oslrod);
+calcuslj();
 rdinf.setUslpr(uslj);
-rdinf.setVredOtec(otec());
+calcotec();
+rdinf.setVredOtec(otec);
 rdinf.setTelOtec(TTelef.getText());
 rdinf.setPhOtec(TPhf.getText());
+rdinf.setVOtec((int) (SVozr.getModel().getValue()));
+rdinf.setDataz(System.currentTimeMillis());
 if (CBObr.getSelectedPcod() != null)
 	rdinf.setObr(CBObr.getSelectedPcod());
 	else rdinf.unsetObr();
@@ -472,6 +479,12 @@ if (CBSem.getSelectedPcod() != null)
 if (CBGrOtec.getSelectedPcod() != null)
 	rdinf.setGrotec(CBGrOtec.getSelectedPcod());
 	else rdinf.unsetGrotec();
+System.out.println(rdinf);		
+	MainForm.tcl.UpdateRdInf(rdinf);
+} catch (KmiacServerException | TException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
 			}
 		});
 		
@@ -557,8 +570,8 @@ if (CBGrOtec.getSelectedPcod() != null)
 		}
 		or1=iw1; 
 		
-		if ((uslj-8)<0){
-		us4=0; 	
+	if ((uslj-8)<0){
+		us4=0; iw2=uslj;	
 		}else {
 		us4=1; iw2=uslj-8;	
 		}
@@ -574,7 +587,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 		}
 		us1=iw2; 
 		if ((otec-4)<0){
-		ot3=0; 
+		ot3=0; iw2=otec;
 		}else {
 		ot3=1; iw2=otec-4;	
 		}
@@ -584,35 +597,45 @@ if (CBGrOtec.getSelectedPcod() != null)
 		ot2=1; iw2=iw2-2;	
 		}
 		ot1=iw2;
-	}
+}
 
 	protected void setRdInfData() throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 	try {
-		rdinf = MainForm.tcl.getRdInfInfo(Vvod.zapVr.npasp);
+		TFio.setText(rdinf.getFioOtec());
+		TMrab.setText(rdinf.getMrOtec());
+		TTelef.setText(rdinf.getTelOtec());
+		TPhf.setText(rdinf.getPhOtec());
+		if (rdinf.isSetGrotec())
+			CBGrOtec.setSelectedPcod(rdinf.getGrotec());
+		else CBGrOtec.setSelectedItem(null);
+		if (rdinf.isSetObr())
+			CBObr.setSelectedPcod(rdinf.getObr());
+		else CBObr.setSelectedItem(null);
+		if (rdinf.isSetSem())
+			CBSem.setSelectedPcod(rdinf.getSem());
+		else CBSem.setSelectedItem(null);
 		oslrod = rdinf.getOsoco();
 		uslj = rdinf.getUslpr();
 		otec = rdinf.getVredOtec();
 		method1();
-		TFio.setText(rdinf.fioOtec);
-		TMrab.setText(rdinf.mrOtec);
-//		CBObr.setd
-		ChBNark.setSelected(ot3 == 1);
-		ChBAlk.setSelected(ot2 == 1);
-		ChBSmok.setSelected(ot1 == 1);
-		ChBNmls.setSelected(or8 == 1);
-		ChBNer.setSelected(or7 == 1);
-		ChBInv.setSelected(or3 == 1);
-		ChBBots.setSelected(or2 == 1);
 		ChBAss.setSelected(or1 == 1);
-		ChBLrp.setSelected(or5 == 1);
+		ChBots.setSelected(or2 == 1);
+		ChBInv.setSelected(or3 == 1);
 		ChBMnd.setSelected(or4 == 1);
+		ChBLrp.setSelected(or5 == 1);
 		ChBCnd.setSelected(or6 == 1);
-		ChBBomg.setSelected(us4 == 1);
-		ChBGorod.setSelected(us3 == 1);
-		ChBOtsb.setSelected(us2 == 1);
+		ChBNer.setSelected(or7 == 1);
+		ChBNmls.setSelected(or8 == 1);
 		ChBSelo.setSelected(us1 == 1);
-	} catch (Exception e) {
+		ChBOtsb.setSelected(us2 == 1);
+	    ChBGorod.setSelected(us3 == 1);
+		ChBBomg.setSelected(us4 == 1);
+	    ChBSmok.setSelected(ot1 == 1);
+		ChBAlk.setSelected(ot2 == 1);
+		ChBNark.setSelected(ot3 == 1);
+			SVozr.setValue(rdinf.getVOtec());
+		} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
@@ -622,7 +645,6 @@ if (CBGrOtec.getSelectedPcod() != null)
 		try {
 			PatientCommonInfo inf;
 		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-//						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
 fam.setText(inf.getFam());
 im.setText(inf.getIm());
 ot.setText(inf.getOt());
