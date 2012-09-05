@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -76,6 +77,11 @@ public class ViewPolpTreeForm extends ModalForm {
 					acceptResults();
 			}
 		});
+		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) tree.getCellRenderer();
+		renderer.setLeafIcon(null);
+		renderer.setClosedIcon(null);
+		renderer.setOpenIcon(null);
+		
 		scrollPane.setViewportView(tree);
 		contentPane.setLayout(gl_contentPane);
 	}
@@ -204,6 +210,8 @@ public class ViewPolpTreeForm extends ModalForm {
 		Rectangle bounds = tree.getPathBounds(path);
 		bounds.x = 0;
 		bounds.y -= (tree.getPreferredSize().height - bounds.height) / 4;
+		if (bounds.y < 0)
+			bounds.y = 0;
 		tree.scrollRectToVisible(bounds);
 	}
 	
