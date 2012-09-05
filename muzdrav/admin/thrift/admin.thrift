@@ -33,26 +33,15 @@ struct UserIdPassword {
 	2: string password;
 }
 
-struct ShablonRazd {
+struct ShablonOsm {
 	1: i32 id;
 	2: string name;
+	3: string diag;
+	4: i32 cDin;
+	5: i32 cslu;
+	6: list<i32> specList;
+	7: list<classifier.IntegerClassifier> textList;
 }
-
-struct ShablonPok {
-	1: i32 id;
-	2: i32 id_razd;
-	3: string name;
-	4: bool checked;
-}
-
-struct ShablonText {
-	1: i32 id;
-	2: i32 id_razd;
-	3: i32 id_pok;
-	4: string pcod_s00;
-	5: string text;
-}
-
 
 /**
  * Врач с такими данными уже существует.
@@ -167,43 +156,11 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	 */
 	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
 
-	/**
-	 * Получает список разделов шаблонов.
-	 */
-	list<ShablonRazd> getShabRazd();
-
-	/**
-	 * Получает список показателей шаблонов.
-	 */
-	list<ShablonPok> getShabPok(1: i32 id_razd, 2: string cdol);
-
-	/**
-	 * Устанавливает доступность показателя шаблона для кода должности.
-	 */
-	void setShabPok(1: ShablonPok shPok, 2: string cdol);
-
-	/**
-	 * Устанавливает доступность показателей для всего раздела.
-	 */
-	void setShabPokGrup(1: ShablonRazd shRazd, 2: string cdol, 3: bool value);
-
-	/**
-	 * Получает тексты шаблонов для показателя шаблона и кода должности в независимости от доступности.
-	 */
-	list<ShablonText> getShablonTextsEdit(1: ShablonPok shPok, 2: string cdol);
-
-	/**
-	 * Получает тексты шаблонов для показателя шаблона и кода должности.
-	 */
-	list<ShablonText> getShablonTexts(1: ShablonPok shPok, 2: string cdol);
-
-	/**
-	 * Добавляет шаблон.
-	 */
-	i32 addShablonText(1: ShablonText shText);
-
-	/**
-	 * Обновляет шаблон.
-	 */
-	void updateShablonText(1: ShablonText shText);
+	list<classifier.IntegerClassifier> getReqShOsmList() throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getAllShablonOsm() throws (1: kmiacServer.KmiacServerException kse);
+	ShablonOsm getShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShablonOsmDiagList(1: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShablonOsmListByDiag(1: string diag) throws (1: kmiacServer.KmiacServerException kse);
+	void deleteShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

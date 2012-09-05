@@ -92,7 +92,9 @@ enum IntegerClassifiers {
 	n_z70 = 74,
 	n_z80 = 75,
 	n_z90 = 76,
-	n_z11 = 77
+	n_z11 = 77,
+	n_spec = 78,
+	n_din = 79
 }
 
 enum StringClassifiers {

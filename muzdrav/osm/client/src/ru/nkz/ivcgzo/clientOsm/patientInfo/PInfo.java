@@ -216,7 +216,6 @@ public class PInfo extends JFrame {
 								if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
 								eptxt.setText(sb.toString());
 							} catch (PatientNotFoundException e1) {
-								System.out.println("hren");
 								e1.printStackTrace();
 							}
 		 				}
@@ -344,7 +343,7 @@ public class PInfo extends JFrame {
 		 				addLineToDetailInfo("Серия родового сертификата", rdsl.isSetSsert(), rdsl.getSsert());
 		 				addLineToDetailInfo("Осложнение после аборта", rdsl.isSetOslab(), rdsl.getOslab());
 		 				addLineToDetailInfo("Планируемые роды", rdsl.isSetPlrod(), rdsl.getPlrod());
-		 				addLineToDetailInfo("Описание предыдущих родов", rdsl.isSetPrroid(), rdsl.getPrroid());
+		 				addLineToDetailInfo("Описание предыдущих родов", rdsl.isSetPrrod(), rdsl.getPrrod());
 		 				addLineToDetailInfo("Возраст Менархе", rdsl.isSetVozmen(), rdsl.getVozmen());
 		 				addLineToDetailInfo("Осложнения предыдущих родов", rdsl.isSetOslrod(), rdsl.getOslrod());
 		 				addLineToDetailInfo("Со сколько лет половая жизнь", rdsl.isSetPolj(), rdsl.getPolj());

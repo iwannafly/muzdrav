@@ -15,6 +15,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
+import ru.nkz.ivcgzo.thriftViewSelect.mrab_0;
 import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
 
 public class ClassifierManager {
@@ -22,6 +23,7 @@ public class ClassifierManager {
 	private Map<Integer, List<StringClassifier>> strClassList;
 	private List<mkb_0> mkbTreeClass;
 	private List<polp_0> polpTreeClass;
+	private List<mrab_0> mrabTreeClass;
 	
 	public ClassifierManager() {
 		intClassList = new HashMap<>();
@@ -80,5 +82,30 @@ public class ClassifierManager {
 			polpTreeClass = MainForm.tcl.getPolp_0();
 		
 		return polpTreeClass;
+	}
+	
+	public List<mrab_0> getMrabTreeClassifier() throws KmiacServerException, TException {
+		if (mrabTreeClass == null)
+			mrabTreeClass = MainForm.tcl.getMrab_0();
+		
+		return mrabTreeClass;
+	}
+	
+	public String getNameFromPcodInteger(IntegerClassifiers cls, int pcod) throws KmiacServerException, TException {
+		for (IntegerClassifier ic : getIntegerClassifier(cls)) {
+			if (ic.pcod == pcod)
+				return ic.name;
+		}
+		
+		throw new KmiacServerException("Cannot fetch name by given pcod.");
+	}
+	
+	public String getNameFromPcodString(StringClassifiers cls, String pcod) throws KmiacServerException, TException {
+		for (StringClassifier sc : getStringClassifier(cls)) {
+			if (sc.pcod.equals(pcod))
+				return sc.name;
+		}
+		
+		throw new KmiacServerException("Cannot fetch name by given pcod.");
 	}
 }

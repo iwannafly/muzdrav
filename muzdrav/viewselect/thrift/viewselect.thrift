@@ -58,6 +58,12 @@ struct polp_0 {
 	3: list<polp_1> polp1;
 }
 
+struct mrab_0{
+    1: i32 pGruppa;
+    2: string name;
+    3: list<classifier.IntegerClassifier> mrab1;
+}
+
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
@@ -89,4 +95,5 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> getStringClassifierSorted(1: classifier.StringClassifiers cls, 2: classifier.ClassifierSortOrder ord, 3: classifier.ClassifierSortFields fld) throws (1: kmiacServer.KmiacServerException kse);
 	list<mkb_0> getMkb_0() throws (1: kmiacServer.KmiacServerException kse);
 	list<polp_0> getPolp_0() throws (1: kmiacServer.KmiacServerException kse);
+    list<mrab_0> getMrab_0() throws (1: kmiacServer.KmiacServerException kse);
 }

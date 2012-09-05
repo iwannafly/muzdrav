@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JCheckBox;
 import java.awt.Font;
+
+import javax.swing.JEditorPane;
 import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
@@ -37,6 +39,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
@@ -125,29 +128,16 @@ public class FormPostBer extends JFrame {
 	private ThriftStringClassifierCombobox<StringClassifier> CBOslAb;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBRod;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPrishSn;
-//    private JTextField SDataRod;
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					FormPostBer frame = new FormPostBer();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-	protected AbstractButton CBKontr;
-//	protected AbstractButton SDsp;
+	private JCheckBox CBKontr;
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
 	private JTextField TSSert;
 	private JTextField TNSert;
+	private JEditorPane TPrRod;
 
 	/**
 	 * Create the frame.
@@ -163,13 +153,21 @@ public class FormPostBer extends JFrame {
 addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
-//			rdsl.getAbort(SKolAb.value);
-	//	SKolAb.get(rdsl.abort);
-			}
+try {
+	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+	setPostBerData();
+	fam.setText(Vvod.zapVr.getFam());
+	im.setText(Vvod.zapVr.getIm());
+	ot.setText(Vvod.zapVr.getOth());
+} catch (KmiacServerException | TException e) {
+	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}			}
 		});
 		setTitle("Постановка на учет по беременности");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 700, 800);
+		setBounds(100, 100, 850, 700);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -182,27 +180,19 @@ addWindowListener(new WindowAdapter() {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					PatientCommonInfo inf;
-					inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-//									tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-			fam.setText(inf.getFam());
-			im.setText(inf.getIm());
-			ot.setText(inf.getOt());
 					rdsl = new RdSlStruct();
 					setDefaultValues();
 					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-					rdsl.setNpasp(Vvod.zapVr.getNpasp());
-					setPostBerData(rdsl);
+//					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//					rdsl.setNpasp(Vvod.zapVr.getNpasp());
+					rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+					setPostBerData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
 					e1.printStackTrace();
 					MainForm.conMan.reconnect(e1);
-				} catch (PatientNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
 			}
 		});
@@ -211,10 +201,9 @@ addWindowListener(new WindowAdapter() {
 		ButSave.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		ButSave.setToolTipText("Сохранить");
 		ButSave.addActionListener(new ActionListener() {
-			private AbstractButton sVozMen;
-            private int getoslrod(int oslrod){
-            	oslrod=0;
-            if (CBKrov.isSelected()){oslrod=oslrod+1;}
+            private void calcOslrod(){
+    			oslrod=0;
+        if (CBKrov.isSelected()){oslrod=oslrod+1;}
             if (CBEkl.isSelected()){oslrod=oslrod+2;}
             if (CBGnoin.isSelected()){oslrod=oslrod+4;}
             if (CBTromb.isSelected()){oslrod=oslrod+8;}
@@ -222,29 +211,33 @@ addWindowListener(new WindowAdapter() {
             if (CBAkush.isSelected()){oslrod=oslrod+32;}
             if (CBIiiiv.isSelected()){oslrod=oslrod+64;}
             if (CBRazrProm.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
+//			System.out.println(oslrod);		
             };
-			private int kontrac(int iw3){
-				if (CBKontr.isSelected()){iw3 = 1;}
-				return iw3;
-			};
 			public void actionPerformed(ActionEvent arg0) {
-	/*			patient.setFam((String) fam.getText());
-				patient.setIm((String)im.getText());
-				patient.setOt((String) ot.getText());*/
+				try {
+
+					rdsl.setId_pvizit(Vvod.zapVr.id_pvizit);
 			rdsl.setAbort((int) SKolAb.getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
+ 			if (SDataM.getDate() != null)
 			rdsl.setDataM( SDataM.getDate().getTime());
+ 			if (SDataOsl.getDate() != null)
 			rdsl.setDataosl( SDataOsl.getDate().getTime());
+ 			if (SDataSn.getDate() != null)
 			rdsl.setDatasn( SDataSn.getDate().getTime());
+ 			if (SDataRod.getDate() != null)
 			rdsl.setDatasn( SDataRod.getDate().getTime());
+ 			if (SDataSert.getDate() != null)
 			rdsl.setDatasert( SDataSert.getDate().getTime());
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
 			rdsl.setNsert(getTextOrNull(TNSert.getText()));
-			rdsl.setDatasn( TDataab.getDate().getTime());
-			rdsl.setDatasert( SDataSert.getDate().getTime());
+			rdsl.setPrrod(getTextOrNull(TPrRod.getText()));
+//			rdsl.setPrrod(TPrRod.getText());
+ 			if (TDataab.getDate() != null)
+			rdsl.setDataab( TDataab.getDate().getTime());
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
 			rdsl.setNsert(getTextOrNull(TNSert.getText()));
+ 			if (SDataPos.getDate() != null)
 			rdsl.setDatay(SDataPos.getDate().getTime());
 			rdsl.setKont(CBKontr.isSelected());
 			rdsl.setDeti((int) SKolDet.getModel().getValue());
@@ -257,8 +250,12 @@ addWindowListener(new WindowAdapter() {
 			rdsl.setPolj((int) SPolJ.getModel().getValue());
 			rdsl.setPrmen((int) SMenC.getModel().getValue());
 //			rdsl.setRost((int) SRost.getModel().getValue());
-			rdsl.setVesd((int) SVes.getModel().getValue());
+			rdsl.setVesd((Double) SVes.getModel().getValue());
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
+           	rdsl.setCdiagt((int) SCDiag.getModel().getValue());
+           	rdsl.setCvera((int) SCvera.getModel().getValue());
+           	rdsl.setDataz(System.currentTimeMillis());
+			calcOslrod();
 			rdsl.setOslrod(oslrod);
 			if (CBOslAb.getSelectedPcod() != null)
 				rdsl.setOslab(CBOslAb.getSelectedPcod());
@@ -269,8 +266,8 @@ addWindowListener(new WindowAdapter() {
 			if (CBPrishSn.getSelectedPcod() != null)
 				rdsl.setIshod(CBPrishSn.getSelectedPcod());
 				else rdsl.unsetIshod();
-			
-			try {
+	System.out.println(rdsl);		
+		//		JOptionPane.showMessageDialog(FormPostBer.this, "Ошибка обновления");
 				MainForm.tcl.UpdateRdSl(rdsl);
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
@@ -342,7 +339,12 @@ addWindowListener(new WindowAdapter() {
 		BPeshOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					String servPath = MainForm.tcl.printKartaBer();
+					KartaBer kartaber = new KartaBer();
+					kartaber.setId_pos(Vvod.pvizitAmb.getId());
+					kartaber.setId_pvizit(Vvod.pvizit.getId());
+					kartaber.setNpasp(Vvod.zapVr.getNpasp());
+					kartaber.setId_rd_sl(0);
+					String servPath = MainForm.tcl.printKartaBer(kartaber);
 					String cliPath;
 					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -475,15 +477,15 @@ addWindowListener(new WindowAdapter() {
 		SRost = new JSpinner();
 
 		SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(0, 0, 250, 1));
+		SVes.setModel(new SpinnerNumberModel(0.0, 0.0, 250.0, 1.0));
 //		rdsl.setVesd((int) SVes.getModel().getValue());
 		
 		SDsp = new JSpinner();
-		SDsp.setModel(new SpinnerNumberModel(0,0, 27,1));
+		SDsp.setModel(new SpinnerNumberModel(0, 0, 27, 1));
 //		rdsl.setDsp((int) SDsp.getModel().getValue());
 		
 		SDcr = new JSpinner();
-		SDcr.setModel(new SpinnerNumberModel(0,0, 30, 1));
+		SDcr.setModel(new SpinnerNumberModel(0, 0, 30, 1));
 //		rdsl.setDsr((int) SDcr.getModel().getValue());
 		
 		SDtroch = new JSpinner();
@@ -647,6 +649,11 @@ addWindowListener(new WindowAdapter() {
 		
 		SSrokA = new JSpinner();
 		SSrokA.setModel(new SpinnerNumberModel(0,0, 40,1 ));
+		
+		JLabel LPrBer = new JLabel("Описание предыдущих родов");
+		
+		TPrRod = new JEditorPane();
+		TPrRod.setBorder(UIManager.getBorder("TextField.border"));
 //		rdsl.setSrokab((int) SSrokA.getModel().getValue());
 
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -735,14 +742,17 @@ addWindowListener(new WindowAdapter() {
 								.addComponent(LDataPlRod))
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panel.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 240, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel.createSequentialGroup()
 									.addGap(15)
-									.addComponent(panel_1, 0, 0, Short.MAX_VALUE))))
+									.addComponent(panel_1, 0, 0, Short.MAX_VALUE))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(TPrRod, GroupLayout.PREFERRED_SIZE, 307, GroupLayout.PREFERRED_SIZE)
+										.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 240, GroupLayout.PREFERRED_SIZE)
+										.addComponent(LPrBer)))))
 						.addComponent(LPrish)
 						.addComponent(LDataSn))
-					.addContainerGap(488, Short.MAX_VALUE))
+					.addContainerGap(438, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -846,8 +856,12 @@ addWindowListener(new WindowAdapter() {
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(1)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(LPrBer)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(TPrRod, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)))
 					.addGap(47))
 		);
 		
@@ -973,7 +987,8 @@ addWindowListener(new WindowAdapter() {
 	private void setDefaultValues() {
 		// TODO Auto-generated method stub
 	try {
-		rdsl.setNpasp(Vvod.zapVr.npasp);
+		rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
+		rdsl.setNpasp(Vvod.zapVr.getNpasp());
 		rdsl.setCext(25);
 		rdsl.setDsp(25);
 		rdsl.setDsr(28);
@@ -992,10 +1007,12 @@ addWindowListener(new WindowAdapter() {
 //		rdsl.setRost(160);
 		rdsl.setVesd(60);
 		rdsl.setOslab("");
+		rdsl.setPrrod("");
 		rdsl.setDataM(System.currentTimeMillis());
 		rdsl.setDatay(System.currentTimeMillis());
 		rdsl.setDataosl(System.currentTimeMillis());
 		rdsl.setDatasn(System.currentTimeMillis());
+		rdsl.setDataz(System.currentTimeMillis());
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -1005,10 +1022,9 @@ addWindowListener(new WindowAdapter() {
 	
 	}
 
-	private void setPostBerData(RdSlStruct rdsl) {
+	private void setPostBerData() {
 		//SRost.setValue(rdsl.getRost());
 		try {
-			rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.id_pvizit, Vvod.zapVr.npasp);
 			SVes.setValue(rdsl.getVesd());
 			SDsp.setValue(rdsl.getDsp());
 			SDcr.setValue(rdsl.getDsr());
@@ -1016,30 +1032,56 @@ addWindowListener(new WindowAdapter() {
 			SCext.setValue(rdsl.getCext());
 			SindSol.setValue(rdsl.getIndsol());
 			SDataPos.setDate(rdsl.getDatay());
+			if (rdsl.getDatay() == 0)
+			SDataPos.setText(null);
 			SDataSn.setDate(rdsl.getDatasn());
+			if (rdsl.getDatasn() == 0)
+			SDataSn.setText(null);
 			SDataRod.setDate(rdsl.getDataZs());
+			if (rdsl.getDataZs() == 0)
+			SDataRod.setText(null);
 			SDataSert.setDate(rdsl.getDatasert());
+			if (rdsl.getDatasert() == 0)
+			SDataSert.setText(null);
 			TSSert.setText(rdsl.ssert);
 			TNSert.setText(rdsl.nsert);
 			SParRod.setValue(rdsl.getKolrod());
 			SKolBer.setValue(rdsl.getShet());
 			TDataab.setDate(rdsl.getDataab());
-			SDataRod.setDate(rdsl.getDataZs());
+			if (rdsl.getDataab() == 0)
+			TDataab.setText(null);
 			SDataSert.setDate(rdsl.getDatasert());
+			if (rdsl.getDatasert() == 0)
+			SDataSert.setText(null);
 			TSSert.setText(rdsl.ssert);
 			TNSert.setText(rdsl.nsert);
+			TPrRod.setText(rdsl.prrod);
 			SParRod.setValue(rdsl.getKolrod());
 			SKolBer.setValue(rdsl.getShet());
 			SDataOsl.setDate(rdsl.getDataosl());
 			SYavka.setValue(rdsl.getYavka1());
 			SDataM.setDate(rdsl.getDataM());
+			if (rdsl.getDataM() == 0)
+			SDataM.setText(null);
 			SKolAb.setValue(rdsl.getAbort());
 			SVozMen.setValue(rdsl.getVozmen());
 			SMenC.setValue(rdsl.getPrmen());
 			SKolDet.setValue(rdsl.getDeti());
 			SPolJ.setValue(rdsl.getPolj());
 			SSrokA.setValue(rdsl.getSrokab());
+			SCDiag.setValue(rdsl.getCdiagt());
+			SCvera.setValue(rdsl.getCvera());
 			oslrod = rdsl.getOslrod();
+			if(rdsl.isSetOslab())
+			CBOslAb.setSelectedPcod(rdsl.getOslab());
+			else CBOslAb.setSelectedItem(null);
+			if (rdsl.isSetPlrod())
+			CBRod.setSelectedPcod(rdsl.getPlrod());
+			else CBRod.setSelectedItem(null);
+			if (rdsl.isSetIshod())
+			CBPrishSn.setSelectedPcod(rdsl.getIshod());
+			else CBPrishSn.setSelectedItem(null);
+			TNKart.setText(String.valueOf(rdsl.getId()));
 			method2();
 			CBKrov.setSelected(or1 == 1);
 			CBEkl.setSelected(or2 == 1);
@@ -1107,9 +1149,9 @@ addWindowListener(new WindowAdapter() {
 			PatientCommonInfo inf;
 		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
 //						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-fam.setText(inf.getFam());
-im.setText(inf.getIm());
-ot.setText(inf.getOt());
+//fam.setText(inf.getFam());
+//im.setText(inf.getIm());
+//ot.setText(inf.getOt());
 			CBOslAb.setData(MainForm.tcl.get_n_db9());
 			CBRod.setData(MainForm.tcl.get_n_db8());
 			CBPrishSn.setData(MainForm.tcl.get_n_db7());

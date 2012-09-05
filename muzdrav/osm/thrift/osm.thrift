@@ -211,7 +211,7 @@ struct RdSlStruct{
         12: optional i32 kolrod;
 	13: optional i32 deti;
 	14: optional bool kont;
-	15: optional i32 vesd;
+	15: optional double vesd;
 	16: optional i32 dsp;
 	17: optional i32 dsr;
 	18: optional i32 dTroch;
@@ -224,7 +224,7 @@ struct RdSlStruct{
 	25: optional string ssert;
 	26: optional string oslab;
 	27: optional i32 plrod;
-	28: optional string prroid;
+	28: optional string prrod;
 	29: optional i32 vozmen;
 	30: optional i32 oslrod;
 	31: optional i32 polj;
@@ -257,7 +257,7 @@ struct RdDinStruct{
 	19: optional i32 serd;
 	20: optional i32 serd1;
 	21: optional i32 id_pos;
-	22: optional i32 ves;
+	22: optional double ves;
 }
 
 /*. Rd_Inf*/
@@ -318,17 +318,17 @@ struct P_isl_ld {
 }
 
 struct Prez_d {
-	1: optional i32 npasp;
-	2: optional i32 nisl;
-	3: optional string kodisl;
-	4: optional double stoim;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional i32 nisl;
+	4: optional string kodisl;
 }
 
 struct Prez_l {
-	1: optional i32 npasp;
-	2: optional i32 nisl;
-	3: optional string cpok;
-	4: optional double stoim;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional i32 nisl;
+	4: optional string cpok;
 }
 
 
@@ -439,6 +439,19 @@ struct PNapr {
 	7: string name;
 }
 
+struct KartaBer {
+	1: optional i32 npasp;
+	2: optional i32 id_pvizit;
+	3: optional i32 id_pos;
+	4: optional i32 id_rd_sl;
+}
+
+struct Shablon{
+	1: i32 id;
+	2: string diag;
+	3: string din;
+	4: string next_osm;
+}
 
 exception PvizitNotFoundException {
 }
@@ -508,15 +521,14 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PNapr> getPnapr(1: i32 idpvizit) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
-	
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
 	list<PokazMet> getPokazMet(1: string c_nz1) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
-	void AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
-	void AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
 	list<IsslInfo> getIsslInfo(1: i32 pvizit_id) throws (1: kmiacServer.KmiacServerException kse);
 
 	
@@ -527,7 +539,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printVypis(1: Vypis vp) throws (1: kmiacServer.KmiacServerException kse);//выписка.данные из бд по номеру посещения и по номеру обращения.возм...а возм и нет
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
-	string printMSK()  throws (1: kmiacServer.KmiacServerException kse);
+	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
@@ -564,6 +576,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_z00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_z11() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_r0z() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
 
 //patient info
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
@@ -594,7 +607,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	
-	string printKartaBer() throws (1: kmiacServer.KmiacServerException kse);
+	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
+/*Shablon*/
+	list<classifier.IntegerClassifier> getShablon() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShPoisk(1: string tf) throws (1: kmiacServer.KmiacServerException kse);
+	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 }
