@@ -171,7 +171,7 @@ service ThriftMss extends kmiacServer.KmiacServer {
 /**
  * удаление записи
  */
-	void delPsmert(1: P_smert npasp);
+	void delPsmert(1: i32 npasp);
 
 /**
  * возвращает сведения о пациенте для печати мед.свидетельства
@@ -198,20 +198,7 @@ service ThriftMss extends kmiacServer.KmiacServer {
  */
 	UserFio getUserFio(1:i32 pcod) throws (1: UserNotFoundException nfio);
 
-
-	list<classifier.IntegerClassifier> get_n_z60() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z10() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z42() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z43() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_z00() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z70() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_r0l() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z01() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z80() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_z90() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_u50() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_p07() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_az0() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> gets_vrach(1:i32 clpu, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> gets_dolj(1:i32 clpu, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 }
