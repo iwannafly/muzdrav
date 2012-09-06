@@ -32,7 +32,6 @@ public class MainForm extends Client<ThriftGenReestr.Client> {
 	private void initialize() throws ClassNotFoundException, InstantiationException, IllegalAccessException, UnsupportedLookAndFeelException {
 		reestrform = new ReestrForm();
 		reestrform.pack();
-		reestrform.setExtendedState(reestrform.MAXIMIZED_BOTH);
 		setFrame(reestrform);
 	}
 
@@ -46,6 +45,7 @@ public class MainForm extends Client<ThriftGenReestr.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftGenReestr.Client) {
 			tcl = thrClient;
+			reestrform.onConnect();
 		}
 	}
 
