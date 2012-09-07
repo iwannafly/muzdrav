@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JCheckBox;
 import java.awt.Font;
+
+import javax.swing.JEditorPane;
 import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
@@ -135,6 +137,7 @@ public class FormPostBer extends JFrame {
 	private JTextField ot;
 	private JTextField TSSert;
 	private JTextField TNSert;
+	private JEditorPane TPrRod;
 
 	/**
 	 * Create the frame.
@@ -198,8 +201,9 @@ try {
 		ButSave.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		ButSave.setToolTipText("Сохранить");
 		ButSave.addActionListener(new ActionListener() {
-            private int getoslrod(int oslrod){
-            if (CBKrov.isSelected()){oslrod=oslrod+1;}
+            private void calcOslrod(){
+    			oslrod=0;
+        if (CBKrov.isSelected()){oslrod=oslrod+1;}
             if (CBEkl.isSelected()){oslrod=oslrod+2;}
             if (CBGnoin.isSelected()){oslrod=oslrod+4;}
             if (CBTromb.isSelected()){oslrod=oslrod+8;}
@@ -207,10 +211,11 @@ try {
             if (CBAkush.isSelected()){oslrod=oslrod+32;}
             if (CBIiiiv.isSelected()){oslrod=oslrod+64;}
             if (CBRazrProm.isSelected()){oslrod=oslrod+128;}
-			return oslrod;	
+//			System.out.println(oslrod);		
             };
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+
 					rdsl.setId_pvizit(Vvod.zapVr.id_pvizit);
 			rdsl.setAbort((int) SKolAb.getValue());
 			rdsl.setCext((int) SCext.getModel().getValue());
@@ -226,6 +231,8 @@ try {
 			rdsl.setDatasert( SDataSert.getDate().getTime());
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
 			rdsl.setNsert(getTextOrNull(TNSert.getText()));
+			rdsl.setPrrod(getTextOrNull(TPrRod.getText()));
+//			rdsl.setPrrod(TPrRod.getText());
  			if (TDataab.getDate() != null)
 			rdsl.setDataab( TDataab.getDate().getTime());
 			rdsl.setSsert(getTextOrNull(TSSert.getText()));
@@ -247,8 +254,8 @@ try {
 			rdsl.setYavka1((int) SYavka.getModel().getValue());
            	rdsl.setCdiagt((int) SCDiag.getModel().getValue());
            	rdsl.setCvera((int) SCvera.getModel().getValue());
-			oslrod=0;
-			getoslrod(oslrod);
+           	rdsl.setDataz(System.currentTimeMillis());
+			calcOslrod();
 			rdsl.setOslrod(oslrod);
 			if (CBOslAb.getSelectedPcod() != null)
 				rdsl.setOslab(CBOslAb.getSelectedPcod());
@@ -470,15 +477,15 @@ try {
 		SRost = new JSpinner();
 
 		SVes = new JSpinner();
-		SVes.setModel(new SpinnerNumberModel(0.0, 0.0, 250.0, 0.0));
+		SVes.setModel(new SpinnerNumberModel(0.0, 0.0, 250.0, 1.0));
 //		rdsl.setVesd((int) SVes.getModel().getValue());
 		
 		SDsp = new JSpinner();
-		SDsp.setModel(new SpinnerNumberModel(0,0, 27,1));
+		SDsp.setModel(new SpinnerNumberModel(0, 0, 27, 1));
 //		rdsl.setDsp((int) SDsp.getModel().getValue());
 		
 		SDcr = new JSpinner();
-		SDcr.setModel(new SpinnerNumberModel(0,0, 30, 1));
+		SDcr.setModel(new SpinnerNumberModel(0, 0, 30, 1));
 //		rdsl.setDsr((int) SDcr.getModel().getValue());
 		
 		SDtroch = new JSpinner();
@@ -642,6 +649,11 @@ try {
 		
 		SSrokA = new JSpinner();
 		SSrokA.setModel(new SpinnerNumberModel(0,0, 40,1 ));
+		
+		JLabel LPrBer = new JLabel("Описание предыдущих родов");
+		
+		TPrRod = new JEditorPane();
+		TPrRod.setBorder(UIManager.getBorder("TextField.border"));
 //		rdsl.setSrokab((int) SSrokA.getModel().getValue());
 
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -730,14 +742,17 @@ try {
 								.addComponent(LDataPlRod))
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panel.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 240, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel.createSequentialGroup()
 									.addGap(15)
-									.addComponent(panel_1, 0, 0, Short.MAX_VALUE))))
+									.addComponent(panel_1, 0, 0, Short.MAX_VALUE))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(TPrRod, GroupLayout.PREFERRED_SIZE, 307, GroupLayout.PREFERRED_SIZE)
+										.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 240, GroupLayout.PREFERRED_SIZE)
+										.addComponent(LPrBer)))))
 						.addComponent(LPrish)
 						.addComponent(LDataSn))
-					.addContainerGap(488, Short.MAX_VALUE))
+					.addContainerGap(438, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -841,8 +856,12 @@ try {
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(1)
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 223, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(LPrBer)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(TPrRod, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)))
 					.addGap(47))
 		);
 		
@@ -988,10 +1007,12 @@ try {
 //		rdsl.setRost(160);
 		rdsl.setVesd(60);
 		rdsl.setOslab("");
+		rdsl.setPrrod("");
 		rdsl.setDataM(System.currentTimeMillis());
 		rdsl.setDatay(System.currentTimeMillis());
 		rdsl.setDataosl(System.currentTimeMillis());
 		rdsl.setDatasn(System.currentTimeMillis());
+		rdsl.setDataz(System.currentTimeMillis());
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -1034,6 +1055,7 @@ try {
 			SDataSert.setText(null);
 			TSSert.setText(rdsl.ssert);
 			TNSert.setText(rdsl.nsert);
+			TPrRod.setText(rdsl.prrod);
 			SParRod.setValue(rdsl.getKolrod());
 			SKolBer.setValue(rdsl.getShet());
 			SDataOsl.setDate(rdsl.getDataosl());
@@ -1059,7 +1081,7 @@ try {
 			if (rdsl.isSetIshod())
 			CBPrishSn.setSelectedPcod(rdsl.getIshod());
 			else CBPrishSn.setSelectedItem(null);
-//			TNKart.setText(rdsl.getId());
+			TNKart.setText(String.valueOf(rdsl.getId()));
 			method2();
 			CBKrov.setSelected(or1 == 1);
 			CBEkl.setSelected(or2 == 1);
@@ -1127,9 +1149,9 @@ try {
 			PatientCommonInfo inf;
 		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
 //						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-fam.setText(inf.getFam());
-im.setText(inf.getIm());
-ot.setText(inf.getOt());
+//fam.setText(inf.getFam());
+//im.setText(inf.getIm());
+//ot.setText(inf.getOt());
 			CBOslAb.setData(MainForm.tcl.get_n_db9());
 			CBRod.setData(MainForm.tcl.get_n_db8());
 			CBPrishSn.setData(MainForm.tcl.get_n_db7());

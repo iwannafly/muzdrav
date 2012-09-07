@@ -90,4 +90,22 @@ public class ClassifierManager {
 		
 		return mrabTreeClass;
 	}
+	
+	public String getNameFromPcodInteger(IntegerClassifiers cls, int pcod) throws KmiacServerException, TException {
+		for (IntegerClassifier ic : getIntegerClassifier(cls)) {
+			if (ic.pcod == pcod)
+				return ic.name;
+		}
+		
+		throw new KmiacServerException("Cannot fetch name by given pcod.");
+	}
+	
+	public String getNameFromPcodString(StringClassifiers cls, String pcod) throws KmiacServerException, TException {
+		for (StringClassifier sc : getStringClassifier(cls)) {
+			if (sc.pcod.equals(pcod))
+				return sc.name;
+		}
+		
+		throw new KmiacServerException("Cannot fetch name by given pcod.");
+	}
 }

@@ -309,9 +309,9 @@ public class MainForm {
 	
 	private void showSelectionPane() {
 		frame.setTitle("Выбор модуля");
-		lblFio.setText(String.format("%s, %s", authInfo.getName(), authInfo.getCdol_name()));
-		lblLpu.setText(authInfo.getClpu_name());
-		lblPodr.setText(String.format("%s, %s", authInfo.getCpodr_name(), authInfo.getCslu_name()));
+		lblFio.setText(String.format("<html>%s, %s</html>", authInfo.getName(), authInfo.getCdol_name()));
+		lblLpu.setText(String.format("<html>%s</html>", authInfo.getClpu_name()));
+		lblPodr.setText(String.format("<html>%s, %s</html>", authInfo.getCpodr_name(), authInfo.getCslu_name()));
 		
 		frame.getContentPane().remove(pnlLogin);
 		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);

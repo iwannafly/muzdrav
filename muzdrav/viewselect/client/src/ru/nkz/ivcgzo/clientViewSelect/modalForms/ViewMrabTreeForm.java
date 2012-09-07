@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -75,6 +76,11 @@ public class ViewMrabTreeForm extends ModalForm {
 					acceptResults();
 			}
 		});
+		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) tree.getCellRenderer();
+		renderer.setLeafIcon(null);
+		renderer.setClosedIcon(null);
+		renderer.setOpenIcon(null);
+		
 		scrollPane.setViewportView(tree);
 		contentPane.setLayout(gl_contentPane);
 	}
@@ -84,7 +90,7 @@ public class ViewMrabTreeForm extends ModalForm {
 		Object sel = tree.getSelectionPath().getLastPathComponent();
 		
 		if (sel instanceof IntegerClassifier)
-			results = new int[] { ((mrab_0) tree.getSelectionPath().getParentPath().getLastPathComponent()).pGruppa, ((IntegerClassifier) sel).pcod };
+			results = sel;
 		else
 			return;
 		
@@ -92,14 +98,14 @@ public class ViewMrabTreeForm extends ModalForm {
 	}
 	
 	@Override
-	public int[] getResults() {
+	public IntegerClassifier getResults() {
 		if (results != null)
-			return (int[]) results;
+			return (IntegerClassifier) results;
 		
 		return null;
 	}
 	
-	public void prepare(int pGruppa, int pMrab) {
+	public void prepare(int pMrab) {
 		if (mrabTree == null)
 			try {
 				mrabTree = MainForm.ccm.getMrabTreeClassifier();
@@ -111,7 +117,7 @@ public class ViewMrabTreeForm extends ModalForm {
 				MainForm.conMan.reconnect(e);
 			} else
 				((DefaultTreeModel) tree.getModel()).reload();
-		selectPcod(pGruppa, pMrab);
+		selectPcod(pMrab);
 	}
 	
 	private void setModel() {
@@ -160,11 +166,10 @@ public class ViewMrabTreeForm extends ModalForm {
 		});
 	}
 	
-	private void selectPcod(int pGruppa, int pMrab) {
+	private void selectPcod(int pMrab) {
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
 		for (int i = 0; i < tree.getModel().getChildCount(root); i++) {
 			mrab_0 mrab0 = (mrab_0) tree.getModel().getChild(root, i);
-			if (mrab0.pGruppa == pGruppa) {
 				for (int j = 0; j < mrab0.getMrab1Size(); j++) {
 					IntegerClassifier mrab1 = mrab0.mrab1.get(j);
 					if (mrab1.pcod == pMrab) {
@@ -172,7 +177,6 @@ public class ViewMrabTreeForm extends ModalForm {
 						return;
 					}
 				}
-			}
 		}
 		
 		scrollToPath(new TreePath(new Object[] {root, tree.getModel().getChild(root, 0)}));
@@ -183,6 +187,8 @@ public class ViewMrabTreeForm extends ModalForm {
 		Rectangle bounds = tree.getPathBounds(path);
 		bounds.x = 0;
 		bounds.y -= (tree.getPreferredSize().height - bounds.height) / 4;
+		if (bounds.y < 0)
+			bounds.y = 0;
 		tree.scrollRectToVisible(bounds);
 	}
 	
