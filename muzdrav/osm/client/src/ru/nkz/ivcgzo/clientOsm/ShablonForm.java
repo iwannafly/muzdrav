@@ -12,7 +12,6 @@ import javax.swing.ListSelectionModel;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 
 import javax.swing.border.TitledBorder;
@@ -24,6 +23,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import org.apache.thrift.TException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
@@ -98,9 +99,12 @@ public class ShablonForm  extends JFrame{
 		 	public void valueChanged(ListSelectionEvent e) {
 		 		if (!e.getValueIsAdjusting()){
 		 			try {
-						Shablon sh=MainForm.tcl.getSh(shlist.getSelectedValue().getPcod());
-						
-							editorPane.setText(sh.din);
+		 				List<String> sp = new ArrayList<>();
+		 				for (Shablon sha : MainForm.tcl.getSh(shlist.getSelectedValue().getPcod())) {
+		 					sp.add(sha.razd);
+		 				}
+
+							editorPane.setText(sp.toString());
 					
 					} catch (KmiacServerException e1) {
 						// TODO Auto-generated catch block

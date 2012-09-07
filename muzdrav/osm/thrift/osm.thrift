@@ -447,10 +447,12 @@ struct KartaBer {
 }
 
 struct Shablon{
-	1: i32 id;
-	2: string diag;
-	3: string din;
-	4: string next_osm;
+	1: optional i32 id;
+	2: optional string diag;
+	3: optional string din;
+	4: optional string next_osm;
+	5: optional string razd;
+	6: optional string text;
 }
 
 exception PvizitNotFoundException {
@@ -612,6 +614,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 /*Shablon*/
 	list<classifier.IntegerClassifier> getShablon() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShPoisk(1: string tf) throws (1: kmiacServer.KmiacServerException kse);
-	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+	list<Shablon> getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 }

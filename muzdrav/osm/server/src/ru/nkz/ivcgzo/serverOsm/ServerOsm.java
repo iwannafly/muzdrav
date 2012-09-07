@@ -198,8 +198,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",    "vid_doc",     "text",       "preds",       "zaved",       "name");
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 		
-		rsmSh = new TResultSetMapper<>(Shablon.class, "id",         "diag",        "din",        "next_osm");
-		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class};
+		rsmSh = new TResultSetMapper<>(Shablon.class, "id",         "diag",        "din",        "next_osm",   "razd",       "text");
+		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class, String.class, String.class};
 		
 	}
 
@@ -2213,13 +2213,10 @@ sb.append("<br>Подпись ____________");
 	}
 
 	@Override
-	public Shablon getSh(int id_sh) throws KmiacServerException,
+	public List<Shablon> getSh(int id_sh) throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select sh_osm.id,sh_osm.diag,n_din.name,sh_osm.next from sh_osm join n_din on (sh_osm.cdin=n_din.pcod)  where sh_osm.id=?", id_sh)) {
-			if (acrs.getResultSet().next())
-				return rsmSh.map(acrs.getResultSet());
-			else 
-				return new Shablon();
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select sh_osm.id,sh_osm.diag,n_din.name as din,sh_osm.next as next_osm,n_shablon.name as razd,sh_osm_text.sh_text as text from sh_osm join n_din on (sh_osm.cdin=n_din.pcod) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm) join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod) where sh_osm.id=?", id_sh)) {
+				return rsmSh.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
