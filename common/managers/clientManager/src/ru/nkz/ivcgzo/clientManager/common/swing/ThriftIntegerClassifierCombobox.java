@@ -197,6 +197,15 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
 	}
 	
+	/**
+	 * Устанавливает наличие строгой проверки вводимых данных. 
+	 */
+	public void setStrictCheck(boolean value) {
+		if (isEditable()) {
+			searcher.strict = value;
+		}
+	}
+	
 	class StringComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
 		private static final long serialVersionUID = 1612989647638575239L;
 
@@ -234,6 +243,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		private boolean searching = false;
 		private boolean enabled = false;
 		private IntegerClassifier lastSelected;
+		private boolean strict = true;
 		
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
@@ -315,8 +325,10 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 							}
 						if (!searching) {
 							searching = true;
-							cmb.setSelectedItem(null);
-							editor.setText(editText);
+							if (strict) {
+								cmb.setSelectedItem(null);
+								editor.setText(editText);
+							}
 							cmb.showPopup();
 						} else if ((lastSelected == null))
 							cmb.showPopup();
@@ -334,7 +346,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		private static final long serialVersionUID = -1173671126585172816L;
 		
 		public CustomComboBoxEditor() {
-			super(true, true, false);
+			super(true, true, true);
 			
 			setBorder(new EmptyBorder(1, 2, 1, 1));
 		}
