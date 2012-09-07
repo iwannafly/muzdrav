@@ -73,6 +73,9 @@ public class ClassifierManager {
 		String sql;
 		
 		switch (cls) {
+		case n_l02:
+			fldPcod = "c_ffomc";
+			break;
 		default:
 			break;
 		}
