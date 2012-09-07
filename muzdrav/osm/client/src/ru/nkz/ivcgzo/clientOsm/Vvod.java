@@ -103,6 +103,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
 import java.awt.Font;
 import javax.swing.border.LineBorder;
+import java.awt.Dialog.ModalExclusionType;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4579259944135540676L;
