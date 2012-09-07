@@ -123,6 +123,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] rdDinTypes;
 	private final TResultSetMapper<PNapr, PNapr._Fields> rsmPnapr;
 	private final Class<?>[] pnaprTypes;
+	private final TResultSetMapper<Shablon, Shablon._Fields> rsmSh;
+	private final Class<?>[] shTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -192,12 +194,14 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr");
 		rdInfTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class};
 
-		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "oteki",       "spl",         "chcc",        "poplp",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
+		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
 		
 		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",    "vid_doc",     "text",       "preds",       "zaved",       "name");
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 		
+		rsmSh = new TResultSetMapper<>(Shablon.class, "id",         "diag",        "din",        "next_osm",   "razd",       "text");
+		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class, String.class, String.class};
 	}
 
 	@Override
@@ -719,8 +723,8 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<RdDinStruct> getRdDinInfo(int id_pos, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pos = ? and npasp = ? ", id_pos, npasp)) {
+	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pvizit = ? and npasp = ? ", id_pvizit, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -831,7 +835,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdateRdDin(RdDinStruct din) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_rd_din SET npasp = ?, srok = ?, grr = ?, ball = ?, oj = ?, hdm = ?, dspos = ?, art1 = ?, art2 = ?, art3 = ?,art4 = ?, oteki = ?, spl = ?, chcc = ?, polpl = ?, predpl = ?, serd = ?, serd1 = ?, ves = ?  WHERE id_pvizit = ?", false, din, rdDinTypes, 2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,19,21,1);
+			sme.execPreparedT("UPDATE p_rd_din SET npasp = ?, srok = ?, grr = ?, ball = ?, oj = ?, hdm = ?, dspos = ?, art1 = ?, art2 = ?, art3 = ?, art4 = ?, spl = ?, oteki = ?, chcc = ?, polpl = ?, predpl = ?, serd = ?, serd1 = ?, ves = ?  WHERE id_pos = ?", false, din, rdDinTypes, 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,20);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();

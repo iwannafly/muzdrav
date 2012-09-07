@@ -191,8 +191,7 @@ public class ShablonForm  extends JDialog {
 				}
 			tbView.setText(str);
 		} catch (KmiacServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Ошибка загрузка текстов шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
