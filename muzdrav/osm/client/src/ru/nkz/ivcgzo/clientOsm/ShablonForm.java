@@ -164,8 +164,8 @@ public class ShablonForm  extends JDialog {
 		getContentPane().setLayout(groupLayout);
 	}
 	
-	public void showShablonForm() {
-		tbSearch.clear();
+	public void showShablonForm(String srcTxt) {
+		tbSearch.setText(srcTxt);
 		trSearch.updateNow(tbSearch.getText());
 		
 		setVisible(true);
@@ -313,7 +313,7 @@ public class ShablonForm  extends JDialog {
 			try {
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 				
-				for (StringClassifier sc : MainForm.tcl.getShPoisk(MainForm.authInfo.cspec, MainForm.authInfo.cslu, srcStr)) {
+				for (StringClassifier sc : MainForm.tcl.getShPoiskDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, srcStr)) {
 					StrClassTreeNode node = new StrClassTreeNode(sc);
 					
 					node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));

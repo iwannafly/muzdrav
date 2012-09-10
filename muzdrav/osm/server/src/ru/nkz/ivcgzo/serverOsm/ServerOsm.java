@@ -123,8 +123,6 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] rdDinTypes;
 	private final TResultSetMapper<PNapr, PNapr._Fields> rsmPnapr;
 	private final Class<?>[] pnaprTypes;
-	private final TResultSetMapper<Shablon, Shablon._Fields> rsmSh;
-	private final Class<?>[] shTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -199,9 +197,6 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmPnapr = new TResultSetMapper<>(PNapr.class, "id",          "idpvizit",    "vid_doc",     "text",       "preds",       "zaved",       "name");
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
-		
-		rsmSh = new TResultSetMapper<>(Shablon.class, "id",         "diag",        "din",        "next_osm",   "razd",       "text");
-		shTypes = new Class<?>[] {                    Integer.class, String.class, String.class, String.class, String.class, String.class};
 	}
 
 	@Override
@@ -2171,7 +2166,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<StringClassifier> getShPoisk(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
+	public List<StringClassifier> getShPoiskDiag(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
 		String sql = "SELECT DISTINCT sho.diag AS pcod, c00.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
 		
 		if (srcText != null)
@@ -2207,6 +2202,22 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<IntegerClassifier> getShByDiag(int cspec, int cslu, String diag) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT sho.id AS pcod, sho.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) AND (sho.diag = ?) ORDER BY sho.name ", cspec, cslu, cslu, diag)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShPoiskName(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, sho.diag || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.name ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText, srcText)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			System.err.println(e.getCause());

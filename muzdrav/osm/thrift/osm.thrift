@@ -610,7 +610,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Shablon*/
-	list<classifier.StringClassifier> getShPoisk(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 }
