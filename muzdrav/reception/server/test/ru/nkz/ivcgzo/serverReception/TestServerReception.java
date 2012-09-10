@@ -2,7 +2,6 @@ package ru.nkz.ivcgzo.serverReception;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.thrift.TException;

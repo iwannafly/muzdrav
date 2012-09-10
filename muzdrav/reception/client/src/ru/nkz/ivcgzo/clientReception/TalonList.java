@@ -112,14 +112,6 @@ public class TalonList {
         }
     }
 
-//  private Date safeGetTimeOfAppointment(final List<Talon> dayTalons, final int index) {
-//      if (index < dayTalons.size()) {
-//          return new Date(dayTalons.get(index).getTimep());
-//      } else {
-//          return null;
-//      }
-//  }
-
     public final Time getTimeOfAppointmentByDay(final int index, final int dayOfWeek) {
         switch (dayOfWeek) {
             case 0:
