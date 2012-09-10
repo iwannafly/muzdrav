@@ -546,6 +546,20 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Классификатор категорий N_LKR (N_LKR(pcod))
 	 */
-	list<classifier.IntegerClassifier> getLKR()
+	list<classifier.IntegerClassifier> getLKR(),
+
+	/**
+	 * Классификатор городов N_L00 (N_L00(pcod))
+	 * select ter, nam_kem  from n_l00 where c_ffomc=?
+	 */
+	list<classifier.IntegerClassifier> getL00(1:i32 pcod),
+
+	/**
+	 * Классификатор улиц N_U10 (N_U10(pcod))
+	 * select ndom  from n_u10 where name1=?
+	 */
+	list<classifier.StringClassifier> getU10(1:string name)
+
+
 
 }
