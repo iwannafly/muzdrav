@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientReception;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.GroupLayout;
@@ -11,6 +12,8 @@ import javax.swing.JTable;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
@@ -26,8 +29,11 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
+import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
+import ru.nkz.ivcgzo.thriftReception.Talon;
 import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 
 /**
@@ -68,6 +74,8 @@ public class TalonSelectFrame extends JFrame {
     // Layouts
     private GroupLayout glPnPatientInfo;
     private GroupLayout glPnTalonType;
+    //Patient
+    private Patient curPatient;
 
     public TalonSelectFrame() {
         initialization();
@@ -280,6 +288,40 @@ public class TalonSelectFrame extends JFrame {
     private void fillTalonSelectPane() {
         tbTalonSelect = new JTable();
         tbTalonSelect.setDefaultRenderer(String.class, new TalonTableCellRenderer());
+        tbTalonSelect.setRowHeight(50);
+        tbTalonSelect.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(final MouseEvent e) { //TODO отрефакторить
+                JTable curTable = (JTable) e.getSource();
+                final int curRow = curTable.getSelectedRow();
+                final int curColumn = curTable.getSelectedColumn();
+                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(tbTalonSelect,
+                        String.format("Записать на приём %s?", curTable.getColumnName(curColumn)),
+                        "Выбор талона", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (indexOfSelectedOption  == 0) {
+                    Talon curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
+                        .getTalonByDay(curRow, curColumn);
+                    try {
+                        if ((curTalon != null) && (curPatient != null)) {
+                            MainForm.tcl.reserveTalon(curPatient, curTalon);
+
+                            TalonTableModel tbtModel = new TalonTableModel(
+                                    cbxPoliclinic.getSelectedItem().getPcod(),
+                                    cbxSpeciality.getSelectedItem().getPcod(),
+                                    cbxDoctor.getSelectedItem().getPcod()
+                            );
+                            tbTalonSelect.setModel(tbtModel);
+                        } else if (curPatient == null) {
+                            JOptionPane.showMessageDialog(tbTalonSelect, "Пациент не выбран",
+                                    "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (KmiacServerException
+                            | ReserveTalonOperationFailedException | TException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
@@ -295,7 +337,7 @@ public class TalonSelectFrame extends JFrame {
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
         lblBirthdate.setText(new Date(patientBirthdate).toString());
-
+        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename);
     }
 
     public final void onConnect() {
@@ -308,19 +350,6 @@ public class TalonSelectFrame extends JFrame {
             cbxPoliclinic.setSelectedIndex(0);
             cbxSpeciality.setData(MainForm.tcl.getSpec(cbxPoliclinic.getSelectedItem().getPcod()));
             cbxSpeciality.setSelectedIndex(0);
-//            cbxDoctor.setData(
-//                MainForm.tcl.getVrach(
-//                    cbxPoliclinic.getSelectedItem().getPcod(),
-//                    cbxSpeciality.getSelectedItem().getPcod()
-//                )
-//            );
-//            cbxDoctor.setSelectedIndex(0);
-//            TalonTableModel tbtModel = new TalonTableModel(
-//                cbxPoliclinic.getSelectedItem().getPcod(),
-//                cbxSpeciality.getSelectedItem().getPcod(),
-//                cbxDoctor.getSelectedItem().getPcod()
-//            );
-//            tbTalonSelect.setModel(tbtModel);
         } catch (KmiacServerException | PoliclinicNotFoundException
                 | TException | SpecNotFoundException e) {
             e.printStackTrace();
