@@ -17,6 +17,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.text.JTextComponent;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -36,6 +37,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	private boolean classifierLoaded;
 	private Searcher searcher;
 	private StringComboBoxModel model;
+	private boolean strict = true;
 	
 	/**
 	 * Конструктор комбобокса с неотсортированным классификатором.
@@ -202,8 +204,20 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 */
 	public void setStrictCheck(boolean value) {
 		if (isEditable()) {
-			searcher.strict = value;
+			strict = value;
 		}
+	}
+	
+	/**
+	 * Получает текст из поля ввода.
+	 */
+	public String getText() {
+		if (getSelectedItem() != null)
+			return getSelectedItem().name.toUpperCase();
+		else if (isEditable())
+			return ((JTextComponent) getEditor().getEditorComponent()).getText();
+		
+		return null;
 	}
 	
 	class StringComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
@@ -243,7 +257,6 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		private boolean searching = false;
 		private boolean enabled = false;
 		private IntegerClassifier lastSelected;
-		private boolean strict = true;
 		
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
@@ -325,10 +338,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 							}
 						if (!searching) {
 							searching = true;
-							if (strict) {
-								cmb.setSelectedItem(null);
-								editor.setText(editText);
-							}
+							cmb.setSelectedItem(null);
+							editor.setText(editText);
 							cmb.showPopup();
 						} else if ((lastSelected == null))
 							cmb.showPopup();
@@ -346,7 +357,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		private static final long serialVersionUID = -1173671126585172816L;
 		
 		public CustomComboBoxEditor() {
-			super(true, true, true);
+			super(true, true, false);
 			
 			setBorder(new EmptyBorder(1, 2, 1, 1));
 		}
@@ -360,7 +371,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		public Object getItem() {
 			IntegerClassifier selItem = ThriftIntegerClassifierCombobox.this.getSelectedItem();
 			
-			if (selItem == null)
+			if (selItem == null && strict)
 				setText(null);
 			
 			return selItem;
