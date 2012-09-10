@@ -128,33 +128,37 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 	 * @throws SQLException
 	 */
 	protected <T extends TBase<?, F>, F extends TFieldIdEnum> void prepareStatementT(PreparedStatement ps, T obj, Class<?>[] types, int... indexes) throws SQLException {
-		for (int i = 0; i < indexes.length; i++) {
-			F fld = obj.fieldForId(indexes[i] + 1);
-			if (!obj.isSet(fld)) {
-				ps.setNull(i + 1, java.sql.Types.NULL);
-			} else {
-				Class<?> cls = types[indexes[i]];
-				if (cls == Integer.class)
-					ps.setInt(i + 1, (Integer) obj.getFieldValue(fld));
-				else if (cls == String.class)
-					ps.setString(i + 1, (String) obj.getFieldValue(fld));
-				else if (cls == Short.class)
-					ps.setShort(i + 1, (Short) obj.getFieldValue(fld));
-				else if (cls == java.sql.Date.class)
-					ps.setDate(i + 1, new java.sql.Date((Long) obj.getFieldValue(fld)));
-				else if (cls == java.sql.Time.class)
-					ps.setTime(i + 1, new java.sql.Time((Long) obj.getFieldValue(fld)));
-				else if (cls == java.sql.Timestamp.class)
-					ps.setTimestamp(i + 1, new java.sql.Timestamp((Long) obj.getFieldValue(fld)));
-				else if (cls == Float.class)
-					ps.setFloat(i + 1, (Float) obj.getFieldValue(fld));
-				else if (cls == Long.class)
-					ps.setLong(i + 1, (Long) obj.getFieldValue(fld));
-				else if (cls == Double.class)
-					ps.setDouble(i + 1, (Double) obj.getFieldValue(fld));
-				else if (cls == Boolean.class)
-					ps.setBoolean(i + 1, (Boolean) obj.getFieldValue(fld));
+		try {
+			for (int i = 0; i < indexes.length; i++) {
+				F fld = obj.fieldForId(indexes[i] + 1);
+				if (!obj.isSet(fld)) {
+					ps.setNull(i + 1, java.sql.Types.NULL);
+				} else {
+					Class<?> cls = types[indexes[i]];
+					if (cls == Integer.class)
+						ps.setInt(i + 1, (Integer) obj.getFieldValue(fld));
+					else if (cls == String.class)
+						ps.setString(i + 1, (String) obj.getFieldValue(fld));
+					else if (cls == Short.class)
+						ps.setShort(i + 1, (Short) obj.getFieldValue(fld));
+					else if (cls == java.sql.Date.class)
+						ps.setDate(i + 1, new java.sql.Date((Long) obj.getFieldValue(fld)));
+					else if (cls == java.sql.Time.class)
+						ps.setTime(i + 1, new java.sql.Time((Long) obj.getFieldValue(fld)));
+					else if (cls == java.sql.Timestamp.class)
+						ps.setTimestamp(i + 1, new java.sql.Timestamp((Long) obj.getFieldValue(fld)));
+					else if (cls == Float.class)
+						ps.setFloat(i + 1, (Float) obj.getFieldValue(fld));
+					else if (cls == Long.class)
+						ps.setLong(i + 1, (Long) obj.getFieldValue(fld));
+					else if (cls == Double.class)
+						ps.setDouble(i + 1, (Double) obj.getFieldValue(fld));
+					else if (cls == Boolean.class)
+						ps.setBoolean(i + 1, (Boolean) obj.getFieldValue(fld));
+				}
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			throw new SQLException(e.getMessage(), e);
 		}
 	}
 

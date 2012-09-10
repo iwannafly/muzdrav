@@ -17,6 +17,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.text.JTextComponent;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -36,6 +37,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	private boolean classifierLoaded;
 	private Searcher searcher;
 	private StringComboBoxModel model;
+	private boolean strict = true;
 	
 	/**
 	 * Конструктор комбобокса с неотсортированным классификатором.
@@ -197,6 +199,35 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
 	}
 	
+	/**
+	 * Устанавливает наличие строгой проверки вводимых данных. 
+	 */
+	public void setStrictCheck(boolean value) {
+		if (isEditable()) {
+			strict = value;
+		}
+	}
+	
+	/**
+	 * Получает текст из поля ввода.
+	 */
+	public String getText() {
+		if (getSelectedItem() != null)
+			return getSelectedItem().name.toUpperCase();
+		else if (isEditable())
+			return ((JTextComponent) getEditor().getEditorComponent()).getText();
+		
+		return null;
+	}
+	
+	/**
+	 * Устанавливает текст в поле ввода.
+	 */
+	public void setText(String text) {
+		if (isEditable())
+			((JTextComponent) getEditor().getEditorComponent()).setText(text);
+	}
+	
 	class StringComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
 		private static final long serialVersionUID = 1612989647638575239L;
 
@@ -348,7 +379,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		public Object getItem() {
 			IntegerClassifier selItem = ThriftIntegerClassifierCombobox.this.getSelectedItem();
 			
-			if (selItem == null)
+			if (selItem == null && strict)
 				setText(null);
 			
 			return selItem;

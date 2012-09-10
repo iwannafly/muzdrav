@@ -33,8 +33,8 @@ struct Pvizit {
 	11: optional i32 cuser;
 	12: optional string zakl;
 	13: optional i64 dataz;
-	14: optional i32 idzab;
-	15: optional string recomend;
+	14: optional string recomend;
+	15: optional i32 idzab;
 	16: optional string vrach_fio;
 }
 
@@ -446,11 +446,16 @@ struct KartaBer {
 	4: optional i32 id_rd_sl;
 }
 
-struct Shablon{
-	1: i32 id;
-	2: string diag;
-	3: string din;
-	4: string next_osm;
+struct ShablonText {
+	1: i32 grupId;
+	2: string grupName;
+	3: string text;
+}
+
+struct Shablon {
+	1: string din;
+	2: string next_osm;
+	3: list<ShablonText> textList;
 }
 
 exception PvizitNotFoundException {
@@ -583,15 +588,10 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Psign getPatientMiscInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PatientNotFoundException pne);
 	list<Pvizit> getPvizitInfo(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
 
-//templates
-	list<classifier.IntegerClassifier> getShablonTexts(1: i32 id_razd, 2: i32 id_pok, 3: string pcod_s00) throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getShablonCdol(1: i32 id_razd, 2: string pcod_s00) throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getPokNames() throws (1: kmiacServer.KmiacServerException kse);
-
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<RdSlStruct> getRdSlInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	list<RdDinStruct> getRdDinInfo(1: i32 id_pos, 2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdDinStruct> getRdDinInfo(1: i32 id_Pvizit, 2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
@@ -610,8 +610,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Shablon*/
-	list<classifier.IntegerClassifier> getShablon() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getShPoisk(1: string tf) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
-
 }
