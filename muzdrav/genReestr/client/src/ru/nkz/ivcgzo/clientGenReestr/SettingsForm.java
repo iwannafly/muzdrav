@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientGenReestr;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -21,9 +22,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import org.apache.thrift.TException;
+import java.awt.Dialog.ModalityType;
 
 
-public class SettingsForm extends JFrame{
+public class SettingsForm extends JDialog {
 	private static final long serialVersionUID = -48586555281952961L;
 	private CustomDateEditor tfDn;
 	private CustomDateEditor tfDk;
@@ -36,9 +38,9 @@ public class SettingsForm extends JFrame{
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_podr;
 	
 	public SettingsForm() {
+		setModalityType(ModalityType.TOOLKIT_MODAL);
 		setBounds(100, 100, 344, 382); //ширина, высота
 		setTitle("Реестры пациентов");
-    	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel panel = new JPanel();
 		
