@@ -215,8 +215,8 @@ public class PacientInfoFrame extends JFrame {
     private ThriftStringClassifierCombobox <StringClassifier> cmb_ogrn;
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_oms_smo;
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_dms_smo;
-    private ThriftStringClassifierCombobox <StringClassifier> cmb_adp_obl;
-    private ThriftStringClassifierCombobox <StringClassifier> cmb_adm_obl;
+    private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_adp_obl;
+    private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_adm_obl;
     private ThriftStringClassifierCombobox <StringClassifier> cmb_adp_gorod;
     private ThriftStringClassifierCombobox <StringClassifier> cmb_adm_gorod;
     private ThriftStringClassifierCombobox <StringClassifier> cmb_adp_ul;
@@ -244,8 +244,8 @@ public class PacientInfoFrame extends JFrame {
     	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	
 		try {
-		    cmb_adp_obl = new ThriftStringClassifierCombobox<>(true);
-		    cmb_adm_obl = new ThriftStringClassifierCombobox<>(true);
+		    cmb_adp_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
+		    cmb_adm_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
 		    cmb_adp_gorod = new ThriftStringClassifierCombobox<>(true);
 		    cmb_adm_gorod = new ThriftStringClassifierCombobox<>(true);
 		    cmb_adp_ul = new ThriftStringClassifierCombobox<>(true);
@@ -437,10 +437,8 @@ public class PacientInfoFrame extends JFrame {
 				    PersonalInfo.setOt(tfOt.getText().toUpperCase().trim());
 				    PersonalInfo.admAddress.setHouse(tf_Adm_dom.getText().toUpperCase().trim());
 				    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase().trim());
-//FIXME				    PersonalInfo.admAddress.setRegion(tf_Adm_obl.getText().toUpperCase().trim());
-//				    PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().toUpperCase().trim());
+//FIXME			    PersonalInfo.admAddress.setCity(tf_Adm_gorod.getText().toUpperCase().trim());
 //				    PersonalInfo.admAddress.setStreet(tf_Adm_ul.getText().toUpperCase().trim());
-//				    PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase().trim());
 //				    PersonalInfo.adpAddress.setCity(tf_Adp_gorod.getText().toUpperCase().trim());
 //				    PersonalInfo.adpAddress.setStreet(tf_Adp_ul.getText().toUpperCase().trim());
 				    PersonalInfo.adpAddress.setHouse(tf_Adp_dom.getText().toUpperCase().trim());
@@ -477,6 +475,9 @@ public class PacientInfoFrame extends JFrame {
 				    if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
 				    if (cmb_ishod.getSelectedItem() != null) PersonalInfo.nambk.setIshod(cmb_ishod.getSelectedPcod());
 				    if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
+//				    PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase().trim());
+				    PersonalInfo.admAddress.setRegion(cmb_adm_obl.getText());
+				    if (cmb_adm_obl.getSelectedItem() != null) PersonalInfo.setRegion_liv(cmb_adm_obl.getSelectedPcod()); 
 				
 //				    try{
 //					pcod из классификатора
@@ -2998,6 +2999,9 @@ public class PacientInfoFrame extends JFrame {
             if (PersonalInfo.getAdmAddress().flat != null){
                 tf_Adm_kv.setText(PersonalInfo.admAddress.flat.trim());
             }
+          if (PersonalInfo.getAdpAddress().region != null)
+//          cmb_adp_obl.setText(PersonalInfo.adpAddress.region.trim());
+          
 //FIXME            if (PersonalInfo.getAdmAddress().region != null){
 //                tf_Adm_obl.setText(PersonalInfo.admAddress.region.trim());
 //            }
@@ -3007,8 +3011,6 @@ public class PacientInfoFrame extends JFrame {
 //            if (PersonalInfo.getAdmAddress().street != null){
 //                tf_Adm_ul.setText(PersonalInfo.admAddress.street.trim());
 //            }
-//            if (PersonalInfo.getAdpAddress().region != null){
-//                tf_Adp_obl.setText(PersonalInfo.adpAddress.region.trim());
 //            }
 //            if (PersonalInfo.getAdpAddress().city != null){
 //                tf_Adp_gorod.setText(PersonalInfo.adpAddress.city.trim());
