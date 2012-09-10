@@ -245,6 +245,7 @@ public class PacientInfoFrame extends JFrame {
     	
 		try {
 		    cmb_adp_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
+		    cmb_adp_obl.setStrictCheck(false);
 		    cmb_adp_obl.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adp_obl.getSelectedItem() != null) {
@@ -258,6 +259,7 @@ public class PacientInfoFrame extends JFrame {
 		    	}
 		    });
 		    cmb_adm_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
+		    cmb_adm_obl.setStrictCheck(false);
 		    cmb_adm_obl.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adm_obl.getSelectedItem() != null) {
@@ -271,24 +273,26 @@ public class PacientInfoFrame extends JFrame {
 		    	}
 		    });
 		    cmb_adp_gorod = new ThriftIntegerClassifierCombobox<>(true);
+		    cmb_adp_gorod.setStrictCheck(false);
 		    cmb_adp_gorod.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adp_gorod.getSelectedItem() != null) {
-						if (cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК"))
-							cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+						if (!cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
+							cmb_adp_ul.setData(null);
 					}
 		    	}
 		    });
 		    cmb_adm_gorod = new ThriftIntegerClassifierCombobox<>(true);
+		    cmb_adm_gorod.setStrictCheck(false);
 		    cmb_adm_gorod.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adm_gorod.getSelectedItem() != null) {
-						if (cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК"))
-							cmb_adm_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+						if (!cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
+							cmb_adm_ul.setData(null);
 					}
 		    	}
 		    });
-		    cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(true);
+		    cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
 		    cmb_adp_ul.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adp_ul.getSelectedItem() != null) {
@@ -301,7 +305,7 @@ public class PacientInfoFrame extends JFrame {
 					}
 		    	}
 		    });
-		    cmb_adm_ul = new ThriftIntegerClassifierCombobox<>(true);
+		    cmb_adm_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
 		    cmb_adm_ul.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adm_ul.getSelectedItem() != null) {
@@ -479,6 +483,32 @@ public class PacientInfoFrame extends JFrame {
                     changePatientAgentInfo(curPatientId);
                     changePatientSignInfo(curPatientId);
                     selectAllPatientPriemInfo(curPatientId);
+                    
+                    
+                    cmb_adp_obl.setText(PersonalInfo.adpAddress.region);
+                    cmb_adm_obl.setText(PersonalInfo.admAddress.region);
+                    cmb_adm_gorod.setText(PersonalInfo.admAddress.city);
+                    cmb_adp_gorod.setText(PersonalInfo.adpAddress.city);
+                    cmb_adm_ul.setText(PersonalInfo.admAddress.street);
+                    cmb_adp_ul.setText(PersonalInfo.adpAddress.street);
+                    cmb_adm_dom.setText(PersonalInfo.admAddress.house);
+                    cmb_adp_dom.setText(PersonalInfo.adpAddress.house);
+                    
+//    				try {
+//						if (cmb_adp_obl.getSelectedPcod() != null) cmb_adp_gorod.setData(MainForm.tcl.getL00(cmb_adp_obl.getSelectedPcod()));
+//						if (cmb_adm_obl.getSelectedPcod() != null)cmb_adm_gorod.setData(MainForm.tcl.getL00(cmb_adm_obl.getSelectedPcod()));
+//						if (cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК Г.")){
+//							cmb_ad_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+//							cmb_adm_dom.setData(MainForm.tcl.getU10(cmb_adm_ul.getText()));
+//						}
+//						if (cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК Г.")){
+//							cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+//							cmb_adp_dom.setData(MainForm.tcl.getU10(cmb_adp_ul.getText()));
+//						}	
+//					} catch (TException e1) {
+//						// TODO Auto-generated catch block
+//						e1.printStackTrace();
+//					}
             	}
 //              tbMain.setSelectedIndex(0);
 //              PacientMainFrame.getInstance().setVisible(true);
@@ -2943,7 +2973,7 @@ public class PacientInfoFrame extends JFrame {
 			try {
 				tbl_lgota.setIntegerClassifierSelector(1, MainForm.tcl.getLKN());
 				tbl_kateg.setIntegerClassifierSelector(1, MainForm.tcl.getLKR());
-			} catch (Exception e1) {
+				} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 		} catch (TException e) {
