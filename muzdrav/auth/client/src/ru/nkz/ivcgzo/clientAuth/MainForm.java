@@ -67,7 +67,8 @@ public class MainForm {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-//					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 					MainForm window = new MainForm();
 					window.frame.getInputContext().selectInputMethod(new Locale("ru", "RU"));
 					window.frame.setVisible(true);
