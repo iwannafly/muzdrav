@@ -1454,4 +1454,30 @@ public class ServerRegPatient extends Server implements Iface {
             throw new TException(e);
         }
     }
+
+    @Override
+    public final List<IntegerClassifier> getL00(final int pcod) throws TException {
+        final String sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ?;";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmL00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "ter", "nam_kem");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+            return rsmL00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<StringClassifier> getU10(final String name) throws TException {
+        final String sqlQuery = "SELECT name1, ndom FROM n_u10 WHERE name1 = ?;";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmU10 =
+                new TResultSetMapper<>(StringClassifier.class, "name1", "ndom");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, name)) {
+            return rsmU10.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
 }
