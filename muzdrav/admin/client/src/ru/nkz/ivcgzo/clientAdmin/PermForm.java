@@ -170,6 +170,9 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbRecep = new TaggedJCheckBox("Запись на приём к врачу поликлиники", 10, CsluPdost.CsluAll);
 		pnlPermChb.add(chbRecep);
 
+		TaggedJCheckBox chbRebInv = new TaggedJCheckBox("Карта ребенка-инвалида", 11, CsluPdost.CsluAll);
+		pnlPermChb.add(chbRebInv);
+
 		TaggedJCheckBox chbGenReestr = new TaggedJCheckBox("Формирование реестров", 12, CsluPdost.CsluAll);
 		pnlPermChb.add(chbGenReestr);
 
