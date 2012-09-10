@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientManager.common;
 
 import java.awt.Dialog.ModalExclusionType;
+import java.awt.Dialog.ModalityType;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -31,7 +32,6 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	private JFrame frame;
 	private IClient parent;
 	private JDialog dialog;
-	private ModalExclusionType prevModalType;
 	private List<Window> childList;
 	
 	public Client(ConnectionManager conMan, UserAuthInfo authInfo, Class<T> thrClass, int appId, int thrPort, int accessParam, String... params) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -98,16 +98,14 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 		dialog = new JDialog(getFrame());
 		
 		this.parent = parent;
-		prevModalType = getFrame().getModalExclusionType();
-		
-		this.getFrame().setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
 		
 		try {
 			dialog.setMinimumSize(getFrame().getMinimumSize());
 			dialog.setBounds(getFrame().getBounds());
 			dialog.setTitle(getFrame().getTitle());
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setModal(true);
+			dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
+			dialog.setModalityType(ModalityType.TOOLKIT_MODAL);
 			dialog.setContentPane(getFrame().getContentPane());
 			dialog.revalidate();
 			if (!(getFrame() instanceof ModalForm) || (((ModalForm) getFrame()).getModalLocationRelativeToParent()))
@@ -129,7 +127,6 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 */
 	public void disposeModal() {
 		conMan.setClient(parent);
-		parent.getFrame().setModalExclusionType(prevModalType);
 		disposeChildren();
 		if (this != parent)
 			conMan.disconnect(getPort());
