@@ -220,6 +220,14 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		return null;
 	}
 	
+	/**
+	 * Устанавливает текст в поле ввода.
+	 */
+	public void setText(String text) {
+		if (isEditable())
+			((JTextComponent) getEditor().getEditorComponent()).setText(text);
+	}
+	
 	class StringComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
 		private static final long serialVersionUID = 1612989647638575239L;
 
