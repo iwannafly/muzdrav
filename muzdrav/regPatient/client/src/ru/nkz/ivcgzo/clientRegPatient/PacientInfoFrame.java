@@ -92,6 +92,7 @@ public class PacientInfoFrame extends JFrame {
     private int curPatientId = 0;
     private int curNgosp = 0;
     private int curId = 0;
+    private int Terp = 0;
     private final ButtonGroup btnGroup_pol = new ButtonGroup();
     private final ButtonGroup btnGroup_gk = new ButtonGroup();
     private final ButtonGroup btnGroup_rf = new ButtonGroup();
@@ -311,7 +312,9 @@ public class PacientInfoFrame extends JFrame {
 		    	}
 		    });
 		    cmb_adp_dom = new ThriftStringClassifierCombobox<>(true);
+		    cmb_adp_dom.setStrictCheck(false);
 		    cmb_adm_dom = new ThriftStringClassifierCombobox<>(true);
+		    cmb_adm_dom.setStrictCheck(false);
 
 		    cmb_cotd = new ThriftIntegerClassifierCombobox<>(true);
 			cmb_org = new ThriftIntegerClassifierCombobox<>(true);
@@ -506,7 +509,7 @@ public class PacientInfoFrame extends JFrame {
 					});
                     
             	}
-//              tbMain.setSelectedIndex(0);
+              tbMain.setSelectedIndex(0);
 //              PacientMainFrame.getInstance().setVisible(true);
           }
         });
@@ -572,6 +575,7 @@ public class PacientInfoFrame extends JFrame {
 				    if (cmb_adp_gorod.getSelectedItem() != null) PersonalInfo.setTer_liv(cmb_adp_gorod.getSelectedPcod()); 
 				    PersonalInfo.admAddress.setHouse(cmb_adm_dom.getText());
 				    PersonalInfo.adpAddress.setHouse(cmb_adp_dom.getText());
+       				PersonalInfo.setTerp(Terp);
 				
 				//FIXME   jitel, terp
 				    if (curPatientId == 0){
@@ -829,10 +833,9 @@ public class PacientInfoFrame extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				if (arg0.getClickCount() == 2) {
 					int[] res = MainForm.conMan.showPolpTreeForm("прикрепление", 0, 0, 0);
-					
 					if (res != null) {
 	       				tf_Cpol.setText(Integer.toString(res[2]));
-	       				PersonalInfo.setTerp(res[0]);
+	       				Terp = res[0];
 					}
 				}
 			}
