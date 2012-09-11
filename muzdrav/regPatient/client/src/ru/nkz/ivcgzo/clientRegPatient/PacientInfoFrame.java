@@ -3,9 +3,10 @@ package ru.nkz.ivcgzo.clientRegPatient;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
@@ -32,22 +34,19 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper.DefaultLanguage;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper.DefaultLanguage;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -56,7 +55,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -75,17 +73,10 @@ import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
-import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
-import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.JComboBox;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -233,13 +224,6 @@ public class PacientInfoFrame extends JFrame {
      * Create the frame.
      */
     public PacientInfoFrame(List<PatientBrief> pat) {
-//		addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowOpened(WindowEvent arg0) {
-//				setExtendedState(JFrame.MAXIMIZED_BOTH);
-//			}
-//		});
-
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
     	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     	
@@ -252,9 +236,10 @@ public class PacientInfoFrame extends JFrame {
 						try {
 							cmb_adp_gorod.setData(MainForm.tcl.getL00(cmb_adp_obl.getSelectedPcod()));
 						} catch (TException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							MainForm.conMan.reconnect(e);
 						}
+					} else {
+						cmb_adp_gorod.setData(null);
 					}
 		    	}
 		    });
@@ -266,56 +251,63 @@ public class PacientInfoFrame extends JFrame {
 						try {
 							cmb_adm_gorod.setData(MainForm.tcl.getL00(cmb_adm_obl.getSelectedPcod()));
 						} catch (TException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							MainForm.conMan.reconnect(e);
 						}
+					} else {
+						cmb_adm_gorod.setData(null);
 					}
+
 		    	}
 		    });
 		    cmb_adp_gorod = new ThriftIntegerClassifierCombobox<>(true);
 		    cmb_adp_gorod.setStrictCheck(false);
 		    cmb_adp_gorod.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
-					if (cmb_adp_gorod.getSelectedItem() != null) {
-						if (!cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
-							cmb_adp_ul.setData(null);
-					}
+					if (!cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
+						cmb_adp_ul.setData(new ArrayList<IntegerClassifier>());
+					else
+						cmb_adp_ul.setData(null);
 		    	}
 		    });
 		    cmb_adm_gorod = new ThriftIntegerClassifierCombobox<>(true);
 		    cmb_adm_gorod.setStrictCheck(false);
 		    cmb_adm_gorod.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
-					if (cmb_adm_gorod.getSelectedItem() != null) {
-						if (!cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
-							cmb_adm_ul.setData(null);
-					}
+					if (!cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
+						cmb_adm_ul.setData(new ArrayList<IntegerClassifier>());
+					else
+						cmb_adm_ul.setData(null);
 		    	}
 		    });
 		    cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+		    cmb_adp_ul.setStrictCheck(false);
 		    cmb_adp_ul.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adp_ul.getSelectedItem() != null) {
 						try {
 							cmb_adp_dom.setData(MainForm.tcl.getU10(cmb_adp_ul.getText()));
 						} catch (TException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							MainForm.conMan.reconnect(e);
 						}
+					} else {
+						cmb_adp_dom.setData(new ArrayList<StringClassifier>());
 					}
 		    	}
 		    });
 		    cmb_adm_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+		    cmb_adm_ul.setStrictCheck(false);
 		    cmb_adm_ul.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
 					if (cmb_adm_ul.getSelectedItem() != null) {
 						try {
 							cmb_adm_dom.setData(MainForm.tcl.getU10(cmb_adm_ul.getText()));
 						} catch (TException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							MainForm.conMan.reconnect(e);
 						}
+					} else {
+						cmb_adm_dom.setData(new ArrayList<StringClassifier>());
 					}
+
 		    	}
 		    });
 		    cmb_adp_dom = new ThriftStringClassifierCombobox<>(true);
@@ -484,31 +476,35 @@ public class PacientInfoFrame extends JFrame {
                     changePatientSignInfo(curPatientId);
                     selectAllPatientPriemInfo(curPatientId);
                     
+                  SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+		                    cmb_adp_obl.setText(PersonalInfo.adpAddress.region);
+		                    cmb_adm_obl.setText(PersonalInfo.admAddress.region);
+		                    SwingUtilities.invokeLater(new Runnable() {
+								@Override
+								public void run() {
+				                    cmb_adm_gorod.setText(PersonalInfo.admAddress.city);
+				                    cmb_adp_gorod.setText(PersonalInfo.adpAddress.city);
+				                    SwingUtilities.invokeLater(new Runnable() {
+										@Override
+										public void run() {
+						                    cmb_adm_ul.setText(PersonalInfo.admAddress.street);
+						                    cmb_adp_ul.setText(PersonalInfo.adpAddress.street);
+						                    SwingUtilities.invokeLater(new Runnable() {
+												@Override
+												public void run() {
+								                    cmb_adm_dom.setText(PersonalInfo.admAddress.house);
+								                    cmb_adp_dom.setText(PersonalInfo.adpAddress.house);
+												}
+											});
+										}
+									});
+								}
+							});
+						}
+					});
                     
-                    cmb_adp_obl.setText(PersonalInfo.adpAddress.region);
-                    cmb_adm_obl.setText(PersonalInfo.admAddress.region);
-                    cmb_adm_gorod.setText(PersonalInfo.admAddress.city);
-                    cmb_adp_gorod.setText(PersonalInfo.adpAddress.city);
-                    cmb_adm_ul.setText(PersonalInfo.admAddress.street);
-                    cmb_adp_ul.setText(PersonalInfo.adpAddress.street);
-                    cmb_adm_dom.setText(PersonalInfo.admAddress.house);
-                    cmb_adp_dom.setText(PersonalInfo.adpAddress.house);
-                    
-//    				try {
-//						if (cmb_adp_obl.getSelectedPcod() != null) cmb_adp_gorod.setData(MainForm.tcl.getL00(cmb_adp_obl.getSelectedPcod()));
-//						if (cmb_adm_obl.getSelectedPcod() != null)cmb_adm_gorod.setData(MainForm.tcl.getL00(cmb_adm_obl.getSelectedPcod()));
-//						if (cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК Г.")){
-//							cmb_ad_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
-//							cmb_adm_dom.setData(MainForm.tcl.getU10(cmb_adm_ul.getText()));
-//						}
-//						if (cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК Г.")){
-//							cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
-//							cmb_adp_dom.setData(MainForm.tcl.getU10(cmb_adp_ul.getText()));
-//						}	
-//					} catch (TException e1) {
-//						// TODO Auto-generated catch block
-//						e1.printStackTrace();
-//					}
             	}
 //              tbMain.setSelectedIndex(0);
 //              PacientMainFrame.getInstance().setVisible(true);
@@ -3072,22 +3068,22 @@ public class PacientInfoFrame extends JFrame {
             if (PersonalInfo.getAdmAddress().flat != null){
                 tf_Adm_kv.setText(PersonalInfo.admAddress.flat.trim());
             }
-            if (PersonalInfo.getAdpAddress().region != null)
-            	cmb_adp_obl.setText(PersonalInfo.adpAddress.region.trim());
-            if (PersonalInfo.getAdmAddress().region != null)
-                cmb_adm_obl.setText(PersonalInfo.admAddress.region.trim());
-            if (PersonalInfo.getAdmAddress().city != null)
-                cmb_adm_gorod.setText(PersonalInfo.admAddress.city.trim());
-            if (PersonalInfo.getAdmAddress().street != null)
-                cmb_adm_ul.setText(PersonalInfo.admAddress.street.trim());
-            if (PersonalInfo.getAdpAddress().city != null)
-                cmb_adp_gorod.setText(PersonalInfo.adpAddress.city.trim());
-            if (PersonalInfo.getAdpAddress().street != null)
-                cmb_adp_ul.setText(PersonalInfo.adpAddress.street.trim());
-            if (PersonalInfo.getAdpAddress().house != null)
-                cmb_adp_dom.setText(PersonalInfo.adpAddress.house.trim());
-            if (PersonalInfo.getAdmAddress().house != null)
-                cmb_adm_dom.setText(PersonalInfo.admAddress.house.trim());
+//            if (PersonalInfo.getAdpAddress().region != null)
+//            	cmb_adp_obl.setText(PersonalInfo.adpAddress.region.trim());
+//            if (PersonalInfo.getAdmAddress().region != null)
+//                cmb_adm_obl.setText(PersonalInfo.admAddress.region.trim());
+//            if (PersonalInfo.getAdmAddress().city != null)
+//                cmb_adm_gorod.setText(PersonalInfo.admAddress.city.trim());
+//            if (PersonalInfo.getAdmAddress().street != null)
+//                cmb_adm_ul.setText(PersonalInfo.admAddress.street.trim());
+//            if (PersonalInfo.getAdpAddress().city != null)
+//                cmb_adp_gorod.setText(PersonalInfo.adpAddress.city.trim());
+//            if (PersonalInfo.getAdpAddress().street != null)
+//                cmb_adp_ul.setText(PersonalInfo.adpAddress.street.trim());
+//            if (PersonalInfo.getAdpAddress().house != null)
+//                cmb_adp_dom.setText(PersonalInfo.adpAddress.house.trim());
+//            if (PersonalInfo.getAdmAddress().house != null)
+//                cmb_adm_dom.setText(PersonalInfo.admAddress.house.trim());
             if (PersonalInfo.getAdpAddress().flat != null)
                 tf_Adp_kv.setText(PersonalInfo.adpAddress.flat.trim());
             if (PersonalInfo.getNamemr() != null){
