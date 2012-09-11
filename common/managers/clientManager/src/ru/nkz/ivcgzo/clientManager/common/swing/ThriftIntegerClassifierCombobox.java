@@ -353,10 +353,11 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 							searching = true;
 							cmb.setSelectedItem(null);
 							editor.setText(editText);
+							if (cmb.items.size() > 0)
+								cmb.showPopup();
+						} else if ((lastSelected == null) && (cmb.items.size() > 0))
 							cmb.showPopup();
-						} else if ((lastSelected == null))
-							cmb.showPopup();
-						else if (!lastSelTextLow.equals(editTextLow))
+						else if (!lastSelTextLow.equals(editTextLow) && (cmb.items.size() > 0))
 							cmb.showPopup();
 					} finally {
 						searching = false;
