@@ -264,6 +264,14 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
+    public final List<Talon> getReservedTalons(final int cpol, final String cdol,
+            final int doctorId, final int patientId) throws KmiacServerException,
+            TalonNotFoundException, TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public final void reserveTalon(final Patient pat, final Talon talon)
             throws KmiacServerException, ReserveTalonOperationFailedException,
             TException {
