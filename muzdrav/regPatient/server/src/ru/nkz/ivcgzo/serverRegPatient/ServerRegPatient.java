@@ -1459,10 +1459,10 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<IntegerClassifier> getL00(final int pcod) throws TException {
         String sqlQuery;
         if (pcod == 42) {
-            sqlQuery = "SELECT ter, (nam_kem || ' ' ||n_l01.name) as nam_kem FROM n_l00 "
-                + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ?;";
+            sqlQuery = "SELECT ter, (nam_kem || ' ' || n_l01.name) as nam_kem FROM n_l00 "
+                + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ? ORDER BY nam_kem;";
         } else {
-            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ?;";
+            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ? ORDER BY nam_kem;";
         }
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmL00 =
                 new TResultSetMapper<>(IntegerClassifier.class, "ter", "nam_kem");
@@ -1476,7 +1476,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<StringClassifier> getU10(final String name) throws TException {
-        final String sqlQuery = "SELECT name1, ndom FROM n_u10 WHERE name1 = ?;";
+        final String sqlQuery = "SELECT name1, ndom FROM n_u10 WHERE name1 = ? ORDER BY ndom;";
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmU10 =
                 new TResultSetMapper<>(StringClassifier.class, "name1", "ndom");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, name)) {
