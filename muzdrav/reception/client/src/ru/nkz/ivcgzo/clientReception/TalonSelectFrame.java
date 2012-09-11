@@ -90,7 +90,6 @@ public class TalonSelectFrame extends JFrame {
         fillSplitPane();
 
         getContentPane().add(splitPane);
-
     }
 
     private void fillSplitPane() {
@@ -201,6 +200,22 @@ public class TalonSelectFrame extends JFrame {
 
     private void fillTalonTypePanel() {
         cbxPoliclinic = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxPoliclinic.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    if (cbxPoliclinic.getSelectedItem() != null) {
+                        cbxSpeciality.setData(
+                            MainForm.tcl.getSpec(cbxPoliclinic.getSelectedItem().getPcod())
+                        );
+                        cbxSpeciality.setSelectedIndex(0);
+                    }
+                } catch (KmiacServerException | SpecNotFoundException
+                        | TException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
         cbxSpeciality = new ThriftStringClassifierCombobox<StringClassifier>(true);
         cbxSpeciality.addActionListener(new ActionListener() {
             @Override
@@ -208,16 +223,15 @@ public class TalonSelectFrame extends JFrame {
                 try {
                     if (cbxSpeciality.getSelectedItem() != null) {
                         cbxDoctor.setData(
-                                MainForm.tcl.getVrach(
-                                    cbxPoliclinic.getSelectedItem().getPcod(),
-                                    cbxSpeciality.getSelectedItem().getPcod()
+                            MainForm.tcl.getVrach(
+                                cbxPoliclinic.getSelectedItem().getPcod(),
+                                cbxSpeciality.getSelectedItem().getPcod()
                             )
                         );
                         cbxDoctor.setSelectedIndex(0);
                     }
                 } catch (KmiacServerException | VrachNotFoundException
                         | TException e1) {
-                    // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             }
@@ -348,10 +362,8 @@ public class TalonSelectFrame extends JFrame {
         try {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
             cbxPoliclinic.setSelectedIndex(0);
-            cbxSpeciality.setData(MainForm.tcl.getSpec(cbxPoliclinic.getSelectedItem().getPcod()));
-            cbxSpeciality.setSelectedIndex(0);
         } catch (KmiacServerException | PoliclinicNotFoundException
-                | TException | SpecNotFoundException e) {
+                | TException e) {
             e.printStackTrace();
         }
     }
