@@ -1457,7 +1457,13 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getL00(final int pcod) throws TException {
-        final String sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ?;";
+        String sqlQuery;
+        if (pcod == 42) {
+            sqlQuery = "SELECT ter, (nam_kem || ' ' ||n_l01.name) as nam_kem FROM n_l00 "
+                + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ?;";
+        } else {
+            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ?;";
+        }
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmL00 =
                 new TResultSetMapper<>(IntegerClassifier.class, "ter", "nam_kem");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {

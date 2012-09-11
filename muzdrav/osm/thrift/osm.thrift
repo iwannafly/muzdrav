@@ -234,6 +234,7 @@ struct RdSlStruct{
 	34: optional i32 cdiagt;
 	35: optional i32 cvera;
 	36: optional i32 id_pvizit;
+        37: optional i32 rost; 
 }
 
 struct RdDinStruct{
