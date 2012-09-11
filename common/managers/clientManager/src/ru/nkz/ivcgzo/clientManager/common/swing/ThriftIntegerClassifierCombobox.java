@@ -84,7 +84,10 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<IntegerClassifier> list) {
-		classifierLoaded = list != null;
+		if (classifier == null)
+			classifierLoaded = true;
+		else
+			classifierLoaded = list != null;
 		if (list == null)
 			list = new ArrayList<>();
 			
@@ -102,10 +105,12 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					loadClassifier();
-					IntegerClassifier res = ConnectionManager.instance.showIntegerClassifierSelector(classifier);
-					
-					if (res != null)
-						setSelectedPcod(res.pcod);
+					if (items.size() > 0) {
+						IntegerClassifier res = ConnectionManager.instance.showIntegerClassifierSelector(classifier);
+						
+						if (res != null)
+							setSelectedPcod(res.pcod);
+					}
 				}
 			}
 		};

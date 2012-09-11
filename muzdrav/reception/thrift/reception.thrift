@@ -118,6 +118,12 @@ service ThriftReception extends kmiacServer.KmiacServer {
     list<Talon> getTalon(1:i32 cpol, 2:string cdol, 3:i32 pcod) throws (1: kmiacServer.KmiacServerException kse,
             2: TalonNotFoundException tnfe);
 
+    /**
+     * Возвращает список всех талонов, занятых данным пациентом 
+     */
+    list<Talon> getReservedTalons(1:i32 cpol, 2:string cdol, 3:i32 doctorId, 4:i32 patientId) throws (
+            1:kmiacServer.KmiacServerException kse, 2: TalonNotFoundException tnfe);
+
     /*
      * Запись пациента на приём (изменение выбранного талона)
      */
