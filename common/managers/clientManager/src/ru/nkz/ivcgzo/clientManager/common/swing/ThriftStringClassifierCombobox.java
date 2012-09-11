@@ -84,7 +84,10 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<StringClassifier> list) {
-		classifierLoaded = list != null;
+		if (classifier == null)
+			classifierLoaded = true;
+		else
+			classifierLoaded = list != null;
 		if (list == null)
 			list = new ArrayList<>();
 			
@@ -102,10 +105,12 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					loadClassifier();
-					StringClassifier res = ConnectionManager.instance.showStringClassifierSelector(classifier);
-					
-					if (res != null)
-						setSelectedPcod(res.pcod);
+					if (items.size() > 0) {
+						StringClassifier res = ConnectionManager.instance.showStringClassifierSelector(classifier);
+						
+						if (res != null)
+							setSelectedPcod(res.pcod);
+					}
 				}
 			}
 		};
@@ -347,10 +352,11 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 							searching = true;
 							cmb.setSelectedItem(null);
 							editor.setText(editText);
+							if (cmb.items.size() > 0)
+								cmb.showPopup();
+						} else if ((lastSelected == null) && (cmb.items.size() > 0))
 							cmb.showPopup();
-						} else if ((lastSelected == null))
-							cmb.showPopup();
-						else if (!lastSelTextLow.equals(editTextLow))
+						else if (!lastSelTextLow.equals(editTextLow) && (cmb.items.size() > 0))
 							cmb.showPopup();
 					} finally {
 						searching = false;
