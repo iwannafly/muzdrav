@@ -267,8 +267,25 @@ public class ServerReception extends Server implements Iface {
     public final List<Talon> getReservedTalons(final int cpol, final String cdol,
             final int doctorId, final int patientId) throws KmiacServerException,
             TalonNotFoundException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
+        // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
+        final long todayMillisec = new java.util.Date().getTime();
+        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv "
+                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? AND datap >= ? "
+                + "AND npasp = ? ORDER BY datap, timep;";
+        try (AutoCloseableResultSet acrs =
+                sse.execPreparedQuery(sqlQuery, cpol, cdol, doctorId,
+                new Date(todayMillisec), patientId)) {
+            List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new TalonNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException(e.getMessage());
+        }
     }
 
     @Override
