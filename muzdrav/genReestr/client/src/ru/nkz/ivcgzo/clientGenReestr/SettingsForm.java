@@ -1,7 +1,6 @@
 package ru.nkz.ivcgzo.clientGenReestr;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JPanel;
@@ -208,26 +207,24 @@ public class SettingsForm extends JDialog {
 		panel.setLayout(gl_panel);
 		getContentPane().setLayout(groupLayout);
 
-		if (MainForm.authInfo.getCslu() == 1){
-			try{
-				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-				cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
-			} catch (TException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (KmiacServerException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public void showSettingsForm() {
         if (tfDn.getDate() == null) tfDn.setDate(System.currentTimeMillis());
         if (tfDk.getDate() == null) tfDk.setDate(System.currentTimeMillis());
-        if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected())
-        	rbtn1.setSelected(true);
+        if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected()) rbtn1.setSelected(true);
+        if (MainForm.authInfo.getCslu() == 2){
+			try{
+				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+				cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+			} catch (TException e) {
+				e.printStackTrace();
+				MainForm.conMan.reconnect(e);
+			} catch (KmiacServerException e) {
+				e.printStackTrace();
+			}
+		}
 		setVisible(true);
 	}
 }

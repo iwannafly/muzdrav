@@ -37,14 +37,15 @@ private TServer thrServ;
 		ThriftGenReestr.Processor<Iface> proc = new ThriftGenReestr.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
-	
+        log.info("Start serverRegPatient");
 	}
 
 	@Override
 	public void stop() {
 		if (thrServ != null)
 			thrServ.stop();
-	}
+			log.info("Stop serverRegPatient");
+}
 
 	public GenReestr(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -75,10 +76,10 @@ private TServer thrServ;
 	@Override
     public final List<IntegerClassifier> getAllPolForCurrentLpu(final int lpuId) throws TException {
 		final String sqlQuery = "SELECT pcod, name FROM n_n00 WHERE clpu = ?";
-    	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
+    	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
     			new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
-			return rsmO00.mapToList(acrs.getResultSet());
+			return rsmN00.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			log.log(Level.ERROR, "SQl Exception: ", e);
 			throw new TException(e);
@@ -88,10 +89,10 @@ private TServer thrServ;
 	@Override
     public final List<IntegerClassifier> getPolForCurrentLpu(final int polId) throws TException {
 		final String sqlQuery = "SELECT pcod, name FROM n_n00 WHERE pcod = ?";
-    	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
+    	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
     			new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, polId)) {
-			return rsmO00.mapToList(acrs.getResultSet());
+			return rsmN00.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			log.log(Level.ERROR, "SQl Exception: ", e);
 			throw new TException(e);
