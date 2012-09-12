@@ -1646,6 +1646,7 @@ public class Vvod extends JFrame {
 				pvizitAmb.setId_obr(pvizit.getId());
 				pvizitAmb.setNpasp(zapVr.getNpasp());
 				pvizitAmb.setDatap(System.currentTimeMillis());
+				pvizitAmb.setDataz(System.currentTimeMillis());
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 				
