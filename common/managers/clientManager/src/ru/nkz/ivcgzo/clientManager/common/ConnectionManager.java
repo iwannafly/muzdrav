@@ -644,4 +644,16 @@ public class ConnectionManager {
 		
 		return null;
 	}
+	
+	/**
+	 * Открывает сгенерированный отчет в офисном редакторе.
+	 * @param path - путь к отчету
+	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>
+	 */
+	public void openFileInEditor(String path, boolean print) {
+		if (print)
+			DocumentPrinter.printFile(path);
+		else
+			DocumentPrinter.editFile(path);
+	}
 }

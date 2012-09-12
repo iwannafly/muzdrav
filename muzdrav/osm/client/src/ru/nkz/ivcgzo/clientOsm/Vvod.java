@@ -211,6 +211,7 @@ public class Vvod extends JFrame {
        						String servPath = MainForm.tcl.printProtokol(protokol);
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+       						MainForm.conMan.openFileInEditor(cliPath, true);
 	       				}
 	       				catch (TException e1) {
 	       					e1.printStackTrace();
@@ -237,7 +238,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printVypis(vp);
 							String cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);
-
+       						MainForm.conMan.openFileInEditor(cliPath, true);
 						}
 						catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
@@ -256,6 +257,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printKek(Vvod.zapVr.getNpasp(), tblPos.getSelectedItem().id_obr);
 								String cliPath = File.createTempFile("kek", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	       						MainForm.conMan.openFileInEditor(cliPath, true);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -275,6 +277,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
 								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	       						MainForm.conMan.openFileInEditor(cliPath, true);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -1267,6 +1270,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printIsslMetod(isslmet);
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 					}
 				}
@@ -1386,8 +1390,9 @@ public class Vvod extends JFrame {
 						naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
 						naprkons.setClpu_name(MainForm.authInfo.getClpu_name());
 						String servPath = MainForm.tcl.printNaprKons(naprkons);
-						String cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
+						String cliPath = File.createTempFile("napk", ".htm").getAbsolutePath();
 						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+   						MainForm.conMan.openFileInEditor(cliPath, false);
 					}
 					else {
 						Napr napr = new Napr();
@@ -1405,6 +1410,7 @@ public class Vvod extends JFrame {
 						String servPath = MainForm.tcl.printNapr(napr);
 						String cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
 						MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+   						MainForm.conMan.openFileInEditor(cliPath, false);
 					}
 				}
 				catch (TException e1) {

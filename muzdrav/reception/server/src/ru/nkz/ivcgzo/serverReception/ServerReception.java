@@ -58,6 +58,7 @@ public class ServerReception extends Server implements Iface {
     private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSpec;
     private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
+    private TResultSetMapper<Talon, Talon._Fields> rsmReservedTalon;
 
 //////////////////////////// Field Name Arrays ////////////////////////////
 
@@ -75,6 +76,10 @@ public class ServerReception extends Server implements Iface {
     };
     private static final String[] TALON_FIELD_NAMES = {
         "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv"
+    };
+    private static final String[] RESERVED_TALON_FIELD_NAMES = {
+        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv",
+        "spec", "fio"
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +99,7 @@ public class ServerReception extends Server implements Iface {
         rsmSpec = new TResultSetMapper<>(StringClassifier.class, SPEC_FIELD_NAMES);
         rsmVidp = new TResultSetMapper<>(Vidp.class, VIDP_FIELD_NAMES);
         rsmTalon = new TResultSetMapper<>(Talon.class, TALON_FIELD_NAMES);
+        rsmReservedTalon = new TResultSetMapper<>(Talon.class, RESERVED_TALON_FIELD_NAMES);
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -270,13 +276,15 @@ public class ServerReception extends Server implements Iface {
         // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv "
-                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? AND datap >= ? "
+        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv, "
+                + "name as spec, (fam || ' ' || im || ' ' || ot) as fio FROM e_talon "
+                + "INNER JOIN n_s00 ON n_s00.pcod = e_talon.cdol "
+                + "INNER JOIN s_vrach ON s_vrach.pcod = e_talon.pcod_sp "
+                + "WHERE cpol = ? AND datap >= ? "
                 + "AND npasp = ? ORDER BY datap, timep;";
         try (AutoCloseableResultSet acrs =
-                sse.execPreparedQuery(sqlQuery, cpol, cdol, doctorId,
-                new Date(todayMillisec), patientId)) {
-            List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
+                sse.execPreparedQuery(sqlQuery, cpol, new Date(todayMillisec), patientId)) {
+            List<Talon> tmpList = rsmReservedTalon.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
             } else {
@@ -288,6 +296,7 @@ public class ServerReception extends Server implements Iface {
         }
     }
 
+    //TODO Добавить проверку на занятость талона прямо перед записью
     @Override
     public final void reserveTalon(final Patient pat, final Talon talon)
             throws KmiacServerException, ReserveTalonOperationFailedException,

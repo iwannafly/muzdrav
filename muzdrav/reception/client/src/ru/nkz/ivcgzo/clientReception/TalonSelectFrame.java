@@ -21,6 +21,8 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.thrift.TException;
 
@@ -31,6 +33,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
+import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.Talon;
@@ -100,6 +103,22 @@ public class TalonSelectFrame extends JFrame {
         tbpTalonOperations = new JTabbedPane(JTabbedPane.TOP);
         fillTalonTabbedPane();
         splitPane.setRightComponent(tbpTalonOperations);
+        tbpTalonOperations.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                switch (tbpTalonOperations.getSelectedIndex()) {
+                    case 0:
+                        refreshTalonTableModel();
+                        break;
+                    case 1:
+                        refreshReservedTalonTableModel();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
     }
 
     private void fillInformationPanel() {
@@ -241,12 +260,10 @@ public class TalonSelectFrame extends JFrame {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 if (cbxDoctor.getSelectedItem() != null) {
-                    TalonTableModel tbtModel = new TalonTableModel(
-                           cbxPoliclinic.getSelectedItem().getPcod(),
-                           cbxSpeciality.getSelectedItem().getPcod(),
-                           cbxDoctor.getSelectedItem().getPcod()
-                    );
-                    tbTalonSelect.setModel(tbtModel);
+                    refreshTalonTableModel();
+                }
+                if ((cbxDoctor.getSelectedItem() != null) && (curPatient != null))  {
+                    refreshReservedTalonTableModel();
                 }
             }
         });
@@ -299,6 +316,15 @@ public class TalonSelectFrame extends JFrame {
         fillTalonDeletePane();
     }
 
+    private void refreshTalonTableModel() {
+        TalonTableModel tbtModel = new TalonTableModel(
+                cbxPoliclinic.getSelectedItem().getPcod(),
+                cbxSpeciality.getSelectedItem().getPcod(),
+                cbxDoctor.getSelectedItem().getPcod()
+        );
+        tbTalonSelect.setModel(tbtModel);
+    }
+
     private void fillTalonSelectPane() {
         tbTalonSelect = new JTable();
         tbTalonSelect.setDefaultRenderer(String.class, new TalonTableCellRenderer());
@@ -318,13 +344,7 @@ public class TalonSelectFrame extends JFrame {
                     try {
                         if ((curTalon != null) && (curPatient != null)) {
                             MainForm.tcl.reserveTalon(curPatient, curTalon);
-
-                            TalonTableModel tbtModel = new TalonTableModel(
-                                    cbxPoliclinic.getSelectedItem().getPcod(),
-                                    cbxSpeciality.getSelectedItem().getPcod(),
-                                    cbxDoctor.getSelectedItem().getPcod()
-                            );
-                            tbTalonSelect.setModel(tbtModel);
+                            refreshTalonTableModel();
                         } else if (curPatient == null) {
                             JOptionPane.showMessageDialog(tbTalonSelect, "Пациент не выбран",
                                     "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
@@ -339,8 +359,45 @@ public class TalonSelectFrame extends JFrame {
         pnTalonSelect.setViewportView(tbTalonSelect);
     }
 
+    private void refreshReservedTalonTableModel() {
+        ReservedTalonTableModel resTbtModel = new ReservedTalonTableModel(
+                cbxPoliclinic.getSelectedItem().getPcod(),
+                cbxSpeciality.getSelectedItem().getPcod(),
+                cbxDoctor.getSelectedItem().getPcod(),
+                curPatient.getId()
+        );
+        tbTalonDelete.setModel(resTbtModel);
+    }
+
     private void fillTalonDeletePane() {
         tbTalonDelete = new JTable();
+        tbTalonDelete.setDefaultRenderer(String.class, new ReservedTalonTableCellRenderer());
+        tbTalonDelete.setRowHeight(50);
+        tbTalonDelete.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(final MouseEvent e) { //TODO отрефакторить
+                JTable curTable = (JTable) e.getSource();
+                final int curRow = curTable.getSelectedRow();
+                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(tbTalonSelect,
+                        "Удалить запись?", "Удаление талона", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE);
+                if (indexOfSelectedOption  == 0) {
+                    Talon curTalon = ((ReservedTalonTableModel) curTable.getModel())
+                            .getReservedTalonList().get(curRow);
+                    try {
+                        if ((curTalon != null) && (curPatient != null)) {
+                            MainForm.tcl.releaseTalon(curTalon);
+                            refreshReservedTalonTableModel();
+                        } else if (curPatient == null) {
+                            JOptionPane.showMessageDialog(tbTalonSelect, "Пациент не выбран",
+                                    "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    } catch (KmiacServerException
+                            | TException | ReleaseTalonOperationFailedException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
         pnTalonDelete.setViewportView(tbTalonDelete);
     }
 
@@ -364,6 +421,7 @@ public class TalonSelectFrame extends JFrame {
             cbxPoliclinic.setSelectedIndex(0);
         } catch (KmiacServerException | PoliclinicNotFoundException
                 | TException e) {
+            System.out.println("пыщ");
             e.printStackTrace();
         }
     }

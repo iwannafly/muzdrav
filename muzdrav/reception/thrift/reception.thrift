@@ -28,6 +28,8 @@ struct Talon {
 	6:optional i32 npasp;
     7:optional i64 dataz;
     8:optional i32 prv;
+    9:optional string doctorSpec;
+    10:optional string doctorFio;
 }
 
 /**

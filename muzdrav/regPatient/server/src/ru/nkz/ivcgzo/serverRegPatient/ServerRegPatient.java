@@ -412,10 +412,9 @@ public class ServerRegPatient extends Server implements Iface {
      * @param id - идентификатор льгота
      * @return String - текстовое описание вида льготы
      */
-    // TODO поменять n_lkr на n_lkn
     private String getStringTranscriptionForLgota(final int lgotaId) throws SQLException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT name FROM n_lkr WHERE (pcod = ?)", lgotaId)) {
+                "SELECT name FROM n_lkn WHERE (pcod = ?)", lgotaId)) {
             ResultSet rs = acrs.getResultSet();
             String tmpName = null;
             if (rs.next()) {
@@ -578,12 +577,11 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    //TODO поле name теперь ссылается на таблицу n_lkn, а не n_lkr - переделать.
     @Override
     public final List<Lgota> getLgota(final int npasp)
             throws LgotaNotFoundException, TException {
         String sqlQuery = "SELECT id, npasp, lgot, datal, name FROM p_kov "
-                + "INNER JOIN n_lkr ON p_kov.lgot = n_lkr.pcod WHERE npasp = ?;";
+                + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<Lgota> lgotaList = rsmLgota.mapToList(rs);
@@ -1425,7 +1423,6 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String printAmbCart(final PatientFullInfo pat) throws TException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -1459,10 +1456,10 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<IntegerClassifier> getL00(final int pcod) throws TException {
         String sqlQuery;
         if (pcod == 42) {
-            sqlQuery = "SELECT ter, (nam_kem || ' ' ||n_l01.name) as nam_kem FROM n_l00 "
-                + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ?;";
+            sqlQuery = "SELECT ter, (nam_kem || ' ' || n_l01.name) as nam_kem FROM n_l00 "
+                + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ? ORDER BY nam_kem;";
         } else {
-            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ?;";
+            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ? ORDER BY nam_kem;";
         }
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmL00 =
                 new TResultSetMapper<>(IntegerClassifier.class, "ter", "nam_kem");
@@ -1476,7 +1473,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<StringClassifier> getU10(final String name) throws TException {
-        final String sqlQuery = "SELECT name1, ndom FROM n_u10 WHERE name1 = ?;";
+        final String sqlQuery = "SELECT name1, ndom FROM n_u10 WHERE name1 = ? ORDER BY ndom;";
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmU10 =
                 new TResultSetMapper<>(StringClassifier.class, "name1", "ndom");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, name)) {
