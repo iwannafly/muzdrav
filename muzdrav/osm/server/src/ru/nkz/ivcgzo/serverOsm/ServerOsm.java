@@ -948,7 +948,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1017,7 +1019,7 @@ public class ServerOsm extends Server implements Iface {
 			
 			acrs.close();
 			osw.write(sb.toString());
-			return "e:\\111.htm";
+			return path;
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1132,7 +1134,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printNapr(Napr na) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1193,7 +1197,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>МП");
 			acrs.close();
 							osw.write(sb.toString());
-							return "e:\\napr.htm";
+							return path;
 						} catch (SQLException | IOException e) {
 							throw new KmiacServerException();
 						}
@@ -1202,7 +1206,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printNaprKons(NaprKons nk) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("napk", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napk", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1263,7 +1269,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>МП");
 			acrs.close();
 							osw.write(sb.toString());
-							return "e:\\naprKons.htm";
+							return path;
 						} catch (SQLException | IOException  e) {
 							throw new KmiacServerException();
 						}
@@ -1271,7 +1277,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printVypis(Vypis vp) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("vypis", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("vypis", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1361,7 +1369,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
-			return "e:\\vypis.htm";
+			return path;
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1369,7 +1377,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public String printKek(int npasp, int pvizitId) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("kek", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kek", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1416,7 +1426,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
-			return "e:\\kek.htm";}
+			return path;
+			}
 		 catch (SQLException | IOException e) {
 			throw new KmiacServerException();
 		}
@@ -1649,8 +1660,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public String printProtokol(Protokol pk) throws KmiacServerException, TException {
 		AutoCloseableResultSet acrs = null;
+		String path;
 		
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("protokol", ".htm").getAbsolutePath()), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("protokol", ".htm").getAbsolutePath()), "utf-8")) {
 			StringBuilder sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -1767,7 +1779,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("<body>");
 			
 			osw.write(sb.toString());
-			return "e:\\protokol.htm";}
+			return path;}
 		catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		} finally {
@@ -1851,7 +1863,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public String printMSK(int npasp) throws KmiacServerException, TException {
-			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("msk", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("msk", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1974,7 +1988,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("_________________ (подпись) ________________(расшифровка)");
 				sb.append("</body>");
 				osw.write(sb.toString());
-				return "e:\\msk.htm";
+				return path;
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
