@@ -264,7 +264,7 @@ public class PacientInfoFrame extends JFrame {
 		    cmb_adp_gorod.setStrictCheck(false);
 		    cmb_adp_gorod.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
-					if (!cmb_adp_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
+					if (!cmb_adp_gorod.getText().substring(0, cmb_adp_gorod.getText().indexOf('.')+1).equals("НОВОКУЗНЕЦК Г."))
 						cmb_adp_ul.setData(new ArrayList<IntegerClassifier>());
 					else
 						cmb_adp_ul.setData(null);
@@ -274,7 +274,8 @@ public class PacientInfoFrame extends JFrame {
 		    cmb_adm_gorod.setStrictCheck(false);
 		    cmb_adm_gorod.addActionListener(new ActionListener() {
 		    	public void actionPerformed(ActionEvent arg0) {
-					if (!cmb_adm_gorod.getText().equals("НОВОКУЗНЕЦК Г."))
+		    			
+		    		if (!cmb_adm_gorod.getText().substring(0, cmb_adm_gorod.getText().indexOf('.')+1).equals("НОВОКУЗНЕЦК Г."))
 						cmb_adm_ul.setData(new ArrayList<IntegerClassifier>());
 					else
 						cmb_adm_ul.setData(null);
@@ -568,16 +569,21 @@ public class PacientInfoFrame extends JFrame {
 				    if (cmb_adp_obl.getSelectedItem() != null) PersonalInfo.setRegion_liv(cmb_adp_obl.getSelectedPcod()); 
 				    PersonalInfo.adpAddress.setRegion(cmb_adp_obl.getText());
 				    PersonalInfo.admAddress.setRegion(cmb_adm_obl.getText());
-				    PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText());
-				    PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText());
+				    if (cmb_adp_obl.getSelectedPcod() ==42)
+				    	PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText().substring(0,cmb_adp_gorod.getText().indexOf('.')+1));
+				    else
+				    	PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText());
+				    if (cmb_adm_obl.getSelectedPcod() ==42)
+				    	PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText().substring(0,cmb_adm_gorod.getText().indexOf('.')+1));
+				    else
+				    	PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText());
 				    PersonalInfo.admAddress.setStreet(cmb_adm_ul.getText());
 				    PersonalInfo.adpAddress.setStreet(cmb_adp_ul.getText());
 				    if (cmb_adp_gorod.getSelectedItem() != null) PersonalInfo.setTer_liv(cmb_adp_gorod.getSelectedPcod()); 
 				    PersonalInfo.admAddress.setHouse(cmb_adm_dom.getText());
 				    PersonalInfo.adpAddress.setHouse(cmb_adp_dom.getText());
        				PersonalInfo.setTerp(Terp);
-				
-				//FIXME   jitel, terp
+       				
 				    if (curPatientId == 0){
 					curPatientId = MainForm.tcl.addPatient(PersonalInfo);
 					//newPatBr.setFam(PersonalInfo.getFam().toUpperCase());
@@ -2919,7 +2925,6 @@ public class PacientInfoFrame extends JFrame {
                     String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
                 } catch (TException | IOException | FileNotFoundException | OpenFileException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
         	}
@@ -2951,12 +2956,13 @@ public class PacientInfoFrame extends JFrame {
         				.addComponent(btnPrint_istb))
         			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        
-//FIXME        if (MainForm.authInfo.getCslu() != 1) {
-//        	tbMain.remove(tpSign);
-//        	tbMain.remove(tpPriem);
-//        	btnPrint_istb.setVisible(false);
-//        }
+       
+//FIXME        
+        if (MainForm.authInfo.getCslu() != 1) {
+        	tbMain.remove(tpSign);
+        	tbMain.remove(tpPriem);
+        	btnPrint_istb.setVisible(false);
+        }
         
         pl_print.setLayout(gl_pl_print);
         contentPane.setLayout(gl_contentPane);
