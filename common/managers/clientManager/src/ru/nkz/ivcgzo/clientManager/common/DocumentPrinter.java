@@ -24,24 +24,31 @@ public class DocumentPrinter {
 			return OparatingSystem.Windows;
 		}
 		
-		return OparatingSystem.Unknown;
+		return OparatingSystem.Linux;
 	}
 	
 	private static String checkForLibreOfficePath() {
+		String path = "";
+		
 		switch (os) {
 		case Windows:
-			String path = readWindowsRegistryString("HKEY_CLASSES_ROOT\\Software\\OpenOffice.org\\LibreOffice", "Path");
+			path = readWindowsRegistryString("HKEY_CLASSES_ROOT\\Software\\OpenOffice.org\\LibreOffice", "Path");
 			if (path.length() > 0) {
 				path = new File(path, "program\\soffice.exe").getAbsolutePath();
 				if (isPathExists(path))
 					return path;
 			}
 			break;
+		case Linux:
+			path = "/usr/bin/soffice";
+			if (isPathExists(path))
+				return path;
+			break;
 		default:
 			break;
 		}
 		
-		return "";
+		return path;
 	}
 	
 	private static String checkForMsOfficePath() {
