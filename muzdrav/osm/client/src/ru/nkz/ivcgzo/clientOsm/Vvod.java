@@ -76,6 +76,7 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import java.awt.Font;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -441,6 +442,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbJal = new JTextArea();
+		tbJal.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbJal.setLineWrap(true);
 		tbJal.setWrapStyleWord(true);
 		spJal.setViewportView(tbJal);
@@ -467,6 +469,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbAnam = new JTextArea();
+		tbAnam.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbAnam.setLineWrap(true);
 		tbAnam.setWrapStyleWord(true);
 		spAnam.setViewportView(tbAnam);
@@ -548,6 +551,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbStat = new JTextArea();
+		tbStat.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbStat.setWrapStyleWord(true);
 		tbStat.setLineWrap(true);
 		spStat.setViewportView(tbStat);
@@ -575,6 +579,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbFiz = new JTextArea();
+		tbFiz.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbFiz.setLineWrap(true);
 		tbFiz.setWrapStyleWord(true);
 		spFiz.setViewportView(tbFiz);
@@ -601,6 +606,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbLoc = new JTextArea();
+		tbLoc.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbLoc.setLineWrap(true);
 		tbLoc.setWrapStyleWord(true);
 		spLoc.setViewportView(tbLoc);
@@ -1129,6 +1135,7 @@ public class Vvod extends JFrame {
 		pnlDiagStat.setLayout(gl_pnlDiagStat);
 		
 		tbDiagOpis = new JTextArea();
+		tbDiagOpis.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		spDiagOpis.setViewportView(tbDiagOpis);
 		pnlDiag.setLayout(gl_pnlDiag);
 		
@@ -1153,6 +1160,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbLech = new JTextArea();
+		tbLech.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbLech.setLineWrap(true);
 		tbLech.setWrapStyleWord(true);
 		spLech.setViewportView(tbLech);
@@ -1463,6 +1471,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbKonsObosnov = new JTextArea();
+		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbKonsObosnov.setLineWrap(true);
 		tbKonsObosnov.setWrapStyleWord(true);
 		spKonsObosnov.setViewportView(tbKonsObosnov);
@@ -1490,6 +1499,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbOcen = new JTextArea();
+		tbOcen.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbOcen.setLineWrap(true);
 		tbOcen.setWrapStyleWord(true);
 		spOcen.setViewportView(tbOcen);
@@ -1544,11 +1554,13 @@ public class Vvod extends JFrame {
 		);
 		
 		tbZaklRek = new JTextArea();
+		tbZaklRek.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbZaklRek.setLineWrap(true);
 		tbZaklRek.setWrapStyleWord(true);
 		spZaklRek.setViewportView(tbZaklRek);
 		
 		tbZakl = new JTextArea();
+		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
