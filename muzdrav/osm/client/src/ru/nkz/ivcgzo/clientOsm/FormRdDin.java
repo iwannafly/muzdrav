@@ -15,6 +15,8 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
+
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
 import javax.swing.SpinnerNumberModel;
@@ -32,6 +34,9 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
+import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -87,6 +92,10 @@ public class FormRdDin extends JFrame {
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
+	private int mes;
+	private int br;
+	private int rost;
+	private double ves;
     JSpinner SSrok ;
 	JSpinner SVes;
 	JSpinner SOkrj;
@@ -317,6 +326,12 @@ public class FormRdDin extends JFrame {
 		SButton.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 		try {
+			SimpleDateFormat frm = new SimpleDateFormat("MM");
+			int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
+			if (mes == 1) br = br+1;
+			if (mes == 2) br = br+1;
+			if (mes == 12) br = br+1;
+			rddin.setGrr(0);
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
 			else rddin.unsetPredpl();
@@ -333,7 +348,10 @@ public class FormRdDin extends JFrame {
 			rddin.setOteki(CBOteki.getSelectedPcod());
 			else rddin.unsetOteki();
 		if (CBDiag.getSelectedPcod() != null)
-			rddin.setDspos(CBDiag.getSelectedPcod());
+		{	rddin.setDspos(CBDiag.getSelectedPcod());
+		rddin.setGrr(1);
+		System.out.println("риск");		
+}
 		    else rddin.unsetDspos();
 		rddin.setArt1((int) SPdad.getModel().getValue());
 		rddin.setArt2((int) SPsad.getModel().getValue());
@@ -345,9 +363,14 @@ public class FormRdDin extends JFrame {
 		rddin.setSpl((int) STolP.getModel().getValue());
 		rddin.setSrok((int) SSrok.getModel().getValue());
 		rddin.setVes((double) SVes.getModel().getValue());
-		rddin.setGrr(0);
-		rddin.setBall(0);
-		System.out.println("пошли обновлять");		
+		ves = (double) SVes.getModel().getValue();
+		rost = FormPostBer.rdSlStruct.getRost();	
+		if (rost != 0)
+		{ves = ves/rost/rost*10000;
+		if (ves<17) br = br+1;
+		if (ves>32) br = br+1;}
+		rddin.setBall(br); 
+//		System.out.println(ves);
 			MainForm.tcl.UpdateRdDin(rddin);
 		} catch (KmiacServerException | TException e1) {
 			// TODO Auto-generated catch block
