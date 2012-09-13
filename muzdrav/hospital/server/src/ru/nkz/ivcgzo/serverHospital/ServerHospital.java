@@ -28,7 +28,6 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
-import ru.nkz.ivcgzo.thriftHospital.TAddress;
 import ru.nkz.ivcgzo.thriftHospital.TComplaint;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
@@ -44,8 +43,6 @@ public class ServerHospital extends Server implements Iface {
     private TServer tServer;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
-    private TResultSetMapper<TAddress, TAddress._Fields> rsmRegistrationAddress;
-    private TResultSetMapper<TAddress, TAddress._Fields> rsmRealAddress;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmLifeHistory;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmDesiaseHistory;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmState;
@@ -56,14 +53,8 @@ public class ServerHospital extends Server implements Iface {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "dataz", "cotd", "npal", "nist"
     };
     private static final String[] PATIENT_FIELD_NAMES = {
-        "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nambk", "jitel", "sgrp", "poms",
-        "pdms", "mrab", "npal"
-    };
-    private static final String[] REGISTRATION_ADDRESS_FIELD_NAMES = {
-        "adp_gorod", "adp_ul", "adp_dom"
-    };
-    private static final String[] REAL_ADDRESS_FIELD_NAMES = {
-        "adm_gorod", "adm_ul", "adm_dom"
+        "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
+        "pdms", "mrab", "npal", "reg_add", "real_add"
     };
     private static final String[] LIFE_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "vitae", "dataz"
@@ -104,9 +95,6 @@ public class ServerHospital extends Server implements Iface {
         rsmSimplePatient  = new TResultSetMapper<>(
                 TSimplePatient.class, SIMPLE_PATIENT_FIELD_NAMES);
         rsmPatient = new TResultSetMapper<>(TPatient.class, PATIENT_FIELD_NAMES);
-        rsmRegistrationAddress = new TResultSetMapper<>(
-                TAddress.class, REGISTRATION_ADDRESS_FIELD_NAMES);
-        rsmRealAddress = new TResultSetMapper<>(TAddress.class, REAL_ADDRESS_FIELD_NAMES);
         rsmLifeHistory = new TResultSetMapper<>(TMedicalHistory.class, LIFE_HISTORY_FIELD_NAMES);
         rsmDesiaseHistory = new TResultSetMapper<>(
                 TMedicalHistory.class, DESIASE_HISTORY_FIELD_NAMES);
@@ -185,30 +173,30 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final TPatient getPatientPersonalInfo(final int patientId)
-            throws TException, PatientNotFoundException {
+            throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
-                + "patient.im, patient.ot, patient.pol, p_nambk.nambk, patient.jitel, "
-                + "patient.sgrp, (patient.poms_ser||patient.poms_nom) as poms, "
-                + "(patient.pdms_ser || patient.pdms_nom) as pdms,  patient.mrab, c_otd.npal, "
-                + "adp_gorod, adp_ul, adp_dom, adm_gorod, adm_UL, adm_dom "
-                + "FROM patient INNER JOIN c_gosp ON c_gosp.npasp = patient.npasp "
-                + "INNER JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
-                + "LEFT JOIN p_nambk ON patient.npasp = p_nambk.npasp WHERE patient.npasp=?;";
+                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, patient.sgrp, "
+                + "(patient.poms_ser||patient.poms_nom) as poms, "
+                + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
+                + "n_z43.name_s as mrab, c_otd.npal, "
+                + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
+                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
+                + "FROM patient LEFT JOIN c_gosp ON c_gosp.npasp = patient.npasp "
+                + "LEFT JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
+                + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
+                + "WHERE patient.npasp= ?;";
         ResultSet rs = null;
 
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
             rs = acrs.getResultSet();
             if (rs.next()) {
-                TPatient patient = rsmPatient.map(rs);
-                patient.registrationAddress = rsmRegistrationAddress.map(rs);
-                patient.realAddress = rsmRealAddress.map(rs);
-                System.out.print(patient);
-                return patient;
+                return rsmPatient.map(rs);
             } else {
                 throw new PatientNotFoundException();
             }
-        } catch (Exception e) {
-            throw new TException(e);
+        } catch (SQLException e) {
+            throw new KmiacServerException();
         }
     }
 

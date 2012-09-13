@@ -90,8 +90,6 @@ public class TestServerHospital {
         final String fam = "РЫМАНОВ";
         final String im = "СЕРГЕЙ";
         final String ot = "АЛЕКСАНДРОВИЧ";
-        final String nambk = "д105ы";
-        final String admUl = "РОКОССОВСКОГО";
         final int sgrp = 9;
         final String poms = null;
         assertEquals("patientId", patientId, patient.getPatientId());
@@ -100,8 +98,6 @@ public class TestServerHospital {
         assertEquals("fam", fam, patient.getSurname());
         assertEquals("im", im, patient.getName());
         assertEquals("ot", ot, patient.getMiddlename());
-        assertEquals("nambk", nambk, patient.getAmbulCardNumber());
-        assertEquals("admUl", admUl, patient.getRealAddress().getStreet());
         assertEquals("sgrp", sgrp, patient.getStatus());
         assertEquals("poms", poms, patient.getOms());
     }

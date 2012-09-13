@@ -29,16 +29,15 @@ struct TPatient{
 	4:string surname;
 	5:string name;
 	6:string middlename;
-	7:i32 gender;
-	8:string ambulCardNumber;
-	9:i32 liver;
-	10:i32 status;
-	11:string oms;
-	12:string dms;
-	13:string job;
-	14:i32 chumber;
-	15:TAddress registrationAddress;
-	16:TAddress realAddress;	
+	7:string gender;
+	8:i32 nist;
+	9:i32 status;
+	10:string oms;
+	11:string dms;
+	12:string job;
+	13:i32 chamber;
+	14:string registrationAddress;
+	15:string realAddress;	
 }
 
 struct TDoctor{
