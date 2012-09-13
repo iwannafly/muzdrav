@@ -1800,7 +1800,11 @@ public class Vvod extends JFrame {
 					if (cmbVidOpl.getSelectedPcod() != null)
 						pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
 					else pvizitAmb.unsetOpl();
-
+					for (PdiagAmb pd : tblDiag.getData()) {
+						if (pd.diag_stat==1) {
+							pvizitAmb.setDiag(pd.getDiag());}
+					}
+					
 					
 					MainForm.tcl.setPriem(priem);
 					MainForm.tcl.setAnamZab(anamZab);
