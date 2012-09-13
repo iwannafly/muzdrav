@@ -51,7 +51,7 @@ struct PatientFullInfo{
 	6:i32 pol,
 	7:i32 jitel,
 	8:i32 sgrp,
-	9:string mrab,
+	9:i32 mrab,
 	10:string namemr,
 	11:i32 ncex,
 	12:i32 cpol_pr,

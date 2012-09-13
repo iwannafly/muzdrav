@@ -3,13 +3,21 @@ package ru.nkz.ivcgzo.clientHospital;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.TPatient;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
@@ -22,10 +30,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JTextPane;
 import javax.swing.JButton;
 
+import org.apache.thrift.TException;
+
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 3513837719265529744L;
     private static final String WINDOW_HEADER = "Врач стационара";
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
     private JMenuBar mbMain;
     private JMenu mnPatientOperation;
     private JMenuItem mntmSelectPatient;
@@ -63,6 +74,7 @@ public class MainFrame extends JFrame {
     private JTextPane textPane;
     private JButton btnUpdateChamber;
     private UserAuthInfo doctorAuth;
+    private TPatient patient;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -87,8 +99,26 @@ public class MainFrame extends JFrame {
         mntmSelectPatient.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                PatientSelectFrame frmPatientSelect = new PatientSelectFrame(doctorAuth);
+                final PatientSelectFrame frmPatientSelect = new PatientSelectFrame(doctorAuth);
                 frmPatientSelect.pack();
+                frmPatientSelect.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(final WindowEvent arg0) {
+                        if (frmPatientSelect.getCurrentPatient() != null) {
+                            try {
+                                patient = ClientHospital.tcl.getPatientPersonalInfo(
+                                        frmPatientSelect.getCurrentPatient().getPatientId());
+                                fillPersonalInfoTextFields();
+                            } catch (PatientNotFoundException e) {
+                                JOptionPane.showMessageDialog(null,
+                                    "Персональная инфомация о данном пациенте не найдена",
+                                    "Внимание!", JOptionPane.WARNING_MESSAGE);
+                            } catch (KmiacServerException | TException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
                 frmPatientSelect.setVisible(true);
             }
         });
@@ -142,7 +172,7 @@ public class MainFrame extends JFrame {
         lblGender = new JLabel("Пол");
         tfGender = new JTextField();
         tfGender.setEditable(false);
-        tfGender.setColumns(3);
+        tfGender.setColumns(15);
 
         lblBirthdate = new JLabel("Дата рождения");
         tfBirthdate = new JTextField();
@@ -152,12 +182,12 @@ public class MainFrame extends JFrame {
         lblOms = new JLabel("Полис ОМС");
         tfOms = new JTextField();
         tfOms.setEditable(false);
-        tfOms.setColumns(15);
+        tfOms.setColumns(20);
 
         lblDms = new JLabel("Полис ДМС");
         tfDms = new JTextField();
         tfDms.setEditable(false);
-        tfDms.setColumns(15);
+        tfDms.setColumns(20);
 
         lblChamber = new JLabel("Номер палаты");
         tfChamber = new JTextField();
@@ -186,6 +216,24 @@ public class MainFrame extends JFrame {
         btnUpdateChamber = new JButton("Сохранить");
 
         setPatientInfoPanelGroupLayout();
+    }
+
+    private void fillPersonalInfoTextFields() {
+        if (patient != null) {
+            tfNumberOfDesiaseHistory.setText(String.valueOf(patient.getNist()));
+            tfSurname.setText(patient.getSurname());
+            tfName.setText(patient.getName());
+            tfMiddlename.setText(patient.getMiddlename());
+            tfGender.setText(patient.getGender());
+            tfBirthdate.setText(DEFAULT_DATE_FORMAT.format(patient.getBirthDate()));
+            tfOms.setText(patient.getOms());
+            tfDms.setText(patient.getDms());
+            tfChamber.setText(String.valueOf(patient.getChamber()));
+            tfStatus.setText(String.valueOf(patient.getStatus()));
+            tfWork.setText(patient.getJob());
+            tfRegistrationAddress.setText(patient.getRegistrationAddress());
+            tfRealAddress.setText(patient.getRealAddress());
+        }
     }
 
     private void setReceptionPanel() {
