@@ -7,7 +7,5 @@
 	<classpathentry kind="var" path="EXTERNAL_LIB/log4j-1.2.12.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.5.8.jar"/>
-	<classpathentry kind="var" path="EXTERNAL_LIB/miglayout-src.zip"/>
-	<classpathentry kind="var" path="EXTERNAL_LIB/miglayout15-swing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

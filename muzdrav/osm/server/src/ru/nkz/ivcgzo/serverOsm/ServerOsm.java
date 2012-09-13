@@ -381,7 +381,8 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET diag = ? WHERE id_obr = ? ", false, pos, pvizitAmbTypes, 6, 1);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();

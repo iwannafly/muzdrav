@@ -59,6 +59,7 @@ import javax.swing.ImageIcon;
 
 public class FormRdInf extends JFrame {
 
+	public static RdInfStruct RdInfStruct;
 	private JPanel contentPane;
 	private JLabel LObr;
 	private JLabel LSem;
@@ -112,7 +113,6 @@ public class FormRdInf extends JFrame {
 	private JCheckBox ChBOtsb;
 	private JCheckBox ChBSelo;
 	private JCheckBox ChBots;
-	
 	/**
 	 * Create the frame.
 	 */
