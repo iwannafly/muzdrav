@@ -75,10 +75,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class FormPostBer extends JFrame {
-
+    
+	public static RdSlStruct rdSlStruct;
 	private JPanel contentPane;
 	private JTextField TNKart;
-    private RdSlStruct rdsl;
 	private PatientCommonInfo patient;
     private int oslrod;
     private int or1;
@@ -160,13 +160,14 @@ addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 try {
-	rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+	rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 	setPostBerData();
 	fam.setText(Vvod.zapVr.getFam());
 	im.setText(Vvod.zapVr.getIm());
 	ot.setText(Vvod.zapVr.getOth());
 	SimpleDateFormat frm = new SimpleDateFormat("MM");
 	int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
+	System.out.println(mes);		
 	
 } catch (KmiacServerException | TException e) {
 	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
@@ -189,12 +190,12 @@ try {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					rdsl = new RdSlStruct();
+					rdSlStruct = new RdSlStruct();
 					setDefaultValues();
-					rdsl.setId(MainForm.tcl.AddRdSl(rdsl));
-//					rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-//					rdsl.setNpasp(Vvod.zapVr.getNpasp());
-					rdsl = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+//					rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//					rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
+					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 					setPostBerData();
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -225,59 +226,59 @@ try {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 
-					rdsl.setId_pvizit(Vvod.zapVr.id_pvizit);
-			rdsl.setAbort((int) SKolAb.getValue());
-			rdsl.setCext((int) SCext.getModel().getValue());
+					rdSlStruct.setId_pvizit(Vvod.zapVr.id_pvizit);
+			rdSlStruct.setAbort((int) SKolAb.getValue());
+			rdSlStruct.setCext((int) SCext.getModel().getValue());
  			if (SDataM.getDate() != null)
-			rdsl.setDataM( SDataM.getDate().getTime());
+			rdSlStruct.setDataM( SDataM.getDate().getTime());
  			if (SDataOsl.getDate() != null)
-			rdsl.setDataosl( SDataOsl.getDate().getTime());
+			rdSlStruct.setDataosl( SDataOsl.getDate().getTime());
  			if (TDataSn.getDate() != null)
-			rdsl.setDatasn( TDataSn.getDate().getTime());
+			rdSlStruct.setDatasn( TDataSn.getDate().getTime());
  			if (SDataRod.getDate() != null)
-			rdsl.setDataZs( SDataRod.getDate().getTime());
+			rdSlStruct.setDataZs( SDataRod.getDate().getTime());
  			if (SDataSert.getDate() != null)
-			rdsl.setDatasert( SDataSert.getDate().getTime());
-			rdsl.setSsert(getTextOrNull(TSSert.getText()));
-			rdsl.setNsert(getTextOrNull(TNSert.getText()));
-			rdsl.setPrrod(getTextOrNull(TPrRod.getText()));
-//			rdsl.setPrrod(TPrRod.getText());
+			rdSlStruct.setDatasert( SDataSert.getDate().getTime());
+			rdSlStruct.setSsert(getTextOrNull(TSSert.getText()));
+			rdSlStruct.setNsert(getTextOrNull(TNSert.getText()));
+			rdSlStruct.setPrrod(getTextOrNull(TPrRod.getText()));
+//			rdSlStruct.setPrrod(TPrRod.getText());
  			if (TDataab.getDate() != null)
-			rdsl.setDataab( TDataab.getDate().getTime());
-			rdsl.setSsert(getTextOrNull(TSSert.getText()));
-			rdsl.setNsert(getTextOrNull(TNSert.getText()));
+			rdSlStruct.setDataab( TDataab.getDate().getTime());
+			rdSlStruct.setSsert(getTextOrNull(TSSert.getText()));
+			rdSlStruct.setNsert(getTextOrNull(TNSert.getText()));
  			if (SDataPos.getDate() != null)
-			rdsl.setDatay(SDataPos.getDate().getTime());
-			rdsl.setKont(CBKontr.isSelected());
-			rdsl.setDeti((int) SKolDet.getModel().getValue());
-			rdsl.setDsp((int) (SDsp.getModel()).getValue());
-			rdsl.setDsr((int) SDcr.getModel().getValue());
-			rdsl.setDTroch((int) SDtroch.getModel().getValue());
-			rdsl.setIndsol((int) SindSol.getModel().getValue());
-			rdsl.setShet((int) SKolBer.getModel().getValue());
-			rdsl.setKolrod((int) SParRod.getModel().getValue());
-			rdsl.setPolj((int) SPolJ.getModel().getValue());
-			rdsl.setPrmen((int) SMenC.getModel().getValue());
-			rdsl.setRost((int) SRost.getModel().getValue());
-			rdsl.setVesd((Double) SVes.getModel().getValue());
-			rdsl.setYavka1((int) SYavka.getModel().getValue());
-           	rdsl.setCdiagt((int) SCDiag.getModel().getValue());
-           	rdsl.setCvera((int) SCvera.getModel().getValue());
-           	rdsl.setDataz(System.currentTimeMillis());
+			rdSlStruct.setDatay(SDataPos.getDate().getTime());
+			rdSlStruct.setKont(CBKontr.isSelected());
+			rdSlStruct.setDeti((int) SKolDet.getModel().getValue());
+			rdSlStruct.setDsp((int) (SDsp.getModel()).getValue());
+			rdSlStruct.setDsr((int) SDcr.getModel().getValue());
+			rdSlStruct.setDTroch((int) SDtroch.getModel().getValue());
+			rdSlStruct.setIndsol((int) SindSol.getModel().getValue());
+			rdSlStruct.setShet((int) SKolBer.getModel().getValue());
+			rdSlStruct.setKolrod((int) SParRod.getModel().getValue());
+			rdSlStruct.setPolj((int) SPolJ.getModel().getValue());
+			rdSlStruct.setPrmen((int) SMenC.getModel().getValue());
+			rdSlStruct.setRost((int) SRost.getModel().getValue());
+			rdSlStruct.setVesd((Double) SVes.getModel().getValue());
+			rdSlStruct.setYavka1((int) SYavka.getModel().getValue());
+           	rdSlStruct.setCdiagt((int) SCDiag.getModel().getValue());
+           	rdSlStruct.setCvera((int) SCvera.getModel().getValue());
+           	rdSlStruct.setDataz(System.currentTimeMillis());
 			calcOslrod();
-			rdsl.setOslrod(oslrod);
+			rdSlStruct.setOslrod(oslrod);
 			if (CBOslAb.getSelectedPcod() != null)
-				rdsl.setOslab(CBOslAb.getSelectedPcod());
-				else rdsl.unsetOslab();
+				rdSlStruct.setOslab(CBOslAb.getSelectedPcod());
+				else rdSlStruct.unsetOslab();
 			if (CBRod.getSelectedPcod() != null)
-				rdsl.setPlrod(CBRod.getSelectedPcod());
-				else rdsl.unsetPlrod();
+				rdSlStruct.setPlrod(CBRod.getSelectedPcod());
+				else rdSlStruct.unsetPlrod();
 			if (CBPrishSn.getSelectedPcod() != null)
-				rdsl.setIshod(CBPrishSn.getSelectedPcod());
-				else rdsl.unsetIshod();
-	System.out.println(rdsl);		
+				rdSlStruct.setIshod(CBPrishSn.getSelectedPcod());
+				else rdSlStruct.unsetIshod();
+	System.out.println(rdSlStruct);		
 		//		JOptionPane.showMessageDialog(FormPostBer.this, "Ошибка обновления");
-				MainForm.tcl.UpdateRdSl(rdsl);
+				MainForm.tcl.UpdateRdSl(rdSlStruct);
 			} catch (KmiacServerException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -307,9 +308,15 @@ try {
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				try {
 				dinform = new FormRdDin();
-						dinform.setVisible(true);
-			}
+				dinform.setVisible(true);
+					dinform.onConnect();
+				} catch (PatientNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
 		});
 		
 		JButton ButDelete = new JButton("");
@@ -318,7 +325,7 @@ try {
 		ButDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					MainForm.tcl.DeleteRdSl(rdsl.getId(), rdsl.getNpasp());
+					MainForm.tcl.DeleteRdSl(rdSlStruct.getId(), rdSlStruct.getNpasp());
 				} catch (KmiacServerException e) {
 					e.printStackTrace();
 				} catch (TException e) {
@@ -457,7 +464,7 @@ try {
 		JLabel LpolJ = new JLabel("Половая жизнь со скольки лет");
 		
 		 CBKontr = new JCheckBox("Контрацепция");
-//		CBKontr.setSelected(rdsl.kont == true);
+//		CBKontr.setSelected(rdSlStruct.kont == true);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(212, 208, 200));
@@ -481,27 +488,21 @@ try {
 
 		SVes = new JSpinner();
 		SVes.setModel(new SpinnerNumberModel(0.0, 0.0, 250.0, 1.0));
-//		rdsl.setVesd((int) SVes.getModel().getValue());
 		
 		SDsp = new JSpinner();
-		SDsp.setModel(new SpinnerNumberModel(0, 0, 27, 1));
-//		rdsl.setDsp((int) SDsp.getModel().getValue());
+		SDsp.setModel(new SpinnerNumberModel(0, 0, 30, 1));
 		
 		SDcr = new JSpinner();
 		SDcr.setModel(new SpinnerNumberModel(0, 0, 30, 1));
-//		rdsl.setDsr((int) SDcr.getModel().getValue());
 		
 		SDtroch = new JSpinner();
 		SDtroch.setModel(new SpinnerNumberModel(0,0,33,1));
-//		rdsl.setDTroch((int) SDtroch.getModel().getValue());
 		
 		SCext = new JSpinner();
-		SCext.setModel(new SpinnerNumberModel(0,0, 35, 1));
-//		rdsl.setCext((int) SCext.getModel().getValue());
+		SCext.setModel(new SpinnerNumberModel(0, 0, 35, 1));
 		
 		SindSol = new JSpinner();
 		SindSol.setModel(new SpinnerNumberModel(0, 0, 20,1));
-//		rdsl.setIndsol((int) SindSol.getModel().getValue());
 		
 		CBKrov = new JCheckBox("Кровотечение");
 		CBKrov.setSelected(or1 == 1);
@@ -577,11 +578,9 @@ try {
 		
 		SParRod = new JSpinner();
 		SParRod.setModel(new SpinnerNumberModel(0, 0, 20, 1));
-//		rdsl.setKolrod((int) SParRod.getModel().getValue());
 		
 		SKolBer = new JSpinner();
 		SKolBer.setModel(new SpinnerNumberModel(0, 0, 50, 1));
-//		rdsl.setShet((int) SKolBer.getModel().getValue());
 		
 		SDataOsl = new CustomDateEditor();
 		
@@ -594,9 +593,9 @@ try {
 		SYavka.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
-			/*	if (rdsl.getDataZs() = null)*/ {
-		        rdsl.setDataZs(rdsl.getDatay()+(280-(rdsl.getYavka1()*7))*864*100000);
-			SDataRod.setDate(rdsl.getDataZs());}
+			/*	if (rdSlStruct.getDataZs() = null)*/ {
+		        rdSlStruct.setDataZs(rdSlStruct.getDatay()+(280-(rdSlStruct.getYavka1()*7))*864*100000);
+			SDataRod.setDate(rdSlStruct.getDataZs());}
 			}
 		});
 		SYavka.setModel(new SpinnerNumberModel(0,0, 40,1));
@@ -605,15 +604,15 @@ try {
 		
 		SKolAb = new JSpinner();
 		SKolAb.setModel(new SpinnerNumberModel(0, 0, 50, 1));
-//		rdsl.setAbort((int) SKolAb.getModel().getValue());
+//		rdSlStruct.setAbort((int) SKolAb.getModel().getValue());
 		
 		SVozMen = new JSpinner();
 		SVozMen.setModel(new SpinnerNumberModel(8 , 8, 30, 1));
-//		rdsl.setVozmen((int) SVozMen.getModel().getValue());
+//		rdSlStruct.setVozmen((int) SVozMen.getModel().getValue());
 		
 		SMenC = new JSpinner();
 		SMenC.setModel(new SpinnerNumberModel(20, 20,  60, 1));
-//		rdsl.setPrmen((int) SMenC.getModel().getValue());
+//		rdSlStruct.setPrmen((int) SMenC.getModel().getValue());
 		
 		SKolDet = new JSpinner();
 		SKolDet.setModel(new SpinnerNumberModel(0, 0, 20, 1));
@@ -893,6 +892,7 @@ try {
 		JLabel lblCvera = new JLabel("C.vera");
 		
 		SCDiag = new JSpinner();
+		SCDiag.setModel(new SpinnerNumberModel(new Integer(0), null, null, new Integer(1)));
 		
 		SCvera = new JSpinner();
 		
@@ -994,33 +994,33 @@ try {
 	private void setDefaultValues() {
 		// TODO Auto-generated method stub
 	try {
-		rdsl.setId_pvizit(Vvod.zapVr.getId_pvizit());
-		rdsl.setNpasp(Vvod.zapVr.getNpasp());
-		rdsl.setCext(25);
-		rdsl.setDsp(25);
-		rdsl.setDsr(28);
-		rdsl.setDTroch(31);
-		rdsl.setIndsol(15);
-		rdsl.setKolrod(0);
-		rdsl.setShet(1);
-		rdsl.setAbort(0);
-		rdsl.setDeti(0);
-		rdsl.setRost(160);
-		rdsl.setYavka1(4);
-		rdsl.setVozmen(11);
-		rdsl.setPrmen(28);
-		rdsl.setPolj(18);
-		rdsl.setCdiagt(5);
-		rdsl.setCvera(11);
-		rdsl.setVesd(60);
-		rdsl.setOslab("");
-		rdsl.setPrrod("");
-		rdsl.setDataM(System.currentTimeMillis());
-		rdsl.setDatay(System.currentTimeMillis());
-		rdsl.setDataosl(System.currentTimeMillis());
-		rdsl.setDatasn(System.currentTimeMillis());
-		rdsl.setDataz(System.currentTimeMillis());
-        rdsl.setDataZs(System.currentTimeMillis()+217728*100000);
+		rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
+		rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
+		rdSlStruct.setCext(25);
+		rdSlStruct.setDsp(25);
+		rdSlStruct.setDsr(28);
+		rdSlStruct.setDTroch(31);
+		rdSlStruct.setIndsol(15);
+		rdSlStruct.setKolrod(0);
+		rdSlStruct.setShet(1);
+		rdSlStruct.setAbort(0);
+		rdSlStruct.setDeti(0);
+		rdSlStruct.setRost(160);
+		rdSlStruct.setYavka1(4);
+		rdSlStruct.setVozmen(11);
+		rdSlStruct.setPrmen(28);
+		rdSlStruct.setPolj(18);
+		rdSlStruct.setCdiagt(5);
+		rdSlStruct.setCvera(11);
+		rdSlStruct.setVesd(60);
+		rdSlStruct.setOslab("");
+		rdSlStruct.setPrrod("");
+		rdSlStruct.setDataM(System.currentTimeMillis());
+		rdSlStruct.setDatay(System.currentTimeMillis());
+		rdSlStruct.setDataosl(System.currentTimeMillis());
+		rdSlStruct.setDatasn(System.currentTimeMillis());
+		rdSlStruct.setDataz(System.currentTimeMillis());
+        rdSlStruct.setDataZs(System.currentTimeMillis()+217728*100000);
 		Calendar cal1 = Calendar.getInstance();
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
@@ -1032,66 +1032,66 @@ try {
 	}
 
 	private void setPostBerData() {
-		//SRost.setValue(rdsl.getRost());
+		//SRost.setValue(rdSlStruct.getRost());
 		try {
-			SVes.setValue(rdsl.getVesd());
-			SDsp.setValue(rdsl.getDsp());
-			SDcr.setValue(rdsl.getDsr());
-			SDtroch.setValue(rdsl.getDTroch());
-			SCext.setValue(rdsl.getCext());
-			SindSol.setValue(rdsl.getIndsol());
-			SDataPos.setDate(rdsl.getDatay());
-			if (rdsl.getDatay() == 0)
+			SVes.setValue(rdSlStruct.getVesd());
+			SDsp.setValue(rdSlStruct.getDsp());
+			SDcr.setValue(rdSlStruct.getDsr());
+			SDtroch.setValue(rdSlStruct.getDTroch());
+			SCext.setValue(rdSlStruct.getCext());
+			SindSol.setValue(rdSlStruct.getIndsol());
+			SDataPos.setDate(rdSlStruct.getDatay());
+			if (rdSlStruct.getDatay() == 0)
 			SDataPos.setText(null);
-			TDataSn.setDate(rdsl.getDatasn());
-			if (rdsl.getDatasn() == 0)
+			TDataSn.setDate(rdSlStruct.getDatasn());
+			if (rdSlStruct.getDatasn() == 0)
 			TDataSn.setText(null);
-			SDataRod.setDate(rdsl.getDataZs());
-			if (rdsl.getDataZs() == 0)
+			SDataRod.setDate(rdSlStruct.getDataZs());
+			if (rdSlStruct.getDataZs() == 0)
 			SDataRod.setText(null);
-			SDataSert.setDate(rdsl.getDatasert());
-			if (rdsl.getDatasert() == 0)
+			SDataSert.setDate(rdSlStruct.getDatasert());
+			if (rdSlStruct.getDatasert() == 0)
 			SDataSert.setText(null);
-			TSSert.setText(rdsl.ssert);
-			TNSert.setText(rdsl.nsert);
-			SParRod.setValue(rdsl.getKolrod());
-			SKolBer.setValue(rdsl.getShet());
-			TDataab.setDate(rdsl.getDataab());
-			if (rdsl.getDataab() == 0)
+			TSSert.setText(rdSlStruct.ssert);
+			TNSert.setText(rdSlStruct.nsert);
+			SParRod.setValue(rdSlStruct.getKolrod());
+			SKolBer.setValue(rdSlStruct.getShet());
+			TDataab.setDate(rdSlStruct.getDataab());
+			if (rdSlStruct.getDataab() == 0)
 			TDataab.setText(null);
-			SDataSert.setDate(rdsl.getDatasert());
-			if (rdsl.getDatasert() == 0)
+			SDataSert.setDate(rdSlStruct.getDatasert());
+			if (rdSlStruct.getDatasert() == 0)
 			SDataSert.setText(null);
-			TSSert.setText(rdsl.ssert);
-			TNSert.setText(rdsl.nsert);
-			TPrRod.setText(rdsl.prrod);
-			SParRod.setValue(rdsl.getKolrod());
-			SKolBer.setValue(rdsl.getShet());
-			SDataOsl.setDate(rdsl.getDataosl());
-			SYavka.setValue(rdsl.getYavka1());
-			SRost.setValue(rdsl.getRost());
-			SDataM.setDate(rdsl.getDataM());
-			if (rdsl.getDataM() == 0)
+			TSSert.setText(rdSlStruct.ssert);
+			TNSert.setText(rdSlStruct.nsert);
+			TPrRod.setText(rdSlStruct.prrod);
+			SParRod.setValue(rdSlStruct.getKolrod());
+			SKolBer.setValue(rdSlStruct.getShet());
+			SDataOsl.setDate(rdSlStruct.getDataosl());
+			SYavka.setValue(rdSlStruct.getYavka1());
+			SRost.setValue(rdSlStruct.getRost());
+			SDataM.setDate(rdSlStruct.getDataM());
+			if (rdSlStruct.getDataM() == 0)
 			SDataM.setText(null);
-			SKolAb.setValue(rdsl.getAbort());
-			SVozMen.setValue(rdsl.getVozmen());
-			SMenC.setValue(rdsl.getPrmen());
-			SKolDet.setValue(rdsl.getDeti());
-			SPolJ.setValue(rdsl.getPolj());
-			SSrokA.setValue(rdsl.getSrokab());
-			SCDiag.setValue(rdsl.getCdiagt());
-			SCvera.setValue(rdsl.getCvera());
-			oslrod = rdsl.getOslrod();
-			if(rdsl.isSetOslab())
-			CBOslAb.setSelectedPcod(rdsl.getOslab());
+			SKolAb.setValue(rdSlStruct.getAbort());
+			SVozMen.setValue(rdSlStruct.getVozmen());
+			SMenC.setValue(rdSlStruct.getPrmen());
+			SKolDet.setValue(rdSlStruct.getDeti());
+			SPolJ.setValue(rdSlStruct.getPolj());
+			SSrokA.setValue(rdSlStruct.getSrokab());
+			SCDiag.setValue(rdSlStruct.getCdiagt());
+			SCvera.setValue(rdSlStruct.getCvera());
+			oslrod = rdSlStruct.getOslrod();
+			if(rdSlStruct.isSetOslab())
+			CBOslAb.setSelectedPcod(rdSlStruct.getOslab());
 			else CBOslAb.setSelectedItem(null);
-			if (rdsl.isSetPlrod())
-			CBRod.setSelectedPcod(rdsl.getPlrod());
+			if (rdSlStruct.isSetPlrod())
+			CBRod.setSelectedPcod(rdSlStruct.getPlrod());
 			else CBRod.setSelectedItem(null);
-			if (rdsl.isSetIshod())
-			CBPrishSn.setSelectedPcod(rdsl.getIshod());
+			if (rdSlStruct.isSetIshod())
+			CBPrishSn.setSelectedPcod(rdSlStruct.getIshod());
 			else CBPrishSn.setSelectedItem(null);
-			TNKart.setText(String.valueOf(rdsl.getId()));
+			TNKart.setText(String.valueOf(rdSlStruct.getId()));
 			method2();
 			CBKrov.setSelected(or1 == 1);
 			CBEkl.setSelected(or2 == 1);
@@ -1101,7 +1101,7 @@ try {
 			CBAkush.setSelected(or6 == 1);
 			CBIiiiv.setSelected(or7 == 1);
 			CBRazrProm.setSelected(or8 == 1);
-			CBKontr.setSelected(rdsl.isKont());
+			CBKontr.setSelected(rdSlStruct.isKont());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
