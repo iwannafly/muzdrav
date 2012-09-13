@@ -107,7 +107,7 @@ public class DocumentPrinter {
 		if (msOfficePath.length() > 0)
 			execCmd = String.format("\"%s\" \"%s\"", msOfficePath, path);
 		if (libreOfficePath.length() > 0)
-			execCmd = String.format("\"%s\" \"%s\"", libreOfficePath, path);
+			execCmd = String.format("%s %s", libreOfficePath, path.replaceAll(" ", "\\\\ "));
 		
 		try {
 			Runtime.getRuntime().exec(execCmd);
@@ -122,7 +122,7 @@ public class DocumentPrinter {
 		if (msOfficePath.length() > 0)
 			execCmd = String.format("\"%s\" \"%s\" /mFilePrintDefault /mFileExit", msOfficePath, path);
 		if (libreOfficePath.length() > 0)
-			execCmd = String.format("\"%s\" -p \"%s\"", libreOfficePath, path);
+			execCmd = String.format("%s -p %s", libreOfficePath, path.replaceAll(" ", "\\\\ "));
 		
 		try {
 			Runtime.getRuntime().exec(execCmd);

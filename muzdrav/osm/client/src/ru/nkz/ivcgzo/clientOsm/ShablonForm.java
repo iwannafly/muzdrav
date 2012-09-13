@@ -43,6 +43,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
+import java.awt.Font;
 
 public class ShablonForm  extends JDialog {
 	private static final long serialVersionUID = -6616098681222163927L;
@@ -155,6 +156,7 @@ public class ShablonForm  extends JDialog {
 		);
 		
 		tbView = new JTextArea();
+		tbView.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbView.setWrapStyleWord(true);
 		tbView.setLineWrap(true);
 		tbView.setEditable(false);

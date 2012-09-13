@@ -185,12 +185,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			try {
 				//table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
 				table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
-				if (pInf == null)
-					pInf = new PInfo();
 				if (vvod == null) {
 					vvod = new Vvod();
 					addChildFrame(vvod);
 				}
+				if (pInf == null)
+					pInf = new PInfo();
+				
 				vvod.onConnect();
 			} catch (KmiacServerException | ParseException e) {
 				// TODO Auto-generated catch block
