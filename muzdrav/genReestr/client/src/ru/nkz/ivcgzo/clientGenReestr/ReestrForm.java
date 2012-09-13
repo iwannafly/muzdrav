@@ -19,6 +19,7 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
 
 public class ReestrForm extends JFrame {
@@ -26,7 +27,7 @@ public class ReestrForm extends JFrame {
 	private SettingsForm sfrm;
 
 	public ReestrForm() {
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
+		//setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle(configuration.appName+" за отчетный период");
 		
@@ -102,10 +103,17 @@ public class ReestrForm extends JFrame {
 
 	public void onConnect() {
 //		try {
-//		
+//			System.out.println(MainForm.authInfo.getCslu());
+//			System.out.println(Integer.toString(MainForm.authInfo.getCpodr()).length());
+//			System.out.println(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+//			if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr());
+//			if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr());
 //		} catch (TException e) {
 //			e.printStackTrace();
 //			MainForm.conMan.reconnect(e);
+//		} catch (KmiacServerException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
 //		}
 	}
 }

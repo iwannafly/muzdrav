@@ -52,6 +52,7 @@ import ru.nkz.ivcgzo.thriftOsm.Psign;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 import java.awt.Dimension;
 
@@ -66,6 +67,7 @@ public class PInfo extends JFrame {
 	private int npasp;
 
 	public PInfo() {
+		setTitle("Просмотр информации на пациента");
 		setBounds(100, 100, 822, 732);
 		
 		JSplitPane splitpinfo = new JSplitPane();
@@ -133,7 +135,7 @@ public class PInfo extends JFrame {
 		
 		
 		
-		treeinfo = new JTree(createNodes());
+		treeinfo = new JTree(createNodes(2));
 		 treeinfo.setFont(new Font("Arial", Font.PLAIN, 12));
 		 treeinfo.addTreeSelectionListener(new TreeSelectionListener() {
 		 	public void valueChanged(TreeSelectionEvent e) {
@@ -433,12 +435,12 @@ public class PInfo extends JFrame {
 	public void update(int npasp) {
 		this.npasp = npasp;
 		
-		treeinfo.setModel(new DefaultTreeModel(createNodes()));
+		treeinfo.setModel(new DefaultTreeModel(createNodes(Vvod.zapVr.pol)));
 		
 		setVisible(true);
 	}
 	
-	private DefaultMutableTreeNode createNodes() {
+	private DefaultMutableTreeNode createNodes(int pol) {
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
 		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
 		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
@@ -449,6 +451,7 @@ public class PInfo extends JFrame {
 		root.add(signinfo);
 		root.add(posinfo);
 		root.add(diaginfo);
+		if (pol!=1)
 		root.add(berinfo);
 		
 		try {

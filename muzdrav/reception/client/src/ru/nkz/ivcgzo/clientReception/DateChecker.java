@@ -12,7 +12,7 @@ public class DateChecker {
     /**
      * Календарь для формирования таблиц талонов
      */
-    GregorianCalendar calend;
+    private GregorianCalendar calend;
     /**
      * Массив дней недели, отображаемой в таблице талонов
      */

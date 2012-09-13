@@ -76,6 +76,7 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import java.awt.Font;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -147,6 +148,7 @@ public class Vvod extends JFrame {
 	private FormSign sign;
 	private FormPostBer postber;
 	private ShablonForm shablonform;
+	 private FormRdDin dinform;
 	
 	/**
 	 * Create the dialog.
@@ -188,10 +190,30 @@ public class Vvod extends JFrame {
 		btnBer = new JButton("Наблюдение за беременными");
 		btnBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				postber.setVisible(true);
+				  JPopupMenu menuBer = new JPopupMenu();
+		            
+		       		JMenuItem mb1 = new JMenuItem("Постановка на учет по беременности");
+		       		mb1.addActionListener(new ActionListener() {
+		       			@Override
+		       			public void actionPerformed(ActionEvent arg0) {
+		       				postber.setVisible(true);	
+		       			}
+		       		});
+		       		menuBer.add(mb1);
+		       		
+					JMenuItem mb2 = new JMenuItem("Динамическое наблюдение за беременными");
+					mb2.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							dinform = new FormRdDin();
+							dinform.setVisible(true);
+						}
+		});
+					menuBer.add(mb2);
+					
+					menuBer.show(btnBer, 0, btnBer.getHeight());
 			}
 		});
-		
 		btnPrint = new JButton("Печатные формы");
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -211,6 +233,7 @@ public class Vvod extends JFrame {
        						String servPath = MainForm.tcl.printProtokol(protokol);
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+       						MainForm.conMan.openFileInEditor(cliPath, true);
 	       				}
 	       				catch (TException e1) {
 	       					e1.printStackTrace();
@@ -237,7 +260,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printVypis(vp);
 							String cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);
-
+       						MainForm.conMan.openFileInEditor(cliPath, true);
 						}
 						catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
@@ -256,6 +279,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printKek(Vvod.zapVr.getNpasp(), tblPos.getSelectedItem().id_obr);
 								String cliPath = File.createTempFile("kek", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	       						MainForm.conMan.openFileInEditor(cliPath, true);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -275,6 +299,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
 								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	       						MainForm.conMan.openFileInEditor(cliPath, true);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -438,6 +463,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbJal = new JTextArea();
+		tbJal.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbJal.setLineWrap(true);
 		tbJal.setWrapStyleWord(true);
 		spJal.setViewportView(tbJal);
@@ -464,6 +490,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbAnam = new JTextArea();
+		tbAnam.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbAnam.setLineWrap(true);
 		tbAnam.setWrapStyleWord(true);
 		spAnam.setViewportView(tbAnam);
@@ -545,6 +572,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbStat = new JTextArea();
+		tbStat.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbStat.setWrapStyleWord(true);
 		tbStat.setLineWrap(true);
 		spStat.setViewportView(tbStat);
@@ -572,6 +600,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbFiz = new JTextArea();
+		tbFiz.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbFiz.setLineWrap(true);
 		tbFiz.setWrapStyleWord(true);
 		spFiz.setViewportView(tbFiz);
@@ -598,6 +627,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbLoc = new JTextArea();
+		tbLoc.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbLoc.setLineWrap(true);
 		tbLoc.setWrapStyleWord(true);
 		spLoc.setViewportView(tbLoc);
@@ -1126,6 +1156,7 @@ public class Vvod extends JFrame {
 		pnlDiagStat.setLayout(gl_pnlDiagStat);
 		
 		tbDiagOpis = new JTextArea();
+		tbDiagOpis.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		spDiagOpis.setViewportView(tbDiagOpis);
 		pnlDiag.setLayout(gl_pnlDiag);
 		
@@ -1150,6 +1181,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbLech = new JTextArea();
+		tbLech.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbLech.setLineWrap(true);
 		tbLech.setWrapStyleWord(true);
 		spLech.setViewportView(tbLech);
@@ -1267,6 +1299,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printIsslMetod(isslmet);
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 					}
 				}
@@ -1386,8 +1419,9 @@ public class Vvod extends JFrame {
 						naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
 						naprkons.setClpu_name(MainForm.authInfo.getClpu_name());
 						String servPath = MainForm.tcl.printNaprKons(naprkons);
-						String cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
+						String cliPath = File.createTempFile("napk", ".htm").getAbsolutePath();
 						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+   						MainForm.conMan.openFileInEditor(cliPath, false);
 					}
 					else {
 						Napr napr = new Napr();
@@ -1405,6 +1439,7 @@ public class Vvod extends JFrame {
 						String servPath = MainForm.tcl.printNapr(napr);
 						String cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
 						MainForm.conMan.transferFileFromServer(servPath, cliPath);	
+   						MainForm.conMan.openFileInEditor(cliPath, false);
 					}
 				}
 				catch (TException e1) {
@@ -1457,6 +1492,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbKonsObosnov = new JTextArea();
+		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbKonsObosnov.setLineWrap(true);
 		tbKonsObosnov.setWrapStyleWord(true);
 		spKonsObosnov.setViewportView(tbKonsObosnov);
@@ -1484,6 +1520,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tbOcen = new JTextArea();
+		tbOcen.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbOcen.setLineWrap(true);
 		tbOcen.setWrapStyleWord(true);
 		spOcen.setViewportView(tbOcen);
@@ -1538,11 +1575,13 @@ public class Vvod extends JFrame {
 		);
 		
 		tbZaklRek = new JTextArea();
+		tbZaklRek.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbZaklRek.setLineWrap(true);
 		tbZaklRek.setWrapStyleWord(true);
 		spZaklRek.setViewportView(tbZaklRek);
 		
 		tbZakl = new JTextArea();
+		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
@@ -1628,6 +1667,7 @@ public class Vvod extends JFrame {
 				pvizitAmb.setId_obr(pvizit.getId());
 				pvizitAmb.setNpasp(zapVr.getNpasp());
 				pvizitAmb.setDatap(System.currentTimeMillis());
+				pvizitAmb.setDataz(System.currentTimeMillis());
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 				
@@ -1781,7 +1821,11 @@ public class Vvod extends JFrame {
 					if (cmbVidOpl.getSelectedPcod() != null)
 						pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
 					else pvizitAmb.unsetOpl();
-
+					for (PdiagAmb pd : tblDiag.getData()) {
+						if (pd.diag_stat==1) {
+							pvizitAmb.setDiag(pd.getDiag());}
+					}
+					
 					
 					MainForm.tcl.setPriem(priem);
 					MainForm.tcl.setAnamZab(anamZab);
