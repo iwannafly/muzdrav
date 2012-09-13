@@ -77,6 +77,8 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
+import java.awt.Component;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -534,7 +536,7 @@ public class PacientInfoFrame extends JFrame {
 				    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase().trim());
 				    PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase().trim());
 				    PersonalInfo.setNamemr(tfMrname.getText().toUpperCase().trim());
-				    PersonalInfo.setMrab(tfMr.getText().toUpperCase().trim());
+				    if (!tfMr.getText().isEmpty()) PersonalInfo.setMrab(Integer.valueOf(tfMr.getText()));
 				    PersonalInfo.setProf(tfDolj.getText().trim());
 				    PersonalInfo.setTel(tfTel.getText().trim());
 				    PersonalInfo.setSnils(tf_Snils.getText().toUpperCase().trim());
@@ -696,19 +698,19 @@ public class PacientInfoFrame extends JFrame {
 		panel_2.setBorder(new TitledBorder(null, "Общая информация", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_3 = new JPanel();
-		panel_3.setBorder(new TitledBorder(null, "\u0410\u0434\u0440\u0435\u0441", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_3.setBorder(new TitledBorder(null, "Адрес", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "\u041C\u0435\u0434\u0438\u0446\u0438\u043D\u0441\u043A\u0438\u0439 \u043F\u043E\u043B\u0438\u0441", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBorder(new TitledBorder(null, "Медицинский полис", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new TitledBorder(null, "\u041C\u0435\u0441\u0442\u043E \u0440\u0430\u0431\u043E\u0442\u044B", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_5.setBorder(new TitledBorder(null, "Место работы", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new TitledBorder(null, "\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_6.setBorder(new TitledBorder(null, "Прикрепление", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_7 = new JPanel();
-		panel_7.setBorder(new TitledBorder(null, "\u0414\u043E\u043A\u0443\u043C\u0435\u043D\u0442, \u0443\u0434\u043E\u0441\u0442\u043E\u0432\u0435\u0440\u044F\u044E\u0449\u0438\u0439 \u043B\u0438\u0447\u043D\u043E\u0441\u0442\u044C", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_7.setBorder(new TitledBorder(null, "Документ, удостоверяющий личность", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_tpPersonal = new GroupLayout(tpPersonal);
 		gl_tpPersonal.setHorizontalGroup(
 			gl_tpPersonal.createParallelGroup(Alignment.TRAILING)
@@ -716,19 +718,17 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_tpPersonal.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_tpPersonal.createSequentialGroup()
-							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addContainerGap())
-						.addGroup(gl_tpPersonal.createSequentialGroup()
 							.addGroup(gl_tpPersonal.createParallelGroup(Alignment.LEADING)
-								.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-								.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 916, Short.MAX_VALUE))
-							.addGap(43))
-						.addGroup(gl_tpPersonal.createSequentialGroup()
-							.addGroup(gl_tpPersonal.createParallelGroup(Alignment.LEADING)
-								.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 916, Short.MAX_VALUE)
 								.addComponent(panel_6, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
-								.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE))
-							.addGap(43))))
+								.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 916, Short.MAX_VALUE)
+								.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 949, Short.MAX_VALUE))
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_tpPersonal.createSequentialGroup()
+							.addGroup(gl_tpPersonal.createParallelGroup(Alignment.TRAILING)
+								.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 949, Short.MAX_VALUE)
+								.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 949, Short.MAX_VALUE)
+								.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		gl_tpPersonal.setVerticalGroup(
 			gl_tpPersonal.createParallelGroup(Alignment.LEADING)
@@ -832,6 +832,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap())
 		);
 		panel_7.setLayout(gl_panel_7);
+		panel_7.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tf_serdoc, tf_nomdoc, cmb_tdoc, tf_Odoc, tf_datadoc, tf_Snils}));
 		
 		tf_Cpol = new JTextField();
 		tf_Cpol.addMouseListener(new MouseAdapter() {
@@ -918,6 +919,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_6.setLayout(gl_panel_6);
+		panel_6.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tf_Cpol, tf_Nuch, tf_Nambk, tf_datapr, tf_dataot, cmb_ishod}));
 		JLabel lblNewLabel_19 = new JLabel("Должность");
 		JLabel lblNewLabel_20 = new JLabel("Телефон");
 		
@@ -933,7 +935,7 @@ public class PacientInfoFrame extends JFrame {
 					
 					if (res != null) {
 	       				tfMr.setText(Integer.toString(res.pcod));
-	       				PersonalInfo.setMrab(res.name);
+	       				PersonalInfo.setMrab(res.pcod);
 	       				tfMrname.setText(res.name);
 	       				
 					}
@@ -984,6 +986,7 @@ public class PacientInfoFrame extends JFrame {
 					.addGap(0, 0, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
+		panel_5.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tfMr, tfMrname, tfDolj, tfTel}));
 		
 		JLabel lblNewLabel_12 = new JLabel("Серия");
 		JLabel lblNewLabel_13 = new JLabel("ОМС");
@@ -1068,6 +1071,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_4.setLayout(gl_panel_4);
+		panel_4.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tf_oms_ser, tf_oms_nom, cmb_oms_doc, cmb_oms_smo, tf_dms_ser, tf_dms_nom, cmb_dms_smo}));
 		
 		JLabel lblNewLabel_5 = new JLabel("Прописка");
 		JLabel lblNewLabel_6 = new JLabel("Проживает");
@@ -1176,6 +1180,7 @@ public class PacientInfoFrame extends JFrame {
 					.addGap(28))
 		);
 		panel_3.setLayout(gl_panel_3);
+		panel_3.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{cmb_adp_obl, cmb_adp_gorod, cmb_adp_ul, cmb_adp_dom, tf_Adp_kv, cmb_adm_obl, cmb_adm_gorod, cmb_adm_ul, cmb_adm_dom, tf_Adm_kv}));
 		
 		tfFam = new JTextField();
 		tfFam.setColumns(10);
@@ -1211,16 +1216,16 @@ public class PacientInfoFrame extends JFrame {
 						.addComponent(lblNewLabel_1)
 						.addComponent(lblNewLabel_2)
 						.addComponent(lblNewLabel_3))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(tfDr)
+						.addComponent(tfDr, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(tfOt)
-						.addComponent(tfIm)
-						.addComponent(tfFam, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE))
-					.addGap(46)
+						.addComponent(tfIm, GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+						.addComponent(tfFam, GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE))
+					.addGap(90)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblNewLabel_4, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cmb_status, GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+						.addComponent(cmb_status, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
 						.addGroup(gl_panel_2.createSequentialGroup()
 							.addComponent(lblPol)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -1238,16 +1243,16 @@ public class PacientInfoFrame extends JFrame {
 						.addComponent(lblNewLabel_4))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-						.addComponent(tfIm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel_2)
-						.addComponent(cmb_status, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cmb_status, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tfIm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(6)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-						.addComponent(tfOt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel_3)
 						.addComponent(lblPol)
 						.addComponent(rbtn_pol_m)
-						.addComponent(rbtn_pol_j))
+						.addComponent(rbtn_pol_j)
+						.addComponent(tfOt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(6)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
@@ -1255,6 +1260,7 @@ public class PacientInfoFrame extends JFrame {
 					.addContainerGap(2, Short.MAX_VALUE))
 		);
 		panel_2.setLayout(gl_panel_2);
+		panel_2.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tfFam, tfIm, tfOt, tfDr, rbtn_pol_m, rbtn_pol_j, cmb_status}));
 		tpPersonal.setLayout(gl_tpPersonal);
 		
 		JPanel tpLgota = new JPanel();
@@ -3098,8 +3104,8 @@ public class PacientInfoFrame extends JFrame {
             if (PersonalInfo.getNamemr() != null){
                 tfMrname.setText(PersonalInfo.namemr.trim());
             }
-            if (PersonalInfo.getMrab() != null){
-                tfMr.setText(PersonalInfo.mrab.trim());
+            if (PersonalInfo.getMrab() != 0){
+                tfMr.setText(Integer.toString(PersonalInfo.getMrab()));
             }
             if (PersonalInfo.getProf() != null){
                 tfDolj.setText(PersonalInfo.prof.trim());
