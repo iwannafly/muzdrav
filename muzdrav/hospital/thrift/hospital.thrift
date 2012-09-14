@@ -16,12 +16,6 @@ struct TSimplePatient{
 	10:optional i32 nist;
 }
 
-struct TAddress{
-	1:string city;
-	2:string street;
-	3:string house;
-}
-
 struct TPatient{
 	1:i32 patientId;
 	2:i32 gospitalCod;
@@ -38,6 +32,25 @@ struct TPatient{
 	13:i32 chamber;
 	14:string registrationAddress;
 	15:string realAddress;	
+}
+
+struct TPriemInfo {
+	1:string pl_extr;
+	2:i64 datap;
+	3:i64 dataosm;
+	4:string naprav;
+	5:string nOrg;
+	6:string diagN;
+	7:string diagNtext;
+	8:string diagP;
+	9:string diagPtext;
+	10:string t0c;
+	11:string ad;
+	12:bool nal_z;
+	13:bool nal_p;
+	14:i32 alkg;
+	15:string vid_tran;
+	16:string jalob;
 }
 
 struct TDoctor{
@@ -125,12 +138,20 @@ exception ComplaintNotFoundException {
 exception DiagnosisNotFoundException {
 }
 
+/*
+ * Информация из приёмного отделения не найдена
+ */
+exception PriemInfoNotFoundException {
+}
+
 service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TSimplePatient> getAllPatientForDoctor(1:i32 doctorId, 2:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
 	list<TSimplePatient> getAllPatientFromOtd(1:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);	
 	TPatient getPatientPersonalInfo(1:i32 patientId) throws (1:PatientNotFoundException pnfe,
+		2:kmiacServer.KmiacServerException kse);
+	TPriemInfo getPriemInfo(1:i32 id_gosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
 	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
 	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId);	

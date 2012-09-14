@@ -107,7 +107,7 @@ public class MainFrame extends JFrame {
                         if (frmPatientSelect.getCurrentPatient() != null) {
                             try {
                                 patient = ClientHospital.tcl.getPatientPersonalInfo(
-                                        frmPatientSelect.getCurrentPatient().getPatientId());
+                                    frmPatientSelect.getCurrentPatient().getPatientId());
                                 fillPersonalInfoTextFields();
                             } catch (PatientNotFoundException e) {
                                 JOptionPane.showMessageDialog(null,
@@ -244,6 +244,17 @@ public class MainFrame extends JFrame {
         textPane = new JTextPane();
         textPane.setEditable(false);
         pReceptionInfo.add(textPane);
+        textPane.setText(
+            "Обращение в приёмное отделение: " + "плановое/экстренное" + "\n"
+            + "Дата поступления: " + "\n"
+            + "Дата осмотра: " + "\n"
+            + "Кем направлен: " + "\n"
+            + "Диагноз напр. учреждения: " + "\n"
+            + "Диагноз приёмного отделения: " + "\n"
+            + "Состояние пациента:" + "\n"
+            + "Температура:" + "\n"
+            + "Давление:" + "\n"
+        );
     }
 
     public void onConnect() {
