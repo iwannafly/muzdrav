@@ -173,7 +173,7 @@ public class PInfo extends JFrame {
 		 				addLineToDetailInfo("Дом (проживание)", info.getAdm_dom());
 		 				addLineToDetailInfo("Корпус (проживание)", info.getAdm_korp());
 		 				addLineToDetailInfo("Квартира (проживание)", info.getAdm_kv());
-		 				//addLineToDetailInfo("Место работы", getValueFromClassifier(Classifiers.n_z43, info.isSetMrab()(), info.getName_mr());
+		 				addLineToDetailInfo("Место работы/учебы", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z43), info.isSetMrab(), info.getMrab()));
 		 				addLineToDetailInfo("Тип места работы", info.getNcex());
 		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_kas), info.isSetPoms_strg(), info.getPoms_strg()));
 		 				addLineToDetailInfo("Тип документа ОМС", info.getPoms_tdoc());
