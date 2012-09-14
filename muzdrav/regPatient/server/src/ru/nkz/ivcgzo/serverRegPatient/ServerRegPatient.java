@@ -110,7 +110,7 @@ public class ServerRegPatient extends Server implements Iface {
     //  datar       pol          jitel        sgrp
         Date.class, Integer.class, Integer.class, Integer.class,
     //  mrab          name_mr       ncex           cpol_pr
-        String.class, String.class, Integer.class, Integer.class,
+        Integer.class, String.class, Integer.class, Integer.class,
     //  terp           tdoc           docser        docnum
         Integer.class, Integer.class, String.class, String.class,
     //  datadoc     odoc          snils         dataz

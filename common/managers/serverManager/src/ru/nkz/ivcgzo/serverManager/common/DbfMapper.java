@@ -130,6 +130,7 @@ public class DbfMapper {
 			hdr.turpleLen += rec.precision;
 			recs.add(rec);
 		}
+		hdr.turpleLen ++;
 		hdr.dataPos = (short) (DbfHeader.hdrLen + (DbfRecord.recLen * recs.size()) + 1);
 	}
 
@@ -139,8 +140,9 @@ public class DbfMapper {
 		
 		datas = new ArrayList<>();
 		while (rs.next()) {
+			buf = new byte[hdr.turpleLen];
+			buf[0] = 32;
 			pos = 1;
-			buf = new byte[hdr.turpleLen + pos];
 			for (int i = 0; i < recs.size(); i++) {
 				DbfRecord rec = recs.get(i);
 				

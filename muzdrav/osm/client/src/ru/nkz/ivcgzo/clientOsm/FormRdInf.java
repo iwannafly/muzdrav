@@ -56,6 +56,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.GridLayout;
 import javax.swing.SwingConstants;
 import javax.swing.ImageIcon;
+import java.awt.Frame;
 
 public class FormRdInf extends JFrame {
 
@@ -117,6 +118,8 @@ public class FormRdInf extends JFrame {
 	 * Create the frame.
 	 */
 	public FormRdInf() {
+		setExtendedState(Frame.MAXIMIZED_BOTH);
+		setAutoRequestFocus(false);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {

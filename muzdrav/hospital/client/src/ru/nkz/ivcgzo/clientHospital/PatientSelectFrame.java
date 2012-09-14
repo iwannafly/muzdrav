@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
@@ -12,10 +13,12 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
+
 import javax.swing.border.MatteBorder;
 import java.awt.Color;
 
-public class PatientSelectFrame extends JFrame {
+public class PatientSelectFrame extends JDialog {
 
     private static final long serialVersionUID = -6475694293017689541L;
     private JTable table;
@@ -23,10 +26,12 @@ public class PatientSelectFrame extends JFrame {
     private JPanel panel;
     private JButton btnSelect;
     private JButton btnCancel;
+    private TSimplePatient currentPatient;
 
     public PatientSelectFrame(final UserAuthInfo authInfo) {
         setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setModalityType(ModalityType.APPLICATION_MODAL);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         addScrollPane(authInfo);
@@ -57,6 +62,14 @@ public class PatientSelectFrame extends JFrame {
         getContentPane().add(panel);
 
         btnSelect = new JButton("Выбрать пациента");
+        btnSelect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
+                        .get(table.convertRowIndexToModel(table.getSelectedRow()));
+                dispose();
+            }
+        });
         panel.add(btnSelect);
         if (table.getRowCount() == 0) {
             btnSelect.setEnabled(false);
@@ -71,5 +84,11 @@ public class PatientSelectFrame extends JFrame {
         });
         panel.add(btnCancel);
     }
+
+    public final TSimplePatient getCurrentPatient() {
+        return currentPatient;
+    }
+
+
 
 }
