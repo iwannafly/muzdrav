@@ -23,9 +23,11 @@ import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.ObjectiveStateNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.SpecialStateNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
+import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
 import ru.nkz.ivcgzo.thriftHospital.TComplaint;
@@ -43,6 +45,7 @@ public class ServerHospital extends Server implements Iface {
     private TServer tServer;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
+    private TResultSetMapper<TPriemInfo, TPriemInfo._Fields> rsmPriemInfo;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmLifeHistory;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmDesiaseHistory;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmState;
@@ -55,6 +58,11 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
         "pdms", "mrab", "npal", "reg_add", "real_add"
+    };
+    private static final String[] PRIEM_INFO_FIELD_NAMES = {
+        "pl_extr", "datap", "dataosm", "naprav",
+        "n_org", "diag_n", "diag_n_text", "diag_p", "diag_p_text",
+        "t0c", "ad", "nal_z", "nal_p", "vid_tran", "alkg", "jalob"
     };
     private static final String[] LIFE_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "vitae", "dataz"
@@ -95,6 +103,7 @@ public class ServerHospital extends Server implements Iface {
         rsmSimplePatient  = new TResultSetMapper<>(
                 TSimplePatient.class, SIMPLE_PATIENT_FIELD_NAMES);
         rsmPatient = new TResultSetMapper<>(TPatient.class, PATIENT_FIELD_NAMES);
+        rsmPriemInfo = new TResultSetMapper<>(TPriemInfo.class, PRIEM_INFO_FIELD_NAMES);
         rsmLifeHistory = new TResultSetMapper<>(TMedicalHistory.class, LIFE_HISTORY_FIELD_NAMES);
         rsmDesiaseHistory = new TResultSetMapper<>(
                 TMedicalHistory.class, DESIASE_HISTORY_FIELD_NAMES);
@@ -158,7 +167,7 @@ public class ServerHospital extends Server implements Iface {
                 + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
-                + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY FAM, IM, OT;";
+                + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, otdNum)) {
             List<TSimplePatient> patientList = rsmSimplePatient.mapToList(acrs.getResultSet());
             if (patientList.size() > 0) {
@@ -209,6 +218,33 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
+        }
+    }
+
+    @Override
+    public final TPriemInfo getPriemInfo(final int idGosp)
+            throws PriemInfoNotFoundException, KmiacServerException {
+        final String sqlQuery = "SELECT n_vgo.name as pl_extr, datap, dataosm, "
+                + "n_k02.name as naprav, n_n00.name as n_org, diag_n, "
+                + "(SELECT name FROM n_c00 WHERE n_c00.pcod = c_gosp.diag_n) "
+                + "as diag_n_text, diag_p, "
+                + "(SELECT name FROM n_c00 WHERE n_c00.pcod = c_gosp.diag_p) as  diag_p_text, "
+                + "t0c, ad, nal_z, nal_p, n_vtr.name as vid_tran, n_alk.name as alkg, jalob "
+                + "FROM c_gosp "
+                + "LEFT JOIN n_k02 ON n_k02.pcod = c_gosp.naprav "
+                + "LEFT JOIN n_n00 ON n_n00.pcod = c_gosp.n_org "
+                + "LEFT JOIN n_alk ON n_alk.pcod = c_gosp.alkg "
+                + "LEFT JOIN n_vtr ON n_vtr.pcod = c_gosp.vid_tran "
+                + "LEFT JOIN n_vgo ON n_vgo.pcod = c_gosp.pl_extr "
+                + "WHERE id = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            if (acrs.getResultSet().next()) {
+                return rsmPriemInfo.map(acrs.getResultSet());
+            } else {
+                throw new PriemInfoNotFoundException();
+            }
+        } catch (SQLException e) {
+            throw new KmiacServerException();
         }
     }
 

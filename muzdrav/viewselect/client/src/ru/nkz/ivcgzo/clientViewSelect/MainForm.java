@@ -40,6 +40,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 //import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientInfoForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
@@ -69,6 +70,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ViewStringClassifierForm strFrm;
 	public ViewPolpTreeForm polpFrm;
 	public ViewMrabTreeForm mrabFrm;
+	public PatientInfoForm infFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -325,6 +327,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		strFrm = new ViewStringClassifierForm();
 		polpFrm = new ViewPolpTreeForm();
 		mrabFrm = new ViewMrabTreeForm();
+		infFrm = new PatientInfoForm();
 	}
 	
 	@Override
@@ -480,6 +483,20 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					} catch (Exception e) {
 						conMan.disconnect(getPort());
 						conMan.setClient(parent);
+					}
+					
+				case 17:
+					setFrame(infFrm);
+					dialog = prepareModal(parent);
+					infFrm.update((int) params[1]);
+					infFrm.setModalityListener();
+					dialog.setVisible(true);
+					try {
+						return infFrm.getResults();
+					} finally {
+						setFrame(frame);
+						infFrm.removeModalityListener();
+						disposeModal();
 					}
 			}}
 		

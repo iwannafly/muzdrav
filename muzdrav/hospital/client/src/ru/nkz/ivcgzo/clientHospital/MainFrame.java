@@ -12,7 +12,9 @@ import javax.swing.JFrame;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
+import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -75,6 +77,7 @@ public class MainFrame extends JFrame {
     private JButton btnUpdateChamber;
     private UserAuthInfo doctorAuth;
     private TPatient patient;
+    private TPriemInfo priemInfo;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -84,8 +87,8 @@ public class MainFrame extends JFrame {
         setTabbedPane();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        pack();
 
+        pack();
     }
 
     private void setMainMenu() {
@@ -107,11 +110,20 @@ public class MainFrame extends JFrame {
                         if (frmPatientSelect.getCurrentPatient() != null) {
                             try {
                                 patient = ClientHospital.tcl.getPatientPersonalInfo(
-                                        frmPatientSelect.getCurrentPatient().getPatientId());
+                                    frmPatientSelect.getCurrentPatient().getPatientId());
                                 fillPersonalInfoTextFields();
+                                priemInfo = ClientHospital.tcl.getPriemInfo(
+                                        patient.getGospitalCod());
+                                System.out.println(patient.getGospitalCod());
+                                fillReceptionPanel();
                             } catch (PatientNotFoundException e) {
                                 JOptionPane.showMessageDialog(null,
-                                    "Персональная инфомация о данном пациенте не найдена",
+                                    "Персональная инфомация о данном пациенте не найдена.",
+                                    "Внимание!", JOptionPane.WARNING_MESSAGE);
+                            } catch (PriemInfoNotFoundException e) {
+                                JOptionPane.showMessageDialog(null,
+                                    "Информация из приёмного отделения"
+                                    + "о данном пациенте не найдена.",
                                     "Внимание!", JOptionPane.WARNING_MESSAGE);
                             } catch (KmiacServerException | TException e) {
                                 e.printStackTrace();
@@ -244,6 +256,48 @@ public class MainFrame extends JFrame {
         textPane = new JTextPane();
         textPane.setEditable(false);
         pReceptionInfo.add(textPane);
+    }
+
+    private void fillReceptionPanel() {
+        String priemInfoText =
+            "ДОСТУПНАЯ ИНФОРМАЦИЯ О ПАЦИЕНТЕ ИЗ ПРИЁМНОГО ОТДЕЛЕНИЯ:" + "\n\n";
+        if (priemInfo != null) {
+            if (priemInfo.getPl_extr() != null) {
+                priemInfoText += "   " + "Форма обращения в приёмное отделение: "
+                    + priemInfo.getPl_extr() + "\n";
+            }
+            if (priemInfo.getDatap() != 0) {
+                priemInfoText += "   " + "Дата поступления: " + DEFAULT_DATE_FORMAT.format(
+                    priemInfo.getDatap()) + "\n";
+            }
+            if (priemInfo.getDataosm() != 0) {
+                priemInfoText += "   " + "Дата осмотра: " + DEFAULT_DATE_FORMAT.format(
+                    priemInfo.getDataosm()) + "\n";
+            }
+            if ((priemInfo.getNaprav() != null) && (priemInfo.getNOrg() != null)) {
+                priemInfoText += "   " + "Кем направлен: " + priemInfo.getNaprav() + "  "
+                    + priemInfo.getNOrg() + "\n";
+            }
+            if ((priemInfo.getDiagN() != null) && (priemInfo.getDiagNtext() != null)) {
+                priemInfoText += "   " + "Диагноз напр. учреждения: " + priemInfo.getDiagN() + " "
+                    + priemInfo.getDiagNtext() + "\n";
+            }
+            if ((priemInfo.getDiagP() != null) && (priemInfo.getDiagPtext() != null)) {
+                priemInfoText += "   " + "Диагноз приёмного отделения: "
+                    + priemInfo.getDiagP() + " "
+                    + priemInfo.getDiagPtext() + "\n";
+            }
+            if (priemInfo.getT0c() != null) {
+                priemInfoText += "   " + "Температура: " + priemInfo.getT0c() + "\n";
+            }
+            if (priemInfo.getAd() != null) {
+                priemInfoText += "   " + "Давление: " + priemInfo.getAd() + "\n";
+            }
+            if (priemInfo.getJalob() != null) {
+                priemInfoText += "   " + "Жалобы при поступлении: :" + priemInfo.getJalob();
+            }
+        }
+        textPane.setText(priemInfoText);
     }
 
     public void onConnect() {

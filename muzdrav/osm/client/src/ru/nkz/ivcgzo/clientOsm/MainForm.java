@@ -2,6 +2,8 @@ package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,8 +14,8 @@ import java.util.GregorianCalendar;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
@@ -22,16 +24,11 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JCheckBox;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
@@ -39,7 +36,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private JFrame frame;
 	public static  CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
-	public static PInfo pInf;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -130,7 +126,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnView.setVisible(false);
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				pInf.update(table.getSelectedItem().getNpasp());
+				MainForm.conMan.showPatientInfoForm(table.getSelectedItem().getNpasp());
 			}
 		});
 		
@@ -189,8 +185,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					vvod = new Vvod();
 					addChildFrame(vvod);
 				}
-				if (pInf == null)
-					pInf = new PInfo();
 				
 				vvod.onConnect();
 			} catch (KmiacServerException | ParseException e) {
