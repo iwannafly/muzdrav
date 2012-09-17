@@ -410,6 +410,23 @@ struct Shablon {
 	3: list<ShablonText> textList;
 }
 
+struct Pmer{
+	1: i32 id;
+	2: i32 npasp;
+	3: i32 id_pdiag;
+	4: string diag;
+	5: i32 pmer;
+	6: i64 pdat;
+	7: i64 fdat;
+	8: i32 cod_sp;
+	9: i64 dataz;
+	10: i32 prichina;
+	11: i32 rez;
+	12: string cdol;
+	13: i32 id_pvizit;
+	14: i32 id_pos;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -528,4 +545,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getShPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+
+/*DispMer*/
+	list<Pmer> getPmer (1: i32 id_pdiag) throws (1: kmiacServer.KmiacServerException kse);
 }
