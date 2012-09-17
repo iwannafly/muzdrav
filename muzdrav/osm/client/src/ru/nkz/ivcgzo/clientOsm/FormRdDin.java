@@ -1,79 +1,54 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JCheckBox;
-import java.awt.Font;
-import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Calendar;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import java.awt.Color;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-import javax.swing.JOptionPane;
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
-import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
-import ru.nkz.ivcgzo.thriftOsm.Pvizit;
-import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
-import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
-import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.JTextPane;
-import javax.swing.border.BevelBorder;
-
-import org.apache.thrift.TException;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
-import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.UIManager;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JTable;
-import javax.swing.ImageIcon;
-import java.awt.Frame;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 
 public class FormRdDin extends JFrame {
-
+	private static final long serialVersionUID = 553969304358351170L;
 	private JPanel contentPane;
 	private RdDinStruct rddin;
 	public static PvizitAmb pvizitAmb;
 	public static Pvizit pvizit;
-//	private PatientCommonInfo patient;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
     private String oslname;
     private String oslcode;
@@ -687,29 +662,9 @@ public class FormRdDin extends JFrame {
 	System.out.println(rddin);		
 	}
 	public void onConnect() throws PatientNotFoundException {
-		try {
-			PatientCommonInfo inf;
-		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-//						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-fam.setText(inf.getFam());
-im.setText(inf.getIm());
-ot.setText(inf.getOt());
-		    CBDiag.setData(MainForm.tcl.get_n_db6());
-			CBPolPl.setData(MainForm.tcl.get_n_db1());
-			CBPredPl.setData(MainForm.tcl.get_n_db2());
-  	        CBCerd.setData(MainForm.tcl.get_n_db3());
-			CBSerd1.setData(MainForm.tcl.get_n_db4());
-			CBOteki.setData(MainForm.tcl.get_n_db5());
-			
-			
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-			MainForm.conMan.reconnect(e);
-		}
+		fam.setText(Vvod.zapVr.fam);
+		im.setText(Vvod.zapVr.im);
+		ot.setText(Vvod.zapVr.oth);
 	}
 
-	};
-
-
+}
