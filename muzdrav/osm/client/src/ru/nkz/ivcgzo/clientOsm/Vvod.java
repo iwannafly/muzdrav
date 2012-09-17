@@ -184,7 +184,7 @@ public class Vvod extends JFrame {
 		JButton btnProsm = new JButton("Просмотр");
 		btnProsm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainForm.pInf.update(zapVr.getNpasp());
+				MainForm.conMan.showPatientInfoForm(zapVr.getNpasp());
 			}
 		});
 		
@@ -1374,25 +1374,10 @@ public class Vvod extends JFrame {
 		
 		cmbKonsVidNapr = new JComboBox<>();
 		cmbKonsVidNapr.setModel(new DefaultComboBoxModel<>(new String[] {"госпитализацию", "консультацию", "обследование"}));
-		cmbKonsVidNapr.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					if (cmbKonsVidNapr.getSelectedIndex() > 0)
-						cmbKonsMesto.setData(MainForm.tcl.get_n_n00());
-				}
-				 catch (KmiacServerException e1) {
-					e1.printStackTrace();
-				} catch (TException e1) {
-					MainForm.conMan.reconnect(e1);
-				}
-			}
-		});
 		
 		JLabel lblKonsVidNapr = new JLabel("на");
 		
-		cmbKonsMesto = new ThriftIntegerClassifierCombobox<>(true);
+		cmbKonsMesto = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_n00);
 		
 		JLabel lblKonsMesto = new JLabel("Куда");
 		
