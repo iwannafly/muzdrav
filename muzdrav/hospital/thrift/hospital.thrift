@@ -151,7 +151,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);	
 	TPatient getPatientPersonalInfo(1:i32 patientId) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
-	TPriemInfo getPriemInfo(1:i32 id_gosp) throws (1: PriemInfoNotFoundException pinfe,
+	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
 	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
 	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId);	

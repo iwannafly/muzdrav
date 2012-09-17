@@ -60,7 +60,9 @@ public class ServerHospital extends Server implements Iface {
         "pdms", "mrab", "npal", "reg_add", "real_add"
     };
     private static final String[] PRIEM_INFO_FIELD_NAMES = {
-        "pl_extr", ""
+        "pl_extr", "datap", "dataosm", "naprav",
+        "n_org", "diag_n", "diag_n_text", "diag_p", "diag_p_text",
+        "t0c", "ad", "nal_z", "nal_p", "vid_tran", "alkg", "jalob"
     };
     private static final String[] LIFE_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "vitae", "dataz"
@@ -101,6 +103,7 @@ public class ServerHospital extends Server implements Iface {
         rsmSimplePatient  = new TResultSetMapper<>(
                 TSimplePatient.class, SIMPLE_PATIENT_FIELD_NAMES);
         rsmPatient = new TResultSetMapper<>(TPatient.class, PATIENT_FIELD_NAMES);
+        rsmPriemInfo = new TResultSetMapper<>(TPriemInfo.class, PRIEM_INFO_FIELD_NAMES);
         rsmLifeHistory = new TResultSetMapper<>(TMedicalHistory.class, LIFE_HISTORY_FIELD_NAMES);
         rsmDesiaseHistory = new TResultSetMapper<>(
                 TMedicalHistory.class, DESIASE_HISTORY_FIELD_NAMES);
@@ -219,10 +222,10 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final TPriemInfo getPriemInfo(final int id_gosp)
-            throws PriemInfoNotFoundException, KmiacServerException, TException {
-        final String sqlQuery = "SELECT pl_extr, datap, dataosm, n_k02.name as naprav,"
-                + "n_n00.name as n_org, diag_n, "
+    public final TPriemInfo getPriemInfo(final int idGosp)
+            throws PriemInfoNotFoundException, KmiacServerException {
+        final String sqlQuery = "SELECT n_vgo.name as pl_extr, datap, dataosm, "
+                + "n_k02.name as naprav, n_n00.name as n_org, diag_n, "
                 + "(SELECT name FROM n_c00 WHERE n_c00.pcod = c_gosp.diag_n) "
                 + "as diag_n_text, diag_p, "
                 + "(SELECT name FROM n_c00 WHERE n_c00.pcod = c_gosp.diag_p) as  diag_p_text, "
@@ -232,8 +235,17 @@ public class ServerHospital extends Server implements Iface {
                 + "LEFT JOIN n_n00 ON n_n00.pcod = c_gosp.n_org "
                 + "LEFT JOIN n_alk ON n_alk.pcod = c_gosp.alkg "
                 + "LEFT JOIN n_vtr ON n_vtr.pcod = c_gosp.vid_tran "
-                + "WH  ERE id = 3";
-        return null;
+                + "LEFT JOIN n_vgo ON n_vgo.pcod = c_gosp.pl_extr "
+                + "WHERE id = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            if (acrs.getResultSet().next()) {
+                return rsmPriemInfo.map(acrs.getResultSet());
+            } else {
+                throw new PriemInfoNotFoundException();
+            }
+        } catch (SQLException e) {
+            throw new KmiacServerException();
+        }
     }
 
     @Override
