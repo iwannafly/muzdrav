@@ -73,6 +73,8 @@ import java.io.File;
 import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Window.Type;
+import java.awt.Frame;
 
 public class FormPostBer extends JFrame {
     
@@ -149,6 +151,7 @@ public class FormPostBer extends JFrame {
 	 * Create the frame.
 	 */
 	public FormPostBer() {
+		setExtendedState(Frame.MAXIMIZED_BOTH);
 		setTitle("Постановка на учет по беременности");
 		addComponentListener(new ComponentAdapter() {
 			@Override
@@ -304,21 +307,6 @@ try {
 			}
 		});
 		
-		JButton btnNewButton_1 = new JButton("Динамическое наблюдение");
-		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				try {
-				dinform = new FormRdDin();
-				dinform.setVisible(true);
-					dinform.onConnect();
-				} catch (PatientNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
-		});
-		
 		JButton ButDelete = new JButton("");
 		ButDelete.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		ButDelete.setToolTipText("Удалить");
@@ -387,20 +375,18 @@ try {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(button))
+							.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(btnNewButton)
-							.addGap(18)
-							.addComponent(ButSave)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(ButSave)
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(ButDelete)
+							.addGap(22)
+							.addComponent(button)
 							.addGap(18)
-							.addComponent(btnNewButton_1)
-							.addGap(27)
 							.addComponent(BPeshOK)))
-					.addContainerGap(304, Short.MAX_VALUE))
+					.addContainerGap(307, Short.MAX_VALUE))
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 965, Short.MAX_VALUE)
@@ -412,22 +398,16 @@ try {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(button))
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-								.addComponent(btnNewButton)
-								.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-									.addComponent(ButSave)
-									.addComponent(ButDelete))))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnNewButton_1)
-								.addComponent(BPeshOK))))
-					.addGap(18)
+						.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(9)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+						.addComponent(btnNewButton)
+						.addComponent(ButSave)
+						.addComponent(ButDelete)
+						.addGroup(Alignment.LEADING, gl_contentPane.createParallelGroup(Alignment.BASELINE)
+							.addComponent(button)
+							.addComponent(BPeshOK)))
+					.addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 581, GroupLayout.PREFERRED_SIZE))
 		);
 		

@@ -16,6 +16,7 @@ import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
@@ -33,10 +34,12 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -62,12 +65,15 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JTable;
 import javax.swing.ImageIcon;
+import java.awt.Frame;
 
 public class FormRdDin extends JFrame {
 
 	private JPanel contentPane;
 	private RdDinStruct rddin;
-	private PatientCommonInfo patient;
+	public static PvizitAmb pvizitAmb;
+	public static Pvizit pvizit;
+//	private PatientCommonInfo patient;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
     private String oslname;
     private String oslcode;
@@ -112,6 +118,7 @@ public class FormRdDin extends JFrame {
 	 * Create the frame.
 	 */
 	public FormRdDin() {
+		setExtendedState(Frame.MAXIMIZED_BOTH);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
@@ -187,8 +194,6 @@ public class FormRdDin extends JFrame {
 		CBOteki = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db5);
 		
 		SDataSl = new CustomDateEditor();
-
-	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 810, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -386,13 +391,51 @@ public class FormRdDin extends JFrame {
 		Nbutton.setToolTipText("Новое посещение");
 		Nbutton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				RdDinStruct rddin = new RdDinStruct();
 				try {
-				setDefaultValues();
+//				Vvod.btnPosAdd.doClick();
+
+				RdDinStruct rddin = new RdDinStruct();
+	//			setDefaultValues();
+				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
-				rddin.setNpasp(Vvod.pvizitAmb.npasp);
+//				rddin.setArt1(120);
+//				rddin.setArt2(80);
+//				rddin.setArt3(120);
+//				rddin.setArt4(80);
+//				rddin.setChcc(70);
+//				rddin.setHdm(0);
+				rddin.setGrr(0);
+				rddin.setBall(0);
+				rddin.setArt1((int) SPdad.getModel().getValue());
+				rddin.setArt2((int) SPsad.getModel().getValue());
+				rddin.setArt3((int) SLdad.getModel().getValue());
+				rddin.setArt4((int) SLsad.getModel().getValue());
+				rddin.setChcc((int) SChcc.getModel().getValue());
+				rddin.setHdm((int) SVdm.getModel().getValue());
+				rddin.setOj((int) SOkrj.getModel().getValue());
+				rddin.setSpl((int) STolP.getModel().getValue());
+				rddin.setSrok((int) SSrok.getModel().getValue());
+				rddin.setVes((double) SVes.getModel().getValue());
+				if (CBPredPl.getSelectedPcod() != null)
+					rddin.setPredpl(CBPredPl.getSelectedPcod());
+					else rddin.unsetPredpl();
+				if (CBPolPl.getSelectedPcod() != null)
+					rddin.setPolpl(CBPolPl.getSelectedPcod());
+					else rddin.unsetPolpl();
+				if (CBSerd1.getSelectedPcod() != null)
+					rddin.setSerd1(CBSerd1.getSelectedPcod());
+					else rddin.unsetSerd1();
+				if (CBCerd.getSelectedPcod() != null)
+					rddin.setSerd(CBCerd.getSelectedPcod());
+					else rddin.unsetSerd();
+				if (CBOteki.getSelectedPcod() != null)
+					rddin.setOteki(CBOteki.getSelectedPcod());
+					else rddin.unsetOteki();
+				if (CBDiag.getSelectedPcod() != null)
+					rddin.setDspos(CBDiag.getSelectedPcod());
+					else rddin.unsetDspos();
+			System.out.println(rddin);		
 				MainForm.tcl.AddRdDin(rddin);
 				} catch (KmiacServerException e1) {
 					// TODO Auto-generated catch block
@@ -402,9 +445,13 @@ public class FormRdDin extends JFrame {
 					e1.printStackTrace();
 				}
 				}
+
+			private void showMessage(RdDinStruct rddin) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
-		
-		JButton btnNewButton = new JButton("");
+	JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Удалить");
 		btnNewButton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		
@@ -623,8 +670,8 @@ public class FormRdDin extends JFrame {
 	}
 	protected void setDefaultValues() {
 		// TODO Auto-generated method stub
-	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
-	rddin.setNpasp(Vvod.zapVr.getNpasp());
+//	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//	rddin.setNpasp(Vvod.zapVr.getNpasp());
 	rddin.setArt1(120);
 	rddin.setArt2(80);
 	rddin.setArt3(120);
@@ -636,6 +683,8 @@ public class FormRdDin extends JFrame {
 	rddin.setOj(60);
 	rddin.setSpl(0);
 //	rddin.setSrok(srok);
+	System.out.println("присвоение");		
+	System.out.println(rddin);		
 	}
 	public void onConnect() throws PatientNotFoundException {
 		try {
