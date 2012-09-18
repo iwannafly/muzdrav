@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Lgota;
 import ru.nkz.ivcgzo.thriftRegPatient.LgotaAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.LgotaNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
+import ru.nkz.ivcgzo.thriftRegPatient.NambkNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
@@ -512,8 +513,6 @@ public class PacientInfoFrame extends JFrame {
                     });
 
                 }
-              tbMain.setSelectedIndex(0);
-//              PacientMainFrame.getInstance().setVisible(true);
           }
         });
 
@@ -529,7 +528,7 @@ public class PacientInfoFrame extends JFrame {
 				    PersonalInfo.adpAddress = new Address();
 				    PersonalInfo.polis_oms = new Polis();
 				    PersonalInfo.polis_dms = new Polis();
-				    PersonalInfo.nambk = new Nambk();
+				    //PersonalInfo.nambk = new Nambk();
 				    PersonalInfo.setDataz(new Date().getTime());
 				    PersonalInfo.setNpasp(curPatientId);
 				    PersonalInfo.setFam(tfFam.getText().toUpperCase().trim());
@@ -583,6 +582,7 @@ public class PacientInfoFrame extends JFrame {
                     PersonalInfo.adpAddress.setHouse(cmb_adp_dom.getText());
                     PersonalInfo.setTerp(Terp);
 				    if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
+				    
 				    if (!tf_Nambk.getText().isEmpty()) NambInfo.setNambk(tf_Nambk.getText());
 				    if (!tf_Nuch.getText().isEmpty())  NambInfo.setNuch(Integer.valueOf(tf_Nuch.getText()));
 				    if (tf_datapr.getDate() != null)   NambInfo.setDatapr(tf_datapr.getDate().getTime());
@@ -3074,7 +3074,13 @@ public class PacientInfoFrame extends JFrame {
                 return;
             NewPatient();
             PersonalInfo = MainForm.tcl.getPatientFullInfo(PatId);
-            NambInfo = MainForm.tcl.getNambk(PatId, MainForm.authInfo.getCpodr());
+            try {
+            	NambInfo = new Nambk();
+            	NambInfo = MainForm.tcl.getNambk(PatId, MainForm.authInfo.getCpodr());
+            } catch (NambkNotFoundException nnfe) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (PersonalInfo.getFam() != null) tfFam.setText(PersonalInfo.getFam().trim());
             if (PersonalInfo.getIm() != null) tfIm.setText(PersonalInfo.getIm().trim());
             if (PersonalInfo.getOt() != null) tfOt.setText(PersonalInfo.getOt().trim());
@@ -3095,22 +3101,22 @@ public class PacientInfoFrame extends JFrame {
             if (PersonalInfo.getPolis_dms().nom != null)tf_oms_nom.setText(PersonalInfo.polis_oms.nom.trim());
             if (PersonalInfo.isSetCpol_pr())tf_Cpol.setText(Integer.toString(PersonalInfo.cpol_pr));
 
-            if (PersonalInfo.getNambk().nambk != null)tf_Nambk.setText(PersonalInfo.getNambk().getNambk().trim());
-            if (PersonalInfo.getNambk().nuch != 0)tf_Nuch.setText(Integer.toString(PersonalInfo.getNambk().getNuch()));
-            if (PersonalInfo.getNambk().datapr != 0)tf_datapr.setDate(PersonalInfo.getNambk().datapr);
-            if (PersonalInfo.getNambk().dataot != 0)tf_dataot.setDate(PersonalInfo.getNambk().dataot);
-            if (PersonalInfo.getNambk().ishod != 0) cmb_ishod.setSelectedPcod(PersonalInfo.getNambk().ishod);
+            if (NambInfo.nambk != null)tf_Nambk.setText(NambInfo.getNambk().trim());
+            if (NambInfo.getNuch() != 0)tf_Nuch.setText(Integer.toString(NambInfo.getNuch()));
+            if (NambInfo.getDatapr() != 0)tf_datapr.setDate(NambInfo.getDatapr());
+            if (NambInfo.getDataot() != 0)tf_dataot.setDate(NambInfo.getDataot());
+            if (NambInfo.getIshod() != 0) cmb_ishod.setSelectedPcod(NambInfo.getIshod());
 
             if (PersonalInfo.isSetDatadoc())tf_datadoc.setDate(PersonalInfo.datadoc);
             if (PersonalInfo.isSetPol()){
                 rbtn_pol_m.setSelected(PersonalInfo.getPol() == 1);
                 rbtn_pol_j.setSelected(PersonalInfo.getPol() == 2);
             }
-            if (PersonalInfo.getSgrp() != 0) cmb_status.setSelectedPcod(PersonalInfo.sgrp);
-            if (PersonalInfo.getPolis_oms().tdoc != 0)cmb_oms_doc.setSelectedPcod(PersonalInfo.polis_oms.tdoc);
-            if (PersonalInfo.getTdoc() != 0) cmb_tdoc.setSelectedPcod(PersonalInfo.tdoc);
-            if (PersonalInfo.getPolis_oms().strg != 0)cmb_oms_smo.setSelectedPcod(PersonalInfo.polis_oms.strg);
-            if (PersonalInfo.getPolis_dms().strg != 0)cmb_dms_smo.setSelectedPcod(PersonalInfo.polis_dms.strg);
+            if (PersonalInfo.getSgrp() != 0) cmb_status.setSelectedPcod(PersonalInfo.getSgrp());
+            if (PersonalInfo.getPolis_oms().tdoc != 0)cmb_oms_doc.setSelectedPcod(PersonalInfo.getPolis_oms().getTdoc());
+            if (PersonalInfo.getTdoc() != 0) cmb_tdoc.setSelectedPcod(PersonalInfo.getTdoc());
+            if (PersonalInfo.getPolis_oms().strg != 0)cmb_oms_smo.setSelectedPcod(PersonalInfo.getPolis_oms().getStrg());
+            if (PersonalInfo.getPolis_dms().strg != 0)cmb_dms_smo.setSelectedPcod(PersonalInfo.getPolis_dms().getStrg());
 
         } catch (Exception e) {
             e.printStackTrace();

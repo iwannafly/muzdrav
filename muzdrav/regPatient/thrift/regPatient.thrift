@@ -72,7 +72,9 @@ struct PatientFullInfo{
 	27:Address adpAddress,
 	28:Address admAddress,
 	29:Polis polis_oms,
-	30:Polis polis_dms
+	30:Polis polis_dms,
+	31:i32 v_sch,
+	32:i32 str_org
 }
 
 /*сведени о представителе табл. p_preds*/
