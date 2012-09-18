@@ -51,7 +51,7 @@ struct PatientFullInfo{
 	6:i32 pol,
 	7:i32 jitel,
 	8:i32 sgrp,
-	9:string mrab,
+	9:i32 mrab,
 	10:string namemr,
 	11:i32 ncex,
 	12:i32 cpol_pr,
@@ -69,11 +69,10 @@ struct PatientFullInfo{
 	24:i32 prizn,
 	25:i32 ter_liv,
 	26:i32 region_liv,
-	27:Nambk nambk,
-	28:Address adpAddress,
-	29:Address admAddress,
-	30:Polis polis_oms,
-	31:Polis polis_dms
+	27:Address adpAddress,
+	28:Address admAddress,
+	29:Polis polis_oms,
+	30:Polis polis_dms
 }
 
 /*сведени о представителе табл. p_preds*/
@@ -273,6 +272,8 @@ exception TerLiveNotFoundException {
 
 exception SmocodNotFoundException {
 }
+exception NambkNotFoundException{
+}
 
 service ThriftRegPatient extends kmiacServer.KmiacServer {
     
@@ -292,6 +293,8 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
      * @throws PatientNotFoundException
      */
     PatientFullInfo getPatientFullInfo(1:i32 npasp) throws (1: PatientNotFoundException pnfe),
+	
+	Nambk getNambk(1:i32 npasp, 2:i32 cpodr) throws (1:NambkNotFoundException nnfe),
 	
     /**
      * Возвращает сведения о представителе пациента с указанным персональным номером
@@ -536,5 +539,30 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Классификатор N_SMORF (N_SMORF(pcod))
 	 */
-	list<classifier.StringClassifier> getSmorf(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe)
+	list<classifier.StringClassifier> getSmorf(1:i32 kodsmo) throws (1: SmorfNotFoundException snfe),
+
+	/**
+	 * Классификатор льгот N_LKN (N_LKN(pcod))
+	 */
+	list<classifier.IntegerClassifier> getLKN(),
+
+	/**
+	 * Классификатор категорий N_LKR (N_LKR(pcod))
+	 */
+	list<classifier.IntegerClassifier> getLKR(),
+
+	/**
+	 * Классификатор городов N_L00 (N_L00(pcod))
+	 * select ter, nam_kem  from n_l00 where c_ffomc=?
+	 */
+	list<classifier.IntegerClassifier> getL00(1:i32 pcod),
+
+	/**
+	 * Классификатор улиц N_U10 (N_U10(pcod))
+	 * select ndom  from n_u10 where name1=?
+	 */
+	list<classifier.StringClassifier> getU10(1:string name)
+
+
+
 }

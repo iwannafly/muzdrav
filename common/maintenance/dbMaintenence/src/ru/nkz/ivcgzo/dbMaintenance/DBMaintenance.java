@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.dbMaintenance;
 
 import ru.nkz.ivcgzo.classifierImporter.ClassifierImporter;
 import ru.nkz.ivcgzo.libsMd5Updater.LibsMd5Updater;
+import ru.nkz.ivcgzo.shablonImporter.ShablonImporter;
 
 public class DBMaintenance {
 
@@ -22,6 +23,9 @@ public class DBMaintenance {
 			case "--updLibsMd5":
 				updateLibsMd5(args);
 				break;
+			case "--impShab":
+				importShablon(args);
+				break;
 			default:
 				usage();
 			}
@@ -37,11 +41,12 @@ public class DBMaintenance {
 		System.out.println("Commands:");
 		
 		System.out.println("\t--impClass <path_to_xml>");
-		System.out.println("\tUpdates classifiers specified in xml. Guess the format of an xml for yourself.");
+		System.out.println("\tUpdates classifiers specified in xml.");
 		
 		System.out.println("\t--updLibsMd5 <path_to_xml>");
-		System.out.println("\tUpdates libraries md5 and sizes in database. Guess the format of an xml for yourself.");
+		System.out.println("\tUpdates libraries md5 and sizes in database.");
 		
+		System.out.println("Guess the format of an xml for yourself.");
 		System.exit(2);
 	}
 	
@@ -54,5 +59,9 @@ public class DBMaintenance {
 		LibsMd5Updater lmu = new LibsMd5Updater(args[1]);
 		lmu.updateLibsMd5();
 	}
-
+	
+	private static void importShablon(String[] args) throws Exception {
+		ShablonImporter shImp = new ShablonImporter(args[1]);
+		shImp.importShablonOsm();
+	}
 }

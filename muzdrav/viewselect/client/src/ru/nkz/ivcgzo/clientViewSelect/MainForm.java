@@ -36,11 +36,15 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+//import ru.nkz.ivcgzo.clientOsm.MainForm;
+//import ru.nkz.ivcgzo.clientOsm.MainForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientInfoForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMkbTreeForm;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewMrabTreeForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewPolpTreeForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewStringClassifierForm;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
@@ -48,6 +52,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -64,6 +69,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ViewIntegerClassifierForm intFrm;
 	public ViewStringClassifierForm strFrm;
 	public ViewPolpTreeForm polpFrm;
+	public ViewMrabTreeForm mrabFrm;
+	public PatientInfoForm infFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -205,7 +212,16 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		    	  //System.out.print(getViewTableValues().getName());
 		    	  String className = table.getSelectedItem().pcod;
 		    	  try {
-					if (tcl.isClassifierPcodInteger(className)) {
+		    		if (className.equals("n_c00")) {
+		    			conMan.showMkbTreeForm("Диагноз", "");
+		    		  }
+		    		else if (className.equals("n_nsipol")) {
+		    			conMan.showPolpTreeForm("Поликлиники Кемеровской Области", -1, -1, -1);
+		    		}
+		    		else if (className.equals("n_z43")) {
+		    			conMan.showMrabTreeForm("Место работы", -1);
+		    		}
+		    		else if (tcl.isClassifierPcodInteger(className)) {
 						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
 						  MainForm.instance.addChildFrame(VSPIForm);
 						  VSPIForm.tableFill(className);
@@ -219,8 +235,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						  VSPSForm.setVisible(true);
 					}
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+						conMan.reconnect(e1);
 				}
 		   
 		         }
@@ -311,6 +326,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		intFrm = new ViewIntegerClassifierForm();
 		strFrm = new ViewStringClassifierForm();
 		polpFrm = new ViewPolpTreeForm();
+		mrabFrm = new ViewMrabTreeForm();
+		infFrm = new PatientInfoForm();
 	}
 	
 	@Override
@@ -434,8 +451,54 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						disposeModal();
 					}
 					
-				}
-			}
+				case 12: 
+					setFrame(mrabFrm);
+					mrabFrm.setTitle((String) params[1]);
+					dialog = prepareModal(parent);
+					mrabFrm.prepare((int) params[2]);
+					mrabFrm.setModalityListener();
+					dialog.setVisible(true);
+					try {
+						return mrabFrm.getResults();
+					} finally {
+						setFrame(frame);
+						mrabFrm.removeModalityListener();
+						disposeModal();
+					}
+					
+				case 13:
+				case 14:
+				case 15:
+				case 16:
+					try {
+						conMan.setClient(this);
+						conMan.connect(getPort());
+						
+						switch ((int) params[0]) {
+						case 13:
+							return ccm.getNameFromPcodInteger((IntegerClassifiers) params[1], (int) params[2]);
+						case 14:
+							return ccm.getNameFromPcodString((StringClassifiers) params[1], (String) params[2]);
+						}
+					} catch (Exception e) {
+						conMan.disconnect(getPort());
+						conMan.setClient(parent);
+					}
+					
+				case 17:
+					setFrame(infFrm);
+					dialog = prepareModal(parent);
+					infFrm.update((int) params[1]);
+					infFrm.setModalityListener();
+					dialog.setVisible(true);
+					try {
+						return infFrm.getResults();
+					} finally {
+						setFrame(frame);
+						infFrm.removeModalityListener();
+						disposeModal();
+					}
+			}}
 		
 		return null;
 	}

@@ -600,4 +600,68 @@ public class ConnectionManager {
 		
 		return null;
 	}
+	
+	/**
+	 * Вызов формы с древовидным отображением мест работы.
+	 * @param title - заголовок формы
+	 * @param pMrab - текущий код места работы
+	 * @return массив из двух значений: код группы и
+	 * код места работы или <code>null</code>, если пользователь закрыл форму
+	 */
+	public IntegerClassifier showMrabTreeForm(String title, int pMrab) {
+		Object res = viewClient.showModal(client, 12, title, pMrab);
+		
+		if (res != null)
+			return (IntegerClassifier) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Получение из классификатора имени по его коду.
+	 * @param cls - название классификатора
+	 * @param pcod - код для поиска имени
+	 */
+	public String getNameFromPcodInteger(IntegerClassifiers cls, int pcod) {
+		Object res = viewClient.showModal(client, 13, cls, pcod);
+		
+		if (res != null)
+			return (String) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Получение из классификатора имени по его коду.
+	 * @param cls - название классификатора
+	 * @param pcod - код для поиска имени
+	 */
+	public String getNameFromPcodString(StringClassifiers cls, String pcod) {
+		Object res = viewClient.showModal(client, 14, cls, pcod);
+		
+		if (res != null)
+			return (String) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Вызов формы с информацией на пациента.
+	 * @param npasp - уникальный номер пациента
+	 */
+	public void showPatientInfoForm(int npasp) {
+		viewClient.showModal(client, 17, npasp);
+	}
+	
+	/**
+	 * Открывает сгенерированный отчет в офисном редакторе.
+	 * @param path - путь к отчету
+	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>
+	 */
+	public void openFileInEditor(String path, boolean print) {
+		if (print)
+			DocumentPrinter.printFile(path);
+		else
+			DocumentPrinter.editFile(path);
+	}
 }

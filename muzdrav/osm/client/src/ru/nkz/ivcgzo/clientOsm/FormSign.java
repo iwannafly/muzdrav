@@ -1,13 +1,7 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -18,7 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -57,38 +50,17 @@ public class FormSign extends JFrame {
 	public static List<IntegerClassifier> pokNames;
 
 	/**
-	 * Launch the application.
-	 */
-
-
-	/**
 	 * Create the frame.
 	 */
-	
-	
 	public FormSign() {
-		try {
-			pokNames = MainForm.tcl.getPokNames();
-		} catch (Exception e3) {
-			e3.printStackTrace();
-			pokNames = new ArrayList<>();
-		}
-
-
+		setTitle("Анамнез жизни");
 		setBounds(100, 100, 1011, 726);
 		
 		final JScrollPane spAnamn = new JScrollPane();
+		spAnamn.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		spAnamn.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		final ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
-		listShablon.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					ShablonTextField.instance.setText(listShablon.getSelectedValue().getName());
-				}
-			}
-		});
 		    
 			final JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
 		      
@@ -321,57 +293,9 @@ public class FormSign extends JFrame {
 		);
 		pallerg.setLayout(gl_pallerg);
 		pAnamn.setLayout(gl_pAnamn);
-//		pAnamn.setLayout(gl_panel_1);
-//		pAnamn.setLayout(gl_panel);
-		//GroupLayout groupLayout = new GroupLayout(getContentPane());
-//		groupLayout.setHorizontalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-//		);
-//		groupLayout.setVerticalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-//		);
 		getContentPane().setLayout(groupLayout);
-		
-		addWindowListener(new WindowAdapter() {
-			List<IntegerClassifier> lstIdRazd;
-			
-			@Override
-			public void windowActivated(WindowEvent e) {
-				try {
-					lstIdRazd = MainForm.tcl.getShablonCdol(3, MainForm.authInfo.getCdol());
-					lstIdRazd.addAll(MainForm.tcl.getShablonCdol(4, MainForm.authInfo.getCdol()));
-					lstIdRazd.addAll(MainForm.tcl.getShablonCdol(5, MainForm.authInfo.getCdol()));
-					disableTextFields(spAnamn);
-				} catch (KmiacServerException e1) {
-					e1.printStackTrace();
-				} catch (TException e1) {
-					e1.printStackTrace();
-				}
-				
-				super.windowActivated(e);
-			}
-			
-			private void disableTextFields(Container c) {
-				if (c.getComponentCount() > 0)
-					lbl: for (int i = 0; i < c.getComponentCount(); i++) {
-						if (c.getComponent(i) instanceof ShablonTextField) {
-							ShablonTextField txt = (ShablonTextField)c.getComponent(i);
-							for (IntegerClassifier razd : lstIdRazd) {
-								if (razd.getPcod() == txt.getIdPok()) {
-									txt.setVisible(true);
-									continue lbl;
-								}
-							}
-							txt.setVisible(false);
-						} else if (c.getComponent(i) instanceof Container)
-							disableTextFields((Container) c.getComponent(i));
-					}
-			}
-		});
 	}
-	
+		
 		private String getVrPr() {
 			String prv,s1,s2,s3;
 			if (cbk.isSelected()){
@@ -397,32 +321,38 @@ public class FormSign extends JFrame {
 		}
 		
 		public void showPsign() {
+			BGgrk.clearSelection();
+			BGRez.clearSelection();
+			cbk.setSelected(false);
+			cba.setSelected(false);
+			cbn.setSelected(false);
+			tpallerg.setText("");
+			tpfarm.setText("");
+			tpanamnz.setText("");
 		try {
 			psign = MainForm.tcl.getPsign(Vvod.zapVr.npasp);
-			if (psign!=null){
-			BGgrk.clearSelection();
+			
 			rb1g.setSelected(psign.grup.charAt(0) == '1');
 			rb2g.setSelected(psign.grup.charAt(0) == '2');
 			rb3g.setSelected(psign.grup.charAt(0) == '3');
 			rb4g.setSelected(psign.grup.charAt(0) == '4');
 			
-			BGRez.clearSelection();
 			rbpol.setSelected(psign.ph.charAt(0) == '+');
 			rbotr.setSelected(psign.ph.charAt(0) == '-');
 			
 			tpallerg.setText(psign.allerg);
 			tpanamnz.setText(psign.vitae);
 			tpfarm.setText(psign.farmkol);
-			tpanamnz.setText(psign.vitae);
 			
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
 			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');}
+			cbn.setSelected(vrp.charAt(2) == '1');
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (PsignNotFoundException e1) {
-			e1.printStackTrace();
+			psign = new Psign();
+			psign.setNpasp(Vvod.zapVr.npasp);
 		} catch (TException e1) {
 			MainForm.conMan.reconnect(e1);
 		}

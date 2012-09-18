@@ -9,6 +9,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
 
 import javax.swing.Action;
 import javax.swing.JMenuItem;
@@ -37,8 +38,12 @@ public class CustomTextComponentWrapper {
 	
 	private boolean isSetPopupMenu;
 	
+	private DefaultLanguage defLang;
+	
 	public CustomTextComponentWrapper(JTextComponent textComponent) {
 		this.textComponent = textComponent;
+		
+		setLanguageFocusListener();
 	}
 	
 	/**
@@ -130,6 +135,26 @@ public class CustomTextComponentWrapper {
 			
 			isSetPopupMenu = true;
 		}
+	}
+	
+	private void setLanguageFocusListener() {
+		defLang = DefaultLanguage.Russian;
+		
+		textComponent.addFocusListener(new FocusAdapter() {
+			public void focusGained(FocusEvent e) {
+				if (textComponent.getInputContext().getLocale().getCountry() != defLang.getLocale().getCountry()) {
+					textComponent.getInputContext().selectInputMethod(defLang.getLocale());
+				}
+			}
+		});
+	}
+	
+	/**
+	 * Установка раскладки, которая будет включаться при получении
+	 * компонентом фокуса. 
+	 */
+	public void setDefaultLanguage(DefaultLanguage defLang) {
+		this.defLang = defLang;
 	}
 	
 	class CustomTextComponentPopupMenu extends JPopupMenu{
@@ -302,6 +327,25 @@ public class CustomTextComponentWrapper {
 		@Override
 		public void checkEnabled() {
 			setEnabled(!((textComponent.getSelectionStart() == 0) && (textComponent.getSelectionEnd() == textComponent.getText().length())));
+		}
+	}
+	
+	public enum DefaultLanguage {
+		Russian,
+		English;
+		
+		private static final Locale rusLoc = new Locale("ru", "RU");
+		private static final Locale engLoc = new Locale("en", "US");
+		
+		public Locale getLocale() {
+			switch (this) {
+			case Russian:
+				return rusLoc;
+			case English:
+				return engLoc;
+			default:
+				throw new RuntimeException("You should never see this exception. Something has gone terribly wrong.");
+			}
 		}
 	}
 }

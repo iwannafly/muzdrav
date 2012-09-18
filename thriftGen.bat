@@ -15,6 +15,8 @@ CALL :generateJavaSource muzdrav\viewselect\thrift"
 CALL :generateJavaSource muzdrav\genTalons\thrift"
 CALL :generateJavaSource muzdrav\outputInfo\thrift"
 CALL :generateJavaSource muzdrav\reception\thrift"
+CALL :generateJavaSource muzdrav\genReestr\thrift"
+CALL :generateJavaSource muzdrav\hospital\thrift"
 
 COLOR 2
 ECHO All sources successfully generated
