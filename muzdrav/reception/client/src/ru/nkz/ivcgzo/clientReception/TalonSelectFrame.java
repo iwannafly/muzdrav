@@ -221,6 +221,17 @@ public class TalonSelectFrame extends JFrame {
     }
 
     private void fillTalonTypePanel() {
+        addPoliclinicComboboxes();
+        addSpecialityComboboxes();
+        addDoctorComboboxes();
+
+        addNavigationButtons();
+
+        fillTalonTypeGroupLayout();
+        pnTalonType.setLayout(glPnTalonType);
+    }
+
+    private void addPoliclinicComboboxes() {
         cbxPoliclinic = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxPoliclinic.addActionListener(new ActionListener() {
             @Override
@@ -240,6 +251,9 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
+    }
+
+    private void addSpecialityComboboxes() {
         cbxSpeciality = new ThriftStringClassifierCombobox<StringClassifier>(true);
         cbxSpeciality.addActionListener(new ActionListener() {
             @Override
@@ -262,6 +276,9 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
+    }
+
+    private void addDoctorComboboxes() {
         cbxDoctor = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxDoctor.addActionListener(new ActionListener() {
             @Override
@@ -274,7 +291,9 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
+    }
 
+    private void addNavigationButtons() {
         btnBackward = new JButton("Назад");
         btnBackward.addActionListener(new ActionListener() {
             @Override
@@ -294,9 +313,6 @@ public class TalonSelectFrame extends JFrame {
                 pnTalonSelect.updateUI();
             }
         });
-
-        fillTalonTypeGroupLayout();
-        pnTalonType.setLayout(glPnTalonType);
     }
 
     private void fillTalonTypeGroupLayout() {
