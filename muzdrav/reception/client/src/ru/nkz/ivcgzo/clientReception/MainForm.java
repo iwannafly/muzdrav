@@ -51,7 +51,7 @@ public class MainForm extends Client<ThriftReception.Client> {
     public final Object showModal(final IClient parent, final Object... params) {
         JDialog dialog = prepareModal(parent);
         talonSelectFrame.fillPatientInfoLabels((int) params[0], (String) params[1],
-                (String) params[2], (String) params[3], (long) params[4]);
+                (String) params[2], (String) params[3], (long) params[4], (int) params[5]);
         dialog.setVisible(true);
         disposeModal();
         return null;

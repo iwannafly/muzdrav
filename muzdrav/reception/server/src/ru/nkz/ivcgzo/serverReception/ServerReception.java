@@ -305,11 +305,20 @@ public class ServerReception extends Server implements Iface {
         // java.sql.Date не имеет нулевого конструктора, а preparedUpdate() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ? "
+        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ?, id_pvizit = ? "
                 + "WHERE  id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            final int numUpdated = sme.execPreparedUpdate(
-                    sqlQuery, false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+            int numUpdated = 0;
+            if (pat.getIdPvizit() != 0) {
+                numUpdated = sme.execPreparedUpdate(
+                    sqlQuery, false, pat.getId(), new Date(todayMillisec), prv, pat.getIdPvizit(),
+                    talon.getId());
+            } else {
+                numUpdated = sme.execPreparedUpdate("UPDATE e_talon SET npasp = ?, dataz = ?, "
+                        + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
+                        + "WHERE  id = ?;",
+                        false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+            }
             if (numUpdated == 1) {
                 sme.setCommit();
             } else {
@@ -327,11 +336,12 @@ public class ServerReception extends Server implements Iface {
             ReleaseTalonOperationFailedException, TException {
         final int defaultNpasp = 0;
         final int defaultPrv = 0;
-        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ? "
+        final int defaultIdPVizit = 0;
+        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ?, id_pvizit = ? "
                 + "WHERE  id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             final int numUpdated = sme.execPreparedUpdate(
-                    sqlQuery, false, defaultNpasp, null, defaultPrv, talon.getId());
+                sqlQuery, false, defaultNpasp, null, defaultPrv, defaultIdPVizit, talon.getId());
             if (numUpdated == 1) {
                 sme.setCommit();
             } else {

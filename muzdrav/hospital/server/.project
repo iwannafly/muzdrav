@@ -30,12 +30,12 @@
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<location>C:/kmiac_repos/gitrep/muzdrav/hospital/config</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/hospital/config</locationURI>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<location>C:/kmiac_repos/gitrep/muzdrav/hospital/thrift/gen-java</location>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/hospital/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

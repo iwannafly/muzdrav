@@ -409,13 +409,15 @@ public class TalonSelectFrame extends JFrame {
     }
 
     public final void fillPatientInfoLabels(final int patientId, final String patientSurname,
-            final String patientName, final String patientMiddlename, final long patientBirthdate) {
+            final String patientName, final String patientMiddlename, final long patientBirthdate,
+            final int idPvizit) {
         lblId.setText(String.valueOf(patientId));
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
         lblBirthdate.setText(new Date(patientBirthdate).toString());
-        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename);
+        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
+                idPvizit);
     }
 
     public final void onConnect() {

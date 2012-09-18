@@ -629,8 +629,10 @@ public class PacientInfoFrame extends JFrame {
                                     String patientName = tfIm.getText();
                                     String patientMiddlename = tfOt.getText();
                                     long patientBirthdate = tfDr.getDate().getTime();
+                                    int idPvizit = 0;
                                     IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
-                                    client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename, patientBirthdate);
+                                    client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename,
+                                            patientBirthdate,  idPvizit);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

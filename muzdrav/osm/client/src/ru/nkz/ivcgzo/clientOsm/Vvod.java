@@ -323,7 +323,7 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
                 try {
 					IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
-					client.showModal(MainForm.instance, zapVr.npasp, zapVr.im, zapVr.fam, zapVr.oth, zapVr.datar);
+					client.showModal(MainForm.instance, zapVr.npasp, zapVr.im, zapVr.fam, zapVr.oth, zapVr.datar, zapVr.id_pvizit);
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Не удалось отобразить форму записи на прием", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				}
@@ -1714,7 +1714,7 @@ public class Vvod extends JFrame {
 				else {
 					
 					try {
-						pvizit.setId(zapVr.getId_pvizit());
+					pvizit.setId(zapVr.getId_pvizit());
 					pvizit.setNpasp(zapVr.getNpasp());
 					pvizit.setCpol(MainForm.authInfo.getCpodr());
 					pvizit.setDatao(System.currentTimeMillis());
@@ -1722,7 +1722,6 @@ public class Vvod extends JFrame {
 					pvizit.setCdol(MainForm.authInfo.getCdol());
 					pvizit.setCuser(MainForm.authInfo.getUser_id());
 					pvizit.setDataz(System.currentTimeMillis());
-					pvizit.setId(MainForm.tcl.AddPViz(pvizit));
 					pvizitAmb = new PvizitAmb();
 					pvizitAmb.setId_obr(pvizit.getId());
 					pvizitAmb.setNpasp(zapVr.getNpasp());
