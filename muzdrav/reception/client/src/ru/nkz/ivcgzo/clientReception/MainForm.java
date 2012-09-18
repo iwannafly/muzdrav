@@ -22,12 +22,12 @@ public class MainForm extends Client<ThriftReception.Client> {
         super(conMan, authInfo, ThriftReception.Client.class, configuration.appId,
                 configuration.thrPort, accessParam);
 
-        initialize();
+        initialize(authInfo);
         instance = this;
     }
 
-    private void initialize() {
-        talonSelectFrame = new TalonSelectFrame();
+    private void initialize(final UserAuthInfo authInfo) {
+        talonSelectFrame = new TalonSelectFrame(authInfo);
         talonSelectFrame.pack();
         setFrame(talonSelectFrame);
     }

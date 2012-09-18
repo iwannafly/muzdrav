@@ -152,7 +152,6 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	public static JButton btnPosAdd;
-	private CustomTable<Pmer, Pmer._Fields> TabDispHron;
 	
 	/**
 	 * Create the dialog.
@@ -1588,32 +1587,7 @@ public class Vvod extends JFrame {
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
-		pnlZakl.setLayout(gl_pnlZakl);
-		
-		JPanel pnlDispHron = new JPanel();
-		tabbedPane.addTab("Дисп.хрон", null, pnlDispHron, null);
-		
-		JScrollPane spDisp = new JScrollPane();
-		GroupLayout gl_pnlDispHron = new GroupLayout(pnlDispHron);
-		gl_pnlDispHron.setHorizontalGroup(
-			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlDispHron.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(spDisp, GroupLayout.PREFERRED_SIZE, 526, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(64, Short.MAX_VALUE))
-		);
-		gl_pnlDispHron.setVerticalGroup(
-			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlDispHron.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(spDisp, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(326, Short.MAX_VALUE))
-		);
-		
-		TabDispHron = new CustomTable<>(true, true, Pmer.class, 14, "Мероприятие", 5, "План.дата", 6, "Факт.дата");;
-		spDisp.setViewportView(TabDispHron);
-		TabDispHron.setFillsViewportHeight(true);
-		pnlDispHron.setLayout(gl_pnlDispHron);
+		pnlZakl.setLayout(gl_pnlZakl);;
 		
 		panel_2.setLayout(gl_panel_2);
 		
@@ -1786,14 +1760,16 @@ public class Vvod extends JFrame {
 		});
 		btnPosAdd.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		
-		JButton btnPosDel = new JButton("");
+		final JButton btnPosDel = new JButton("");
 		btnPosDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (tblPos.getSelectedItem()!= null)
+					if (JOptionPane.showConfirmDialog(btnPosDel, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 					MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
 					MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
 					MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
-					tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));
+					tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -1983,8 +1959,6 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
-			TabDispHron.setData(MainForm.tcl.getPmer(25));
-//			TabDispHron.setIntegerClassifierSelector(3, MainForm.tcl.);
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
