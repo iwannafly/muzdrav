@@ -68,8 +68,6 @@ public class TalonSelectFrame extends JFrame {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxPoliclinic;
     private ThriftStringClassifierCombobox<StringClassifier> cbxSpeciality;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxDoctor;
-    // Buttons
-    private JButton btnUpdate;
     // Panes
     private JSplitPane splitPane;
     private JTabbedPane tbpTalonOperations;
@@ -81,6 +79,8 @@ public class TalonSelectFrame extends JFrame {
     //Patient
     private Patient curPatient;
     private UserAuthInfo curDoctorInfo;
+    private JButton btnBackward;
+    private JButton btnForward;
 
     public TalonSelectFrame(final UserAuthInfo authInfo) {
         curDoctorInfo = authInfo;
@@ -274,25 +274,47 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
-        btnUpdate = new JButton("Обновить");
-        glPnTalonType = new GroupLayout(pnTalonType);
+
+        btnBackward = new JButton("Назад");
+        btnBackward.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ((TalonTableModel) tbTalonSelect.getModel()).setPrevWeek();
+                tbTalonSelect.repaint();
+                tbTalonSelect.updateUI();
+            }
+        });
+
+        btnForward = new JButton("Вперед");
+        btnForward.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ((TalonTableModel) tbTalonSelect.getModel()).setNextWeek();
+                tbTalonSelect.repaint();
+                tbTalonSelect.updateUI();
+            }
+        });
+
         fillTalonTypeGroupLayout();
         pnTalonType.setLayout(glPnTalonType);
     }
 
     private void fillTalonTypeGroupLayout() {
+        glPnTalonType = new GroupLayout(pnTalonType);
         glPnTalonType.setHorizontalGroup(
             glPnTalonType.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPnTalonType.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(glPnTalonType.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(btnUpdate, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
-                        .addComponent(cbxDoctor, Alignment.LEADING, 0, 252, Short.MAX_VALUE)
-                        .addComponent(
-                                cbxSpeciality, Alignment.LEADING, 0, 252, Short.MAX_VALUE)
-                        .addComponent(
-                                cbxPoliclinic, Alignment.LEADING, 0, 252, Short.MAX_VALUE))
+                    .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING)
+                        .addComponent(cbxDoctor, 0, 328, Short.MAX_VALUE)
+                        .addComponent(cbxSpeciality, 0, 328, Short.MAX_VALUE)
+                        .addComponent(cbxPoliclinic, 0, 328, Short.MAX_VALUE)
+                        .addGroup(glPnTalonType.createSequentialGroup()
+                            .addComponent(btnBackward, GroupLayout.PREFERRED_SIZE, 181,
+                                    GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                            .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
+                                    GroupLayout.PREFERRED_SIZE)))
                     .addContainerGap())
         );
         glPnTalonType.setVerticalGroup(
@@ -307,9 +329,11 @@ public class TalonSelectFrame extends JFrame {
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addComponent(cbxDoctor, GroupLayout.PREFERRED_SIZE,
                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(37)
-                    .addComponent(btnUpdate)
-                    .addContainerGap(86, Short.MAX_VALUE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(btnBackward)
+                        .addComponent(btnForward))
+                    .addContainerGap(107, Short.MAX_VALUE))
         );
     }
 
