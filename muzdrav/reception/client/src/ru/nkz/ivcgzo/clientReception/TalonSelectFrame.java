@@ -10,10 +10,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
@@ -46,6 +48,7 @@ import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 public class TalonSelectFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
     // Tables
     private JTable tbTalonSelect;
     private JTable tbTalonDelete;
@@ -64,6 +67,9 @@ public class TalonSelectFrame extends JFrame {
     private JLabel lblMiddlename;
     private JLabel lblBirthdateHeader;
     private JLabel lblBirthdate;
+    private JLabel lblPoliclinicCbx;
+    private JLabel lblSpecialityCbx;
+    private JLabel lblDoctorCbx;
     // ComboBoxes
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxPoliclinic;
     private ThriftStringClassifierCombobox<StringClassifier> cbxSpeciality;
@@ -81,6 +87,7 @@ public class TalonSelectFrame extends JFrame {
     private UserAuthInfo curDoctorInfo;
     private JButton btnBackward;
     private JButton btnForward;
+    private JLabel lblWeekNevigation;
 
     public TalonSelectFrame(final UserAuthInfo authInfo) {
         curDoctorInfo = authInfo;
@@ -89,10 +96,11 @@ public class TalonSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setPreferredSize(new Dimension(950, 600));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         splitPane = new JSplitPane();
-        splitPane.setResizeWeight(0.3);
+        splitPane.setResizeWeight(0);
         fillSplitPane();
 
         getContentPane().add(splitPane);
@@ -167,26 +175,26 @@ public class TalonSelectFrame extends JFrame {
                         .addGroup(glPnPatientInfo.createSequentialGroup()
                             .addComponent(lblBirthdateHeader)
                             .addPreferredGap(
-                                    ComponentPlacement.RELATED, 128, Short.MAX_VALUE)
+                                    ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
                             .addComponent(lblBirthdate))
                         .addGroup(glPnPatientInfo.createSequentialGroup()
                             .addComponent(lblMiddlenameHeader)
                             .addPreferredGap(
-                                    ComponentPlacement.RELATED, 160, Short.MAX_VALUE)
+                                    ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
                             .addComponent(lblMiddlename))
                         .addGroup(glPnPatientInfo.createSequentialGroup()
                             .addComponent(lblNameHeader)
                             .addPreferredGap(
-                                    ComponentPlacement.RELATED, 220, Short.MAX_VALUE)
+                                    ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
                             .addComponent(lblName))
                         .addGroup(glPnPatientInfo.createSequentialGroup()
                             .addComponent(lblSurnameHeader)
                             .addPreferredGap(
-                                    ComponentPlacement.RELATED, 183, Short.MAX_VALUE)
+                                    ComponentPlacement.RELATED, 163, Short.MAX_VALUE)
                             .addComponent(lblSurname))
                         .addGroup(glPnPatientInfo.createSequentialGroup()
                             .addComponent(
-                                    lblIdHeader, GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE)
+                                    lblIdHeader, GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblId)))
                         .addContainerGap())
@@ -221,6 +229,7 @@ public class TalonSelectFrame extends JFrame {
     }
 
     private void fillTalonTypePanel() {
+        addCbxLabels();
         addPoliclinicComboboxes();
         addSpecialityComboboxes();
         addDoctorComboboxes();
@@ -229,6 +238,13 @@ public class TalonSelectFrame extends JFrame {
 
         fillTalonTypeGroupLayout();
         pnTalonType.setLayout(glPnTalonType);
+    }
+
+    private void addCbxLabels() {
+        lblPoliclinicCbx = new JLabel("Выберите отделение:");
+        lblSpecialityCbx = new JLabel("Выберите специальность:");
+        lblDoctorCbx = new JLabel("Выберите врача:");
+        lblWeekNevigation = new JLabel("Изменить неделю для отображения талонов:");
     }
 
     private void addPoliclinicComboboxes() {
@@ -294,7 +310,7 @@ public class TalonSelectFrame extends JFrame {
     }
 
     private void addNavigationButtons() {
-        btnBackward = new JButton("Назад");
+        btnBackward = new JButton("Пред. неделя");
         btnBackward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -304,7 +320,7 @@ public class TalonSelectFrame extends JFrame {
             }
         });
 
-        btnForward = new JButton("Вперед");
+        btnForward = new JButton("След. неделя");
         btnForward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -322,34 +338,45 @@ public class TalonSelectFrame extends JFrame {
                 .addGroup(glPnTalonType.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING)
-                        .addComponent(cbxDoctor, 0, 328, Short.MAX_VALUE)
-                        .addComponent(cbxSpeciality, 0, 328, Short.MAX_VALUE)
-                        .addComponent(cbxPoliclinic, 0, 328, Short.MAX_VALUE)
+                        .addComponent(cbxDoctor, 0, 375, Short.MAX_VALUE)
+                        .addComponent(cbxSpeciality, 0, 375, Short.MAX_VALUE)
+                        .addComponent(cbxPoliclinic, 0, 375, Short.MAX_VALUE)
                         .addGroup(glPnTalonType.createSequentialGroup()
                             .addComponent(btnBackward, GroupLayout.PREFERRED_SIZE, 181,
                                     GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED, 0, Short.MAX_VALUE)
                             .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
-                                    GroupLayout.PREFERRED_SIZE)))
+                                    GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblPoliclinicCbx)
+                        .addComponent(lblSpecialityCbx)
+                        .addComponent(lblDoctorCbx)
+                        .addComponent(lblWeekNevigation))
                     .addContainerGap())
         );
         glPnTalonType.setVerticalGroup(
             glPnTalonType.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPnTalonType.createSequentialGroup()
-                    .addGap(20)
+                    .addComponent(lblPoliclinicCbx)
+                    .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(cbxPoliclinic, GroupLayout.PREFERRED_SIZE,
                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(lblSpecialityCbx)
+                    .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(cbxSpeciality, GroupLayout.PREFERRED_SIZE,
                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(lblDoctorCbx)
+                    .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(cbxDoctor, GroupLayout.PREFERRED_SIZE,
                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addComponent(lblWeekNevigation)
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
                         .addComponent(btnBackward)
                         .addComponent(btnForward))
-                    .addContainerGap(107, Short.MAX_VALUE))
+                    .addContainerGap(77, Short.MAX_VALUE))
         );
     }
 
@@ -455,7 +482,7 @@ public class TalonSelectFrame extends JFrame {
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
-        lblBirthdate.setText(new Date(patientBirthdate).toString());
+        lblBirthdate.setText(DEFAULT_DATE_FORMAT.format(new Date(patientBirthdate)));
         curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
                 idPvizit);
     }
