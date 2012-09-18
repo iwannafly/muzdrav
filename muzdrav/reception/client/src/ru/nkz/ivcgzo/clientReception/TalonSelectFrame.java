@@ -281,7 +281,7 @@ public class TalonSelectFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setPrevWeek();
                 tbTalonSelect.repaint();
-                tbTalonSelect.updateUI();
+                pnTalonSelect.updateUI();
             }
         });
 
@@ -291,7 +291,7 @@ public class TalonSelectFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setNextWeek();
                 tbTalonSelect.repaint();
-                tbTalonSelect.updateUI();
+                pnTalonSelect.updateUI();
             }
         });
 

@@ -2936,6 +2936,7 @@ public class PacientInfoFrame extends JFrame {
                     servPath = MainForm.tcl.printMedCart(g, PersonalInfo);
                     String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
+                    MainForm.conMan.openFileInEditor(cliPath, false);
                 } catch (TException | IOException | FileNotFoundException | OpenFileException e) {
                     e.printStackTrace();
                 }
