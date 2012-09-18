@@ -31,6 +31,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
@@ -79,8 +80,10 @@ public class TalonSelectFrame extends JFrame {
     private GroupLayout glPnTalonType;
     //Patient
     private Patient curPatient;
+    private UserAuthInfo curDoctorInfo;
 
-    public TalonSelectFrame() {
+    public TalonSelectFrame(final UserAuthInfo authInfo) {
+        curDoctorInfo = authInfo;
         initialization();
     }
 
@@ -227,11 +230,13 @@ public class TalonSelectFrame extends JFrame {
                         cbxSpeciality.setData(
                             MainForm.tcl.getSpec(cbxPoliclinic.getSelectedItem().getPcod())
                         );
-                        cbxSpeciality.setSelectedIndex(0);
+                        cbxSpeciality.setSelectedPcod(curDoctorInfo.getCdol());
                     }
                 } catch (KmiacServerException | SpecNotFoundException
                         | TException e1) {
                     e1.printStackTrace();
+                } catch (RuntimeException re) {
+                    cbxSpeciality.setSelectedIndex(0);
                 }
             }
         });
@@ -247,11 +252,13 @@ public class TalonSelectFrame extends JFrame {
                                 cbxSpeciality.getSelectedItem().getPcod()
                             )
                         );
-                        cbxDoctor.setSelectedIndex(0);
+                        cbxDoctor.setSelectedPcod(curDoctorInfo.getPcod());
                     }
                 } catch (KmiacServerException | VrachNotFoundException
                         | TException e1) {
                     e1.printStackTrace();
+                } catch (RuntimeException re) {
+                    cbxDoctor.setSelectedIndex(0);
                 }
             }
         });
@@ -402,13 +409,15 @@ public class TalonSelectFrame extends JFrame {
     }
 
     public final void fillPatientInfoLabels(final int patientId, final String patientSurname,
-            final String patientName, final String patientMiddlename, final long patientBirthdate) {
+            final String patientName, final String patientMiddlename, final long patientBirthdate,
+            final int idPvizit) {
         lblId.setText(String.valueOf(patientId));
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
         lblBirthdate.setText(new Date(patientBirthdate).toString());
-        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename);
+        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
+                idPvizit);
     }
 
     public final void onConnect() {
@@ -418,11 +427,12 @@ public class TalonSelectFrame extends JFrame {
     private void fillTalonTypeComboboxes() {
         try {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
-            cbxPoliclinic.setSelectedIndex(0);
+            cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
         } catch (KmiacServerException | PoliclinicNotFoundException
                 | TException e) {
-            System.out.println("пыщ");
             e.printStackTrace();
+        } catch (RuntimeException e) {
+            cbxPoliclinic.setSelectedIndex(0);
         }
     }
 }

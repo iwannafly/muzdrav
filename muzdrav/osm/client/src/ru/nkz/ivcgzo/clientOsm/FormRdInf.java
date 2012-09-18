@@ -1,64 +1,42 @@
 package ru.nkz.ivcgzo.clientOsm;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.AbstractButton;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import java.awt.Font;
-import javax.swing.JTextField;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-import java.util.Date;
-import java.util.Calendar;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import java.awt.Color;
-
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import org.apache.thrift.TException;
+
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
-import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
-import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.JTextPane;
-import javax.swing.border.BevelBorder;
-
-import org.apache.thrift.TException;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.border.LineBorder;
-import javax.swing.UIManager;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.GridLayout;
-import javax.swing.SwingConstants;
-import javax.swing.ImageIcon;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 
 public class FormRdInf extends JFrame {
-
+	private static final long serialVersionUID = 8843590132227415590L;
 	public static RdInfStruct RdInfStruct;
 	private JPanel contentPane;
 	private JLabel LObr;
@@ -69,7 +47,6 @@ public class FormRdInf extends JFrame {
 	private JTextField TPhf;
 	private JSpinner SVozr;
     private RdInfStruct rdinf;
-//	private PatientCommonInfo patient;
     private int oslrod;
     private int or1;
     private int or2;
@@ -117,6 +94,8 @@ public class FormRdInf extends JFrame {
 	 * Create the frame.
 	 */
 	public FormRdInf() {
+		setExtendedState(Frame.MAXIMIZED_BOTH);
+		setAutoRequestFocus(false);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
@@ -654,21 +633,8 @@ System.out.println(rdinf);
 		
 	}
 	public void onConnect() throws PatientNotFoundException {
-		try {
-			PatientCommonInfo inf;
-		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-fam.setText(inf.getFam());
-im.setText(inf.getIm());
-ot.setText(inf.getOt());
-			CBObr.setData(MainForm.tcl.get_n_z00());
-			CBSem.setData(MainForm.tcl.get_n_z11());
-			CBGrOtec.setData(MainForm.tcl.get_n_r0z());
-			
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-			MainForm.conMan.reconnect(e);
-		}
+		fam.setText(Vvod.zapVr.fam);
+		im.setText(Vvod.zapVr.im);
+		ot.setText(Vvod.zapVr.oth);
 	}
 }
