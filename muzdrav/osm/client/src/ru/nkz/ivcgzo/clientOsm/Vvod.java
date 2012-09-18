@@ -699,12 +699,14 @@ public class Vvod extends JFrame {
 		});
 		btnDiagAdd.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		
-		JButton btnDiagDel = new JButton("");
+		final JButton btnDiagDel = new JButton("");
 		btnDiagDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		  		try {
-					MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
-					tblDiag.setData(MainForm.tcl.getPdiagAmb(Vvod.zapVr.getId_pvizit()));
+					if (tblDiag.getSelectedItem()!= null)
+					if (JOptionPane.showConfirmDialog(btnDiagDel, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+		  			MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
+					tblDiag.setData(MainForm.tcl.getPdiagAmb(Vvod.zapVr.getId_pvizit()));}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
