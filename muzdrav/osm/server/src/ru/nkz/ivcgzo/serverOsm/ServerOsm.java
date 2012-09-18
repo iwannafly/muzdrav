@@ -135,8 +135,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "recomend");
 		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class,  Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class};
 		
-		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr");
-		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
+		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz");
+		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class};
 		
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
@@ -359,7 +359,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol) VALUES (?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5);
+			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, dataz) VALUES (?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 20);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.execPrepared("INSERT INTO p_priem (id_obr, npasp, id_pos) VALUES (?, ?, ?) ", false, pos.id_obr, pos.npasp, id);
 			sme.setCommit();
@@ -381,7 +381,8 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, diag = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 7, 8, 9, 11, 14, 15, 16, 17, 18, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET diag = ? WHERE id_obr = ? ", false, pos, pvizitAmbTypes, 6, 1);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
@@ -948,7 +949,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1017,7 +1020,7 @@ public class ServerOsm extends Server implements Iface {
 			
 			acrs.close();
 			osw.write(sb.toString());
-			return "e:\\111.htm";
+			return path;
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1132,7 +1135,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printNapr(Napr na) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napr", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1193,7 +1198,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>МП");
 			acrs.close();
 							osw.write(sb.toString());
-							return "e:\\napr.htm";
+							return path;
 						} catch (SQLException | IOException e) {
 							throw new KmiacServerException();
 						}
@@ -1202,7 +1207,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printNaprKons(NaprKons nk) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("napk", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("napk", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1263,7 +1270,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>МП");
 			acrs.close();
 							osw.write(sb.toString());
-							return "e:\\naprKons.htm";
+							return path;
 						} catch (SQLException | IOException  e) {
 							throw new KmiacServerException();
 						}
@@ -1271,7 +1278,9 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public String printVypis(Vypis vp) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("vypis", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("vypis", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1361,7 +1370,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
-			return "e:\\vypis.htm";
+			return path;
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}
@@ -1369,7 +1378,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public String printKek(int npasp, int pvizitId) throws KmiacServerException, TException {
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("kek", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kek", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1416,7 +1427,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
-			return "e:\\kek.htm";}
+			return path;
+			}
 		 catch (SQLException | IOException e) {
 			throw new KmiacServerException();
 		}
@@ -1649,8 +1661,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public String printProtokol(Protokol pk) throws KmiacServerException, TException {
 		AutoCloseableResultSet acrs = null;
+		String path;
 		
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("protokol", ".htm").getAbsolutePath()), "utf-8")) {
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("protokol", ".htm").getAbsolutePath()), "utf-8")) {
 			StringBuilder sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -1767,7 +1780,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("<body>");
 			
 			osw.write(sb.toString());
-			return "e:\\protokol.htm";}
+			return path;}
 		catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		} finally {
@@ -1851,7 +1864,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public String printMSK(int npasp) throws KmiacServerException, TException {
-			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(File.createTempFile("msk", ".htm").getAbsolutePath()), "utf-8")) {
+		String path;
+		
+			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("msk", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -1974,7 +1989,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("_________________ (подпись) ________________(расшифровка)");
 				sb.append("</body>");
 				osw.write(sb.toString());
-				return "e:\\msk.htm";
+				return path;
 		} catch (SQLException | IOException  e) {
 			throw new KmiacServerException();
 		}

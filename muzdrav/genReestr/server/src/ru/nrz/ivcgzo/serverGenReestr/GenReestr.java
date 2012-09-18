@@ -115,11 +115,24 @@ private TServer thrServ;
         if (vidr == 2) sqlwhere = "AND (v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11))";
         if (vidr == 3) sqlwhere = "AND v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
 //		c_mu, prof_fn,         	
-		String sql = "SELECT  v.id AS sl_id, v.id AS id_med, v.kod_rez AS kod_rez, v.datap as d_pst, 2 AS kl_usl, v.pl_extr AS pl_extr, " +
+		String sqlmed = "SELECT  v.id AS sl_id, v.id AS id_med, v.kod_rez AS kod_rez, v.datap as d_pst, 2 AS kl_usl, v.pl_extr AS pl_extr, " +
 				"v.uet AS kol_usl, null AS c_mu, v.diag AS diag, null AS prof_fn, v.stoim AS stoim, "+
-			    " FROM p_vizit_amb v" + 
-				" WHERE v.opl = ?  AND v.cpodr = ? "+sqlwhere;
-		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sql, vopl, cpodr, dn, dk, dn, dk)) : (sse.execPreparedQuery(sql, vopl, cpodr, dn, dk))) {
+				"null AS case, null AS place, null AS spec, null AS prvd, null AS v_mu, null AS res_g, null AS ssd, 1 AS psv, 0 AS pr_pv, p.v_sch AS v_sch"+
+			    " FROM p_vizit_amb v, patient p" + 
+				" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpodr = ? "+sqlwhere;
+		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, vopl, cpodr, dn, dk, dn, dk)) : (sse.execPreparedQuery(sqlmed, vopl, cpodr, dn, dk))) {
+            ResultSet rs = acrs.getResultSet();
+            
+		} catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		}
+		String sqlpasp = "SELECT  v.id AS sl_id, 2 AS vid_rstr, p.str_org AS str_org, p. as name_str, 2 AS kl_usl, v.pl_extr AS pl_extr, " +
+				"v.uet AS kol_usl, null AS c_mu, v.diag AS diag, null AS prof_fn, v.stoim AS stoim, "+
+				"null AS case, null AS place, null AS spec, null AS prvd, null AS v_mu, null AS res_g, null AS ssd, 1 AS psv, 0 AS pr_pv, p.v_sch AS v_sch"+
+			    " FROM p_vizit_amb v, patient p" + 
+				" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpodr = ? "+sqlwhere;
+		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, vopl, cpodr, dn, dk, dn, dk)) : (sse.execPreparedQuery(sqlpasp, vopl, cpodr, dn, dk))) {
             ResultSet rs = acrs.getResultSet();
 		} catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);

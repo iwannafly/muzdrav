@@ -84,5 +84,4 @@ public final class TalonTableModel implements TableModel {
     public void removeTableModelListener(final TableModelListener listener) {
         listeners.remove(listener);
     }
-
 }

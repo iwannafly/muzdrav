@@ -53,6 +53,7 @@ public class FormSign extends JFrame {
 	 * Create the frame.
 	 */
 	public FormSign() {
+		setTitle("Анамнез жизни");
 		setBounds(100, 100, 1011, 726);
 		
 		final JScrollPane spAnamn = new JScrollPane();

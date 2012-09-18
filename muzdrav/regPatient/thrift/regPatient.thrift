@@ -291,7 +291,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
      * @return thrift-объект, содержащий полную информацию о пациенте
      * @throws PatientNotFoundException
      */
-    PatientFullInfo getPatientFullInfo(1:i32 npasp) throws (1: PatientNotFoundException pnfe),
+    PatientFullInfo getPatientFullInfo(1:i32 npasp, 2:i32 cpodr) throws (1: PatientNotFoundException pnfe),
 	
     /**
      * Возвращает сведения о представителе пациента с указанным персональным номером
