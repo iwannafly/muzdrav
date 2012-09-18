@@ -63,6 +63,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
@@ -77,6 +78,7 @@ import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import java.awt.Font;
+import javax.swing.JTable;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -150,6 +152,7 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	public static JButton btnPosAdd;
+	private CustomTable<Pmer, Pmer._Fields> TabDispHron;
 	
 	/**
 	 * Create the dialog.
@@ -782,7 +785,7 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
-		tblDiag = new CustomTable<>(true, true, PdiagAmb.class, 7, "Дата", 3, "Код МКБ");
+		tblDiag = new CustomTable<>(false, true, PdiagAmb.class, 7, "Дата", 3, "Код МКБ");
 		tblDiag.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -1572,6 +1575,31 @@ public class Vvod extends JFrame {
 		spZakl.setViewportView(tbZakl);
 		pnlZakl.setLayout(gl_pnlZakl);
 		
+		JPanel pnlDispHron = new JPanel();
+		tabbedPane.addTab("Дисп.хрон", null, pnlDispHron, null);
+		
+		JScrollPane spDisp = new JScrollPane();
+		GroupLayout gl_pnlDispHron = new GroupLayout(pnlDispHron);
+		gl_pnlDispHron.setHorizontalGroup(
+			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisp, GroupLayout.PREFERRED_SIZE, 526, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(64, Short.MAX_VALUE))
+		);
+		gl_pnlDispHron.setVerticalGroup(
+			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisp, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(326, Short.MAX_VALUE))
+		);
+		
+		TabDispHron = new CustomTable<>(true, true, Pmer.class, 14, "Мероприятие", 5, "План.дата", 6, "Факт.дата");;
+		spDisp.setViewportView(TabDispHron);
+		TabDispHron.setFillsViewportHeight(true);
+		pnlDispHron.setLayout(gl_pnlDispHron);
+		
 		panel_2.setLayout(gl_panel_2);
 		
 		cmbVidOpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_opl);
@@ -1941,6 +1969,8 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+			TabDispHron.setData(MainForm.tcl.getPmer(25));
+//			TabDispHron.setIntegerClassifierSelector(3, MainForm.tcl.);
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
