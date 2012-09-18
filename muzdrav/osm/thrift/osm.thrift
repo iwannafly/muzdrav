@@ -35,8 +35,9 @@ struct Pvizit {
 	12: optional string zakl;
 	13: optional i64 dataz;
 	14: optional string recomend;
-	15: optional i32 idzab;
-	16: optional string vrach_fio;
+	15: optional string lech;
+	16: optional i32 idzab;
+	17: optional string vrach_fio;
 }
 
 struct PvizitAmb {

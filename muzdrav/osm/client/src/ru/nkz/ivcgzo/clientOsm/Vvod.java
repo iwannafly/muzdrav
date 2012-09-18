@@ -1820,6 +1820,7 @@ public class Vvod extends JFrame {
 					
 					pvizit.setZakl(getTextOrNull(tbZakl.getText()));
 					pvizit.setRecomend(getTextOrNull(tbZaklRek.getText()));
+					pvizit.setLech(getTextOrNull(tbLech.getText()));
 					if (cmbCelObr.getSelectedPcod() != null)
 						pvizit.setCobr(cmbCelObr.getSelectedPcod());
 						else pvizit.unsetCobr();
@@ -1935,7 +1936,7 @@ public class Vvod extends JFrame {
 					tbAnam.setText(anamZab.getT_ist_zab());
 					tbZakl.setText(pvizit.getZakl());
 					tbZaklRek.setText(pvizit.getRecomend());
-
+					tbLech.setText(pvizit.getLech());
 				}
 			}
 		}
