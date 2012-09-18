@@ -179,7 +179,7 @@ public class PacientInfoFrame extends JFrame {
     private JSpinner sp_sv_day;
     public List<PatientBrief> pat;
     private PatientFullInfo PersonalInfo;
-    private Nambk Namb;
+    private Nambk NambInfo;
     private Agent AgentInfo;
     private List<Lgota> LgotaInfo;
     private List<Kontingent> KontingentInfo;
@@ -524,7 +524,7 @@ public class PacientInfoFrame extends JFrame {
         	public void actionPerformed(ActionEvent arg0) {
         		try {
         			PersonalInfo = new PatientFullInfo();
-        			Namb = new Nambk();
+        			NambInfo = new Nambk();
         			PersonalInfo.admAddress = new Address();
 				    PersonalInfo.adpAddress = new Address();
 				    PersonalInfo.polis_oms = new Polis();
@@ -583,22 +583,22 @@ public class PacientInfoFrame extends JFrame {
                     PersonalInfo.adpAddress.setHouse(cmb_adp_dom.getText());
                     PersonalInfo.setTerp(Terp);
 				    if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
-				    Namb.setNambk(tf_Nambk.getText());
-				    if (!tf_Nuch.getText().isEmpty()) Namb.setNuch(Integer.valueOf(tf_Nuch.getText()));
-				    if (tf_datapr.getDate() != null) Namb.setDatapr(tf_datapr.getDate().getTime());
-				    if (tf_dataot.getDate() != null) Namb.setDataot(tf_dataot.getDate().getTime());
-                    if (cmb_ishod.getSelectedItem() != null) Namb.setIshod(cmb_ishod.getSelectedPcod());
-                    Namb.setCpol(MainForm.authInfo.getCpodr());
-                	Namb.setNpasp(curPatientId);
+				    if (!tf_Nambk.getText().isEmpty()) NambInfo.setNambk(tf_Nambk.getText());
+				    if (!tf_Nuch.getText().isEmpty())  NambInfo.setNuch(Integer.valueOf(tf_Nuch.getText()));
+				    if (tf_datapr.getDate() != null)   NambInfo.setDatapr(tf_datapr.getDate().getTime());
+				    if (tf_dataot.getDate() != null)   NambInfo.setDataot(tf_dataot.getDate().getTime());
+                    if (cmb_ishod.getSelectedItem() != null) NambInfo.setIshod(cmb_ishod.getSelectedPcod());
+                    NambInfo.setCpol(MainForm.authInfo.getCpodr());
+                	NambInfo.setNpasp(curPatientId);
                 	//TODO
                 	if (curPatientId == 0){
                     	curPatientId = MainForm.tcl.addPatient(PersonalInfo);
-                    	Namb.setNpasp(curPatientId);
-                    	MainForm.tcl.addNambk(Namb);
+                    	NambInfo.setNpasp(curPatientId);
+                    	MainForm.tcl.addNambk(NambInfo);
                     }
                     else{
                         MainForm.tcl.updatePatient(PersonalInfo);
-                    	MainForm.tcl.updateNambk(Namb);
+                    	MainForm.tcl.updateNambk(NambInfo);
                         }
                 } catch (PatientAlreadyExistException paee) {
                         System.out.println("Пациент не найден.");
@@ -3072,11 +3072,11 @@ public class PacientInfoFrame extends JFrame {
             if (PatId == 0)
                 return;
             NewPatient();
-            PersonalInfo = MainForm.tcl.getPatientFullInfo(PatId, MainForm.authInfo.getCpodr());
-            //NambkInfo = MainForm.tcl.getPatientFullInfo(PatId);
-            if (PersonalInfo.getFam() != null) tfFam.setText(PersonalInfo.fam.trim());
-            if (PersonalInfo.getIm() != null) tfIm.setText(PersonalInfo.im.trim());
-            if (PersonalInfo.getOt() != null) tfOt.setText(PersonalInfo.ot.trim());
+            PersonalInfo = MainForm.tcl.getPatientFullInfo(PatId);
+            NambInfo = MainForm.tcl.getNambk(PatId, MainForm.authInfo.getCpodr());
+            if (PersonalInfo.getFam() != null) tfFam.setText(PersonalInfo.getFam().trim());
+            if (PersonalInfo.getIm() != null) tfIm.setText(PersonalInfo.getIm().trim());
+            if (PersonalInfo.getOt() != null) tfOt.setText(PersonalInfo.getOt().trim());
             if (PersonalInfo.isSetDatar()) tfDr.setDate(PersonalInfo.datar);
             if (PersonalInfo.getAdmAddress().flat != null) tf_Adm_kv.setText(PersonalInfo.admAddress.flat.trim());
             if (PersonalInfo.getAdpAddress().flat != null) tf_Adp_kv.setText(PersonalInfo.adpAddress.flat.trim());
@@ -3094,16 +3094,16 @@ public class PacientInfoFrame extends JFrame {
             if (PersonalInfo.getPolis_dms().nom != null)tf_oms_nom.setText(PersonalInfo.polis_oms.nom.trim());
             if (PersonalInfo.isSetCpol_pr())tf_Cpol.setText(Integer.toString(PersonalInfo.cpol_pr));
 
-            if (PersonalInfo.getNambk().nambk != null)tf_Nambk.setText(PersonalInfo.nambk.nambk.trim());
-            if (PersonalInfo.getNambk().nuch != 0)tf_Nuch.setText(Integer.toString(PersonalInfo.nambk.nuch));
-            if (PersonalInfo.getNambk().datapr != 0)tf_datapr.setDate(PersonalInfo.nambk.datapr);
-            if (PersonalInfo.getNambk().dataot != 0)tf_dataot.setDate(PersonalInfo.nambk.dataot);
-            if (PersonalInfo.getNambk().ishod != 0) cmb_ishod.setSelectedPcod(PersonalInfo.nambk.ishod);
+            if (PersonalInfo.getNambk().nambk != null)tf_Nambk.setText(PersonalInfo.getNambk().getNambk().trim());
+            if (PersonalInfo.getNambk().nuch != 0)tf_Nuch.setText(Integer.toString(PersonalInfo.getNambk().getNuch()));
+            if (PersonalInfo.getNambk().datapr != 0)tf_datapr.setDate(PersonalInfo.getNambk().datapr);
+            if (PersonalInfo.getNambk().dataot != 0)tf_dataot.setDate(PersonalInfo.getNambk().dataot);
+            if (PersonalInfo.getNambk().ishod != 0) cmb_ishod.setSelectedPcod(PersonalInfo.getNambk().ishod);
 
             if (PersonalInfo.isSetDatadoc())tf_datadoc.setDate(PersonalInfo.datadoc);
             if (PersonalInfo.isSetPol()){
-                rbtn_pol_m.setSelected(PersonalInfo.pol == 1);
-                rbtn_pol_j.setSelected(PersonalInfo.pol == 2);
+                rbtn_pol_m.setSelected(PersonalInfo.getPol() == 1);
+                rbtn_pol_j.setSelected(PersonalInfo.getPol() == 2);
             }
             if (PersonalInfo.getSgrp() != 0) cmb_status.setSelectedPcod(PersonalInfo.sgrp);
             if (PersonalInfo.getPolis_oms().tdoc != 0)cmb_oms_doc.setSelectedPcod(PersonalInfo.polis_oms.tdoc);
