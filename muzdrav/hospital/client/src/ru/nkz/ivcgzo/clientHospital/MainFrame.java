@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -33,6 +34,7 @@ import javax.swing.JTextPane;
 import javax.swing.JButton;
 
 import org.apache.thrift.TException;
+import javax.swing.JTextArea;
 
 public class MainFrame extends JFrame {
 
@@ -78,6 +80,17 @@ public class MainFrame extends JFrame {
     private UserAuthInfo doctorAuth;
     private TPatient patient;
     private TPriemInfo priemInfo;
+    private JPanel pMedicalHistory;
+    private JTabbedPane tbpMedicalHistory;
+    private JTextField tfShablonFilter;
+    private JButton btnFilterShablon;
+    private ThriftIntegerClassifierList lShablonNames;
+    private JPanel panel_5;
+    private JPanel panel_6;
+    private JPanel panel_7;
+    private JPanel panel_8;
+    private JPanel panel_9;
+    private JPanel panel_10;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -86,7 +99,7 @@ public class MainFrame extends JFrame {
         setMainMenu();
         setTabbedPane();
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         pack();
     }
@@ -145,6 +158,7 @@ public class MainFrame extends JFrame {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane);
         setPatientInfoPanel();
+        setMedicalHistoryPanel();
     }
 
     private void setPatientInfoPanel() {
@@ -156,9 +170,26 @@ public class MainFrame extends JFrame {
         setReceptionPanel();
     }
 
+    private void setMedicalHistoryPanel() {
+        pMedicalHistory = new JPanel();
+        tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
+
+        tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
+
+        setJalobPanel();
+
+        tfShablonFilter = new JTextField();
+        tfShablonFilter.setColumns(10);
+
+        btnFilterShablon = new JButton("Выбрать");
+
+        lShablonNames = new ThriftIntegerClassifierList();
+        setMedicalHistoryPanelGroupLayout();
+    }
+
+
     private void setPersonalInfoPanel() {
         pPersonalInfo = new JPanel();
-        pPersonalInfo.setSize(1000, 1000);
         spPatientInfo.setLeftComponent(pPersonalInfo);
 
         lblNumberDesiaseHistory = new JLabel("Номер истории болезни");
@@ -300,6 +331,50 @@ public class MainFrame extends JFrame {
         textPane.setText(priemInfoText);
     }
 
+    private void setJalobPanel() {
+
+        JPanel panel = new JPanel();
+        tbpMedicalHistory.addTab("1", null, panel, null);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JTextArea textArea = new JTextArea();
+        panel.add(textArea);
+
+        JButton btnNewButton = new JButton("New button");
+        panel.add(btnNewButton);
+
+        JPanel panel_1 = new JPanel();
+        tbpMedicalHistory.addTab("2", null, panel_1, null);
+
+        JPanel panel_2 = new JPanel();
+        tbpMedicalHistory.addTab("3", null, panel_2, null);
+
+        JPanel panel_3 = new JPanel();
+        tbpMedicalHistory.addTab("4", null, panel_3, null);
+
+        panel_8 = new JPanel();
+        tbpMedicalHistory.addTab("5", null, panel_8, null);
+
+        panel_10 = new JPanel();
+        tbpMedicalHistory.addTab("6", null, panel_10, null);
+
+        JPanel panel_4 = new JPanel();
+        tbpMedicalHistory.addTab("7", null, panel_4, null);
+
+        panel_5 = new JPanel();
+        tbpMedicalHistory.addTab("8", null, panel_5, null);
+
+        panel_6 = new JPanel();
+        tbpMedicalHistory.addTab("9", null, panel_6, null);
+
+        panel_7 = new JPanel();
+        tbpMedicalHistory.addTab("10", null, panel_7, null);
+
+        panel_9 = new JPanel();
+        tbpMedicalHistory.addTab("11", null, panel_9, null);
+
+    }
+
     public void onConnect() {
         // TODO doing smth on connect
     }
@@ -321,9 +396,9 @@ public class MainFrame extends JFrame {
                         .addComponent(lblRegistrationAddress)
                         .addComponent(lblRealAddress))
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
                         .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addGroup(glPersonalInfo.createSequentialGroup()
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addGroup(glPersonalInfo.createSequentialGroup()
@@ -333,8 +408,8 @@ public class MainFrame extends JFrame {
                                         .addComponent(tfGender, GroupLayout.PREFERRED_SIZE,
                                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                         .addComponent(tfNumberOfDesiaseHistory,
-                                            GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                            GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                            GroupLayout.PREFERRED_SIZE))
                                     .addGap(31)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(lblSurname)
@@ -343,10 +418,13 @@ public class MainFrame extends JFrame {
                                     .addPreferredGap(ComponentPlacement.RELATED)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                            GroupLayout.DEFAULT_SIZE,
+                                            GroupLayout.PREFERRED_SIZE)
                                         .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE,
+                                            GroupLayout.DEFAULT_SIZE,
+                                            GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(tfStatus,
+                                            GroupLayout.PREFERRED_SIZE,
                                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                     .addGap(34)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
@@ -357,31 +435,32 @@ public class MainFrame extends JFrame {
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addGroup(glPersonalInfo.createSequentialGroup()
                                             .addGroup(glPersonalInfo.createParallelGroup(
-                                                Alignment.LEADING).addComponent(tfName,
-                                                    GroupLayout.PREFERRED_SIZE,
+                                                Alignment.LEADING)
+                                                .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
                                                     GroupLayout.DEFAULT_SIZE,
                                                     GroupLayout.PREFERRED_SIZE)
-                                                    .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
-                                                        GroupLayout.DEFAULT_SIZE,
-                                                            GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
+                                                    GroupLayout.DEFAULT_SIZE,
+                                                    GroupLayout.PREFERRED_SIZE))
                                             .addGap(43)
                                             .addGroup(glPersonalInfo.createParallelGroup(
                                                 Alignment.LEADING)
-                                                    .addComponent(lblMiddlename)
-                                                    .addComponent(lblDms)))
+                                                .addComponent(lblMiddlename)
+                                                .addComponent(lblDms)))
                                         .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                                                GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE)))
                                 .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
-                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addGap(18)
-                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(btnUpdateChamber, GroupLayout.DEFAULT_SIZE,
-                                    GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(glPersonalInfo.createParallelGroup(
-                                    Alignment.LEADING, false)
-                                        .addComponent(tfMiddlename)
-                                        .addComponent(tfDms)))))
-                    .addContainerGap(554, Short.MAX_VALUE))
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                                .addComponent(btnUpdateChamber, GroupLayout.PREFERRED_SIZE, 166,
+                                        GroupLayout.PREFERRED_SIZE)
+                                .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING,
+                                    false)
+                                    .addComponent(tfMiddlename)
+                                    .addComponent(tfDms)))))
+                    .addGap(5))
         );
         glPersonalInfo.setVerticalGroup(
             glPersonalInfo.createParallelGroup(Alignment.LEADING)
@@ -390,54 +469,88 @@ public class MainFrame extends JFrame {
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblNumberDesiaseHistory)
                         .addComponent(tfNumberOfDesiaseHistory, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblSurname)
                         .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblName)
                         .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblMiddlename)
                         .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblGender)
                         .addComponent(tfGender, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblBirthdate)
                         .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblOms)
                         .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblDms)
                         .addComponent(tfDms, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblChamber)
                         .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblStatus)
                         .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblWork)
-                        .addComponent(tfWork, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                            GroupLayout.PREFERRED_SIZE))
+                        .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRegistrationAddress)
                         .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
-                        Short.MAX_VALUE)
+                            Short.MAX_VALUE)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRealAddress)
                         .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
-                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnUpdateChamber)))
         );
         pPersonalInfo.setLayout(glPersonalInfo);
+    }
+
+    private void setMedicalHistoryPanelGroupLayout() {
+        GroupLayout gl_pMedicalHistory = new GroupLayout(pMedicalHistory);
+        gl_pMedicalHistory.setHorizontalGroup(
+            gl_pMedicalHistory.createParallelGroup(Alignment.TRAILING)
+                .addGroup(gl_pMedicalHistory.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(gl_pMedicalHistory.createParallelGroup(Alignment.LEADING)
+                        .addGroup(gl_pMedicalHistory.createSequentialGroup()
+                            .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE, 199, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnFilterShablon, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lShablonNames, GroupLayout.PREFERRED_SIZE, 306, GroupLayout.PREFERRED_SIZE))
+                    .addContainerGap())
+        );
+        gl_pMedicalHistory.setVerticalGroup(
+            gl_pMedicalHistory.createParallelGroup(Alignment.LEADING)
+                .addGroup(gl_pMedicalHistory.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(gl_pMedicalHistory.createParallelGroup(Alignment.LEADING)
+                        .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                        .addGroup(gl_pMedicalHistory.createSequentialGroup()
+                            .addGroup(gl_pMedicalHistory.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnFilterShablon))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lShablonNames, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
+                            .addGap(5)))
+                    .addContainerGap())
+        );
+        pMedicalHistory.setLayout(gl_pMedicalHistory);
     }
 }

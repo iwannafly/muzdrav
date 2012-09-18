@@ -31,6 +31,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
@@ -67,8 +68,6 @@ public class TalonSelectFrame extends JFrame {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxPoliclinic;
     private ThriftStringClassifierCombobox<StringClassifier> cbxSpeciality;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxDoctor;
-    // Buttons
-    private JButton btnUpdate;
     // Panes
     private JSplitPane splitPane;
     private JTabbedPane tbpTalonOperations;
@@ -79,8 +78,12 @@ public class TalonSelectFrame extends JFrame {
     private GroupLayout glPnTalonType;
     //Patient
     private Patient curPatient;
+    private UserAuthInfo curDoctorInfo;
+    private JButton btnBackward;
+    private JButton btnForward;
 
-    public TalonSelectFrame() {
+    public TalonSelectFrame(final UserAuthInfo authInfo) {
+        curDoctorInfo = authInfo;
         initialization();
     }
 
@@ -227,11 +230,13 @@ public class TalonSelectFrame extends JFrame {
                         cbxSpeciality.setData(
                             MainForm.tcl.getSpec(cbxPoliclinic.getSelectedItem().getPcod())
                         );
-                        cbxSpeciality.setSelectedIndex(0);
+                        cbxSpeciality.setSelectedPcod(curDoctorInfo.getCdol());
                     }
                 } catch (KmiacServerException | SpecNotFoundException
                         | TException e1) {
                     e1.printStackTrace();
+                } catch (RuntimeException re) {
+                    cbxSpeciality.setSelectedIndex(0);
                 }
             }
         });
@@ -247,11 +252,13 @@ public class TalonSelectFrame extends JFrame {
                                 cbxSpeciality.getSelectedItem().getPcod()
                             )
                         );
-                        cbxDoctor.setSelectedIndex(0);
+                        cbxDoctor.setSelectedPcod(curDoctorInfo.getPcod());
                     }
                 } catch (KmiacServerException | VrachNotFoundException
                         | TException e1) {
                     e1.printStackTrace();
+                } catch (RuntimeException re) {
+                    cbxDoctor.setSelectedIndex(0);
                 }
             }
         });
@@ -267,25 +274,47 @@ public class TalonSelectFrame extends JFrame {
                 }
             }
         });
-        btnUpdate = new JButton("Обновить");
-        glPnTalonType = new GroupLayout(pnTalonType);
+
+        btnBackward = new JButton("Назад");
+        btnBackward.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ((TalonTableModel) tbTalonSelect.getModel()).setPrevWeek();
+                tbTalonSelect.repaint();
+                tbTalonSelect.updateUI();
+            }
+        });
+
+        btnForward = new JButton("Вперед");
+        btnForward.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ((TalonTableModel) tbTalonSelect.getModel()).setNextWeek();
+                tbTalonSelect.repaint();
+                tbTalonSelect.updateUI();
+            }
+        });
+
         fillTalonTypeGroupLayout();
         pnTalonType.setLayout(glPnTalonType);
     }
 
     private void fillTalonTypeGroupLayout() {
+        glPnTalonType = new GroupLayout(pnTalonType);
         glPnTalonType.setHorizontalGroup(
             glPnTalonType.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPnTalonType.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(glPnTalonType.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(btnUpdate, Alignment.LEADING,
-                                GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
-                        .addComponent(cbxDoctor, Alignment.LEADING, 0, 252, Short.MAX_VALUE)
-                        .addComponent(
-                                cbxSpeciality, Alignment.LEADING, 0, 252, Short.MAX_VALUE)
-                        .addComponent(
-                                cbxPoliclinic, Alignment.LEADING, 0, 252, Short.MAX_VALUE))
+                    .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING)
+                        .addComponent(cbxDoctor, 0, 328, Short.MAX_VALUE)
+                        .addComponent(cbxSpeciality, 0, 328, Short.MAX_VALUE)
+                        .addComponent(cbxPoliclinic, 0, 328, Short.MAX_VALUE)
+                        .addGroup(glPnTalonType.createSequentialGroup()
+                            .addComponent(btnBackward, GroupLayout.PREFERRED_SIZE, 181,
+                                    GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                            .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
+                                    GroupLayout.PREFERRED_SIZE)))
                     .addContainerGap())
         );
         glPnTalonType.setVerticalGroup(
@@ -300,9 +329,11 @@ public class TalonSelectFrame extends JFrame {
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addComponent(cbxDoctor, GroupLayout.PREFERRED_SIZE,
                             GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGap(37)
-                    .addComponent(btnUpdate)
-                    .addContainerGap(86, Short.MAX_VALUE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(btnBackward)
+                        .addComponent(btnForward))
+                    .addContainerGap(107, Short.MAX_VALUE))
         );
     }
 
@@ -402,13 +433,15 @@ public class TalonSelectFrame extends JFrame {
     }
 
     public final void fillPatientInfoLabels(final int patientId, final String patientSurname,
-            final String patientName, final String patientMiddlename, final long patientBirthdate) {
+            final String patientName, final String patientMiddlename, final long patientBirthdate,
+            final int idPvizit) {
         lblId.setText(String.valueOf(patientId));
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
         lblBirthdate.setText(new Date(patientBirthdate).toString());
-        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename);
+        curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
+                idPvizit);
     }
 
     public final void onConnect() {
@@ -418,11 +451,12 @@ public class TalonSelectFrame extends JFrame {
     private void fillTalonTypeComboboxes() {
         try {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
-            cbxPoliclinic.setSelectedIndex(0);
+            cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
         } catch (KmiacServerException | PoliclinicNotFoundException
                 | TException e) {
-            System.out.println("пыщ");
             e.printStackTrace();
+        } catch (RuntimeException e) {
+            cbxPoliclinic.setSelectedIndex(0);
         }
     }
 }

@@ -684,4 +684,11 @@ public class ServerHospital extends Server implements Iface {
         }
     }
 
+    @Override
+    public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
+            final String srcText) throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

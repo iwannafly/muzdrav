@@ -154,6 +154,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
 	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
+	list<classifier.IntegerClassifier> getShablonNames(1: i32 cspec, 2: i32 cslu, 3: string srcText)
+		throws (1: kmiacServer.KmiacServerException kse);
+		
 	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId);	
 	TMedicalHistory getLifeHistory(1:i32 gospId) throws (1:LifeHistoryNotFoundException lhnfe);
     TMedicalHistory getDesiaseHistory(1:i32 gospId) throws (1:DesiaseHistoryNotFoundException dhnfe);

@@ -40,6 +40,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
@@ -115,6 +116,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private final Class<?>[] rdDinTypes;
+	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
+	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
 
 
@@ -185,6 +188,10 @@ public class ServerOsm extends Server implements Iface {
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
+	
+		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "id_pdiag",    "diag",       "pmer",        "pdat",     "vdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",       "id_pvizit",   "id_pos",      "name_pmer");
+		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
+
 	}
 
 	@Override
@@ -270,7 +277,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<ZapVr> getZapVr(int idvr, String cdol, long datap) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, tal.vidp, tal.timepn, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, tal.id_pvizit, pat.pol, pat.datar FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?)", idvr, cdol, new Date(datap))) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, tal.vidp, tal.timepn, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, tal.id_pvizit, pat.pol, pat.datar FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL", idvr, cdol, new Date(datap))) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
@@ -297,20 +304,6 @@ public class ServerOsm extends Server implements Iface {
 		}
 	}
 	
-	@Override
-	public int AddPViz(Pvizit pv) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_vizit (npasp, cpol, datao, cod_sp, cdol, cuser, dataz) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, pv, pvizitTypes, 1, 2, 4, 8, 9, 10, 12);
-			int id = sme.getGeneratedKeys().getInt("id");
-			sme.execPrepared("INSERT INTO p_anam_zab (id_pvizit, npasp) VALUES (?, ?) ", false, id, pv.getNpasp());
-			sme.setCommit();
-			return id;
-		} catch (InterruptedException | SQLException e) {
-			throw new KmiacServerException();	
-		
-	}
-}
-
 	@Override
 	public Pvizit getPvizit(int obrId) throws PvizitNotFoundException, KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_vizit WHERE id = ? ", obrId)) {
@@ -1879,6 +1872,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error searching template");
 		}
+	}
+
+	@Override
+	public List<Pmer> getPmer(int id_pdiag) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.id_pdiag = ?", id_pdiag)) {
+			return rsmPmer.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
+
 	}
 
 
