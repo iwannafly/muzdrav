@@ -374,12 +374,6 @@ public class FormRdDin extends JFrame {
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
-//				rddin.setArt1(120);
-//				rddin.setArt2(80);
-//				rddin.setArt3(120);
-//				rddin.setArt4(80);
-//				rddin.setChcc(70);
-//				rddin.setHdm(0);
 				rddin.setGrr(0);
 				rddin.setBall(0);
 				rddin.setArt1((int) SPdad.getModel().getValue());
