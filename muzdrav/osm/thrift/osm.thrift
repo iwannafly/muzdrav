@@ -425,6 +425,7 @@ struct Pmer{
 	12: string cdol;
 	13: i32 id_pvizit;
 	14: i32 id_pos;
+	15: string name_pmer;
 }
 
 exception PvizitNotFoundException {
