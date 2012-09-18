@@ -110,12 +110,17 @@ struct PatientMestn {
 }
 
 struct Psmertdop {
-	 1: i32 cpodr,
-	 2: i32 cslu,
-	 3: bool prizn,
-	 4: i32 nomer_n,
-	 5: i32 nomer_k,
-	 6: i32 nomer_t
+	 1: optional i32 id,
+	 2: optional i32 cpodr,
+	 3: optional i32 cslu,
+	 4: optional i32 clpu,
+	 5: optional bool prizn,
+	 6: optional i32 nomer_n,
+	 7: optional i32 nomer_k,
+	 8: optional i32 nomer_t,
+	 9: optional string fam,
+	10: optional string im,
+	11: optional string ot		
 	 
 }
 
@@ -181,7 +186,7 @@ service ThriftMss extends kmiacServer.KmiacServer {
 /**
  * выбор записи из таблицы дополнительной информации
  */
-	Psmertdop getPsmertdop(1:i32 cpodr) throws (1: MssdopNotFoundException sdne);
+	Psmertdop getPsmertdop(1:i32 cpodr,2:i32 cslu,3:i32 clpu) throws (1: MssdopNotFoundException sdne);
 
 /**
  * определение местности проживания
@@ -189,9 +194,10 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	PatientMestn getL00(1:i32 c_ffoms, 2: string name) throws (1: MestnNotFoundException mstn);	
 
 /**
- * ввод или корректировка диапазона номеров мед. свидетельства
+ * добавляет дополнительную информацию для формирования МСС в базу
  */
 	i32 setPsmertdop(1: Psmertdop cpodr);
+	
 
 /**
  * заполнивший медицинское свидетельство о смерти

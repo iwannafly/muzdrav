@@ -34,6 +34,7 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -47,6 +48,8 @@ import ru.nkz.ivcgzo.thriftMss.P_smert;
 import ru.nkz.ivcgzo.thriftMss.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftMss.PatientMestn;
 import ru.nkz.ivcgzo.thriftMss.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftMss.Psmertdop;
+import ru.nkz.ivcgzo.thriftMss.MssdopNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 import ru.nkz.ivcgzo.thriftMss.UserFio;
 import ru.nkz.ivcgzo.thriftMss.UserNotFoundException;
@@ -66,7 +69,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private final ButtonGroup BtnGroup_mjit = new ButtonGroup();
 	private final ButtonGroup BtnGroup_don = new ButtonGroup();
 	private JTextField tfAds_obl;
-	private JTextField tfAds_raion;
+	private CustomTextField tfAds_raion;
 	private JTextField tfAds_gorod;
 	private JTextField tfAds_ul;
 	private JTextField tfAds_dom;
@@ -91,7 +94,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private CustomDateEditor tfDatas;
 	private CustomTimeEditor tfVrems;
 	private JTextField tfAdm_obl;
-	private JTextField tfAdm_raion;
+	private CustomTextField tfAdm_raion;
 	private JTextField tfAdm_gorod;
 	private JTextField tfAdm_ul;
 	private JTextField tfAdm_dom;
@@ -165,6 +168,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private PatientCommonInfo PatientAdres;
 	private PatientMestn PatMestn;
 	private UserFio UFio;
+	private Psmertdop nomerMss;
 	
 	private int patId = 0;
 	private float ktime = 0;
@@ -176,7 +180,8 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private int cuserCslu = 0;
 	private int cuserClpu = 0;
 	private String cuserFio;
-	private String opDiag;
+	private DopInfoForm dopInfo;
+	private int nextNomer = 0;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftMss.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -207,7 +212,15 @@ public class MainForm extends Client<ThriftMss.Client> {
 				cuserClpu = MainForm.authInfo.getClpu();
 				cuserCslu = MainForm.authInfo.getCslu();
 				cuserPodr = MainForm.authInfo.getCpodr();
-				
+				try {
+					nomerMss = MainForm.tcl.getPsmertdop(cuserPodr, cuserCslu, cuserClpu);
+					nextNomer = nomerMss.nomer_t+1;
+					
+				} catch (MssdopNotFoundException | TException e0) {
+					
+					e0.printStackTrace();
+				}
+			
 					try {
 						UFio = MainForm.tcl.getUserFio(cuserId);
 						cuserFio = UFio.getFam().trim() + ' '+ UFio.getIm().trim()+ ' ' + UFio.getOt().trim();
@@ -373,18 +386,11 @@ public class MainForm extends Client<ThriftMss.Client> {
 						if (Patientsmert.getKvdok() != null) tfKvdok.setText(Patientsmert.kvdok.trim());
 						if (Patientsmert.isSetDvdok()) tfDvdok.setDate(Patientsmert.dvdok);
 						aBool = changeValue();
-						//try {
-						//	UFio = MainForm.tcl.getUserFio(cuserId);
-						//	cuserFio = UFio.getFam().trim() + ' '+ UFio.getIm().trim()+ ' ' + UFio.getOt().trim();
-						//	tfZapolnil.setText(cuserFio);
-						//} catch (UserNotFoundException | TException e2) {
-						//	// TODO Auto-generated catch block
-						//	e2.printStackTrace();
-						//}
-						//panel_6.setVisible(aBool);
 						} catch (MssNotFoundException e1) {
-						//System.out.println("NO" );
-					//	JOptionPane.showMessageDialog(frame, String.format("Нет информации на пациента %d", res[0]));
+							tfSer.setText("32");
+							tfNomer.setText(String.valueOf(nextNomer).trim());
+							
+						//	JOptionPane.showMessageDialog(frame, String.format("Нет информации на пациента %d", res[0]));
 					}
 					} catch (TException e1) {
 						e1.printStackTrace();
@@ -566,6 +572,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 					if (Patientsmert.getDataz() == 0) Patientsmert.setDataz(new Date().getTime());
 					//System.out.println("STROKA" );
 					MainForm.tcl.setPsmert(Patientsmert);
+					try {
+						nomerMss.setNomer_t(Integer.valueOf(tfNomer.getText()));
+						MainForm.tcl.setPsmertdop(nomerMss);	
+					} catch (Exception e3) {
+						e3.printStackTrace();
+					}
+					
 				} catch (Exception e1) {
 					e1.printStackTrace();						
 				}						
@@ -675,6 +688,14 @@ public class MainForm extends Client<ThriftMss.Client> {
 		JButton btnNomer = new JButton("Номера");
 		btnNomer.setVerticalAlignment(SwingConstants.TOP);
 		panel.add(btnNomer);
+		btnNomer.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+			dopInfo = new DopInfoForm();
+			dopInfo.setVisible(true);
+			}
+			
+		});
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		cmbVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_r0l);
@@ -943,7 +964,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 			
 			JLabel lblNewLabel_14 = new JLabel("район");
 			
-			tfAds_raion = new JTextField();
+			tfAds_raion = new CustomTextField();
 			tfAds_raion.setColumns(10);
 			
 			JLabel lblNewLabel_15 = new JLabel("город (населенный пункт)");
@@ -1043,7 +1064,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					tfAdm_obl.setEditable(false);
 					tfAdm_obl.setColumns(10);
 					
-					tfAdm_raion = new JTextField();
+					tfAdm_raion = new CustomTextField();
 					tfAdm_raion.setColumns(10);
 					
 					tfAdm_gorod = new JTextField();

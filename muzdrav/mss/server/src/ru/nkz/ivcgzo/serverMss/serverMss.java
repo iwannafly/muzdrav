@@ -1,10 +1,12 @@
 package ru.nkz.ivcgzo.serverMss;
 
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -78,8 +80,8 @@ public class serverMss extends Server implements Iface {
 		mssPatient = new TResultSetMapper<>(PatientCommonInfo.class, "npasp","fam", "im", "ot", "datar", "pol", "adm_obl", "adm_gorod", "adm_ul", "adm_dom", "adm_korp", "adm_kv", "region_liv");
 		patTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,Date.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class};
 		
-		mssDop = new TResultSetMapper<>(Psmertdop.class, "cpodr", "cslu", "prizn", "nomer_n", "nomer_k", "nomer_t");
-		dopTypes = new Class<?>[] {Integer.class,Integer.class,Boolean.class,Integer.class,Integer.class,Integer.class};
+		mssDop = new TResultSetMapper<>(Psmertdop.class, "id","cpodr", "cslu", "clpu", "prizn", "nomer_n", "nomer_k", "nomer_t", "fam", "im", "ot");
+		dopTypes = new Class<?>[] {Integer.class,Integer.class,Integer.class,Integer.class,Boolean.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class};
 		
 		mssClass = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		intcTypes = new Class<?>[] {Integer.class, String.class};
@@ -93,6 +95,22 @@ public class serverMss extends Server implements Iface {
 		mssUser = new TResultSetMapper<>(UserFio.class, "pcod", "fam", "im", "ot");
 		userTypes = new Class<?>[] {Integer.class, String.class, String.class, String.class};
 	}
+	
+	/**
+     * Проверяет, существует в таблице дополнительная информация для печати МСС
+     * @param dopInfo - thrift-объект с информацией 
+     * @return true - если информация уже существует,
+     * false - если не существует
+     */
+//	private boolean isExistInfo(final int cpodr, int cslu, int clpu) throws SQLException {
+//        try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
+//                "SELECT id FROM p_smert_dop WHERE (cpodr = ?) and (cslu = ?) and (clpu = ?) ",
+//                cpodr,cslu,clpu, dopTypes, 0)) {
+//        	return acrs.getResultSet().next();
+//            } catch (SQLException e) {
+//            return false;
+//        }
+//	}
 
 	@Override
 	public void testConnection() throws TException {
@@ -206,9 +224,9 @@ public class serverMss extends Server implements Iface {
 	}
 
 	@Override
-	public Psmertdop getPsmertdop(int cpodr) throws MssdopNotFoundException,
+	public Psmertdop getPsmertdop(int cpodr, int cslu, int clpu) throws MssdopNotFoundException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_smert_dop WHERE cpodr = ? ", cpodr)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT cpodr,cslu,clpu,prizn,nomer_n,nomer_k,nomer_t,fam,im,ot FROM p_smert_dop WHERE (cpodr = ?) and (cslu = ?) and (clpu = ?) ", cpodr,cslu,clpu)) {
 			if (acrs.getResultSet().next())
 				return mssDop.map(acrs.getResultSet());
 			else
@@ -220,31 +238,23 @@ public class serverMss extends Server implements Iface {
 	}
 
 	@Override
-	public int setPsmertdop(Psmertdop cpodr) throws TException {
+	public int setPsmertdop(Psmertdop dopInfo) throws TException {
 		String sql;
 		
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
-				getPsmertdop(cpodr.getCpodr());
-				
-				sql = "UPDATE p_smert_dop SET prizn = ?, nomer_n = ?, nomer_k = ?, nomer_t = ?  WHERE cpodr = ? and cslu = ?" ;
-				sme.execPreparedT(sql, false, cpodr, dopTypes, 3, 4, 5, 6, 1);
+				getPsmertdop(dopInfo.getCpodr(),dopInfo.getCslu(), dopInfo.getClpu());
+				sql = "UPDATE p_smert_dop SET prizn = ?, nomer_n = ?, nomer_k = ?, nomer_t = ?, fam = ?, im = ?, ot = ?   WHERE (cpodr = ?) and (cslu = ?)  and (clpu = ?) " ;
+				sme.execPreparedT(sql, false, dopInfo, dopTypes, 4, 5, 6, 7, 8, 9, 10, 1,2,3);
 				sme.setCommit();
 			} catch (MssdopNotFoundException e) {
-				try {
-					sql = "INSERT INTO p_smert_dop (cpodr, cslu, prizn, nomer_n, nomer_k, nomer_t) VALUES (?, ?, ?, ?, ?, ?)";
-					sme.execPreparedT(sql, false, cpodr, dopTypes, 1, 2, 3, 4, 5, 6);
-					sme.setCommit();
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				sql = "INSERT INTO p_smert_dop (cpodr, cslu, clpu, prizn, nomer_n, nomer_k, nomer_t, fam, im, ot) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				sme.execPreparedT(sql, false, dopInfo, dopTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+				sme.setCommit();
 			}
-		} catch (InterruptedException | SqlExecutorException e) {
-			// TODO Auto-generated catch block
+		} catch (SQLException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -308,6 +318,8 @@ public class serverMss extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
+
+
 
 		
 }
