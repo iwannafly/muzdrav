@@ -253,13 +253,13 @@ public class PatientInfoForm extends ModalForm {
 		 					else
 		 						addHeader("Исследований нет");
 		 				}
-		 				addHeader("Поставленные диагнозы");//getPdiagAmb
+		 				addHeader("Поставленные диагнозы");
 		 				for (PatientDiagAmbInfo pdiagamb : MainForm.tcl.getPatientDiagAmbInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 		 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 		 					addLineToDetailInfo("Статус",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
 		 				}
-		 				addHeader("Выписанные документы");//getPdiagAmb
+		 				addHeader("Выписанные документы");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование",pnapr.isSetText(),pnapr.getText());
@@ -275,11 +275,9 @@ public class PatientInfoForm extends ModalForm {
 		 				PvizitAmbNode pvizitAmbNode = (PvizitAmbNode) lastPath;
 		 				PatientVizitAmbInfo pam = pvizitAmbNode.pam;
 		 				PatientPriemInfo priem =  MainForm.tcl.getPatientPriemInfo(pam.getNpasp(),pam.getId());
-						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
+//						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
 						addLineToDetailInfo("Должность",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pam.isSetCdol(), pam.getCdol()));
 						addLineToDetailInfo("Врач",pam.isSetFio_vr(),pam.getFio_vr());
-						//addHeader("Жалобы");
-						//addLineToDetailInfo("Жалобы",priem.isSetT_jalob(), priem.getT_jalob());
 						addLineToDetailInfo("Место обслуживания",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abs), pam.isSetMobs(), pam.getMobs()));
 						addLineToDetailInfo("Жалобы",priem.isSetT_jalob(), priem.getT_jalob());
 						addLineToDetailInfo("ЧСС",priem.isSetT_chss(), priem.getT_chss());
@@ -289,9 +287,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Вес",priem.isSetT_ves(), priem.getT_ves());
 						addLineToDetailInfo("Status praesense",priem.isSetT_status_praesense(), priem.getT_status_praesense());
 						addLineToDetailInfo("Физикальное обследование",priem.isSetT_fiz_obsl(), priem.getT_fiz_obsl());
-						//addHeader("Status localis");
 						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
-						//addHeader("Оценка данных анамнеза и объективного исследования");
 						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
