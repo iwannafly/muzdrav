@@ -862,23 +862,9 @@ public class Vvod extends JFrame {
 				if (!e.getValueIsAdjusting()){
 					if (tblDiag.getSelectedItem()!= null) {
 						diagamb = tblDiag.getSelectedItem();
-						tbDiagOpis.setText(diagamb.getNamed());
-						bgDiagStat.clearSelection();
-						rbtDiagOsn.setSelected(diagamb.diag_stat == 1);
-						rbtDiagSop.setSelected(diagamb.diag_stat == 3);
-						rbtDiagOsl.setSelected(diagamb.diag_stat == 2);
-						bgDiagPredv.clearSelection();
-						if (diagamb.predv)
-							rbtDiagPredv.doClick();
-						else
-							rbtDiagZakl.doClick();
-						if (diagamb.isSetObstreg()) cmbDiagObstReg.setSelectedPcod(diagamb.getObstreg());else cmbDiagObstReg.setSelectedItem(null);
-						if (diagamb.isSetVid_tr()) cmbDiagVidTr.setSelectedPcod(diagamb.getVid_tr()); else cmbDiagVidTr.setSelectedItem(null);
-
 							
-						pdiag = new PdiagZ();
 						try {
-							pdiag = MainForm.tcl.getPdiagZ(tblDiag.getSelectedItem().getId());
+							pdiag = MainForm.tcl.getPdiagZ(diagamb.getId());
 						} catch (KmiacServerException e1) {
 							e1.printStackTrace();
 						} catch (PdiagNotFoundException e1) {
@@ -886,19 +872,9 @@ public class Vvod extends JFrame {
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
-						bgDiagStadZab.clearSelection();
-						rbtDiagStadRan.setSelected(pdiag.getStady() == 1);
-						rbtDiagStadPoz.setSelected(pdiag.getStady() == 2);
-						bgDiagHarZab.clearSelection();
-						rbtDiagHarOstr.setSelected(pdiag.getXzab() == 1);
-						rbtDiagHarHron.setSelected(pdiag.getXzab() == 2);
-						chbDiagBer.setSelected(pdiag.getPat() == 1);
-						chbDiagBoe.setSelected(pdiag.getPrizb() == 1);
-						chbDiagInv.setSelected(pdiag.getPrizi() == 1);
 						
-						pdisp = new Pdisp();
 						try {
-							pdisp = MainForm.tcl.getPdisp(tblDiag.getSelectedItem().getId());
+							pdisp = MainForm.tcl.getPdisp(diagamb.getId());
 						} catch (KmiacServerException e1) {
 							e1.printStackTrace();
 						} catch (PdispNotFoundException e1) {
@@ -906,27 +882,53 @@ public class Vvod extends JFrame {
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
-						
-						if (pdisp.isSetD_vz())
-							tbDiagDispDatVz.setDate(pdisp.getD_vz());
-						else
-							tbDiagDispDatVz.setValue(null);
-						
-						if (pdisp.isSetDataish())
-							tbDiagDispDatIsh.setDate(pdisp.getDataish());
-						else
-							tbDiagDispDatIsh.setValue(null);
-						
-						if (pdisp.isSetIshod())
-							cmbDiagDispIsh.setSelectedPcod(pdisp.getIshod());
-						else
-							cmbDiagDispIsh.setSelectedItem(null);
-						if (pdisp.isSetD_grup())
-							cmbDiagDispGrup.setSelectedPcod(pdisp.getD_grup());
-						else
-							cmbDiagDispGrup.setSelectedItem(null);
-						}	
-
+					} else {
+						diagamb = new PdiagAmb();
+						pdiag = new PdiagZ();
+						pdisp = new Pdisp();
+					}
+					
+					tbDiagOpis.setText(diagamb.getNamed());
+					bgDiagStat.clearSelection();
+					rbtDiagOsn.setSelected(diagamb.diag_stat == 1);
+					rbtDiagSop.setSelected(diagamb.diag_stat == 3);
+					rbtDiagOsl.setSelected(diagamb.diag_stat == 2);
+					bgDiagPredv.clearSelection();
+					if (diagamb.predv)
+						rbtDiagPredv.doClick();
+					else
+						rbtDiagZakl.doClick();
+					if (diagamb.isSetObstreg()) cmbDiagObstReg.setSelectedPcod(diagamb.getObstreg());else cmbDiagObstReg.setSelectedItem(null);
+					if (diagamb.isSetVid_tr()) cmbDiagVidTr.setSelectedPcod(diagamb.getVid_tr()); else cmbDiagVidTr.setSelectedItem(null);
+					
+					bgDiagStadZab.clearSelection();
+					rbtDiagStadRan.setSelected(pdiag.getStady() == 1);
+					rbtDiagStadPoz.setSelected(pdiag.getStady() == 2);
+					bgDiagHarZab.clearSelection();
+					rbtDiagHarOstr.setSelected(pdiag.getXzab() == 1);
+					rbtDiagHarHron.setSelected(pdiag.getXzab() == 2);
+					chbDiagBer.setSelected(pdiag.getPat() == 1);
+					chbDiagBoe.setSelected(pdiag.getPrizb() == 1);
+					chbDiagInv.setSelected(pdiag.getPrizi() == 1);
+					
+					if (pdisp.isSetD_vz())
+						tbDiagDispDatVz.setDate(pdisp.getD_vz());
+					else
+						tbDiagDispDatVz.setValue(null);
+					
+					if (pdisp.isSetDataish())
+						tbDiagDispDatIsh.setDate(pdisp.getDataish());
+					else
+						tbDiagDispDatIsh.setValue(null);
+					
+					if (pdisp.isSetIshod())
+						cmbDiagDispIsh.setSelectedPcod(pdisp.getIshod());
+					else
+						cmbDiagDispIsh.setSelectedItem(null);
+					if (pdisp.isSetD_grup())
+						cmbDiagDispGrup.setSelectedPcod(pdisp.getD_grup());
+					else
+						cmbDiagDispGrup.setSelectedItem(null);
 					}
 			}
 		});
