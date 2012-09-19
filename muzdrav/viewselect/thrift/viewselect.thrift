@@ -142,6 +142,7 @@ struct PatientVizitInfo {
 	14: optional string recomend;
 	15: optional i32 idzab;
 	16: optional string vrach_fio;
+	17: optional string lech;
 }
 
 struct PatientDiagZInfo {
@@ -168,7 +169,7 @@ struct PatientDiagZInfo {
 	21: optional i32 prizb;
 	22: optional i32 prizi;
 	23: optional string named;
-	24: optional string nameC00;
+	24: optional string fio_vr;
 }
 
 struct PatientVizitAmbInfo {

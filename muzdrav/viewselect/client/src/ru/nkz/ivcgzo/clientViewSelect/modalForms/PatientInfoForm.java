@@ -202,12 +202,15 @@ public class PatientInfoForm extends ModalForm {
 							if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
 						} catch (KmiacServerException e1) {
 							System.err.println(e1.getMessage());
+							eptxt.setText("");
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
 						eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PdiagTreeNode) {
 			 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
+			 			if(pdiagNode.getChildCount()==0) eptxt.setText("");
+			 			else{
 			 			PatientDiagZInfo pdiag = pdiagNode.pdiag;
 						addLineToDetailInfo("Поликлиника",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
 						addLineToDetailInfo("Медицинское описание", pdiag.isSetNamed(),pdiag.getNamed());
@@ -221,21 +224,17 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Исход д/у", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abb),pdiag.isSetIshod(),pdiag.getIshod()));
 			 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
 						addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
-		 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
+		 				addLineToDetailInfo("Врач, ведущий д/у", pdiag.isSetFio_vr(),pdiag.getFio_vr());
 						addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
 						addLineIf("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
 						addLineIf("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
 						addLineIf("Инвалидизующий диагноз: да", pdiag.isSetPrizi(), pdiag.getPrizi());
-						eptxt.setText(sb.toString());
+						eptxt.setText(sb.toString());}
 		 			} else if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 				PatientVizitInfo pvizit = pvizitNode.pvizit;
-			 			//addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
 						addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
-			 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
-						//addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
-						//addHeader("Анамнез заболевания");
 		 				try {
 							PatientAnamZabInfo anamnez =  MainForm.tcl.getPatientAnamZabInfo(pvizit.getId(),pvizit.getNpasp());
 							addLineToDetailInfo("История настоящего заболевания",anamnez.isSetT_ist_zab(), anamnez.getT_ist_zab());
@@ -269,6 +268,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetRezult(), pvizit.getRezult()));
 						addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 			 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
+			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());
 	
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitAmbNode) {
@@ -289,7 +289,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Физикальное обследование",priem.isSetT_fiz_obsl(), priem.getT_fiz_obsl());
 						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
 						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pam.isSetRezult(), pam.getRezult()));
+						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 			 		} else if (lastPath instanceof RdslTreeNode) {
 		 				RdslTreeNode rdslNode = (RdslTreeNode) lastPath;
@@ -420,7 +420,7 @@ public class PatientInfoForm extends ModalForm {
 		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
 		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
 		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
-		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
+		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Заключительные диагнозы");
 		DefaultMutableTreeNode berinfo = new DefaultMutableTreeNode("Случаи беременности");
 		root.add(patinfo);
 		root.add(signinfo);
