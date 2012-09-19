@@ -647,10 +647,11 @@ public class ConnectionManager {
 	
 	/**
 	 * Вызов формы с информацией на пациента.
+	 * @param title - заголовок формы
 	 * @param npasp - уникальный номер пациента
 	 */
-	public void showPatientInfoForm(int npasp) {
-		viewClient.showModal(client, 17, npasp);
+	public void showPatientInfoForm(String title, int npasp) {
+		viewClient.showModal(client, 17, title, npasp);
 	}
 	
 	/**

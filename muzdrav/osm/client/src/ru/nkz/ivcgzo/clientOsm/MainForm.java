@@ -106,7 +106,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnView.setVisible(false);
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainForm.conMan.showPatientInfoForm(table.getSelectedItem().getNpasp());
+				if (table.getSelectedItem() != null)
+				MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", table.getSelectedItem().fam, table.getSelectedItem().im, table.getSelectedItem().oth), table.getSelectedItem().npasp);
 			}
 		});
 		
