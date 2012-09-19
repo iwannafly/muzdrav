@@ -29,7 +29,7 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
-	public static Client<ThriftOsm.Client> instance;
+	public static MainForm instance;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
@@ -191,5 +191,9 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		}
 		
 		timer.restart();
+	}
+	
+	public void setVisible(boolean value) {
+		frame.setVisible(value);
 	}
 }

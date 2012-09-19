@@ -495,6 +495,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
+	bool isZapVrNext(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);

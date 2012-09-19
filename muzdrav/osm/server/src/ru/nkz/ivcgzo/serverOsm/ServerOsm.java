@@ -1890,13 +1890,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<Pmer> getPmer(int id_pdiag) throws KmiacServerException,
-			TException {
+	public List<Pmer> getPmer(int id_pdiag) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.id_pdiag = ?", id_pdiag)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException();
 		}
+	}
 
+	@Override
+	public boolean isZapVrNext(int idObr) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id_pvizit FROM e_talon WHERE (id_pvizit = ?) AND (datap > CURRENT_DATE) ", idObr)) {
+			return acrs.getResultSet().next();
+		} catch (SQLException e) {
+			throw new KmiacServerException();
+		}
 	}
 }

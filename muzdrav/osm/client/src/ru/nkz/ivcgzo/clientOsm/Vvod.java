@@ -1,10 +1,13 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -78,7 +81,6 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import java.awt.Frame;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -158,6 +160,24 @@ public class Vvod extends JFrame {
 	 * Create the dialog.
 	 */
 	public Vvod() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+				
+				try {
+					if (!checkInput())
+						if (JOptionPane.showConfirmDialog(Vvod.this, "Пациент не записан на следующий прием или ему не проставлен исход случая обращения. Закрыть окно?", "Предупреждение", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+							setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+							return;
+						}
+					MainForm.instance.setVisible(true);
+				} catch (TException e1) {
+					setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+					MainForm.conMan.reconnect(e1);
+				}
+			}
+		});
 		setExtendedState(Frame.MAXIMIZED_BOTH);
 		sign = new FormSign();
 		MainForm.instance.addChildFrame(sign);
@@ -1696,20 +1716,11 @@ public class Vvod extends JFrame {
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 				
-				try {
-					SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
-					String strDat = frm.format(new Date(System.currentTimeMillis()));
-					Date dat = frm.parse(strDat);
-					long curDateMills = dat.getTime();
-					for (PvizitAmb pviz : tblPos.getData()) {
-						if (pviz.getDatap() == curDateMills) {
-							JOptionPane.showMessageDialog(Vvod.this, "333333");
-							return;
-						}
+				for (PvizitAmb pviz : tblPos.getData())
+					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
+						JOptionPane.showMessageDialog(Vvod.this, "333333");
+						return;
 					}
-				} catch (ParseException e1) {
-					e1.printStackTrace();
-				}
 				
 				try {
 					Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
@@ -1736,46 +1747,30 @@ public class Vvod extends JFrame {
 				}
 				}
 				else {
+					for (PvizitAmb pviz : tblPos.getData())
+						if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
+							JOptionPane.showMessageDialog(Vvod.this, "333333");
+							return;
+						}
 					
 					try {
-					pvizit.setNpasp(zapVr.getNpasp());
-					pvizit.setCpol(MainForm.authInfo.getCpodr());
-					pvizit.setDatao(System.currentTimeMillis());
-					pvizit.setCod_sp(MainForm.authInfo.getPcod());
-					pvizit.setCdol(MainForm.authInfo.getCdol());
-					pvizit.setCuser(MainForm.authInfo.getUser_id());
-					pvizit.setDataz(System.currentTimeMillis());
-					pvizit.setId(MainForm.tcl.AddPvizitId(pvizit));
-					pvizitAmb = new PvizitAmb();
-					pvizitAmb.setId_obr(pvizit.getId());
-					pvizitAmb.setNpasp(zapVr.getNpasp());
-					pvizitAmb.setDatap(System.currentTimeMillis());
-					pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
-					pvizitAmb.setCdol(MainForm.authInfo.getCdol());
-					try {
-						SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
-						String strDat = frm.format(new Date(System.currentTimeMillis()));
-						Date dat = frm.parse(strDat);
-						long curDateMills = dat.getTime();
-						for (PvizitAmb pviz : tblPos.getData()) {
-							if (pviz.getDatap() == curDateMills) {
-								JOptionPane.showMessageDialog(Vvod.this, "333333");
-								return;
-							}
-						}
-						
-						try {
-							Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
-							pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
+						pvizit.setNpasp(zapVr.getNpasp());
+						pvizit.setCpol(MainForm.authInfo.getCpodr());
+						pvizit.setDatao(System.currentTimeMillis());
+						pvizit.setCod_sp(MainForm.authInfo.getPcod());
+						pvizit.setCdol(MainForm.authInfo.getCdol());
+						pvizit.setCuser(MainForm.authInfo.getUser_id());
+						pvizit.setDataz(System.currentTimeMillis());
+						pvizit.setId(MainForm.tcl.AddPvizitId(pvizit));
+						pvizitAmb = new PvizitAmb();
+						pvizitAmb.setId_obr(pvizit.getId());
+						pvizitAmb.setNpasp(zapVr.getNpasp());
+						pvizitAmb.setDatap(System.currentTimeMillis());
+						pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
+						pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
 						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
-						} catch (PvizitNotFoundException e1) {
-							e1.printStackTrace();
-						}
-					} catch (ParseException e1) {
-						e1.printStackTrace();
-					}
-						
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -1990,8 +1985,9 @@ public class Vvod extends JFrame {
 				
 		try {
 			setTitle(String.format("Врачебный осмотр - пациент: %s %s %s, номер и серия полиса: %s %s", zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getNompolis(), zapVr.getSerpolis()));
-			btnBer.setEnabled(zapVr.pol != 1);
-			chbDiagBer.setEnabled(zapVr.pol != 1);
+			int age = (int) ((System.currentTimeMillis() - zapVr.datar) / 31556952000L);
+			btnBer.setEnabled((zapVr.pol != 1) && ((age > 13) && (age < 50)));
+			chbDiagBer.setEnabled(btnBer.isEnabled());
 			
 			tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 			if (tblPos.getRowCount() > 0)
@@ -1999,14 +1995,15 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+			
+			setVisible(true);
+			MainForm.instance.setVisible(false);
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
 			e.printStackTrace();
 			MainForm.conMan.reconnect(e);
 		}
-		
-		setVisible(true);
 	}
 	private String getTextOrNull(String str) {
 		if (str != null)
@@ -2070,5 +2067,32 @@ public class Vvod extends JFrame {
 		tbDiagDispDatIsh.setEnabled(value);
 		cmbDiagDispGrup.setEnabled(value);
 		cmbDiagDispIsh.setEnabled(value);
+	}
+	
+	private boolean checkInput() throws TException {
+		try {
+			if (tblPos.getData().size() > 0)
+				if (tblPos.getData().get(tblPos.getData().size() - 1).datap == getDateMills(System.currentTimeMillis()))
+					if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit))
+						return true;
+					else if (!MainForm.tcl.getPvizit(zapVr.id_pvizit).isSetIshod())
+						return false;
+		} catch (KmiacServerException | PvizitNotFoundException e) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private long getDateMills(long mills) {
+		try {
+			SimpleDateFormat frm = new SimpleDateFormat("dd.MM.yyyy");
+			
+			return frm.parse(frm.format(new Date(mills))).getTime();
+		} catch (ParseException e) {
+			System.err.println("Error getDateMills");
+			
+			return 0;
+		}
 	}
 }
