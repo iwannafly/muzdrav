@@ -69,11 +69,12 @@ struct PatientFullInfo{
 	24:i32 prizn,
 	25:i32 ter_liv,
 	26:i32 region_liv,
-	27:Nambk nambk,
-	28:Address adpAddress,
-	29:Address admAddress,
-	30:Polis polis_oms,
-	31:Polis polis_dms
+	27:Address adpAddress,
+	28:Address admAddress,
+	29:Polis polis_oms,
+	30:Polis polis_dms,
+	31:i32 v_sch,
+	32:i32 str_org
 }
 
 /*сведени о представителе табл. p_preds*/
@@ -273,6 +274,8 @@ exception TerLiveNotFoundException {
 
 exception SmocodNotFoundException {
 }
+exception NambkNotFoundException{
+}
 
 service ThriftRegPatient extends kmiacServer.KmiacServer {
     
@@ -292,6 +295,8 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
      * @throws PatientNotFoundException
      */
     PatientFullInfo getPatientFullInfo(1:i32 npasp) throws (1: PatientNotFoundException pnfe),
+	
+	Nambk getNambk(1:i32 npasp, 2:i32 cpodr) throws (1:NambkNotFoundException nnfe),
 	
     /**
      * Возвращает сведения о представителе пациента с указанным персональным номером

@@ -487,8 +487,9 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					
 				case 17:
 					setFrame(infFrm);
+					infFrm.setTitle((String) params[1]);
 					dialog = prepareModal(parent);
-					infFrm.update((int) params[1]);
+					infFrm.update((int) params[2]);
 					infFrm.setModalityListener();
 					dialog.setVisible(true);
 					try {
