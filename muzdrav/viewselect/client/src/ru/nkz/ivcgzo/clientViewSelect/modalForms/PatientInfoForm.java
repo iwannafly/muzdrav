@@ -60,6 +60,12 @@ public class PatientInfoForm extends ModalForm {
 	private CustomDateEditor tfdatn;
 	private CustomDateEditor tfDatk;
 	private PatientCommonInfo info;
+	private DefaultMutableTreeNode root;
+	private DefaultMutableTreeNode patinfo;
+	private DefaultMutableTreeNode signinfo;
+	private DefaultMutableTreeNode posinfo;
+	private DefaultMutableTreeNode diaginfo;
+	private DefaultMutableTreeNode berinfo;
 
 	public PatientInfoForm() {
 		super(true);
@@ -209,8 +215,6 @@ public class PatientInfoForm extends ModalForm {
 						eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PdiagTreeNode) {
 			 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
-			 			if(pdiagNode.getChildCount()==0) eptxt.setText("");
-			 			else{
 			 			PatientDiagZInfo pdiag = pdiagNode.pdiag;
 						addLineToDetailInfo("Поликлиника",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
 						addLineToDetailInfo("Медицинское описание", pdiag.isSetNamed(),pdiag.getNamed());
@@ -229,7 +233,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineIf("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
 						addLineIf("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
 						addLineIf("Инвалидизующий диагноз: да", pdiag.isSetPrizi(), pdiag.getPrizi());
-						eptxt.setText(sb.toString());}
+						eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 				PatientVizitInfo pvizit = pvizitNode.pvizit;
@@ -330,7 +334,17 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("C.vera", rdsl.isSetCvera(), rdsl.getCvera());
 						eptxt.setText(sb.toString());
 		 			} 	
+			 		else if (lastPath.toString() == "Случаи заболевания") {
+			 			if (posinfo.getChildCount()==0) eptxt.setText("");
+			 		}
+		 			else if (lastPath.toString() == "Заключительные диагнозы") {
+			 			if (diaginfo.getChildCount()==0) eptxt.setText("");
+		 			}
+		 			else if (lastPath.toString() == "Случаи беременности") {
+			 			if (berinfo.getChildCount()==0) eptxt.setText("");
+		 			}
 	 			}
+		 		
 	 			catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -416,12 +430,12 @@ public class PatientInfoForm extends ModalForm {
 	}
 	
 	private DefaultMutableTreeNode createNodes(int pol) {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
-		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
-		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
-		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
-		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Заключительные диагнозы");
-		DefaultMutableTreeNode berinfo = new DefaultMutableTreeNode("Случаи беременности");
+		root = new DefaultMutableTreeNode("Корень");
+		patinfo = new DefaultMutableTreeNode("Личная информация");
+		signinfo = new DefaultMutableTreeNode("Анамнез жизни");
+		posinfo = new DefaultMutableTreeNode("Случаи заболевания");
+		diaginfo = new DefaultMutableTreeNode("Заключительные диагнозы");
+		berinfo = new DefaultMutableTreeNode("Случаи беременности");
 		root.add(patinfo);
 		root.add(signinfo);
 		root.add(posinfo);
