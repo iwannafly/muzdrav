@@ -1727,7 +1727,6 @@ public class Vvod extends JFrame {
 				else {
 					
 					try {
-					pvizit.setId(zapVr.getId_pvizit());
 					pvizit.setNpasp(zapVr.getNpasp());
 					pvizit.setCpol(MainForm.authInfo.getCpodr());
 					pvizit.setDatao(System.currentTimeMillis());
@@ -1735,6 +1734,7 @@ public class Vvod extends JFrame {
 					pvizit.setCdol(MainForm.authInfo.getCdol());
 					pvizit.setCuser(MainForm.authInfo.getUser_id());
 					pvizit.setDataz(System.currentTimeMillis());
+					pvizit.setId(MainForm.tcl.AddPvizitId(pvizit));
 					pvizitAmb = new PvizitAmb();
 					pvizitAmb.setId_obr(pvizit.getId());
 					pvizitAmb.setNpasp(zapVr.getNpasp());
