@@ -99,7 +99,8 @@ public class FormRdDin extends JFrame {
 			public void windowOpened(WindowEvent arg0) {
 //				JOptionPane.showMessageDialog(FormRdDin.this,  Vvod.zapVr.getId_pvizit());
 				try {
-					fam.setText(Vvod.zapVr.getFam());
+					System.out.println(Vvod.zapVr.getId_pvizit());
+	 			    fam.setText(Vvod.zapVr.getFam());
 					im.setText(Vvod.zapVr.getIm());
 					ot.setText(Vvod.zapVr.getOth());
 					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
@@ -367,7 +368,7 @@ public class FormRdDin extends JFrame {
 		Nbutton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-//				Vvod.btnPosAdd.doClick();
+				Vvod.btnPosAdd.doClick();
 
 				RdDinStruct rddin = new RdDinStruct();
 	//			setDefaultValues();

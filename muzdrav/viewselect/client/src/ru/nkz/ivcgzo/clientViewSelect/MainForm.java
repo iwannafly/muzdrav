@@ -36,9 +36,6 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-//import ru.nkz.ivcgzo.clientOsm.MainForm;
-//import ru.nkz.ivcgzo.clientOsm.MainForm;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientInfoForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
@@ -52,7 +49,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
@@ -398,6 +394,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						conMan.disconnect(getPort());
 						conMan.setClient(parent);
 					}
+					break;
+					
 				case 7:
 				case 8:
 					setFrame(intFrm);
@@ -479,16 +477,22 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 							return ccm.getNameFromPcodInteger((IntegerClassifiers) params[1], (int) params[2]);
 						case 14:
 							return ccm.getNameFromPcodString((StringClassifiers) params[1], (String) params[2]);
+						case 15:
+							return ccm.getPcodFromNameInteger((IntegerClassifiers) params[1], (String) params[2]);
+						case 16:
+							return ccm.getPcodFromNameString((StringClassifiers) params[1], (String) params[2]);
 						}
 					} catch (Exception e) {
 						conMan.disconnect(getPort());
 						conMan.setClient(parent);
 					}
+					break;
 					
 				case 17:
 					setFrame(infFrm);
+					infFrm.setTitle((String) params[1]);
 					dialog = prepareModal(parent);
-					infFrm.update((int) params[1]);
+					infFrm.update((int) params[2]);
 					infFrm.setModalityListener();
 					dialog.setVisible(true);
 					try {

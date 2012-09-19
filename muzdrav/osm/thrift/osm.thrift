@@ -35,8 +35,9 @@ struct Pvizit {
 	12: optional string zakl;
 	13: optional i64 dataz;
 	14: optional string recomend;
-	15: optional i32 idzab;
-	16: optional string vrach_fio;
+	15: optional string lech;
+	16: optional i32 idzab;
+	17: optional string vrach_fio;
 }
 
 struct PvizitAmb {
@@ -460,7 +461,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<ZapVr> getZapVrSrc(1: string npaspList) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
-	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
+	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 

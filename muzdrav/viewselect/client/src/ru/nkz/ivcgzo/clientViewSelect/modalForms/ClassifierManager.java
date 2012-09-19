@@ -100,6 +100,16 @@ public class ClassifierManager {
 		throw new KmiacServerException("Cannot fetch name by given pcod.");
 	}
 	
+	public int getPcodFromNameInteger(IntegerClassifiers cls, String name) throws KmiacServerException, TException {
+		name = name.toLowerCase();
+		for (IntegerClassifier ic : getIntegerClassifier(cls)) {
+			if (ic.name.toLowerCase().equals(name))
+				return ic.pcod;
+		}
+		
+		throw new KmiacServerException("Cannot fetch pcod by given name.");
+	}
+	
 	public String getNameFromPcodString(StringClassifiers cls, String pcod) throws KmiacServerException, TException {
 		for (StringClassifier sc : getStringClassifier(cls)) {
 			if (sc.pcod.equals(pcod))
@@ -107,5 +117,15 @@ public class ClassifierManager {
 		}
 		
 		throw new KmiacServerException("Cannot fetch name by given pcod.");
+	}
+	
+	public String getPcodFromNameString(StringClassifiers cls, String name) throws KmiacServerException, TException {
+		name = name.toLowerCase();
+		for (StringClassifier sc : getStringClassifier(cls)) {
+			if (sc.name.toLowerCase().equals(name))
+				return sc.pcod;
+		}
+		
+		throw new KmiacServerException("Cannot fetch pcod by given name.");
 	}
 }
