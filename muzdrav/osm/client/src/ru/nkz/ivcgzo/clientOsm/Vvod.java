@@ -1718,7 +1718,7 @@ public class Vvod extends JFrame {
 				
 				for (PvizitAmb pviz : tblPos.getData())
 					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
-						JOptionPane.showMessageDialog(Vvod.this, "333333");
+						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
 						return;
 					}
 				
@@ -1749,7 +1749,7 @@ public class Vvod extends JFrame {
 				else {
 					for (PvizitAmb pviz : tblPos.getData())
 						if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
-							JOptionPane.showMessageDialog(Vvod.this, "333333");
+							JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
 							return;
 						}
 					
@@ -1786,13 +1786,19 @@ public class Vvod extends JFrame {
 		btnPosDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (tblPos.getSelectedItem()!= null)
+					if (tblPos.getSelectedItem()!= null){
 						
 					if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 					MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
 					MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
 					MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
 					tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));}
+					if (tblPos.getSelectedItem()== null){
+					MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());	
+					MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
+					}
+
+					}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {

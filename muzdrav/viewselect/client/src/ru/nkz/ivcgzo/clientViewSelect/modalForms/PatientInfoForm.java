@@ -247,22 +247,18 @@ public class PatientInfoForm extends ModalForm {
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
-						addHeader("Назначенные исследования");
-		 				for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+							
 		 					if (issl.isSetNisl()) {
 		 	 				addLineToDetailInfo("Показатель",issl.isSetPokaz_name(),issl.getPokaz_name());
 		 					addLineToDetailInfo("Результат",issl.isSetRez(),issl.getRez());
 		 					addLineToDetailInfo("Дата",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));}
-		 					else
-		 						addHeader("Исследований нет");
 		 				}
-		 				addHeader("Поставленные диагнозы");
 		 				for (PatientDiagAmbInfo pdiagamb : MainForm.tcl.getPatientDiagAmbInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 		 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 		 					addLineToDetailInfo("Статус",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
 		 				}
-		 				addHeader("Выписанные документы");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование",pnapr.isSetText(),pnapr.getText());
@@ -421,7 +417,7 @@ public class PatientInfoForm extends ModalForm {
 	public void update(int npasp) {
 		try {
 			info = MainForm.tcl.getPatientCommonInfo(npasp);
-			treeinfo.setModel(new DefaultTreeModel(createNodes(info.pol)));
+			treeinfo.setModel(new DefaultTreeModel(createNodes(info.pol,(int) ((System.currentTimeMillis() - info.datar) / 31556952000L))));
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
@@ -429,7 +425,7 @@ public class PatientInfoForm extends ModalForm {
 		}
 	}
 	
-	private DefaultMutableTreeNode createNodes(int pol) {
+	private DefaultMutableTreeNode createNodes(int pol, int age) {
 		root = new DefaultMutableTreeNode("Корень");
 		patinfo = new DefaultMutableTreeNode("Личная информация");
 		signinfo = new DefaultMutableTreeNode("Анамнез жизни");
@@ -446,7 +442,7 @@ public class PatientInfoForm extends ModalForm {
 					posinfo.add(new PvizitTreeNode(pvizit));
 			for (PatientDiagZInfo pdiag : MainForm.tcl.getPatientDiagZInfoList(info.npasp))
 				diaginfo.add(new PdiagTreeNode(pdiag));
-			if (pol!=1) {
+			if ((pol!=1) & ((age > 13) & (age < 50))) {
 				root.add(berinfo);
 				for (RdSlInfo rdsl : MainForm.tcl.getRdSlInfoList(info.npasp)) 
 					berinfo.add(new RdslTreeNode(rdsl));

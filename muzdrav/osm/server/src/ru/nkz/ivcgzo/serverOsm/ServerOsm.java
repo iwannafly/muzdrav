@@ -1906,4 +1906,16 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}
 	}
+
+	@Override
+	public void DeleteEtalon(int id_pvizit) throws KmiacServerException,
+			TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM e_talon WHERE id_pvizit = ? ", false, id_pvizit);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			throw new KmiacServerException();
+	
+		}		
+	}
 }
