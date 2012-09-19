@@ -144,22 +144,26 @@ public class FormRdInf extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					RdInfStruct rdinf = new RdInfStruct();
- 		            MainForm.tcl.AddRdInf(rdinf);
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
 					//присвоить начальные значения
 					rdinf.setDataz(System.currentTimeMillis());
-					rdinf.setFioOtec(Vvod.zapVr.fam);
-					rdinf.setGrotec(null);
-					rdinf.setMrOtec(null);
+/*					rdinf.setFioOtec(Vvod.zapVr.fam);
+//					rdinf.setGrotec();//классиф.
+					rdinf.setMrOtec(TMrab.getText());
+//					rdinf.setMrOtec(TMrab.getText());
+					rdinf.setGrotec(CBGrOtec.getText());
+					rdinf.setSem(0);
 					rdinf.setObr(3);
 					rdinf.setOsoco(0);
-					rdinf.setPhOtec(null);
-					rdinf.setTelOtec(null);
+					rdinf.setPhOtec(TPhf.getText());
+					rdinf.setTelOtec(TTelef.getText());
 					rdinf.setUslpr(4);
 					rdinf.setVOtec(0);
-					rdinf.setVredOtec(0);
-					setRdInfData();
-				} catch (KmiacServerException e1) {
+					rdinf.setVredOtec(0);*/
+//					setRdInfData();
+					System.out.println(rdinf);		
+		            MainForm.tcl.AddRdInf(rdinf);
+			} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormRdInf.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {

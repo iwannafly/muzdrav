@@ -623,7 +623,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void AddRdInf(RdInfStruct rdInf) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rd_inf (npasp, obr, sem, votec, grotec, photec, dataz, fiootec, mrotec, telotec, vredotec, osoco, uslpr) VALUES (?, ?,  ?,  ?, ?,  ?, ?,  ?,  ?, ?,  ?, ?, ?) ", false, rdInf, rdInfTypes, 0, 1, 2, 3, 4, 5, 6, 7,  8, 9, 10, 11, 12);
+			sme.execPreparedT("INSERT INTO p_rd_inf (npasp, dataz) VALUES (?, ?) ", false, rdInf, rdInfTypes, 0, 6);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
