@@ -35,8 +35,9 @@ struct Pvizit {
 	12: optional string zakl;
 	13: optional i64 dataz;
 	14: optional string recomend;
-	15: optional i32 idzab;
-	16: optional string vrach_fio;
+	15: optional string lech;
+	16: optional i32 idzab;
+	17: optional string vrach_fio;
 }
 
 struct PvizitAmb {
@@ -61,6 +62,8 @@ struct PvizitAmb {
 	19: optional i32 vpom;
 	20: optional string fio_vr;
 	21: optional i64 dataz;
+	22: optional string cpos;
+	23: optional i32 cpol;
 }
 
 struct PdiagAmb {
@@ -459,9 +462,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<ZapVr> getZapVrSrc(1: string npaspList) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteEtalon (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPvizitAmb(1: PvizitAmb pos) throws (1: kmiacServer.KmiacServerException kse);
 	list<PvizitAmb> getPvizitAmb(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
@@ -493,6 +498,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
+	bool isZapVrNext(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
@@ -539,6 +545,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
+	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Shablon*/
 	list<classifier.StringClassifier> getShPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);

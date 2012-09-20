@@ -72,7 +72,6 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 	 * закрытии модальной формы. 
 	 */
 	public void addChildFrame(Window child) {
-		child.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE);
 		childList.add(child);
 	}
 	

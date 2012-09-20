@@ -1,11 +1,16 @@
 package ru.nkz.ivcgzo.serverHospital;
 
+import java.io.File;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -17,20 +22,17 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftHospital.ComplaintNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.DesiaseHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.ObjectiveStateNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.SpecialStateNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.Shablon;
+import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
-import ru.nkz.ivcgzo.thriftHospital.TComplaint;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
@@ -38,19 +40,19 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 
 
 public class ServerHospital extends Server implements Iface {
+    private static Logger log = Logger.getLogger(ServerHospital.class.getName());
     private TServer tServer;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
     private TResultSetMapper<TPriemInfo, TPriemInfo._Fields> rsmPriemInfo;
-    private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmLifeHistory;
-    private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmDesiaseHistory;
-    private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmState;
-    private TResultSetMapper<TComplaint, TComplaint._Fields> rsmComplaint;
+    private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmMedicalHistory;
     private TResultSetMapper<TDiagnosis, TDiagnosis._Fields> rsmDiagnosis;
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "dataz", "cotd", "npal", "nist"
@@ -59,38 +61,33 @@ public class ServerHospital extends Server implements Iface {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
         "pdms", "mrab", "npal", "reg_add", "real_add"
     };
+    private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
+        "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
+        "fisical_obs", "pcod_vrach", "dataz", "timez"
+    };
     private static final String[] PRIEM_INFO_FIELD_NAMES = {
         "pl_extr", "datap", "dataosm", "naprav",
         "n_org", "diag_n", "diag_n_text", "diag_p", "diag_p_text",
         "t0c", "ad", "nal_z", "nal_p", "vid_tran", "alkg", "jalob"
     };
-    private static final String[] LIFE_HISTORY_FIELD_NAMES = {
-        "id", "id_gosp", "vitae", "dataz"
-    };
-    private static final String[] DESIASE_HISTORY_FIELD_NAMES = {
-        "id", "id_gosp", "morbi", "dataz"
-    };
-    private static final String[] STATE_FIELD_NAMES = {
-        "id", "id_gosp", "osost", "dataz"
-    };
-    private static final String[] COMPLAINT_FIELD_NAMES = {
-        "id", "id_gosp", "datez", "timez", "jalob"
-    };
     private static final String[] DIAGNOSIS_FIELD_NAMES = {
         "id", "id_gosp", "diag", "prizn", "ustan", "named", "dataz"
     };
-
-    private static final Class<?>[] COMPLAINT_TYPES = new Class<?>[] {
-    //  id             id_gosp        dataz       timez
-        Integer.class, Integer.class, Date.class, Time.class,
-    //  jalob
-        String.class
+    private static final String[] INT_CLAS_FIELD_NAMES = {
+        "pcod", "name"
     };
+
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
     //  id             id_gosp        diag          prizn
         Integer.class, Integer.class, String.class, Integer.class,
     //  ustan          named         dataz
         Integer.class, String.class, Date.class
+    };
+    private static final Class<?>[] MEDICAL_HISTORY_TYPES = {
+    //  id             id_gosp       jalob         morbi          st_praesense  status_localis
+        Integer.class, Integer.class, String.class, String.class, String.class, String.class,
+    //  fisical_obs   pcod_vrach    dataz       timez
+        String.class, String.class, Date.class, Time.class
     };
 
     /**
@@ -100,16 +97,19 @@ public class ServerHospital extends Server implements Iface {
     public ServerHospital(final ISqlSelectExecutor seq, final ITransactedSqlExecutor tse) {
         super(seq, tse);
 
+        //Инициализация логгера с конфигом из файла ../../manager/log4j.xml;
+        String manPath = new File(this.getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath();
+        DOMConfigurator.configure(new File(manPath, "log4j.xml").getAbsolutePath());
+
         rsmSimplePatient  = new TResultSetMapper<>(
                 TSimplePatient.class, SIMPLE_PATIENT_FIELD_NAMES);
         rsmPatient = new TResultSetMapper<>(TPatient.class, PATIENT_FIELD_NAMES);
         rsmPriemInfo = new TResultSetMapper<>(TPriemInfo.class, PRIEM_INFO_FIELD_NAMES);
-        rsmLifeHistory = new TResultSetMapper<>(TMedicalHistory.class, LIFE_HISTORY_FIELD_NAMES);
-        rsmDesiaseHistory = new TResultSetMapper<>(
-                TMedicalHistory.class, DESIASE_HISTORY_FIELD_NAMES);
-        rsmState = new TResultSetMapper<>(TMedicalHistory.class, STATE_FIELD_NAMES);
-        rsmComplaint = new TResultSetMapper<>(TComplaint.class, COMPLAINT_FIELD_NAMES);
+        rsmMedicalHistory = new TResultSetMapper<>(TMedicalHistory.class,
+            MEDICAL_HISTORY_FIELD_NAMES);
         rsmDiagnosis = new TResultSetMapper<>(TDiagnosis.class, DIAGNOSIS_FIELD_NAMES);
+        rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, INT_CLAS_FIELD_NAMES);
     }
 
     @Override
@@ -153,16 +153,19 @@ public class ServerHospital extends Server implements Iface {
             if (patientList.size() > 0) {
                 return patientList;
             } else {
+                log.log(Level.INFO, String.format(
+                    "PatientNotFoundException, otdNum = %s, doctorId = %s;", otdNum, doctorId));
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }
 
     @Override
     public final List<TSimplePatient> getAllPatientFromOtd(final int otdNum)
-            throws TException, PatientNotFoundException {
+            throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im,"
                 + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
@@ -173,10 +176,12 @@ public class ServerHospital extends Server implements Iface {
             if (patientList.size() > 0) {
                 return patientList;
             } else {
+                log.log(Level.INFO, "PatientNotFoundException, otdNum = " + otdNum);
                 throw new PatientNotFoundException();
             }
         } catch (Exception e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -202,9 +207,11 @@ public class ServerHospital extends Server implements Iface {
             if (rs.next()) {
                 return rsmPatient.map(rs);
             } else {
+                log.log(Level.INFO, "PatientNotFoundException, patientId = " + patientId);
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }
@@ -241,9 +248,11 @@ public class ServerHospital extends Server implements Iface {
             if (acrs.getResultSet().next()) {
                 return rsmPriemInfo.map(acrs.getResultSet());
             } else {
+                log.log(Level.INFO, "PriemInfoNotFoundException, idGosp = " + idGosp);
                 throw new PriemInfoNotFoundException();
             }
         } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }
@@ -253,222 +262,6 @@ public class ServerHospital extends Server implements Iface {
         final String sqlQuery = "UPDATE c_otd SET vrach = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false, doctorId, gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final TMedicalHistory getLifeHistory(final int gospId)
-            throws TException, LifeHistoryNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, vitae, dataz FROM c_vitae WHERE id_gosp = ?;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            if (acrs.getResultSet().next()) {
-                return rsmLifeHistory.map(acrs.getResultSet());
-            } else {
-                throw new LifeHistoryNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final TMedicalHistory getDesiaseHistory(final int gospId)
-            throws TException, DesiaseHistoryNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, morbi, dataz FROM c_morbi WHERE id_gosp = ?;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            if (acrs.getResultSet().next()) {
-                return rsmDesiaseHistory.map(acrs.getResultSet());
-            } else {
-                throw new DesiaseHistoryNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final TMedicalHistory getObjectiveState(final int gospId)
-            throws TException, ObjectiveStateNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, osost, dataz FROM c_praesens "
-                + "WHERE id_gosp = ? AND k_osost = 0;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            if (acrs.getResultSet().next()) {
-                return rsmState.map(acrs.getResultSet());
-            } else {
-                throw new ObjectiveStateNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final TMedicalHistory getSpecialState(final int gospId)
-            throws TException, SpecialStateNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, osost, dataz FROM c_praesens "
-                + "WHERE id_gosp = ? AND k_osost = 1;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            if (acrs.getResultSet().next()) {
-                return rsmState.map(acrs.getResultSet());
-            } else {
-                throw new SpecialStateNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateLifeHistory(final int gospId, final TMedicalHistory lifeHistory)
-            throws TException {
-        final String sqlQuery = "UPDATE c_vitae SET vitae = ?, dataz = ? "
-                + "WHERE id_gosp = ?";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false,
-                    lifeHistory.getText(), new Date(lifeHistory.getDataz()), gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateDesiaseHistory(final int gospId, final TMedicalHistory desiaseHistory)
-            throws TException {
-        final String sqlQuery = "UPDATE c_morbi SET morbi = ?, dataz = ? "
-                + "WHERE id_gosp = ?";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false,
-                    desiaseHistory.getText(), new Date(desiaseHistory.getDataz()), gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateObjectiveState(final int gospId, final TMedicalHistory objectiveState)
-            throws TException {
-        final String sqlQuery = "UPDATE c_praesens SET osost = ?, dataz = ? "
-                + "WHERE id_gosp = ? AND k_osost = 0";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false,
-                    objectiveState.getText(), new Date(objectiveState.getDataz()), gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateSpecialState(final int gospId, final TMedicalHistory specialState)
-            throws TException {
-        final String sqlQuery = "UPDATE c_praesens SET osost = ?, dataz = ? "
-                + "WHERE id_gosp = ? AND k_osost = 1";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false,
-                    specialState.getText(), new Date(specialState.getDataz()), gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteLifeHistory(final int gospId) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_vitae WHERE id_gosp = ?;", false, gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteDesiaseHistory(final int gospId) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_morbi WHERE id_gosp = ?;", false, gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteObjectiveState(final int gospId) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_praesens WHERE id_gosp = ? AND k_osost = 0;",
-                    false, gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteSpecialState(final int gospId) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_praesens WHERE id_gosp = ? AND k_osost = 1;",
-                    false, gospId);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final List<TComplaint> getComplaints(final int gospId)
-            throws TException, ComplaintNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, dataz, timez, jalob FROM c_jalob WHERE id_gosp = ?";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            List<TComplaint> jalobList = rsmComplaint.mapToList(acrs.getResultSet());
-            if (jalobList.size() > 0) {
-                return jalobList;
-            } else {
-                throw new ComplaintNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final int addComplaint(final TComplaint complaint) throws TException {
-        final int[] indexes = {1, 2, 3, 4};
-        final String sqlQuery = "INSERT INTO c_jalob (id_gosp, dataz, timez, jalob) "
-                + "VALUES (?, ?, ?, ?);";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT(sqlQuery, true, complaint,
-                    COMPLAINT_TYPES, indexes);
-            int id = sme.getGeneratedKeys().getInt("id");
-            sme.setCommit();
-            return id;
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateComplaint(final int id, final TComplaint complaint)
-            throws TException {
-        final String sqlQuery = "UPDATE c_jalob SET dataz = ?, timez = ?, jalob = ? "
-                + "WHERE id = ?";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, new Date(complaint.getDate()),
-                    new Time(complaint.getTime()), complaint.getText(), id);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteComplaint(final int id) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_jalob WHERE id = ?;", false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new TException(e);
@@ -591,64 +384,6 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final List<TDiagnosis> getCopmlication(final int gospId)
-            throws TException, DiagnosisNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, diag, prizn, ustan, named, dataz "
-                + "FROM c_diag WHERE id_gosp = ? AND prizn = 3";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            List<TDiagnosis> diagList = rsmDiagnosis.mapToList(acrs.getResultSet());
-            if (diagList.size() > 0) {
-                return diagList;
-            } else {
-                throw new DiagnosisNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final int addCopmlication(final TDiagnosis inDiagnos)
-            throws TException {
-        final int[] indexes = {1, 2, 4, 5, 6};
-        final String sqlQuery = "INSERT INTO c_diag (id_gosp, diag, 3, ustan, named, dataz) "
-                + "VALUES (?, ?, ?, ?, ?, ?);";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT(sqlQuery, true, inDiagnos,
-                    DIAGNOSIS_TYPES, indexes);
-            int id = sme.getGeneratedKeys().getInt("id");
-            sme.setCommit();
-            return id;
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateCopmlication(final int id, final TDiagnosis inDiagnos)
-            throws TException {
-        final String sqlQuery = "UPDATE c_diag SET ustan = ?, named = ?, dataz = ? "
-                + "WHERE id = ? AND prizn = 3;";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, inDiagnos.getUstan(),
-                    inDiagnos.getNamed(), new Date(inDiagnos.getDataz()), id);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteCopmlication(final int id) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_diag WHERE id = ? AND prizn = 3;", false, id);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
     public final List<StringClassifier> getAzj() throws TException {
         final String sqlQuery = "SELECT pcod, name FROM n_azj";
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmAzj =
@@ -687,8 +422,104 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
             final String srcText) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
+                + "sho.diag || ' ' || sho.name AS name "
+                + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
+                + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+                + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
+                + "WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+
+        if (srcText != null) {
+            sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?)"
+                    + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+        }
+        sql += "ORDER BY sho.name ";
+
+        try (AutoCloseableResultSet acrs = (srcText == null)
+                ? sse.execPreparedQuery(sql, cspec, cslu, cslu)
+                : sse.execPreparedQuery(sql, cspec, cslu, cslu,
+                        srcText, srcText, srcText, srcText)) {
+            return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            System.err.println(e.getCause());
+            throw new KmiacServerException("Error searching template");
+        }
+    }
+
+    @Override
+    public final Shablon getShablon(final int idSh) throws KmiacServerException {
+        final String sqlQuery = "SELECT nd.name, sho.next, nsh.pcod,nsh.name, sht.sh_text "
+            + "FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) "
+            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+            + "JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) "
+            + "WHERE sho.id = ? ORDER BY nsh.pcod;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idSh)) {
+            if (acrs.getResultSet().next()) {
+                Shablon sho = new Shablon(acrs.getResultSet().getString(1),
+                        acrs.getResultSet().getString(2), new ArrayList<ShablonText>());
+                do {
+                    sho.textList.add(new ShablonText(acrs.getResultSet().getInt(3),
+                            acrs.getResultSet().getString(4), acrs.getResultSet().getString(5)));
+                } while (acrs.getResultSet().next());
+                return sho;
+            } else {
+                throw new SQLException("No templates with this id");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getCause());
+            throw new KmiacServerException("Error loading template by its id");
+        }
+    }
+
+    @Override
+    public final List<TMedicalHistory> getMedicalHistory(final int idGosp)
+            throws KmiacServerException, MedicalHistoryNotFoundException {
+        final String sqlQuery = "SELECT * FROM c_osmotr WHERE id_gosp = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            List<TMedicalHistory> tmpMedHistories =
+                rsmMedicalHistory.mapToList(acrs.getResultSet());
+            if (tmpMedHistories.size() > 0) {
+                return tmpMedHistories;
+            } else {
+                log.log(Level.INFO,  "MedicalHistoryNotFoundException, idGosp = " + idGosp);
+                throw new MedicalHistoryNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final int addMedicalHistory(final TMedicalHistory medHist)
+            throws KmiacServerException, TException {
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        final String sqlQuery = "INSERT INTO c_osmotr (id, id_gosp, jalob, "
+            + "morbi, status_praesense, "
+            + "status_localis, fisical_obs, pcod_vrach, dataz, timez) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (InterruptedException | SQLException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void deleteMedicalHistory(final int idGosp) throws KmiacServerException,
+            TException {
+        final String sqlQuery = "DELETE * FROM c_osmotr WHERE id_gosp = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, idGosp);
+            sme.setCommit();
+        } catch (SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
 }

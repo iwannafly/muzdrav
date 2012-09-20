@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientHospital;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
@@ -14,6 +16,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.Shablon;
+import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 
@@ -35,6 +39,10 @@ import javax.swing.JButton;
 
 import org.apache.thrift.TException;
 import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import java.awt.Font;
 
 public class MainFrame extends JFrame {
 
@@ -84,13 +92,29 @@ public class MainFrame extends JFrame {
     private JTabbedPane tbpMedicalHistory;
     private JTextField tfShablonFilter;
     private JButton btnFilterShablon;
+    private JPanel pnStatusLocalis;
+    private JPanel pnRecomendation;
+    private JPanel pnFarmo;
+    private JPanel pnZakl;
+    private JPanel pnStatusPraence;
+    private JPanel pnJalob;
+    private JPanel pnDesiaseHistory;
+    private JPanel pnAllergo;
+    private JPanel pnLifeHistory;
+    private JPanel pnFisicalObs;
+    private JTextArea taJalob;
+    private JTextArea taDesiaseHistory;
+    private JTextArea taAllergo;
+    private JTextArea taLifeHistory;
+    private JTextArea taFarmo;
+    private JTextArea taStatusPraence;
+    private JTextArea taFisicalObs;
+    private JTextArea taStatusLocalis;
+    private JTextArea taRecomdation;
+    private JTextArea taZakl;
+    private JScrollPane spShablonNames;
     private ThriftIntegerClassifierList lShablonNames;
-    private JPanel panel_5;
-    private JPanel panel_6;
-    private JPanel panel_7;
-    private JPanel panel_8;
-    private JPanel panel_9;
-    private JPanel panel_10;
+    private JButton btnSaveMedicalHistory;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -129,6 +153,9 @@ public class MainFrame extends JFrame {
                                         patient.getGospitalCod());
                                 System.out.println(patient.getGospitalCod());
                                 fillReceptionPanel();
+                                setTitle(String.format("%s %s %s",
+                                        patient.getSurname(), patient.getName(),
+                                        patient.getMiddlename()));
                             } catch (PatientNotFoundException e) {
                                 JOptionPane.showMessageDialog(null,
                                     "Персональная инфомация о данном пациенте не найдена.",
@@ -175,15 +202,38 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
 
         tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
+        tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
-        setJalobPanel();
+        setMedicalHistoryTabs();
 
         tfShablonFilter = new JTextField();
         tfShablonFilter.setColumns(10);
 
-        btnFilterShablon = new JButton("Выбрать");
-
+        spShablonNames = new JScrollPane();
         lShablonNames = new ThriftIntegerClassifierList();
+        lShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        lShablonNames.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lShablonNames.getSelectedValue() != null) {
+                        try {
+                            pasteSelectedShablon(ClientHospital.tcl.getShablon(
+                                lShablonNames.getSelectedValue().pcod));
+                        } catch (KmiacServerException e1) {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        } catch (TException e1) {
+                            ClientHospital.conMan.reconnect(e1);
+                        }
+                    }
+                }
+            }
+        });
+        spShablonNames.setViewportView(lShablonNames);
+
+        btnFilterShablon = new JButton("Выбрать");
+        btnSaveMedicalHistory = new JButton("Сохранить");
         setMedicalHistoryPanelGroupLayout();
     }
 
@@ -331,52 +381,205 @@ public class MainFrame extends JFrame {
         textPane.setText(priemInfoText);
     }
 
-    private void setJalobPanel() {
-
-        JPanel panel = new JPanel();
-        tbpMedicalHistory.addTab("1", null, panel, null);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JTextArea textArea = new JTextArea();
-        panel.add(textArea);
-
-        JButton btnNewButton = new JButton("New button");
-        panel.add(btnNewButton);
-
-        JPanel panel_1 = new JPanel();
-        tbpMedicalHistory.addTab("2", null, panel_1, null);
-
-        JPanel panel_2 = new JPanel();
-        tbpMedicalHistory.addTab("3", null, panel_2, null);
-
-        JPanel panel_3 = new JPanel();
-        tbpMedicalHistory.addTab("4", null, panel_3, null);
-
-        panel_8 = new JPanel();
-        tbpMedicalHistory.addTab("5", null, panel_8, null);
-
-        panel_10 = new JPanel();
-        tbpMedicalHistory.addTab("6", null, panel_10, null);
-
-        JPanel panel_4 = new JPanel();
-        tbpMedicalHistory.addTab("7", null, panel_4, null);
-
-        panel_5 = new JPanel();
-        tbpMedicalHistory.addTab("8", null, panel_5, null);
-
-        panel_6 = new JPanel();
-        tbpMedicalHistory.addTab("9", null, panel_6, null);
-
-        panel_7 = new JPanel();
-        tbpMedicalHistory.addTab("10", null, panel_7, null);
-
-        panel_9 = new JPanel();
-        tbpMedicalHistory.addTab("11", null, panel_9, null);
-
+    private void setMedicalHistoryTabs() {
+        addJalonPanel();
+        addDesiaseHistoryPanel();
+        addStatusPraencePanel();
+        addFisicalObsPanel();
+        addStausLocalisPanel();
+        addRecomendationPanel();
+        addLifeHistoryPanel();
+        addAllergoPanel();
+        addFarmoPanel();
+        addZaklPanel();
     }
 
-    public void onConnect() {
-        // TODO doing smth on connect
+    private void addJalonPanel() {
+        pnJalob = new JPanel();
+        pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Жалобы", null, pnJalob, null);
+        pnJalob.setLayout(new BoxLayout(pnJalob, BoxLayout.Y_AXIS));
+
+        taJalob = new JTextArea();
+        taJalob.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        taJalob.setLineWrap(true);
+        taJalob.setWrapStyleWord(true);
+        pnJalob.add(taJalob);
+    }
+
+    private void addDesiaseHistoryPanel() {
+        pnDesiaseHistory = new JPanel();
+        pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("История болезни", null, pnDesiaseHistory, null);
+        pnDesiaseHistory.setLayout(new BoxLayout(pnDesiaseHistory, BoxLayout.X_AXIS));
+
+        taDesiaseHistory = new JTextArea();
+        taDesiaseHistory.setWrapStyleWord(true);
+        taDesiaseHistory.setLineWrap(true);
+        taDesiaseHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnDesiaseHistory.add(taDesiaseHistory);
+    }
+
+    private void addAllergoPanel() {
+        pnAllergo = new JPanel();
+        pnAllergo.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Аллергоанамнез", null, pnAllergo, null);
+        pnAllergo.setLayout(new BoxLayout(pnAllergo, BoxLayout.X_AXIS));
+
+        taAllergo = new JTextArea();
+        taAllergo.setWrapStyleWord(true);
+        taAllergo.setLineWrap(true);
+        taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnAllergo.add(taAllergo);
+    }
+
+    private void addLifeHistoryPanel() {
+        pnLifeHistory = new JPanel();
+        pnLifeHistory.setBackground(new Color(102, 153, 51));
+        pnLifeHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("История жизни", null, pnLifeHistory, null);
+        pnLifeHistory.setLayout(new BoxLayout(pnLifeHistory, BoxLayout.X_AXIS));
+
+        taLifeHistory = new JTextArea();
+        taLifeHistory.setWrapStyleWord(true);
+        taLifeHistory.setLineWrap(true);
+        taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnLifeHistory.add(taLifeHistory);
+    }
+
+    private void addFarmoPanel() {
+        pnFarmo = new JPanel();
+        pnFarmo.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Фармакологический анамнез", null, pnFarmo, null);
+        pnFarmo.setLayout(new BoxLayout(pnFarmo, BoxLayout.X_AXIS));
+
+        taFarmo = new JTextArea();
+        taFarmo.setLineWrap(true);
+        taFarmo.setWrapStyleWord(true);
+        taFarmo.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnFarmo.add(taFarmo);
+    }
+
+    private void addStatusPraencePanel() {
+        pnStatusPraence = new JPanel();
+        pnStatusPraence.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Status praense", null, pnStatusPraence, null);
+        pnStatusPraence.setLayout(new BoxLayout(pnStatusPraence, BoxLayout.X_AXIS));
+
+        taStatusPraence = new JTextArea();
+        taStatusPraence.setLineWrap(true);
+        taStatusPraence.setWrapStyleWord(true);
+        taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnStatusPraence.add(taStatusPraence);
+    }
+
+    private void addFisicalObsPanel() {
+        pnFisicalObs = new JPanel();
+        pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Физикальное обследование", null, pnFisicalObs, null);
+        pnFisicalObs.setLayout(new BoxLayout(pnFisicalObs, BoxLayout.X_AXIS));
+
+        taFisicalObs = new JTextArea();
+        taFisicalObs.setLineWrap(true);
+        taFisicalObs.setWrapStyleWord(true);
+        taFisicalObs.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnFisicalObs.add(taFisicalObs);
+    }
+
+    private void addStausLocalisPanel() {
+        pnStatusLocalis = new JPanel();
+        pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Status localis", null, pnStatusLocalis, null);
+        pnStatusLocalis.setLayout(new BoxLayout(pnStatusLocalis, BoxLayout.X_AXIS));
+
+        taStatusLocalis = new JTextArea();
+        taStatusLocalis.setLineWrap(true);
+        taStatusLocalis.setWrapStyleWord(true);
+        taStatusLocalis.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnStatusLocalis.add(taStatusLocalis);
+    }
+
+    private void addRecomendationPanel() {
+        pnRecomendation = new JPanel();
+        pnRecomendation.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Рекомендации", null, pnRecomendation, null);
+        pnRecomendation.setLayout(new BoxLayout(pnRecomendation, BoxLayout.X_AXIS));
+
+        taRecomdation = new JTextArea();
+        taRecomdation.setLineWrap(true);
+        taRecomdation.setWrapStyleWord(true);
+        taRecomdation.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnRecomendation.add(taRecomdation);
+    }
+
+    private void addZaklPanel() {
+        pnZakl = new JPanel();
+        pnZakl.setBorder(new LineBorder(new Color(0, 0, 0)));
+        tbpMedicalHistory.addTab("Заключение", null, pnZakl, null);
+        pnZakl.setLayout(new BoxLayout(pnZakl, BoxLayout.X_AXIS));
+
+        taZakl = new JTextArea();
+        taZakl.setWrapStyleWord(true);
+        taZakl.setLineWrap(true);
+        taZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pnZakl.add(taZakl);
+    }
+
+    private void clearMedicalHistoryText() {
+        taJalob.setText("");
+    }
+
+    private void pasteSelectedShablon(final Shablon shablon) {
+        if (shablon == null) {
+            return;
+        }
+
+        clearMedicalHistoryText();
+
+        for (ShablonText shText : shablon.textList) {
+            switch (shText.grupId) {
+                case 1:
+                    taJalob.setText(shText.getText());
+                    break;
+                case 2:
+                    taDesiaseHistory.setText(shText.getText());
+                    break;
+                case 3:
+                    taAllergo.setText(shText.getText());
+                    break;
+                case 4:
+                    taLifeHistory.setText(shText.getText());
+                    break;
+                case 5:
+                    taFarmo.setText(shText.getText());
+                    break;
+                case 6:
+                    taStatusPraence.setText(shText.getText());
+                    break;
+                case 7:
+                    taFisicalObs.setText(shText.getText());
+                    break;
+                case 8:
+                    taStatusLocalis.setText(shText.getText());
+                    break;
+                case 12:
+                    taRecomdation.setText(shText.getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public final void onConnect() {
+        try {
+            lShablonNames.setData(ClientHospital.tcl.getShablonNames(
+                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
+        }
     }
 
 ////////////////////////////////////////// CAUTION! ///////////////////////////////////////////////
@@ -521,36 +724,51 @@ public class MainFrame extends JFrame {
     }
 
     private void setMedicalHistoryPanelGroupLayout() {
-        GroupLayout gl_pMedicalHistory = new GroupLayout(pMedicalHistory);
-        gl_pMedicalHistory.setHorizontalGroup(
-            gl_pMedicalHistory.createParallelGroup(Alignment.TRAILING)
-                .addGroup(gl_pMedicalHistory.createSequentialGroup()
+        GroupLayout glPMedicalHistory = new GroupLayout(pMedicalHistory);
+        glPMedicalHistory.setHorizontalGroup(
+            glPMedicalHistory.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPMedicalHistory.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
+                    .addGroup(glPMedicalHistory.createParallelGroup(Alignment.TRAILING)
+                        .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 700,
+                            GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSaveMedicalHistory, GroupLayout.PREFERRED_SIZE,
+                            541, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(gl_pMedicalHistory.createParallelGroup(Alignment.LEADING)
-                        .addGroup(gl_pMedicalHistory.createSequentialGroup()
-                            .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE, 199, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPMedicalHistory.createSequentialGroup()
+                            .addComponent(tfShablonFilter, GroupLayout.DEFAULT_SIZE,
+                                249, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnFilterShablon, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(lShablonNames, GroupLayout.PREFERRED_SIZE, 306, GroupLayout.PREFERRED_SIZE))
-                    .addContainerGap())
+                            .addComponent(btnFilterShablon, GroupLayout.PREFERRED_SIZE, 90,
+                                GroupLayout.PREFERRED_SIZE)
+                            .addGap(5))
+                        .addGroup(glPMedicalHistory.createSequentialGroup()
+                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 340,
+                                Short.MAX_VALUE)
+                            .addContainerGap())))
         );
-        gl_pMedicalHistory.setVerticalGroup(
-            gl_pMedicalHistory.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_pMedicalHistory.createSequentialGroup()
+        glPMedicalHistory.setVerticalGroup(
+            glPMedicalHistory.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPMedicalHistory.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(gl_pMedicalHistory.createParallelGroup(Alignment.LEADING)
-                        .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                        .addGroup(gl_pMedicalHistory.createSequentialGroup()
-                            .addGroup(gl_pMedicalHistory.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPMedicalHistory.createSequentialGroup()
+                            .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE, 252,
+                                Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnSaveMedicalHistory)
+                            .addGap(5))
+                        .addGroup(glPMedicalHistory.createSequentialGroup()
+                            .addGroup(glPMedicalHistory.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnFilterShablon))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(lShablonNames, GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-                            .addGap(5)))
-                    .addContainerGap())
+                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 246,
+                                Short.MAX_VALUE)
+                            .addContainerGap())))
         );
-        pMedicalHistory.setLayout(gl_pMedicalHistory);
+        pMedicalHistory.setLayout(glPMedicalHistory);
     }
 }
