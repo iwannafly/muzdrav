@@ -63,6 +63,7 @@ struct PvizitAmb {
 	20: optional string fio_vr;
 	21: optional i64 dataz;
 	22: optional string cpos;
+	23: optional i32 cpol;
 }
 
 struct PdiagAmb {
@@ -544,6 +545,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
+	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Shablon*/
 	list<classifier.StringClassifier> getShPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
