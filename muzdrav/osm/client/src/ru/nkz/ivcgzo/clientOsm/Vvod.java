@@ -166,11 +166,13 @@ public class Vvod extends JFrame {
 				setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 				
 				try {
-					if (!checkInput())
-						if (JOptionPane.showConfirmDialog(Vvod.this, "Пациент не записан на следующий прием или ему не проставлен исход случая обращения. Закрыть окно?", "Предупреждение", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION) {
+					if (!checkInput()) {
+						int modalResult = JOptionPane.showConfirmDialog(Vvod.this, "Пациент не записан на следующий прием или ему не проставлен исход случая обращения. Закрыть окно?", "Предупреждение", JOptionPane.OK_CANCEL_OPTION);
+						if (modalResult == JOptionPane.CANCEL_OPTION || modalResult == JOptionPane.CLOSED_OPTION) {
 							setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 							return;
 						}
+					}
 					MainForm.instance.setVisible(true);
 				} catch (TException e1) {
 					setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -1729,7 +1731,7 @@ public class Vvod extends JFrame {
 					Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 					tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-					tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
+					tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, 0);
 				} catch (KmiacServerException e2) {
 					e2.printStackTrace();
 				} catch (PvizitNotFoundException e2) {
@@ -1737,7 +1739,7 @@ public class Vvod extends JFrame {
 						MainForm.tcl.AddPvizit(pvizit);
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
+						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, 0);
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -1774,7 +1776,7 @@ public class Vvod extends JFrame {
 						pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
+						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, 0);
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -2001,10 +2003,10 @@ public class Vvod extends JFrame {
 			
 			tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 			if (tblPos.getRowCount() > 0)
-				tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
+				tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, 0);
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
-				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, 0);
 			
 			setVisible(true);
 			MainForm.instance.setVisible(false);

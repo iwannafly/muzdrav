@@ -308,6 +308,7 @@ public class Option {
 												S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
 												MainForm.ltc.AddS_ot01(s01);
 												ts_ot01.addItem(s01);
+												break;
 										
 											}else{
 												//System.out.println(s + " = "+ s1 + "; " + nldipcod +" = " + sot01pcod);
