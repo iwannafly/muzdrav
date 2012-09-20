@@ -1984,16 +1984,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 
-	public List<IntegerClassifier> getShablon() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select distinct sh_ot_spec.id_sh_osm as pcod,sh_osm.name as name from sh_ot_spec join ot100 on (sh_ot_spec.cspec=ot100.cspec) join n_spec on (sh_ot_spec.cspec=n_spec.pcod) join n_s00 on (n_s00.pcod=ot100.cdol) join sh_osm on (sh_ot_spec.id_sh_osm=sh_osm.id) join sh_osm_text on (sh_osm.id=sh_osm_text.id_sh_osm)  join n_shablon on (sh_osm_text.id_n_shablon=n_shablon.pcod)")) 
-		{
-			return rsmIntClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
 	@Override
 	public List<IntegerClassifier> get_vid_issl() throws KmiacServerException,
 			TException {
