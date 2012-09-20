@@ -14,7 +14,7 @@ service ThriftGenReestr extends kmiacServer.KmiacServer {
 	/**
         * Создает реестр
 	*/
-	void getReestrInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
+	void getReestrInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
 
 	/*Классификаторы*/
 
