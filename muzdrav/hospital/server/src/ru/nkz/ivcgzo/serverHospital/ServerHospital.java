@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -24,6 +25,8 @@ import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.ObjectiveStateNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.Shablon;
+import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.SpecialStateNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
@@ -51,6 +54,7 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmState;
     private TResultSetMapper<TComplaint, TComplaint._Fields> rsmComplaint;
     private TResultSetMapper<TDiagnosis, TDiagnosis._Fields> rsmDiagnosis;
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "dataz", "cotd", "npal", "nist"
@@ -78,6 +82,9 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] DIAGNOSIS_FIELD_NAMES = {
         "id", "id_gosp", "diag", "prizn", "ustan", "named", "dataz"
+    };
+    private static final String[] SHABLON_NAME_FIELD_NAMES = {
+        "pcod", "name"
     };
 
     private static final Class<?>[] COMPLAINT_TYPES = new Class<?>[] {
@@ -110,6 +117,7 @@ public class ServerHospital extends Server implements Iface {
         rsmState = new TResultSetMapper<>(TMedicalHistory.class, STATE_FIELD_NAMES);
         rsmComplaint = new TResultSetMapper<>(TComplaint.class, COMPLAINT_FIELD_NAMES);
         rsmDiagnosis = new TResultSetMapper<>(TDiagnosis.class, DIAGNOSIS_FIELD_NAMES);
+        rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, SHABLON_NAME_FIELD_NAMES);
     }
 
     @Override
@@ -687,8 +695,53 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
             final String srcText) throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-        return null;
+        String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
+                + "sho.diag || ' ' || sho.name AS name "
+                + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
+                + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+                + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
+                + "WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+
+        if (srcText != null) {
+            sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?)"
+                    + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+        }
+        sql += "ORDER BY sho.name ";
+
+        try (AutoCloseableResultSet acrs = (srcText == null)
+                ? sse.execPreparedQuery(sql, cspec, cslu, cslu)
+                : sse.execPreparedQuery(sql, cspec, cslu, cslu,
+                        srcText, srcText, srcText, srcText)) {
+            return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            System.err.println(e.getCause());
+            throw new KmiacServerException("Error searching template");
+        }
+    }
+
+    @Override
+    public final Shablon getShablon(final int idSh) throws KmiacServerException {
+        final String sqlQuery = "SELECT nd.name, sho.next, nsh.pcod,nsh.name, sht.sh_text "
+            + "FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) "
+            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+            + "JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) "
+            + "WHERE sho.id = ? ORDER BY nsh.pcod;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idSh)) {
+            if (acrs.getResultSet().next()) {
+                Shablon sho = new Shablon(acrs.getResultSet().getString(1),
+                        acrs.getResultSet().getString(2), new ArrayList<ShablonText>());
+                do {
+                    sho.textList.add(new ShablonText(acrs.getResultSet().getInt(3),
+                            acrs.getResultSet().getString(4), acrs.getResultSet().getString(5)));
+                } while (acrs.getResultSet().next());
+                return sho;
+            } else {
+                throw new SQLException("No templates with this id");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getCause());
+            throw new KmiacServerException("Error loading template by its id");
+        }
     }
 
 }
