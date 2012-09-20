@@ -616,7 +616,6 @@ public class ServerOsm extends Server implements Iface {
 		} catch (InterruptedException | SQLException e) {
 			throw new KmiacServerException();
 		}
-		
 	}
 
 
@@ -626,7 +625,9 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPreparedT("INSERT INTO p_rd_inf (npasp, dataz) VALUES (?, ?) ", false, rdInf, rdInfTypes, 0, 6);
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
-			throw new KmiacServerException();
+			if (e instanceof SQLException)
+				if (!((SQLException)e.getCause()).getSQLState().equals("23505"))
+					throw new KmiacServerException();
 		}
 	
 	}
