@@ -1792,18 +1792,18 @@ public class Vvod extends JFrame {
 		btnPosDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (tblPos.getSelectedItem()!= null){
-						
-					if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
-					MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
-					MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
-					MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
-					tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));}
-					if (tblPos.getSelectedItem()== null){
-					MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());	
-					MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
-					}
-
+					if (tblPos.getSelectedItem() !=  null) {
+						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
+							MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
+							if (tblPos.getSelectedRow() == tblPos.getRowCount() - 1)
+								MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
+							tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));
+							if (tblPos.getSelectedItem() == null) {
+								MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
+								MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());	
+							}
+						}
 					}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
