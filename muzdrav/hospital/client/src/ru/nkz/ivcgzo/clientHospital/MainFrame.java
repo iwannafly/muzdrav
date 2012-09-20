@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JFrame;
 
@@ -18,6 +19,7 @@ import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
+import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 
@@ -94,19 +96,13 @@ public class MainFrame extends JFrame {
     private JButton btnFilterShablon;
     private JPanel pnStatusLocalis;
     private JPanel pnRecomendation;
-    private JPanel pnFarmo;
     private JPanel pnZakl;
     private JPanel pnStatusPraence;
     private JPanel pnJalob;
     private JPanel pnDesiaseHistory;
-    private JPanel pnAllergo;
-    private JPanel pnLifeHistory;
     private JPanel pnFisicalObs;
     private JTextArea taJalob;
     private JTextArea taDesiaseHistory;
-    private JTextArea taAllergo;
-    private JTextArea taLifeHistory;
-    private JTextArea taFarmo;
     private JTextArea taStatusPraence;
     private JTextArea taFisicalObs;
     private JTextArea taStatusLocalis;
@@ -234,6 +230,19 @@ public class MainFrame extends JFrame {
 
         btnFilterShablon = new JButton("Выбрать");
         btnSaveMedicalHistory = new JButton("Сохранить");
+        btnSaveMedicalHistory.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                TMedicalHistory medicalHist = createMedicalHistory();
+                try {
+                    medicalHist.setId(ClientHospital.tcl.addMedicalHistory(medicalHist));
+                } catch (KmiacServerException | TException e1) {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Ошибка при записи медицинской истории. Информация не будет сохранена!",
+                        "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    e1.printStackTrace();
+                }
+            }
+        });
         setMedicalHistoryPanelGroupLayout();
     }
 
@@ -388,9 +397,6 @@ public class MainFrame extends JFrame {
         addFisicalObsPanel();
         addStausLocalisPanel();
         addRecomendationPanel();
-        addLifeHistoryPanel();
-        addAllergoPanel();
-        addFarmoPanel();
         addZaklPanel();
     }
 
@@ -418,46 +424,6 @@ public class MainFrame extends JFrame {
         taDesiaseHistory.setLineWrap(true);
         taDesiaseHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnDesiaseHistory.add(taDesiaseHistory);
-    }
-
-    private void addAllergoPanel() {
-        pnAllergo = new JPanel();
-        pnAllergo.setBorder(new LineBorder(new Color(0, 0, 0)));
-        tbpMedicalHistory.addTab("Аллергоанамнез", null, pnAllergo, null);
-        pnAllergo.setLayout(new BoxLayout(pnAllergo, BoxLayout.X_AXIS));
-
-        taAllergo = new JTextArea();
-        taAllergo.setWrapStyleWord(true);
-        taAllergo.setLineWrap(true);
-        taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnAllergo.add(taAllergo);
-    }
-
-    private void addLifeHistoryPanel() {
-        pnLifeHistory = new JPanel();
-        pnLifeHistory.setBackground(new Color(102, 153, 51));
-        pnLifeHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
-        tbpMedicalHistory.addTab("История жизни", null, pnLifeHistory, null);
-        pnLifeHistory.setLayout(new BoxLayout(pnLifeHistory, BoxLayout.X_AXIS));
-
-        taLifeHistory = new JTextArea();
-        taLifeHistory.setWrapStyleWord(true);
-        taLifeHistory.setLineWrap(true);
-        taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnLifeHistory.add(taLifeHistory);
-    }
-
-    private void addFarmoPanel() {
-        pnFarmo = new JPanel();
-        pnFarmo.setBorder(new LineBorder(new Color(0, 0, 0)));
-        tbpMedicalHistory.addTab("Фармакологический анамнез", null, pnFarmo, null);
-        pnFarmo.setLayout(new BoxLayout(pnFarmo, BoxLayout.X_AXIS));
-
-        taFarmo = new JTextArea();
-        taFarmo.setLineWrap(true);
-        taFarmo.setWrapStyleWord(true);
-        taFarmo.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnFarmo.add(taFarmo);
     }
 
     private void addStatusPraencePanel() {
@@ -544,15 +510,6 @@ public class MainFrame extends JFrame {
                 case 2:
                     taDesiaseHistory.setText(shText.getText());
                     break;
-                case 3:
-                    taAllergo.setText(shText.getText());
-                    break;
-                case 4:
-                    taLifeHistory.setText(shText.getText());
-                    break;
-                case 5:
-                    taFarmo.setText(shText.getText());
-                    break;
                 case 6:
                     taStatusPraence.setText(shText.getText());
                     break;
@@ -569,6 +526,20 @@ public class MainFrame extends JFrame {
                     break;
             }
         }
+    }
+
+    private TMedicalHistory createMedicalHistory() {
+        TMedicalHistory tmpHist = new TMedicalHistory();
+        tmpHist.setIdGosp(patient.getGospitalCod());
+        tmpHist.setJalob(taJalob.getText());
+        tmpHist.setMorbi(taDesiaseHistory.getText());
+        tmpHist.setStatusPraesense(taStatusPraence.getText());
+        tmpHist.setStatusLocalis(taStatusLocalis.getText());
+        tmpHist.setFisicalObs(taFisicalObs.getText());
+        tmpHist.setPcodVrach(doctorAuth.getPcod());
+        tmpHist.setDataz(new Date().getTime());
+        tmpHist.setTimez(new Date().getTime());
+        return tmpHist;
     }
 
     public final void onConnect() {
