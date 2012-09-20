@@ -194,6 +194,7 @@ struct PatientVizitAmbInfo {
 	19: optional i32 vpom;
 	20: optional string fio_vr;
 	21: optional i64 dataz;
+	22: optional string cpos;
 }
 
 struct RdSlInfo {
