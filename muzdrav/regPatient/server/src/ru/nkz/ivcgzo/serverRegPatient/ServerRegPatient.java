@@ -448,7 +448,6 @@ public class ServerRegPatient extends Server implements Iface {
 
     private String setReportPath() {
         if (isWindows()) {
-            System.out.println("Нашли винду");
             return "C:\\Temp\\MedCardAmbPriem_t.htm";
         } else if (isUnix()) {
             return System.getProperty("user.home")
