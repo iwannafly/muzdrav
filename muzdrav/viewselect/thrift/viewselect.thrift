@@ -58,6 +58,251 @@ struct polp_0 {
 	3: list<polp_1> polp1;
 }
 
+struct mrab_0 {
+    1: i32 pGruppa;
+    2: string name;
+    3: list<classifier.IntegerClassifier> mrab1;
+}
+
+struct PatientCommonInfo {
+	 1: optional i32 npasp;
+	 2: optional string fam;
+	 3: optional string im;
+	 4: optional string ot;
+	 5: optional i64 datar;
+	 6: optional string poms_ser;
+	 7: optional string poms_nom;
+	 8: optional i32 pol;
+	 9: optional i32 jitel;
+	10: optional i32 sgrp;
+	11: optional string adp_obl;
+	12: optional string adp_gorod;
+	13: optional string adp_ul;
+	14: optional string adp_dom;
+	15: optional string adp_korp;
+	16: optional string adp_kv;
+	17: optional string adm_obl;
+	18: optional string adm_gorod;
+	19: optional string adm_ul;
+	20: optional string adm_dom;
+	21: optional string adm_korp;
+	22: optional string adm_kv;
+	23: optional string name_mr;
+	24: optional i32 ncex;
+	25: optional i32 poms_strg;
+	26: optional i32 poms_tdoc;
+	27: optional string poms_ndog;
+	28: optional i32 pdms_strg;
+	29: optional string pdms_ser;
+	30: optional string pdms_nom;
+	31: optional string pdms_ndog;
+	32: optional i32 cpol_pr;
+	33: optional i32 terp;
+	34: optional i64 datapr;
+	35: optional i32 tdoc;
+	36: optional string docser;
+	37: optional string docnum;
+	38: optional i64 datadoc;
+	39: optional string odoc;
+	40: optional string snils;
+	41: optional i64 dataz;
+	42: optional string prof;
+	43: optional string tel;
+	44: optional i64 dsv;
+	45: optional i32 prizn;
+	46: optional i32 ter_liv;
+	47: optional i32 region_liv;
+	48: optional i32 mrab;
+}
+
+struct PatientSignInfo {
+	1: optional i32 npasp;
+	2: optional string grup;
+	3: optional string ph;
+	4: optional string allerg;
+	5: optional string farmkol;
+	6: optional string vitae;
+	7: optional string vred;
+}
+
+struct PatientVizitInfo {
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional i32 cpol;
+	4: optional string cobr;
+	5: optional i64 datao;
+	6: optional i32 ishod;
+	7: optional i32 rezult;
+	8: optional i32 talon;
+	9: optional i32 cod_sp;
+	10: optional string cdol;
+	11: optional i32 cuser;
+	12: optional string zakl;
+	13: optional i64 dataz;
+	14: optional string recomend;
+	15: optional i32 idzab;
+	16: optional string vrach_fio;
+	17: optional string lech;
+}
+
+struct PatientDiagZInfo {
+	 1: optional i32 id;
+	 2: optional i32 id_diag_amb;
+	 3: optional i32 npasp;
+	 4: optional string diag;
+	 5: optional i32 cpodr;
+	 6: optional i64 d_vz;
+	 7: optional i32 d_grup;
+	 8: optional i32 ishod;
+	 9: optional i64 dataish;
+	10: optional i64 datag;
+	11: optional i64 datad;
+	12: optional string diag_s;
+	13: optional i32 d_grup_s;
+	14: optional i32 cod_sp;
+	15: optional string cdol_ot;
+	16: optional i32 nmvd;
+	17: optional i32 xzab;
+	18: optional i32 stady;
+	19: optional i32 disp;
+	20: optional i32 pat;
+	21: optional i32 prizb;
+	22: optional i32 prizi;
+	23: optional string named;
+	24: optional string fio_vr;
+}
+
+struct PatientVizitAmbInfo {
+	1: optional i32 id;
+	2: optional i32 id_obr;
+	3: optional i32 npasp;
+	4: optional i64 datap;
+	5: optional i32 cod_sp;
+	6: optional string cdol;
+	7: optional string diag; 
+	8: optional i32 mobs;
+	9: optional i32 rezult;
+	10: optional i32 opl;
+	11: optional double stoim;
+	12: optional i32 uet;
+	13: optional i64 datak;
+	14: optional i32 kod_rez;
+	15: optional i32 k_lr;
+	16: optional i32 n_sp;
+	17: optional i32 pr_opl;
+	18: optional i32 pl_extr;
+	19: optional i32 vpom;
+	20: optional string fio_vr;
+	21: optional i64 dataz;
+}
+
+struct RdSlInfo {
+        1: optional i32 id;
+        2: optional i32 npasp;
+        3: optional i64 datay;
+	4: optional i64 dataosl;
+	5: optional i32 abort;
+	6: optional i32 shet;
+	7: optional i64 dataM;
+	8: optional i32 yavka1;
+	9: optional i32 ishod;
+	10: optional i64 Datasn; 
+	11: optional i64 DataZs;
+        12: optional i32 kolrod;
+	13: optional i32 deti;
+	14: optional bool kont;
+	15: optional double vesd;
+	16: optional i32 dsp;
+	17: optional i32 dsr;
+	18: optional i32 dTroch;
+	19: optional i32 cext;
+	20: optional i32 indsol;
+	21: optional i32 prmen;
+	22: optional i64 dataz;
+	23: optional i64 datasert;
+	24: optional string nsert;
+	25: optional string ssert;
+	26: optional string oslab;
+	27: optional i32 plrod;
+	28: optional string prrod;
+	29: optional i32 vozmen;
+	30: optional i32 oslrod;
+	31: optional i32 polj;
+	32: optional i64 dataab;
+	33: optional i32 srokab;
+	34: optional i32 cdiagt;
+	35: optional i32 cvera;
+	36: optional i32 id_pvizit;
+        37: optional i32 rost; 
+}
+
+struct PatientAnamZabInfo {
+	1: optional i32 id_pvizit;
+	2: optional i32 npasp;
+	3: optional string t_ist_zab;
+}
+
+struct PatientIsslInfo{
+	1: optional i32 nisl;
+	2: optional i32 cisl;
+	3: optional string name_cisl;
+	4: optional string pokaz;
+	5: optional string pokaz_name;
+	6: optional string rez;
+	7: optional i64 datav;
+}
+
+struct PatientDiagAmbInfo {
+	 1: optional i32 id;
+	 2: optional i32 id_obr;
+	 3: optional i32 npasp;
+	 4: optional string diag;
+	 5: optional string named;/*медицинское описание д-за*/
+	 6: optional i32 diag_stat;
+	 7: optional bool predv;
+	 8: optional i64 datad;
+	 9: optional i32 obstreg;
+	10: optional i32 cod_sp;
+	11: optional string cdol;
+	12: optional i64 datap;
+	13: optional i64 dataot;
+	14: optional i32 obstot;
+	15: optional i32 codsp_ot;
+	16: optional string cdol_ot;
+	17: optional i32 vid_tr;
+}
+
+struct PatientNaprInfo {
+	1: optional i32 id;
+	2: optional i32 idpvizit;
+	3: optional i32 vid_doc;
+	4: optional string text;
+	5: optional i32 preds;
+	6: optional i32 zaved;
+	7: optional string name;
+}
+
+struct PatientPriemInfo {
+	1: optional i32 id_pvizit;
+	2: optional i32 npasp;
+	3: optional i32 idpos;
+	4: optional i32 sl_ob;
+	5: optional i32 n_is;
+	6: optional i32 n_kons;
+	7: optional i32 n_proc;
+	8: optional i32 n_lek;
+	9: optional string t_chss;
+	10: optional string t_temp;
+	11: optional string t_ad;
+	12: optional string t_rost;
+	13: optional string t_ves;
+	14: optional string t_st_localis;
+	15: optional string t_ocenka;
+	16: optional string t_jalob;
+	17: optional string t_status_praesense;
+	18: optional string t_fiz_obsl;
+}
+
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
@@ -89,4 +334,17 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> getStringClassifierSorted(1: classifier.StringClassifiers cls, 2: classifier.ClassifierSortOrder ord, 3: classifier.ClassifierSortFields fld) throws (1: kmiacServer.KmiacServerException kse);
 	list<mkb_0> getMkb_0() throws (1: kmiacServer.KmiacServerException kse);
 	list<polp_0> getPolp_0() throws (1: kmiacServer.KmiacServerException kse);
+	list<mrab_0> getMrab_0() throws (1: kmiacServer.KmiacServerException kse);
+
+	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	PatientSignInfo getPatientSignInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientVizitInfo> getPatientVizitInfoList(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
+	list<RdSlInfo> getRdSlInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientDiagZInfo> getPatientDiagZInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientVizitAmbInfo> getPatientVizitAmbInfoList(1: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
+	PatientPriemInfo getPatientPriemInfo(1: i32 npasp, 2: i32 pvizitAmbId) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientNaprInfo> getPatientNaprInfoList(1: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientDiagAmbInfo> getPatientDiagAmbInfoList(1: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientIsslInfo> getPatientIsslInfoList(1: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
+	PatientAnamZabInfo getPatientAnamZabInfo(1: i32 pvizitId, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 }

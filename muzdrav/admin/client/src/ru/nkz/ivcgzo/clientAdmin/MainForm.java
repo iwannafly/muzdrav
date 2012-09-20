@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
@@ -15,11 +17,13 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
+import java.awt.Dimension;
 
 public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private final boolean adminMode;
 	public static ThriftServerAdmin.Client tcl;
 	private JFrame frame;
+	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
 	private ShablonPanel tpShablon;
 
@@ -38,12 +42,20 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setMinimumSize(new Dimension(896, 128));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientAdmin/resources/icon_2_32x32.png")));
 		frame.setTitle(configuration.appName);
 		frame.setBounds(100, 100, 600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (tabbedPane.getSelectedIndex() == 1)
+					tpShablon.prepareShTextFields();
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -85,7 +97,6 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 			tcl = thrClient;
 			try {
 				tpUser.onConnect();
-				tpShablon.setCdolList(tcl.get_n_s00());
 			} catch (TException e) {
 				e.printStackTrace();
 				conMan.reconnect(e);

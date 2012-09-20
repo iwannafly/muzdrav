@@ -1,12 +1,15 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 
 /**
  * Параметризированный класс для работы со списками swing. В качестве параметра должна
@@ -19,12 +22,15 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 	private static final long serialVersionUID = -873049270461876460L;
 	private List<IntegerClassifier> items;
 	private StringListModel model;
+	private IntegerClassifiers classifier;
+	private boolean classifierLoaded;
 	
 	/**
 	 * Конструктор списка.
 	 */
 	public ThriftIntegerClassifierList() {
-		this(new ArrayList<IntegerClassifier>());
+		setModel();
+		setData(null);
 	}
 	
 	/**
@@ -32,8 +38,17 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 	 * @param list - список из thrift-структур для отображения
 	 */
 	public ThriftIntegerClassifierList(List<IntegerClassifier> list) {
-		setModel();
+		this();
 		setData(list);
+	}
+	
+	/**
+	 * Конструктор списка.
+	 * @param classifierName - название классификатора для загрузки
+	 */
+	public ThriftIntegerClassifierList(IntegerClassifiers classifierName) {
+		this();
+		this.classifier = classifierName;
 	}
 	
 	private void setModel() {
@@ -45,6 +60,7 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 	 * Устанавливает список для отображения. 
 	 */
 	public void setData(List<IntegerClassifier> list) {
+		classifierLoaded = list != null;
 		if (list == null)
 			list = new ArrayList<>();
 			
@@ -52,7 +68,30 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 		for (IntegerClassifier item : list) {
 			items.add(new IntegerClassifierItem(item));
 		}
+		selectFirstItem();
 		model.fireContentsChanged();
+	}
+
+	private void selectFirstItem() {
+		if (items.size() > 0)
+			setSelectedIndex(0);
+		scrollRectToVisible(new Rectangle());
+	}
+	
+	/**
+	 * Загрузка классификатора, указанного в конструкторе
+	 */
+	public void loadClassifier() {
+		if (!classifierLoaded)
+			reloadClassifier();
+	}
+	
+	/**
+	 * Перезагрузка классификатора, указанного в конструкторе
+	 */
+	public void reloadClassifier() {
+		if (classifier != null)
+			setData(ConnectionManager.instance.getIntegerClassifier(classifier));
 	}
 	
 	/**

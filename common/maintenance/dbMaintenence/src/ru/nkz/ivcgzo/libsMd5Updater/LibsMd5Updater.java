@@ -112,7 +112,7 @@ public class LibsMd5Updater {
 	private void update(List<Library> updList, int minLibIdx) throws Exception {
 		for (Library upd : updList) {
 			if (upd.isNew) {
-				try (PreparedStatement stm = conn.createPreparedStatement("INSERT INTO s_libs VALUES (?, ?, ?, ?) ")) {
+				try (PreparedStatement stm = conn.createPreparedStatement("INSERT INTO s_libs VALUES (?, ?, ?, ?) ", false)) {
 					if (upd.id < 0)
 						stm.setInt(1, --minLibIdx);
 					else
@@ -127,7 +127,7 @@ public class LibsMd5Updater {
 					throw new Exception(String.format("Error inserting library %s.", upd.name), e);
 				}
 			} else {
-				try (PreparedStatement stm = conn.createPreparedStatement("UPDATE s_libs SET md5 = ?, size = ? WHERE id = ?")) {
+				try (PreparedStatement stm = conn.createPreparedStatement("UPDATE s_libs SET md5 = ?, size = ? WHERE id = ?", false)) {
 					stm.setString(1, upd.md5);
 					stm.setInt(2, upd.size);
 					stm.setInt(3, upd.id);
