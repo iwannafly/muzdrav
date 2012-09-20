@@ -22,6 +22,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -2095,6 +2096,14 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
+		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
+				arcs4 = null, arsc5 = null, arsc6 = null;
+		try {
+			acrs = sse.execPreparedQuery("SELECT p.fam, p.im, p.ot, p.datar, (current_date - p.datar) / 365,p.docser,p.docnum,p.adp_gorod,p.adp_ul,p.adp_dom,p.adp_korp,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,p.sgrp,p.cpol_pr,p.terp,p.adm_gorod, p.adm_ul, p.adm_dom,p.adm_korp, p.adm_kv, p.tel FROM patient p, n_l00 l,n_l00 n, WHERE npasp = ? and ", kb.getNpasp());
+		} catch (SqlExecutorException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 		return null;
 	}
 }
