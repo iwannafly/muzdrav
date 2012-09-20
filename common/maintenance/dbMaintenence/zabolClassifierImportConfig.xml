@@ -73,6 +73,7 @@
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
 		<table srcName="SMORF" dstName="n_smorf" />
+		<table srcName="SPEC" dstName="n_spec" />
 		<table srcName="STOIM" dstName="n_stoim" />
 		<table srcName="T00" dstName="n_t00" />
 		<table srcName="U00" dstName="n_u00" />
