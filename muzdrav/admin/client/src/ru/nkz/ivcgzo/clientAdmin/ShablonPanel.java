@@ -501,7 +501,7 @@ public class ShablonPanel extends JPanel {
 		shOsm.setName(tbName.getText());
 		shOsm.setDiag(tbDiag.getText());
 		shOsm.setCDin(cbDyn.getSelectedPcod());
-		shOsm.setCslu((cbSluPol.isSelected() ? 1 : 0) | (((cbSluStat.isSelected()) ? 1 : 0) << 1));
+		shOsm.setCslu((cbSluStat.isSelected() ? 1 : 0) | (((cbSluPol.isSelected()) ? 1 : 0) << 1));
 		
 		List<Integer> specList = new ArrayList<>();
 		for (IntegerClassifier spc : ltSpec.getSelectedItems())
@@ -536,7 +536,9 @@ public class ShablonPanel extends JPanel {
 			enb &= !ltSpec.isAllItemsUnselected();
 		}
 		
-		if (!prevDiagCode.equals(tbDiag.getText()))
+		if (tbDiag.getText().length() == 0)
+			diagName = null;
+		else if (!prevDiagCode.equals(tbDiag.getText()))
 			prevDiagCode = tbDiag.getText();
 			diagName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, prevDiagCode);
 			
@@ -735,6 +737,7 @@ public class ShablonPanel extends JPanel {
 							if (parent.getChildCount() > 0) {
 								if (childIndex >= parent.getChildCount())
 									childIndex = parent.getChildCount() - 1;
+								changingNodes = false;
 								setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
 							} else {
 								getModel().removeNodeFromParent(parent);

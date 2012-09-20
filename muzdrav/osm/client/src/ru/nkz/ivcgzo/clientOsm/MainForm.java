@@ -29,11 +29,12 @@ import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
-	public static Client<ThriftOsm.Client> instance;
+	public static MainForm instance;
 	private JFrame frame;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
 	private Timer timer;
+	private ZapVr prevZapvr;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -175,7 +176,14 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
 		
 		try {
+			prevZapvr = table.getSelectedItem();
 			table.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis()));
+			if (prevZapvr != null)
+				for (int i = 0; i < table.getData().size(); i++)
+					if (table.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {
+						table.changeSelection(i, 0, false, false);
+						break;
+					}
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
@@ -183,5 +191,9 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		}
 		
 		timer.restart();
+	}
+	
+	public void setVisible(boolean value) {
+		frame.setVisible(value);
 	}
 }

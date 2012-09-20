@@ -60,6 +60,12 @@ public class PatientInfoForm extends ModalForm {
 	private CustomDateEditor tfdatn;
 	private CustomDateEditor tfDatk;
 	private PatientCommonInfo info;
+	private DefaultMutableTreeNode root;
+	private DefaultMutableTreeNode patinfo;
+	private DefaultMutableTreeNode signinfo;
+	private DefaultMutableTreeNode posinfo;
+	private DefaultMutableTreeNode diaginfo;
+	private DefaultMutableTreeNode berinfo;
 
 	public PatientInfoForm() {
 		super(true);
@@ -202,6 +208,7 @@ public class PatientInfoForm extends ModalForm {
 							if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
 						} catch (KmiacServerException e1) {
 							System.err.println(e1.getMessage());
+							eptxt.setText("");
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
@@ -221,7 +228,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Исход д/у", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abb),pdiag.isSetIshod(),pdiag.getIshod()));
 			 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
 						addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
-		 				addLineToDetailInfo("Код врача, ведущего д/у", pdiag.isSetCod_sp(),pdiag.getCod_sp());
+		 				addLineToDetailInfo("Врач, ведущий д/у", pdiag.isSetFio_vr(),pdiag.getFio_vr());
 						addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
 						addLineIf("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
 						addLineIf("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
@@ -230,12 +237,8 @@ public class PatientInfoForm extends ModalForm {
 		 			} else if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 				PatientVizitInfo pvizit = pvizitNode.pvizit;
-			 			//addLineToDetailInfo("id: ", pvizit.isSetId(), pvizit.getId());
 						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
 						addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
-			 			//addLineToDetailInfo("Врач", pvizit.isSetVrach_fio(),pvizit.getVrach_fio());
-						//addLineToDetailInfo("Дата записи в базу", pvizit.isSetDataz(), DateFormat.getDateInstance().format(new Date(pvizit.getDataz())));
-						//addHeader("Анамнез заболевания");
 		 				try {
 							PatientAnamZabInfo anamnez =  MainForm.tcl.getPatientAnamZabInfo(pvizit.getId(),pvizit.getNpasp());
 							addLineToDetailInfo("История настоящего заболевания",anamnez.isSetT_ist_zab(), anamnez.getT_ist_zab());
@@ -244,22 +247,18 @@ public class PatientInfoForm extends ModalForm {
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
-						addHeader("Назначенные исследования");
-		 				for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+							
 		 					if (issl.isSetNisl()) {
 		 	 				addLineToDetailInfo("Показатель",issl.isSetPokaz_name(),issl.getPokaz_name());
 		 					addLineToDetailInfo("Результат",issl.isSetRez(),issl.getRez());
 		 					addLineToDetailInfo("Дата",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));}
-		 					else
-		 						addHeader("Исследований нет");
 		 				}
-		 				addHeader("Поставленные диагнозы");
 		 				for (PatientDiagAmbInfo pdiagamb : MainForm.tcl.getPatientDiagAmbInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 		 					addLineToDetailInfo("Медицинское описание",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 		 					addLineToDetailInfo("Статус",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
 		 				}
-		 				addHeader("Выписанные документы");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование",pnapr.isSetText(),pnapr.getText());
@@ -269,6 +268,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetRezult(), pvizit.getRezult()));
 						addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 			 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
+			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());
 	
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitAmbNode) {
@@ -289,7 +289,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Физикальное обследование",priem.isSetT_fiz_obsl(), priem.getT_fiz_obsl());
 						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
 						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pam.isSetRezult(), pam.getRezult()));
+						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 			 		} else if (lastPath instanceof RdslTreeNode) {
 		 				RdslTreeNode rdslNode = (RdslTreeNode) lastPath;
@@ -330,7 +330,17 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("C.vera", rdsl.isSetCvera(), rdsl.getCvera());
 						eptxt.setText(sb.toString());
 		 			} 	
+			 		else if (lastPath.toString() == "Случаи заболевания") {
+			 			if (posinfo.getChildCount()==0) eptxt.setText("");
+			 		}
+		 			else if (lastPath.toString() == "Заключительные диагнозы") {
+			 			if (diaginfo.getChildCount()==0) eptxt.setText("");
+		 			}
+		 			else if (lastPath.toString() == "Случаи беременности") {
+			 			if (berinfo.getChildCount()==0) eptxt.setText("");
+		 			}
 	 			}
+		 		
 	 			catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -407,7 +417,7 @@ public class PatientInfoForm extends ModalForm {
 	public void update(int npasp) {
 		try {
 			info = MainForm.tcl.getPatientCommonInfo(npasp);
-			treeinfo.setModel(new DefaultTreeModel(createNodes(info.pol)));
+			treeinfo.setModel(new DefaultTreeModel(createNodes(info.pol,(int) ((System.currentTimeMillis() - info.datar) / 31556952000L))));
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
@@ -415,13 +425,13 @@ public class PatientInfoForm extends ModalForm {
 		}
 	}
 	
-	private DefaultMutableTreeNode createNodes(int pol) {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
-		DefaultMutableTreeNode patinfo = new DefaultMutableTreeNode("Личная информация");
-		DefaultMutableTreeNode signinfo = new DefaultMutableTreeNode("Анамнез жизни");
-		DefaultMutableTreeNode posinfo = new DefaultMutableTreeNode("Случаи заболевания");
-		DefaultMutableTreeNode diaginfo = new DefaultMutableTreeNode("Диагнозы");
-		DefaultMutableTreeNode berinfo = new DefaultMutableTreeNode("Случаи беременности");
+	private DefaultMutableTreeNode createNodes(int pol, int age) {
+		root = new DefaultMutableTreeNode("Корень");
+		patinfo = new DefaultMutableTreeNode("Личная информация");
+		signinfo = new DefaultMutableTreeNode("Анамнез жизни");
+		posinfo = new DefaultMutableTreeNode("Случаи заболевания");
+		diaginfo = new DefaultMutableTreeNode("Заключительные диагнозы");
+		berinfo = new DefaultMutableTreeNode("Случаи беременности");
 		root.add(patinfo);
 		root.add(signinfo);
 		root.add(posinfo);
@@ -432,7 +442,7 @@ public class PatientInfoForm extends ModalForm {
 					posinfo.add(new PvizitTreeNode(pvizit));
 			for (PatientDiagZInfo pdiag : MainForm.tcl.getPatientDiagZInfoList(info.npasp))
 				diaginfo.add(new PdiagTreeNode(pdiag));
-			if (pol!=1) {
+			if ((pol!=1) & ((age > 13) & (age < 50))) {
 				root.add(berinfo);
 				for (RdSlInfo rdsl : MainForm.tcl.getRdSlInfoList(info.npasp)) 
 					berinfo.add(new RdslTreeNode(rdsl));

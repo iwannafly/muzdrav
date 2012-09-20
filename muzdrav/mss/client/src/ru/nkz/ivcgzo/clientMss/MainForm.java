@@ -9,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,10 +69,10 @@ public class MainForm extends Client<ThriftMss.Client> {
 	private final ButtonGroup BtnGroup_ms = new ButtonGroup();
 	private final ButtonGroup BtnGroup_mjit = new ButtonGroup();
 	private final ButtonGroup BtnGroup_don = new ButtonGroup();
-	private JTextField tfAds_obl;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> tfAds_obl;
 	private CustomTextField tfAds_raion;
-	private JTextField tfAds_gorod;
-	private JTextField tfAds_ul;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> tfAds_gorod;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> tfAds_ul;
 	private JTextField tfAds_dom;
 	private JTextField tfAds_korp;
 	private JTextField tfAds_kv;
@@ -959,8 +960,26 @@ public class MainForm extends Client<ThriftMss.Client> {
 			
 			JLabel lblNewLabel_13 = new JLabel("республика, край, область");
 			
-			tfAds_obl = new JTextField();
-			tfAds_obl.setColumns(10);
+			tfAds_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
+			tfAds_obl.setStrictCheck(false);
+			//tfAds_obl.setColumns(10);
+//			tfAds_obl.addActionListener(new ActionListener() {
+
+//				@Override
+//				public void actionPerformed(ActionEvent arg0) {
+//					if (tfAds_obl.getSelectedItem() != null) {
+//						try {
+//							tfAds_gorod.setData(MainForm.tcl.getL00(tfAds_obl.getSelectedPcod()));// TODO Auto-generated method stub
+//						} catch (TException e) {
+//							MainForm.conMan.reconnect(e);
+//						}
+//					}
+					
+//				}
+				
+//			});
+				
+			
 			
 			JLabel lblNewLabel_14 = new JLabel("район");
 			
@@ -969,13 +988,25 @@ public class MainForm extends Client<ThriftMss.Client> {
 			
 			JLabel lblNewLabel_15 = new JLabel("город (населенный пункт)");
 			
-			tfAds_gorod = new JTextField();
-			tfAds_gorod.setColumns(10);
+			tfAds_gorod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l00);
+			tfAds_gorod.setStrictCheck(false);
+			//tfAds_gorod.addActionListener(new ActionListener() {
+            //public void actionPerformed(ActionEvent arg0) {
+
+//                if (!tfAds_gorod.getText().substring(0, tfAds_gorod.getText().indexOf('.')+1).equals("НОВОКУЗНЕЦК"))
+            	//if (tfAds_gorod.getText().trim() == "НОВОКУЗНЕЦК")
+            	//tfAds_ul.setData(new ArrayList<IntegerClassifier>());
+                //else
+                  //  tfAds_ul.setData(null);
+            //}
+        //});
+			//tfAds_gorod.setColumns(10);
 			
 			JLabel lblNewLabel_16 = new JLabel("улица");
 			
-			tfAds_ul = new JTextField();
-			tfAds_ul.setColumns(10);
+			tfAds_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
+			tfAds_ul.setStrictCheck(false);
+			//tfAds_ul.setColumns(10);
 			
 			JLabel lblNewLabel_17 = new JLabel("дом, корпус, квартира");
 			

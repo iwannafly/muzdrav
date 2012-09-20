@@ -96,6 +96,18 @@ struct TClassifier {
 	2: string name;
 }
 
+struct ShablonText {
+	1: i32 grupId;
+	2: string grupName;
+	3: string text;
+}
+
+struct Shablon {
+	1: string din;
+	2: string next_osm;
+	3: list<ShablonText> textList;
+}
+
 /**
  * Пациент с такими данными не найден.
  */
@@ -156,6 +168,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
 	list<classifier.IntegerClassifier> getShablonNames(1: i32 cspec, 2: i32 cslu, 3: string srcText)
 		throws (1: kmiacServer.KmiacServerException kse);
+	Shablon getShablon(1: i32 idSh) throws (1: kmiacServer.KmiacServerException kse);
 		
 	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId);	
 	TMedicalHistory getLifeHistory(1:i32 gospId) throws (1:LifeHistoryNotFoundException lhnfe);
