@@ -62,9 +62,15 @@ struct TDoctor{
 
 struct TMedicalHistory{
     1:i32 id;
-    2:i32 id_gosp;
-    3:string text;
-    4:i64 dataz;
+	2:i32 idGosp;
+	3:optional string jalob;
+	4:optional string morbi;
+	5:optional string status_praesense;
+	6:optional string status_localis;
+	7:optional string fisical_obs;
+	8:i32 pcod_vrach;
+	9:i64 dataz;
+	10:i64 timez;
 }
 
 struct TDiagnosis{
@@ -81,19 +87,6 @@ struct TAllDiagnosis{
 	1:TDiagnosis mainDiagnosis;
 	2:list<TDiagnosis> accompDiagnosis;
 	3:list<TDiagnosis> complication;
-}
-
-struct TComplaint{
-    1:i32 id;
-    2:i32 id_gosp;
-	3:i64 date;
-    4:i64 time;
-	5:string text;
-}
-
-struct TClassifier {
-	1: i32 id;
-	2: string name;
 }
 
 struct ShablonText {
@@ -115,33 +108,9 @@ exception PatientNotFoundException {
 }
 
 /**
- * История жизни с такими данными не найдена.
+ * Медицинская история с такими данными не найдена.
  */
-exception LifeHistoryNotFoundException {
-}
-
-/**
- * История болезни с такими данными не найдена.
- */
-exception DesiaseHistoryNotFoundException {
-}
-
-/**
- * Объективный статус с такими данными не найден.
- */
-exception ObjectiveStateNotFoundException {
-}
-
-/**
- * Специальный статус с такими данными не найден.
- */
-exception SpecialStateNotFoundException {
-}
-
-/**
- * Жалоба с такими данными не найдена.
- */
-exception ComplaintNotFoundException {
+exception MedicalHistoryNotFoundException {
 }
 
 /**
@@ -166,29 +135,17 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
 	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
-	list<classifier.IntegerClassifier> getShablonNames(1: i32 cspec, 2: i32 cslu, 3: string srcText)
-		throws (1: kmiacServer.KmiacServerException kse);
-	Shablon getShablon(1: i32 idSh) throws (1: kmiacServer.KmiacServerException kse);
-		
-	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId);	
-	TMedicalHistory getLifeHistory(1:i32 gospId) throws (1:LifeHistoryNotFoundException lhnfe);
-    TMedicalHistory getDesiaseHistory(1:i32 gospId) throws (1:DesiaseHistoryNotFoundException dhnfe);
-    TMedicalHistory getObjectiveState(1:i32 gospId) throws (1:ObjectiveStateNotFoundException osnfe);
-    TMedicalHistory getSpecialState(1:i32 gospId) throws (1:SpecialStateNotFoundException ssnfe);
-	void updateLifeHistory(1:i32 gospId, 2:TMedicalHistory lifeHistory);
-	void updateDesiaseHistory(1:i32 gospId, 2:TMedicalHistory desiaseHistory);
-	void updateObjectiveState(1:i32 gospId, 2:TMedicalHistory objectiveState);
-	void updateSpecialState(1:i32 gospId, 2:TMedicalHistory specialState);
-    
-    void deleteLifeHistory(1:i32 gospId);
-    void deleteDesiaseHistory(1:i32 gospId);
-    void deleteObjectiveState(1:i32 gospId);
-    void deleteSpecialState(1:i32 gospId);
-    
-	list<TComplaint> getComplaints(1:i32 gospId) throws (1:ComplaintNotFoundException cnfe);
-	i32 addComplaint(1:TComplaint complaint);
-    void updateComplaint(1:i32 id,2:TComplaint complaint);
-	void deleteComplaint(1:i32 id);
+
+	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
+		throws (1:kmiacServer.KmiacServerException kse);
+	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
+		2: MedicalHistoryNotFoundException mhnfe);
+	i32 addMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
+	void deleteMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
+	
+	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId) throws (1:PatientNotFoundException pnfe,
+		2:kmiacServer.KmiacServerException kse);
 
     TDiagnosis getMainDiagnosis(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe);
     i32 addMainDiagnosis(1: TDiagnosis inDiagnos);
@@ -199,11 +156,6 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     i32 addAccompDiagnosis(1: TDiagnosis inDiagnos);
     void updateAccompDiagnosis(1:i32 id, 2: TDiagnosis inDiagnos);
     void deleteAccompDiagnosis(1:i32 id);
-
-    list<TDiagnosis> getCopmlication(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe);
-    i32 addCopmlication(1: TDiagnosis inDiagnos);
-    void updateCopmlication(1:i32 id, 2: TDiagnosis inDiagnos);
-    void deleteCopmlication(1:i32 id);
 	
 /*Классификаторы*/
 	
