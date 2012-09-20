@@ -559,7 +559,8 @@ public class PacientInfoFrame extends JFrame {
                     if (rbtn_pol_m.isSelected()) PersonalInfo.setPol(1);
                     if (rbtn_pol_j.isSelected()) PersonalInfo.setPol(2);
                     if (cmb_dms_smo.getSelectedItem() != null) PersonalInfo.polis_dms.setStrg(cmb_dms_smo.getSelectedPcod());
-                    if (cmb_oms_smo.getSelectedItem() != null) PersonalInfo.polis_oms.setStrg(cmb_oms_smo.getSelectedPcod());
+//TODO
+                    if (cmb_oms_smo.getSelectedItem() != null)	PersonalInfo.polis_oms.setStrg(cmb_oms_smo.getSelectedPcod());
                     if (cmb_status.getSelectedItem() != null) PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
                     if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
                     if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
