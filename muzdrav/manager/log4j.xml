@@ -25,7 +25,7 @@
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>
-	<logger name="ru.nkz.ivcgzo.hospital.ServerHospital">
+	<logger name="ru.nkz.ivcgzo.serverHospital.ServerHospital">
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>
