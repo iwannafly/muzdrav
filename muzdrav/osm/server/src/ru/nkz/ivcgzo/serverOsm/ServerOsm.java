@@ -131,8 +131,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "cobr",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "recomend",   "lech");
 		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class,  Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class, String.class};
 		
-		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz",    "cpos");
-		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, String.class};
+		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz",    "cpos",        "cpol");
+		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, String.class, Integer.class};
 		
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
@@ -204,7 +204,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("UPDATE s_users SET config = ? WHERE id = ? ", false, config, id);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new TException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new TException();
 		}
 	}
@@ -282,6 +286,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, tal.vidp, tal.timepn, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, tal.id_pvizit, pat.pol, pat.datar FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL", idvr, cdol, new Date(datap))) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -291,6 +296,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar FROM patient pat WHERE pat.npasp IN " + npaspList)) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -301,7 +307,11 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPreparedT("INSERT INTO p_vizit (id, npasp, cpol, datao, cod_sp, cdol, cuser, dataz) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", false, obr, pvizitTypes, 0, 1, 2, 4, 8, 9, 10, 12);
 			sme.execPrepared("INSERT INTO p_anam_zab (id_pvizit, npasp) VALUES (?, ?) ", false, obr.getId(), obr.getNpasp());
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -314,6 +324,7 @@ public class ServerOsm extends Server implements Iface {
 			else
 				throw new PvizitNotFoundException();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -326,7 +337,11 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPrepared("INSERT INTO p_anam_zab (id_pvizit, npasp) VALUES (?, ?) ", false, id, obr.getNpasp());
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();	
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();	
 		}
 	}
@@ -336,7 +351,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ?, cobr = ?, lech = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 3, 14, 0);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -346,7 +365,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_vizit WHERE id = ? ", false, obrId);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -354,14 +377,18 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, dataz) VALUES (?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 20);
+			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, dataz, cpol) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 20, 22);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.execPrepared("INSERT INTO p_priem (id_obr, npasp, id_pos) VALUES (?, ?, ?) ", false, pos.id_obr, pos.npasp, id);
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
-		}
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+			}
 	}
 
 	@Override
@@ -369,6 +396,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ORDER BY pva.datap", obrId)) {
 			return rsmPvizitAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -376,10 +404,14 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ?, cpos = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 7, 8, 9, 11, 14, 15, 16, 17, 18, 21, 0);
+			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, mobs = ?, rezult = ?, opl = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ?, cpos = ?, cpol = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 7, 8, 9, 11, 14, 15, 16, 17, 18, 21, 22, 0);
 			sme.execPreparedT("UPDATE p_vizit_amb SET diag = ? WHERE id_obr = ? ", false, pos, pvizitAmbTypes, 6, 1);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -389,7 +421,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_vizit_amb WHERE id = ? ", false, posId);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -401,7 +437,11 @@ public class ServerOsm extends Server implements Iface {
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -411,6 +451,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_obr = ? ", obrId)) {
 			return rsmPdiagAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -420,7 +461,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_diag_amb SET id_obr = ?, npasp = ?, diag = ?, named = ?, diag_stat = ?, predv = ?, datad = ?, obstreg = ?, cod_sp = ?, cdol = ?, datap = ?, dataot = ?, obstot = ?, cod_spot = ?, cdol_ot = ?, vid_tr = ? WHERE id = ? ", false, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -430,7 +475,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_diag_amb WHERE id = ? ", false, diagId);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -443,6 +492,7 @@ public class ServerOsm extends Server implements Iface {
 			else
 				throw new PsignNotFoundException();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -458,7 +508,11 @@ public class ServerOsm extends Server implements Iface {
 				sme.execPreparedT("INSERT INTO p_sign (npasp, grup, ph, allerg, farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?) ", false, sign, psignTypes, 0, 1, 2, 3, 4, 5, 6);
 				sme.setCommit();
 			}
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -471,6 +525,7 @@ public class ServerOsm extends Server implements Iface {
 			else
 				throw new PriemNotFoundException();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -480,7 +535,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_priem SET sl_ob = ?, n_is = ?, n_kons = ?, n_proc = ?, n_lek = ?, t_chss = ?, t_temp = ?, t_ad = ?, t_rost = ?, t_ves = ?, t_st_localis = ?, t_ocenka = ?, t_jalob = ?, t_status_praesense = ?, t_fiz_obsl = ? WHERE id_obr = ? AND npasp = ? AND id_pos = ? ", false, pr, priemTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 0, 1, 2);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -503,7 +562,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT n_nz1.pcod, n_nz1.name FROM n_nz1 JOIN s_ot01 ON (n_nz1.pcod=s_ot01.c_nz1) WHERE s_ot01.cotd = ? ", cotd)) {
 			return rsmStrClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -513,6 +572,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pvizit = ? and npasp = ? ", id_pvizit, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 
@@ -526,7 +586,7 @@ public class ServerOsm extends Server implements Iface {
 			else
 				throw new KmiacServerException("rd inf not found");
 		} catch (SQLException e) {
-			e.printStackTrace();
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -539,6 +599,7 @@ public class ServerOsm extends Server implements Iface {
 			else
 				throw new KmiacServerException("rd sl inf not found");
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -550,7 +611,11 @@ public class ServerOsm extends Server implements Iface {
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 		
@@ -561,7 +626,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_rd_din (id_pvizit,  npasp,  srok, oj,  hdm, grr, ball,  dspos,  art1,  art2, art3, art4,  spl,   oteki, chcc, polpl, predpl, serd,  serd1, id_pos,ves) VALUES (?, ?,  ?,  ?, ?,  ?, ?,  ?,  ?, ?,  ?, ?, ?,  ?, ?,  ?, ?, ?, ?, ? ,?) ", false, RdDin, rdDinTypes,  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 
@@ -572,7 +641,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_rd_sl WHERE id_pvizit = ? and npasp = ?", false, id_pvizit, npasp);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 		
@@ -583,7 +656,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pos = ? and iD = ?", false, id_pos,iD);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 		
@@ -603,7 +680,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_rd_sl SET npasp = ?, datay = ?, dataosl = ?, abort = ?, shet = ?, datam = ?, yavka1 = ?, ishod = ?,datasn = ?, datazs = ?,kolrod = ?, deti = ?, kont = ?, vesd = ?, dsp = ?,dsr = ?,dtroch = ?, cext = ?, indsol = ?, prmen = ?,dataz = ?, datasert = ?, nsert = ?, ssert = ?, oslab = ?, plrod = ?, prrod = ?, vozmen = ?, oslrod = ?, polj = ?, dataab = ?, srokab = ?, cdiagt = ?, cvera = ?, rost = ? WHERE id_pvizit = ?", false, Dispb, rdSlTypes, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36, 35);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 		
@@ -614,7 +695,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_rd_din SET npasp = ?, srok = ?, grr = ?, ball = ?, oj = ?, hdm = ?, dspos = ?, art1 = ?, art2 = ?, art3 = ?, art4 = ?, spl = ?, oteki = ?, chcc = ?, polpl = ?, predpl = ?, serd = ?, serd1 = ?, ves = ?  WHERE id_pos = ?", false, din, rdDinTypes, 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,20);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 		
@@ -626,7 +711,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_rd_inf (npasp, dataz) VALUES (?, ?) ", false, rdInf, rdInfTypes, 0, 6);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	
@@ -637,7 +726,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_rd_inf WHERE npasp = ? ", false, npasp);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	
@@ -648,7 +741,11 @@ public class ServerOsm extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_rd_inf SET obr = ?,sem = ?, votec = ?, grotec = ?, photec = ?, dataz = ?, fiootec = ?, mrotec = ?, telotec = ?, vredotec = ?, osoco = ?, uslpr = ? WHERE npasp = ?", false, inf, rdInfTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 0);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 		
@@ -663,6 +760,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, kodissl)) {
 			return rsmMetod.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -674,6 +772,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, c_nz1)) {
 			return rsmPokazMet.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -687,6 +786,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, kodissl, kodsyst)) {
 			return rsmPokaz.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -698,7 +798,11 @@ public class ServerOsm extends Server implements Iface {
 			int id = sme.getGeneratedKeys().getInt("nisl");
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -710,7 +814,11 @@ public class ServerOsm extends Server implements Iface {
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -722,7 +830,11 @@ public class ServerOsm extends Server implements Iface {
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -801,7 +913,11 @@ public class ServerOsm extends Server implements Iface {
 			acrs.close();
 			osw.write(sb.toString());
 			return path;
-		} catch (SQLException | IOException  e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -891,6 +1007,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_lds WHERE clpu = ? ", clpu)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -900,6 +1017,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT m.pcod, m.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod != ? ", clpu)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -909,6 +1027,7 @@ public class ServerOsm extends Server implements Iface {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT l.pcod,l.name FROM n_m00 m JOIN n_lds l ON (m.pcod = l.clpu) WHERE m.pcod = ? ", clpu)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -980,7 +1099,11 @@ public class ServerOsm extends Server implements Iface {
 			acrs.close();
 							osw.write(sb.toString());
 							return path;
-						} catch (SQLException | IOException e) {
+						} catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						} catch (IOException e) {
+							e.printStackTrace();
 							throw new KmiacServerException();
 						}
 
@@ -1053,7 +1176,11 @@ public class ServerOsm extends Server implements Iface {
 			acrs.close();
 							osw.write(sb.toString());
 							return path;
-						} catch (SQLException | IOException  e) {
+						} catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						} catch (IOException e) {
+							e.printStackTrace();
 							throw new KmiacServerException();
 						}
 	}
@@ -1157,7 +1284,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			acrs.close();
 			osw.write(sb.toString());
 			return path;
-		} catch (SQLException | IOException  e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1201,21 +1332,25 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null){sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));}else {sb.append(" -<br>");}
 					}
-				sb.append("<br> <b>Решение комиссии</b>________________________________________ <br>");
-				sb.append("__________________________________________________________<br>");
-				sb.append("__________________________________________________________<br>");
-				sb.append("__________________________________________________________<br>");
-				sb.append("__________________________________________________________<br>");
+				sb.append("<br> <b>Решение комиссии</b>______________________________________________________________ <br>");
+				sb.append("__________________________________________________________________________________________<br>");
+				sb.append("__________________________________________________________________________________________<br>");
+				sb.append("__________________________________________________________________________________________<br>");
+				sb.append("__________________________________________________________________________________________<br>");
 			sb.append("<b>Подпись членов комиссии</b> <br>");
-			sb.append("<b>Председатель КЭК</b>________________ <br>");
-			sb.append("<b>Зав.отделением</b>___________________ <br>");
-			sb.append("<b>Лечащий врач</b>________________________ <br>");
+			sb.append("<b>Председатель КЭК</b>______________________ <br>");
+			sb.append("<b>Зав.отделением</b>_________________________ <br>");
+			sb.append("<b>Лечащий врач</b>____________________________ <br>");
 			sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
 			acrs.close();
 			osw.write(sb.toString());
 			return path;
 			}
-		 catch (SQLException | IOException e) {
+		 catch (SQLException e) {
+			 ((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1228,6 +1363,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			else
 				return new AnamZab();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1237,7 +1373,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("UPDATE p_anam_zab SET  t_ist_zab = ? WHERE id_pvizit = ? ", false, anam, anamZabTypes, 2, 0);
 			sme.setCommit();
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1247,6 +1387,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_pvizit = ? AND predv = FALSE AND diag_stat=1", idObr)) {
 			return rsmPdiagAmb.map(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1291,6 +1432,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			else
 				throw new PdiagNotFoundException();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1303,6 +1445,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			else
 				throw new PdispNotFoundException();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1321,7 +1464,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sme.setCommit();
 				return id;
 			}
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException  e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1340,7 +1487,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sme.setCommit();
 				return id;
 			}
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1468,7 +1619,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			
 			osw.write(sb.toString());
 			return path;}
-		catch (SQLException | IOException  e) {
+		catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		} finally {
 			if (acrs != null)
@@ -1481,7 +1636,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_priem WHERE id_pos = ? ", false, posId);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}		
 	}
@@ -1492,7 +1651,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_anam_zab WHERE id_pvizit = ? ", false, pvizit_id);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}	
 	}
@@ -1504,7 +1667,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
-		} catch (InterruptedException | SQLException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1637,7 +1804,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("</body>");
 				osw.write(sb.toString());
 				return path;
-		} catch (SQLException | IOException  e) {
+		} catch (SQLException  e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1798,7 +1969,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			
 			osw.write(sb.toString());
 			return "c:\\kart1.html";
-		} catch (SQLException|IOException  e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
 			throw new KmiacServerException();
 		} finally {
 			if (acrs != null)
@@ -1813,6 +1988,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		{
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1823,7 +1999,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, tip as name  from n_lds")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 
@@ -1840,7 +2016,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText, srcText)) {
 			return rsmStrClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
-			System.err.println(e.getCause());
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException("Error searching template");
 		}
 	}
@@ -1858,7 +2034,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				throw new SQLException("No templates with this id");
 			}
 		} catch (SQLException e) {
-			System.err.println(e.getCause());
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException("Error loading template by its id");
 	}
 }
@@ -1868,7 +2044,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT sho.id AS pcod, sho.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) AND (sho.diag = ?) ORDER BY sho.name ", cspec, cslu, cslu, diag)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
-			System.err.println(e.getCause());
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException("Error searching template");
 		}
 	}
@@ -1884,7 +2060,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText, srcText)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
-			System.err.println(e.getCause());
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException("Error searching template");
 		}
 	}
@@ -1894,6 +2070,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.id_pdiag = ?", id_pdiag)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1903,6 +2080,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id_pvizit FROM e_talon WHERE (id_pvizit = ?) AND (datap > CURRENT_DATE) ", idObr)) {
 			return acrs.getResultSet().next();
 		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
@@ -1913,9 +2091,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM e_talon WHERE id_pvizit = ? ", false, id_pvizit);
 			sme.setCommit();
-		} catch (SQLException | InterruptedException e) {
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 	
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
 		}		
 	}
 }

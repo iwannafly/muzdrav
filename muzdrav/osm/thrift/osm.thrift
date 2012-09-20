@@ -63,6 +63,7 @@ struct PvizitAmb {
 	20: optional string fio_vr;
 	21: optional i64 dataz;
 	22: optional string cpos;
+	23: optional i32 cpol;
 }
 
 struct PdiagAmb {

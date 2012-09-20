@@ -1717,6 +1717,7 @@ public class Vvod extends JFrame {
 				pvizitAmb.setDataz(System.currentTimeMillis());
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+				pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
 				
 				for (PvizitAmb pviz : tblPos.getData())
 					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
@@ -1770,6 +1771,7 @@ public class Vvod extends JFrame {
 						pvizitAmb.setDatap(System.currentTimeMillis());
 						pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 						pvizitAmb.setCdol(MainForm.authInfo.getCdol());
+						pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
 						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
