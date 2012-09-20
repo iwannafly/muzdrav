@@ -45,6 +45,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
@@ -52,6 +53,8 @@ import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 public class FormPostBer extends JFrame {
 	private static final long serialVersionUID = -1244773743749481104L;
 	public static RdSlStruct rdSlStruct;
+//	public static RdInfStruct RdInfStruct;
+    private RdInfStruct rdinf;
 	private JPanel contentPane;
 	private JTextField TNKart;
     private int oslrod;
@@ -136,13 +139,13 @@ addWindowListener(new WindowAdapter() {
 			public void windowOpened(WindowEvent arg0) {
 try {
 	rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+	System.out.println(Vvod.zapVr.getNpasp());		
 	setPostBerData();
 	fam.setText(Vvod.zapVr.getFam());
 	im.setText(Vvod.zapVr.getIm());
 	ot.setText(Vvod.zapVr.getOth());
 	SimpleDateFormat frm = new SimpleDateFormat("MM");
 	int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
-	System.out.println(mes);		
 	
 } catch (KmiacServerException | TException e) {
 	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
@@ -168,8 +171,11 @@ try {
 					rdSlStruct = new RdSlStruct();
 					setDefaultValues();
 					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-//					rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
-//					rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
+					RdInfStruct rdinf = new RdInfStruct();
+					rdinf.setNpasp(Vvod.zapVr.getNpasp());
+					rdinf.setDataz(System.currentTimeMillis());
+					System.out.println(rdinf);		
+		            MainForm.tcl.AddRdInf(rdinf);
 					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 					setPostBerData();
 				} catch (KmiacServerException e1) {
@@ -322,7 +328,8 @@ try {
 					kartaber.setId_rd_sl(0);
 					String servPath = MainForm.tcl.printKartaBer(kartaber);
 					String cliPath;
-					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
+					oslname = "kart1"+String.valueOf(rdSlStruct.getId());
+					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
 			}
