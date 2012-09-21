@@ -555,4 +555,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*DispMer*/
 	list<Pmer> getPmer (1: i32 id_pdiag) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePmer(1: i32 pmer_id) throws (1: kmiacServer.KmiacServerException kse);
 }
