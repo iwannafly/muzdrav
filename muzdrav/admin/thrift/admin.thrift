@@ -83,7 +83,7 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	/**
 	 * Список всех врачей для данного лпу.
 	 */
-	list<VrachInfo> GetVrachList();
+	list<VrachInfo> GetVrachList(1: i32 clpu);
 
 	/**
 	 * Информация на конкретного врача по его коду.

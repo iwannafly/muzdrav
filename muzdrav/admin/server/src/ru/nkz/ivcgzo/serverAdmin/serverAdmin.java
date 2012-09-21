@@ -70,8 +70,8 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public List<VrachInfo> GetVrachList() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT * FROM s_vrach ")) {
+	public List<VrachInfo> GetVrachList(int clpu) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT v.* FROM s_vrach v JOIN s_mrab m ON (m.pcod = v.pcod) WHERE m.clpu = ? ", clpu)) {
 			return rsmVrach.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
