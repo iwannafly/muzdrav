@@ -87,7 +87,7 @@ public class ServerHospital extends Server implements Iface {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
         Integer.class, Integer.class, String.class, String.class, String.class, String.class,
     //  fisical_obs   pcod_vrach    dataz       timez
-        String.class, String.class, Date.class, Time.class
+        String.class, Integer.class, Date.class, Time.class
     };
 
     /**
@@ -119,15 +119,14 @@ public class ServerHospital extends Server implements Iface {
 
         tServer = new TThreadedSelectorServer(new Args(
                 new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-        System.out.println("hospital server started");
-
+        log.log(Level.INFO, "hospital server started");
         tServer.serve();
     }
 
     @Override
     public final void stop() {
         tServer.stop();
-        System.out.println("hospital server stopped");
+        log.log(Level.INFO, "hospital server stopped");
     }
 
     @Override
@@ -493,17 +492,18 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException, TException {
-        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-        final String sqlQuery = "INSERT INTO c_osmotr (id, id_gosp, jalob, "
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+        final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, "
             + "status_localis, fisical_obs, pcod_vrach, dataz, timez) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, medHist, MEDICAL_HISTORY_TYPES, indexes);
             int id = sme.getGeneratedKeys().getInt("id");
             sme.setCommit();
             return id;
         } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
             log.log(Level.ERROR, "SqlException", e);
             throw new KmiacServerException();
         }

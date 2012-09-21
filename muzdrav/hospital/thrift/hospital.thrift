@@ -65,10 +65,10 @@ struct TMedicalHistory{
 	2:i32 idGosp;
 	3:optional string jalob;
 	4:optional string morbi;
-	5:optional string status_praesense;
-	6:optional string status_localis;
-	7:optional string fisical_obs;
-	8:i32 pcod_vrach;
+	5:optional string statusPraesense;
+	6:optional string statusLocalis;
+	7:optional string fisicalObs;
+	8:i32 pcodVrach;
 	9:i64 dataz;
 	10:i64 timez;
 }
