@@ -24,18 +24,18 @@ struct Pvizit {
 	1: optional i32 id;
 	2: optional i32 npasp;
 	3: optional i32 cpol;
-	4: optional string cobr;
-	5: optional i64 datao;
-	6: optional i32 ishod;
-	7: optional i32 rezult;
-	8: optional i32 talon;
-	9: optional i32 cod_sp;
-	10: optional string cdol;
-	11: optional i32 cuser;
-	12: optional string zakl;
-	13: optional i64 dataz;
-	14: optional string recomend;
-	15: optional string lech;
+	4: optional i64 datao;
+	5: optional i32 ishod;
+	6: optional i32 rezult;
+	7: optional i32 talon;
+	8: optional i32 cod_sp;
+	9: optional string cdol;
+	10: optional i32 cuser;
+	11: optional string zakl;
+	12: optional i64 dataz;
+	13: optional string recomend;
+	14: optional string lech;
+	15: optional i32 cobr;
 	16: optional i32 idzab;
 	17: optional string vrach_fio;
 }
@@ -62,7 +62,7 @@ struct PvizitAmb {
 	19: optional i32 vpom;
 	20: optional string fio_vr;
 	21: optional i64 dataz;
-	22: optional string cpos;
+	22: optional i32 cpos;
 	23: optional i32 cpol;
 }
 
@@ -525,6 +525,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_abd() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
@@ -554,7 +555,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispMer*/
-	list<Pmer> getPmer (1: i32 id_pdiag) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pmer> getPmer (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePmer(1: i32 pmer_id) throws (1: kmiacServer.KmiacServerException kse);

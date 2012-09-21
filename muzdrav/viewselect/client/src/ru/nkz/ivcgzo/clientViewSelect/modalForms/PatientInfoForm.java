@@ -238,8 +238,8 @@ public class PatientInfoForm extends ModalForm {
 		 			} else if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 				PatientVizitInfo pvizit = pvizitNode.pvizit;
-						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
-						addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
+						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
+		 				addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
 		 				try {
 							PatientAnamZabInfo anamnez =  MainForm.tcl.getPatientAnamZabInfo(pvizit.getId(),pvizit.getNpasp());
 							addLineToDetailInfo("История настоящего заболевания",anamnez.isSetT_ist_zab(), anamnez.getT_ist_zab());
@@ -280,7 +280,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Должность врача, ведущего прием",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pam.isSetCdol(), pam.getCdol()));
 						addLineToDetailInfo("Врач, ведущий прием",pam.isSetFio_vr(),pam.getFio_vr());
 						addLineToDetailInfo("Место обслуживания",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abs), pam.isSetMobs(), pam.getMobs()));
-						addLineToDetailInfo("Цель посещения",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_p0c), pam.isSetCpos(), pam.getCpos()));
+						addLineToDetailInfo("Цель посещения",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pam.isSetCpos(), pam.getCpos()));
 						addLineToDetailInfo("Жалобы",priem.isSetT_jalob(), priem.getT_jalob());
 						addLineToDetailInfo("ЧСС",priem.isSetT_chss(), priem.getT_chss());
 						addLineToDetailInfo("Температура",priem.isSetT_temp(), priem.getT_temp());

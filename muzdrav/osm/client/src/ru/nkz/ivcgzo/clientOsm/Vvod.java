@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
@@ -81,12 +82,13 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import javax.swing.JTable;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
 	private CustomTable<PvizitAmb, PvizitAmb._Fields> tblPos;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbVidOpl;
-	private ThriftStringClassifierCombobox<StringClassifier> cmbCelObr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbCelObr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbRez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbMobs;
 	private CustomTextField tbShabSrc;
@@ -155,6 +157,7 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	public static JButton btnPosAdd;
+	private CustomTable<Pmer, Pmer._Fields> tblDisphron;
 	
 	/**
 	 * Create the dialog.
@@ -1636,7 +1639,34 @@ public class Vvod extends JFrame {
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
-		pnlZakl.setLayout(gl_pnlZakl);;
+		pnlZakl.setLayout(gl_pnlZakl);
+		
+		JPanel pDispHron = new JPanel();
+		tabbedPane.addTab("Дисп.хрон.", null, pDispHron, null);
+		
+		JScrollPane spDisphron = new JScrollPane();
+		GroupLayout gl_pDispHron = new GroupLayout(pDispHron);
+		gl_pDispHron.setHorizontalGroup(
+			gl_pDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisphron, GroupLayout.PREFERRED_SIZE, 566, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(24, Short.MAX_VALUE))
+		);
+		gl_pDispHron.setVerticalGroup(
+			gl_pDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisphron, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(357, Short.MAX_VALUE))
+		);
+		
+		tblDisphron = new CustomTable<>(true, true, Pmer.class, 4, "Мероприятие", 5, "План.дата", 6, "Факт.дата");
+		tblDisphron.setDateField(1);
+		tblDisphron.setDateField(2);
+		spDisphron.setViewportView(tblDisphron);
+		tblDisphron.setFillsViewportHeight(true);
+		pDispHron.setLayout(gl_pDispHron);;
 		
 		panel_2.setLayout(gl_panel_2);
 		
@@ -1644,7 +1674,7 @@ public class Vvod extends JFrame {
 		
 		JLabel lblVidOpl = new JLabel("Вид оплаты");
 		
-		cmbCelObr = new ThriftStringClassifierCombobox<>(StringClassifiers.n_p0c);
+		cmbCelObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);
 		
 		JLabel lblCelObr = new JLabel("Цель обращения");
 		
@@ -2007,7 +2037,7 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, 0);
-			
+			tblDisphron.setData(MainForm.tcl.getPmer(377));
 			setVisible(true);
 			MainForm.instance.setVisible(false);
 		} catch (KmiacServerException e) {

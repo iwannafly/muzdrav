@@ -232,14 +232,22 @@ public class MainFrame extends JFrame {
         btnSaveMedicalHistory = new JButton("Сохранить");
         btnSaveMedicalHistory.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                TMedicalHistory medicalHist = createMedicalHistory();
-                try {
-                    medicalHist.setId(ClientHospital.tcl.addMedicalHistory(medicalHist));
-                } catch (KmiacServerException | TException e1) {
-                    JOptionPane.showMessageDialog(MainFrame.this,
-                        "Ошибка при записи медицинской истории. Информация не будет сохранена!",
-                        "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    e1.printStackTrace();
+                if (patient != null) {
+                    TMedicalHistory medicalHist = createMedicalHistory();
+                    try {
+                        medicalHist.setId(ClientHospital.tcl.addMedicalHistory(medicalHist));
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Медицинская история сохранена", "Операция успешно завершена",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (KmiacServerException | TException e1) {
+                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при записи "
+                            + "медицинской истории. Информация не будет сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        e1.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Пациент не выбран!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -493,6 +501,12 @@ public class MainFrame extends JFrame {
 
     private void clearMedicalHistoryText() {
         taJalob.setText("");
+        taDesiaseHistory.setText("");
+        taFisicalObs.setText("");
+        taStatusLocalis.setText("");
+        taStatusPraence.setText("");
+        taRecomdation.setText("");
+        taZakl.setText("");
     }
 
     private void pasteSelectedShablon(final Shablon shablon) {
