@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -432,30 +433,30 @@ public class ServerRegPatient extends Server implements Iface {
 
 /////////////////////////////////// Check OS Type /////////////////////////////
 
-    private boolean isWindows() {
-        String os = System.getProperty("os.name").toLowerCase();
-        //windows
-        return (os.indexOf("win") >= 0);
-    }
-
-    private boolean isUnix() {
-        String os = System.getProperty("os.name").toLowerCase();
-        //linux or unix
-        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
-    }
+//    private boolean isWindows() {
+//        String os = System.getProperty("os.name").toLowerCase();
+//        //windows
+//        return (os.indexOf("win") >= 0);
+//    }
+//
+//    private boolean isUnix() {
+//        String os = System.getProperty("os.name").toLowerCase();
+//        //linux or unix
+//        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
+//    }
 
 ////////////////////////////// Other ///////////////////////////////////////////
 
-    private String setReportPath() {
-        if (isWindows()) {
-            return "C:\\Temp\\MedCardAmbPriem_t.htm";
-        } else if (isUnix()) {
-            return System.getProperty("user.home")
-                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
-        } else {
-            return "MedCardAmbPriem_t.htm";
-        }
-    }
+//    private String setReportPath() {
+//        if (isWindows()) {
+//            return "C:\\Temp\\MedCardAmbPriem_t.htm";
+//        } else if (isUnix()) {
+//            return System.getProperty("user.home")
+//                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
+//        } else {
+//            return "MedCardAmbPriem_t.htm";
+//        }
+//    }
 
 ////////////////////////////////////////////////////////////////////////
 //                       Public Methods                               //
@@ -1391,32 +1392,34 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final String printMedCart(final Gosp gosp, final PatientFullInfo pat)
-            throws TException {
-        final String reportPath = setReportPath();
-        try (OutputStreamWriter osw =
-                new OutputStreamWriter(new FileOutputStream(reportPath), "utf-8")) {
+    public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
+            final UserAuthInfo uai) throws TException {
+        final String path;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 //            AutoCloseableResultSet acrs;
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
             String gender;
             if (pat.getPol() == 1) {
                 gender = "мужской";
-            } else if (pat.getPol() == 0) {
+            } else if (pat.getPol() == 2) {
                 gender = "женский";
             } else {
                 gender = "";
             }
-            HtmTemplate htmTemplate = new HtmTemplate("C:\\muzdrav_reports\\MedCardAmbPriem.htm");
-            System.out.println(htmTemplate.getLabelsCount());
+            HtmTemplate htmTemplate = new HtmTemplate(
+                    new File(this.getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                    + "\\plugin\\reports\\MedCardAmbPriem.htm");
             htmTemplate.replaceLabels(true,
-                "",
-                "",
-                "", // тут раньше был pat.nambk() но теперь намбк отдельно... TODO перепилить
+                uai.getClpu_name(),
+                "123213133",
+                nambk.getNambk(),
                 "",
                 pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
                 String.valueOf(pat.getPolis_oms().getStrg()),
                 pat.getSnils(),
-                "",
+                "123123231",
                 pat.getFam(),
                 pat.getIm(),
                 pat.getOt(),
@@ -1433,7 +1436,7 @@ public class ServerRegPatient extends Server implements Iface {
                 pat.getTel()
             );
             osw.write(htmTemplate.getTemplateText());
-            return reportPath;
+            return path;
         } catch (Exception e) {
             throw new  TException(e); // тут должен быть кмиац сервер иксепшн
         }

@@ -338,7 +338,7 @@ public class ServerReception extends Server implements Iface {
         final int defaultPrv = 0;
         final int defaultIdPVizit = 0;
         final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ?, id_pvizit = ? "
-                + "WHERE  id = ?;";
+                + "WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             final int numUpdated = sme.execPreparedUpdate(
                 sqlQuery, false, defaultNpasp, null, defaultPrv, defaultIdPVizit, talon.getId());
