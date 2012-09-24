@@ -146,18 +146,19 @@ public class DbfMapper {
 			for (int i = 0; i < recs.size(); i++) {
 				DbfRecord rec = recs.get(i);
 				
+				rs.getString(i + 1); //necessary to wasNull() method to work
 				switch (rec.type) {
 				case 'N':
 					if (rec.scale == 0)
-						writeNumber(buf, pos, rs.getLong(i + 1), rec.precision);
+						writeNumber(buf, pos, (!rs.wasNull()) ? rs.getLong(i + 1) : null, rec.precision);
 					else
-						writeFloat(buf, pos, rs.getDouble(i + 1), rec.precision, rec.scale);
+						writeFloat(buf, pos, (!rs.wasNull()) ? rs.getDouble(i + 1) : null, rec.precision, rec.scale);
 					break;
 				case 'C':
 					writeString(buf, pos, rs.getString(i + 1), rec.precision);
 					break;
 				case 'D':
-					writeString(buf, pos, sdf.format(rs.getDate(i + 1)), rec.precision);
+					writeString(buf, pos, (!rs.wasNull()) ? sdf.format(rs.getDate(i + 1)) : rs.getString(i + 1), rec.precision);
 					break;
 				default:
 					throw new SQLException(String.format("Unsupported data type: %s.", rec.type));
@@ -169,15 +170,15 @@ public class DbfMapper {
 		}
 	}
 	
-	private void writeNumber(byte[] buf, int pos, long num, int len) {
-		String str = String.format(String.format("%% %dd", len), num);
+	private void writeNumber(byte[] buf, int pos, Long num, int len) {
+		String str = (num != null) ? (String.format(String.format("%% %dd", len), num)) : ("                    ".substring(0, len));
 		
 		for (int i = 0; i < len; i++)
 			buf[pos++] = (byte) str.charAt(i);
 	}
 	
-	private void writeFloat(byte[] buf, int pos, double num, int prc, int scl) {
-		String str = String.format(Locale.US, String.format("%%%d.", prc) + String.format("%df", scl), num);
+	private void writeFloat(byte[] buf, int pos, Double num, int prc, int scl) {
+		String str = (num != null) ? (String.format(Locale.US, String.format("%%%d.", prc) + String.format("%df", scl), num)) : ("                    ".substring(0, prc));
 		
 		for (int i = 0; i < prc; i++)
 			buf[pos++] = (byte) str.charAt(i);

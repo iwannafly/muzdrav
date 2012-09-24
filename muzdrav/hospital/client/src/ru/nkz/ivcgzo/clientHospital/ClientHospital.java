@@ -1,4 +1,3 @@
-
 package ru.nkz.ivcgzo.clientHospital;
 
 import java.lang.reflect.InvocationTargetException;
