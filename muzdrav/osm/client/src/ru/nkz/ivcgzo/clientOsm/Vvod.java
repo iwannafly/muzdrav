@@ -82,7 +82,6 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import javax.swing.JTable;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -170,11 +169,9 @@ public class Vvod extends JFrame {
 				
 				try {
 					if (!checkInput()) {
-						int modalResult = JOptionPane.showConfirmDialog(Vvod.this, "Пациент не записан на следующий прием или ему не проставлен исход случая обращения. Закрыть окно?", "Предупреждение", JOptionPane.OK_CANCEL_OPTION);
-						if (modalResult == JOptionPane.CANCEL_OPTION || modalResult == JOptionPane.CLOSED_OPTION) {
-							setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-							return;
-						}
+						JOptionPane.showMessageDialog(Vvod.this, "Пациент не записан на следующий прием, ему не проставлен исход случая обращения или не поставлен диагноз.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
 					}
 					MainForm.instance.setVisible(true);
 				} catch (TException e1) {
@@ -1676,7 +1673,7 @@ public class Vvod extends JFrame {
 		
 		cmbCelObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);
 		
-		JLabel lblCelObr = new JLabel("Цель обращения");
+		JLabel lblCelObr = new JLabel("Цель посещения");
 		
 		JLabel lblRez = new JLabel("Результат");
 		
@@ -1876,21 +1873,29 @@ public class Vvod extends JFrame {
 						if (cmbCelObr.getSelectedPcod() != null)
 							{pvizitAmb.setCpos(cmbCelObr.getSelectedPcod());
 							pvizit.setCobr(pvizitAmb.getCpos());}
-							else {pvizitAmb.unsetCpos();pvizit.unsetCobr();}
+							else 
+							{JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Цель посещения'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+								pvizitAmb.unsetCpos();pvizit.unsetCobr();}
 						if (cmbRez.getSelectedPcod() != null)
 							{pvizitAmb.setRezult(cmbRez.getSelectedPcod());
 							pvizit.setRezult(pvizitAmb.getRezult());}
-							else {pvizitAmb.unsetRezult();pvizit.unsetRezult();}
+							else {JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Результат'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+								pvizitAmb.unsetRezult();pvizit.unsetRezult();
+								pvizit.unsetRezult();}
 						if (cmbZaklIsh.getSelectedPcod() != null)
 							pvizit.setIshod(cmbZaklIsh.getSelectedPcod());
 							else pvizit.unsetIshod();
 						if (cmbMobs.getSelectedPcod() != null)
 							pvizitAmb.setMobs(cmbMobs.getSelectedPcod());
 						else
-							pvizitAmb.unsetMobs();
+							{JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Место обращения'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+							pvizitAmb.unsetMobs();}
 						if (cmbVidOpl.getSelectedPcod() != null)
 							pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
-						else pvizitAmb.unsetOpl();
+						else 
+						{	JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Вид оплаты'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+							pvizitAmb.unsetOpl();}
+						pvizitAmb.setPl_extr(1);
 						for (PdiagAmb pd : tblDiag.getData()) {
 							if (pd.diag_stat==1) {
 								pvizitAmb.setDiag(pd.getDiag());}
@@ -1935,7 +1940,7 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
-		tblPos = new CustomTable<>(false, false, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
+		tblPos = new CustomTable<>(true, true, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
 		tblPos.setDateField(0);
 		tblPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		@Override
@@ -2119,6 +2124,8 @@ public class Vvod extends JFrame {
 						return true;
 					else if (!MainForm.tcl.getPvizit(zapVr.id_pvizit).isSetIshod())
 						return false;
+					else if (tblDiag.getData().size()>0) 
+						return true;
 		} catch (KmiacServerException | PvizitNotFoundException e) {
 			return false;
 		}
@@ -2137,4 +2144,6 @@ public class Vvod extends JFrame {
 			return 0;
 		}
 	}
+	
+
 }
