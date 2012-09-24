@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 3513837719265529744L;
     private static final String WINDOW_HEADER = "Врач стационара";
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
     private JMenuBar mbMain;
     private JMenu mnPatientOperation;
     private JMenuItem mntmSelectPatient;
@@ -111,6 +111,21 @@ public class MainFrame extends JFrame {
     private JScrollPane spShablonNames;
     private ThriftIntegerClassifierList lShablonNames;
     private JButton btnSaveMedicalHistory;
+    private JPanel pLifeHistory;
+    private JLabel lblLifeHistory;
+    private JScrollPane spLifeHistory;
+    private JLabel lblAllergo;
+    private JScrollPane spAllergo;
+    private JLabel lblFarmo;
+    private JScrollPane spFarmo;
+    private JTextField tfLifeHShablonFilter;
+    private JButton btnLifeHShablonFilter;
+    private JScrollPane spLifeHShablonNames;
+    private JButton btnSaveLifeHistory;
+    private JTextArea taLifeHistory;
+    private JTextArea taAllergo;
+    private JTextArea taFarmo;
+    private ThriftIntegerClassifierList lLifeHistoryShabloNames;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -181,6 +196,7 @@ public class MainFrame extends JFrame {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane);
         setPatientInfoPanel();
+        setLifeHistoryPanel();
         setMedicalHistoryPanel();
     }
 
@@ -193,13 +209,71 @@ public class MainFrame extends JFrame {
         setReceptionPanel();
     }
 
+    private void setLifeHistoryPanel() {
+        pLifeHistory = new JPanel();
+        tabbedPane.addTab("История жизни", null, pLifeHistory, null);
+
+        lblLifeHistory = new JLabel("История жизни");
+        spLifeHistory = new JScrollPane();
+        taLifeHistory = new JTextArea();
+        taLifeHistory.setLineWrap(true);
+        taLifeHistory.setWrapStyleWord(true);
+        taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        spLifeHistory.setViewportView(taLifeHistory);
+
+        lblAllergo = new JLabel("Аллергоанамнез");
+        spAllergo = new JScrollPane();
+        taAllergo = new JTextArea();
+        taAllergo.setWrapStyleWord(true);
+        taAllergo.setLineWrap(true);
+        taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        spAllergo.setViewportView(taAllergo);
+
+        lblFarmo = new JLabel("Фармоанамнез");
+        spFarmo = new JScrollPane();
+        taFarmo = new JTextArea();
+        taFarmo.setLineWrap(true);
+        taFarmo.setWrapStyleWord(true);
+        taFarmo.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        spFarmo.setViewportView(taFarmo);
+
+        tfLifeHShablonFilter = new JTextField();
+        tfLifeHShablonFilter.setColumns(10);
+        btnLifeHShablonFilter = new JButton("Выбрать");
+        spLifeHShablonNames = new JScrollPane();
+        lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
+        lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        lLifeHistoryShabloNames.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lShablonNames.getSelectedValue() != null) {
+                        try {
+                            pasteSelectedLifeHShablon(ClientHospital.tcl.getShablon(
+                                lShablonNames.getSelectedValue().pcod));
+                        } catch (KmiacServerException e1) {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        } catch (TException e1) {
+                            ClientHospital.conMan.reconnect(e1);
+                        }
+                    }
+                }
+            }
+        });
+        spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
+
+        btnSaveLifeHistory = new JButton("Сохранить");
+
+        setLifeHistoryPanelGroupLayout();
+    }
+
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
         tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
 
         tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
         tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-
         setMedicalHistoryTabs();
 
         tfShablonFilter = new JTextField();
@@ -324,6 +398,14 @@ public class MainFrame extends JFrame {
         tfRealAddress.setColumns(85);
 
         btnUpdateChamber = new JButton("Сохранить");
+        btnUpdateChamber.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    ClientHospital.conMan.showPatientInfoForm("Информация о пациенте",
+                            patient.getPatientId());
+                }
+            }
+        });
 
         setPatientInfoPanelGroupLayout();
     }
@@ -556,9 +638,32 @@ public class MainFrame extends JFrame {
         return tmpHist;
     }
 
+    private void pasteSelectedLifeHShablon(final Shablon shablon) {
+        if (shablon == null) {
+            return;
+        }
+
+        for (ShablonText shText : shablon.textList) {
+            switch (shText.grupId) {
+                case 4:
+                    taLifeHistory.setText(shText.getText());
+                    break;
+                case 3:
+                    taAllergo.setText(shText.getText());
+                    break;
+                case 5:
+                    taFarmo.setText(shText.getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     public final void onConnect() {
         try {
             lShablonNames.setData(ClientHospital.tcl.getShablonNames(
+                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getShablonNames(
                     doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
         } catch (KmiacServerException e) {
             e.printStackTrace();
@@ -755,5 +860,72 @@ public class MainFrame extends JFrame {
                             .addContainerGap())))
         );
         pMedicalHistory.setLayout(glPMedicalHistory);
+    }
+
+    private void setLifeHistoryPanelGroupLayout() {
+        GroupLayout glPLifeHistory = new GroupLayout(pLifeHistory);
+        glPLifeHistory.setHorizontalGroup(
+            glPLifeHistory.createParallelGroup(Alignment.TRAILING)
+                .addGroup(glPLifeHistory.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING, false)
+                        .addComponent(btnSaveLifeHistory, GroupLayout.PREFERRED_SIZE, 722,
+                                GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblLifeHistory)
+                        .addComponent(lblAllergo)
+                        .addComponent(lblFarmo)
+                        .addComponent(spLifeHistory, GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE)
+                        .addComponent(spAllergo, GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE)
+                        .addComponent(spFarmo, GroupLayout.PREFERRED_SIZE, 722,
+                                GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPLifeHistory.createSequentialGroup()
+                            .addComponent(tfLifeHShablonFilter, GroupLayout.PREFERRED_SIZE, 249,
+                                    GroupLayout.PREFERRED_SIZE)
+                            .addGap(6)
+                            .addComponent(btnLifeHShablonFilter, GroupLayout.PREFERRED_SIZE, 90,
+                                    GroupLayout.PREFERRED_SIZE))
+                        .addGroup(glPLifeHistory.createSequentialGroup()
+                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE, 349,
+                                    Short.MAX_VALUE)
+                            .addGap(5)))
+                    .addContainerGap())
+        );
+        glPLifeHistory.setVerticalGroup(
+            glPLifeHistory.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPLifeHistory.createSequentialGroup()
+                    .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPLifeHistory.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(lblLifeHistory)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(spLifeHistory, GroupLayout.DEFAULT_SIZE,
+                                    135, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lblAllergo)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(spAllergo, GroupLayout.PREFERRED_SIZE, 135,
+                                    Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lblFarmo)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(spFarmo, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                            .addGap(17)
+                            .addComponent(btnSaveLifeHistory))
+                        .addGroup(glPLifeHistory.createSequentialGroup()
+                            .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
+                                .addGroup(glPLifeHistory.createSequentialGroup()
+                                    .addGap(1)
+                                    .addComponent(tfLifeHShablonFilter,
+                                            GroupLayout.PREFERRED_SIZE,
+                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnLifeHShablonFilter))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE, 499,
+                                    Short.MAX_VALUE)))
+                    .addContainerGap())
+        );
+        pLifeHistory.setLayout(glPLifeHistory);
     }
 }
