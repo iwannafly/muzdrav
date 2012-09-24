@@ -43,6 +43,13 @@ struct ShablonOsm {
 	7: list<classifier.IntegerClassifier> textList;
 }
 
+struct ShablonDop {
+	1: i32 id;
+	2: i32 idNshablon
+	3: string name;
+	4: string text;
+}
+
 /**
  * Врач с такими данными уже существует.
  */
@@ -67,6 +74,12 @@ exception MestoRabExistsException {
 exception MestoRabNotFoundException {
 }
 
+/**
+ * Шаблон с такими параметрами уже существует.
+ */
+exception TemplateExistsException {
+}
+
 
 service ThriftServerAdmin extends kmiacServer.KmiacServer {
 
@@ -83,7 +96,7 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	/**
 	 * Список всех врачей для данного лпу.
 	 */
-	list<VrachInfo> GetVrachList();
+	list<VrachInfo> GetVrachList(1: i32 clpu);
 
 	/**
 	 * Информация на конкретного врача по его коду.
@@ -163,4 +176,9 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> getShablonOsmDiagList(1: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShablonOsmListByDiag(1: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	void deleteShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShDopRazdList() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShDopList(1: i32 idNshablon) throws (1: kmiacServer.KmiacServerException kse);
+	ShablonDop getShDop(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShDop(1: ShablonDop shDop) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
+	void deleteShDop(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

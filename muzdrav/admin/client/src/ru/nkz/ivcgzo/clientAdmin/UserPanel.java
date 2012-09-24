@@ -277,7 +277,7 @@ public class UserPanel extends JPanel {
 	}
 	
 	public void onConnect() throws TException {
-		tblVrach.setData(MainForm.tcl.GetVrachList());
+		tblVrach.setData(MainForm.tcl.GetVrachList(MainForm.authInfo.clpu));
 		tblVrach.setIntegerClassifierSelector(3, MainForm.tcl.get_n_z30());
 		tblVrach.setStringClassifierSelector(5, MainForm.tcl.get_n_z00());
 		

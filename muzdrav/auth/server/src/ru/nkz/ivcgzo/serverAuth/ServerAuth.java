@@ -97,7 +97,7 @@ public class ServerAuth extends Server implements Iface {
 			throw new TException(e);
 		}
 		
-		String sql = String.format("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config, r.cdol, s.name AS cdol_name, get_short_fio(v.fam, v.im, v.ot) AS name_short, cpn.name AS cpodr_name, m.name AS clpu_name, p.pcod AS cslu, p.name AS cslu_name, ns.pcod AS cspec, ns.name AS cspec_name FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr) JOIN n_s00 s ON (s.pcod = r.cdol) JOIN n_m00 m ON (m.pcod = u.clpu) JOIN %s cpn ON (cpn.pcod = u.cpodr) JOIN n_p0s p ON (r.cslu = p.pcod) JOIN n_ot100 o1 ON (o1.cdol = r.cdol) JOIN n_spec ns ON (ns.pcod = o1.cspec) WHERE (u.login = ?) AND (u.password = ?) ", cpodrTableName);
+		String sql = String.format("SELECT u.pcod, u.clpu, u.cpodr, u.pdost, v.fam || ' ' || v.im || ' ' || v.ot AS name, u.id, u.config, r.cdol, s.name AS cdol_name, get_short_fio(v.fam, v.im, v.ot) AS name_short, cpn.name AS cpodr_name, m.name AS clpu_name, p.pcod AS cslu, p.name AS cslu_name, ns.pcod AS cspec, ns.name AS cspec_name FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr) JOIN n_s00 s ON (s.pcod = r.cdol) JOIN n_m00 m ON (m.pcod = u.clpu) JOIN %s cpn ON (cpn.pcod = u.cpodr) JOIN n_p0s p ON (r.cslu = p.pcod) JOIN n_spec ns ON (ns.pcod = s.spec) WHERE (u.login = ?) AND (u.password = ?) ", cpodrTableName);
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, login, password)) {
 			if (acrs.getResultSet().next())
 				return rsmAuth.map(acrs.getResultSet());

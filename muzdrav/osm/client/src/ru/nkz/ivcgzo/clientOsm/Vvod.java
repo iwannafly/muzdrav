@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
@@ -86,7 +87,7 @@ public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
 	private CustomTable<PvizitAmb, PvizitAmb._Fields> tblPos;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbVidOpl;
-	private ThriftStringClassifierCombobox<StringClassifier> cmbCelObr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbCelObr;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbRez;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbMobs;
 	private CustomTextField tbShabSrc;
@@ -155,6 +156,7 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	public static JButton btnPosAdd;
+	private CustomTable<Pmer, Pmer._Fields> tblDisphron;
 	
 	/**
 	 * Create the dialog.
@@ -167,11 +169,9 @@ public class Vvod extends JFrame {
 				
 				try {
 					if (!checkInput()) {
-						int modalResult = JOptionPane.showConfirmDialog(Vvod.this, "Пациент не записан на следующий прием или ему не проставлен исход случая обращения. Закрыть окно?", "Предупреждение", JOptionPane.OK_CANCEL_OPTION);
-						if (modalResult == JOptionPane.CANCEL_OPTION || modalResult == JOptionPane.CLOSED_OPTION) {
-							setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-							return;
-						}
+						JOptionPane.showMessageDialog(Vvod.this, "Пациент не записан на следующий прием, ему не проставлен исход случая обращения или не поставлен диагноз.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
 					}
 					MainForm.instance.setVisible(true);
 				} catch (TException e1) {
@@ -1636,7 +1636,34 @@ public class Vvod extends JFrame {
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
-		pnlZakl.setLayout(gl_pnlZakl);;
+		pnlZakl.setLayout(gl_pnlZakl);
+		
+		JPanel pDispHron = new JPanel();
+		tabbedPane.addTab("Дисп.хрон.", null, pDispHron, null);
+		
+		JScrollPane spDisphron = new JScrollPane();
+		GroupLayout gl_pDispHron = new GroupLayout(pDispHron);
+		gl_pDispHron.setHorizontalGroup(
+			gl_pDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisphron, GroupLayout.PREFERRED_SIZE, 566, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(24, Short.MAX_VALUE))
+		);
+		gl_pDispHron.setVerticalGroup(
+			gl_pDispHron.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pDispHron.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spDisphron, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(357, Short.MAX_VALUE))
+		);
+		
+		tblDisphron = new CustomTable<>(true, true, Pmer.class, 4, "Мероприятие", 5, "План.дата", 6, "Факт.дата");
+		tblDisphron.setDateField(1);
+		tblDisphron.setDateField(2);
+		spDisphron.setViewportView(tblDisphron);
+		tblDisphron.setFillsViewportHeight(true);
+		pDispHron.setLayout(gl_pDispHron);;
 		
 		panel_2.setLayout(gl_panel_2);
 		
@@ -1644,9 +1671,9 @@ public class Vvod extends JFrame {
 		
 		JLabel lblVidOpl = new JLabel("Вид оплаты");
 		
-		cmbCelObr = new ThriftStringClassifierCombobox<>(StringClassifiers.n_p0c);
+		cmbCelObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);
 		
-		JLabel lblCelObr = new JLabel("Цель обращения");
+		JLabel lblCelObr = new JLabel("Цель посещения");
 		
 		JLabel lblRez = new JLabel("Результат");
 		
@@ -1792,18 +1819,18 @@ public class Vvod extends JFrame {
 		btnPosDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (tblPos.getSelectedItem()!= null){
-						
-					if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
-					MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
-					MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
-					MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
-					tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));}
-					if (tblPos.getSelectedItem()== null){
-					MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());	
-					MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
-					}
-
+					if (tblPos.getSelectedItem() !=  null) {
+						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+							MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
+							MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
+							if (tblPos.getSelectedRow() == tblPos.getRowCount() - 1)
+								MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
+							tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));
+							if (tblPos.getSelectedItem() == null) {
+								MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
+								MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());	
+							}
+						}
 					}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -1846,21 +1873,29 @@ public class Vvod extends JFrame {
 						if (cmbCelObr.getSelectedPcod() != null)
 							{pvizitAmb.setCpos(cmbCelObr.getSelectedPcod());
 							pvizit.setCobr(pvizitAmb.getCpos());}
-							else {pvizitAmb.unsetCpos();pvizit.unsetCobr();}
+							else 
+							{JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Цель посещения'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+								pvizitAmb.unsetCpos();pvizit.unsetCobr();}
 						if (cmbRez.getSelectedPcod() != null)
 							{pvizitAmb.setRezult(cmbRez.getSelectedPcod());
 							pvizit.setRezult(pvizitAmb.getRezult());}
-							else {pvizitAmb.unsetRezult();pvizit.unsetRezult();}
+							else {JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Результат'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+								pvizitAmb.unsetRezult();pvizit.unsetRezult();
+								pvizit.unsetRezult();}
 						if (cmbZaklIsh.getSelectedPcod() != null)
 							pvizit.setIshod(cmbZaklIsh.getSelectedPcod());
 							else pvizit.unsetIshod();
 						if (cmbMobs.getSelectedPcod() != null)
 							pvizitAmb.setMobs(cmbMobs.getSelectedPcod());
 						else
-							pvizitAmb.unsetMobs();
+							{JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Место обращения'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+							pvizitAmb.unsetMobs();}
 						if (cmbVidOpl.getSelectedPcod() != null)
 							pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
-						else pvizitAmb.unsetOpl();
+						else 
+						{	JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Вид оплаты'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+							pvizitAmb.unsetOpl();}
+						pvizitAmb.setPl_extr(1);
 						for (PdiagAmb pd : tblDiag.getData()) {
 							if (pd.diag_stat==1) {
 								pvizitAmb.setDiag(pd.getDiag());}
@@ -1905,7 +1940,7 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
-		tblPos = new CustomTable<>(false, false, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
+		tblPos = new CustomTable<>(true, true, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
 		tblPos.setDateField(0);
 		tblPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		@Override
@@ -2007,7 +2042,7 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, 0);
-			
+			tblDisphron.setData(MainForm.tcl.getPmer(377));
 			setVisible(true);
 			MainForm.instance.setVisible(false);
 		} catch (KmiacServerException e) {
@@ -2089,6 +2124,8 @@ public class Vvod extends JFrame {
 						return true;
 					else if (!MainForm.tcl.getPvizit(zapVr.id_pvizit).isSetIshod())
 						return false;
+					else if (tblDiag.getData().size()>0) 
+						return true;
 		} catch (KmiacServerException | PvizitNotFoundException e) {
 			return false;
 		}
@@ -2107,4 +2144,6 @@ public class Vvod extends JFrame {
 			return 0;
 		}
 	}
+	
+
 }
