@@ -25,7 +25,8 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private JFrame frame;
 	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
-	private ShablonPanel tpShablon;
+	private ShablonOsmPanel tpShablonOsm;
+	private ShablonDopPanel tpShablonDop;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftServerAdmin.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -53,7 +54,9 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				if (tabbedPane.getSelectedIndex() == 1)
-					tpShablon.prepareShTextFields();
+					tpShablonOsm.prepareShTextFields();
+				else if (tabbedPane.getSelectedIndex() == 2)
+					tpShablonDop.prepareShTextFields();
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -75,8 +78,12 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		tpUser = new UserPanel(adminMode);
 		tabbedPane.addTab("Пользователи", null, tpUser, null);
 		
-		tpShablon = new ShablonPanel();
-		tabbedPane.addTab("Шаблоны", null, tpShablon, null);
+		tpShablonOsm = new ShablonOsmPanel();
+		tabbedPane.addTab("Шаблоны осмотра", null, tpShablonOsm, null);
+		
+		tpShablonDop = new ShablonDopPanel();
+		tabbedPane.addTab("Дополнительные шаблоны", null, tpShablonDop, null);
+		
 		frame.getContentPane().setLayout(groupLayout);
 		
 		frame.setLocationRelativeTo(null);

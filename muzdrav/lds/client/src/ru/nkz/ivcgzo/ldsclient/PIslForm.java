@@ -27,8 +27,10 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper.DefaultLanguage;
 import ru.nkz.ivcgzo.ldsThrift.DIslExistsException;
 import ru.nkz.ivcgzo.ldsThrift.DIslNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.DiagIsl;
@@ -41,14 +43,17 @@ import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
 import ru.nkz.ivcgzo.ldsThrift.Patient;
 import ru.nkz.ivcgzo.ldsThrift.PatientNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
+//import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 //import sun.text.resources.FormatData;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,6 +62,12 @@ import java.util.Date;
 import java.util.List;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 
 public class PIslForm {
 
@@ -64,30 +75,30 @@ public class PIslForm {
 	private CustomTable<Patient, Patient._Fields> tpatient;
 	private CustomDateEditor tFdatap;
 	private CustomDateEditor tFdatav;
-	private JTextField tFnprob;
-	private JTextField tFnaprotd;
-	private JTextField tFdiag;
+	private CustomTextField tFnprob;
+	private CustomTextField tFnaprotd;
+	private CustomTextField tFdiag;
 	private CustomTable<ObInfIsl, ObInfIsl._Fields> tn_ldi;
 	private CustomTable<LabIsl, LabIsl._Fields> tlab_isl;
-	private JTextField tFkodisl;
-	private JTextField tFrez_name;
+	private CustomTextField tFkodisl;
+	private CustomTextField tFrez_name;
 	public ThriftStringClassifierCombobox<StringClassifier> cBpcisl;
 	public ThriftStringClassifierCombobox<StringClassifier> cBkodisl;
 	public ThriftStringClassifierCombobox<StringClassifier> cBpcod_m;
 	public ThriftStringClassifierCombobox<StringClassifier> cBLpcod_m;
-	public ThriftStringClassifierCombobox<StringClassifier> cBprichina;
+	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBprichina;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBSvrach;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBVrach;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBpopl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBnapravl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBvopl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBrez;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
-	private JTextField textField_5;
+	private CustomTextField textField;
+	private CustomTextField textField_1;
+	private CustomTextField textField_2;
+	private CustomTextField textField_3;
+	private CustomTextField textField_4;
+	private CustomTextField textField_5;
 	private JTable table;
 	public JTabbedPane tabbedPane;
 	
@@ -147,6 +158,70 @@ public class PIslForm {
 		JButton btnNewButton_8 = new JButton("Протокол");
 		btnNewButton_8.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				
+			String path;
+			OutputStreamWriter osw;
+			try {
+				osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\1\\prob.htm"), "utf-8");
+
+			//	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+					//AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+				sb.append("<title>Протокол исследований…</title>");
+			sb.append("</head>");
+			sb.append("<body>");
+			sb.append("<div>");
+			
+			//sb.append("<p class=\"MsoNormal\" align=\"center\" style=\"text-align:center\"><b>"+MainForm.authInfo.clpu_name +"</b></p>");
+			sb.append("<p><b>"+MainForm.authInfo.cpodr_name+"</b></p>");
+/*			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
+			sb.append("<tr valign=\"top\">");
+				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
+					sb.append("<h3>Информация для пациента:</h3>");
+					sb.append("<b>Дата:</b><br />");
+					sb.append("<b>Время:</b><br />");
+					sb.append("<b>Подготовка:</b><br />");
+				sb.append("</td>");
+					sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
+				
+				
+				sb.append("<b>Диагноз:</b><br />");
+				sb.append("<h3>Наименование показателей:</h3>");
+				sb.append("<ol>");
+				sb.append("</ol>");
+				sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+				sb.append("<b>Подпись врача:</b><br />");
+				sb.append("</td>");
+			sb.append("</tr>");
+			sb.append("</table>");*/
+			
+			sb.append("</div>");
+			sb.append("</body>");
+			sb.append("</html>");
+			
+			
+			osw.write(sb.toString());
+			System.out.print(MainForm.authInfo.clpu_name);
+			//return path;
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				
+				
+				
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
@@ -252,14 +327,14 @@ public class PIslForm {
 		
 		JLabel lblNewLabel_3 = new JLabel("Номер пробы");
 		
-		tFnprob = new JTextField();
+		tFnprob = new CustomTextField();
 		tFnprob.setColumns(10);
 		
 		JLabel lblNewLabel_4 = new JLabel("Причина обращения");
 		
 		JLabel lblNewLabel_5 = new JLabel("Обстоятельства обращения");
 		
-		cBprichina = new ThriftStringClassifierCombobox<>(true);
+		cBprichina = new ThriftIntegerClassifierCombobox<>(true);
 		
 		cBpopl = new ThriftIntegerClassifierCombobox<>(true);
 		
@@ -269,7 +344,7 @@ public class PIslForm {
 		
 		cBnapravl = new ThriftIntegerClassifierCombobox<>(true);
 		
-		tFnaprotd = new JTextField();
+		tFnaprotd = new CustomTextField();
 		tFnaprotd.getDocument().addDocumentListener(new DocumentListener() {
 			
 			@Override
@@ -382,7 +457,8 @@ public class PIslForm {
 		
 		JLabel lblNewLabel_14 = new JLabel("Диагноз");
 		
-		tFdiag = new JTextField();
+		tFdiag = new CustomTextField();
+		tFdiag.setDefaultLanguage(DefaultLanguage.English);
 		tFdiag.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
@@ -576,7 +652,8 @@ public class PIslForm {
 		
 		JLabel label = new JLabel("Исследование");
 		
-		tFkodisl = new JTextField();
+		tFkodisl = new CustomTextField();
+		tFkodisl.setDefaultLanguage(DefaultLanguage.English);
 		tFkodisl.setColumns(10);
 		
 		cBkodisl = new ThriftStringClassifierCombobox<>(true);
@@ -607,7 +684,7 @@ public class PIslForm {
 		
 		JLabel label_4 = new JLabel("Стоимость");
 		
-		tFrez_name = new JTextField();
+		tFrez_name = new CustomTextField();
 		tFrez_name.setColumns(10);
 		
 		JButton button_3 = new JButton("Добавить");
@@ -634,10 +711,10 @@ public class PIslForm {
 		
 		JLabel label_6 = new JLabel("Модель аппарата");
 		
-		textField = new JTextField();
+		textField = new CustomTextField();
 		textField.setColumns(10);
 		
-		textField_1 = new JTextField();
+		textField_1 = new CustomTextField();
 		textField_1.setColumns(10);
 		
 		JButton button_2 = new JButton(">>");
@@ -656,10 +733,10 @@ public class PIslForm {
 		
 		JLabel label_11 = new JLabel("Модель аппарата");
 		
-		textField_2 = new JTextField();
+		textField_2 = new CustomTextField();
 		textField_2.setColumns(10);
 		
-		textField_3 = new JTextField();
+		textField_3 = new CustomTextField();
 		textField_3.setColumns(10);
 		
 		JButton button_8 = new JButton(">>");
@@ -678,12 +755,12 @@ public class PIslForm {
 		JLabel label_14 = new JLabel("Модель аппарата");
 		label_14.setEnabled(false);
 		
-		textField_4 = new JTextField();
+		textField_4 = new CustomTextField();
 		textField_4.setEnabled(false);
 		textField_4.setVisible(false);
 		textField_4.setColumns(10);
 		
-		textField_5 = new JTextField();
+		textField_5 = new CustomTextField();
 		textField_5.setEnabled(false);
 		textField_5.setColumns(10);
 		
@@ -1024,9 +1101,10 @@ public class PIslForm {
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
+					.addGap(0, 0, Short.MAX_VALUE)
 					.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 42, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_9, GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+					.addComponent(panel_9, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(5))
 		);
 		
@@ -1111,13 +1189,13 @@ public class PIslForm {
 			public void actionPerformed(ActionEvent arg0) {
 				
 				
-				List<S_ot01> dnli;
+				List<StringClassifier> dnli;
 				List<Metod> dstoim;
 				LabIsl nLI = new LabIsl();
 
 
 				try {
-					dnli = MainForm.ltc.GetS_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcisl);
+					dnli = MainForm.ltc.GetKlasIsS_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcisl);
 					
 					dstoim = MainForm.ltc.GetLabStoim(tn_ldi.getSelectedItem().pcisl, MainForm.authInfo.cpodr);
 					boolean check;
@@ -1136,11 +1214,12 @@ public class PIslForm {
 							nLI.setNisl(tn_ldi.getSelectedItem().nisl);
 							nLI.setNpasp(tn_ldi.getSelectedItem().npasp);
 							nLI.setCpok(dnli.get(i).pcod);
-							nLI.setPcod_m(dnli.get(i).c_obst);
+							//nLI.setPcod_m(dnli.get(i).c_obst);
 							
 							for (int j = 0; j<dstoim.size(); j++){
 								
 								if (dnli.get(i).pcod.equals(dstoim.get(j).pcod)){
+									nLI.setPcod_m(dstoim.get(j).c_obst);
 									nLI.setStoim(dstoim.get(j).stoim);
 									break;
 								}
@@ -1434,7 +1513,7 @@ public class PIslForm {
 				upnisl.setDatav(tFdatav.getDate().getTime());
 				
 				if (cBprichina.getSelectedPcod() != null){
-					upnisl.setPrichina(Integer.parseInt(cBprichina.getSelectedPcod()));
+					upnisl.setPrichina(cBprichina.getSelectedPcod());
 				}
 				
 				if (cBpopl.getSelectedPcod() != null){
@@ -1473,7 +1552,7 @@ public class PIslForm {
 				tn_ldi.getSelectedItem().setDatav(tFdatav.getDate().getTime());
 				
 				if (cBprichina.getSelectedPcod() != null){
-					tn_ldi.getSelectedItem().setPrichina(Integer.parseInt(cBprichina.getSelectedPcod()));
+					tn_ldi.getSelectedItem().setPrichina(cBprichina.getSelectedPcod());
 				}
 				
 				if (cBpopl.getSelectedPcod() != null){
@@ -1685,7 +1764,7 @@ public class PIslForm {
 				
 				tFnprob.setText(String.valueOf(tn_ldi.getSelectedItem().nprob));
 				if(tn_ldi.getSelectedItem().prichina != 0){
-					cBprichina.setSelectedPcod(String.valueOf(tn_ldi.getSelectedItem().prichina));
+					cBprichina.setSelectedPcod(tn_ldi.getSelectedItem().prichina);
 				}else{
 					cBprichina.setSelectedItem(null);
 				}
