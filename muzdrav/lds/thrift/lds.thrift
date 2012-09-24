@@ -218,7 +218,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	
 	list<N_lds> getN_lds (1: i32 pcod);
 
-	list <classifier.StringClassifier> GetKlasCpos2();
+	list <classifier.IntegerClassifier> GetKlasCpos2();
 	list <classifier.StringClassifier>  GetKlasS_ot01(1: i32 cotd);
 	list <classifier.StringClassifier>  GetKlasIsS_ot01(1: i32 cotd, 2: string organ);
 	list <classifier.StringClassifier>  GetKlasMetS_ot01(1: i32 cotd, 2: string organ, 3: string isl);
