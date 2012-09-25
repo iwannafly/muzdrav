@@ -2154,15 +2154,4 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 		
 	}
-
-	@Override
-	public List<IntegerClassifier> get_n_abd() throws KmiacServerException,
-			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name from n_abd ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}	
-	}
 }
