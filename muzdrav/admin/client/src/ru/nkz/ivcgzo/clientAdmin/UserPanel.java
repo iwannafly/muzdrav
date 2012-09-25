@@ -10,6 +10,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -27,7 +28,10 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.clientManager.common.swing.TableComboBoxIntegerEditor;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRab;
+import ru.nkz.ivcgzo.thriftServerAdmin.VrachExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.VrachInfo;
 
 public class UserPanel extends JPanel {
@@ -52,8 +56,7 @@ public class UserPanel extends JPanel {
 				try {
 					if (!arg0.getValueIsAdjusting()) {
 						if (tblVrach.getSelectedItem() != null) {
-							MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod);
-							tblMrab.setData(MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod));
+							tblMrab.setData(MainForm.tcl.GetMrabList(tblVrach.getSelectedItem().pcod, MainForm.authInfo.clpu));
 							prevSelVrachItem = tblVrach.getSelectedItem();
 							btnVrPerm.setEnabled(tblMrab.getRowCount() > 0);
 							btnMrDel.setEnabled(btnVrPerm.isEnabled());
@@ -68,7 +71,7 @@ public class UserPanel extends JPanel {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<VrachInfo> event) {
 				try {
-					MainForm.tcl.DelVrach(event.getItem().pcod);
+					MainForm.tcl.DelVrach(event.getItem().pcod, MainForm.authInfo.clpu);
 					return true;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
@@ -84,6 +87,9 @@ public class UserPanel extends JPanel {
 				try {
 					MainForm.tcl.UpdVrach(event.getItem());
 					return true;
+				} catch (VrachExistsException e) {
+					JOptionPane.showMessageDialog(UserPanel.this, "Врач с такими данными уже существует.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					return false;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
 					return false;
@@ -97,6 +103,15 @@ public class UserPanel extends JPanel {
 			public boolean doAction(CustomTableItemChangeEvent<VrachInfo> event) {
 				try {
 					event.getItem().setPcod(MainForm.tcl.AddVrach(event.getItem()));
+					int cnt = 0;
+					for (int i = 0; i < tblVrach.getData().size(); i++) {
+						if ((tblVrach.getData().get(i).pcod == event.getItem().pcod) && (++cnt == 2))
+						{
+							tblVrach.getData().remove(i);
+							tblVrach.getModel().fireTableRowsDeleted(i, i);
+							break;
+						}
+					}
 					return true;
 				} catch (TTransportException e) {
 					MainForm.conMan.reconnect(e);
@@ -277,14 +292,23 @@ public class UserPanel extends JPanel {
 	}
 	
 	public void onConnect() throws TException {
-		tblVrach.setData(MainForm.tcl.GetVrachList(MainForm.authInfo.clpu));
-		tblVrach.setIntegerClassifierSelector(3, MainForm.tcl.get_n_z30());
+		updateVrachTable();
+		tblVrach.setIntegerClassifierSelector(3, MainForm.conMan.getIntegerClassifier(IntegerClassifiers.n_z30));
 		tblVrach.setStringClassifierSelector(5, MainForm.tcl.get_n_z00());
 		
 		tblMrab.setIntegerClassifierSelector(0, MainForm.tcl.get_n_p0s13());
 		new TableVidSluComboBoxEditorRenderer(tblMrab, 0, 1);
-		tblMrab.setIntegerClassifierSelector(4, MainForm.tcl.getPrizndList());
-		tblMrab.setStringClassifierSelector(2, MainForm.tcl.get_n_s00());
+		tblMrab.setIntegerClassifierSelector(4, MainForm.conMan.getIntegerClassifier(IntegerClassifiers.n_priznd));
+		tblMrab.setStringClassifierSelector(2, MainForm.conMan.getStringClassifier(StringClassifiers.n_s00));
+	}
+
+	public void updateVrachTable() {
+		try {
+			if (MainForm.tcl != null)
+				tblVrach.setData(MainForm.tcl.GetVrachList(MainForm.authInfo.clpu));
+		} catch (TException e) {
+			MainForm.conMan.reconnect(e);
+		}
 	}
 	
 	class TableVidSluComboBoxEditorRenderer extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
