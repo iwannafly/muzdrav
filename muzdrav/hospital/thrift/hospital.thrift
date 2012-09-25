@@ -73,6 +73,13 @@ struct TMedicalHistory{
 	10:i64 timez;
 }
 
+struct TLifeHistory{
+	1:i32 id;
+	2:string allerg;
+	3:string farmkol;
+	4:string vitae;
+}
+
 struct TDiagnosis{
 	1:i32 id
     2:i32 id_gosp
@@ -108,6 +115,12 @@ exception PatientNotFoundException {
 }
 
 /**
+ * История жизни с такими данными не найдена.
+ */
+exception LifeHistoryNotFoundException {
+}
+
+/**
  * Медицинская история с такими данными не найдена.
  */
 exception MedicalHistoryNotFoundException {
@@ -135,6 +148,10 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
 	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
+	
+	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
+		2:kmiacServer.KmiacServerException kse);
+	void updateLifeHistory(1:TLifeHistory lifeHist) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);

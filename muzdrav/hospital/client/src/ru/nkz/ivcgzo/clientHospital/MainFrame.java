@@ -15,10 +15,12 @@ import javax.swing.JFrame;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
+import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
@@ -86,7 +88,7 @@ public class MainFrame extends JFrame {
     private JLabel lblRealAddress;
     private JTextField tfRealAddress;
     private JTextPane textPane;
-    private JButton btnUpdateChamber;
+    private JButton btnShowPatientInfo;
     private UserAuthInfo doctorAuth;
     private TPatient patient;
     private TPriemInfo priemInfo;
@@ -126,6 +128,9 @@ public class MainFrame extends JFrame {
     private JTextArea taAllergo;
     private JTextArea taFarmo;
     private ThriftIntegerClassifierList lLifeHistoryShabloNames;
+    private JButton btnUpdateChamber;
+    private TLifeHistory lifeHistory;
+    private PatientSelectFrame frmPatientSelect;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -139,6 +144,48 @@ public class MainFrame extends JFrame {
         pack();
     }
 
+    private void createModalFrames() {
+        frmPatientSelect = new PatientSelectFrame(doctorAuth);
+        frmPatientSelect.pack(); System.out.println("000");
+        frmPatientSelect.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(final WindowEvent arg0) {
+                if (frmPatientSelect.getCurrentPatient() != null) {
+                    try {
+                        System.out.println("[x1");
+                        patient = ClientHospital.tcl.getPatientPersonalInfo(
+                            frmPatientSelect.getCurrentPatient().getPatientId());
+                        fillPersonalInfoTextFields();
+                        priemInfo = ClientHospital.tcl.getPriemInfo(
+                                patient.getGospitalCod());
+                        fillReceptionPanel();
+                        lifeHistory =
+                                ClientHospital.tcl.getLifeHistory(patient.getPatientId());
+                        fillLifeHistoryPanel();
+                        setTitle(String.format("%s %s %s",
+                                patient.getSurname(), patient.getName(),
+                                patient.getMiddlename()));
+                    } catch (PatientNotFoundException e) {
+                        JOptionPane.showMessageDialog(frmPatientSelect,
+                            "Персональная инфомация о данном пациенте не найдена.",
+                            "Внимание!", JOptionPane.WARNING_MESSAGE);
+                    } catch (PriemInfoNotFoundException e) {
+                        JOptionPane.showMessageDialog(frmPatientSelect,
+                            "Информация из приёмного отделения"
+                            + "о данном пациенте не найдена.",
+                            "Внимание!", JOptionPane.WARNING_MESSAGE);
+                    } catch (LifeHistoryNotFoundException e) {
+                        JOptionPane.showMessageDialog(frmPatientSelect,
+                            "История жизни данного пациента не найдена.",
+                            "Внимание!", JOptionPane.WARNING_MESSAGE);
+                    } catch (KmiacServerException | TException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
     private void setMainMenu() {
         mbMain = new JMenuBar();
         setJMenuBar(mbMain);
@@ -150,38 +197,6 @@ public class MainFrame extends JFrame {
         mntmSelectPatient.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                final PatientSelectFrame frmPatientSelect = new PatientSelectFrame(doctorAuth);
-                frmPatientSelect.pack();
-                frmPatientSelect.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosed(final WindowEvent arg0) {
-                        if (frmPatientSelect.getCurrentPatient() != null) {
-                            try {
-                                patient = ClientHospital.tcl.getPatientPersonalInfo(
-                                    frmPatientSelect.getCurrentPatient().getPatientId());
-                                fillPersonalInfoTextFields();
-                                priemInfo = ClientHospital.tcl.getPriemInfo(
-                                        patient.getGospitalCod());
-                                System.out.println(patient.getGospitalCod());
-                                fillReceptionPanel();
-                                setTitle(String.format("%s %s %s",
-                                        patient.getSurname(), patient.getName(),
-                                        patient.getMiddlename()));
-                            } catch (PatientNotFoundException e) {
-                                JOptionPane.showMessageDialog(null,
-                                    "Персональная инфомация о данном пациенте не найдена.",
-                                    "Внимание!", JOptionPane.WARNING_MESSAGE);
-                            } catch (PriemInfoNotFoundException e) {
-                                JOptionPane.showMessageDialog(null,
-                                    "Информация из приёмного отделения"
-                                    + "о данном пациенте не найдена.",
-                                    "Внимание!", JOptionPane.WARNING_MESSAGE);
-                            } catch (KmiacServerException | TException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                });
                 frmPatientSelect.setVisible(true);
             }
         });
@@ -264,6 +279,27 @@ public class MainFrame extends JFrame {
         spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
 
         btnSaveLifeHistory = new JButton("Сохранить");
+        btnSaveLifeHistory.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if ((lifeHistory != null) && (patient != null)) {
+                    try {
+                        updateLifeHistoryFromTextAreas();
+                        ClientHospital.tcl.updateLifeHistory(lifeHistory);
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                            "История жизни сохранена", "Операция успешно завершена",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    } catch (KmiacServerException | TException e1) {
+                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
+                            + "изменении истории жизни. Информация не будет сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
+                            + "изменении истории жизни. Информация не будет сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
 
         setLifeHistoryPanelGroupLayout();
     }
@@ -398,7 +434,8 @@ public class MainFrame extends JFrame {
         tfRealAddress.setColumns(85);
 
         btnUpdateChamber = new JButton("Сохранить");
-        btnUpdateChamber.addActionListener(new ActionListener() {
+        btnShowPatientInfo = new JButton("Информация о пациенте");
+        btnShowPatientInfo.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
                     ClientHospital.conMan.showPatientInfoForm("Информация о пациенте",
@@ -638,6 +675,14 @@ public class MainFrame extends JFrame {
         return tmpHist;
     }
 
+    private void fillLifeHistoryPanel() {
+        if (lifeHistory != null) {
+            taAllergo.setText(lifeHistory.getAllerg());
+            taFarmo.setText(lifeHistory.getFarmkol());
+            taLifeHistory.setText(lifeHistory.getVitae());
+        }
+    }
+
     private void pasteSelectedLifeHShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
@@ -659,7 +704,9 @@ public class MainFrame extends JFrame {
             }
         }
     }
+
     public final void onConnect() {
+        createModalFrames();
         try {
             lShablonNames.setData(ClientHospital.tcl.getShablonNames(
                     doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
@@ -671,6 +718,12 @@ public class MainFrame extends JFrame {
             ClientHospital.conMan.reconnect(e);
         }
     }
+
+    private void updateLifeHistoryFromTextAreas() {
+        lifeHistory.setAllerg(taAllergo.getText());
+        lifeHistory.setFarmkol(taFarmo.getText());
+        lifeHistory.setVitae(taLifeHistory.getText());
+    };
 
 ////////////////////////////////////////// CAUTION! ///////////////////////////////////////////////
 /////////////////// Автогенерируемое нечитаемое говно. Спасибо ВиндоуБилдеру за это. //////////////
@@ -689,70 +742,62 @@ public class MainFrame extends JFrame {
                         .addComponent(lblRegistrationAddress)
                         .addComponent(lblRealAddress))
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
-                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPersonalInfo.createSequentialGroup()
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                                .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfGender, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfNumberOfDesiaseHistory,
+                                        GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.PREFERRED_SIZE))
+                            .addGap(31)
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblSurname)
+                                .addComponent(lblBirthdate)
+                                .addComponent(lblStatus))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                                .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addGap(34)
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblName)
+                                .addComponent(lblOms)
+                                .addComponent(lblWork))
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addGroup(glPersonalInfo.createSequentialGroup()
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfGender, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfNumberOfDesiaseHistory,
-                                            GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                            GroupLayout.PREFERRED_SIZE))
-                                    .addGap(31)
-                                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(lblSurname)
-                                        .addComponent(lblBirthdate)
-                                        .addComponent(lblStatus))
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE,
-                                            GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE,
-                                            GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfStatus,
-                                            GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                    .addGap(34)
-                                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(lblName)
-                                        .addComponent(lblOms)
-                                        .addComponent(lblWork))
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addGroup(glPersonalInfo.createSequentialGroup()
-                                            .addGroup(glPersonalInfo.createParallelGroup(
-                                                Alignment.LEADING)
-                                                .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
-                                                    GroupLayout.DEFAULT_SIZE,
-                                                    GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
-                                                    GroupLayout.DEFAULT_SIZE,
-                                                    GroupLayout.PREFERRED_SIZE))
-                                            .addGap(43)
-                                            .addGroup(glPersonalInfo.createParallelGroup(
-                                                Alignment.LEADING)
-                                                .addComponent(lblMiddlename)
-                                                .addComponent(lblDms)))
-                                        .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
+                                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
                                                 GroupLayout.DEFAULT_SIZE,
-                                                GroupLayout.PREFERRED_SIZE)))
-                                .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                            .addGap(18)
-                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
-                                .addComponent(btnUpdateChamber, GroupLayout.PREFERRED_SIZE, 166,
-                                        GroupLayout.PREFERRED_SIZE)
-                                .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING,
-                                    false)
-                                    .addComponent(tfMiddlename)
-                                    .addComponent(tfDms)))))
+                                                GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
+                                                GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE))
+                                    .addGap(43)
+                                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(lblMiddlename)
+                                        .addComponent(lblDms)))
+                                .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addGap(18)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                        .addComponent(btnShowPatientInfo, GroupLayout.DEFAULT_SIZE,
+                                166, Short.MAX_VALUE)
+                        .addComponent(tfMiddlename)
+                        .addComponent(tfDms)
+                        .addComponent(btnUpdateChamber, GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGap(5))
         );
         glPersonalInfo.setVerticalGroup(
@@ -796,19 +841,20 @@ public class MainFrame extends JFrame {
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblWork)
                         .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnShowPatientInfo))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRegistrationAddress)
                         .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnUpdateChamber))
                     .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
                             Short.MAX_VALUE)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRealAddress)
                         .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnUpdateChamber)))
+                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
         );
         pPersonalInfo.setLayout(glPersonalInfo);
     }
