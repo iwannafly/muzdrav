@@ -346,10 +346,12 @@ public class FormRdDin extends JFrame {
 		rddin.setVes((double) SVes.getModel().getValue());
 		ves = (double) SVes.getModel().getValue();
 		rost = FormPostBer.rdSlStruct.getRost();	
-		if (rost != 0)
+		if (rost<=154) br = br+1;
+		if (FormRdInf.RdInfStruct.getObr() == 3) br = br+1; 
+		if (rost != 0) 
 		{ves = ves/rost/rost*10000;
 		if (ves<17) br = br+1;
-		if (ves>32) br = br+1;}
+		if (ves>=32) br = br+1;}
 		rddin.setBall(br); 
 //		System.out.println(ves);
 			MainForm.tcl.UpdateRdDin(rddin);
