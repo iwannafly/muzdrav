@@ -1,5 +1,9 @@
 	package ru.nkz.ivcgzo.lds_server;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
@@ -34,7 +38,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
 
 
@@ -324,9 +328,9 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public List<StringClassifier> GetKlasCpos2() throws TException {
+	public List<IntegerClassifier> GetKlasCpos2() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0c ")) {
-			return rsmStrClas.mapToList(acrs.getResultSet());
+			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -632,5 +636,6 @@ public class LDSserver extends Server implements Iface {
 
 
 
+	
 
 }

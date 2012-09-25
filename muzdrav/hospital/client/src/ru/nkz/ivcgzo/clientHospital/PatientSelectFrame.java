@@ -65,9 +65,11 @@ public class PatientSelectFrame extends JDialog {
         btnSelect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
-                        .get(table.convertRowIndexToModel(table.getSelectedRow()));
-                dispose();
+                if (table.getSelectedRow() != -1) {
+                    currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
+                            .get(table.convertRowIndexToModel(table.getSelectedRow()));
+                    dispose();
+                }
             }
         });
         panel.add(btnSelect);
