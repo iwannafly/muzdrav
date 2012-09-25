@@ -530,10 +530,12 @@ public class ShablonOsmPanel extends JPanel {
 				break;
 			}
 		
+		enb &= trSearch.getSelectionPath() != null;
 		if (enb) {
 			enb &= !tbName.isEmpty();
 			enb &= !tbDiag.isEmpty();
 			enb &= !ltSpec.isAllItemsUnselected();
+			enb &= trSearch.getSelectionPath().getLastPathComponent() instanceof SearchTree.IntClassTreeNode;
 		}
 		
 		if (tbDiag.getText().length() == 0)

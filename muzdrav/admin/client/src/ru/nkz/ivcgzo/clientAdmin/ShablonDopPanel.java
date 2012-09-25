@@ -32,6 +32,7 @@ import javax.swing.tree.TreePath;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -214,6 +215,7 @@ public class ShablonDopPanel extends JPanel {
 		tbText = new JTextArea();
 		tbText.getDocument().addDocumentListener(textListener);
 		tbText.setFont(defFont);
+		new CustomTextComponentWrapper(tbText).setPopupMenu();
 		spText.setViewportView(tbText);
 		gbText.setLayout(gl_gbText);
 		
@@ -264,6 +266,9 @@ public class ShablonDopPanel extends JPanel {
 		
 		enb &= !tbName.isEmpty();
 		enb &= !(tbText.getText().length() == 0);
+		enb &= trSearch.getSelectionPath() != null;
+		if (enb)
+			enb &= ((DefaultMutableTreeNode) trSearch.getSelectionPath().getLastPathComponent()).getLevel() == 2;
 		
 		btSave.setEnabled(enb);
 	}
