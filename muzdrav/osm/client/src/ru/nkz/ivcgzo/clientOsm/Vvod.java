@@ -475,7 +475,7 @@ public class Vvod extends JFrame {
 				if (e.getClickCount() == 2) 
 					if (lbShabSrc.getSelectedValue() != null) {
 						try {
-							pasteShablon(MainForm.tcl.getSh(lbShabSrc.getSelectedValue().pcod));
+							pasteShablon(MainForm.tcl.getShOsm(lbShabSrc.getSelectedValue().pcod));
 						} catch (KmiacServerException e1) {
 							JOptionPane.showMessageDialog(Vvod.this, "Ошибка загрузка шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
 						} catch (TException e1) {
@@ -2025,7 +2025,7 @@ public class Vvod extends JFrame {
 	
 	private void loadShablonList() {
 		try {
-			lbShabSrc.setData(MainForm.tcl.getShPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu, (tbShabSrc.getText().length() < 3) ? null : '%' + tbShabSrc.getText() + '%'));
+			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu, (tbShabSrc.getText().length() < 3) ? null : '%' + tbShabSrc.getText() + '%'));
 		} catch (KmiacServerException e1) {
 			JOptionPane.showMessageDialog(Vvod.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e1) {
@@ -2039,7 +2039,7 @@ public class Vvod extends JFrame {
 			cmbNaprMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
 			cmbKonsMesto.setData(MainForm.tcl.get_n_m00(MainForm.authInfo.clpu));
 			listVidIssl = MainForm.tcl.get_vid_issl();
-			lbShabSrc.setData(MainForm.tcl.getShPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));
+			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));
 		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {

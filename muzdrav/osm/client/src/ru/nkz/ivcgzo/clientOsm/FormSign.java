@@ -2,6 +2,10 @@ package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -12,6 +16,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -19,9 +24,11 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
+import javax.swing.text.BadLocationException;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -30,8 +37,11 @@ import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 
 public class FormSign extends JFrame {
 	private static final long serialVersionUID = -5267798845014525253L;
-	private JEditorPane tpfarm;
-	private JEditorPane tpanamnz;
+	private ShablonDopEditorPane tpfarm;
+	private ShablonDopEditorPane tpanamnz;
+	private ShablonDopEditorPane tpallerg;
+	private static ShablonDopEditorPane selShabPane;
+	private ThriftIntegerClassifierList listShablon;
 	private Psign psign;
 	private JCheckBox cbk;
 	private JCheckBox cba;
@@ -45,7 +55,6 @@ public class FormSign extends JFrame {
 	private JRadioButton rbpol;
 	private JRadioButton rbotr;
 	private String vrp;
-	private JEditorPane tpallerg;
 	private JPanel pallerg;
 	public static List<IntegerClassifier> pokNames;
 
@@ -60,13 +69,31 @@ public class FormSign extends JFrame {
 		spAnamn.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		spAnamn.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
-		final ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
-		    
-			final JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
-		      
-		      JScrollPane spSh = new JScrollPane();
-		      
-		      spSh.setViewportView(listShablon);
+		listShablon = new ThriftIntegerClassifierList();
+		listShablon.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					if (listShablon.getSelectedValue() != null)
+						if (selShabPane != null)
+							try {
+								selShabPane.getDocument().insertString(selShabPane.getText().length(), MainForm.tcl.getShDop(listShablon.getSelectedPcod()).name, null);
+							} catch (BadLocationException e1) {
+								e1.printStackTrace();
+							} catch (KmiacServerException e1) {
+								JOptionPane.showMessageDialog(FormSign.this, "Ошибка загрузка текста шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+							} catch (TException e1) {
+								e1.printStackTrace();
+								MainForm.conMan.reconnect(e1);
+							}
+			}
+		});
+		
+		JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
+		
+		JScrollPane spSh = new JScrollPane();
+		
+		spSh.setViewportView(listShablon);
 		
 		JLabel lblVr = new JLabel("Вредные привычки");
 		
@@ -230,10 +257,10 @@ public class FormSign extends JFrame {
 		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
 		
-		tpfarm = new JEditorPane();
+		tpfarm = new ShablonDopEditorPane(5);
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
-		tpanamnz = new JEditorPane();
+		tpanamnz = new ShablonDopEditorPane(4);
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 pallerg = new JPanel();
@@ -272,7 +299,7 @@ public class FormSign extends JFrame {
 		
 		JLabel label = new JLabel("Аллергоанамнез");
 		
-		 tpallerg = new JEditorPane();
+		tpallerg = new ShablonDopEditorPane(3);
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_pallerg = new GroupLayout(pallerg);
 		gl_pallerg.setHorizontalGroup(
@@ -294,6 +321,49 @@ public class FormSign extends JFrame {
 		pallerg.setLayout(gl_pallerg);
 		pAnamn.setLayout(gl_pAnamn);
 		getContentPane().setLayout(groupLayout);
+	}
+	
+	private class ShablonDopEditorPane extends JEditorPane {
+		private static final long serialVersionUID = -2297529095988741139L;
+		private int idRazd;
+		
+		public ShablonDopEditorPane(int idRazd) {
+			super();
+			
+			this.idRazd = idRazd;
+			
+			setFocusListener();
+			new CustomTextComponentWrapper(this).setPopupMenu();
+		}
+		
+		private void setFocusListener() {
+			addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					try {
+						selShabPane = ShablonDopEditorPane.this;
+						listShablon.setData(MainForm.tcl.getShDopNames(getIdRazd()));
+					} catch (KmiacServerException e1) {
+						JOptionPane.showMessageDialog(FormSign.this, "Ошибка загрузка названий шаблонов", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						handleError();
+					} catch (TException e1) {
+						e1.printStackTrace();
+						handleError();
+						MainForm.conMan.reconnect(e1);
+					}
+				}
+				
+				private void handleError() {
+					selShabPane = null;
+					listShablon.setData(null);
+					listShablon.requestFocusInWindow();
+				}
+			});
+		}
+		
+		private int getIdRazd() {
+			return idRazd;
+		}
 	}
 		
 		private String getVrPr() {
