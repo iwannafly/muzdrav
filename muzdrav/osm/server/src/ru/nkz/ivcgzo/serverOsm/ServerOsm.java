@@ -56,6 +56,7 @@ import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdPatient;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
@@ -117,6 +118,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private final Class<?>[] rdDinTypes;
+	private final TResultSetMapper<RdPatient, RdPatient._Fields> rsmRdPat;
+	private final Class<?>[] rdPatientTypes;
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
@@ -187,6 +190,9 @@ public class ServerOsm extends Server implements Iface {
 
 		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
+		
+		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot");
+		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class};
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
@@ -597,7 +603,7 @@ public class ServerOsm extends Server implements Iface {
 			if (acrs.getResultSet().next())
 				return rsmRdSl.map(acrs.getResultSet());
 			else
-				throw new KmiacServerException("rd sl inf not found");
+				throw new KmiacServerException("нет записи");
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -2157,6 +2163,41 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
+		
+	}
+
+	@Override
+	public void getRdPatient(int npasp) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+/*		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT p.fam, p.im, p.ot, p.datar,
+p.docser,p.docnum,p.adp_gorod,p.adp_ul,p.adp_dom,p.adp_korp,p.adp_kv,
+p.poms_ser,p.poms_nom,p.poms_ndog,n.clpu,
+p.terp,p.adm_gorod, p.adm_ul, p.adm_dom,p.adm_korp,
+ p.adm_kv, p.tel,s.grup,s.ph,s.vred,a.stat
+FROM patient p,n_n00 n,p_sign s,n_az9 a,p_rd_sl rd
+WHERE p.npasp = 16164 and p.cpol_pr=n.pcod and
+p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp", npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmRdSl.map(acrs.getResultSet());
+			else
+				throw new KmiacServerException("нет записи");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+*/		
+	}
+
+	@Override
+	public void getRdVizit(int npasp) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void getRdConVizit(int npasp) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
 		
 	}
 }
