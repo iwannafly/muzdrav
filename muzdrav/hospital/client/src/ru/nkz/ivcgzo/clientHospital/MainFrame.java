@@ -138,21 +138,49 @@ public class MainFrame extends JFrame {
         setTitle(WINDOW_HEADER);
         setMainMenu();
         setTabbedPane();
-
 //        setExtendedState(JFrame.MAXIMIZED_BOTH);
-
         pack();
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////// Общие методы //////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setTabbedPane() {
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        getContentPane().add(tabbedPane);
+        setPatientInfoPanel();
+        setLifeHistoryPanel();
+        setMedicalHistoryPanel();
+    }
+
+    public final void onConnect() {
+        createModalFrames();
+        try {
+            lShablonNames.setData(ClientHospital.tcl.getShablonNames(
+                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getShablonNames(
+                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// Модульные фреймы ///////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
     private void createModalFrames() {
         frmPatientSelect = new PatientSelectFrame(doctorAuth);
-        frmPatientSelect.pack(); System.out.println("000");
+        frmPatientSelect.pack();
         frmPatientSelect.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(final WindowEvent arg0) {
                 if (frmPatientSelect.getCurrentPatient() != null) {
                     try {
-                        System.out.println("[x1");
                         patient = ClientHospital.tcl.getPatientPersonalInfo(
                             frmPatientSelect.getCurrentPatient().getPatientId());
                         fillPersonalInfoTextFields();
@@ -186,6 +214,10 @@ public class MainFrame extends JFrame {
         });
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////   Главное меню   ///////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
     private void setMainMenu() {
         mbMain = new JMenuBar();
         setJMenuBar(mbMain);
@@ -206,164 +238,17 @@ public class MainFrame extends JFrame {
         mnPatientOperation.add(mntmReception);
     }
 
-    private void setTabbedPane() {
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        getContentPane().add(tabbedPane);
-        setPatientInfoPanel();
-        setLifeHistoryPanel();
-        setMedicalHistoryPanel();
-    }
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////   Информация о пациенте   //////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void setPatientInfoPanel() {
         spPatientInfo = new JSplitPane();
         spPatientInfo.setOrientation(JSplitPane.VERTICAL_SPLIT);
         tabbedPane.addTab("Информация о пациенте", null, spPatientInfo, null);
-
         setPersonalInfoPanel();
         setReceptionPanel();
     }
-
-    private void setLifeHistoryPanel() {
-        pLifeHistory = new JPanel();
-        tabbedPane.addTab("История жизни", null, pLifeHistory, null);
-
-        lblLifeHistory = new JLabel("История жизни");
-        spLifeHistory = new JScrollPane();
-        taLifeHistory = new JTextArea();
-        taLifeHistory.setLineWrap(true);
-        taLifeHistory.setWrapStyleWord(true);
-        taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        spLifeHistory.setViewportView(taLifeHistory);
-
-        lblAllergo = new JLabel("Аллергоанамнез");
-        spAllergo = new JScrollPane();
-        taAllergo = new JTextArea();
-        taAllergo.setWrapStyleWord(true);
-        taAllergo.setLineWrap(true);
-        taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        spAllergo.setViewportView(taAllergo);
-
-        lblFarmo = new JLabel("Фармоанамнез");
-        spFarmo = new JScrollPane();
-        taFarmo = new JTextArea();
-        taFarmo.setLineWrap(true);
-        taFarmo.setWrapStyleWord(true);
-        taFarmo.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        spFarmo.setViewportView(taFarmo);
-
-        tfLifeHShablonFilter = new JTextField();
-        tfLifeHShablonFilter.setColumns(10);
-        btnLifeHShablonFilter = new JButton("Выбрать");
-        spLifeHShablonNames = new JScrollPane();
-        lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
-        lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
-        lLifeHistoryShabloNames.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    if (lShablonNames.getSelectedValue() != null) {
-                        try {
-                            pasteSelectedLifeHShablon(ClientHospital.tcl.getShablon(
-                                lShablonNames.getSelectedValue().pcod));
-                        } catch (KmiacServerException e1) {
-                            JOptionPane.showMessageDialog(MainFrame.this,
-                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        } catch (TException e1) {
-                            ClientHospital.conMan.reconnect(e1);
-                        }
-                    }
-                }
-            }
-        });
-        spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
-
-        btnSaveLifeHistory = new JButton("Сохранить");
-        btnSaveLifeHistory.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if ((lifeHistory != null) && (patient != null)) {
-                    try {
-                        updateLifeHistoryFromTextAreas();
-                        ClientHospital.tcl.updateLifeHistory(lifeHistory);
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                            "История жизни сохранена", "Операция успешно завершена",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    } catch (KmiacServerException | TException e1) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
-                            + "изменении истории жизни. Информация не будет сохранена!",
-                            "Ошибка", JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
-                            + "изменении истории жизни. Информация не будет сохранена!",
-                            "Ошибка", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-        setLifeHistoryPanelGroupLayout();
-    }
-
-    private void setMedicalHistoryPanel() {
-        pMedicalHistory = new JPanel();
-        tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
-
-        tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
-        tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        setMedicalHistoryTabs();
-
-        tfShablonFilter = new JTextField();
-        tfShablonFilter.setColumns(10);
-
-        spShablonNames = new JScrollPane();
-        lShablonNames = new ThriftIntegerClassifierList();
-        lShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
-        lShablonNames.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    if (lShablonNames.getSelectedValue() != null) {
-                        try {
-                            pasteSelectedShablon(ClientHospital.tcl.getShablon(
-                                lShablonNames.getSelectedValue().pcod));
-                        } catch (KmiacServerException e1) {
-                            JOptionPane.showMessageDialog(MainFrame.this,
-                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        } catch (TException e1) {
-                            ClientHospital.conMan.reconnect(e1);
-                        }
-                    }
-                }
-            }
-        });
-        spShablonNames.setViewportView(lShablonNames);
-
-        btnFilterShablon = new JButton("Выбрать");
-        btnSaveMedicalHistory = new JButton("Сохранить");
-        btnSaveMedicalHistory.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if (patient != null) {
-                    TMedicalHistory medicalHist = createMedicalHistory();
-                    try {
-                        medicalHist.setId(ClientHospital.tcl.addMedicalHistory(medicalHist));
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                                "Медицинская история сохранена", "Операция успешно завершена",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } catch (KmiacServerException | TException e1) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при записи "
-                            + "медицинской истории. Информация не будет сохранена!",
-                            "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        e1.printStackTrace();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Пациент не выбран!",
-                            "Ошибка", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-        setMedicalHistoryPanelGroupLayout();
-    }
-
 
     private void setPersonalInfoPanel() {
         pPersonalInfo = new JPanel();
@@ -517,7 +402,152 @@ public class MainFrame extends JFrame {
         textPane.setText(priemInfoText);
     }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////   История жизни  ///////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setLifeHistoryPanel() {
+        pLifeHistory = new JPanel();
+        tabbedPane.addTab("История жизни", null, pLifeHistory, null);
+        setLifeHistoryTextAreas();
+        setLifeHistoryShablonComponents();
+        setLifeHistoryButtons();
+        setLifeHistoryPanelGroupLayout();
+    }
+
+    private void setLifeHistoryTextAreas() {
+        lblLifeHistory = new JLabel("История жизни");
+        spLifeHistory = new JScrollPane();
+        taLifeHistory = new JTextArea();
+        taLifeHistory.setLineWrap(true);
+        taLifeHistory.setWrapStyleWord(true);
+        taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        spLifeHistory.setViewportView(taLifeHistory);
+
+        lblAllergo = new JLabel("Аллергоанамнез");
+        spAllergo = new JScrollPane();
+        taAllergo = new JTextArea();
+        taAllergo.setWrapStyleWord(true);
+        taAllergo.setLineWrap(true);
+        taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        spAllergo.setViewportView(taAllergo);
+
+        lblFarmo = new JLabel("Фармоанамнез");
+        spFarmo = new JScrollPane();
+        taFarmo = new JTextArea();
+        taFarmo.setLineWrap(true);
+        taFarmo.setWrapStyleWord(true);
+        taFarmo.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        spFarmo.setViewportView(taFarmo);
+    }
+
+    private void setLifeHistoryShablonComponents() {
+        tfLifeHShablonFilter = new JTextField();
+        tfLifeHShablonFilter.setColumns(10);
+
+        btnLifeHShablonFilter = new JButton("Выбрать");
+
+        spLifeHShablonNames = new JScrollPane();
+        lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
+        lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        lLifeHistoryShabloNames.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lShablonNames.getSelectedValue() != null) {
+                        try {
+                            pasteSelectedLifeHShablon(ClientHospital.tcl.getShablon(
+                                lShablonNames.getSelectedValue().pcod));
+                        } catch (KmiacServerException e1) {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        } catch (TException e1) {
+                            ClientHospital.conMan.reconnect(e1);
+                        }
+                    }
+                }
+            }
+        });
+        spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
+    }
+
+    private void setLifeHistoryButtons() {
+        btnSaveLifeHistory = new JButton("Сохранить");
+        btnSaveLifeHistory.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if ((lifeHistory != null) && (patient != null)) {
+                    try {
+                        updateLifeHistoryFromTextAreas();
+                        ClientHospital.tcl.updateLifeHistory(lifeHistory);
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                            "История жизни сохранена", "Операция успешно завершена",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    } catch (KmiacServerException | TException e1) {
+                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
+                            + "изменении истории жизни. Информация не будет сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
+                            + "изменении истории жизни. Информация не будет сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
+    private void fillLifeHistoryPanel() {
+        if (lifeHistory != null) {
+            taAllergo.setText(lifeHistory.getAllerg());
+            taFarmo.setText(lifeHistory.getFarmkol());
+            taLifeHistory.setText(lifeHistory.getVitae());
+        }
+    }
+
+    private void pasteSelectedLifeHShablon(final Shablon shablon) {
+        if (shablon == null) {
+            return;
+        }
+
+        for (ShablonText shText : shablon.textList) {
+            switch (shText.grupId) {
+                case 4:
+                    taLifeHistory.setText(shText.getText());
+                    break;
+                case 3:
+                    taAllergo.setText(shText.getText());
+                    break;
+                case 5:
+                    taFarmo.setText(shText.getText());
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void updateLifeHistoryFromTextAreas() {
+        lifeHistory.setAllerg(taAllergo.getText());
+        lifeHistory.setFarmkol(taFarmo.getText());
+        lifeHistory.setVitae(taLifeHistory.getText());
+    };
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////   Медицинская история   ////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setMedicalHistoryPanel() {
+        pMedicalHistory = new JPanel();
+        tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
+        setMedicalHistoryTabs();
+        setMedicalHistoryShablonComponents();
+        setMedicalHistoryButtons();
+        setMedicalHistoryPanelGroupLayout();
+    }
+
     private void setMedicalHistoryTabs() {
+        tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
+        tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         addJalonPanel();
         addDesiaseHistoryPanel();
         addStatusPraencePanel();
@@ -525,6 +555,61 @@ public class MainFrame extends JFrame {
         addStausLocalisPanel();
         addRecomendationPanel();
         addZaklPanel();
+    }
+
+    private void setMedicalHistoryShablonComponents() {
+        tfShablonFilter = new JTextField();
+        tfShablonFilter.setColumns(10);
+
+        spShablonNames = new JScrollPane();
+        lShablonNames = new ThriftIntegerClassifierList();
+        lShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        lShablonNames.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lShablonNames.getSelectedValue() != null) {
+                        try {
+                            pasteSelectedShablon(ClientHospital.tcl.getShablon(
+                                lShablonNames.getSelectedValue().pcod));
+                        } catch (KmiacServerException e1) {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        } catch (TException e1) {
+                            ClientHospital.conMan.reconnect(e1);
+                        }
+                    }
+                }
+            }
+        });
+        spShablonNames.setViewportView(lShablonNames);
+
+        btnFilterShablon = new JButton("Выбрать");
+    }
+
+    private void setMedicalHistoryButtons() {
+        btnSaveMedicalHistory = new JButton("Сохранить");
+        btnSaveMedicalHistory.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    TMedicalHistory medicalHist = createMedicalHistory();
+                    try {
+                        medicalHist.setId(ClientHospital.tcl.addMedicalHistory(medicalHist));
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Медицинская история сохранена", "Операция успешно завершена",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (KmiacServerException | TException e1) {
+                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при записи "
+                            + "медицинской истории. Информация не будет сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        e1.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this, "Пациент не выбран!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
     }
 
     private void addJalonPanel() {
@@ -674,56 +759,6 @@ public class MainFrame extends JFrame {
         tmpHist.setTimez(new Date().getTime());
         return tmpHist;
     }
-
-    private void fillLifeHistoryPanel() {
-        if (lifeHistory != null) {
-            taAllergo.setText(lifeHistory.getAllerg());
-            taFarmo.setText(lifeHistory.getFarmkol());
-            taLifeHistory.setText(lifeHistory.getVitae());
-        }
-    }
-
-    private void pasteSelectedLifeHShablon(final Shablon shablon) {
-        if (shablon == null) {
-            return;
-        }
-
-        for (ShablonText shText : shablon.textList) {
-            switch (shText.grupId) {
-                case 4:
-                    taLifeHistory.setText(shText.getText());
-                    break;
-                case 3:
-                    taAllergo.setText(shText.getText());
-                    break;
-                case 5:
-                    taFarmo.setText(shText.getText());
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    public final void onConnect() {
-        createModalFrames();
-        try {
-            lShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
-            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            ClientHospital.conMan.reconnect(e);
-        }
-    }
-
-    private void updateLifeHistoryFromTextAreas() {
-        lifeHistory.setAllerg(taAllergo.getText());
-        lifeHistory.setFarmkol(taFarmo.getText());
-        lifeHistory.setVitae(taLifeHistory.getText());
-    };
 
 ////////////////////////////////////////// CAUTION! ///////////////////////////////////////////////
 /////////////////// Автогенерируемое нечитаемое говно. Спасибо ВиндоуБилдеру за это. //////////////
