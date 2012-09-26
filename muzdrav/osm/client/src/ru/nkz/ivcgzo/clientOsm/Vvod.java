@@ -869,6 +869,7 @@ public class Vvod extends JFrame {
 					}
 					
 					tbDiagOpis.setText(diagamb.getNamed());
+					tbDiagOpis.setCaretPosition(0);
 					bgDiagStat.clearSelection();
 					rbtDiagOsn.setSelected(diagamb.diag_stat == 1);
 					rbtDiagSop.setSelected(diagamb.diag_stat == 3);
@@ -2177,9 +2178,9 @@ public class Vvod extends JFrame {
 		  		diagamb.setCdol(MainForm.authInfo.getCdol());
 		  		diagamb.setPredv(true);
 		  		diagamb.setDiag_stat(1);
-				diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
 				diagamb.setDiag(mkb.pcod);
 				diagamb.setNamed(mkb.name);
+				diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
 	 			tblDiag.addItem(diagamb);
   			}
 		} catch (KmiacServerException e1) {
