@@ -2109,7 +2109,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, id_pdiag, diag, pmer, pdat, vdat, cod_sp, dataz, prichina, rez, cdol, id_pvizit, id_pos) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+			sme.execPreparedT("insert into p_mer (npasp, id_pdiag, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, id_pvizit, id_pos) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
