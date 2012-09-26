@@ -27,6 +27,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Font;
+import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.JSeparator;
 import javax.swing.JRadioButton;
 import javax.swing.JToggleButton;
@@ -34,38 +36,48 @@ import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
 import javax.swing.JCheckBox;
 
-public class MainForm {
+import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.clientManager.common.Client;
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
+import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class MainForm extends Client<ThriftOutputInfo.Client> {
 
 	private JFrame frame;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField tfDataB;
+	private JTextField tfDataF;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
+	
+	public static ThriftOutputInfo.Client tcl;
+	public Input_info inputInfo;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MainForm window = new MainForm();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	
 
 	/**
 	 * Create the application.
 	 */
-	public MainForm() {
+	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
+		super(conMan, authInfo, ThriftOutputInfo.Client.class, configuration.appId, configuration.thrPort, lncPrm);
+		
 		initialize();
+		inputInfo.setKpolik(authInfo.clpu);
+		inputInfo.setNamepol(authInfo.clpu_name);
 	}
 
+	@Override
+	public String getName() {
+		return configuration.appName;
+	}
+	
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -101,7 +113,7 @@ public class MainForm {
 		JPanel panel = new JPanel();
 		scrollPane_1.setViewportView(panel);
 		
-		JButton button = new JButton("Выполнить");
+		
 		
 		JLabel label = new JLabel("Период формирования");
 		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -112,11 +124,11 @@ public class MainForm {
 		JLabel label_2 = new JLabel("по");
 		label_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		tfDataB = new JTextField();
+		tfDataB.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
+		tfDataF = new JTextField();
+		tfDataF.setColumns(10);
 		
 		JSeparator separator = new JSeparator();
 		
@@ -127,7 +139,7 @@ public class MainForm {
 		final JRadioButton rdbtnNewRadioButton_2 = new JRadioButton("Подростки 15-18 лет");
 		
 		final JRadioButton rdbtnNewRadioButton_3 = new JRadioButton("Взрослые");
-		final ButtonGroup GBox1 = new ButtonGroup();
+		ButtonGroup GBox1 = new ButtonGroup();
 		panel_1.add(rdbtnNewRadioButton_1);
 		panel_1.add(rdbtnNewRadioButton_2);
 		panel_1.add(rdbtnNewRadioButton_3);
@@ -142,6 +154,17 @@ public class MainForm {
 		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JLabel label_3 = new JLabel("Номер участка");
+		
+		JButton button = new JButton("Выполнить");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				inputInfo.setDateb(tfDataB.getText());
+				inputInfo.setDatef(tfDataF.getText());
+				if (rdbtnNewRadioButton_1.isSelected()) inputInfo.vozcat="det";
+				else if (rdbtnNewRadioButton_2.isSelected()) inputInfo.vozcat="pod";
+				else if (rdbtnNewRadioButton_3.isSelected()) inputInfo.vozcat="vzr";
+			}
+		});
 		
 		textField_2 = new JTextField();
 		textField_2.setColumns(10);
@@ -175,11 +198,11 @@ public class MainForm {
 											.addGroup(gl_panel.createSequentialGroup()
 												.addComponent(label_1)
 												.addGap(12)
-												.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addComponent(tfDataB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 												.addGap(18)
 												.addComponent(label_2)
 												.addGap(18)
-												.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+												.addComponent(tfDataF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 									.addGroup(gl_panel.createSequentialGroup()
 										.addGap(26)
 										.addComponent(label_3)
@@ -218,9 +241,9 @@ public class MainForm {
 							.addPreferredGap(ComponentPlacement.UNRELATED, 11, Short.MAX_VALUE)
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(label_2)
-								.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(tfDataF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(label_1)
-								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(tfDataB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(label_3)
@@ -484,5 +507,20 @@ public class MainForm {
 		tree.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		scrollPane.setViewportView(tree);
 		frame.getContentPane().setLayout(groupLayout);
+	}
+
+	@Override
+	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
+		super.onConnect(conn);
+		if (conn instanceof ThriftOutputInfo.Client) {
+			tcl = thrClient;
+			try {
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			
+		}
+		
 	}
 }
