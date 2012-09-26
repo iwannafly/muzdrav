@@ -53,7 +53,9 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		tabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (tabbedPane.getSelectedIndex() == 1)
+				if (tabbedPane.getSelectedIndex() == 0)
+					tpUser.updateVrachTable();
+				else if (tabbedPane.getSelectedIndex() == 1)
 					tpShablonOsm.prepareShTextFields();
 				else if (tabbedPane.getSelectedIndex() == 2)
 					tpShablonDop.prepareShTextFields();
