@@ -212,6 +212,10 @@ public class ShablonForm  extends JDialog {
 		return sho;
 	}
 	
+	public String getSearchString() {
+		return tbSearch.getText();
+	}
+	
 	private class SearchTree extends JTree {
 		private static final long serialVersionUID = 8411964778613690597L;
 		private Timer timer;
