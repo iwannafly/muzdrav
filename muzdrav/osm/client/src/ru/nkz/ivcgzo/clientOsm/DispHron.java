@@ -47,13 +47,20 @@ public class DispHron extends JFrame{
 		JScrollPane scrollPane = new JScrollPane();
 		
 		JButton button = new JButton("+");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			tblDispHron.addItem();
+			}
+		});
 		
 		JButton btnV = new JButton("v");
 		btnV.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Pmer pmer = new Pmer();
+				pmer.setId(tblDispHron.getSelectedItem().getId());
 				pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
-				pmer.setId(2);
+				pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
+				pmer.setFdat(tblDispHron.getSelectedItem().getFdat());
 				try {
 					MainForm.tcl.UpdatePmer(pmer);
 				} catch (KmiacServerException e1) {
@@ -106,6 +113,7 @@ public class DispHron extends JFrame{
 	{	try {
 		tblDispHron.setData(MainForm.tcl.getPmer(377));
 		tblDispHron.setIntegerClassifierSelector(2, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
+		tblDispHron.setIntegerClassifierSelector(6, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
 	} catch (KmiacServerException e) {
 		e.printStackTrace();
 	} catch (TException e) {
