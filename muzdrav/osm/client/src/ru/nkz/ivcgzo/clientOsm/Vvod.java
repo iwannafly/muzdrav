@@ -156,8 +156,8 @@ public class Vvod extends JFrame {
 	private FormPostBer postber;
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
+	private DispHron disphron;
 	public static JButton btnPosAdd;
-	private CustomTable<Pmer, Pmer._Fields> tblDisphron;
 	
 	/**
 	 * Create the dialog.
@@ -174,6 +174,27 @@ public class Vvod extends JFrame {
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
+					if (!checkCmb(cmbVidOpl)) {
+						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
+					}
+					if (!checkCmb(cmbCelObr)) {
+						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Цель посещения' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
+					}
+					if (!checkCmb(cmbRez)) {
+						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Результат' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
+					}
+					if (!checkCmb(cmbMobs)) {
+						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Место обслуживания' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
+					}
+					
 					MainForm.instance.setVisible(true);
 				} catch (TException e1) {
 					setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -190,6 +211,9 @@ public class Vvod extends JFrame {
 		
 		shablonform = new ShablonForm();
 		MainForm.instance.addChildFrame(shablonform);
+		
+		disphron = new DispHron();
+		MainForm.instance.addChildFrame(disphron);
 		
 		setTitle("Врачебный осмотр");
 		setBounds(100, 100, 1010, 748);
@@ -1076,6 +1100,13 @@ public class Vvod extends JFrame {
 		cmbDiagDispIsh = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abb);
 		
 		JLabel lblDiagDispIsh = new JLabel("Исход ДУ");
+		
+		JButton btnDispHron = new JButton("...");
+		btnDispHron.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			disphron.ShowDispHron();
+			}
+		});
 		GroupLayout gl_pnlDiagDisp = new GroupLayout(pnlDiagDisp);
 		gl_pnlDiagDisp.setHorizontalGroup(
 			gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
@@ -1089,15 +1120,17 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE))
+							.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.TRAILING, false)
 								.addComponent(lblDiagDispIsh, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(lblDiagDispGrup, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.TRAILING)
-								.addComponent(cmbDiagDispIsh, 0, 476, Short.MAX_VALUE)
-								.addComponent(cmbDiagDispGrup, Alignment.LEADING, 0, 476, Short.MAX_VALUE))))
+								.addComponent(cmbDiagDispIsh, 0, 462, Short.MAX_VALUE)
+								.addComponent(cmbDiagDispGrup, Alignment.LEADING, 0, 462, Short.MAX_VALUE))))
 					.addContainerGap())
 		);
 		gl_pnlDiagDisp.setVerticalGroup(
@@ -1107,7 +1140,8 @@ public class Vvod extends JFrame {
 						.addComponent(lblDiagDispDatVz)
 						.addComponent(tbDiagDispDatVz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblDiagDispDatIsh)
-						.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.BASELINE)
 						.addComponent(cmbDiagDispGrup, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -1592,34 +1626,7 @@ public class Vvod extends JFrame {
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
-		pnlZakl.setLayout(gl_pnlZakl);
-		
-		JPanel pDispHron = new JPanel();
-		tabbedPane.addTab("Дисп.хрон.", null, pDispHron, null);
-		
-		JScrollPane spDisphron = new JScrollPane();
-		GroupLayout gl_pDispHron = new GroupLayout(pDispHron);
-		gl_pDispHron.setHorizontalGroup(
-			gl_pDispHron.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pDispHron.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(spDisphron, GroupLayout.PREFERRED_SIZE, 566, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(24, Short.MAX_VALUE))
-		);
-		gl_pDispHron.setVerticalGroup(
-			gl_pDispHron.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pDispHron.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(spDisphron, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(357, Short.MAX_VALUE))
-		);
-		
-		tblDisphron = new CustomTable<>(true, true, Pmer.class, 4, "Мероприятие", 5, "План.дата", 6, "Факт.дата");
-		tblDisphron.setDateField(1);
-		tblDisphron.setDateField(2);
-		spDisphron.setViewportView(tblDisphron);
-		tblDisphron.setFillsViewportHeight(true);
-		pDispHron.setLayout(gl_pDispHron);;
+		pnlZakl.setLayout(gl_pnlZakl);;
 		
 		panel_2.setLayout(gl_panel_2);
 		
@@ -2054,7 +2061,6 @@ public class Vvod extends JFrame {
 			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, 0);
-			tblDisphron.setData(MainForm.tcl.getPmer(377));
 			setVisible(true);
 			MainForm.instance.setVisible(false);
 		} catch (KmiacServerException e) {
@@ -2138,8 +2144,8 @@ public class Vvod extends JFrame {
 						return true;
 					else if (!MainForm.tcl.getPvizit(zapVr.id_pvizit).isSetIshod())
 						return false;
-					else if (tblDiag.getData().size()>0) 
-						return true;
+				if ((tblPos.getData().size() > 0)&&(tblDiag.getData().size()==0)) 
+						return false;
 		} catch (KmiacServerException | PvizitNotFoundException e) {
 			return false;
 		}
@@ -2158,7 +2164,7 @@ public class Vvod extends JFrame {
 			return 0;
 		}
 	}
-
+	
 	private void addDiag(StringClassifier mkb) {
 		try {
   			if (mkb != null) {
@@ -2181,5 +2187,14 @@ public class Vvod extends JFrame {
 		} catch (TException e1) {
 			MainForm.conMan.reconnect(e1);
 		}
+	}
+		
+	private boolean checkCmb(ThriftIntegerClassifierCombobox cmb) throws TException {
+			if (tblPos.getData().size() > 0){
+				if (cmb.getSelectedPcod()==null)
+					return false;
+				else return true;
+					}
+		return true;
 	}
 }
