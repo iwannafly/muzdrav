@@ -22,12 +22,12 @@ public class MainForm extends Client<ThriftReception.Client> {
         super(conMan, authInfo, ThriftReception.Client.class, configuration.appId,
                 configuration.thrPort, accessParam);
 
-        initialize();
+        initialize(authInfo);
         instance = this;
     }
 
-    private void initialize() {
-        talonSelectFrame = new TalonSelectFrame();
+    private void initialize(final UserAuthInfo authInfo) {
+        talonSelectFrame = new TalonSelectFrame(authInfo);
         talonSelectFrame.pack();
         setFrame(talonSelectFrame);
     }
@@ -51,7 +51,7 @@ public class MainForm extends Client<ThriftReception.Client> {
     public final Object showModal(final IClient parent, final Object... params) {
         JDialog dialog = prepareModal(parent);
         talonSelectFrame.fillPatientInfoLabels((int) params[0], (String) params[1],
-                (String) params[2], (String) params[3], (long) params[4]);
+                (String) params[2], (String) params[3], (long) params[4], (int) params[5]);
         dialog.setVisible(true);
         disposeModal();
         return null;

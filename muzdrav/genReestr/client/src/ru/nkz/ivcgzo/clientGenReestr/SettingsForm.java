@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.TitledBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 
@@ -171,8 +172,14 @@ public class SettingsForm extends JDialog {
 				if (rbtn3.isSelected()) vidrstr = 3;
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {
-					MainForm.tcl.GenReestrFile(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr);
+					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
+						MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu());
+						dispose();
+					}else
+						JOptionPane.showMessageDialog(null, "Укажите все параметры формирования реестра.", null, JOptionPane.INFORMATION_MESSAGE); 
 				} catch (ReestrNotFoundException | TException e) {
+					e.printStackTrace();
+				} catch (KmiacServerException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

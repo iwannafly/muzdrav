@@ -646,6 +646,43 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Получение из классификатора кода по его имени.
+	 * @param cls - название классификатора
+	 * @param name - имя для поиска кода
+	 */
+	public Integer getPcodFromNameInteger(IntegerClassifiers cls, String name) {
+		Object res = viewClient.showModal(client, 15, cls, name);
+		
+		if (res != null)
+			return (Integer) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Получение из классификатора кода по его имени.
+	 * @param cls - название классификатора
+	 * @param name - имя для поиска кода
+	 */
+	public String getPcodFromNameString(StringClassifiers cls, String name) {
+		Object res = viewClient.showModal(client, 16, cls, name);
+		
+		if (res != null)
+			return (String) res;
+		
+		return null;
+	}
+	
+	/**
+	 * Вызов формы с информацией на пациента.
+	 * @param title - заголовок формы
+	 * @param npasp - уникальный номер пациента
+	 */
+	public void showPatientInfoForm(String title, int npasp) {
+		viewClient.showModal(client, 17, title, npasp);
+	}
+	
+	/**
 	 * Открывает сгенерированный отчет в офисном редакторе.
 	 * @param path - путь к отчету
 	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>

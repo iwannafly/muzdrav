@@ -10,6 +10,7 @@ import ru.nkz.ivcgzo.thriftReception.Talon;
 
 public class TalonList {
     private DateChecker dateChecker;
+    private List<Talon> allTalonList;
     private List<Talon> mondayTalonList;
     private List<Talon> tuesdayTalonList;
     private List<Talon> wednesdayTalonList;
@@ -30,8 +31,9 @@ public class TalonList {
     }
 
     public TalonList(final List<Talon> weekTalonList) {
+        allTalonList = weekTalonList;
         dateChecker = new DateChecker();
-        partitionWeekTalonList(weekTalonList);
+        partitionWeekTalonList(allTalonList);
     }
 
     public final List<Talon> getMondayTalonList() {
@@ -79,6 +81,16 @@ public class TalonList {
 
     public final Date[] getWeekDays() {
         return dateChecker.getCurrentWeek();
+    }
+
+    public final void setPrevWeek() {
+        dateChecker.prevWeek();
+        partitionWeekTalonList(allTalonList);
+    }
+
+    public final void setNextWeek() {
+        dateChecker.nextWeek();
+        partitionWeekTalonList(allTalonList);
     }
 
     private void partitionWeekTalonList(final List<Talon> weekTalonList) {
