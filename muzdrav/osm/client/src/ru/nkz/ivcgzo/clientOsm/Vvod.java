@@ -176,21 +176,25 @@ public class Vvod extends JFrame {
 					}
 					if (!checkCmb(cmbVidOpl)) {
 						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						cmbVidOpl.requestFocus();
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
 					if (!checkCmb(cmbCelObr)) {
 						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Цель посещения' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						cmbCelObr.requestFocus();
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
 					if (!checkCmb(cmbRez)) {
 						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Результат' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						cmbRez.requestFocus();
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
 					if (!checkCmb(cmbMobs)) {
 						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Место обслуживания' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						cmbMobs.requestFocus();
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
@@ -1791,7 +1795,7 @@ public class Vvod extends JFrame {
 								MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
 							tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));
 							if (tblPos.getSelectedItem() == null) {
-								MainForm.tcl.DeleteAnamZab(tblPos.getSelectedItem().getId_obr());
+								MainForm.tcl.DeleteAnamZab(zapVr.getId_pvizit());
 								MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());	
 							}
 						}
@@ -1838,13 +1842,11 @@ public class Vvod extends JFrame {
 							{pvizitAmb.setCpos(cmbCelObr.getSelectedPcod());
 							pvizit.setCobr(pvizitAmb.getCpos());}
 							else 
-							{JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Цель посещения'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-								pvizitAmb.unsetCpos();pvizit.unsetCobr();}
+							{pvizitAmb.unsetCpos();pvizit.unsetCobr();}
 						if (cmbRez.getSelectedPcod() != null)
 							{pvizitAmb.setRezult(cmbRez.getSelectedPcod());
 							pvizit.setRezult(pvizitAmb.getRezult());}
-							else {JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Результат'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-								pvizitAmb.unsetRezult();pvizit.unsetRezult();
+							else {pvizitAmb.unsetRezult();pvizit.unsetRezult();
 								pvizit.unsetRezult();}
 						if (cmbZaklIsh.getSelectedPcod() != null)
 							pvizit.setIshod(cmbZaklIsh.getSelectedPcod());
@@ -1852,13 +1854,11 @@ public class Vvod extends JFrame {
 						if (cmbMobs.getSelectedPcod() != null)
 							pvizitAmb.setMobs(cmbMobs.getSelectedPcod());
 						else
-							{JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Место обращения'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-							pvizitAmb.unsetMobs();}
+							{pvizitAmb.unsetMobs();}
 						if (cmbVidOpl.getSelectedPcod() != null)
 							pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
 						else 
-						{	JOptionPane.showMessageDialog(Vvod.this, "Не заполнено поле 'Вид оплаты'. Сохранение изменений невозможно.", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-							pvizitAmb.unsetOpl();}
+						{pvizitAmb.unsetOpl();}
 						pvizitAmb.setPl_extr(1);
 						for (PdiagAmb pd : tblDiag.getData()) {
 							if (pd.diag_stat==1) {
