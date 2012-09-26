@@ -245,7 +245,7 @@ public class ShablonForm  extends JDialog {
 						
 						try {
 							node.removeAllChildren();
-							for (IntegerClassifier ic : MainForm.tcl.getShByDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, node.getCode()))
+							for (IntegerClassifier ic : MainForm.tcl.getShByDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, node.getCode(), srcStr))
 								node.add(new IntClassTreeNode(ic));
 							((DefaultTreeModel) getModel()).reload(node);
 						} catch (KmiacServerException e) {
@@ -298,23 +298,18 @@ public class ShablonForm  extends JDialog {
 		
 		public void requestUpdate(String srcStr) {
 			timer.stop();
-			this.srcStr = srcStr;
+			this.srcStr = getSearchString(srcStr);
 			timer.start();
 		}
 		
 		public void updateNow(String srcStr) {
-			this.srcStr = srcStr;
+			this.srcStr = getSearchString(srcStr);
 			update();
 		}
 		
 		private void update() {
 			timer.stop();
 			clearFields();
-			
-			if (srcStr.length() < 3)
-				srcStr = null;
-			else
-				srcStr = '%' + srcStr + '%';
 			
 			try {
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
@@ -331,6 +326,13 @@ public class ShablonForm  extends JDialog {
 			} catch (TException e) {
 				MainForm.conMan.reconnect(e);
 			}
+		}
+
+		private String getSearchString(String srcStr) {
+			if (srcStr.length() < 3)
+				return null;
+			else
+				return '%' + srcStr + '%';
 		}
 				
 		private class StrClassTreeNode extends DefaultMutableTreeNode {
