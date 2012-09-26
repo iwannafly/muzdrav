@@ -72,6 +72,13 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 		model.fireContentsChanged();
 	}
 	
+	/**
+	 * Получает список данных. 
+	 */
+	public List<StringClassifier> getData() {
+		return items;
+	}
+	
 	private void selectFirstItem() {
 		if (items.size() > 0)
 			setSelectedIndex(0);

@@ -444,7 +444,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
-	 * Получае список данных. 
+	 * Получает список данных. 
 	 */
 	public List<T> getData() {
 		return lst;
