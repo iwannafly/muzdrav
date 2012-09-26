@@ -2003,7 +2003,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<StringClassifier> getShPoiskDiag(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
+	public List<StringClassifier> getShOsmPoiskDiag(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
 		String sql = "SELECT DISTINCT sho.diag AS pcod, c00.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
 		
 		if (srcText != null)
@@ -2019,7 +2019,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public Shablon getSh(int id_sh) throws KmiacServerException, TException {
+	public Shablon getShOsm(int id_sh) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT sho.id, sho.diag, nd.name, sho.next, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
 			if (acrs.getResultSet().next()) {
 				Shablon sho = new Shablon(acrs.getResultSet().getInt(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), new ArrayList<ShablonText>());
@@ -2037,7 +2037,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 }
 
 	@Override
-	public List<IntegerClassifier> getShByDiag(int cspec, int cslu, String diag, String srcText) throws KmiacServerException, TException {
+	public List<IntegerClassifier> getShOsmByDiag(int cspec, int cslu, String diag, String srcText) throws KmiacServerException, TException {
 		String sql = "SELECT sho.id AS pcod, sho.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) AND (sho.diag = ?) ";
 		
 		if (srcText != null)
@@ -2053,7 +2053,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<IntegerClassifier> getShPoiskName(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
+	public List<IntegerClassifier> getShOsmPoiskName(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
 		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, sho.diag || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
 		
 		if (srcText != null)
@@ -2068,6 +2068,29 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 
+	@Override
+	public List<IntegerClassifier> getShDopNames(int idRazd) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, name FROM sh_dop WHERE id_n_shablon = ? ", idRazd)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template names by razd id");
+		}
+	}
+	
+	@Override
+	public IntegerClassifier getShDop(int id_sh) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, text AS name FROM sh_dop WHERE id = ? ", id_sh)) {
+			if (acrs.getResultSet().next())
+				return rsmIntClas.map(acrs.getResultSet());
+			else
+				throw new SQLException("No templates with this id");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template by its id");
+		}
+	}
+	
 	@Override
 	public List<Pmer> getPmer(int id_pvizit) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.id_pvizit = ?", id_pvizit)) {
