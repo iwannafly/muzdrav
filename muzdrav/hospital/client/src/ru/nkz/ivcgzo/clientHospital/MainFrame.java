@@ -131,6 +131,7 @@ public class MainFrame extends JFrame {
     private JButton btnUpdateChamber;
     private TLifeHistory lifeHistory;
     private PatientSelectFrame frmPatientSelect;
+    private JPanel pDiagnosis;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -153,6 +154,7 @@ public class MainFrame extends JFrame {
         setPatientInfoPanel();
         setLifeHistoryPanel();
         setMedicalHistoryPanel();
+        setDiagnosisPanel();
     }
 
     public final void onConnect() {
@@ -758,6 +760,15 @@ public class MainFrame extends JFrame {
         tmpHist.setDataz(new Date().getTime());
         tmpHist.setTimez(new Date().getTime());
         return tmpHist;
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// Диагнозы //////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setDiagnosisPanel() {
+        pDiagnosis = new JPanel();
+        tabbedPane.addTab("Диагнозы", null, pDiagnosis, null);
     }
 
 ////////////////////////////////////////// CAUTION! ///////////////////////////////////////////////
