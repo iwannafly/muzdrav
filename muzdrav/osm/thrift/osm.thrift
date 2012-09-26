@@ -408,9 +408,11 @@ struct ShablonText {
 }
 
 struct Shablon {
-	1: string din;
-	2: string next_osm;
-	3: list<ShablonText> textList;
+	1: i32 id;
+	2: string diag;
+	3: string din;
+	4: string next_osm;
+	5: list<ShablonText> textList;
 }
 
 struct Pmer{

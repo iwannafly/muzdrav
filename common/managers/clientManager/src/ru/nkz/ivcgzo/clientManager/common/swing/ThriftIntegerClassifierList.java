@@ -71,6 +71,13 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 		selectFirstItem();
 		model.fireContentsChanged();
 	}
+	
+	/**
+	 * Получает список данных. 
+	 */
+	public List<IntegerClassifier> getData() {
+		return items;
+	}
 
 	private void selectFirstItem() {
 		if (items.size() > 0)

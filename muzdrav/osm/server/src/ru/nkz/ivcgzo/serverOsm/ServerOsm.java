@@ -118,7 +118,6 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private final Class<?>[] rdDinTypes;
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
-	@SuppressWarnings("unused")
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
 
@@ -2015,11 +2014,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public Shablon getSh(int id_sh) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT nd.name, sho.next, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT sho.id, sho.diag, nd.name, sho.next, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
 			if (acrs.getResultSet().next()) {
-				Shablon sho = new Shablon(acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), new ArrayList<ShablonText>());
+				Shablon sho = new Shablon(acrs.getResultSet().getInt(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), new ArrayList<ShablonText>());
 				do {
-					sho.textList.add(new ShablonText(acrs.getResultSet().getInt(3), acrs.getResultSet().getString(4), acrs.getResultSet().getString(5)));
+					sho.textList.add(new ShablonText(acrs.getResultSet().getInt(5), acrs.getResultSet().getString(6), acrs.getResultSet().getString(7)));
 				} while (acrs.getResultSet().next());
 				return sho;
 			} else {

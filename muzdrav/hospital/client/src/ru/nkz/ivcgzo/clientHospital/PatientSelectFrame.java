@@ -3,10 +3,11 @@ package ru.nkz.ivcgzo.clientHospital;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -68,7 +69,8 @@ public class PatientSelectFrame extends JDialog {
                 if (table.getSelectedRow() != -1) {
                     currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
                             .get(table.convertRowIndexToModel(table.getSelectedRow()));
-                    dispose();
+                    PatientSelectFrame.this.dispatchEvent(new WindowEvent(
+                            PatientSelectFrame.this, WindowEvent.WINDOW_CLOSING));
                 }
             }
         });

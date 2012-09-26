@@ -23,12 +23,14 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
+import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
@@ -50,6 +52,7 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
     private TResultSetMapper<TPriemInfo, TPriemInfo._Fields> rsmPriemInfo;
+    private TResultSetMapper<TLifeHistory, TLifeHistory._Fields> rsmLifeHistory;
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmMedicalHistory;
     private TResultSetMapper<TDiagnosis, TDiagnosis._Fields> rsmDiagnosis;
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
@@ -60,6 +63,9 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
         "pdms", "mrab", "npal", "reg_add", "real_add"
+    };
+    private static final String[] LIFE_HISTORY_FIELD_NAMES = {
+        "npasp", "allerg", "farmkol", "vitae"
     };
     private static final String[] MEDICAL_HISTORY_FIELD_NAMES = {
         "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis",
@@ -89,6 +95,10 @@ public class ServerHospital extends Server implements Iface {
     //  fisical_obs   pcod_vrach    dataz       timez
         String.class, Integer.class, Date.class, Time.class
     };
+    private static final Class<?>[] LIFE_HISTORY_TYPES = {
+    //  npasp          allerg        farmkol       vitae
+        Integer.class, String.class, String.class, String.class
+    };
 
     /**
      * @param seq
@@ -106,6 +116,7 @@ public class ServerHospital extends Server implements Iface {
                 TSimplePatient.class, SIMPLE_PATIENT_FIELD_NAMES);
         rsmPatient = new TResultSetMapper<>(TPatient.class, PATIENT_FIELD_NAMES);
         rsmPriemInfo = new TResultSetMapper<>(TPriemInfo.class, PRIEM_INFO_FIELD_NAMES);
+        rsmLifeHistory = new TResultSetMapper<>(TLifeHistory.class, LIFE_HISTORY_FIELD_NAMES);
         rsmMedicalHistory = new TResultSetMapper<>(TMedicalHistory.class,
             MEDICAL_HISTORY_FIELD_NAMES);
         rsmDiagnosis = new TResultSetMapper<>(TDiagnosis.class, DIAGNOSIS_FIELD_NAMES);
@@ -517,6 +528,53 @@ public class ServerHospital extends Server implements Iface {
             sme.execPrepared(sqlQuery, false, idGosp);
             sme.setCommit();
         } catch (SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final TLifeHistory getLifeHistory(final int patientId)
+            throws LifeHistoryNotFoundException, KmiacServerException {
+        final String sqlQuery = "SELECT npasp, allerg, farmkol, vitae "
+                + "FROM p_sign WHERE npasp = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
+            if (acrs.getResultSet().next()) {
+                return rsmLifeHistory.map(acrs.getResultSet());
+            } else {
+                throw new LifeHistoryNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateLifeHistory(final TLifeHistory lifeHist)
+            throws KmiacServerException {
+        final int[] indexes = {1, 2, 3, 0};
+        String sqlQuery = null;
+        if (isLifeHistoryExist(lifeHist.getId())) {
+            sqlQuery = "UPDATE p_sign SET allerg = ?, farmkol = ?, vitae = ? WHERE npasp = ?";
+        } else {
+            sqlQuery = "INSERT INTO p_sign (allerg, farmkol, vitae, npasp) VALUES (?, ?, ?, ?);";
+        }
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, lifeHist, LIFE_HISTORY_TYPES, indexes);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+
+    }
+
+    private boolean isLifeHistoryExist(final int patientId) throws KmiacServerException {
+        final String sqlQuery = "SELECT npasp FROM p_sign WHERE npasp = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
             log.log(Level.ERROR, "SqlException", e);
             throw new KmiacServerException();
         }
