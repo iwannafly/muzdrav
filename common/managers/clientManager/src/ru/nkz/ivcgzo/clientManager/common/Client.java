@@ -104,7 +104,7 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 			dialog.setTitle(getFrame().getTitle());
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setModalExclusionType(ModalExclusionType.NO_EXCLUDE);
-			dialog.setModalityType(ModalityType.TOOLKIT_MODAL);
+			dialog.setModalityType(ModalityType.APPLICATION_MODAL);
 			dialog.setContentPane(getFrame().getContentPane());
 			dialog.revalidate();
 			if (!(getFrame() instanceof ModalForm) || (((ModalForm) getFrame()).getModalLocationRelativeToParent()))
