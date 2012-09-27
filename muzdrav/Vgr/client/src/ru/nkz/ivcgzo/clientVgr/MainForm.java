@@ -27,6 +27,8 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 
 	private JFrame frame;
 	private Period per;
+	public static MainForm instance;
+	public static ThriftVgr.Client tcl;
 
 	/**
 	 * Launch the application.
@@ -51,6 +53,10 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		super(conMan, authInfo, ThriftVgr.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
 		initialize();
+		
+		setFrame(frame);
+
+		instance = this;
 	}
 
 	/**
@@ -94,8 +100,8 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		JMenuItem menuItem = new JMenuItem("Диспансеризация КОВ");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				per = new Period();
-				per.setVisible(true);
+//				per = new Period();
+//				per.setVisible(true);
 			}
 		});
 		mnNewMenu.add(menuItem);
@@ -139,20 +145,28 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 	}
 
 	private static void addPopup(Component component, final JPopupMenu popup) {
-		component.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					showMenu(e);
-				}
-			}
-			private void showMenu(MouseEvent e) {
-				popup.show(e.getComponent(), e.getX(), e.getY());
-			}
-		});
+//		component.addMouseListener(new MouseAdapter() {
+//			public void mousePressed(MouseEvent e) {
+//				if (e.isPopupTrigger()) {
+//					showMenu(e);
+//				}
+//			}
+//			public void mouseReleased(MouseEvent e) {
+//				if (e.isPopupTrigger()) {
+//					showMenu(e);
+//				}
+//			}
+//			private void showMenu(MouseEvent e) {
+//				popup.show(e.getComponent(), e.getX(), e.getY());
+//			}
+//		});
+	}
+
+	@Override
+	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
+		super.onConnect(conn);
+		if (conn instanceof ThriftVgr.Client) {
+			tcl = thrClient;
+		}
 	}
 }
