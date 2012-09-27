@@ -22,6 +22,10 @@ public final class TalonTableModel implements TableModel {
     private TalonList talonList;
 
     public TalonTableModel(final int cpol, final String cdol, final int pcod) {
+        setTalonList(cpol, cdol, pcod);
+    }
+
+    private void setTalonList(final int cpol, final String cdol, final int pcod) {
         try {
             talonList = new TalonList(MainForm.tcl.getTalon(cpol, cdol, pcod));
         } catch (TalonNotFoundException e) {
@@ -75,6 +79,13 @@ public final class TalonTableModel implements TableModel {
     public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
     }
 
+    public void setPrevWeek() {
+        talonList.setPrevWeek();
+    }
+
+    public void setNextWeek() {
+        talonList.setNextWeek();
+    }
     @Override
     public void addTableModelListener(final TableModelListener listener) {
         listeners.add(listener);
@@ -84,5 +95,4 @@ public final class TalonTableModel implements TableModel {
     public void removeTableModelListener(final TableModelListener listener) {
         listeners.remove(listener);
     }
-
 }

@@ -1,8 +1,9 @@
 package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 /**
@@ -59,7 +60,9 @@ public class HtmTemplate {
      */
     private String readTemplateFromFile(final String templatePath) {
         try {
-            BufferedReader in = new BufferedReader(new FileReader(templatePath));
+//            BufferedReader in = new BufferedReader(new FileReader(templatePath));
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                new FileInputStream(templatePath), "utf-8"));
             StringBuilder strBuild = new StringBuilder();
             String tmpStr;
             while ((tmpStr = in.readLine()) != null) {

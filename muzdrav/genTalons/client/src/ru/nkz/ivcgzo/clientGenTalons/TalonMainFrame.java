@@ -909,7 +909,7 @@ public class TalonMainFrame extends JFrame {
 		sp_day.setModel(new SpinnerNumberModel(2, 1, 31, 1));
 		sp_day.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
-			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
+//			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
 //				if (cmb_month.getSelectedIndex() != 0 && Integer.valueOf(sp_day.getValue().toString()) != 0 && Integer.valueOf(sp_god.getValue().toString()) != 0){
 				if (nmonth != 0 && nday != 0 && nyear != 0){
 			        nday = Integer.valueOf(sp_day.getValue().toString());

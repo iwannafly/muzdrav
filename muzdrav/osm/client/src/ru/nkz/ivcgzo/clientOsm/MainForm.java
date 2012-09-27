@@ -2,9 +2,9 @@ package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -12,34 +12,32 @@ import java.util.GregorianCalendar;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.Timer;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.clientOsm.patientInfo.PInfo;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JCheckBox;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
-	public static Client<ThriftOsm.Client> instance;
+	public static MainForm instance;
 	private JFrame frame;
-	public static  CustomTable<ZapVr, ZapVr._Fields> table;
+	private JButton btnSelect;
+	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
-	public static PInfo pInf;
+	private Timer timer;
+	private ZapVr prevZapvr;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -55,24 +53,21 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
-		frame.addWindowListener(new WindowAdapter() {
+		timer = new Timer(5000, new ActionListener() {
 			@Override
-			public void windowOpened(WindowEvent e) {
-				//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-				}
+			public void actionPerformed(ActionEvent e) {
+				updateZapList();
+			}
 		});
+		
+		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 721, 508);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		
-		JButton btnNewButton = new JButton("Выбор");
-		btnNewButton.addActionListener(new ActionListener() {
+		btnSelect = new JButton("Выбор");
+		btnSelect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (table.getSelectedItem() != null)
@@ -83,21 +78,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		final JCheckBox cbzpr = new JCheckBox("Вернуться к записанным на прием");
 		cbzpr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
-					Calendar calendar = GregorianCalendar.getInstance();
-					calendar.setTimeInMillis(System.currentTimeMillis());
-					frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
-
-					table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
-				} catch (KmiacServerException e) {
-					e.printStackTrace();
-				} catch (TException e) {
-					conMan.reconnect(e);
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-
+				updateZapList();
 			}
 		});
 		cbzpr.setEnabled(false);
@@ -107,12 +88,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, false);
 				
 				try {
-					if (res == null){
+					if (res == null) {
 						cbzpr.setEnabled(false);
-						table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));}
-					else{
+						updateZapList();
+					} else {
 						frame.setTitle("Найденные пациенты");
 						cbzpr.setEnabled(true);
+						timer.stop();
 						table.setData(tcl.getZapVrSrc(Arrays.toString(res).replace('[', '(').replace(']', ')')));
 					}
 				} catch (KmiacServerException e1) {
@@ -120,8 +102,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 				} catch (TException e1) {
 					e1.printStackTrace();
 					conMan.reconnect(e1);
-				} catch (ParseException e1) {
-					e1.printStackTrace();
 				}
 			}
 		});
@@ -130,7 +110,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnView.setVisible(false);
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				pInf.update(table.getSelectedItem().getNpasp());
+				if (table.getSelectedItem() != null)
+				MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", table.getSelectedItem().fam, table.getSelectedItem().im, table.getSelectedItem().oth), table.getSelectedItem().npasp);
 			}
 		});
 		
@@ -145,7 +126,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSearch)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton)
+							.addComponent(btnSelect)
 							.addGap(18)
 							.addComponent(btnView)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -158,7 +139,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSearch)
-						.addComponent(btnNewButton)
+						.addComponent(btnSelect)
 						.addComponent(btnView)
 						.addComponent(cbzpr))
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -167,6 +148,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		);
 		
 		table = new CustomTable<>(false, true, ZapVr.class, 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					btnSelect.doClick();
+			}
+		});
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);
@@ -182,24 +170,40 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftOsm.Client) {
 			tcl = thrClient;
-			try {
-				//table.setData(tcl.getZapVr(authInfo.getPcod(),authInfo.getCdol(), SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
-				table.setData(tcl.getZapVr(6,"3", SimpleDateFormat.getDateInstance().parse("30.01.2012").getTime()));
-				if (vvod == null) {
-					vvod = new Vvod();
-					addChildFrame(vvod);
-				}
-				if (pInf == null)
-					pInf = new PInfo();
-				
-				vvod.onConnect();
-			} catch (KmiacServerException | ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TException e) {
-				e.printStackTrace();
-				conMan.reconnect(e);
+			updateZapList();
+			if (vvod == null) {
+				vvod = new Vvod();
+				addChildFrame(vvod);
 			}
+			vvod.onConnect();
 		}
+	}
+	
+	private void updateZapList() {
+		String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
+		
+		try {
+			prevZapvr = table.getSelectedItem();
+			table.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis()));
+			if (prevZapvr != null)
+				for (int i = 0; i < table.getData().size(); i++)
+					if (table.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {
+						table.changeSelection(i, 0, false, false);
+						break;
+					}
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			conMan.reconnect(e);
+		}
+		
+		timer.restart();
+	}
+	
+	public void setVisible(boolean value) {
+		frame.setVisible(value);
 	}
 }

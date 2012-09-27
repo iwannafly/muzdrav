@@ -62,6 +62,9 @@ public class Option {
 		JPanel panel = new JPanel();
 		
 		JSplitPane splitPane = new JSplitPane();
+		
+		splitPane.setResizeWeight(0.5);
+		
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -130,6 +133,9 @@ public class Option {
 		splitPane.setLeftComponent(panel_1);
 		
 		JSplitPane splitPane_1 = new JSplitPane();
+		
+		splitPane_1.setResizeWeight(0.5);
+		
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -170,9 +176,19 @@ public class Option {
 						if (tn_ldi.getSelectedColumn()==3){
 							if (tn_ldi.getSelectedItem().vibor){
 								
-								S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, null,n_nz1.getSelectedPcod());
+								S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, "00.00.000",n_nz1.getSelectedPcod());
 								MainForm.ltc.AddS_ot01(s01);
 								ts_ot01.addItem(s01);
+								
+								for(int i = 0; i< tmetod.getRowCount(); i++){
+									if (ts_ot01.getSelectedItem().c_obst.equals(tmetod.getData().get(i).c_obst)){
+										tmetod.getModel().setValueAt(true, i, 3);
+									}else{
+										tmetod.getModel().setValueAt(false, i, 3);	
+									}
+									
+								}
+								tmetod.repaint();
 							}else{
 								
 								for(int i = 0; i< tmetod.getRowCount(); i++){
@@ -308,6 +324,7 @@ public class Option {
 												S_ot01 s01 = new S_ot01(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
 												MainForm.ltc.AddS_ot01(s01);
 												ts_ot01.addItem(s01);
+												break;
 										
 											}else{
 												//System.out.println(s + " = "+ s1 + "; " + nldipcod +" = " + sot01pcod);

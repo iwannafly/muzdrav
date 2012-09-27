@@ -8,9 +8,10 @@ struct Patient {
     2:string surname;
     3:string name;
     4:string middlename;
-    5:optional i64 birthdate;
-    6:optional string omsSer;
-    7:optional string omsNum;
+	5:i32 idPvizit;
+    6:optional i64 birthdate;
+    7:optional string omsSer;
+    8:optional string omsNum;
 }
 
 struct Vidp {

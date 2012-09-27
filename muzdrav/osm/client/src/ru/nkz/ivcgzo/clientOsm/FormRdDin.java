@@ -1,68 +1,54 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.text.SimpleDateFormat;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JCheckBox;
-import java.awt.Font;
-import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-import java.util.Date;
-import java.util.Calendar;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import java.awt.Color;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
-import javax.swing.JOptionPane;
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOsm.PatientCommonInfo;
-import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.JTextPane;
-import javax.swing.border.BevelBorder;
-
-import org.apache.thrift.TException;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
-import javax.swing.border.LineBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.UIManager;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.JTable;
-import javax.swing.ImageIcon;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.Pvizit;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
+import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 
 public class FormRdDin extends JFrame {
-
+	private static final long serialVersionUID = 553969304358351170L;
 	private JPanel contentPane;
 	private RdDinStruct rddin;
-	private PatientCommonInfo patient;
+	public static PvizitAmb pvizitAmb;
+	public static Pvizit pvizit;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
     private String oslname;
     private String oslcode;
@@ -87,6 +73,10 @@ public class FormRdDin extends JFrame {
 	private JTextField fam;
 	private JTextField im;
 	private JTextField ot;
+	private int mes;
+	private int br;
+	private int rost;
+	private double ves;
     JSpinner SSrok ;
 	JSpinner SVes;
 	JSpinner SOkrj;
@@ -103,12 +93,14 @@ public class FormRdDin extends JFrame {
 	 * Create the frame.
 	 */
 	public FormRdDin() {
+		setExtendedState(Frame.MAXIMIZED_BOTH);
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 //				JOptionPane.showMessageDialog(FormRdDin.this,  Vvod.zapVr.getId_pvizit());
 				try {
-					fam.setText(Vvod.zapVr.getFam());
+					System.out.println(Vvod.zapVr.getId_pvizit());
+	 			    fam.setText(Vvod.zapVr.getFam());
 					im.setText(Vvod.zapVr.getIm());
 					ot.setText(Vvod.zapVr.getOth());
 					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
@@ -178,8 +170,6 @@ public class FormRdDin extends JFrame {
 		CBOteki = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db5);
 		
 		SDataSl = new CustomDateEditor();
-
-	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 810, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -317,6 +307,12 @@ public class FormRdDin extends JFrame {
 		SButton.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 		try {
+			SimpleDateFormat frm = new SimpleDateFormat("MM");
+			int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
+			if (mes == 1) br = br+1;
+			if (mes == 2) br = br+1;
+			if (mes == 12) br = br+1;
+			rddin.setGrr(0);
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
 			else rddin.unsetPredpl();
@@ -333,7 +329,10 @@ public class FormRdDin extends JFrame {
 			rddin.setOteki(CBOteki.getSelectedPcod());
 			else rddin.unsetOteki();
 		if (CBDiag.getSelectedPcod() != null)
-			rddin.setDspos(CBDiag.getSelectedPcod());
+		{	rddin.setDspos(CBDiag.getSelectedPcod());
+		rddin.setGrr(1);
+		System.out.println("риск");		
+}
 		    else rddin.unsetDspos();
 		rddin.setArt1((int) SPdad.getModel().getValue());
 		rddin.setArt2((int) SPsad.getModel().getValue());
@@ -345,9 +344,19 @@ public class FormRdDin extends JFrame {
 		rddin.setSpl((int) STolP.getModel().getValue());
 		rddin.setSrok((int) SSrok.getModel().getValue());
 		rddin.setVes((double) SVes.getModel().getValue());
-		rddin.setGrr(0);
-		rddin.setBall(0);
-		System.out.println("пошли обновлять");		
+		ves = (double) SVes.getModel().getValue();
+		rost = FormPostBer.rdSlStruct.getRost();	
+		if (rost<=154) br = br+1;
+		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
+		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
+		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
+		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
+		if (rost != 0) 
+		{ves = ves/rost/rost*10000;
+		if (ves<17) br = br+1;
+		if (ves>=32) br = br+1;}
+		rddin.setBall(br); 
+		System.out.println(rost);
 			MainForm.tcl.UpdateRdDin(rddin);
 		} catch (KmiacServerException | TException e1) {
 			// TODO Auto-generated catch block
@@ -363,13 +372,45 @@ public class FormRdDin extends JFrame {
 		Nbutton.setToolTipText("Новое посещение");
 		Nbutton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				RdDinStruct rddin = new RdDinStruct();
 				try {
-				setDefaultValues();
+				Vvod.btnPosAdd.doClick();
+
+				RdDinStruct rddin = new RdDinStruct();
+	//			setDefaultValues();
+				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
-				rddin.setNpasp(Vvod.pvizitAmb.npasp);
+				rddin.setGrr(0);
+				rddin.setBall(0);
+				rddin.setArt1((int) SPdad.getModel().getValue());
+				rddin.setArt2((int) SPsad.getModel().getValue());
+				rddin.setArt3((int) SLdad.getModel().getValue());
+				rddin.setArt4((int) SLsad.getModel().getValue());
+				rddin.setChcc((int) SChcc.getModel().getValue());
+				rddin.setHdm((int) SVdm.getModel().getValue());
+				rddin.setOj((int) SOkrj.getModel().getValue());
+				rddin.setSpl((int) STolP.getModel().getValue());
+				rddin.setSrok((int) SSrok.getModel().getValue());
+				rddin.setVes((double) SVes.getModel().getValue());
+				if (CBPredPl.getSelectedPcod() != null)
+					rddin.setPredpl(CBPredPl.getSelectedPcod());
+					else rddin.unsetPredpl();
+				if (CBPolPl.getSelectedPcod() != null)
+					rddin.setPolpl(CBPolPl.getSelectedPcod());
+					else rddin.unsetPolpl();
+				if (CBSerd1.getSelectedPcod() != null)
+					rddin.setSerd1(CBSerd1.getSelectedPcod());
+					else rddin.unsetSerd1();
+				if (CBCerd.getSelectedPcod() != null)
+					rddin.setSerd(CBCerd.getSelectedPcod());
+					else rddin.unsetSerd();
+				if (CBOteki.getSelectedPcod() != null)
+					rddin.setOteki(CBOteki.getSelectedPcod());
+					else rddin.unsetOteki();
+				if (CBDiag.getSelectedPcod() != null)
+					rddin.setDspos(CBDiag.getSelectedPcod());
+					else rddin.unsetDspos();
+			System.out.println(rddin);		
 				MainForm.tcl.AddRdDin(rddin);
 				} catch (KmiacServerException e1) {
 					// TODO Auto-generated catch block
@@ -379,9 +420,13 @@ public class FormRdDin extends JFrame {
 					e1.printStackTrace();
 				}
 				}
+
+			private void showMessage(RdDinStruct rddin) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
-		
-		JButton btnNewButton = new JButton("");
+	JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Удалить");
 		btnNewButton.setIcon(new ImageIcon(FormRdDin.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		
@@ -600,8 +645,8 @@ public class FormRdDin extends JFrame {
 	}
 	protected void setDefaultValues() {
 		// TODO Auto-generated method stub
-	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
-	rddin.setNpasp(Vvod.zapVr.getNpasp());
+//	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
+//	rddin.setNpasp(Vvod.zapVr.getNpasp());
 	rddin.setArt1(120);
 	rddin.setArt2(80);
 	rddin.setArt3(120);
@@ -613,31 +658,13 @@ public class FormRdDin extends JFrame {
 	rddin.setOj(60);
 	rddin.setSpl(0);
 //	rddin.setSrok(srok);
+	System.out.println("присвоение");		
+	System.out.println(rddin);		
 	}
 	public void onConnect() throws PatientNotFoundException {
-		try {
-			PatientCommonInfo inf;
-		inf = MainForm.tcl.getPatientCommonInfo(Vvod.zapVr.npasp);
-//						tfPatient.setText("Пациент: "+inf.getFam()+" "+inf.getIm()+" "+inf.getOt()+" Номер и серия полиса: "+inf.getPoms_ser()+"  "+inf.getPoms_nom());
-fam.setText(inf.getFam());
-im.setText(inf.getIm());
-ot.setText(inf.getOt());
-		    CBDiag.setData(MainForm.tcl.get_n_db6());
-			CBPolPl.setData(MainForm.tcl.get_n_db1());
-			CBPredPl.setData(MainForm.tcl.get_n_db2());
-  	        CBCerd.setData(MainForm.tcl.get_n_db3());
-			CBSerd1.setData(MainForm.tcl.get_n_db4());
-			CBOteki.setData(MainForm.tcl.get_n_db5());
-			
-			
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-			MainForm.conMan.reconnect(e);
-		}
+		fam.setText(Vvod.zapVr.fam);
+		im.setText(Vvod.zapVr.im);
+		ot.setText(Vvod.zapVr.oth);
 	}
 
-	};
-
-
+}
