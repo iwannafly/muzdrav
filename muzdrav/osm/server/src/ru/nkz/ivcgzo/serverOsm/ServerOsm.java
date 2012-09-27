@@ -2092,8 +2092,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 	
 	@Override
-	public List<Pmer> getPmer(int id_pvizit) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.id_pvizit = ?", id_pvizit)) {
+	public List<Pmer> getPmer(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.npasp = ?", npasp)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2222,5 +2222,27 @@ p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp", npasp)) {
 			TException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public List<StringClassifier> get_n_s00(int clpu)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select distinct s_mrab.cdol as pcod,n_s00.name as name from s_users join s_mrab on (s_users.clpu=s_mrab.clpu) join n_s00 on (s_mrab.cdol=n_s00.pcod) where s_mrab.clpu= ?", clpu)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<StringClassifier> get_n_c00(int npasp)
+			throws KmiacServerException, TException {
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select n_c00.pcod as pcod,p_disp.diag as name  from p_disp join n_c00 on (p_disp.diag=n_c00.pcod) where npasp=? ", npasp)) {
+		return rsmStrClas.mapToList(acrs.getResultSet());
+	} catch (SQLException e) {
+		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}
 	}
 }

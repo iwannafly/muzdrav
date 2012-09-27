@@ -582,6 +582,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_s00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
@@ -617,7 +619,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispMer*/
-	list<Pmer> getPmer (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pmer> getPmer (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePmer(1: i32 pmer_id) throws (1: kmiacServer.KmiacServerException kse);
