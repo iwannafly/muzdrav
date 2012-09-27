@@ -54,10 +54,12 @@ import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.RdConVizit;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdPatient;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdVizit;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
@@ -118,8 +120,14 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private final Class<?>[] rdDinTypes;
+	
 	private final TResultSetMapper<RdPatient, RdPatient._Fields> rsmRdPat;
 	private final Class<?>[] rdPatientTypes;
+	private final TResultSetMapper< RdVizit, RdVizit._Fields> rsmRdViz;
+	private final Class<?>[] rdVizitTypes;
+	private final TResultSetMapper< RdConVizit, RdConVizit._Fields> rsmRdCV;
+	private final Class<?>[] rdConVizitTypes;
+
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
@@ -191,8 +199,14 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
 		
-		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot");
-		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class};
+		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
+		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
+	
+		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr");
+		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class};
+
+		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",        "uid",       "ves",       "ned",        "lcad",        "ldad",       "rcad",       "rdad",       "rost",       "datar",    "obr",        "sem",          "ososo",       "vrpr" );
+		rdConVizitTypes = new Class<?>[]{                 Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
@@ -2190,38 +2204,44 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public void getRdPatient(int npasp) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-/*		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT p.fam, p.im, p.ot, p.datar,
-p.docser,p.docnum,p.adp_gorod,p.adp_ul,p.adp_dom,p.adp_korp,p.adp_kv,
-p.poms_ser,p.poms_nom,p.poms_ndog,n.clpu,
-p.terp,p.adm_gorod, p.adm_ul, p.adm_dom,p.adm_korp,
- p.adm_kv, p.tel,s.grup,s.ph,s.vred,a.stat
-FROM patient p,n_n00 n,p_sign s,n_az9 a,p_rd_sl rd
-WHERE p.npasp = 16164 and p.cpol_pr=n.pcod and
-p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp", npasp)) {
+	public List<RdPatient> getRdPatient() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT p.fam, p.im, p.ot, p.datar,p.docser,p.docnum,p.adp_gorod,p.adp_ul,p.adp_dom,p.adp_korp,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,n.clpu,p.terp,p.adm_gorod, p.adm_ul, p.adm_dom,p.adm_korp, p.adm_kv, p.tel,s.grup,s.ph,s.vred,a.stat FROM patient p,n_n00 n,p_sign s,n_az9 a,p_rd_sl rd WHERE p.cpol_pr=n.pcod and p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp")) {
 			if (acrs.getResultSet().next())
-				return rsmRdSl.map(acrs.getResultSet());
+				return rsmRdPat.mapToList(acrs.getResultSet());
 			else
 				throw new KmiacServerException("нет записи");
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
-*/		
 	}
 
 	@Override
-	public void getRdVizit(int npasp) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
+	public List<RdVizit> getRdVizit() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT v.datap,v.diag,v.mobs,v.rezult,v.n_sp,s.cod_sp,c.cod_tf,d.fam,d.im,d.ot FROM p_rd_sl rd,p_vizit_amb v, n_s00 s,n_p0c c,s_vrach d where rd.npasp=v.npasp and v.cdol=s.pcod and v.cpos=c.pcod and v.n_sp=d.pcod")) {
+			if (acrs.getResultSet().next())
+				return rsmRdViz.mapToList(acrs.getResultSet());
+			else
+				throw new KmiacServerException("нет записи");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
 		
 	}
 
 	@Override
-	public void getRdConVizit(int npasp) throws KmiacServerException,
+	public List<RdConVizit> getRdConVizit() throws KmiacServerException,
 			TException {
-		// TODO Auto-generated method stub
-		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select d.id_pvizit,d.id_pos,d.npasp,d.srok,d.ves,d.art1,d.art2,d.art3,d.art4,d.ball from p_rd_din d,p_rd_sl rd where d.id_pvizit=rd.id_pvizit")) {
+			if (acrs.getResultSet().next())
+				return rsmRdCV.mapToList(acrs.getResultSet());
+			else
+				throw new KmiacServerException("нет записи");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
