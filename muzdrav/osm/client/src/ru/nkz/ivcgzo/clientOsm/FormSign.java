@@ -1,13 +1,11 @@
 package ru.nkz.ivcgzo.clientOsm;
 
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -26,9 +24,11 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
+import javax.swing.text.BadLocationException;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -37,8 +37,11 @@ import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 
 public class FormSign extends JFrame {
 	private static final long serialVersionUID = -5267798845014525253L;
-	private JEditorPane tpfarm;
-	private JEditorPane tpanamnz;
+	private ShablonDopEditorPane tpfarm;
+	private ShablonDopEditorPane tpanamnz;
+	private ShablonDopEditorPane tpallerg;
+	private static ShablonDopEditorPane selShabPane;
+	private ThriftIntegerClassifierList listShablon;
 	private Psign psign;
 	private JCheckBox cbk;
 	private JCheckBox cba;
@@ -52,49 +55,45 @@ public class FormSign extends JFrame {
 	private JRadioButton rbpol;
 	private JRadioButton rbotr;
 	private String vrp;
-	private JEditorPane tpallerg;
 	private JPanel pallerg;
 	public static List<IntegerClassifier> pokNames;
 
 	/**
-	 * Launch the application.
-	 */
-
-
-	/**
 	 * Create the frame.
 	 */
-	
-	
 	public FormSign() {
-		try {
-			pokNames = MainForm.tcl.getPokNames();
-		} catch (Exception e3) {
-			e3.printStackTrace();
-			pokNames = new ArrayList<>();
-		}
-
-
+		setTitle("Анамнез жизни");
 		setBounds(100, 100, 1011, 726);
 		
 		final JScrollPane spAnamn = new JScrollPane();
+		spAnamn.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		spAnamn.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
-		final ThriftIntegerClassifierList listShablon = new ThriftIntegerClassifierList();
+		listShablon = new ThriftIntegerClassifierList();
 		listShablon.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2) {
-					ShablonTextField.instance.setText(listShablon.getSelectedValue().getName());
-				}
+				if (e.getClickCount() == 2)
+					if (listShablon.getSelectedValue() != null)
+						if (selShabPane != null)
+							try {
+								selShabPane.getDocument().insertString(selShabPane.getText().length(), MainForm.tcl.getShDop(listShablon.getSelectedPcod()).name, null);
+							} catch (BadLocationException e1) {
+								e1.printStackTrace();
+							} catch (KmiacServerException e1) {
+								JOptionPane.showMessageDialog(FormSign.this, "Ошибка загрузка текста шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+							} catch (TException e1) {
+								e1.printStackTrace();
+								MainForm.conMan.reconnect(e1);
+							}
 			}
 		});
-		    
-			final JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
-		      
-		      JScrollPane spSh = new JScrollPane();
-		      
-		      spSh.setViewportView(listShablon);
+		
+		JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
+		
+		JScrollPane spSh = new JScrollPane();
+		
+		spSh.setViewportView(listShablon);
 		
 		JLabel lblVr = new JLabel("Вредные привычки");
 		
@@ -258,10 +257,10 @@ public class FormSign extends JFrame {
 		
 		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
 		
-		tpfarm = new JEditorPane();
+		tpfarm = new ShablonDopEditorPane(5);
 		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
 		
-		tpanamnz = new JEditorPane();
+		tpanamnz = new ShablonDopEditorPane(4);
 		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
 		
 		 pallerg = new JPanel();
@@ -300,7 +299,7 @@ public class FormSign extends JFrame {
 		
 		JLabel label = new JLabel("Аллергоанамнез");
 		
-		 tpallerg = new JEditorPane();
+		tpallerg = new ShablonDopEditorPane(3);
 		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		GroupLayout gl_pallerg = new GroupLayout(pallerg);
 		gl_pallerg.setHorizontalGroup(
@@ -321,57 +320,52 @@ public class FormSign extends JFrame {
 		);
 		pallerg.setLayout(gl_pallerg);
 		pAnamn.setLayout(gl_pAnamn);
-//		pAnamn.setLayout(gl_panel_1);
-//		pAnamn.setLayout(gl_panel);
-		//GroupLayout groupLayout = new GroupLayout(getContentPane());
-//		groupLayout.setHorizontalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-//		);
-//		groupLayout.setVerticalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-//		);
 		getContentPane().setLayout(groupLayout);
-		
-		addWindowListener(new WindowAdapter() {
-			List<IntegerClassifier> lstIdRazd;
-			
-			@Override
-			public void windowActivated(WindowEvent e) {
-				try {
-					lstIdRazd = MainForm.tcl.getShablonCdol(3, MainForm.authInfo.getCdol());
-					lstIdRazd.addAll(MainForm.tcl.getShablonCdol(4, MainForm.authInfo.getCdol()));
-					lstIdRazd.addAll(MainForm.tcl.getShablonCdol(5, MainForm.authInfo.getCdol()));
-					disableTextFields(spAnamn);
-				} catch (KmiacServerException e1) {
-					e1.printStackTrace();
-				} catch (TException e1) {
-					e1.printStackTrace();
-				}
-				
-				super.windowActivated(e);
-			}
-			
-			private void disableTextFields(Container c) {
-				if (c.getComponentCount() > 0)
-					lbl: for (int i = 0; i < c.getComponentCount(); i++) {
-						if (c.getComponent(i) instanceof ShablonTextField) {
-							ShablonTextField txt = (ShablonTextField)c.getComponent(i);
-							for (IntegerClassifier razd : lstIdRazd) {
-								if (razd.getPcod() == txt.getIdPok()) {
-									txt.setVisible(true);
-									continue lbl;
-								}
-							}
-							txt.setVisible(false);
-						} else if (c.getComponent(i) instanceof Container)
-							disableTextFields((Container) c.getComponent(i));
-					}
-			}
-		});
 	}
 	
+	private class ShablonDopEditorPane extends JEditorPane {
+		private static final long serialVersionUID = -2297529095988741139L;
+		private int idRazd;
+		
+		public ShablonDopEditorPane(int idRazd) {
+			super();
+			
+			this.idRazd = idRazd;
+			
+			setFocusListener();
+			new CustomTextComponentWrapper(this).setPopupMenu();
+		}
+		
+		private void setFocusListener() {
+			addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					try {
+						selShabPane = ShablonDopEditorPane.this;
+						listShablon.setData(MainForm.tcl.getShDopNames(getIdRazd()));
+					} catch (KmiacServerException e1) {
+						JOptionPane.showMessageDialog(FormSign.this, "Ошибка загрузка названий шаблонов", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						handleError();
+					} catch (TException e1) {
+						e1.printStackTrace();
+						handleError();
+						MainForm.conMan.reconnect(e1);
+					}
+				}
+				
+				private void handleError() {
+					selShabPane = null;
+					listShablon.setData(null);
+					listShablon.requestFocusInWindow();
+				}
+			});
+		}
+		
+		private int getIdRazd() {
+			return idRazd;
+		}
+	}
+		
 		private String getVrPr() {
 			String prv,s1,s2,s3;
 			if (cbk.isSelected()){
@@ -397,32 +391,38 @@ public class FormSign extends JFrame {
 		}
 		
 		public void showPsign() {
+			BGgrk.clearSelection();
+			BGRez.clearSelection();
+			cbk.setSelected(false);
+			cba.setSelected(false);
+			cbn.setSelected(false);
+			tpallerg.setText("");
+			tpfarm.setText("");
+			tpanamnz.setText("");
 		try {
 			psign = MainForm.tcl.getPsign(Vvod.zapVr.npasp);
-			if (psign!=null){
-			BGgrk.clearSelection();
+			
 			rb1g.setSelected(psign.grup.charAt(0) == '1');
 			rb2g.setSelected(psign.grup.charAt(0) == '2');
 			rb3g.setSelected(psign.grup.charAt(0) == '3');
 			rb4g.setSelected(psign.grup.charAt(0) == '4');
 			
-			BGRez.clearSelection();
 			rbpol.setSelected(psign.ph.charAt(0) == '+');
 			rbotr.setSelected(psign.ph.charAt(0) == '-');
 			
 			tpallerg.setText(psign.allerg);
 			tpanamnz.setText(psign.vitae);
 			tpfarm.setText(psign.farmkol);
-			tpanamnz.setText(psign.vitae);
 			
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
 			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');}
+			cbn.setSelected(vrp.charAt(2) == '1');
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (PsignNotFoundException e1) {
-			e1.printStackTrace();
+			psign = new Psign();
+			psign.setNpasp(Vvod.zapVr.npasp);
 		} catch (TException e1) {
 			MainForm.conMan.reconnect(e1);
 		}

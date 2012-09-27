@@ -21,4 +21,6 @@ generateJavaSource muzdrav/viewselect/thrift
 generateJavaSource muzdrav/genTalons/thrift
 generateJavaSource muzdrav/outputInfo/thrift
 generateJavaSource muzdrav/reception/thrift
+generateJavaSource muzdrav/genReestr/thrift
+generateJavaSource muzdrav/hospital/thrift
 

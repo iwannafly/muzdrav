@@ -58,6 +58,7 @@ public class ServerReception extends Server implements Iface {
     private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSpec;
     private TResultSetMapper<Vidp, Vidp._Fields> rsmVidp;
     private TResultSetMapper<Talon, Talon._Fields> rsmTalon;
+    private TResultSetMapper<Talon, Talon._Fields> rsmReservedTalon;
 
 //////////////////////////// Field Name Arrays ////////////////////////////
 
@@ -74,7 +75,11 @@ public class ServerReception extends Server implements Iface {
         "pcod", "name", "vcolor"
     };
     private static final String[] TALON_FIELD_NAMES = {
-        "id", "ntalon", "vidp", "timepn", "timepk", "datap", "npasp", "dataz", "prv"
+        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv"
+    };
+    private static final String[] RESERVED_TALON_FIELD_NAMES = {
+        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv",
+        "spec", "fio"
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -94,6 +99,7 @@ public class ServerReception extends Server implements Iface {
         rsmSpec = new TResultSetMapper<>(StringClassifier.class, SPEC_FIELD_NAMES);
         rsmVidp = new TResultSetMapper<>(Vidp.class, VIDP_FIELD_NAMES);
         rsmTalon = new TResultSetMapper<>(Talon.class, TALON_FIELD_NAMES);
+        rsmReservedTalon = new TResultSetMapper<>(Talon.class, RESERVED_TALON_FIELD_NAMES);
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -246,9 +252,9 @@ public class ServerReception extends Server implements Iface {
         // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "SELECT id, ntalon, vidp, timepn, timepk, datap, npasp, dataz, prv "
+        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv "
                 + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? AND datap >= ? "
-                + "AND prv = ?;";
+                + "AND prv = ? ORDER BY datap, timep;";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec), prv)) {
             List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
@@ -264,6 +270,34 @@ public class ServerReception extends Server implements Iface {
     }
 
     @Override
+    public final List<Talon> getReservedTalons(final int cpol, final String cdol,
+            final int doctorId, final int patientId) throws KmiacServerException,
+            TalonNotFoundException, TException {
+        // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
+        // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
+        final long todayMillisec = new java.util.Date().getTime();
+        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv, "
+                + "name as spec, (fam || ' ' || im || ' ' || ot) as fio FROM e_talon "
+                + "INNER JOIN n_s00 ON n_s00.pcod = e_talon.cdol "
+                + "INNER JOIN s_vrach ON s_vrach.pcod = e_talon.pcod_sp "
+                + "WHERE cpol = ? AND datap >= ? "
+                + "AND npasp = ? ORDER BY datap, timep;";
+        try (AutoCloseableResultSet acrs =
+                sse.execPreparedQuery(sqlQuery, cpol, new Date(todayMillisec), patientId)) {
+            List<Talon> tmpList = rsmReservedTalon.mapToList(acrs.getResultSet());
+            if (tmpList.size() > 0) {
+                return tmpList;
+            } else {
+                throw new TalonNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException(e.getMessage());
+        }
+    }
+
+    //TODO Добавить проверку на занятость талона прямо перед записью
+    @Override
     public final void reserveTalon(final Patient pat, final Talon talon)
             throws KmiacServerException, ReserveTalonOperationFailedException,
             TException {
@@ -271,11 +305,20 @@ public class ServerReception extends Server implements Iface {
         // java.sql.Date не имеет нулевого конструктора, а preparedUpdate() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ? "
+        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ?, id_pvizit = ? "
                 + "WHERE  id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            final int numUpdated = sme.execPreparedUpdate(
-                    sqlQuery, false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+            int numUpdated = 0;
+            if (pat.getIdPvizit() != 0) {
+                numUpdated = sme.execPreparedUpdate(
+                    sqlQuery, false, pat.getId(), new Date(todayMillisec), prv, pat.getIdPvizit(),
+                    talon.getId());
+            } else {
+                numUpdated = sme.execPreparedUpdate("UPDATE e_talon SET npasp = ?, dataz = ?, "
+                        + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
+                        + "WHERE  id = ?;",
+                        false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+            }
             if (numUpdated == 1) {
                 sme.setCommit();
             } else {
@@ -293,11 +336,12 @@ public class ServerReception extends Server implements Iface {
             ReleaseTalonOperationFailedException, TException {
         final int defaultNpasp = 0;
         final int defaultPrv = 0;
-        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ? "
-                + "WHERE  id = ?;";
+        final int defaultIdPVizit = 0;
+        final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ?, id_pvizit = ? "
+                + "WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             final int numUpdated = sme.execPreparedUpdate(
-                    sqlQuery, false, defaultNpasp, null, defaultPrv, talon.getId());
+                sqlQuery, false, defaultNpasp, null, defaultPrv, defaultIdPVizit, talon.getId());
             if (numUpdated == 1) {
                 sme.setCommit();
             } else {

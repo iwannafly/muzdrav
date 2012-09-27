@@ -45,7 +45,6 @@ enum IntegerClassifiers {
 	n_db3 = 26,
 	n_db4 = 27,
 	n_db5 = 28,
-	n_db6 = 29,
 	n_db7 = 30,
 	n_db8 = 31,
 	n_edd = 32,
@@ -93,7 +92,10 @@ enum IntegerClassifiers {
 	n_z70 = 74,
 	n_z80 = 75,
 	n_z90 = 76,
-	n_z11 = 77
+	n_z11 = 77,
+	n_spec = 78,
+	n_din = 79,
+	n_p0c = 80
 }
 
 enum StringClassifiers {
@@ -106,11 +108,11 @@ enum StringClassifiers {
 	n_ldi = 7,
 	n_nz1 = 8,
 	n_obst = 9,
-	n_p0c = 10,
 	n_r0c = 11,
 	n_r0z = 12,
 	n_s00 = 13,
-	n_spr = 14
+	n_spr = 14,
+	n_db6 = 15
 }
 
 enum ClassifierSortOrder {

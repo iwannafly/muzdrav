@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -44,6 +45,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.LgotaAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.LgotaNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
 import ru.nkz.ivcgzo.thriftRegPatient.NambkAlreadyExistException;
+import ru.nkz.ivcgzo.thriftRegPatient.NambkNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
@@ -110,15 +112,15 @@ public class ServerRegPatient extends Server implements Iface {
     //  datar       pol          jitel        sgrp
         Date.class, Integer.class, Integer.class, Integer.class,
     //  mrab          name_mr       ncex           cpol_pr
-        String.class, String.class, Integer.class, Integer.class,
+        Integer.class, String.class, Integer.class, Integer.class,
     //  terp           tdoc           docser        docnum
         Integer.class, Integer.class, String.class, String.class,
     //  datadoc     odoc          snils         dataz
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv
-        Integer.class, Integer.class
+    //  ter_liv        region_liv     v_sch          str_org
+        Integer.class, Integer.class, Integer.class, Integer.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg          datal
@@ -161,7 +163,7 @@ public class ServerRegPatient extends Server implements Iface {
         Integer.class, Date.class, Time.class, Date.class, String.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
-    //  npasp          nambk         cpol           nuch
+    //  npasp          nambk         nuch           cpol
         Integer.class, String.class, Integer.class, Integer.class,
     //  datapr      dataot      ishod
         Date.class, Date.class, Integer.class
@@ -194,7 +196,8 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
-        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv"
+        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv",
+        "v_sch", "str_org"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
@@ -275,8 +278,8 @@ public class ServerRegPatient extends Server implements Iface {
      */
     private boolean isNambkExist(final Nambk nambk) throws SQLException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
-                "SELECT npasp FROM p_nambk WHERE (npasp = ?)",
-                nambk, NAMBK_TYPES, 0)) {
+                "SELECT npasp FROM p_nambk WHERE (npasp = ?) AND (cpol = ?)",
+                nambk, NAMBK_TYPES, 0, 3)) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -412,10 +415,9 @@ public class ServerRegPatient extends Server implements Iface {
      * @param id - идентификатор льгота
      * @return String - текстовое описание вида льготы
      */
-    // TODO поменять n_lkr на n_lkn
     private String getStringTranscriptionForLgota(final int lgotaId) throws SQLException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT name FROM n_lkr WHERE (pcod = ?)", lgotaId)) {
+                "SELECT name FROM n_lkn WHERE (pcod = ?)", lgotaId)) {
             ResultSet rs = acrs.getResultSet();
             String tmpName = null;
             if (rs.next()) {
@@ -431,30 +433,30 @@ public class ServerRegPatient extends Server implements Iface {
 
 /////////////////////////////////// Check OS Type /////////////////////////////
 
-    private boolean isWindows() {
-        String os = System.getProperty("os.name").toLowerCase();
-        //windows
-        return (os.indexOf("win") >= 0);
-    }
-
-    private boolean isUnix() {
-        String os = System.getProperty("os.name").toLowerCase();
-        //linux or unix
-        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
-    }
+//    private boolean isWindows() {
+//        String os = System.getProperty("os.name").toLowerCase();
+//        //windows
+//        return (os.indexOf("win") >= 0);
+//    }
+//
+//    private boolean isUnix() {
+//        String os = System.getProperty("os.name").toLowerCase();
+//        //linux or unix
+//        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
+//    }
 
 ////////////////////////////// Other ///////////////////////////////////////////
 
-    private String setReportPath() {
-        if (isWindows()) {
-            return "C:\\Temp\\MedCardAmbPriem_t.htm";
-        } else if (isUnix()) {
-            return System.getProperty("user.home")
-                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
-        } else {
-            return "MedCardAmbPriem_t.htm";
-        }
-    }
+//    private String setReportPath() {
+//        if (isWindows()) {
+//            return "C:\\Temp\\MedCardAmbPriem_t.htm";
+//        } else if (isUnix()) {
+//            return System.getProperty("user.home")
+//                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
+//        } else {
+//            return "MedCardAmbPriem_t.htm";
+//        }
+//    }
 
 ////////////////////////////////////////////////////////////////////////
 //                       Public Methods                               //
@@ -536,10 +538,9 @@ public class ServerRegPatient extends Server implements Iface {
                 + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
                 + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
                 + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
-                + "patient.region_liv, p_nambk.nambk, p_nambk.cpol, p_nambk.nuch, "
-                + "p_nambk.datapr, p_nambk.dataot, p_nambk.ishod "
-                + "FROM patient LEFT JOIN p_nambk ON "
-                + "patient.npasp = p_nambk.npasp WHERE patient.npasp = ?;";
+                + "patient.region_liv, patient.v_sch, patient.str_org "
+                + "FROM patient "
+                + "WHERE patient.npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
@@ -548,7 +549,6 @@ public class ServerRegPatient extends Server implements Iface {
                 patient.setAdmAddress(rsmAdmAdress.map(rs));
                 patient.setPolis_oms(rsmPolisOms.map(rs));
                 patient.setPolis_dms(rsmPolisDms.map(rs));
-                patient.setNambk(rsmNambk.map(rs));
                 return patient;
             } else {
                 throw new PatientNotFoundException();
@@ -559,6 +559,23 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    @Override
+    public final Nambk getNambk(final int npasp, final int cpodr) throws NambkNotFoundException,
+            TException {
+        String sqlQuery = "SELECT * FROM p_nambk WHERE npasp = ? AND cpol = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp,  cpodr)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                Nambk nambk = rsmNambk.map(rs);
+                return nambk;
+            } else {
+                throw new NambkNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
 
     @Override
     public final Agent getAgent(final int npasp)
@@ -578,12 +595,11 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    //TODO поле name теперь ссылается на таблицу n_lkn, а не n_lkr - переделать.
     @Override
     public final List<Lgota> getLgota(final int npasp)
             throws LgotaNotFoundException, TException {
         String sqlQuery = "SELECT id, npasp, lgot, datal, name FROM p_kov "
-                + "INNER JOIN n_lkr ON p_kov.lgot = n_lkr.pcod WHERE npasp = ?;";
+                + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<Lgota> lgotaList = rsmLgota.mapToList(rs);
@@ -750,10 +766,11 @@ public class ServerRegPatient extends Server implements Iface {
                         + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
                         + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
                         + "cpol_pr, terp, tdoc, docser, docnum, datadoc, "
-                        + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv) "
+                        + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv, "
+                        + "v_sch, str_org) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?);", true,
+                        + "?, ?, ?, ?);", true,
                         patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                         new Date(patinfo.getDatar()),
                         patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -771,7 +788,7 @@ public class ServerRegPatient extends Server implements Iface {
                         new Date(patinfo.getDatadoc()), patinfo.getOdoc(), patinfo.getSnils(),
                         new Date(patinfo.getDataz()), patinfo.getProf(), patinfo.getTel(),
                         new Date(patinfo.getDsv()), patinfo.getPrizn(), patinfo.getTer_liv(),
-                        patinfo.getRegion_liv());
+                        patinfo.getRegion_liv(), patinfo.getV_sch(), patinfo.getStr_org());
                 int id = sme.getGeneratedKeys().getInt("npasp");
                 sme.setCommit();
                 return id;
@@ -926,7 +943,7 @@ public class ServerRegPatient extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isNambkExist(nambk)) {
                 sme.execPreparedT("INSERT INTO p_nambk ("
-                        + "npasp, nambk, cpol, nuch, datapr, dataot, ishod)"
+                        + "npasp, nambk, nuch, cpol, datapr, dataot, ishod)"
                         + "VALUES (?, ?, ?, ?, ?, ?, ?);",
                         false, nambk, NAMBK_TYPES, indexes);
                 sme.setCommit();
@@ -1038,7 +1055,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "pdms_ser = ?, pdms_nom = ?, cpol_pr = ?, terp = ?, tdoc=?, "
                 + "docser = ?, docnum = ?, datadoc = ?, odoc = ?, snils = ?, "
                 + "dataz = ?, prof = ?, tel = ?, dsv = ?, prizn = ?, ter_liv = ?, "
-                + "region_liv = ? WHERE npasp = ?", false,
+                + "region_liv = ?, v_sch = ?, str_org = ? WHERE npasp = ?", false,
                 patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                 new Date(patinfo.getDatar()),
                 patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -1056,7 +1073,8 @@ public class ServerRegPatient extends Server implements Iface {
                 new Date(patinfo.getDatadoc()), patinfo.getOdoc(), patinfo.getSnils(),
                 new Date(patinfo.getDataz()), patinfo.getProf(), patinfo.getTel(),
                 new Date(patinfo.getDsv()), patinfo.getPrizn(), patinfo.getTer_liv(),
-                patinfo.getRegion_liv(), patinfo.getNpasp());
+                patinfo.getRegion_liv(), patinfo.getV_sch(), patinfo.getStr_org(),
+                patinfo.getNpasp());
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1066,12 +1084,12 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final void updateNambk(final Nambk nambk) throws TException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 0, 3};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE p_nambk SET "
-                    + "nambk = ?, cpol = ?, nuch = ?, "
+                    + "nambk = ?, nuch = ?, cpol = ?, "
                     + "datapr = ?, dataot = ?, ishod = ? "
-                    + "WHERE npasp =?",
+                    + "WHERE npasp = ? AND cpol = ?",
                     false, nambk, NAMBK_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
@@ -1374,33 +1392,34 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final String printMedCart(final Gosp gosp, final PatientFullInfo pat)
-            throws TException {
-        final String reportPath = setReportPath();
-        try (OutputStreamWriter osw =
-                new OutputStreamWriter(new FileOutputStream(reportPath), "utf-8")) {
+    public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
+            final UserAuthInfo uai) throws TException {
+        final String path;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 //            AutoCloseableResultSet acrs;
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
             String gender;
             if (pat.getPol() == 1) {
                 gender = "мужской";
-            } else if (pat.getPol() == 0) {
+            } else if (pat.getPol() == 2) {
                 gender = "женский";
             } else {
                 gender = "";
             }
-            HtmTemplate htmTemplate =
-                    new HtmTemplate("/home/as/Work/muzdrav_reports/MedCardAmbPriem.htm");
-            System.out.println(htmTemplate.getLabelsCount());
+            HtmTemplate htmTemplate = new HtmTemplate(
+                    new File(this.getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                    + "\\plugin\\reports\\MedCardAmbPriem.htm");
             htmTemplate.replaceLabels(true,
-                "",
-                "",
-                pat.getNambk().getNambk(),
+                uai.getClpu_name(),
+                "123213133",
+                nambk.getNambk(),
                 "",
                 pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
                 String.valueOf(pat.getPolis_oms().getStrg()),
                 pat.getSnils(),
-                "",
+                "123123231",
                 pat.getFam(),
                 pat.getIm(),
                 pat.getOt(),
@@ -1417,7 +1436,7 @@ public class ServerRegPatient extends Server implements Iface {
                 pat.getTel()
             );
             osw.write(htmTemplate.getTemplateText());
-            return reportPath;
+            return path;
         } catch (Exception e) {
             throw new  TException(e); // тут должен быть кмиац сервер иксепшн
         }
@@ -1425,7 +1444,65 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String printAmbCart(final PatientFullInfo pat) throws TException {
-        // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public final List<IntegerClassifier> getLKN() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_lkn;";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmLkn =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmLkn.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getLKR() throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_lkr;";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmLkr =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmLkr.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getL00(final int pcod) throws TException {
+        String sqlQuery;
+        if (pcod == 42) {
+            sqlQuery = "SELECT ter, (nam_kem || ' ' || n_l01.name) as nam_kem FROM n_l00 "
+                + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ? ORDER BY nam_kem;";
+        } else {
+            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ? ORDER BY nam_kem;";
+        }
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmL00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "ter", "nam_kem");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+            return rsmL00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
+    @Override
+    public final List<StringClassifier> getU10(final String name) throws TException {
+        final String sqlQuery = "SELECT name1, ndom FROM n_u10 WHERE name1 = ? ORDER BY ndom;";
+        final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmU10 =
+                new TResultSetMapper<>(StringClassifier.class, "name1", "ndom");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, name)) {
+            return rsmU10.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+
 }

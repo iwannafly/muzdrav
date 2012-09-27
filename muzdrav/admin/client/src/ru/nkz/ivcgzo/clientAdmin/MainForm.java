@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
@@ -15,13 +17,16 @@ import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
+import java.awt.Dimension;
 
 public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private final boolean adminMode;
 	public static ThriftServerAdmin.Client tcl;
 	private JFrame frame;
+	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
-	private ShablonPanel tpShablon;
+	private ShablonOsmPanel tpShablonOsm;
+	private ShablonDopPanel tpShablonDop;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftServerAdmin.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -38,12 +43,24 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setMinimumSize(new Dimension(896, 128));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientAdmin/resources/icon_2_32x32.png")));
 		frame.setTitle(configuration.appName);
 		frame.setBounds(100, 100, 600, 600);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (tabbedPane.getSelectedIndex() == 0)
+					tpUser.updateVrachTable();
+				else if (tabbedPane.getSelectedIndex() == 1)
+					tpShablonOsm.prepareShTextFields();
+				else if (tabbedPane.getSelectedIndex() == 2)
+					tpShablonDop.prepareShTextFields();
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -63,8 +80,12 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		tpUser = new UserPanel(adminMode);
 		tabbedPane.addTab("Пользователи", null, tpUser, null);
 		
-		tpShablon = new ShablonPanel();
-		tabbedPane.addTab("Шаблоны", null, tpShablon, null);
+		tpShablonOsm = new ShablonOsmPanel();
+		tabbedPane.addTab("Шаблоны осмотра", null, tpShablonOsm, null);
+		
+		tpShablonDop = new ShablonDopPanel();
+		tabbedPane.addTab("Дополнительные шаблоны", null, tpShablonDop, null);
+		
 		frame.getContentPane().setLayout(groupLayout);
 		
 		frame.setLocationRelativeTo(null);
@@ -85,7 +106,6 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 			tcl = thrClient;
 			try {
 				tpUser.onConnect();
-				tpShablon.setCdolList(tcl.get_n_s00());
 			} catch (TException e) {
 				e.printStackTrace();
 				conMan.reconnect(e);

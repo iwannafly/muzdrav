@@ -18,6 +18,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
@@ -27,6 +28,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
@@ -117,7 +119,6 @@ public class TestServerRegPatient {
             throws TException, PatientNotFoundException {
         int npasp = 2;
         final int pomsStrg = 9;
-        final int nambkIshod = 5;
         final int terp = 10;
         final Date birthDate = new Date(101, 4, 4);
         PatientFullInfo patientFullInfo =
@@ -153,12 +154,6 @@ public class TestServerRegPatient {
         assertEquals("adm_kv value", "107", patientFullInfo.getAdmAddress().getFlat());
         assertEquals("poms_strg value", pomsStrg,
                 patientFullInfo.getPolis_oms().getStrg());
-        assertEquals("nambk_npasp", 2,
-                patientFullInfo.getNambk().getNpasp());
-        assertEquals("nambk_nambk", "намбк2",
-                patientFullInfo.getNambk().getNambk());
-        assertEquals("nambk_ishod", nambkIshod,
-                patientFullInfo.getNambk().getIshod());
     }
 
     @Test
@@ -377,11 +372,12 @@ public class TestServerRegPatient {
     @Test
     public final void printMedCard_isTemplateCorrect() throws TException, PatientNotFoundException {
         int npasp = 8;
-        Gosp gosp = new Gosp();
+        Nambk nambk = new Nambk();
+        UserAuthInfo uai = new UserAuthInfo();
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
-        String pathToTemplate = testServer.printMedCart(gosp, patientFullInfo);
-        System.out.println(pathToTemplate);        
+        String pathToTemplate = testServer.printMedCart(nambk, patientFullInfo, uai);
+        System.out.println(pathToTemplate);
     }
 
 //    @Test

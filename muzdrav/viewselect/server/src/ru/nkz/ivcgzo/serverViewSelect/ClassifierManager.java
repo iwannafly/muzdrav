@@ -20,6 +20,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_1;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_2;
+import ru.nkz.ivcgzo.thriftViewSelect.mrab_0;
 import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
 import ru.nkz.ivcgzo.thriftViewSelect.polp_1;
 
@@ -31,6 +32,7 @@ public class ClassifierManager {
 	private Map<Integer, List<StringClassifier>> strClassList;
 	private List<mkb_0> mkbTreeClass;
 	private List<polp_0> polpTreeClass;
+	private List<mrab_0> mrabTreeClass;
 	
 	public ClassifierManager(ISqlSelectExecutor executor) {
 		sse = executor;
@@ -71,6 +73,13 @@ public class ClassifierManager {
 		String sql;
 		
 		switch (cls) {
+		case n_l02:
+			fldPcod = "c_ffomc";
+			break;
+		case n_z00:
+			fldPcod = "pcod_s";
+			fldName = "name_s";
+			break;
 		default:
 			break;
 		}
@@ -206,6 +215,39 @@ public class ClassifierManager {
 			}
 			
 			return polpTreeClass;
+		} catch (SQLException e) {
+			throw new KmiacServerException("Error loading polp tree classifier.");
+		}
+		
+	}
+	
+	
+	
+	public List<mrab_0> getMrabTreeClassifier() throws KmiacServerException {
+		if (mrabTreeClass != null)
+			return mrabTreeClass;
+		
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT n1.pcod AS pgruppa, n1.name AS ngruppa, n0.pcod AS pmrab, n0.name AS nmrab FROM n_z43_gr n1 JOIN n_z43 n0 ON (n0.gruppa = n1.pcod) ORDER BY pgruppa, pmrab ")) {
+			mrabTreeClass = new ArrayList<>();
+			
+			ResultSet rs = acrs.getResultSet(); rs.next();
+			while (!rs.isAfterLast()) {
+				List<IntegerClassifier> mrab1List = new ArrayList<>();
+				mrab_0 mrab0 = new mrab_0(rs.getInt(1), rs.getString(2), mrab1List);
+				//while (!rs.isAfterLast() && polp0.getPGruppa() == rs.getInt(1)) {
+					//List<IntegerClassifier> mrab1List = new ArrayList<>();
+					//mrab_1 mrab1 = new mrab_1(rs.getInt(3), rs.getString(4), polp2List);
+				while (!rs.isAfterLast() && mrab0.getPGruppa() == rs.getInt(1)) {
+					//if (polp1.getKdlpu() != rs.getInt(5))
+						mrab1List.add(new IntegerClassifier(rs.getInt(3), rs.getString(4)));
+					rs.next();
+				}
+				//mrab1List.add(mrab1);
+			//}
+			mrabTreeClass.add(mrab0);
+		}
+			
+			return mrabTreeClass;
 		} catch (SQLException e) {
 			throw new KmiacServerException("Error loading polp tree classifier.");
 		}

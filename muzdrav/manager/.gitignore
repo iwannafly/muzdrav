@@ -1,5 +1,4 @@
 bin/
 *_lib/
-plugin/*
-client/*
 lib/
+*.log

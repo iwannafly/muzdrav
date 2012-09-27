@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>serverGenReestr</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
+			<triggers>auto,</triggers>
+			<arguments>
+				<dictionary>
+					<key>LaunchConfigHandle</key>
+					<value>&lt;project&gt;/.externalToolBuilders/serverGenReestr build.xml [Builder].launch</value>
+				</dictionary>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>config</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/genReestr/config</locationURI>
+		</link>
+		<link>
+			<name>gen-java</name>
+			<type>2</type>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/genReestr/thrift/gen-java</locationURI>
+		</link>
+	</linkedResources>
+</projectDescription>

@@ -1,13 +1,11 @@
 package ru.nkz.ivcgzo.clientReception;
 
-import static org.junit.Assert.assertEquals;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.GregorianCalendar;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Avdeev Alexander
@@ -30,5 +28,7 @@ public class TestDateChecker {
         for (Date day:testDateChecker.getCurrentWeek()) {
             System.out.println(day);
         }
+        GregorianCalendar calend = new GregorianCalendar();
+        System.out.println(calend.getMaximum(Calendar.DAY_OF_WEEK));
     }
 }

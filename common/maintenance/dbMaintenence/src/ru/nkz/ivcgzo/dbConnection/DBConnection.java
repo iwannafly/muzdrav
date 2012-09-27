@@ -127,8 +127,8 @@ public class DBConnection {
 		return stm.executeQuery(sql);
 	}
 	
-	public PreparedStatement createPreparedStatement(String sql) throws SQLException {
-		return connection.prepareStatement(sql);
+	public PreparedStatement createPreparedStatement(String sql, boolean keys) throws SQLException {
+		return connection.prepareStatement(sql, (keys) ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
 	}
 	
 	public void commit() {

@@ -10,7 +10,13 @@ base port + 0	auth
 7	viewSelect
 8	genTalons
 9	outputInfo
+<<<<<<< HEAD
 10	reception
 11	kartaRInv
+=======
+10  	reception
+12	genReestr
+13	infomat
+>>>>>>> 8a627a268264ce734981c652749e1a13827bb373
 
 55201	libUpd
