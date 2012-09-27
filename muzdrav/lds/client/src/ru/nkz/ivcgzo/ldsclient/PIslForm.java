@@ -101,6 +101,7 @@ public class PIslForm {
 	private CustomTextField textField_5;
 	private JTable table;
 	public JTabbedPane tabbedPane;
+	public JTextPane tPop_name;
 	
 	/**
 	 * Create the application.
@@ -120,6 +121,9 @@ public class PIslForm {
 		JPanel panel = new JPanel();
 		
 		JSplitPane splitPane = new JSplitPane();
+		
+		splitPane.setResizeWeight(0.5);
+		
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -161,9 +165,7 @@ public class PIslForm {
 				
 				
 			String path;
-			OutputStreamWriter osw;
-			try {
-				osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\1\\prob.htm"), "utf-8");
+			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = "c:\\1\\123.htm"), "utf-8")) {
 
 			//	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 					//AutoCloseableResultSet acrs;
@@ -178,36 +180,78 @@ public class PIslForm {
 			sb.append("<body>");
 			sb.append("<div>");
 			
-			//sb.append("<p class=\"MsoNormal\" align=\"center\" style=\"text-align:center\"><b>"+MainForm.authInfo.clpu_name +"</b></p>");
-			sb.append("<p><b>"+MainForm.authInfo.cpodr_name+"</b></p>");
-/*			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
-			sb.append("<tr valign=\"top\">");
-				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
-					sb.append("<h3>Информация для пациента:</h3>");
-					sb.append("<b>Дата:</b><br />");
-					sb.append("<b>Время:</b><br />");
-					sb.append("<b>Подготовка:</b><br />");
-				sb.append("</td>");
-					sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
-				
-				
-				sb.append("<b>Диагноз:</b><br />");
-				sb.append("<h3>Наименование показателей:</h3>");
-				sb.append("<ol>");
-				sb.append("</ol>");
-				sb.append(String.format("<b>Дата направления:</b> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-				sb.append("<b>Подпись врача:</b><br />");
-				sb.append("</td>");
-			sb.append("</tr>");
-			sb.append("</table>");*/
+			sb.append("<p style=\"text-align:center\"><b>"+MainForm.authInfo.clpu_name +"</b></p>");
+			//sb.append("<p><b>"+MainForm.authInfo.clpu_name+"</b></p>");
+			sb.append("<p style=\"text-align:right\">Протокол №_____________</p>");
+			sb.append(String.format("<p style=\"text-align:right\">Дата исследования: %1$td.%1$tm.%1$tY</p>", tn_ldi.getSelectedItem().datav));
 			
+			if(!PostPer.tip.equals("Л")){
+				sb.append("<p></p><p></p>");
+				sb.append("<p style=\"text-align:center\">"+cBkodisl.getSelectedItem().name+"</p>");
+				sb.append("<p></p><p></p>");
+			}
+			
+			sb.append("<p>Ф.И.О.:&nbsp;" + tpatient.getSelectedItem().fam +"&nbsp;"+tpatient.getSelectedItem().im+"&nbsp;"+tpatient.getSelectedItem().ot+"</p>");
+			int age = (int) ((tn_ldi.getSelectedItem().datav - tpatient.getSelectedItem().datar) / 31556952000L);
+			sb.append("<p>Возраст:&nbsp;"+age+"&nbsp; лет(года)</p>");
+			
+			
+			sb.append("<p>Амб. Карта № ________________________________ История болезни №_______________________________ </p>");
+
+			if (PostPer.tip.equals("Л")){
+				sb.append("<p style=\"text-align:right\">Врач:"+ cBSvrach.getSelectedItem().name+"</p>");
+				sb.append("<table cellpadding=\"0\" cellspacing=\"0\">");
+					sb.append("<tbody>");
+			
+						sb.append("<tr valign=\"top\">");
+							sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px;\" width=\"60%\">");
+								sb.append("<p style=\"text-align:center\"><b>Наименование показателя<o:p></o:p></b></p>");
+							sb.append("</td>");
+							sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: none; border-right: 1px solid black; padding: 5px;\" width=\"20%\">");
+								sb.append("<p style=\"text-align:center\"><b>Значение<o:p></o:p></b></p>");
+							sb.append("</td>");
+							sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: none; border-right: 1px solid black; padding: 5px;\" width=\"20%\">");
+								sb.append("<p style=\"text-align:center\"><b>Норма<o:p></o:p></b></p>");
+							sb.append("</td>");				
+						sb.append("</tr>");
+				
+				
+						for(int i = 0; i<tlab_isl.getRowCount(); i++){
+					
+							sb.append("<tr valign=\"top\">");
+								sb.append("<td style=\"border-top: none; border-bottom: 1px solid black; border-left: 1px solid black; border-right: 1px solid black; padding: 5px;\" width=\"60%\">");
+									sb.append("<p style=\"text-align:left\">"+tlab_isl.getData().get(i).name+"<o:p></o:p></b></p>");
+								sb.append("</td>");
+								sb.append("<td style=\"border-top: none; border-bottom: 1px solid black; border-left: none; border-right: 1px solid black; padding: 5px;\" width=\"20%\">");
+									sb.append("<p style=\"text-align:center\">"+tlab_isl.getData().get(i).zpok+"<o:p></o:p></b></p>");
+								sb.append("</td>");
+								sb.append("<td style=\"border-top: none; border-bottom: 1px solid black; border-left: none; border-right: 1px solid black; padding: 5px;\" width=\"20%\">");
+									if (tlab_isl.getData().get(i).norma != null){
+									sb.append("<p style=\"text-align:center\">"+tlab_isl.getData().get(i).norma+"<o:p></o:p></b></p>");
+									}else{
+										sb.append("<p><o:p></o:p></b></p>");
+									}
+									
+								sb.append("</td>");				
+							sb.append("</tr>");					
+						}
+			
+					sb.append("</tbody>");
+				sb.append("</table>");
+			}else{
+				
+				sb.append("<p></p><p>Описание:&nbsp;"+tPop_name.getText()+"</p><p></p>");
+				sb.append("<p>Заключение:&nbsp;"+tFrez_name.getText()+"</p><p></p>");
+				sb.append("<p style=\"text-align:right\">Врач:"+ cBSvrach.getSelectedItem().name+"</p>");
+			}
 			sb.append("</div>");
 			sb.append("</body>");
 			sb.append("</html>");
 			
 			
 			osw.write(sb.toString());
-			System.out.print(MainForm.authInfo.clpu_name);
+			MainForm.conMan.openFileInEditor(path, false);
+			//System.out.print(MainForm.authInfo.clpu_name);
 			//return path;
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
@@ -283,9 +327,12 @@ public class PIslForm {
 		
 		
 		JSplitPane splitPane_1 = new JSplitPane();
+		
+		splitPane_1.setResizeWeight(0.5);
 		splitPane_1.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		
 		JSplitPane splitPane_2 = new JSplitPane();
+		splitPane_2.setResizeWeight(0.5);
 		splitPane_2.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPane_1.setRightComponent(splitPane_2);
 		
@@ -697,7 +744,7 @@ public class PIslForm {
 		
 		JLabel label_8 = new JLabel("Описание");
 		
-		final JTextPane tPop_name = new JTextPane();
+		tPop_name = new JTextPane();
 		
 		JLabel label_2 = new JLabel("Анамнез");
 		
