@@ -73,9 +73,9 @@ public class DocumentPrinter {
 			
 		try {
 			Process process = Runtime.getRuntime().exec(String.format("reg query \"%s\" /v \"%s\"", path, key));
-			reader = new InputStreamReader(process.getInputStream());
 			
 			if (process.waitFor() == 0) {
+				reader = new InputStreamReader(process.getInputStream());
 				char[] buf = new char[1000];
 				reader.read(buf);
 				reader.close();

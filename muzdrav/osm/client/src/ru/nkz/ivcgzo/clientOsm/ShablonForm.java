@@ -183,7 +183,7 @@ public class ShablonForm  extends JDialog {
 		try {
 			String str;
 			String nl = System.lineSeparator();
-			sho = MainForm.tcl.getSh(code);
+			sho = MainForm.tcl.getShOsm(code);
 			
 			str = String.format("Динамика: %s%s", sho.din, nl);
 			str += nl;
@@ -245,7 +245,7 @@ public class ShablonForm  extends JDialog {
 						
 						try {
 							node.removeAllChildren();
-							for (IntegerClassifier ic : MainForm.tcl.getShByDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, node.getCode(), srcStr))
+							for (IntegerClassifier ic : MainForm.tcl.getShOsmByDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, node.getCode(), srcStr))
 								node.add(new IntClassTreeNode(ic));
 							((DefaultTreeModel) getModel()).reload(node);
 						} catch (KmiacServerException e) {
@@ -314,7 +314,7 @@ public class ShablonForm  extends JDialog {
 			try {
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 				
-				for (StringClassifier sc : MainForm.tcl.getShPoiskDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, srcStr)) {
+				for (StringClassifier sc : MainForm.tcl.getShOsmPoiskDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, srcStr)) {
 					StrClassTreeNode node = new StrClassTreeNode(sc);
 					
 					node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
