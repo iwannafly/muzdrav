@@ -99,6 +99,13 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		model.fireContentsChanged();
 	}
 	
+	/**
+	 * Получает список данных. 
+	 */
+	public List<IntegerClassifier> getData() {
+		return items;
+	}
+	
 	private void setFormListeners() {
 		MouseAdapter ma = new MouseAdapter() {
 			@Override

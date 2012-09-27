@@ -83,14 +83,11 @@ exception TemplateExistsException {
 
 service ThriftServerAdmin extends kmiacServer.KmiacServer {
 
-	list<classifier.IntegerClassifier> getPrizndList();
-	list<classifier.StringClassifier> get_n_s00();
 	list<classifier.IntegerClassifier> get_n_p0s13();
 	list<classifier.IntegerClassifier> get_n_o00(1: i32 clpu);
 	list<classifier.IntegerClassifier> get_n_n00(1: i32 clpu);
 	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu);
 	list<classifier.StringClassifier> get_n_z00();
-	list<classifier.IntegerClassifier> get_n_z30();
 
 
 	/**
@@ -106,7 +103,7 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	/**
 	 * Добавление врача.
 	 */
-	i32 AddVrach(1: VrachInfo vr) throws (1: VrachExistsException vee);
+	i32 AddVrach(1: VrachInfo vr);
 
 	/**
 	 * Обновление информации о враче.
@@ -116,13 +113,13 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	/**
 	 * Удаление врача.
 	 */
-	void DelVrach(1: i32 pcod);
+	void DelVrach(1: i32 vrPcod, 2: i32 lpuPcod);
 
 
 	/**
 	 * Список всех мест работ для данного врача.
 	 */
-	list<MestoRab> GetMrabList(1: i32 vrPcod);
+	list<MestoRab> GetMrabList(1: i32 vrPcod, 2: i32 clpu);
 
 	/**
 	 * Информация о конкретном месте работы по его коду.

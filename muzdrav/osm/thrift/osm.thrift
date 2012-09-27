@@ -231,6 +231,61 @@ struct RdInfStruct{
 	12: optional i32 osoco;
 	13: optional i32 uslpr;
 }
+/*Выгрузка для Кемерово по диспансеризации беременных*/
+struct RdPatient{
+         1: optional i32    uid;
+         2: optional string fam;
+         3: optional string im;
+         4: optional string ot;
+         5: optional i64    datar;
+         6: optional string docser;
+         7: optional string docnum;
+         8: optional i32    tawn;
+         9: optional string street;
+        10: optional string house;  
+        11: optional string flat;
+        12: optional string poms_ser;
+        13: optional string poms_nom;
+        14: optional string dog;
+        15: optional i32    stat;
+        16: optional i32    lpup;
+        17: optional i32    terp;
+        18: optional i32    ftawn; 
+        19: optional string fstreet;
+        20: optional string fhouse;
+        21: optional string fflat;
+        22: optional string grk;
+        23: optional string rez;  
+}
+struct RdVizit{
+         1: optional i32    uid;
+         2: optional i64    dv;
+         3: optional string sp;
+         4: optional string famwr;
+         5: optional string imwr;
+         6: optional string otwr;
+         7: optional string diag;
+         8: optional i32    mso;
+         9: optional i32    rzp;
+        10: optional i32    aim;
+        11: optional i32    npr;  
+}
+struct RdConVizit{
+         1: optional i32    uiv;
+         2: optional i32    uid;
+         3: optional double ves;
+         4: optional i32    ned;
+         5: optional i32    lcad;
+         6: optional i32    ldad; 
+         7: optional i32    rcad;
+         8: optional i32    rdad;
+         9: optional i32    rost;
+        10: optional i64    datar;
+        11: optional i32    obr;
+        12: optional i32    sem;
+        13: optional i32    osoco;
+        14: optional string vrpr;
+}
 
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
@@ -408,9 +463,11 @@ struct ShablonText {
 }
 
 struct Shablon {
-	1: string din;
-	2: string next_osm;
-	3: list<ShablonText> textList;
+	1: i32 id;
+	2: string diag;
+	3: string din;
+	4: string next_osm;
+	5: list<ShablonText> textList;
 }
 
 struct Pmer{
@@ -525,7 +582,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_abd() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
@@ -548,11 +604,17 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
+/*Выгрузка для Кемерово по диспансеризации беременных*/
+        void getRdPatient(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+        void getRdVizit(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+        void getRdConVizit(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 /*Shablon*/
-	list<classifier.StringClassifier> getShPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getShPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getShByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag) throws (1: kmiacServer.KmiacServerException kse);
-	Shablon getSh(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOsmByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag, 4: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	Shablon getShOsm(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShDopNames(1: i32 idRazd) throws (1: kmiacServer.KmiacServerException kse);
+	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispMer*/
 	list<Pmer> getPmer (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
