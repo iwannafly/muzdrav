@@ -14,6 +14,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -22,6 +23,7 @@ import java.awt.event.ActionEvent;
 
 public class DispHron extends JFrame{
 	private CustomTable<Pmer,Pmer._Fields> tblDispHron;
+	private Pmer pmer;
 
 
 	/**
@@ -49,7 +51,19 @@ public class DispHron extends JFrame{
 		JButton button = new JButton("+");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			tblDispHron.addItem();
+				pmer = new Pmer();
+		  		pmer.setNpasp(Vvod.zapVr.getNpasp());
+		  		pmer.setId_pdiag(tblDispHron.getSelectedItem().getId_pdiag());
+				try {
+					pmer.setId(MainForm.tcl.AddPmer(pmer));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	 			tblDispHron.addItem(pmer);
 			}
 		});
 		
@@ -100,9 +114,9 @@ public class DispHron extends JFrame{
 					.addContainerGap(344, Short.MAX_VALUE))
 		);
 		
-		tblDispHron = new CustomTable<>(true,true,Pmer.class,3,"Диагноз",11,"Врач.должность",4,"Мероприятие",7,"Специалист",5,"Дата план.",6,"Дата факт.",10,"Результат");
+		tblDispHron = new CustomTable<>(true,true,Pmer.class,3,"Диагноз",4,"Мероприятие",7,"Специалист",5,"Дата план.",6,"Дата факт.",10,"Результат");
+		tblDispHron.setDateField(3);
 		tblDispHron.setDateField(4);
-		tblDispHron.setDateField(5);
 		tblDispHron.setFillsViewportHeight(true);
 		scrollPane.setViewportView(tblDispHron);
 		pnlDispHron.setLayout(gl_pnlDispHron);
