@@ -53,13 +53,6 @@ struct TPriemInfo {
 	16:string jalob;
 }
 
-struct TDoctor{
-	1:i32 doctorId;
-	2:string surname;
-	3:string name;
-	4:string middlename;	
-}
-
 struct TMedicalHistory{
     1:i32 id;
 	2:i32 idGosp;
@@ -75,25 +68,21 @@ struct TMedicalHistory{
 
 struct TLifeHistory{
 	1:i32 id;
-	2:string allerg;
-	3:string farmkol;
-	4:string vitae;
+	2:optional string allerg;
+	3:optional string farmkol;
+	4:optional string vitae;
 }
 
 struct TDiagnosis{
 	1:i32 id
-    2:i32 id_gosp
-    3:string diag;
-	4:i32 prizn;
-	5:i32 ustan;
-    6:string named;
-    7:i64 dataz;
-}
-
-struct TAllDiagnosis{
-	1:TDiagnosis mainDiagnosis;
-	2:list<TDiagnosis> accompDiagnosis;
-	3:list<TDiagnosis> complication;
+    2:i32 idGosp
+    3:optional string cod;
+	4:optional string medOp;
+	5:optional i64 dateUstan;
+    6:optional i32 prizn;
+    7:optional i32 vrach;
+	/* Поле для customTable в swinge - в таблице Бд его нет*/
+	8:optional string diagName;
 }
 
 struct ShablonText {
@@ -147,7 +136,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum);
+	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum) throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -156,6 +145,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);
 	i32 addMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
@@ -164,15 +154,11 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
 
-    TDiagnosis getMainDiagnosis(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe);
-    i32 addMainDiagnosis(1: TDiagnosis inDiagnos);
-    void updateMainDiagnosis(1:i32 id, 2: TDiagnosis inDiagnos);
-    void deleteMainDiagnosis(1:i32 id);
-
-    list<TDiagnosis> getAccompDiagnosis(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe);
-    i32 addAccompDiagnosis(1: TDiagnosis inDiagnos);
-    void updateAccompDiagnosis(1:i32 id, 2: TDiagnosis inDiagnos);
-    void deleteAccompDiagnosis(1:i32 id);
+    list<TDiagnosis> getDiagnosis(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe
+		2:kmiacServer.KmiacServerException kse);
+    i32 addDiagnosis(1:TDiagnosis inDiagnos) throws (1:kmiacServer.KmiacServerException kse);
+    void updateDiagnosis(1:TDiagnosis inDiagnos) throws (1:kmiacServer.KmiacServerException kse);
+    void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 	
 /*Классификаторы*/
 	
