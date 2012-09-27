@@ -33,15 +33,16 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
 import javax.swing.JCheckBox;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 
 public class MainForm {
 
 	private JFrame frame;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
+	private CustomDateEditor t_datn;
+	private CustomDateEditor t_datk;
+	private JTextField t_nuch;
+	private JTextField t_godrog;
+	private JTextField t_godotch;
 
 	/**
 	 * Launch the application.
@@ -112,11 +113,11 @@ public class MainForm {
 		JLabel label_2 = new JLabel("по");
 		label_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		textField = new JTextField();
-		textField.setColumns(10);
+		t_datn = new CustomDateEditor();
+		t_datn.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
+		t_datk = new CustomDateEditor();
+		t_datk.setColumns(10);
 		
 		JSeparator separator = new JSeparator();
 		
@@ -143,8 +144,8 @@ public class MainForm {
 		
 		JLabel label_3 = new JLabel("Номер участка");
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
+		t_nuch = new JTextField();
+		t_nuch.setColumns(10);
 		
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new TitledBorder(null, "\u0417\u0430\u0431\u043E\u043B\u0435\u0432\u0430\u043D\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -175,16 +176,16 @@ public class MainForm {
 											.addGroup(gl_panel.createSequentialGroup()
 												.addComponent(label_1)
 												.addGap(12)
-												.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+												.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 												.addGap(18)
 												.addComponent(label_2)
 												.addGap(18)
-												.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+												.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 									.addGroup(gl_panel.createSequentialGroup()
 										.addGap(26)
 										.addComponent(label_3)
 										.addGap(18)
-										.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+										.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 								.addGroup(gl_panel.createSequentialGroup()
 									.addContainerGap()
 									.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 231, GroupLayout.PREFERRED_SIZE))
@@ -218,13 +219,13 @@ public class MainForm {
 							.addPreferredGap(ComponentPlacement.UNRELATED, 11, Short.MAX_VALUE)
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(label_2)
-								.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(label_1)
-								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(label_3)
-								.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(13))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(25)
@@ -286,11 +287,11 @@ public class MainForm {
 		
 		JLabel label_4 = new JLabel("Отчетный год");
 		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
+		t_godrog = new JTextField();
+		t_godrog.setColumns(10);
 		
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
+		t_godotch = new JTextField();
+		t_godotch.setColumns(10);
 		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
 		gl_panel_5.setHorizontalGroup(
 			gl_panel_5.createParallelGroup(Alignment.LEADING)
@@ -300,11 +301,11 @@ public class MainForm {
 						.addGroup(gl_panel_5.createSequentialGroup()
 							.addComponent(lblNewLabel)
 							.addGap(18)
-							.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addComponent(t_godrog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_5.createSequentialGroup()
 							.addComponent(label_4)
 							.addGap(18)
-							.addComponent(textField_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(t_godotch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		gl_panel_5.setVerticalGroup(
@@ -313,11 +314,11 @@ public class MainForm {
 					.addContainerGap()
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
-						.addComponent(textField_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(t_godrog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_4)
-						.addComponent(textField_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(t_godotch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		panel_5.setLayout(gl_panel_5);
