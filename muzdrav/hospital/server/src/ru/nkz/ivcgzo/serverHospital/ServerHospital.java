@@ -285,7 +285,7 @@ public class ServerHospital extends Server implements Iface {
             throws KmiacServerException, DiagnosisNotFoundException {
         String sqlQuery = "SELECT c_diag.id, c_diag.id_gosp, c_diag.cod, c_diag.med_op, "
             + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach , n_c00.name as diagName "
-            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ;?";
+            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
             List<TDiagnosis> diagList = rsmDiagnosis.mapToList(acrs.getResultSet());
             if (diagList.size() > 0) {
@@ -335,8 +335,9 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void deleteDiagnosis(final int id) throws KmiacServerException {
+        final String sqlQuery = "DELETE FROM c_diag WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE * FROM c_diag WHERE id = ?", false, id);
+            sme.execPrepared(sqlQuery, false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);

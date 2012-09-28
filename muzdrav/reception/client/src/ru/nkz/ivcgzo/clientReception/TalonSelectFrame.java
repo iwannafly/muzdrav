@@ -49,6 +49,9 @@ public class TalonSelectFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
+    private static final String[] DAY_NAMES = {
+        "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"
+    };
     // Tables
     private JTable tbTalonSelect;
     private JTable tbTalonDelete;
@@ -96,7 +99,7 @@ public class TalonSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setPreferredSize(new Dimension(950, 600));
+        setPreferredSize(new Dimension(980, 600));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         splitPane = new JSplitPane();
@@ -316,7 +319,7 @@ public class TalonSelectFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setPrevWeek();
                 tbTalonSelect.repaint();
-                pnTalonSelect.updateUI();
+                updateSelectTableHeaders();
             }
         });
 
@@ -326,7 +329,7 @@ public class TalonSelectFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 ((TalonTableModel) tbTalonSelect.getModel()).setNextWeek();
                 tbTalonSelect.repaint();
-                pnTalonSelect.updateUI();
+                updateSelectTableHeaders();
             }
         });
     }
@@ -397,6 +400,7 @@ public class TalonSelectFrame extends JFrame {
                 cbxDoctor.getSelectedItem().getPcod()
         );
         tbTalonSelect.setModel(tbtModel);
+        //updateSelectTableHeaders();
     }
 
     private void fillTalonSelectPane() {
@@ -443,6 +447,19 @@ public class TalonSelectFrame extends JFrame {
                 curPatient.getId()
         );
         tbTalonDelete.setModel(resTbtModel);
+    }
+
+    private void updateSelectTableHeaders() {
+        for (int i = 0; i < 7; i++) {
+            tbTalonSelect.getColumnModel().getColumn(i).setHeaderValue(
+                DAY_NAMES[i] + " " + DEFAULT_DATE_FORMAT.format(
+                    ((TalonTableModel) tbTalonSelect.getModel())
+                        .getTalonList().getWeekDays()[i]
+                )
+            );
+        }
+        tbTalonSelect.repaint();
+        tbTalonSelect.updateUI();
     }
 
     private void fillTalonDeletePane() {
