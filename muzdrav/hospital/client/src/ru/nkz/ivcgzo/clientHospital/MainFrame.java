@@ -12,19 +12,24 @@ import java.util.Date;
 
 import javax.swing.JFrame;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
+import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 
+import javax.swing.ImageIcon;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -47,6 +52,9 @@ import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
 import java.awt.Font;
+import javax.swing.JRadioButton;
+import java.awt.Component;
+import javax.swing.Box;
 
 public class MainFrame extends JFrame {
 
@@ -132,6 +140,24 @@ public class MainFrame extends JFrame {
     private TLifeHistory lifeHistory;
     private PatientSelectFrame frmPatientSelect;
     private JPanel pDiagnosis;
+    private JButton btnSaveDiag;
+    private JRadioButton rdbtnMain;
+    private JRadioButton rdbtnSoput;
+    private JRadioButton rdbtnOsl;
+    private JTextField tfDiagShablonFilter;
+    private ThriftIntegerClassifierList lDiagShablonNames;
+    private CustomTable<TDiagnosis, TDiagnosis._Fields> tbDiag;
+    private JScrollPane spDiag;
+    private JButton btnAddDiag;
+    private JButton btnDelDiag;
+    private JLabel lblDiagMedOp;
+    private JTextArea taDiagMedOp;
+    private JPanel pDiagTypes;
+    private JButton btnDiagShablonFilter;
+    private JScrollPane spDiagShablonNames;
+    private Component hzstMainDiagSopDiag;
+    private Component hzstSopDiagOslDiag;
+    private JScrollPane scrollPane;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -769,6 +795,121 @@ public class MainFrame extends JFrame {
     private void setDiagnosisPanel() {
         pDiagnosis = new JPanel();
         tabbedPane.addTab("Диагнозы", null, pDiagnosis, null);
+        setDiagnosisShablonComponents();
+        setDiagnosisTable();
+        setDiagnosisTextArea();
+        setDiagnosisRadioButtons();
+        setDiagnosisPanelGroupLayout();
+    }
+
+    private void setDiagnosisShablonComponents() {
+        tfDiagShablonFilter = new JTextField();
+        tfDiagShablonFilter.setColumns(10);
+
+        spDiagShablonNames = new JScrollPane();
+        lDiagShablonNames = new ThriftIntegerClassifierList();
+        lDiagShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        spDiagShablonNames.setViewportView(lDiagShablonNames);
+
+        btnDiagShablonFilter = new JButton("Выбрать");
+    }
+
+    private void setDiagnosisTable() {
+        setDiagTable();
+        setDiagTableControlButtons();
+    }
+
+    private void setDiagTableControlButtons() {
+        btnAddDiag = new JButton();
+        btnAddDiag.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                addDiagnosisToTable(ClientHospital.conMan.showMkbTreeForm("Диагноз", ""));
+            }
+        });
+        btnAddDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+
+        btnDelDiag = new JButton();
+        btnDelDiag.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    if (tbDiag.getSelectedItem() != null) {
+                        int opResult = JOptionPane.showConfirmDialog(
+                            btnDelDiag, "Удалить диагноз?",
+                            "Удаление диагноза", JOptionPane.YES_NO_OPTION);
+                        if (opResult == JOptionPane.YES_OPTION) {
+                            ClientHospital.tcl.deleteDiagnosis(tbDiag.getSelectedItem().getId());
+                            tbDiag.setData(
+                                ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
+                        }
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientHospital.conMan.reconnect(e1);
+                } catch (DiagnosisNotFoundException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        btnDelDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
+
+        btnSaveDiag = new JButton();
+        btnSaveDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
+    }
+
+    private void addDiagnosisToTable(final StringClassifier curDiagnosis) {
+        try {
+            if ((curDiagnosis != null) && (patient != null)) {
+                TDiagnosis diag = new TDiagnosis();
+                diag.setIdGosp(patient.getGospitalCod());
+                diag.setCod(curDiagnosis.getPcod());
+                diag.setDateUstan(System.currentTimeMillis());
+                diag.setVrach(doctorAuth.getPcod());
+                diag.setDiagName(curDiagnosis.getName());
+                diag.setId(ClientHospital.tcl.addDiagnosis(diag));
+                tbDiag.addItem(diag);
+            }
+        } catch (KmiacServerException e1) {
+            e1.printStackTrace();
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
+        }
+    }
+
+    private void setDiagTable() {
+        spDiag = new JScrollPane();
+        tbDiag = new CustomTable<TDiagnosis, TDiagnosis._Fields>(
+            false, true, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
+        tbDiag.setBorder(new LineBorder(new Color(0, 0, 0)));
+        spDiag.setViewportView(tbDiag);
+    }
+
+    private void setDiagnosisTextArea() {
+        lblDiagMedOp = new JLabel("Медицинское описание диагноза");
+    }
+
+    private void setDiagnosisRadioButtons() {
+        pDiagTypes = new JPanel();
+        pDiagTypes.setBorder(new LineBorder(new Color(0, 0, 0)));
+        pDiagTypes.setLayout(new BoxLayout(pDiagTypes, BoxLayout.X_AXIS));
+
+        rdbtnMain = new JRadioButton("Основной");
+        pDiagTypes.add(rdbtnMain);
+
+        hzstMainDiagSopDiag = Box.createHorizontalStrut(150);
+        pDiagTypes.add(hzstMainDiagSopDiag);
+
+        rdbtnSoput = new JRadioButton("Сопутствующий");
+        pDiagTypes.add(rdbtnSoput);
+
+        hzstSopDiagOslDiag = Box.createHorizontalStrut(150);
+        pDiagTypes.add(hzstSopDiagOslDiag);
+
+        rdbtnOsl = new JRadioButton("Осложнение основного");
+        pDiagTypes.add(rdbtnOsl);
     }
 
 ////////////////////////////////////////// CAUTION! ///////////////////////////////////////////////
@@ -1019,5 +1160,89 @@ public class MainFrame extends JFrame {
                     .addContainerGap())
         );
         pLifeHistory.setLayout(glPLifeHistory);
+    }
+
+    private void setDiagnosisPanelGroupLayout() {
+
+        scrollPane = new JScrollPane();
+        GroupLayout glPDiagnosis = new GroupLayout(pDiagnosis);
+        glPDiagnosis.setHorizontalGroup(
+            glPDiagnosis.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPDiagnosis.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
+                        .addComponent(lblDiagMedOp)
+                        .addGroup(glPDiagnosis.createSequentialGroup()
+                            .addGroup(glPDiagnosis.createParallelGroup(Alignment.TRAILING, false)
+                                .addComponent(pDiagTypes, Alignment.LEADING,
+                                        GroupLayout.PREFERRED_SIZE, 635, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(scrollPane, Alignment.LEADING,
+                                        GroupLayout.PREFERRED_SIZE, 635, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spDiag, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
+                                        635, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING, false)
+                                .addComponent(btnAddDiag, GroupLayout.PREFERRED_SIZE,
+                                        52, Short.MAX_VALUE)
+                                .addComponent(btnSaveDiag, GroupLayout.PREFERRED_SIZE,
+                                        52, Short.MAX_VALUE)
+                                .addComponent(btnDelDiag, 0, 0, Short.MAX_VALUE))
+                            .addGap(9)
+                            .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
+                                .addGroup(glPDiagnosis.createSequentialGroup()
+                                    .addComponent(tfDiagShablonFilter, GroupLayout.DEFAULT_SIZE,
+                                            276, Short.MAX_VALUE)
+                                    .addGap(6)
+                                    .addComponent(btnDiagShablonFilter, GroupLayout.PREFERRED_SIZE,
+                                            90, GroupLayout.PREFERRED_SIZE)
+                                    .addGap(10))
+                                .addGroup(glPDiagnosis.createSequentialGroup()
+                                    .addComponent(spDiagShablonNames, GroupLayout.DEFAULT_SIZE, 377,
+                                            Short.MAX_VALUE)
+                                    .addGap(5)))))
+                    .addGap(0))
+        );
+        glPDiagnosis.setVerticalGroup(
+            glPDiagnosis.createParallelGroup(Alignment.LEADING)
+                .addGroup(glPDiagnosis.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPDiagnosis.createSequentialGroup()
+                            .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
+                                .addGroup(glPDiagnosis.createSequentialGroup()
+                                    .addGap(1)
+                                    .addComponent(tfDiagShablonFilter, GroupLayout.PREFERRED_SIZE,
+                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnDiagShablonFilter))
+                            .addGap(6)
+                            .addComponent(spDiagShablonNames, GroupLayout.DEFAULT_SIZE, 488,
+                                    Short.MAX_VALUE)
+                            .addContainerGap())
+                        .addGroup(glPDiagnosis.createSequentialGroup()
+                            .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING, false)
+                                .addGroup(glPDiagnosis.createSequentialGroup()
+                                    .addComponent(btnAddDiag, GroupLayout.PREFERRED_SIZE, 54,
+                                            GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(btnDelDiag, GroupLayout.PREFERRED_SIZE, 54,
+                                            GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(btnSaveDiag, GroupLayout.PREFERRED_SIZE, 54,
+                                            GroupLayout.PREFERRED_SIZE))
+                                .addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 299,
+                                        GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lblDiagMedOp)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(pDiagTypes, GroupLayout.PREFERRED_SIZE, 28,
+                                    GroupLayout.PREFERRED_SIZE)
+                            .addGap(75))))
+        );
+        taDiagMedOp = new JTextArea();
+        scrollPane.setViewportView(taDiagMedOp);
+        taDiagMedOp.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        pDiagnosis.setLayout(glPDiagnosis);
     }
 }

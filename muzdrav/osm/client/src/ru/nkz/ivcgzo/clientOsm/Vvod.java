@@ -149,8 +149,8 @@ public class Vvod extends JFrame {
 	private AnamZab anamZab;
 	public static Pvizit pvizit;
 	private PdiagAmb diagamb;
-	private PdiagZ pdiag;
-	private Pdisp pdisp;
+	public static PdiagZ pdiag;
+	public static Pdisp pdisp;
 	
 	private FormSign sign;
 	private FormPostBer postber;

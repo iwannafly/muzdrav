@@ -582,6 +582,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_s00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
@@ -605,9 +607,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Выгрузка для Кемерово по диспансеризации беременных*/
-        void getRdPatient(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-        void getRdVizit(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-        void getRdConVizit(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+        list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
+        list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
+        list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
 /*Shablon*/
 	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
