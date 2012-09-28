@@ -12,7 +12,6 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeSelectionModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
@@ -36,10 +35,6 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
 import javax.swing.JCheckBox;
-<<<<<<< HEAD
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-=======
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 
 import ru.nkz.ivcgzo.configuration;
@@ -48,7 +43,6 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
->>>>>>> fa64ae36aa912c23df8ff3c7649cbe60be263b7c
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -94,7 +88,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Статистика");
-		frame.setBounds(100, 100, 950, 700);
+		frame.setBounds(100, 100, 821, 651);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -105,18 +99,18 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 211, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 207, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(scrollPane_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
-						.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(scrollPane_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
+						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		
@@ -171,42 +165,8 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 							.addComponent(label))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-<<<<<<< HEAD
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(18)
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
-										.addGroup(gl_panel.createSequentialGroup()
-											.addComponent(label_1)
-											.addGap(12)
-											.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-											.addGap(18)
-											.addComponent(label_2)
-											.addGap(18)
-											.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(26)
-									.addComponent(label_3)
-									.addGap(18)
-									.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addContainerGap()
-									.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 231, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(23)
-									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-										.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
-										.addComponent(button)))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(48)
-									.addComponent(label)))
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(42)
-=======
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGap(19)
->>>>>>> fa64ae36aa912c23df8ff3c7649cbe60be263b7c
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_panel.createSequentialGroup()
 											.addComponent(lblNewLabel)
@@ -221,23 +181,6 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 											.addGap(18)
 											.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 								.addGroup(gl_panel.createSequentialGroup()
-<<<<<<< HEAD
-									.addGap(41)
-									.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
-					.addContainerGap(137, Short.MAX_VALUE))
-		);
-		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(label)
-							.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_2)
-								.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-=======
 									.addGap(27)
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 										.addComponent(panel_zab, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
@@ -264,32 +207,15 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 						.addComponent(panel_sv, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
->>>>>>> fa64ae36aa912c23df8ff3c7649cbe60be263b7c
 								.addComponent(label_1)
 								.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(label_2)
 								.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-<<<<<<< HEAD
-								.addComponent(label_3)
-								.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(13))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(25)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator, GroupLayout.PREFERRED_SIZE, 2, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)
-							.addGap(18))
-=======
 								.addComponent(lblNewLabel)
 								.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
->>>>>>> fa64ae36aa912c23df8ff3c7649cbe60be263b7c
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(29)
 							.addComponent(panel_pr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -473,21 +399,15 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		textField_2 = new JTextField();
 		textField_2.setColumns(10);
 		
-		final JTree tree = new JTree();
+		JTree tree = new JTree();
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
-				if(tree.getLastSelectedPathComponent().toString().equals("Табель работы врача"))
-				{
-					tableVrach tableVrach = new tableVrach();
-					tableVrach.frameVr.setVisible(true); 
-					tableVrach.frameVr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				}
-
+		 			if (lastPath.toString() ==  "Факторы, влияющие на состояние здоровья");
+		 			JOptionPane.showMessageDialog(frame, "juerhyweutr");
 	
 			}
 		});
-		
 		tree.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Выходные формы") {
 				{
@@ -495,7 +415,6 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 					DefaultMutableTreeNode node_2;
 					DefaultMutableTreeNode node_3;
 					node_1 = new DefaultMutableTreeNode("Поликлиника");
-						node_1.add(new DefaultMutableTreeNode("Табель работы врача"));
 						node_2 = new DefaultMutableTreeNode("Регламентные формы");
 							node_3 = new DefaultMutableTreeNode("Отчеты по форме 025");
 								node_3.add(new DefaultMutableTreeNode("Сводная ведомость учета зарегистрированных заболеваний"));
@@ -548,11 +467,8 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 			}
 		));
 		tree.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-				
 		scrollPane.setViewportView(tree);
 		frame.getContentPane().setLayout(groupLayout);
-		
-		
 	}
 
 	@Override
