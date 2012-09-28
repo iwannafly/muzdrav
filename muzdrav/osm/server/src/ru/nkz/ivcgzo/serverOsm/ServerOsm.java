@@ -42,6 +42,7 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
+import ru.nkz.ivcgzo.thriftOsm.Pobost;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
@@ -131,6 +132,8 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
+	private final TResultSetMapper<Pobost, Pobost._Fields> rsmPobost;
+	private final Class<?>[] pobostTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -212,6 +215,9 @@ public class ServerOsm extends Server implements Iface {
 	
 		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "id_pdiag",    "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",       "id_pvizit",   "id_pos",      "name_pmer");
 		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
+
+		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz");
+		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class};
 
 	}
 
@@ -2106,8 +2112,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 	
 	@Override
-	public List<Pmer> getPmer(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.npasp = ?", npasp)) {
+	public List<Pmer> getPmer(int npasp, String diag) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.npasp = ? and diag = ?", npasp, diag)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2262,6 +2268,67 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		return rsmStrClas.mapToList(acrs.getResultSet());
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}
+	}
+
+
+	@Override
+	public List<Pobost> getPobost(int npasp, String diag)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_obost where npasp = ? and diag = ?", npasp, diag)) {
+			return rsmPobost.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+
+	}
+
+	@Override
+	public int AddPobost(Pobost pbst) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into p_obost (npasp, id_pdiag, diag, sl_obostr, sl_hron, cod_sp, cdol, dataz) values (?, ?, ?, ?, ?, ?, ?, ?) ", true, pbst, pobostTypes, 1, 2, 3, 4, 5, 6, 7, 8);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+
+	}
+
+	@Override
+	public void UpdatePobost(Pobost pbst) throws KmiacServerException,
+			TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("update p_obost set sl_obostr = ?, sl_hron = ? where id = ? ", false, pbst, pmerTypes, 4, 5, 0);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+			
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+		
+	}
+
+	@Override
+	public void DeletePobost(int pobost_id) throws KmiacServerException, TException{
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPrepared("delete from p_obost where id = ? ", false, pobost_id);
+		sme.setCommit();
+	} catch (SQLException e) {
+		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	} catch (InterruptedException e1) {
+		e1.printStackTrace();
 		throw new KmiacServerException();
 	}
 	}

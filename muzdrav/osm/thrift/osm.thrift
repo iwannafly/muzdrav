@@ -488,6 +488,18 @@ struct Pmer{
 	15: string name_pmer;
 }
 
+struct Pobost{
+	1: i32 id;
+	2: i32 npasp;
+	3: i32 id_pdiag;
+	4: string diag;
+	5: i32 sl_obostr;
+	6: i32 sl_hron;
+	7: i32 cod_sp;
+	8: string cdol;
+	9: i64 dataz;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -619,8 +631,15 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispMer*/
-	list<Pmer> getPmer (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pmer> getPmer (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePmer(1: i32 pmer_id) throws (1: kmiacServer.KmiacServerException kse);
+
+/*Disp_sl_obostr*/
+	list<Pobost> getPobost (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePobost(1: i32 pobost_id) throws (1: kmiacServer.KmiacServerException kse);
+
 }
