@@ -12,6 +12,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeSelectionModel;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.LineBorder;
@@ -33,6 +34,10 @@ import javax.swing.JToggleButton;
 import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
 import javax.swing.JCheckBox;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainForm {
 
@@ -72,7 +77,7 @@ public class MainForm {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setTitle("Статистика");
-		frame.setBounds(100, 100, 821, 651);
+		frame.setBounds(100, 100, 950, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -83,18 +88,18 @@ public class MainForm {
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 207, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 211, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(scrollPane_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
-						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(scrollPane_1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+						.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		
@@ -164,35 +169,34 @@ public class MainForm {
 							.addComponent(separator, GroupLayout.PREFERRED_SIZE, 483, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-									.addGroup(gl_panel.createSequentialGroup()
-										.addGap(49)
-										.addComponent(label))
-									.addGroup(gl_panel.createSequentialGroup()
-										.addGap(18)
-										.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-											.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
-											.addGroup(gl_panel.createSequentialGroup()
-												.addComponent(label_1)
-												.addGap(12)
-												.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-												.addGap(18)
-												.addComponent(label_2)
-												.addGap(18)
-												.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-									.addGroup(gl_panel.createSequentialGroup()
-										.addGap(26)
-										.addComponent(label_3)
-										.addGap(18)
-										.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(18)
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
+										.addGroup(gl_panel.createSequentialGroup()
+											.addComponent(label_1)
+											.addGap(12)
+											.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+											.addGap(18)
+											.addComponent(label_2)
+											.addGap(18)
+											.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(26)
+									.addComponent(label_3)
+									.addGap(18)
+									.addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel.createSequentialGroup()
 									.addContainerGap()
 									.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 231, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(43)
+									.addGap(23)
 									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 										.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
-										.addComponent(button))))
+										.addComponent(button)))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(48)
+									.addComponent(label)))
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGap(42)
@@ -206,16 +210,16 @@ public class MainForm {
 								.addGroup(gl_panel.createSequentialGroup()
 									.addGap(41)
 									.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
-					.addContainerGap(68, Short.MAX_VALUE))
+					.addContainerGap(137, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+			gl_panel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(label)
-							.addPreferredGap(ComponentPlacement.UNRELATED, 11, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(label_2)
 								.addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -232,8 +236,8 @@ public class MainForm {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(separator, GroupLayout.PREFERRED_SIZE, 2, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)
 							.addGap(18))
 						.addGroup(gl_panel.createSequentialGroup()
@@ -414,15 +418,21 @@ public class MainForm {
 		panel_1.setLayout(gl_panel_1);
 		panel.setLayout(gl_panel);
 		
-		JTree tree = new JTree();
+		final JTree tree = new JTree();
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
-		 			if (lastPath.toString() ==  "Факторы, влияющие на состояние здоровья");
-		 			JOptionPane.showMessageDialog(frame, "juerhyweutr");
+				if(tree.getLastSelectedPathComponent().toString().equals("Табель работы врача"))
+				{
+					tableVrach tableVrach = new tableVrach();
+					tableVrach.frameVr.setVisible(true); 
+					tableVrach.frameVr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}
+
 	
 			}
 		});
+		
 		tree.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Выходные формы") {
 				{
@@ -430,6 +440,7 @@ public class MainForm {
 					DefaultMutableTreeNode node_2;
 					DefaultMutableTreeNode node_3;
 					node_1 = new DefaultMutableTreeNode("Поликлиника");
+						node_1.add(new DefaultMutableTreeNode("Табель работы врача"));
 						node_2 = new DefaultMutableTreeNode("Регламентные формы");
 							node_3 = new DefaultMutableTreeNode("Отчеты по форме 025");
 								node_3.add(new DefaultMutableTreeNode("Сводная ведомость учета зарегистрированных заболеваний"));
@@ -482,7 +493,10 @@ public class MainForm {
 			}
 		));
 		tree.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+				
 		scrollPane.setViewportView(tree);
 		frame.getContentPane().setLayout(groupLayout);
+		
+		
 	}
 }
