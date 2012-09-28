@@ -16,9 +16,9 @@ import java.awt.Font;
 
 public class Period {
 
-	private JFrame frame;
-	private CustomDateEditor textField;
-	private CustomDateEditor textField_1;
+    private JFrame frame;
+    private CustomDateEditor textField;
+    private CustomDateEditor textField_1;
 
 
 	/**
@@ -51,30 +51,30 @@ public class Period {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
+
 		JButton btnNewButton = new JButton("Выполнить");
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
-		
+
 		JButton btnNewButton_1 = new JButton("Выход");
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);	
+				frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 			}
 		});
-		
+
 		JLabel lblNewLabel = new JLabel("Задайте период");
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 14));
-		
+
 		JLabel lblNewLabel_1 = new JLabel("с");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 12));
-		
+
 		JLabel lblNewLabel_2 = new JLabel("по");
 		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD, 12));
-		
+
 		textField = new  CustomDateEditor();
 		textField.setColumns(10);
-		
+
 		textField_1 = new CustomDateEditor();
 		textField_1.setColumns(10);
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -124,8 +124,8 @@ public class Period {
 
 	public void setVisible(boolean value) {
 		frame.setVisible(value);
-		
+
 	}
 
-	
+
 }
