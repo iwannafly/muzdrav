@@ -49,22 +49,17 @@ import java.awt.event.ActionEvent;
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
 	private JFrame frame;
-<<<<<<< HEAD
-	private CustomDateEditor t_datn;
-	private CustomDateEditor t_datk;
-	private JTextField t_nuch;
-	private JTextField t_godrog;
-	private JTextField t_godotch;
-=======
-	private JTextField tfDataB;
-	private JTextField tfDataF;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
 	
 	public static ThriftOutputInfo.Client tcl;
 	public Input_info inputInfo;
->>>>>>> 8a627a268264ce734981c652749e1a13827bb373
+	private JTextField t_datn;
+	private JTextField t_datk;
+	private JTextField t_nuch;
+	private JTextField tgodrog;
+	private JTextField t_godotch;
 
 	/**
 	 * Launch the application.
@@ -120,358 +115,289 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		);
 		
 		JPanel panel = new JPanel();
-		scrollPane_1.setViewportView(panel);
-		
-		
+		scrollPane_1.setRowHeaderView(panel);
 		
 		JLabel label = new JLabel("Период формирования");
 		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel label_1 = new JLabel("с");
-		label_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel label_2 = new JLabel("по");
-		label_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-<<<<<<< HEAD
 		t_datn = new CustomDateEditor();
 		t_datn.setColumns(10);
 		
 		t_datk = new CustomDateEditor();
 		t_datk.setColumns(10);
-=======
-		tfDataB = new JTextField();
-		tfDataB.setColumns(10);
 		
-		tfDataF = new JTextField();
-		tfDataF.setColumns(10);
->>>>>>> 8a627a268264ce734981c652749e1a13827bb373
+		JLabel lblNewLabel = new JLabel("Номер участка");
 		
-		JSeparator separator = new JSeparator();
-		
-		final JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0412\u043E\u0437\u0440\u0430\u0441\u0442\u043D\u044B\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		final JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Дети до 14 лет");
-		
-		final JRadioButton rdbtnNewRadioButton_2 = new JRadioButton("Подростки 15-18 лет");
-		
-		final JRadioButton rdbtnNewRadioButton_3 = new JRadioButton("Взрослые");
-		ButtonGroup GBox1 = new ButtonGroup();
-		panel_1.add(rdbtnNewRadioButton_1);
-		panel_1.add(rdbtnNewRadioButton_2);
-		panel_1.add(rdbtnNewRadioButton_3);
-		GBox1.add(rdbtnNewRadioButton_1);
-		GBox1.add(rdbtnNewRadioButton_2);
-		GBox1.add(rdbtnNewRadioButton_3);
-		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		JPanel panel_3 = new JPanel();
-		panel_3.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		JLabel label_3 = new JLabel("Номер участка");
-		
-<<<<<<< HEAD
 		t_nuch = new JTextField();
 		t_nuch.setColumns(10);
-=======
+		
+		JPanel panel_sv = new JPanel();
+		panel_sv.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0421\u0432\u043E\u0434\u043A\u0438", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_vozr = new JPanel();
+		panel_vozr.setBorder(new TitledBorder(null, "\u0412\u043E\u0437\u0440\u0430\u0441\u0442\u043D\u044B\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_pr = new JPanel();
+		panel_pr.setBorder(new TitledBorder(null, "\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u043B\u0435\u043D\u0438\u0435", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_zab = new JPanel();
+		panel_zab.setBorder(new TitledBorder(null, "\u0417\u0430\u0431\u043E\u043B\u0435\u0432\u0430\u043D\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_disp = new JPanel();
+		panel_disp.setBorder(new TitledBorder(null, "\u0414\u0438\u0441\u043F\u0430\u043D\u0441\u0435\u0440\u0438\u0437\u0430\u0446\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new TitledBorder(null, "\u0413\u043E\u0434\u043E\u0432\u043E\u0439 \u043E\u0442\u0447\u0435\u0442", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
 		JButton button = new JButton("Выполнить");
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				inputInfo.setDateb(tfDataB.getText());
-				inputInfo.setDatef(tfDataF.getText());
-				if (rdbtnNewRadioButton_1.isSelected()) inputInfo.vozcat="det";
-				else if (rdbtnNewRadioButton_2.isSelected()) inputInfo.vozcat="pod";
-				else if (rdbtnNewRadioButton_3.isSelected()) inputInfo.vozcat="vzr";
-			}
-		});
-		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
->>>>>>> 8a627a268264ce734981c652749e1a13827bb373
-		
-		JPanel panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "\u0417\u0430\u0431\u043E\u043B\u0435\u0432\u0430\u043D\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0414\u0438\u0441\u043F\u0430\u043D\u0441\u0435\u0440\u0438\u0437\u0430\u0446\u0438\u044F", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new TitledBorder(null, "\u0413\u043E\u0434\u043E\u0432\u043E\u0439 \u043E\u0442\u0447\u0435\u0442", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		button.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(separator, GroupLayout.PREFERRED_SIZE, 483, GroupLayout.PREFERRED_SIZE))
+							.addGap(28)
+							.addComponent(label))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-									.addGroup(gl_panel.createSequentialGroup()
-										.addGap(49)
-										.addComponent(label))
-									.addGroup(gl_panel.createSequentialGroup()
-										.addGap(18)
-										.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-											.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE)
-											.addGroup(gl_panel.createSequentialGroup()
-												.addComponent(label_1)
-												.addGap(12)
-<<<<<<< HEAD
-												.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-												.addGap(18)
-												.addComponent(label_2)
-												.addGap(18)
-												.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-=======
-												.addComponent(tfDataB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-												.addGap(18)
-												.addComponent(label_2)
-												.addGap(18)
-												.addComponent(tfDataF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
->>>>>>> 8a627a268264ce734981c652749e1a13827bb373
-									.addGroup(gl_panel.createSequentialGroup()
-										.addGap(26)
-										.addComponent(label_3)
-										.addGap(18)
-										.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 								.addGroup(gl_panel.createSequentialGroup()
-									.addContainerGap()
-									.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 231, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(43)
-									.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-										.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 210, GroupLayout.PREFERRED_SIZE)
-										.addComponent(button))))
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(42)
+									.addGap(19)
 									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_panel.createSequentialGroup()
-											.addGap(34)
-											.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 214, GroupLayout.PREFERRED_SIZE))
+											.addComponent(lblNewLabel)
+											.addGap(32)
+											.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 										.addGroup(gl_panel.createSequentialGroup()
-											.addGap(7)
-											.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE))))
+											.addComponent(label_1)
+											.addGap(18)
+											.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+											.addGap(18)
+											.addComponent(label_2)
+											.addGap(18)
+											.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 								.addGroup(gl_panel.createSequentialGroup()
-									.addGap(41)
-									.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
-					.addContainerGap(68, Short.MAX_VALUE))
+									.addGap(27)
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(panel_zab, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+										.addComponent(panel_vozr, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+							.addGap(46)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(panel_disp, GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE)
+								.addComponent(panel_pr, 0, 0, Short.MAX_VALUE)
+								.addComponent(panel_sv, GroupLayout.DEFAULT_SIZE, 210, Short.MAX_VALUE))))
+					.addGap(178))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(248)
+					.addComponent(button)
+					.addContainerGap(390, Short.MAX_VALUE))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(label)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_sv, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(label)
-							.addPreferredGap(ComponentPlacement.UNRELATED, 11, Short.MAX_VALUE)
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(label_1)
+								.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(label_2)
-<<<<<<< HEAD
-								.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(label_1)
-								.addComponent(t_datn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-=======
-								.addComponent(tfDataF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(label_1)
-								.addComponent(tfDataB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
->>>>>>> 8a627a268264ce734981c652749e1a13827bb373
+								.addComponent(t_datk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGap(18)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(label_3)
-								.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(13))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(25)
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator, GroupLayout.PREFERRED_SIZE, 2, GroupLayout.PREFERRED_SIZE)
-					.addGap(18)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)
-							.addGap(18))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
-							.addGap(39)))
+								.addComponent(lblNewLabel)
+								.addComponent(t_nuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
-							.addGap(49)
-							.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
-							.addGap(57)
-							.addComponent(button))
-						.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(108))
-		);
-		
-		JCheckBox chckbxNewCheckBox = new JCheckBox(" Таблица 1000");
-		
-		JCheckBox checkBox = new JCheckBox(" Таблица 2000");
-		
-		JCheckBox checkBox_1 = new JCheckBox(" Таблица 3000");
-		
-		JCheckBox chckbxNewCheckBox_1 = new JCheckBox(" Таблица 4000");
-		GroupLayout gl_panel_6 = new GroupLayout(panel_6);
-		gl_panel_6.setHorizontalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_6.createSequentialGroup()
-					.addGroup(gl_panel_6.createParallelGroup(Alignment.LEADING)
-						.addComponent(chckbxNewCheckBox)
-						.addComponent(checkBox)
-						.addComponent(checkBox_1)
-						.addComponent(chckbxNewCheckBox_1))
-					.addContainerGap(97, Short.MAX_VALUE))
-		);
-		gl_panel_6.setVerticalGroup(
-			gl_panel_6.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_6.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(chckbxNewCheckBox)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(checkBox)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(checkBox_1)
-					.addPreferredGap(ComponentPlacement.RELATED, 2, Short.MAX_VALUE)
-					.addComponent(chckbxNewCheckBox_1))
-		);
-		panel_6.setLayout(gl_panel_6);
-		
-		JLabel lblNewLabel = new JLabel("Год рождения");
-		
-		JLabel label_4 = new JLabel("Отчетный год");
-		
-		t_godrog = new JTextField();
-		t_godrog.setColumns(10);
-		
-		t_godotch = new JTextField();
-		t_godotch.setColumns(10);
-		GroupLayout gl_panel_5 = new GroupLayout(panel_5);
-		gl_panel_5.setHorizontalGroup(
-			gl_panel_5.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_5.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_5.createSequentialGroup()
-							.addComponent(lblNewLabel)
+							.addGap(29)
+							.addComponent(panel_pr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(18)
-							.addComponent(t_godrog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_5.createSequentialGroup()
-							.addComponent(label_4)
-							.addGap(18)
-							.addComponent(t_godotch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addComponent(panel_vozr, GroupLayout.PREFERRED_SIZE, 97, GroupLayout.PREFERRED_SIZE)))
+					.addGap(30)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_disp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_zab, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE))
+					.addGap(38)
+					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 132, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+					.addComponent(button)
+					.addContainerGap())
 		);
-		gl_panel_5.setVerticalGroup(
-			gl_panel_5.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_5.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNewLabel)
-						.addComponent(t_godrog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-						.addComponent(label_4)
-						.addComponent(t_godotch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(13, Short.MAX_VALUE))
-		);
-		panel_5.setLayout(gl_panel_5);
 		
-		JRadioButton radioButton_2 = new JRadioButton("по нозологиям");
+		JCheckBox ch_tab1000 = new JCheckBox("Таблица 1000");
 		
-		JRadioButton rdbtnNewRadioButton_5 = new JRadioButton("по группам заболеваний");
-		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
-		gl_panel_4.setHorizontalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addComponent(radioButton_2)
-						.addComponent(rdbtnNewRadioButton_5))
-					.addContainerGap(86, Short.MAX_VALUE))
-		);
-		gl_panel_4.setVerticalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addComponent(radioButton_2)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(rdbtnNewRadioButton_5)
-					.addContainerGap(19, Short.MAX_VALUE))
-		);
-		panel_4.setLayout(gl_panel_4);
+		JCheckBox ch_tab2000 = new JCheckBox("Таблица 2000");
 		
-		JRadioButton radioButton = new JRadioButton("по обратившимся всего");
+		JCheckBox ch_tab3000 = new JCheckBox("Таблица 3000");
 		
-		JRadioButton radioButton_1 = new JRadioButton("по приклепленным к поликлинике");
-		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
-		gl_panel_3.setHorizontalGroup(
-			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_3.createSequentialGroup()
-					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-						.addComponent(radioButton)
-						.addComponent(radioButton_1))
-					.addContainerGap(54, Short.MAX_VALUE))
-		);
-		gl_panel_3.setVerticalGroup(
-			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_3.createSequentialGroup()
-					.addComponent(radioButton)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(radioButton_1)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		panel_3.setLayout(gl_panel_3);
-		
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("по дате посещения");
-		
-		JRadioButton rdbtnNewRadioButton_4 = new JRadioButton("по дате записи в базу");
-		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
-		gl_panel_2.setHorizontalGroup(
-			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_2.createSequentialGroup()
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addComponent(rdbtnNewRadioButton)
-						.addComponent(rdbtnNewRadioButton_4))
-					.addContainerGap(81, Short.MAX_VALUE))
-		);
-		gl_panel_2.setVerticalGroup(
-			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_2.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(rdbtnNewRadioButton)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(rdbtnNewRadioButton_4)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-		);
-		panel_2.setLayout(gl_panel_2);
-		
-
+		JCheckBox ch_tab4000 = new JCheckBox("Таблица 4000");
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addComponent(rdbtnNewRadioButton_3)
-						.addComponent(rdbtnNewRadioButton_2)
-						.addComponent(rdbtnNewRadioButton_1))
-					.addContainerGap(73, Short.MAX_VALUE))
+						.addComponent(ch_tab1000)
+						.addComponent(ch_tab2000)
+						.addComponent(ch_tab3000)
+						.addComponent(ch_tab4000))
+					.addContainerGap(153, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addComponent(rdbtnNewRadioButton_1)
-					.addGap(3)
-					.addComponent(rdbtnNewRadioButton_2)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(rdbtnNewRadioButton_3)
-					.addContainerGap(23, Short.MAX_VALUE))
+					.addContainerGap()
+					.addComponent(ch_tab1000)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(ch_tab2000)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(ch_tab3000)
+					.addPreferredGap(ComponentPlacement.RELATED, 3, Short.MAX_VALUE)
+					.addComponent(ch_tab4000))
 		);
 		panel_1.setLayout(gl_panel_1);
+		
+		JLabel label_3 = new JLabel("Год рождения");
+		
+		JLabel label_4 = new JLabel("Отчетный год");
+		
+		tgodrog = new JTextField();
+		tgodrog.setColumns(10);
+		
+		t_godotch = new JTextField();
+		t_godotch.setColumns(10);
+		GroupLayout gl_panel_disp = new GroupLayout(panel_disp);
+		gl_panel_disp.setHorizontalGroup(
+			gl_panel_disp.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_disp.createSequentialGroup()
+					.addGroup(gl_panel_disp.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_disp.createSequentialGroup()
+							.addComponent(label_3)
+							.addGap(18)
+							.addComponent(tgodrog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_disp.createSequentialGroup()
+							.addComponent(label_4)
+							.addGap(18)
+							.addComponent(t_godotch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(17, Short.MAX_VALUE))
+		);
+		gl_panel_disp.setVerticalGroup(
+			gl_panel_disp.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_disp.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_disp.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_3)
+						.addComponent(tgodrog, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+					.addGroup(gl_panel_disp.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label_4)
+						.addComponent(t_godotch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		);
+		panel_disp.setLayout(gl_panel_disp);
+		
+		JRadioButton rb_nozol = new JRadioButton("по нозологиям");
+		
+		JRadioButton rb_grzab = new JRadioButton("по группам заболеваний");
+		GroupLayout gl_panel_zab = new GroupLayout(panel_zab);
+		gl_panel_zab.setHorizontalGroup(
+			gl_panel_zab.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_zab.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_zab.createParallelGroup(Alignment.LEADING)
+						.addComponent(rb_nozol)
+						.addComponent(rb_grzab))
+					.addContainerGap(64, Short.MAX_VALUE))
+		);
+		gl_panel_zab.setVerticalGroup(
+			gl_panel_zab.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_zab.createSequentialGroup()
+					.addComponent(rb_nozol)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(rb_grzab)
+					.addContainerGap())
+		);
+		panel_zab.setLayout(gl_panel_zab);
+		
+		JRadioButton rb_obrativ = new JRadioButton("по обратившимся всего");
+		
+		JRadioButton rb_prikrep = new JRadioButton("по прикрепленным к поликлинике");
+		GroupLayout gl_panel_pr = new GroupLayout(panel_pr);
+		gl_panel_pr.setHorizontalGroup(
+			gl_panel_pr.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_pr.createSequentialGroup()
+					.addGroup(gl_panel_pr.createParallelGroup(Alignment.LEADING)
+						.addComponent(rb_obrativ)
+						.addComponent(rb_prikrep))
+					.addContainerGap(49, Short.MAX_VALUE))
+		);
+		gl_panel_pr.setVerticalGroup(
+			gl_panel_pr.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_pr.createSequentialGroup()
+					.addComponent(rb_obrativ)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(rb_prikrep))
+		);
+		panel_pr.setLayout(gl_panel_pr);
+		
+		JRadioButton rb_deti = new JRadioButton("Дети до 14 лет");
+		
+		JRadioButton radioButton = new JRadioButton("Подростки 15-18 лет");
+		
+		JRadioButton rb_vzros = new JRadioButton("Взрослые");
+		GroupLayout gl_panel_vozr = new GroupLayout(panel_vozr);
+		gl_panel_vozr.setHorizontalGroup(
+			gl_panel_vozr.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_vozr.createSequentialGroup()
+					.addGroup(gl_panel_vozr.createParallelGroup(Alignment.LEADING)
+						.addComponent(rb_deti)
+						.addComponent(radioButton)
+						.addComponent(rb_vzros))
+					.addContainerGap(48, Short.MAX_VALUE))
+		);
+		gl_panel_vozr.setVerticalGroup(
+			gl_panel_vozr.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_vozr.createSequentialGroup()
+					.addComponent(rb_deti)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(radioButton)
+					.addPreferredGap(ComponentPlacement.RELATED, 1, Short.MAX_VALUE)
+					.addComponent(rb_vzros))
+		);
+		panel_vozr.setLayout(gl_panel_vozr);
+		
+		JRadioButton rb_datpos = new JRadioButton("по дате посещения");
+		
+		JRadioButton rb_datzap = new JRadioButton("по дате записи в базу");
+		GroupLayout gl_panel_sv = new GroupLayout(panel_sv);
+		gl_panel_sv.setHorizontalGroup(
+			gl_panel_sv.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_sv.createSequentialGroup()
+					.addGroup(gl_panel_sv.createParallelGroup(Alignment.LEADING)
+						.addComponent(rb_datpos)
+						.addComponent(rb_datzap))
+					.addContainerGap(69, Short.MAX_VALUE))
+		);
+		gl_panel_sv.setVerticalGroup(
+			gl_panel_sv.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_sv.createSequentialGroup()
+					.addComponent(rb_datpos)
+					.addPreferredGap(ComponentPlacement.RELATED, 1, Short.MAX_VALUE)
+					.addComponent(rb_datzap))
+		);
+		panel_sv.setLayout(gl_panel_sv);
 		panel.setLayout(gl_panel);
+		ButtonGroup GBox1 = new ButtonGroup();
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
 		
 		JTree tree = new JTree();
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
