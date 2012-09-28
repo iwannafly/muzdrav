@@ -3,7 +3,6 @@ package ru.nkz.ivcgzo.serverHospital;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.thrift.TException;
 import org.junit.Before;
@@ -14,9 +13,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
@@ -103,51 +100,30 @@ public class TestServerHospital {
     }
 
     @Test
-    public final void addPatientToDoctor_isActuallyAdded() throws TException {
+    public final void addPatientToDoctor_isActuallyAdded() throws KmiacServerException {
         final int gospId = 8;
         final int doctorId = 45;
         testServer.addPatientToDoctor(gospId, doctorId);
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    public final void getMainDiagnosis_isValueCorrect()
-            throws TException, DiagnosisNotFoundException {
-        final int id = 1;
-        final int gospId = 4;
-        final String diag = "K12.1";
-        final int prizn = 1;
-        final int ustan = 4;
-        final String named = "основной диагноз";
-        final Date dataz = new Date(112, 5, 1);
-        TDiagnosis diagnoz = testServer.getMainDiagnosis(gospId);
-        assertEquals("id", id, diagnoz.getId());
-        assertEquals("id_gosp", gospId, diagnoz.getId_gosp());
-        assertEquals("diag", diag, diagnoz.getDiag());
-        assertEquals("prizn", prizn, diagnoz.getPrizn());
-        assertEquals("ustan", ustan, diagnoz.getUstan());
-        assertEquals("named", named, diagnoz.getNamed());
-        assertEquals("dataz", dataz, new Date(diagnoz.getDataz()));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public final void getAccompDiagnosis_isValueCorrect()
-            throws TException, DiagnosisNotFoundException {
-        final int id = 4;
-        final int gospId = 4;
-        final String diag = "K18.3";
-        final int prizn = 2;
-        final int ustan = 3;
-        final String named = "сопутствующий диагноз";
-        final Date dataz = new Date(112, 5, 1);
-        List<TDiagnosis> diagList = testServer.getAccompDiagnosis(gospId);
-        assertEquals("id", id, diagList.get(0).getId());
-        assertEquals("id_gosp", gospId, diagList.get(0).getId_gosp());
-        assertEquals("diag", diag, diagList.get(0).getDiag());
-        assertEquals("prizn", prizn, diagList.get(0).getPrizn());
-        assertEquals("ustan", ustan, diagList.get(0).getUstan());
-        assertEquals("named", named, diagList.get(0).getNamed());
-        assertEquals("dataz", dataz, new Date(diagList.get(0).getDataz()));
-    }
+//    @SuppressWarnings("deprecation")
+//    @Test
+//    public final void getMainDiagnosis_isValueCorrect()
+//            throws TException, DiagnosisNotFoundException {
+//        final int id = 1;
+//        final int gospId = 4;
+//        final String diag = "K12.1";
+//        final int prizn = 1;
+//        final int ustan = 4;
+//        final String named = "основной диагноз";
+//        final Date dataz = new Date(112, 5, 1);
+//        TDiagnosis diagnoz = testServer.getMainDiagnosis(gospId);
+//        assertEquals("id", id, diagnoz.getId());
+//        assertEquals("id_gosp", gospId, diagnoz.getId_gosp());
+//        assertEquals("diag", diag, diagnoz.getDiag());
+//        assertEquals("prizn", prizn, diagnoz.getPrizn());
+//        assertEquals("ustan", ustan, diagnoz.getUstan());
+//        assertEquals("named", named, diagnoz.getNamed());
+//        assertEquals("dataz", dataz, new Date(diagnoz.getDataz()));
+//    }
 }
