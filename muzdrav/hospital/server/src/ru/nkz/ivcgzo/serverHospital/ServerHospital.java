@@ -336,7 +336,7 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void deleteDiagnosis(final int id) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_diag WHERE id = ?", false, id);
+            sme.execPrepared("DELETE * FROM c_diag WHERE id = ?", false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);

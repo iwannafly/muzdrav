@@ -134,8 +134,8 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		menuBar.add(menu);
 		
-		JMenuBar menuBar_1 = new JMenuBar();
-		menuBar.add(menuBar_1);
+//		JMenuBar menuBar_1 = new JMenuBar();
+//		menuBar.add(menuBar_1);
 	}
 
 	@Override
