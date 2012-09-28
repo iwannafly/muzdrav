@@ -2,6 +2,8 @@ package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -31,6 +33,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
 	public static MainForm instance;
 	private JFrame frame;
+	private JButton btnSelect;
 	private CustomTable<ZapVr, ZapVr._Fields> table;
 	private Vvod vvod;
 	private Timer timer;
@@ -63,8 +66,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		
 		JScrollPane scrollPane = new JScrollPane();
 		
-		JButton btnNewButton = new JButton("Выбор");
-		btnNewButton.addActionListener(new ActionListener() {
+		btnSelect = new JButton("Выбор");
+		btnSelect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (table.getSelectedItem() != null)
@@ -123,7 +126,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSearch)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton)
+							.addComponent(btnSelect)
 							.addGap(18)
 							.addComponent(btnView)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -136,7 +139,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSearch)
-						.addComponent(btnNewButton)
+						.addComponent(btnSelect)
 						.addComponent(btnView)
 						.addComponent(cbzpr))
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -145,6 +148,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		);
 		
 		table = new CustomTable<>(false, true, ZapVr.class, 3,"Фамилия",4, "Имя", 5, "Отчество",6,"Серия полиса",7,"Номер полиса");
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					btnSelect.doClick();
+			}
+		});
 		table.setFillsViewportHeight(true);
 		scrollPane.setViewportView(table);
 		frame.getContentPane().setLayout(groupLayout);

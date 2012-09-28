@@ -183,7 +183,7 @@ public class ShablonForm  extends JDialog {
 		try {
 			String str;
 			String nl = System.lineSeparator();
-			sho = MainForm.tcl.getSh(code);
+			sho = MainForm.tcl.getShOsm(code);
 			
 			str = String.format("Динамика: %s%s", sho.din, nl);
 			str += nl;
@@ -210,6 +210,10 @@ public class ShablonForm  extends JDialog {
 	
 	public Shablon getShablon() {
 		return sho;
+	}
+	
+	public String getSearchString() {
+		return tbSearch.getText();
 	}
 	
 	private class SearchTree extends JTree {
@@ -241,7 +245,7 @@ public class ShablonForm  extends JDialog {
 						
 						try {
 							node.removeAllChildren();
-							for (IntegerClassifier ic : MainForm.tcl.getShByDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, node.getCode()))
+							for (IntegerClassifier ic : MainForm.tcl.getShOsmByDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, node.getCode(), srcStr))
 								node.add(new IntClassTreeNode(ic));
 							((DefaultTreeModel) getModel()).reload(node);
 						} catch (KmiacServerException e) {
@@ -294,12 +298,12 @@ public class ShablonForm  extends JDialog {
 		
 		public void requestUpdate(String srcStr) {
 			timer.stop();
-			this.srcStr = srcStr;
+			this.srcStr = getSearchString(srcStr);
 			timer.start();
 		}
 		
 		public void updateNow(String srcStr) {
-			this.srcStr = srcStr;
+			this.srcStr = getSearchString(srcStr);
 			update();
 		}
 		
@@ -307,15 +311,10 @@ public class ShablonForm  extends JDialog {
 			timer.stop();
 			clearFields();
 			
-			if (srcStr.length() < 3)
-				srcStr = null;
-			else
-				srcStr = '%' + srcStr + '%';
-			
 			try {
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 				
-				for (StringClassifier sc : MainForm.tcl.getShPoiskDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, srcStr)) {
+				for (StringClassifier sc : MainForm.tcl.getShOsmPoiskDiag(MainForm.authInfo.cspec, MainForm.authInfo.cslu, srcStr)) {
 					StrClassTreeNode node = new StrClassTreeNode(sc);
 					
 					node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
@@ -327,6 +326,13 @@ public class ShablonForm  extends JDialog {
 			} catch (TException e) {
 				MainForm.conMan.reconnect(e);
 			}
+		}
+
+		private String getSearchString(String srcStr) {
+			if (srcStr.length() < 3)
+				return null;
+			else
+				return '%' + srcStr + '%';
 		}
 				
 		private class StrClassTreeNode extends DefaultMutableTreeNode {

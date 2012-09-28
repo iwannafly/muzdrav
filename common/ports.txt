@@ -10,8 +10,10 @@ base port + 0	auth
 7	viewSelect
 8	genTalons
 9	outputInfo
-10  	reception
+10	reception
+11	kartaRInv
 12	genReestr
 13	infomat
+14	Vgr
 
 55201	libUpd

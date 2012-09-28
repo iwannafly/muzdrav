@@ -99,6 +99,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		model.fireContentsChanged();
 	}
 	
+	/**
+	 * Получает список данных. 
+	 */
+	public List<StringClassifier> getData() {
+		return items;
+	}
+	
 	private void setFormListeners() {
 		MouseAdapter ma = new MouseAdapter() {
 			@Override

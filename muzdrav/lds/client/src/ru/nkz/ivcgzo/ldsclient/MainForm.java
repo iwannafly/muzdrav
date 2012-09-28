@@ -57,6 +57,12 @@ public class MainForm extends Client<LDSThrift.Client> {
 			public void actionPerformed(ActionEvent arg0) {				
 				winPat.frame.setVisible(true);
 				winPat.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				try {
+					winPat.cBpcisl.setData(ltc.GetKlasS_ot01(authInfo.cpodr));
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				winPat.filtPat();
 				
 			}
@@ -65,8 +71,8 @@ public class MainForm extends Client<LDSThrift.Client> {
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Ввод значений показателей");
 		mnNewMenu.add(mntmNewMenuItem_1);
-		
 		JMenu mnNewMenu_1 = new JMenu("Сервис");
+		mntmNewMenuItem_1.setVisible(false);
 		menuBar.add(mnNewMenu_1);
 
 		
@@ -82,7 +88,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 		
 		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Исправление ошибок");
 		mnNewMenu_1.add(mntmNewMenuItem_3);
-		
+		mntmNewMenuItem_3.setVisible(false);
 	}
 
 	@Override
@@ -127,7 +133,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 				cbrez.setData(MainForm.tcl.getAp0());
 				cbish.setData(MainForm.tcl.getAq0());*/
 
-				winPat.cBpcisl.setData(ltc.GetKlasS_ot01(authInfo.cpodr));
+				
 				//winPat.cBpcisl.setData(ltc.GetKlasS_ot01(2000004));
 				winPat.cBprichina.setData(ltc.GetKlasCpos2());
 				winPat.cBpopl.setData(ltc.GetKlasPopl());

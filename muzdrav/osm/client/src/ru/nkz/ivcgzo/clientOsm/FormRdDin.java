@@ -346,12 +346,17 @@ public class FormRdDin extends JFrame {
 		rddin.setVes((double) SVes.getModel().getValue());
 		ves = (double) SVes.getModel().getValue();
 		rost = FormPostBer.rdSlStruct.getRost();	
-		if (rost != 0)
+		if (rost<=154) br = br+1;
+		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
+		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
+		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
+		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
+		if (rost != 0) 
 		{ves = ves/rost/rost*10000;
 		if (ves<17) br = br+1;
-		if (ves>32) br = br+1;}
+		if (ves>=32) br = br+1;}
 		rddin.setBall(br); 
-//		System.out.println(ves);
+		System.out.println(rost);
 			MainForm.tcl.UpdateRdDin(rddin);
 		} catch (KmiacServerException | TException e1) {
 			// TODO Auto-generated catch block

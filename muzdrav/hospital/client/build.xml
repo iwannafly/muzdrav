@@ -1,56 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="clientHospital" default="main_d" basedir=".">
-	
-	<!-- Создание свойств, используемых далее в текущем скрипте -->
-	<property name="src_client.dir" location="src" />
-	<property name="src_config.dir" location="../config" />
-	<property name="src_thrift.dir" location="../thrift/gen-java" />
-	<property name="lib.dir" value="../../../../lib" />
-	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
-	<property name="build.dir" location="bin" />
-	<property name="export.jar" location="../../auth/client/plugin/clientHospital.jar" />
-	<property name="export.copy.dir" location="../../manager/client" />
-	
-	<path id="build.classpath">
-	  <fileset dir="${lib.dir}">
-	     <include name="*.jar"/>
-	  </fileset>	
-	  <pathelement path="${bin_client_manager.dir}"/>		
-	</path>		
-	
-	<property name="build.classpath" refid="build.classpath"/>
-	
-	<!-- Очистка директорий -->	
-	<target name="clean" description = "Очистка директорий">
-	        <delete dir="${build.dir}"/>
-	</target>
-	
-	<!-- Создание директорий -->
-	<target name="makedir" description="Создание директорий">
-		<mkdir dir="${build.dir}" />
-	</target>
 
-	<!-- Компилирование  исходного кода -->
-	<target name="compile" depends="clean, makedir" description="Компиляция">
-		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
-			<classpath refid="build.classpath"/>
-		</javac>
-	</target>
-	
-	<!-- Создание jar файла -->
-	<target name="jar" depends="compile" description = "Создание jar">
-		<jar destfile="${export.jar}" basedir="${build.dir}" />
-		<copy file="${export.jar}" todir="${export.copy.dir}" overwrite="true" force="true" />
-	</target>
+  <!-- Создание свойств, используемых далее в текущем скрипте -->
+  <property name="src_client.dir" location="src" />
+  <property name="src_config.dir" location="../config" />
+  <property name="src_thrift.dir" location="../thrift/gen-java" />
+  <property name="lib.dir" value="../../../../lib" />
+  <property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
+  <property name="com_resources.dir" location="../../../common/resources" />
+  <property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientHospital/resources" />
+  <property name="build.dir" location="bin" />
+  <property name="export.jar" location="../../auth/client/plugin/clientHospital.jar" />
+  <property name="export.copy.dir" location="../../manager/client" />
 
-	<target name="main" depends="jar">
-	</target>
+  <path id="build.classpath">
+    <fileset dir="${lib.dir}">
+       <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${bin_client_manager.dir}"/>
+  </path>
 
-	<target name="main_d">
-		<antcall target="main">
-			<param name="debug.build" value="true"/>
-		</antcall>
-	</target>
+  <property name="build.classpath" refid="build.classpath"/>
+
+  <!-- Очистка директорий -->
+  <target name="clean" description = "Очистка директорий">
+          <delete dir="${build.dir}"/>
+  </target>
+
+  <!-- Создание директорий -->
+  <target name="makedir" description="Создание директорий">
+    <mkdir dir="${build.dir}" />
+  </target>
+
+  <!-- Компилирование  исходного кода -->
+  <target name="compile" depends="clean, makedir" description="Компиляция">
+    <javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
+      <classpath refid="build.classpath"/>
+    </javac>
+    <copy file="${com_resources.dir}/1331789242_Add.png" todir="${bin_resources.dir}" />
+    <copy file="${com_resources.dir}/1331789259_Delete.png" todir="${bin_resources.dir}" />
+    <copy file="${com_resources.dir}/1341981970_Accept.png" todir="${bin_resources.dir}" />
+  </target>
+
+  <!-- Создание jar файла -->
+  <target name="jar" depends="compile" description = "Создание jar">
+    <jar destfile="${export.jar}" basedir="${build.dir}" />
+    <copy file="${export.jar}" todir="${export.copy.dir}" overwrite="true" force="true" />
+  </target>
+
+  <target name="main" depends="jar">
+  </target>
+
+  <target name="main_d">
+    <antcall target="main">
+      <param name="debug.build" value="true"/>
+    </antcall>
+  </target>
 
 </project>
 

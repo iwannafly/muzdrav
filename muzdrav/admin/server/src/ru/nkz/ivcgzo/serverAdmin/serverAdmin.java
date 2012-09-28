@@ -95,15 +95,16 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public int AddVrach(VrachInfo vr) throws VrachExistsException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			if (!isVrachExists(vr)) {
+	public int AddVrach(VrachInfo vr) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
+			if (!acrs.getResultSet().next()) {
 				sme.execPreparedT("INSERT INTO s_vrach (fam, im, ot, pol, datar, obr, snils, idv) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8);
 				int pcod = sme.getGeneratedKeys().getInt("pcod");
 				sme.setCommit();
 				return pcod;
 			} else
-				throw new VrachExistsException();
+				return acrs.getResultSet().getInt(1);
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
 		}
@@ -111,8 +112,9 @@ public class serverAdmin extends Server implements Iface {
 
 	@Override
 	public void UpdVrach(VrachInfo vr) throws VrachExistsException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			if (!isVrachExists(vr)) {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
+			if (!acrs.getResultSet().next()) {
 				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
 				sme.setCommit();
 			} else
@@ -123,9 +125,11 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public void DelVrach(int pcod) throws TException {
+	public void DelVrach(int vrPcod, int lpuPcod) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM s_vrach WHERE pcod = ? ", false, pcod);
+			sme.execPrepared("DELETE FROM s_vrach WHERE pcod = ? ", false, vrPcod);
+			sme.execPrepared("DELETE FROM s_mrab WHERE (pcod = ?) AND (clpu = ?) ", false, vrPcod, lpuPcod);
+			sme.execPrepared("DELETE FROM s_users WHERE (pcod = ?) AND (clpu = ?) ", false, vrPcod, lpuPcod);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -134,8 +138,8 @@ public class serverAdmin extends Server implements Iface {
 
 	
 	@Override
-	public List<MestoRab> GetMrabList(int vrPcod) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM s_mrab WHERE pcod = ?", vrPcod)) {
+	public List<MestoRab> GetMrabList(int vrPcod, int clpu) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM s_mrab WHERE (pcod = ?) AND (clpu = ?) ", vrPcod, clpu)) {
 			return rsmMrab.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -272,12 +276,6 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 
-	private boolean isVrachExists(VrachInfo vi) throws SQLException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) AND (obr = ?) AND (idv = ?) ", vi, vrachTypes, 1, 2, 3, 4, 5, 6, 8)) {
-			return acrs.getResultSet().next();
-		}
-	}
-	
 	private boolean isMrabExists(MestoRab mr) throws SQLException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQueryT("SELECT id FROM s_mrab WHERE (pcod = ?) AND (clpu = ?) AND (cslu = ?) AND (cpodr = ?) AND (cdol = ?) AND (datau = ?) AND (priznd = ?) ", mr, mrabTypes, 1, 2, 3, 4, 5, 6, 7)) {
 			return acrs.getResultSet().next();
@@ -316,15 +314,6 @@ public class serverAdmin extends Server implements Iface {
 			return new String(pass1, Charset.forName("cp1251"));
 		}
 	}
-	
-	@Override
-	public List<IntegerClassifier> getPrizndList() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT * FROM n_priznd ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			throw new TException(e);
-		}
-	}
 
 	@Override
 	public void testConnection() throws TException {
@@ -337,15 +326,6 @@ public class serverAdmin extends Server implements Iface {
 			sme.setCommit();
 		} catch (InterruptedException | SQLException e) {
 			throw new TException();
-		}
-	}
-
-	@Override
-	public List<StringClassifier> get_n_s00() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_s00 ")) {
-			return rsmStrClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			throw new TException(e);
 		}
 	}
 
@@ -389,15 +369,6 @@ public class serverAdmin extends Server implements Iface {
 	public List<StringClassifier> get_n_z00() throws TException {
 		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z00 ")) {
 			return rsmStrClas.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			throw new TException(e);
-		}
-	}
-
-	@Override
-	public List<IntegerClassifier> get_n_z30() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_z30 ")) {
-			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
@@ -581,10 +552,9 @@ public class serverAdmin extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM sh_dop WHERE id = ? ", false, id);
 			sme.setCommit();
-	} catch (SQLException | InterruptedException e) {
-		System.err.println(e.getCause());
-		throw new KmiacServerException("Error deleting template dop");
+		} catch (SQLException | InterruptedException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error deleting template dop");
+		}
 	}
-	}
-
 }

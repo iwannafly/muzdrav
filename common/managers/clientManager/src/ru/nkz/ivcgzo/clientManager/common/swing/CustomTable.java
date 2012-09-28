@@ -191,6 +191,11 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 					if (getSelectedRow() < 0)
 						return;
 					
+					if (isEditing()) {
+						getCellEditor().cancelCellEditing();
+						return;
+					}
+					
 					itemUpd = true;
 					if (itemAdd) {
 						sel = null;
@@ -439,7 +444,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
-	 * Получае список данных. 
+	 * Получает список данных. 
 	 */
 	public List<T> getData() {
 		return lst;
@@ -553,7 +558,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			getSelectionModel().setValueIsAdjusting(true);
 			getModel().fireTableRowsInserted(updRow, updRow);
 			selRow = convertRowIndexToView(selRow);
-			this.changeSelection(selRow, selCol, false, false);
+			this.changeSelection(selRow, 0, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			this.editCellAt(selRow, 0);
 			break;

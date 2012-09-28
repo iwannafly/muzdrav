@@ -408,7 +408,8 @@ public class TalonSelectFrame extends JFrame {
                 JTable curTable = (JTable) e.getSource();
                 final int curRow = curTable.getSelectedRow();
                 final int curColumn = curTable.getSelectedColumn();
-                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(tbTalonSelect,
+                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(
+                        TalonSelectFrame.this.getContentPane(),
                         String.format("Записать на приём %s?", curTable.getColumnName(curColumn)),
                         "Выбор талона", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
@@ -420,7 +421,8 @@ public class TalonSelectFrame extends JFrame {
                             MainForm.tcl.reserveTalon(curPatient, curTalon);
                             refreshTalonTableModel();
                         } else if (curPatient == null) {
-                            JOptionPane.showMessageDialog(tbTalonSelect, "Пациент не выбран",
+                            JOptionPane.showMessageDialog(
+                                    TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
                                     "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (KmiacServerException
@@ -451,8 +453,9 @@ public class TalonSelectFrame extends JFrame {
             public void mouseClicked(final MouseEvent e) { //TODO отрефакторить
                 JTable curTable = (JTable) e.getSource();
                 final int curRow = curTable.getSelectedRow();
-                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(tbTalonSelect,
-                        "Удалить запись?", "Удаление талона", JOptionPane.YES_NO_OPTION,
+                final int indexOfSelectedOption = JOptionPane.showConfirmDialog(
+                        TalonSelectFrame.this.getContentPane(), "Удалить запись?",
+                        "Удаление талона", JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
                 if (indexOfSelectedOption  == 0) {
                     Talon curTalon = ((ReservedTalonTableModel) curTable.getModel())
@@ -462,7 +465,8 @@ public class TalonSelectFrame extends JFrame {
                             MainForm.tcl.releaseTalon(curTalon);
                             refreshReservedTalonTableModel();
                         } else if (curPatient == null) {
-                            JOptionPane.showMessageDialog(tbTalonSelect, "Пациент не выбран",
+                            JOptionPane.showMessageDialog(
+                                    TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
                                     "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (KmiacServerException
