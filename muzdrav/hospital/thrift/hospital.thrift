@@ -5,7 +5,7 @@ include "../../../common/thrift/kmiacServer.thrift"
 
 struct TSimplePatient{
 	1:optional i32 patientId;
-    2:optional i32 id_gosp;
+    2:optional i32 idGosp;
 	3:optional string surname;
 	4:optional string name;
 	5:optional string middlename;
@@ -159,6 +159,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     i32 addDiagnosis(1:TDiagnosis inDiagnos) throws (1:kmiacServer.KmiacServerException kse);
     void updateDiagnosis(1:TDiagnosis inDiagnos) throws (1:kmiacServer.KmiacServerException kse);
     void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
+
+	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	
 /*Классификаторы*/
 	
