@@ -77,7 +77,7 @@ public class ServerHospital extends Server implements Iface {
         "t0c", "ad", "nal_z", "nal_p", "vid_tran", "alkg", "jalob"
     };
     private static final String[] DIAGNOSIS_FIELD_NAMES = {
-        "id", "id_gosp", "cod", "med_op", "date_ustan", "prizn", "vrach" , "diagName"
+        "id", "id_gosp", "cod", "med_op", "date_ustan", "prizn", "vrach" , "diagname"
     };
     private static final String[] INT_CLAS_FIELD_NAMES = {
         "pcod", "name"
@@ -189,7 +189,7 @@ public class ServerHospital extends Server implements Iface {
                 log.log(Level.INFO, "PatientNotFoundException, otdNum = " + otdNum);
                 throw new PatientNotFoundException();
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
@@ -284,7 +284,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TDiagnosis> getDiagnosis(final int gospId)
             throws KmiacServerException, DiagnosisNotFoundException {
         String sqlQuery = "SELECT c_diag.id, c_diag.id_gosp, c_diag.cod, c_diag.med_op, "
-            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach , n_c00.name as diagName "
+            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach , n_c00.name as diagname "
             + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
             List<TDiagnosis> diagList = rsmDiagnosis.mapToList(acrs.getResultSet());
@@ -321,8 +321,8 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void updateDiagnosis(final TDiagnosis inDiagnos)
             throws KmiacServerException {
-        final int[] indexes = {3, 5};
-        final String sqlQuery = "UPDATE c_diag SET med_op = ?, prizn = ?, "
+        final int[] indexes = {3, 5, 0};
+        final String sqlQuery = "UPDATE c_diag SET med_op = ?, prizn = ? "
                 + "WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, inDiagnos, DIAGNOSIS_TYPES, indexes);
@@ -528,6 +528,19 @@ public class ServerHospital extends Server implements Iface {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void disharge(final int idGosp) throws KmiacServerException, TException {
+        final String sqlQuery = "UPDATE c_otd SET vrach = ? "
+                + "WHERE id_gosp = ?";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, null, idGosp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }

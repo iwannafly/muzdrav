@@ -13,7 +13,6 @@ import javax.swing.table.TableModel;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
@@ -26,14 +25,24 @@ public class AllPatientTableModel implements TableModel {
         "Номер палаты"
     };
 
-    public AllPatientTableModel(final UserAuthInfo authInfo) {
+    public AllPatientTableModel(final int pcod, final int cpodr) {
         try {
-            patients = ClientHospital.tcl.getAllPatientForDoctor(
-                    authInfo.getPcod(), authInfo.getCpodr());
+            patients = ClientHospital.tcl.getAllPatientForDoctor(pcod, cpodr);
         } catch (PatientNotFoundException e) {
-            patients = Collections.emptyList();
+            patients = Collections.<TSimplePatient>emptyList();
         } catch (KmiacServerException | TException e) {
-            // TODO Auto-generated catch block
+            patients = Collections.<TSimplePatient>emptyList();
+            e.printStackTrace();
+        }
+    }
+
+    public AllPatientTableModel(final int cpodr) {
+        try {
+            patients = ClientHospital.tcl.getAllPatientFromOtd(cpodr);
+        } catch (PatientNotFoundException e) {
+            patients = Collections.<TSimplePatient>emptyList();
+        } catch (KmiacServerException | TException e) {
+            patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
         }
     }
