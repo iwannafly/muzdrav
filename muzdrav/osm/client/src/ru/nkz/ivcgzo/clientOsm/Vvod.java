@@ -2012,14 +2012,19 @@ public class Vvod extends JFrame {
 	}
 	
 	private void syncShablonList(String searchString, Shablon shablon) {
+		
 		shablonSearchListener.updateNow(searchString);
 		
-		for (int i = 0; i < lbShabSrc.getData().size(); i++)
-			if (lbShabSrc.getData().get(i).pcod == shablon.id)
-			{
-				lbShabSrc.setSelectedIndex(i);
-				break;
-			}
+		if (shablon != null) {
+			for (int i = 0; i < lbShabSrc.getData().size(); i++)
+				if (lbShabSrc.getData().get(i).pcod == shablon.id)
+				{
+					lbShabSrc.setSelectedIndex(i);
+					break;
+				}
+		} else {
+			lbShabSrc.setSelectedIndex(-1);
+		}
 	}
 	
 	private void loadShablonList() {
