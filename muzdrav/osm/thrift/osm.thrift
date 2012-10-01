@@ -64,6 +64,7 @@ struct PvizitAmb {
 	21: optional i64 dataz;
 	22: optional i32 cpos;
 	23: optional i32 cpol;
+	24: optional i32 kod_ter;
 }
 
 struct PdiagAmb {
