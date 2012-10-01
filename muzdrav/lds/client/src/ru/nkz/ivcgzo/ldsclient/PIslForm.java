@@ -1790,9 +1790,12 @@ public class PIslForm {
                         }else{
                         	cBLpcod_m.setSelectedItem(0);
                         }
+                    }else{
+                    	cBLpcod_m.setSelectedItem(0);
                     }
                 } catch (TException e) {
                     // TODO Auto-generated catch block
+                	cBLpcod_m.setSelectedItem(1);
                     e.printStackTrace();
                 }
 				
