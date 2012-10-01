@@ -2284,8 +2284,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		String fhouse;
 		String fflat;
 		Integer grk = null;
-		String rez;
-		String fiovr = null;
 		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
 				arcs4 = null, arsc5 = null, arsc6 = null;
 		//таблица паспортной информации Patient.csv
@@ -2298,38 +2296,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 //		}
 		for (RdPatient rdp : rdPatient) {
 		p1 = new Date(rdp.datar);
-		uid = rdp.uid;
-		fam = rdp.fam;
-		im = rdp.im;
-		ot = rdp.ot;
-		doc = String.format("%s%s",rdp.docser,rdp.docnum);
-		tawn = rdp.tawn;
-		street = rdp.street;
-		house = rdp.house;
-		flat = rdp.flat;
-		poms = String.format("%s%s",rdp.poms_ser,rdp.poms_nom);
-		dog = rdp.dog;
-		stat = rdp.stat;
-		lpup = rdp.lpup;
-		terp = rdp.terp;
-		ftown = rdp.ftawn;
-		fstreet = rdp.fstreet;
-		fhouse = rdp.fhouse;
-		fflat = rdp.fflat;
 		if (rdp.grk == "I") grk = 1;
 		if (rdp.grk == "II") grk = 2;
 		if (rdp.grk == "III") grk = 3;
 		if (rdp.grk == "IV") grk = 4;
-		rez = rdp.rez;
-		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s;%s;%s;%s;%s;%s;%s;%d;%d;%d;%d;%s;%s;%s;%d;%s", uid, fam, im, ot, p1,doc,tawn,street,house,flat,poms,dog,stat,lpup,terp,ftown,fstreet,fhouse,fflat,grk,rez));		
+		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s%s;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%s;%s;%s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p1,rdp.docser,rdp.docnum,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
 		}
 		StringBuilder sb1 = new StringBuilder(0x10000);
 		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
 		List<RdVizit> rdVizit = getRdVizit();
 		for (RdVizit rvz : rdVizit) {
 			p1 = new Date(rvz.dv);
-			fiovr = String.format("%s %s %s",rvz.famwr,rvz.imwr,rvz.otwr);
-			sb1.append(String.format("%d;%d;%3$td.%3$tm.%3$tY;%d;%s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, fiovr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
+			sb1.append(String.format("%d;%d;%3$td.%3$tm.%3$tY;%d;%s %s %s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, rvz.famwr,rvz.imwr,rvz.otwr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
 		}
 		return null;
 	}
