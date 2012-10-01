@@ -68,7 +68,6 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;

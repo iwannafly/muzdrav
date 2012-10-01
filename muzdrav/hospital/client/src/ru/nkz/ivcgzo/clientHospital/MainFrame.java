@@ -839,6 +839,7 @@ public class MainFrame extends JFrame {
                             "Удаление диагноза", JOptionPane.YES_NO_OPTION);
                         if (opResult == JOptionPane.YES_OPTION) {
                             ClientHospital.tcl.deleteDiagnosis(tbDiag.getSelectedItem().getId());
+                            System.out.println(tbDiag.getSelectedItem().getId());
                             tbDiag.setData(
                                 ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
                         }
@@ -883,6 +884,7 @@ public class MainFrame extends JFrame {
         spDiag = new JScrollPane();
         tbDiag = new CustomTable<TDiagnosis, TDiagnosis._Fields>(
             false, true, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
+        tbDiag.setDateField(0);
         tbDiag.setBorder(new LineBorder(new Color(0, 0, 0)));
         spDiag.setViewportView(tbDiag);
     }
