@@ -36,6 +36,7 @@ import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
 import ru.nkz.ivcgzo.thriftOsm.PNapr;
 import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
+import ru.nkz.ivcgzo.thriftOsm.Pdata;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
@@ -66,6 +67,7 @@ import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import ru.nkz.ivcgzo.thriftOsm.ZapVr._Fields;
 
 public class ServerOsm extends Server implements Iface {
 	private TServer thrServ;
@@ -131,6 +133,7 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
+	private TResultSetMapper<ZapVr, _Fields> rsmPvizitAmb;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -2142,20 +2145,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
-				arcs4 = null, arsc5 = null, arsc6 = null;
-		try {
-			acrs = sse.execPreparedQuery("SELECT p.fam, p.im, p.ot, p.datar, (current_date - p.datar) / 365,p.docser,p.docnum,p.adp_gorod,p.adp_ul,p.adp_dom,p.adp_korp,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,p.sgrp,p.cpol_pr,p.terp,p.adm_gorod, p.adm_ul, p.adm_dom,p.adm_korp, p.adm_kv, p.tel FROM patient p, n_l00 l,n_l00 n, WHERE npasp = ? and ", kb.getNpasp());
-		} catch (SqlExecutorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-		return null;
-	}
-
-	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("insert into p_mer (npasp, id_pdiag, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, id_pvizit, id_pos) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
@@ -2265,4 +2254,26 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		throw new KmiacServerException();
 	}
 	}
+	@Override
+	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		Date p1;
+		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
+				arcs4 = null, arsc5 = null, arsc6 = null;
+		List<RdPatient> rdPatient = getRdPatient();
+		p1=new Date(rdPatient.get(1).datar);
+		
+//		if rdPatient.wait().next{}
+		return null;
+	}
+	@Override
+	public Pdata getPdata(int id_pos) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT datap FROM p_vizit_amb WHERE id_pos = ? ", id_pos)) {
+				return rsmPdata.map(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
 }
