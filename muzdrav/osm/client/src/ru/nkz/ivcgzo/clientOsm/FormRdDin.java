@@ -602,9 +602,8 @@ public class FormRdDin extends JFrame {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()) {
-					//вставить выбор даты из таблицы посещений прописать метод
 					rddin = tablePos.getSelectedItem();
-					
+					//вставить выбор даты из таблицы посещений 
 					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
 					SSrok.setValue(rddin.getSrok());
 					SVes.setValue(rddin.getVes());

@@ -22,7 +22,6 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
-import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -36,13 +35,13 @@ import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
 import ru.nkz.ivcgzo.thriftOsm.PNapr;
 import ru.nkz.ivcgzo.thriftOsm.P_isl_ld;
-import ru.nkz.ivcgzo.thriftOsm.Pdata;
 import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
+import ru.nkz.ivcgzo.thriftOsm.Pobost;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
@@ -67,7 +66,6 @@ import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import ru.nkz.ivcgzo.thriftOsm.ZapVr._Fields;
 
 public class ServerOsm extends Server implements Iface {
 	private TServer thrServ;
@@ -133,7 +131,9 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
-	private TResultSetMapper<ZapVr, _Fields> rsmPvizitAmb;
+//	private TResultSetMapper<ZapVr, _Fields> rsmPvizitAmb;
+	private final TResultSetMapper<Pobost, Pobost._Fields> rsmPobost;
+	private final Class<?>[] pobostTypes;
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -205,8 +205,11 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
 		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
 	
-		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr");
-		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class};
+		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
+		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+	
+//		rsmPdata = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr");
+//		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
 		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",        "uid",       "ves",       "ned",        "lcad",        "ldad",       "rcad",       "rdad",       "rost",       "datar",    "obr",        "sem",          "ososo",       "vrpr" );
 		rdConVizitTypes = new Class<?>[]{                 Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class, Integer.class, Integer.class, Integer.class, Integer.class };
@@ -215,6 +218,9 @@ public class ServerOsm extends Server implements Iface {
 	
 		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "id_pdiag",    "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",       "id_pvizit",   "id_pos",      "name_pmer");
 		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
+
+		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz");
+		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class};
 
 	}
 
@@ -2109,8 +2115,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 	
 	@Override
-	public List<Pmer> getPmer(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.npasp = ?", npasp)) {
+	public List<Pmer> getPmer(int npasp, String diag) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.npasp = ? and diag = ?", npasp, diag)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2254,26 +2260,136 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		throw new KmiacServerException();
 	}
 	}
+
 	@Override
 	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		Date p1;
+		Integer uid;
+		String fam;
+		String im;
+		String ot;
+		String doc;
+		Integer tawn;
+		String street;
+		String house;
+		String flat;
+		String poms;
+		String dog;
+		Integer stat;
+		Integer lpup;
+		Integer terp;
+		Integer ftown;
+		String fstreet;
+		String fhouse;
+		String fflat;
+		Integer grk = null;
+		String rez;
+		String fiovr = null;
 		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
 				arcs4 = null, arsc5 = null, arsc6 = null;
+		//таблица паспортной информации Patient.csv
+		StringBuilder sb = new StringBuilder(0x10000);
+		sb.append("uid;fam;im;ot;dr;pasp;tawn;street;house;flat;polis;dog;stat;lpup;terp;ftown;fstreet;fhouse;fflat;grk;rez");
 		List<RdPatient> rdPatient = getRdPatient();
-		p1=new Date(rdPatient.get(1).datar);
-		
-//		if rdPatient.wait().next{}
+//		for (int j = 0; j < rdPatient.size(); j++) {
+//			RdPatient rdp = rdPatient.get(j);
+//			
+//		}
+		for (RdPatient rdp : rdPatient) {
+		p1 = new Date(rdp.datar);
+		uid = rdp.uid;
+		fam = rdp.fam;
+		im = rdp.im;
+		ot = rdp.ot;
+		doc = String.format("%s%s",rdp.docser,rdp.docnum);
+		tawn = rdp.tawn;
+		street = rdp.street;
+		house = rdp.house;
+		flat = rdp.flat;
+		poms = String.format("%s%s",rdp.poms_ser,rdp.poms_nom);
+		dog = rdp.dog;
+		stat = rdp.stat;
+		lpup = rdp.lpup;
+		terp = rdp.terp;
+		ftown = rdp.ftawn;
+		fstreet = rdp.fstreet;
+		fhouse = rdp.fhouse;
+		fflat = rdp.fflat;
+		if (rdp.grk == "I") grk = 1;
+		if (rdp.grk == "II") grk = 2;
+		if (rdp.grk == "III") grk = 3;
+		if (rdp.grk == "IV") grk = 4;
+		rez = rdp.rez;
+		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s;%s;%s;%s;%s;%s;%s;%d;%d;%d;%d;%s;%s;%s;%d;%s", uid, fam, im, ot, p1,doc,tawn,street,house,flat,poms,dog,stat,lpup,terp,ftown,fstreet,fhouse,fflat,grk,rez));		
+		}
+		StringBuilder sb1 = new StringBuilder(0x10000);
+		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
+		List<RdVizit> rdVizit = getRdVizit();
+		for (RdVizit rvz : rdVizit) {
+			p1 = new Date(rvz.dv);
+			fiovr = String.format("%s %s %s",rvz.famwr,rvz.imwr,rvz.otwr);
+			sb1.append(String.format("%d;%d;%3$td.%3$tm.%3$tY;%d;%s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, fiovr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
+		}
 		return null;
 	}
+
 	@Override
-	public Pdata getPdata(int id_pos) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT datap FROM p_vizit_amb WHERE id_pos = ? ", id_pos)) {
-				return rsmPdata.map(acrs.getResultSet());
+	public List<Pobost> getPobost(int npasp, String diag)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_obost where npasp = ? and diag = ?", npasp, diag)) {
+			return rsmPobost.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
+
 	}
 
+	@Override
+	public int AddPobost(Pobost pbst) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into p_obost (npasp, id_pdiag, diag, sl_obostr, sl_hron, cod_sp, cdol, dataz) values (?, ?, ?, ?, ?, ?, ?, ?) ", true, pbst, pobostTypes, 1, 2, 3, 4, 5, 6, 7, 8);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+
+	}
+
+	@Override
+	public void UpdatePobost(Pobost pbst) throws KmiacServerException,
+			TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("update p_obost set sl_obostr = ?, sl_hron = ? where id = ? ", false, pbst, pmerTypes, 4, 5, 0);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+			
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+		
+	}
+	@Override
+	public void DeletePobost(int pobost_id) throws KmiacServerException, TException{
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPrepared("delete from p_obost where id = ? ", false, pobost_id);
+		sme.setCommit();
+	} catch (SQLException e) {
+		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	} catch (InterruptedException e1) {
+		e1.printStackTrace();
+		throw new KmiacServerException();
+	}
+	}
 }
