@@ -1714,6 +1714,11 @@ public class Vvod extends JFrame {
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 				pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
+				try {
+					pvizitAmb.setStoim(MainForm.tcl.getStoim(MainForm.authInfo.getKateg(), MainForm.authInfo.getC_nom(), MainForm.authInfo.getCdol()));
+				} catch (TException e3) {
+					e3.printStackTrace();
+				}
 				
 				for (PvizitAmb pviz : tblPos.getData())
 					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
