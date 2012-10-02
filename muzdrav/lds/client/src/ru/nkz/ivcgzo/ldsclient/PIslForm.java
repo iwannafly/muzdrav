@@ -8,6 +8,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -43,6 +44,8 @@ import ru.nkz.ivcgzo.ldsThrift.ObInfIsl;
 import ru.nkz.ivcgzo.ldsThrift.Patient;
 import ru.nkz.ivcgzo.ldsThrift.PatientNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
+import ru.nkz.ivcgzo.ldsThrift.Sh_lds;
+import ru.nkz.ivcgzo.ldsThrift.Sh_ldsNotFoundException;
 //import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
@@ -72,7 +75,9 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 public class PIslForm {
-
+	
+	ShabOpRezName winShab;
+	
 	public JFrame frame;
 	private CustomTable<Patient, Patient._Fields> tpatient;
 	private CustomDateEditor tFdatap;
@@ -114,6 +119,8 @@ public class PIslForm {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 855, 731);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
+		winShab = new ShabOpRezName();
 		
 		JPanel panel = new JPanel();
 		
@@ -1187,8 +1194,6 @@ public class PIslForm {
 		
 		JPanel panel_4 = new JPanel();
 		
-		JButton brez_name = new JButton(">>");
-		
 		JLabel label = new JLabel("Исследование");
 		
 		tFkodisl = new CustomTextField();
@@ -1240,6 +1245,40 @@ public class PIslForm {
 		tFrez_name.setColumns(10);
 		
 		JButton button_4 = new JButton("Выбрать");
+		button_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				
+			
+			if(cBkodisl.getSelectedItem() != null){
+				
+				
+				try {
+					winShab.listName.setData(MainForm.ltc.GetShab_lds(cBkodisl.getSelectedPcod()));
+
+					if (winShab.listName.getData().size()>0){
+						winShab.setVisible(true);
+						tPop_name.setText(winShab.VozvOpis());
+						tFrez_name.setText(winShab.VozvZak());
+					}else{
+						
+						JOptionPane.showMessageDialog(frame, "Нет шаблонов на данное исследование.");
+						
+					}
+					
+				
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
+				
+				
+			}else{
+				JOptionPane.showMessageDialog(frame, "Не введено исследование");
+			}
+				
+			}
+		});
 		
 		cBpcod_m = new ThriftStringClassifierCombobox<>(true);
 		
@@ -1335,7 +1374,7 @@ public class PIslForm {
 					} 
 								
 				}
-				 	System.out.print(upDisl);			
+				 	//System.out.print(upDisl);			
 				try {
 					MainForm.ltc.UpdDIsl(upDisl);
 				} catch (DIslExistsException e) {
@@ -1414,10 +1453,8 @@ public class PIslForm {
 							.addGap(18)
 							.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, 478, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addComponent(brez_name, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-						.addComponent(button_4))
-					.addGap(0))
+					.addComponent(button_4)
+					.addGap(127))
 		);
 		gl_panel_4.setVerticalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -1443,26 +1480,22 @@ public class PIslForm {
 							.addComponent(label_4))
 						.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel_4.createSequentialGroup()
 									.addGap(48)
 									.addComponent(label_8))
 								.addComponent(tPop_name, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
-							.addGap(4))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(button_4, GroupLayout.PREFERRED_SIZE, 117, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)))
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(4)
-							.addComponent(label_7))
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(1)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(brez_name))))
+							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_4.createSequentialGroup()
+									.addGap(4)
+									.addComponent(label_7))
+								.addGroup(gl_panel_4.createSequentialGroup()
+									.addGap(1)
+									.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+						.addComponent(button_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addGap(8)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addComponent(button)

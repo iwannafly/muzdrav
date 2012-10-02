@@ -623,6 +623,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
+        list<RdSlStruct> getRdSl() throws (1: kmiacServer.KmiacServerException kse);
 /*Shablon*/
 	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);

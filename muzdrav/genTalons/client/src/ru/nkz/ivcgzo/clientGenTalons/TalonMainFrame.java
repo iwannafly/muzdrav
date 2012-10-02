@@ -57,7 +57,6 @@ import ru.nkz.ivcgzo.thriftGenTalon.Spec;
 import ru.nkz.ivcgzo.thriftGenTalon.Talon;
 import ru.nkz.ivcgzo.thriftGenTalon.TalonNotFoundException;
 import ru.nkz.ivcgzo.thriftGenTalon.VidpNotFoundException;
-//import ru.nkz.ivcgzo.thriftGenTalon
 import ru.nkz.ivcgzo.thriftGenTalon.Vrach;
 import ru.nkz.ivcgzo.clientGenTalons.RaspisanieUnit;
 import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
@@ -65,10 +64,9 @@ import ru.nkz.ivcgzo.clientGenTalons.SvodkiUnit;
 import javax.swing.JProgressBar;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
-import javax.swing.border.BevelBorder;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.MatteBorder;
-import java.awt.Color;
+
+import org.apache.thrift.TException;
 
 public class TalonMainFrame extends JFrame {
 
@@ -381,12 +379,31 @@ public class TalonMainFrame extends JFrame {
 		tbl_rasp.setTimeField(3);
 		tbl_rasp.setFillsViewportHeight(true);
 		sp_rasp.setViewportView(tbl_rasp);
+
+        //изменить
+        tbl_rasp.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Nrasp>() {
+            @Override
+            public boolean doAction(CustomTableItemChangeEvent<Nrasp> event) {
+                try {
+					if (tbl_rasp.getSelectedItem() != null)
+						MainForm.tcl.updateNrasp(tbl_rasp.getData());
+                } catch (TException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (KmiacServerException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        });
 		
 		JButton btn_save = new JButton("Сохранить");
 		btn_save.setToolTipText("Сохранить расписание");
 		btn_save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
+                    tbl_rasp.updateSelectedItem();
 					if (tbl_rasp.getSelectedItem() != null)
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
 				} catch (Exception e) {
@@ -807,7 +824,7 @@ public class TalonMainFrame extends JFrame {
 		btn_save_norm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-					MainForm.tcl.updateNorm(tbl_norm.getData());
+                    tbl_norm.updateSelectedItem();
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -855,7 +872,25 @@ public class TalonMainFrame extends JFrame {
 		sp_norm.setViewportView(tbl_norm);
 		tbNorm.setLayout(gl_tbNorm);
 		
-		JPanel tbTalon = new JPanel();
+        //изменить
+        tbl_norm.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<Norm>() {
+            @Override
+            public boolean doAction(CustomTableItemChangeEvent<Norm> event) {
+                try {
+					if (tbl_norm.getSelectedItem() != null)
+						MainForm.tcl.updateNorm(tbl_norm.getData());
+                } catch (TException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (KmiacServerException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+                return true;
+            }
+        });
+
+        JPanel tbTalon = new JPanel();
 		tbMain.addTab("Журнал талонов", null, tbTalon, null);
 		
 		JPanel panel_5 = new JPanel();
