@@ -165,7 +165,9 @@ private TServer thrServ;
 				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-				"(select get_region(p.poms_strg))::integer AS region "+
+				"(select get_region(p.poms_strg))::integer AS region," +
+				"p.ter_liv::integer AS ter_liv,  (select get_status(p.sgrp))::integer AS status, " +
+				"(select get_kov(p.npasp))::char(30) AS kob, "+
 			    " FROM p_vizit_amb v, patient p" + 
 				" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? "+sqlwhere;
 		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
