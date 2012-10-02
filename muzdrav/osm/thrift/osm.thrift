@@ -644,4 +644,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void UpdatePobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePobost(1: i32 pobost_id) throws (1: kmiacServer.KmiacServerException kse);
 
+/*Stoim_p*/
+	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
+
 }
