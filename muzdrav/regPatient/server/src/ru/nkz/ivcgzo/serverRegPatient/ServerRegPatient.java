@@ -1414,7 +1414,8 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
-            final UserAuthInfo uai, final String docInfo) throws KmiacServerException {
+            final UserAuthInfo uai, final String docInfo, final String omsOrg,
+            final String lgot) throws KmiacServerException {
         final String path;
         try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
@@ -1434,13 +1435,13 @@ public class ServerRegPatient extends Server implements Iface {
                     + "\\plugin\\reports\\MedCardAmbPriem.htm");
             htmTemplate.replaceLabels(true,
                 uai.getClpu_name(),
-                "123213133",
-                nambk.getNambk(),
                 "",
+                nambk.getNambk(),
+                omsOrg,
                 pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
                 String.valueOf(pat.getPolis_oms().getStrg()),
                 pat.getSnils(),
-                "123123231",
+                lgot,
                 pat.getFam(),
                 pat.getIm(),
                 pat.getOt(),
