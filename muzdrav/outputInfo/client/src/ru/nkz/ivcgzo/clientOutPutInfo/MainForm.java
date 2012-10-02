@@ -45,16 +45,20 @@ import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.BorderLayout;
+import javax.swing.JTabbedPane;
 
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
 	private JFrame frame;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
 	
 	public static ThriftOutputInfo.Client tcl;
 	public Input_info inputInfo;
+	public SvodVed pSvodVed;
+	public FacZd pFacZd;
+
 
 	/**
 	 * Launch the application.
@@ -68,8 +72,59 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		super(conMan, authInfo, ThriftOutputInfo.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 		
 		initialize();
-		inputInfo.setKpolik(authInfo.clpu);
-		inputInfo.setNamepol(authInfo.clpu_name);
+		setFrame(frame);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		JScrollPane scrollPane = new JScrollPane();
+		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		
+		//inputInfo.setKpolik(authInfo.clpu);
+		//inputInfo.setNamepol(authInfo.clpu_name);
+		
+		/**
+		 * Создание панелей с табами (категорий)
+		 */
+		JTabbedPane tpMain = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpPol = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpStac = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpPar = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpReg = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpZap = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpRees = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpVrTabel = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tp025 = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tp039 = new JTabbedPane(JTabbedPane.TOP);
+		//JTabbedPane tpSvodVed = new JTabbedPane(JTabbedPane.TOP);
+		//JTabbedPane tpFacZd = new JTabbedPane(JTabbedPane.TOP);
+		
+		/**
+		 * Создание панелей (классов) во вкладках
+		 */
+		SvodVed pSvodVed = new SvodVed();
+		FacZd pFacZd = new FacZd();
+		
+		scrollPane.setViewportView(tpMain);
+
+		/**
+		 * Создание и привязка вкладок
+		 */
+		tpMain.addTab("Поликлиника", tpPol);
+		tpMain.addTab("Стационар", tpStac);
+		tpMain.addTab("Параотделение", tpPar);
+		
+		//tpPol.addTab("Табель врача", tpVrTabel);
+		tpPol.addTab("Регламентные сводки", tpReg);
+		tpPol.addTab("Запросы", tpZap);
+		tpPol.addTab("Реестры", tpRees);
+		
+		tpReg.addTab("Отчеты по форме 025", tp025);
+		tpReg.addTab("Отчеты по форме 039", tp039);
+		
+		/**
+		 * Создание и привязка панелей (классов)
+		 */
+		tp025.addTab("Сводная ведомость учета зарегистрированных заболеваний", pSvodVed);
+		tp025.addTab("Факторы, влияющие на состояние здоровья", pFacZd);
 	}
 
 	@Override
@@ -85,6 +140,12 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		frame.setTitle("Статистика");
 		frame.setBounds(100, 100, 821, 651);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+				}
+		});
 	}
 
 	@Override
