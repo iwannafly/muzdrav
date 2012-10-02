@@ -10,10 +10,12 @@ import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JFrame;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -42,6 +44,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
+import javax.swing.Timer;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -54,6 +57,9 @@ import org.apache.thrift.TException;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JRadioButton;
@@ -106,7 +112,7 @@ public class MainFrame extends JFrame {
     private TPriemInfo priemInfo;
     private JPanel pMedicalHistory;
     private JTabbedPane tbpMedicalHistory;
-    private JTextField tfShablonFilter;
+    private CustomTextField tfShablonFilter;
     private JPanel pnStatusLocalis;
     private JPanel pnRecomendation;
     private JPanel pnZakl;
@@ -131,7 +137,7 @@ public class MainFrame extends JFrame {
     private JScrollPane spAllergo;
     private JLabel lblFarmo;
     private JScrollPane spFarmo;
-    private JTextField tfLifeHShablonFilter;
+    private CustomTextField tfLifeHShablonFilter;
     private JScrollPane spLifeHShablonNames;
     private JButton btnSaveLifeHistory;
     private JTextArea taLifeHistory;
@@ -147,7 +153,7 @@ public class MainFrame extends JFrame {
     private JRadioButton rdbtnMain;
     private JRadioButton rdbtnSoput;
     private JRadioButton rdbtnOsl;
-    private JTextField tfDiagShablonFilter;
+    private CustomTextField tfDiagShablonFilter;
     private ThriftIntegerClassifierList lDiagShablonNames;
     private CustomTable<TDiagnosis, TDiagnosis._Fields> tbDiag;
     private JScrollPane spDiag;
@@ -162,7 +168,7 @@ public class MainFrame extends JFrame {
     private JScrollPane scrollPane;
     private ButtonGroup btgDiag;
     private JPanel pZakl;
-    private JTextField tfZaklShablonNames;
+    private CustomTextField tfZaklShablonNames;
     private JButton btnSaveZakl;
     private JLabel lblRecomend;
     private JLabel lblZakluch;
@@ -173,6 +179,10 @@ public class MainFrame extends JFrame {
     private JTextArea taRecomend;
     private JScrollPane spZakluch;
     private JTextArea taZakluch;
+    private ShablonSearchListener lifeHiSearchListener;
+    private ShablonSearchListener medHiSearchListener;
+    private ShablonSearchListener diagSearchListener;
+    private ShablonSearchListener zaklSearchListener;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -230,6 +240,60 @@ public class MainFrame extends JFrame {
         clearZaklText();
     }
 
+    private class ShablonSearchListener implements DocumentListener {
+        private CustomTextField ctf;
+        private ThriftIntegerClassifierList ticl;
+
+        public ShablonSearchListener(final CustomTextField inCtf,
+                final ThriftIntegerClassifierList inTicl) {
+            ctf = inCtf;
+            ticl = inTicl;
+        }
+
+        Timer timer = new Timer(500, new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                updateNow();
+            }
+        });
+
+        @Override
+        public void removeUpdate(final DocumentEvent e) {
+            timer.restart();
+        }
+
+        @Override
+        public void insertUpdate(final DocumentEvent e) {
+            timer.restart();
+        }
+
+        @Override
+        public void changedUpdate(final DocumentEvent e) {
+            timer.restart();
+        }
+
+        public void updateNow() {
+            timer.stop();
+            loadShablonList(ctf, ticl);
+        }
+    }
+
+    private void loadShablonList(final CustomTextField inCtf,
+            final ThriftIntegerClassifierList inTicl) {
+        try {
+            List<IntegerClassifier> intClassif = ClientHospital.tcl.getShablonNames(
+                    doctorAuth.getCspec(), doctorAuth.getCslu(),
+                    (inCtf.getText().length() < 3)
+                    ? null : '%' + inCtf.getText() + '%');
+            inTicl.setData(intClassif);
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                    "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
+        }
+    }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// Модульные фреймы ///////////////////////////////////////////
@@ -367,6 +431,27 @@ public class MainFrame extends JFrame {
         tfRealAddress.setColumns(85);
 
         btnUpdateChamber = new JButton("Сохранить");
+        btnUpdateChamber.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if ((patient != null) || (!tfChamber.getText().isEmpty())) {
+                    try {
+                        ClientHospital.tcl.updatePatientChamberNumber(
+                                patient.gospitalCod, Integer.parseInt(tfChamber.getText()));
+                    } catch (NumberFormatException e1) {
+                        JOptionPane.showMessageDialog(frmPatientSelect,
+                                "Формат номера палаты неверный",
+                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    } catch (KmiacServerException e1) {
+                        JOptionPane.showMessageDialog(frmPatientSelect,
+                                "Ошибка сохранения номера палаты",
+                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    } catch (TException e1) {
+                        ClientHospital.conMan.reconnect(e1);
+                    }
+                }
+            }
+        });
+
         btnShowPatientInfo = new JButton("Информация о пациенте");
         btnShowPatientInfo.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -546,9 +631,6 @@ public class MainFrame extends JFrame {
     }
 
     private void setLifeHistoryShablonComponents() {
-        tfLifeHShablonFilter = new JTextField();
-        tfLifeHShablonFilter.setColumns(10);
-
         spLifeHShablonNames = new JScrollPane();
         lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
         lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -571,6 +653,13 @@ public class MainFrame extends JFrame {
             }
         });
         spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
+
+
+        tfLifeHShablonFilter = new CustomTextField(true, true, false);
+        lifeHiSearchListener =
+                new ShablonSearchListener(tfLifeHShablonFilter, lLifeHistoryShabloNames);
+        tfLifeHShablonFilter.getDocument().addDocumentListener(lifeHiSearchListener);
+        tfLifeHShablonFilter.setColumns(10);
     }
 
     private void setLifeHistoryButtons() {
@@ -676,9 +765,6 @@ public class MainFrame extends JFrame {
     }
 
     private void setMedicalHistoryShablonComponents() {
-        tfShablonFilter = new JTextField();
-        tfShablonFilter.setColumns(10);
-
         spShablonNames = new JScrollPane();
         lShablonNames = new ThriftIntegerClassifierList();
         lShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -701,6 +787,12 @@ public class MainFrame extends JFrame {
             }
         });
         spShablonNames.setViewportView(lShablonNames);
+
+
+        tfShablonFilter = new CustomTextField(true, true, false);
+        medHiSearchListener = new ShablonSearchListener(tfShablonFilter, lShablonNames);
+        tfShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
+        tfShablonFilter.setColumns(10);
     }
 
     private void setMedicalHistoryButtons() {
@@ -892,13 +984,15 @@ public class MainFrame extends JFrame {
     }
 
     private void setDiagnosisShablonComponents() {
-        tfDiagShablonFilter = new JTextField();
-        tfDiagShablonFilter.setColumns(10);
-
         spDiagShablonNames = new JScrollPane();
         lDiagShablonNames = new ThriftIntegerClassifierList();
         lDiagShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
         spDiagShablonNames.setViewportView(lDiagShablonNames);
+
+        tfDiagShablonFilter = new CustomTextField(true, true, false);
+        diagSearchListener = new ShablonSearchListener(tfDiagShablonFilter, lDiagShablonNames);
+        tfDiagShablonFilter.getDocument().addDocumentListener(diagSearchListener);
+        tfDiagShablonFilter.setColumns(10);
     }
 
     private void clearDiagnosisText() {
@@ -1112,9 +1206,6 @@ public class MainFrame extends JFrame {
     }
 
     private void setZaklShablonComponents() {
-        tfZaklShablonNames = new JTextField();
-        tfZaklShablonNames.setColumns(10);
-
         spZaklShablonNames = new JScrollPane();
         lZaklShablonNames = new ThriftIntegerClassifierList();
         lZaklShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -1137,6 +1228,11 @@ public class MainFrame extends JFrame {
             }
         });
         spZaklShablonNames.setViewportView(lZaklShablonNames);
+
+        tfZaklShablonNames = new CustomTextField(true, true, false);
+        tfZaklShablonNames.setColumns(10);
+        zaklSearchListener = new ShablonSearchListener(tfZaklShablonNames, lZaklShablonNames);
+        tfZaklShablonNames.getDocument().addDocumentListener(zaklSearchListener);
     }
 
     private void pasteZaklSelectedShablon(final Shablon shablon) {
