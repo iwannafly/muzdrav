@@ -112,7 +112,10 @@ public class CustomTextComponentWrapper {
 						
 						@Override
 						public void run() {
+							int caretPos = textComponent.getCaretPosition();
+							
 							textComponent.setText(textComponent.getText().toUpperCase());
+							textComponent.setCaretPosition(caretPos);
 							
 							running = false;
 						}
