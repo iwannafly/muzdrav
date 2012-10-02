@@ -399,12 +399,17 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		textField_2 = new JTextField();
 		textField_2.setColumns(10);
 		
-		JTree tree = new JTree();
+		final JTree tree = new JTree();
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
-		 			if (lastPath.toString() ==  "Факторы, влияющие на состояние здоровья");
-		 			JOptionPane.showMessageDialog(frame, "juerhyweutr");
+				if(tree.getLastSelectedPathComponent().toString().equals("Табель работы врача"))
+				{
+					tableVrach tableVrach = new tableVrach();
+					tableVrach.frameVr.setVisible(true); 
+					tableVrach.frameVr.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}
+
 	
 			}
 		});
@@ -415,6 +420,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 					DefaultMutableTreeNode node_2;
 					DefaultMutableTreeNode node_3;
 					node_1 = new DefaultMutableTreeNode("Поликлиника");
+						node_1.add(new DefaultMutableTreeNode("Табель работы врача"));
 						node_2 = new DefaultMutableTreeNode("Регламентные формы");
 							node_3 = new DefaultMutableTreeNode("Отчеты по форме 025");
 								node_3.add(new DefaultMutableTreeNode("Сводная ведомость учета зарегистрированных заболеваний"));
