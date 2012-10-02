@@ -1857,13 +1857,14 @@ public class Vvod extends JFrame {
 						else
 							{pvizitAmb.unsetMobs();}
 						if (cmbVidOpl.getSelectedPcod() != null){
-							pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());}
+							pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
 						if 	(cmbVidOpl.getSelectedPcod() ==2){
 						try {
 								pvizitAmb.setStoim(MainForm.tcl.getStoim(MainForm.authInfo.getKateg(), MainForm.authInfo.getC_nom(), MainForm.authInfo.getCdol()));
 							} catch (TException e3) {
 								e3.printStackTrace();
 							}
+						}else pvizitAmb.unsetStoim();
 						}
 						else 
 						{pvizitAmb.unsetOpl();}
