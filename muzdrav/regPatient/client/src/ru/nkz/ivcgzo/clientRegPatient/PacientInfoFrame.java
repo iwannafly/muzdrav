@@ -3189,8 +3189,8 @@ public class PacientInfoFrame extends JFrame {
             cmb_dms_smo.setSelectedIndex(-1);
             cmb_adm_obl.setSelectedIndex(-1);
             cmb_adp_obl.setSelectedIndex(-1);
-            cmb_adm_gorod.setData(null);
-            cmb_adp_gorod.setData(null);
+            cmb_adm_gorod.setSelectedIndex(-1);
+            cmb_adp_gorod.setSelectedIndex(-1);
             cmb_adm_ul.setData(null);
             cmb_adp_ul.setData(null);
             cmb_adp_dom.setData(null);
@@ -3283,7 +3283,7 @@ public class PacientInfoFrame extends JFrame {
         try {
             NewSign();
             SignInfo = MainForm.tcl.getSign(PatId);
-            if (SignInfo.getGrup().trim() != null){
+            if (SignInfo.getGrup() != null){
                 rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
                 rbtn_gk2.setSelected(SignInfo.grup.charAt(0) == '2');
                 rbtn_gk3.setSelected(SignInfo.grup.charAt(0) == '3');

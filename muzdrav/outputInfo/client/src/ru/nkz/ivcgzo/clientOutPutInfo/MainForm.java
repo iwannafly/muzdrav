@@ -41,7 +41,6 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -55,9 +54,10 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	private JFrame frame;
 	
 	public static ThriftOutputInfo.Client tcl;
-	public Input_info inputInfo;
+	//public Input_info inputInfo;
 	public SvodVed pSvodVed;
 	public FacZd pFacZd;
+	public tableVrach pTableVrach;
 
 
 	/**
@@ -89,19 +89,22 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JTabbedPane tpStac = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpPar = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpReg = new JTabbedPane(JTabbedPane.TOP);
+		tpReg.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		JTabbedPane tpZap = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpRees = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpVrTabel = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tp025 = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tp039 = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tp025 = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpDisp = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tp615 = new JTabbedPane(JTabbedPane.TOP);
+		JTabbedPane tpVzaim = new JTabbedPane(JTabbedPane.TOP);
 		//JTabbedPane tpSvodVed = new JTabbedPane(JTabbedPane.TOP);
 		//JTabbedPane tpFacZd = new JTabbedPane(JTabbedPane.TOP);
 		
 		/**
 		 * Создание панелей (классов) во вкладках
 		 */
-		SvodVed pSvodVed = new SvodVed();
-		FacZd pFacZd = new FacZd();
+		tableVrach pTableVrach = new tableVrach();
 		
 		scrollPane.setViewportView(tpMain);
 
@@ -112,19 +115,28 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		tpMain.addTab("Стационар", tpStac);
 		tpMain.addTab("Параотделение", tpPar);
 		
-		//tpPol.addTab("Табель врача", tpVrTabel);
 		tpPol.addTab("Регламентные сводки", tpReg);
 		tpPol.addTab("Запросы", tpZap);
 		tpPol.addTab("Реестры", tpRees);
+
+		//tp025.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		SvodVed pSvodVed = new SvodVed();
+		FacZd pFacZd = new FacZd();
 		
 		tpReg.addTab("Отчеты по форме 025", tp025);
 		tpReg.addTab("Отчеты по форме 039", tp039);
+		tpReg.addTab("Сводки по диспансеризации", tpDisp);
+		tpReg.addTab("Сводки по пр.№615 и положению 16 ТС", tp615);
+		tpReg.addTab("Реестр на взаиморасчеты по параклинике", tpVzaim);
 		
 		/**
 		 * Создание и привязка панелей (классов)
 		 */
+		
+		tpPol.addTab("Табель врача", pTableVrach);
 		tp025.addTab("Сводная ведомость учета зарегистрированных заболеваний", pSvodVed);
 		tp025.addTab("Факторы, влияющие на состояние здоровья", pFacZd);
+		//tpReg.addTab("Паспорт участка", pFacZd);
 	}
 
 	@Override
