@@ -58,6 +58,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public Input_info inputInfo;
 	public SvodVed pSvodVed;
 	public FacZd pFacZd;
+	public tableVrach pTableVrach;
 
 
 	/**
@@ -102,6 +103,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		 */
 		SvodVed pSvodVed = new SvodVed();
 		FacZd pFacZd = new FacZd();
+		tableVrach pTableVrach = new tableVrach();
 		
 		scrollPane.setViewportView(tpMain);
 
@@ -113,6 +115,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		tpMain.addTab("Параотделение", tpPar);
 		
 		//tpPol.addTab("Табель врача", tpVrTabel);
+		
 		tpPol.addTab("Регламентные сводки", tpReg);
 		tpPol.addTab("Запросы", tpZap);
 		tpPol.addTab("Реестры", tpRees);
@@ -123,6 +126,8 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		/**
 		 * Создание и привязка панелей (классов)
 		 */
+		
+		tpPol.addTab("Табель врача", pTableVrach);
 		tp025.addTab("Сводная ведомость учета зарегистрированных заболеваний", pSvodVed);
 		tp025.addTab("Факторы, влияющие на состояние здоровья", pFacZd);
 	}
