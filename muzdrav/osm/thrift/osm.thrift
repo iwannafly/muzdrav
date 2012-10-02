@@ -285,6 +285,7 @@ struct RdConVizit{
         12: optional i32    sem;
         13: optional i32    osoco;
         14: optional string vrpr;
+        15: optional i32 npasp;
 }
 
 /*Список показателей исследований по выбранному методу*/
