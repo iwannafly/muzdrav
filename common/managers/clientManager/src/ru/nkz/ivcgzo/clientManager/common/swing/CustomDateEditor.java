@@ -194,4 +194,8 @@ public class CustomDateEditor extends JFormattedTextField {
 			setValue(null);
 		}
 	}
+	
+	public SimpleDateFormat getDateFormatter() {
+		return dateFormatter;
+	}
 }
