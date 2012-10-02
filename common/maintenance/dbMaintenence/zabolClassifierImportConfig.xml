@@ -79,6 +79,7 @@
 		<table srcName="U00" dstName="n_u00" />
 		<table srcName="U10" dstName="n_u10" />
 		<table srcName="U50" dstName="n_u50" />
+		<table srcName="V10" dstName="n_v10" />
 		<table srcName="VDI" dstName="n_vdi" />
 		<table srcName="VGO" dstName="n_vgo" />
 		<table srcName="VP2" dstName="n_vp2" />
