@@ -359,8 +359,8 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	/**
 	 * Печать медицинской карты приемного отделения
 	 */
-	string printMedCart(1: Nambk nambk, 2: PatientFullInfo pat, 3: kmiacServer.UserAuthInfo uai) throws (
-		1:kmiacServer.KmiacServerException kse);
+	string printMedCart(1: Nambk nambk, 2: PatientFullInfo pat, 3: kmiacServer.UserAuthInfo uai,
+		4: string docInfo) throws (1:kmiacServer.KmiacServerException kse);
 	
 	/**
 	 * Печать амбулаторный карты

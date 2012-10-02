@@ -388,6 +388,19 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    /**
+     * Возвращает null вместо 0, что помогает избегать записи в БД дефолтной даты '1970-01-01'
+     * @param inDateMillisec - количество миллисекунд
+     * @return Date - если количество миллисекунд больше 0,
+     * null - если количество миллисекунд равно 0
+     */
+    private Date avoidDefaultSqlDateValue(final long inDateMillisec) {
+        if (inDateMillisec == 0) {
+            return null;
+        }
+        return new Date(inDateMillisec);
+    }
+
 ///////////////////// Get Transcription Methods /////////////////////////////////
 
     /**
@@ -758,8 +771,6 @@ public class ServerRegPatient extends Server implements Iface {
 
     //Не нравится этот метод? Мне он тоже не нравится. Говно, а не метод.
     //TODO перепилить добавление объектов с вложенными пользовательскими типами
-    //TODO сделать проверку дат до добавления, иначе вместо пустой даты
-    //добавляет 1970 год, а это не есть хорошо.
     @Override
     public final int addPatient(final PatientFullInfo patinfo)
             throws PatientAlreadyExistException, KmiacServerException {
@@ -777,7 +788,7 @@ public class ServerRegPatient extends Server implements Iface {
                         + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?);", true,
                         patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
-                        new Date(patinfo.getDatar()),
+                        avoidDefaultSqlDateValue(patinfo.getDatar()),
                         patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
                         patinfo.getPol(), patinfo.getJitel(), patinfo.getSgrp(),
                         patinfo.getAdpAddress().getRegion(), patinfo.getAdpAddress().getCity(),
@@ -790,10 +801,12 @@ public class ServerRegPatient extends Server implements Iface {
                         patinfo.getPolis_dms().getStrg(), patinfo.getPolis_dms().getSer(),
                         patinfo.getPolis_dms().getNom(), patinfo.getCpol_pr(), patinfo.getTerp(),
                         patinfo.getTdoc(), patinfo.getDocser(), patinfo.getDocnum(),
-                        new Date(patinfo.getDatadoc()), patinfo.getOdoc(), patinfo.getSnils(),
-                        new Date(patinfo.getDataz()), patinfo.getProf(), patinfo.getTel(),
-                        new Date(patinfo.getDsv()), patinfo.getPrizn(), patinfo.getTer_liv(),
-                        patinfo.getRegion_liv(), patinfo.getV_sch(), patinfo.getStr_org());
+                        avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
+                        patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
+                        patinfo.getProf(), patinfo.getTel(),
+                        avoidDefaultSqlDateValue(patinfo.getDsv()), patinfo.getPrizn(),
+                        patinfo.getTer_liv(), patinfo.getRegion_liv(),
+                        patinfo.getV_sch(), patinfo.getStr_org());
                 int id = sme.getGeneratedKeys().getInt("npasp");
                 sme.setCommit();
                 return id;
@@ -1063,7 +1076,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "dataz = ?, prof = ?, tel = ?, dsv = ?, prizn = ?, ter_liv = ?, "
                 + "region_liv = ?, v_sch = ?, str_org = ? WHERE npasp = ?", false,
                 patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
-                new Date(patinfo.getDatar()),
+                avoidDefaultSqlDateValue(patinfo.getDatar()),
                 patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
                 patinfo.getPol(), patinfo.getJitel(), patinfo.getSgrp(),
                 patinfo.getAdpAddress().getRegion(), patinfo.getAdpAddress().getCity(),
@@ -1076,9 +1089,10 @@ public class ServerRegPatient extends Server implements Iface {
                 patinfo.getPolis_dms().getStrg(), patinfo.getPolis_dms().getSer(),
                 patinfo.getPolis_dms().getNom(), patinfo.getCpol_pr(), patinfo.getTerp(),
                 patinfo.getTdoc(), patinfo.getDocser(), patinfo.getDocnum(),
-                new Date(patinfo.getDatadoc()), patinfo.getOdoc(), patinfo.getSnils(),
-                new Date(patinfo.getDataz()), patinfo.getProf(), patinfo.getTel(),
-                new Date(patinfo.getDsv()), patinfo.getPrizn(), patinfo.getTer_liv(),
+                avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
+                patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
+                patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),
+                patinfo.getPrizn(), patinfo.getTer_liv(),
                 patinfo.getRegion_liv(), patinfo.getV_sch(), patinfo.getStr_org(),
                 patinfo.getNpasp());
             sme.setCommit();
@@ -1400,7 +1414,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
-            final UserAuthInfo uai) throws KmiacServerException {
+            final UserAuthInfo uai, final String docInfo) throws KmiacServerException {
         final String path;
         try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
@@ -1440,7 +1454,8 @@ public class ServerRegPatient extends Server implements Iface {
                     + "," + pat.getAdpAddress().getStreet() + " "
                     + pat.getAdpAddress().getHouse()
                     + " - " + pat.getAdpAddress().getFlat(),
-                pat.getTel()
+                pat.getTel(),
+                docInfo
             );
             osw.write(htmTemplate.getTemplateText());
             return path;
