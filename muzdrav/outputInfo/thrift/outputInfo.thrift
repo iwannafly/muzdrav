@@ -23,6 +23,27 @@ struct SvodVed {
 	10: optional string clpu_name;
 }
 
+struct VrachInfo {
+	1: i32 pcod;
+	2: string fam;
+	3: string im;
+	4: string ot;
+	5: string cdol;
+} 
+
+struct VrachTabel {
+	1: i32 pcod;
+	2: string cdol;
+	3: i64 datav;
+	4: double timep;
+	5: double timed;
+	6: double timepda;
+	7: double timeprf;
+	8: double timepr;
+	9: i32 nuch1;
+	10: i32 nuch2;
+	11: i32 nuch3;
+}
 
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printSvodVed(1: SvodVed sv) throws (1: kmiacServer.KmiacServerException kse);
