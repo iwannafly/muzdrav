@@ -198,6 +198,7 @@ public class Vvod extends JFrame {
 						return;
 					}
 					
+					MainForm.instance.updateZapList();
 					MainForm.instance.setVisible(true);
 				} catch (TException e1) {
 					setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
