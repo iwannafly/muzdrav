@@ -211,8 +211,8 @@ public class ServerOsm extends Server implements Iface {
 //		rsmPdata = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr");
 //		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
-		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",        "uid",       "ves",       "ned",        "lcad",        "ldad",       "rcad",       "rdad",       "rost",       "datar",    "obr",        "sem",          "ososo",       "vrpr" );
-		rdConVizitTypes = new Class<?>[]{                 Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class, Integer.class, Integer.class, Integer.class, Integer.class };
+		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",        "uid",       "ves",       "ned",        "lcad",        "ldad",       "rcad",       "rdad",       "rost",       "datar",    "obr",        "sem",          "ososo",       "vrpr" ,      "npasp");
+		rdConVizitTypes = new Class<?>[]{                 Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
@@ -2213,7 +2213,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<RdVizit> getRdVizit() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT v.datap,v.diag,v.mobs,v.rezult,v.n_sp,s.cod_sp,c.cod_tf,d.fam,d.im,d.ot FROM p_rd_sl rd,p_vizit_amb v, n_s00 s,n_p0c c,s_vrach d where rd.npasp=v.npasp and v.cdol=s.pcod and v.cpos=c.pcod and v.n_sp=d.pcod")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT v.datap,v.diag,v.mobs,v.rezult,v.n_sp,s.cod_sp,c.cod_tf,d.fam,d.im,d.ot,rd.npasp,v.id FROM p_rd_sl rd,p_vizit_amb v, n_s00 s,n_p0c c,s_vrach d where rd.npasp=v.npasp and v.cdol=s.pcod and v.cpos=c.pcod and v.n_sp=d.pcod")) {
 			if (acrs.getResultSet().next())
 				return rsmRdViz.mapToList(acrs.getResultSet());
 			else
@@ -2265,25 +2265,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		Date p1;
-		Integer uid;
-		String fam;
-		String im;
-		String ot;
-		String doc;
-		Integer tawn;
-		String street;
-		String house;
-		String flat;
-		String poms;
-		String dog;
-		Integer stat;
-		Integer lpup;
-		Integer terp;
-		Integer ftown;
-		String fstreet;
-		String fhouse;
-		String fflat;
-		Integer grk = null;
+		Integer ball1 = 0;
+		Integer ball2 = 0;
+		Integer ball3 = 0;
+		Integer ball4 = 0;
+		Integer ball5 = 0;
+		Integer grk = 0;
+		Integer j = 0;
 		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
 				arcs4 = null, arsc5 = null, arsc6 = null;
 		//таблица паспортной информации Patient.csv
@@ -2308,6 +2296,25 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		for (RdVizit rvz : rdVizit) {
 			p1 = new Date(rvz.dv);
 			sb1.append(String.format("%d;%d;%3$td.%3$tm.%3$tY;%d;%s %s %s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, rvz.famwr,rvz.imwr,rvz.otwr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
+		}
+		StringBuilder sb2 = new StringBuilder(0x10000);
+		sb2.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
+		List<RdConVizit> rdConVizit = getRdConVizit();
+		for (RdConVizit rcv : rdConVizit) {
+			j = j+1;
+			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,ball5));		
+		}
+		StringBuilder sb3 = new StringBuilder(0x10000);
+		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl");
+		try (AutoCloseableResultSet acrs1 = sse.execQuery("SELECT npasp rd FROM p_rd_sl rd")) {
+//			String npasp;
+//			if (acrs1.getResultSet().next())
+//				return npasp; //rsmRdPat.mapToList(acrs.getResultSet());
+//			else
+//				throw new KmiacServerException("нет записи");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
 		}
 		return null;
 	}
