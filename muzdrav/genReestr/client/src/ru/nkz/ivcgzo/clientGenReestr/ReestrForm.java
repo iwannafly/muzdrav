@@ -28,6 +28,7 @@ public class ReestrForm extends JFrame {
 
 	public ReestrForm() {
 		//setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setBounds(50, 50, 432, 311); //ширина, высота
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle(configuration.appName+" за отчетный период");
 		
