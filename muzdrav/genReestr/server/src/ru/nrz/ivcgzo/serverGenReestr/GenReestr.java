@@ -2,6 +2,7 @@ package ru.nrz.ivcgzo.serverGenReestr;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -110,31 +111,60 @@ private TServer thrServ;
     }
 
 	@Override
-	public void getReestrInfoPol(int cpodr, long dn, long dk, int vidr, int vopl, int clpu)
+	public void getReestrInfoPol(int cpodr, long dn, long dk, int vidr, int vopl, int clpu, long df)
 			 throws KmiacServerException, ReestrNotFoundException, TException {
         String sqlwhere;
         sqlwhere = "";
         if (vidr == 1) sqlwhere = "AND v.dataz >= ? AND v.dataz <= ? AND v.kod_rez = 0";
         if (vidr == 2) sqlwhere = "AND (v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11))";
         if (vidr == 3) sqlwhere = "AND v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
-//		c_mu, prof_fn,         	
-		String sqlmed = "SELECT  v.id AS sl_id, v.id AS id_med, v.kod_rez AS kod_rez, v.datap as d_pst, 2 AS kl_usl, v.pl_extr AS pl_extr, " +
-				"v.uet AS kol_usl, v.diag AS diag, v.stoim AS stoim, v.cpos AS case, v.rezult AS res_g, 1 AS psv, 0 AS pr_pv, " +
-				"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end) AS c_mu, "+   //from p_vizit_amb where id=v.id, "+
-				"(select get_prof(?, v.cdol)) AS prof_fn, " +
-				"(select get_kodsp(v.cdol)) AS spec, " +
-				"(select get_kodvr(v.cdol)) AS prvd, " +
-				"(select get_vmu(v.cdol)) AS v_mu, " +
-				"(select get_vrach_snils(v.cod_sp)) AS ssd, " +
-				"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end) AS place, " +
-				"(select get_v_sch(p.npasp, ?)) AS v_sch "+
-			    "FROM p_vizit_amb v, patient p " + 
-				"WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? "+sqlwhere;
-		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, dn, dk, dn, dk)) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, dn, dk))) {
+
+//        String sqlmed = "SELECT v.id::integer AS sl_id, v.id AS id_med, v.kod_rez AS kod_rez, v.datap as d_pst, 2 AS kl_usl, v.pl_extr AS pl_extr, " +
+//				"v.uet AS kol_usl, v.diag AS diag, v.stoim AS stoim, v.cpos AS case, v.rezult AS res_g, 1 AS psv, 0 AS pr_pv, " +
+//				"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end) AS c_mu, "+
+//				"(select get_prof(?, v.cdol)) AS prof_fn, " +
+//				"(select get_kodsp(v.cdol)) AS spec, " +
+//				"(select get_kodvr(v.cdol)::integer) AS prvd, " +
+//				"(select get_vmu(v.cdol)) AS v_mu, " +
+//				"(select get_vrach_snils(v.cod_sp)) AS ssd, " +
+//				"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end) AS place, " +
+//				"(select get_v_sch(p.npasp, ?)) AS v_sch, "+
+//				"null::integer AS kod_otd, null::date AS d_end, null::integer AS pr_exp, null::integer AS etap, null::char(15) AS usl, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt "+
+//			    "FROM p_vizit_amb v, patient p " + 
+//				"WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? "+sqlwhere;
+//		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk)))) {
+//            ResultSet rs = acrs.getResultSet();
+//            
+//            new DbfMapper(rs).mapToFile("c:\\med.dbf");
+//            
+//		} catch (SQLException e) {
+//            log.log(Level.ERROR, "SQl Exception: ", e);
+//			throw new KmiacServerException();
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+        
+		String sqlpasp = "SELECT  v.id AS sl_id, 2::integer AS vid_rstr, " +
+				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
+				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
+				"0::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
+				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
+				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
+				"(select get_fam_pr(p.npasp))::char(60) AS fam_rp, "+
+				"(select get_im_pr(p.npasp))::char(40) AS im_rp, "+
+				"(select get_ot_pr(p.npasp))::char(40) AS otch_rp," +
+				"(select get_dr_pr(p.npasp))::date AS dr_pr "+
+			    " FROM p_vizit_amb v, patient p" + 
+				" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? "+sqlwhere;
+		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, cpodr, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, cpodr, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
             ResultSet rs = acrs.getResultSet();
             
-            new DbfMapper(rs).mapToFile("c:\\med.dbf");
-            
+            new DbfMapper(rs).mapToFile("c:\\pasp.dbf");
+		
 		} catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
 			throw new KmiacServerException();
@@ -144,26 +174,6 @@ private TServer thrServ;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		String sqlpasp = "SELECT  v.id AS sl_id, 2 AS vid_rstr, p.str_org AS str_org, p. as name_str, 2 AS kl_usl, v.pl_extr AS pl_extr, " +
-				"v.uet AS kol_usl, null AS c_mu, v.diag AS diag, null AS prof_fn, v.stoim AS stoim, "+
-				"null AS case, null AS place, null AS spec, null AS prvd, null AS v_mu, null AS res_g, null AS ssd, 1 AS psv, 0 AS pr_pv, p.v_sch AS v_sch"+
-			    " FROM p_vizit_amb v, patient p" + 
-				" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpodr = ? "+sqlwhere;
-		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, vopl, cpodr, dn, dk, dn, dk)) : (sse.execPreparedQuery(sqlpasp, vopl, cpodr, dn, dk))) {
-            ResultSet rs = acrs.getResultSet();
-            
-            //new DbfMapper(rs).mapToFile("c:\\pasp.dbf");
-		
-		} catch (SQLException e) {
-            log.log(Level.ERROR, "SQl Exception: ", e);
-			throw new KmiacServerException();
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
 		}
 	}
 

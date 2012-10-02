@@ -406,7 +406,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, dataz, cpol, kod_ter) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 20, 22, 23);
+			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, dataz, cpol, kod_ter, stoim) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 20, 22, 23, 10);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.execPrepared("INSERT INTO p_priem (id_obr, npasp, id_pos) VALUES (?, ?, ?) ", false, pos.id_obr, pos.npasp, id);
 			sme.setCommit();
@@ -2377,4 +2377,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		throw new KmiacServerException();
 	}
 	}
+
+	@Override
+	public double getStoim(String kateg, int prv, String cdol) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select stoim from n_stoim_p where kateg = ? and prv = ? and cdol = ? ", kateg, prv, cdol)) {
+			if (acrs.getResultSet().next())
+				return acrs.getResultSet().getDouble(1);
+			else
+				return 0;
+		} catch (SQLException e) {
+			throw new TException(e);
+		}		
+	}
+
+
+
+	
 }
