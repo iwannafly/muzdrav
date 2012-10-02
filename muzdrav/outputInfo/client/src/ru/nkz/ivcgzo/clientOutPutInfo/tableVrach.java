@@ -9,7 +9,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -21,34 +22,53 @@ import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class tableVrach {
+public class tableVrach extends JPanel {
 	
-	public JFrame frameVr;
+	//public JFrame frameVr;
+	private static CustomTable<VrachInfo, VrachInfo._Fields> tableVrachInfo;
+	private static CustomTable<VrachTabel, VrachTabel._Fields> tableVrachTabel;
 
-public static void main(String[] args) {
+/**public static void main(String[] args) {
 	EventQueue.invokeLater(new Runnable() {
 		public void run() {
 			try {
-				tableVrach window = new tableVrach();
-				window.frameVr.setVisible(true);
+				//tableVrach window = new tableVrach();
+				//window.frameVr.setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	});
-}
+}*/
 
 public tableVrach(){
+	JScrollPane scrollPane = new JScrollPane();
+	scrollPane.setViewportView(this);
 	initialize();
+
 }
 
 public void initialize() {
-	frameVr = new JFrame();
-	frameVr.setTitle("Табель работы врача");
-	frameVr.setBounds(180, 180, 1000, 700);
-	frameVr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//frameVr = new JFrame();
+	//frameVr.setTitle("Табель работы врача");
+	//frameVr.setBounds(180, 180, 1000, 700);
+	//frameVr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	JScrollPane vrPane = new JScrollPane();
+	
+	//Новая таблица врача
+	
+	//frameVr.getContentPane().add(vrPane, BorderLayout.CENTER);
+	tableVrachInfo = new CustomTable<>(false, true, VrachInfo.class, 0, "Код врача", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Должность");
+	tableVrachInfo.setAutoCreateRowSorter(true);
+	tableVrachInfo.getRowSorter().toggleSortOrder(0);
+	tableVrachInfo.setFillsViewportHeight(true);
+	tableVrachInfo.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+	tableVrachInfo.getColumnModel().getColumn(0).setMaxWidth(100);
+	vrPane.setViewportView(tableVrachInfo);
+	
+	//Старая таблица врача
+	/*
 	JTable tableVr = new JTable();
 	tableVr.setModel(new DefaultTableModel(
 			new Object[][] {
@@ -69,36 +89,50 @@ public void initialize() {
 	tableVr.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 	vrPane.setViewportView(tableVr);
 
-	JScrollPane timePane = new JScrollPane();
+	
+	//Старая таблица табеля
 	
 	JTable tableTime = new JTable();
 	tableTime.setModel(new DefaultTableModel(
 			new Object[][] {
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
-					{null, null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
+					{null, null, null, null, null, null, null, null, null, null, null},
 
 			},
 			new String[] {
-					"Код врача", "Должность", "Дата приема", "В поликлинике", "На дому", "На дому актив", "Проф.осмотр", "Прочие", "№1 участка", "№2 участка", "№3 участка", "Прим." 
+					"Код врача", "Должность", "Дата приема", "В поликлинике", "На дому", "На дому актив", "Проф.осмотр", "Прочие", "№1 участка", "№2 участка", "№3 участка" 
 			}
 			));
 	tableTime.setAutoCreateRowSorter(true);
 	tableTime.getRowSorter().toggleSortOrder(0);
 	tableTime.setFillsViewportHeight(true);
 	tableTime.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-	timePane.setViewportView(tableTime);	
+	timePane.setViewportView(tableTime);
+	*/
+	
+	//Новая таблица табеля
+	JScrollPane timePane = new JScrollPane();
+	
+	//frameVr.getContentPane().add(timePane, BorderLayout.CENTER);
+	tableVrachTabel = new CustomTable<>(false, true, VrachTabel.class, 0, "Код врача", 1, "Должность", 2, "Дата приема", 3, "В поликлинике", 4, "На дому", 5, "На дому актив", 6, "Проф.осмотр", 7, "Прочие", 8, "№1 участка", 9, "№2 участка", 10, "№3 участка");
+	tableVrachTabel.setAutoCreateRowSorter(true);
+	tableVrachTabel.getRowSorter().toggleSortOrder(0);
+	tableVrachTabel.setFillsViewportHeight(true);
+	tableVrachTabel.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+	tableVrachTabel.getColumnModel().getColumn(0).setMaxWidth(100);
+	timePane.setViewportView(tableVrachTabel);
 	
 	JPanel butPanel = new JPanel();
 	
 	
-	GroupLayout groupLayout = new GroupLayout(frameVr.getContentPane());
+	GroupLayout groupLayout = new GroupLayout(this);
 	groupLayout.setHorizontalGroup(
 		groupLayout.createParallelGroup(Alignment.TRAILING)
 			.addGroup(groupLayout.createSequentialGroup()
@@ -162,7 +196,7 @@ public void initialize() {
 			}
 		});
 		butPanel.add(butSave);
-	frameVr.getContentPane().setLayout(groupLayout);
+	//frameVr.getContentPane().setLayout(groupLayout);
 	
 	
 	
