@@ -64,6 +64,7 @@ struct PvizitAmb {
 	21: optional i64 dataz;
 	22: optional i32 cpos;
 	23: optional i32 cpol;
+	24: optional i32 kod_ter;
 }
 
 struct PdiagAmb {
@@ -189,7 +190,6 @@ struct RdSlStruct{
 	36: optional i32 id_pvizit;
         37: optional i32 rost; 
 }
-
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
 	2: optional i32 id_pvizit;
@@ -214,7 +214,6 @@ struct RdDinStruct{
 	21: optional i32 id_pos;
 	22: optional double ves;
 }
-
 /*. Rd_Inf*/
 struct RdInfStruct{
 	1: optional i32 npasp;
@@ -268,7 +267,8 @@ struct RdVizit{
          8: optional i32    mso;
          9: optional i32    rzp;
         10: optional i32    aim;
-        11: optional i32    npr;  
+        11: optional i32    npr; 
+        12: optional i32    npasp; 
 }
 struct RdConVizit{
          1: optional i32    uiv;
@@ -285,6 +285,7 @@ struct RdConVizit{
         12: optional i32    sem;
         13: optional i32    osoco;
         14: optional string vrpr;
+        15: optional i32 npasp;
 }
 
 /*Список показателей исследований по выбранному методу*/
@@ -488,6 +489,18 @@ struct Pmer{
 	15: string name_pmer;
 }
 
+struct Pobost{
+	1: i32 id;
+	2: i32 npasp;
+	3: i32 id_pdiag;
+	4: string diag;
+	5: i32 sl_obostr;
+	6: i32 sl_hron;
+	7: i32 cod_sp;
+	8: string cdol;
+	9: i64 dataz;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -591,7 +604,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
 	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
-
+ 
 	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteRdDin(1:i32 id_pos,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -619,8 +632,15 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispMer*/
-	list<Pmer> getPmer (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pmer> getPmer (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePmer(1: i32 pmer_id) throws (1: kmiacServer.KmiacServerException kse);
+
+/*Disp_sl_obostr*/
+	list<Pobost> getPobost (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePobost(1: i32 pobost_id) throws (1: kmiacServer.KmiacServerException kse);
+
 }

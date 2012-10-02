@@ -68,7 +68,6 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
@@ -2013,14 +2012,19 @@ public class Vvod extends JFrame {
 	}
 	
 	private void syncShablonList(String searchString, Shablon shablon) {
+		
 		shablonSearchListener.updateNow(searchString);
 		
-		for (int i = 0; i < lbShabSrc.getData().size(); i++)
-			if (lbShabSrc.getData().get(i).pcod == shablon.id)
-			{
-				lbShabSrc.setSelectedIndex(i);
-				break;
-			}
+		if (shablon != null) {
+			for (int i = 0; i < lbShabSrc.getData().size(); i++)
+				if (lbShabSrc.getData().get(i).pcod == shablon.id)
+				{
+					lbShabSrc.setSelectedIndex(i);
+					break;
+				}
+		} else {
+			lbShabSrc.setSelectedIndex(-1);
+		}
 	}
 	
 	private void loadShablonList() {
