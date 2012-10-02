@@ -68,7 +68,6 @@ import ru.nkz.ivcgzo.thriftOsm.PdiagNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.PdiagZ;
 import ru.nkz.ivcgzo.thriftOsm.Pdisp;
 import ru.nkz.ivcgzo.thriftOsm.PdispNotFoundException;
-import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
@@ -1715,6 +1714,7 @@ public class Vvod extends JFrame {
 				pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 				pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
+				pvizitAmb.setKod_ter(MainForm.authInfo.getKdate());
 				
 				for (PvizitAmb pviz : tblPos.getData())
 					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
@@ -1770,6 +1770,7 @@ public class Vvod extends JFrame {
 						pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 						pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
+						pvizitAmb.setKod_ter(MainForm.authInfo.getKdate());
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
 						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, 0);
 					} catch (KmiacServerException e1) {
@@ -1855,8 +1856,16 @@ public class Vvod extends JFrame {
 							pvizitAmb.setMobs(cmbMobs.getSelectedPcod());
 						else
 							{pvizitAmb.unsetMobs();}
-						if (cmbVidOpl.getSelectedPcod() != null)
+						if (cmbVidOpl.getSelectedPcod() != null){
 							pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
+						if 	(cmbVidOpl.getSelectedPcod() ==2){
+						try {
+								pvizitAmb.setStoim(MainForm.tcl.getStoim(MainForm.authInfo.getKateg(), MainForm.authInfo.getC_nom(), MainForm.authInfo.getCdol()));
+							} catch (TException e3) {
+								e3.printStackTrace();
+							}
+						}else pvizitAmb.unsetStoim();
+						}
 						else 
 						{pvizitAmb.unsetOpl();}
 						pvizitAmb.setPl_extr(1);
@@ -2013,14 +2022,19 @@ public class Vvod extends JFrame {
 	}
 	
 	private void syncShablonList(String searchString, Shablon shablon) {
+		
 		shablonSearchListener.updateNow(searchString);
 		
-		for (int i = 0; i < lbShabSrc.getData().size(); i++)
-			if (lbShabSrc.getData().get(i).pcod == shablon.id)
-			{
-				lbShabSrc.setSelectedIndex(i);
-				break;
-			}
+		if (shablon != null) {
+			for (int i = 0; i < lbShabSrc.getData().size(); i++)
+				if (lbShabSrc.getData().get(i).pcod == shablon.id)
+				{
+					lbShabSrc.setSelectedIndex(i);
+					break;
+				}
+		} else {
+			lbShabSrc.setSelectedIndex(-1);
+		}
 	}
 	
 	private void loadShablonList() {

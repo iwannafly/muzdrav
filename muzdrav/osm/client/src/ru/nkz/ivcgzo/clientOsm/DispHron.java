@@ -12,28 +12,38 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOsm.PdiagAmb;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
+import ru.nkz.ivcgzo.thriftOsm.Pobost;
+
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 
 public class DispHron extends JFrame{
+	private static final long serialVersionUID = -2929416282414434095L;
 	private CustomTable<Pmer,Pmer._Fields> tblDispHron;
 	private Pmer pmer;
+	private ThriftStringClassifierCombobox<StringClassifier> cmbDiag;
+	private CustomTable<Pobost,Pobost._Fields> tabObost;
+	private Pobost obostr;
 
 
-	/**
-	 * Create the application.
-	 */
 	public DispHron() {
 		setTitle("Диспансеризация");
-		setBounds(100, 100, 1011, 398);
+		setBounds(100, 100, 1011, 739);
 		JScrollPane spDispHron = new JScrollPane();
 		spDispHron.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		spDispHron.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -52,41 +62,43 @@ public class DispHron extends JFrame{
 		
 		JScrollPane scrollPane = new JScrollPane();
 		
-		JButton button = new JButton("+");
-		button.addActionListener(new ActionListener() {
+		JButton bAddDispHron = new JButton("");
+		bAddDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
+		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pmer = new Pmer();
 		  		pmer.setNpasp(Vvod.zapVr.getNpasp());
 		  		pmer.setId_pdiag(Vvod.pdisp.getId_diag());
-		  		pmer.setDiag(Vvod.pdisp.getDiag());
+		  		pmer.setDiag(cmbDiag.getSelectedPcod());
 		  		pmer.setCod_sp(MainForm.authInfo.getPcod());
 		  		pmer.setId_pvizit(Vvod.pvizit.getId());
 		  		pmer.setId_pos(Vvod.pvizitAmb.getId());
 				try {
 					pmer.setId(MainForm.tcl.AddPmer(pmer));
 				} catch (KmiacServerException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 	 			tblDispHron.addItem(pmer);
 			}
 		});
 		
-		JButton btnV = new JButton("v");
-		btnV.addActionListener(new ActionListener() {
+		JButton bSaveDispHron = new JButton("");
+		bSaveDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
+		bSaveDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Pmer pmer = new Pmer();
-				pmer.setId(tblDispHron.getSelectedItem().getId());
-				pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
-				pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
-				pmer.setFdat(tblDispHron.getSelectedItem().getFdat());
-				pmer.setDataz(System.currentTimeMillis());
-				pmer.setRez(tblDispHron.getSelectedItem().getRez());
-				pmer.setCdol(tblDispHron.getSelectedItem().getCdol());
+				tblDispHron.updateSelectedItem();
 				try {
+					Pmer pmer = new Pmer();
+					pmer.setId(tblDispHron.getSelectedItem().getId());
+					pmer.setDiag(tblDispHron.getSelectedItem().getDiag());
+					pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
+					pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
+					pmer.setFdat(tblDispHron.getSelectedItem().getFdat());
+					pmer.setDataz(System.currentTimeMillis());
+					pmer.setRez(tblDispHron.getSelectedItem().getRez());
+					pmer.setCdol(tblDispHron.getSelectedItem().getCdol());
 					MainForm.tcl.UpdatePmer(pmer);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -96,14 +108,15 @@ public class DispHron extends JFrame{
 				}
 		});
 		
-		final JButton button_1 = new JButton("-");
-		button_1.addActionListener(new ActionListener() {
+		final JButton bDelDispHron = new JButton("");
+		bDelDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
+		bDelDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		  		try {
 						if (tblDispHron.getSelectedItem()!= null)
-						if (JOptionPane.showConfirmDialog(button_1, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+						if (JOptionPane.showConfirmDialog(bDelDispHron, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 			  			MainForm.tcl.DeletePmer(tblDispHron.getSelectedItem().getId());
-						tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp()));}
+						tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), "D50"));}
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -111,37 +124,109 @@ public class DispHron extends JFrame{
 					}
 			}
 		});
+		
+		 cmbDiag = new ThriftStringClassifierCombobox<>(true);
+		
+		JLabel lblDiag = new JLabel("Диагноз");
+		
+		JScrollPane spObost = new JScrollPane();
+		
+		JLabel lblObost = new JLabel("Случаи обострения");
+		
+		JButton bAddObost = new JButton("");
+		bAddObost.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			JOptionPane.showMessageDialog(DispHron.this, Vvod.pdisp.id_diag);
+			}
+		});
+		bAddObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
+		
+		JButton bSaveObost = new JButton("");
+		bSaveObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
+		
+		JButton bDelObost = new JButton("");
+		bDelObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		GroupLayout gl_pnlDispHron = new GroupLayout(pnlDispHron);
 		gl_pnlDispHron.setHorizontalGroup(
 			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlDispHron.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
-						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 969, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDispHron.createSequentialGroup()
-							.addComponent(button)
+							.addGap(5)
+							.addComponent(lblDiag)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(cmbDiag, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pnlDispHron.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(bAddDispHron)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnV)
+							.addComponent(bSaveDispHron)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button_1)))
-					.addContainerGap(22, Short.MAX_VALUE))
+							.addComponent(bDelDispHron))
+						.addGroup(gl_pnlDispHron.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 983, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pnlDispHron.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(bAddObost)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(bSaveObost)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(bDelObost))
+						.addGroup(gl_pnlDispHron.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(spObost, GroupLayout.PREFERRED_SIZE, 969, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pnlDispHron.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(lblObost)))
+					.addContainerGap(10, Short.MAX_VALUE))
 		);
 		gl_pnlDispHron.setVerticalGroup(
 			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlDispHron.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 297, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.BASELINE)
+						.addComponent(cmbDiag, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblDiag))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.BASELINE)
-						.addComponent(button)
-						.addComponent(btnV)
-						.addComponent(button_1))
-					.addContainerGap(434, Short.MAX_VALUE))
+						.addComponent(bAddDispHron)
+						.addComponent(bSaveDispHron)
+						.addComponent(bDelDispHron))
+					.addGap(26)
+					.addComponent(lblObost)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(spObost, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
+						.addComponent(bAddObost)
+						.addComponent(bSaveObost)
+						.addComponent(bDelObost))
+					.addGap(872))
 		);
 		
-		tblDispHron = new CustomTable<>(true,true,Pmer.class,3,"Диагноз",4,"Мероприятие",11,"Специалист",5,"Дата план.",6,"Дата факт.",10,"Результат");
+		tabObost = new CustomTable<>(true, true, Pobost.class,4,"Случай обострения",5,"Случай хронического очага",8,"Дата обострения");
+		tabObost.setDateField(2);
+		tabObost.setFillsViewportHeight(true);
+		spObost.setViewportView(tabObost);
+		
+		tblDispHron = new CustomTable<>(true,true,Pmer.class,4,"Мероприятие",11,"Специалист",5,"Дата план.",6,"Дата факт.",10,"Результат");
+		tblDispHron.setDateField(2);
 		tblDispHron.setDateField(3);
-		tblDispHron.setDateField(4);
+		
+		tblDispHron.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+//			if (!arg0.getValueIsAdjusting()){
+//				if (tblDispHron.getSelectedItem()!= null) {
+//					
+//				}
+//			}
+		}
+				});
+	
 		tblDispHron.setFillsViewportHeight(true);
 		scrollPane.setViewportView(tblDispHron);
 		pnlDispHron.setLayout(gl_pnlDispHron);
@@ -150,11 +235,12 @@ public class DispHron extends JFrame{
 	
 	public void ShowDispHron()
 	{	try {
-		tblDispHron.setData(MainForm.tcl.getPmer(16164));
-		tblDispHron.setStringClassifierSelector(0, MainForm.tcl.get_n_c00(16164));
-		tblDispHron.setIntegerClassifierSelector(1, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
-		tblDispHron.setStringClassifierSelector(2, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
-		tblDispHron.setIntegerClassifierSelector(5, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
+		cmbDiag.setData(MainForm.tcl.get_n_c00(16164));
+		tblDispHron.setData(MainForm.tcl.getPmer(16164, "D50.0"));
+		tabObost.setData(MainForm.tcl.getPobost(16164, "D50.0"));
+		tblDispHron.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
+		tblDispHron.setStringClassifierSelector(1, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
+		tblDispHron.setIntegerClassifierSelector(4, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
 		
 	} catch (KmiacServerException e) {
 		e.printStackTrace();

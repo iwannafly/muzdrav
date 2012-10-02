@@ -33,28 +33,37 @@ import javax.swing.tree.TreePath;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper.DefaultLanguage;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftServerAdmin.ShablonDop;
+import ru.nkz.ivcgzo.thriftServerAdmin.ShablonLds;
 import ru.nkz.ivcgzo.thriftServerAdmin.TemplateExistsException;
 
-public class ShablonDopPanel extends JPanel {
+public class ShablonLdsPanel extends JPanel {
 	private static final long serialVersionUID = -181023590802237403L;
 	private CustomTextField tbSearch;
 	private SearchTree trSearch;
 	private JButton btDelete;
 	private JButton btCreate;
 	private CustomTextField tbName;
-	private JScrollPane spText;
-	private JTextArea tbText;
+	private CustomTextField tbIssl;
+	private JLabel lblIsslName;
+	private JScrollPane spOpis;
+	private JTextArea tbOpis;
+	private JTextArea tbZakl;
 	private DocumentListener textListener;
 	private JButton btSave;
-	private ShablonDop shDop;
+	private ShablonLds shLds;
 	private boolean fillingUI;
 	private Font defFont;
+	private String prevIssl, prevIsslName;
 	
-	public ShablonDopPanel() {
+	public ShablonLdsPanel() {
+		prevIssl = "";
+		prevIsslName = null;
 		textListener = new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -76,13 +85,11 @@ public class ShablonDopPanel extends JPanel {
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 775, Short.MAX_VALUE)
+				.addComponent(splitPane, GroupLayout.PREFERRED_SIZE, 683, Short.MAX_VALUE)
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
-					.addGap(0))
+				.addComponent(splitPane, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
 		);
 		
 		JPanel gbSearch = new JPanel();
@@ -116,13 +123,7 @@ public class ShablonDopPanel extends JPanel {
 		btDelete = new JButton("Удалить");
 		btDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					trSearch.removeSelected();
-				} catch (KmiacServerException e1) {
-					JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-				} catch (TException e1) {
-					MainForm.conMan.reconnect(e1);
-				}
+				trSearch.removeSelected();
 			}
 		});
 		
@@ -179,15 +180,31 @@ public class ShablonDopPanel extends JPanel {
 		
 		JPanel gbText = new JPanel();
 		gbText.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Тексты", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		tbIssl = new CustomTextField();
+		tbIssl.setDefaultLanguage(DefaultLanguage.English);
+		tbIssl.getDocument().addDocumentListener(textListener);
+		tbIssl.setColumns(10);
+		
+		JLabel lblIssl = new JLabel("Исследование");
+		
+		lblIsslName = new JLabel("");
 		GroupLayout gl_gbEdit = new GroupLayout(gbEdit);
 		gl_gbEdit.setHorizontalGroup(
 			gl_gbEdit.createParallelGroup(Alignment.LEADING)
+				.addComponent(btSave, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
 				.addGroup(gl_gbEdit.createSequentialGroup()
-					.addComponent(lbName, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_gbEdit.createParallelGroup(Alignment.LEADING)
+						.addComponent(lbName, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblIssl, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tbName, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE))
-				.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
-				.addComponent(btSave, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
+					.addGroup(gl_gbEdit.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_gbEdit.createSequentialGroup()
+							.addComponent(tbIssl, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblIsslName, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE))
+						.addComponent(tbName, GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)))
+				.addComponent(gbText, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 		);
 		gl_gbEdit.setVerticalGroup(
 			gl_gbEdit.createParallelGroup(Alignment.TRAILING)
@@ -196,27 +213,54 @@ public class ShablonDopPanel extends JPanel {
 						.addComponent(tbName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lbName))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+					.addGroup(gl_gbEdit.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tbIssl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblIssl)
+						.addComponent(lblIsslName))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btSave))
 		);
 		
-		spText = new JScrollPane();
+		spOpis = new JScrollPane();
+		
+		JLabel lblOpis = new JLabel("Описание");
+		
+		JLabel lblZakl = new JLabel("Заключение");
+		
+		JScrollPane spZakl = new JScrollPane();
 		GroupLayout gl_gbText = new GroupLayout(gbText);
 		gl_gbText.setHorizontalGroup(
 			gl_gbText.createParallelGroup(Alignment.LEADING)
-				.addComponent(spText, GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
+				.addComponent(lblOpis, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+				.addComponent(spOpis, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
+				.addComponent(lblZakl, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
+				.addComponent(spZakl, GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
 		);
 		gl_gbText.setVerticalGroup(
 			gl_gbText.createParallelGroup(Alignment.LEADING)
-				.addComponent(spText, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+				.addGroup(gl_gbText.createSequentialGroup()
+					.addComponent(lblOpis)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(spOpis, GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblZakl)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(spZakl, GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
 		);
 		
-		tbText = new JTextArea();
-		tbText.getDocument().addDocumentListener(textListener);
-		tbText.setFont(defFont);
-		new CustomTextComponentWrapper(tbText).setPopupMenu();
-		spText.setViewportView(tbText);
+		tbZakl = new JTextArea();
+		tbZakl.getDocument().addDocumentListener(textListener);
+		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		new CustomTextComponentWrapper(tbZakl).setPopupMenu();
+		spZakl.setViewportView(tbZakl);
+		
+		tbOpis = new JTextArea();
+		tbOpis.getDocument().addDocumentListener(textListener);
+		tbOpis.setFont(defFont);
+		new CustomTextComponentWrapper(tbOpis).setPopupMenu();
+		spOpis.setViewportView(tbOpis);
 		gbText.setLayout(gl_gbText);
 		
 		gbEdit.setLayout(gl_gbEdit);
@@ -231,7 +275,13 @@ public class ShablonDopPanel extends JPanel {
 	
 	private void clearFields() {
 		tbName.clear();
-		tbText.setText("");
+		lblIsslName.setText("");
+		prevIssl = "";
+		prevIsslName = null;
+		tbIssl.clear();
+		tbIssl.setEditable(true);
+		tbOpis.setText("");
+		tbZakl.setText("");
 		
 		btSave.setEnabled(false);
 		btDelete.setEnabled(false);
@@ -241,21 +291,23 @@ public class ShablonDopPanel extends JPanel {
 		fillShablonFromUI();
 		
 		try {
-			shDop.setId(MainForm.tcl.saveShDop(shDop));
+			shLds.setId(MainForm.tcl.saveShLds(shLds));
 			trSearch.updateSavedNode();
 		} catch (TemplateExistsException e) {
-			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Шаблон с таким именем уже существует для данного раздела.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Шаблон с таким именем уже существует для данного исследования.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			tbName.requestFocusInWindow();
 		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
-			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
 	}
 	
 	private void fillShablonFromUI() {
-		shDop.setName(tbName.getText());
-		shDop.setText(tbText.getText());
+		shLds.setName(tbName.getText());
+		shLds.setC_ldi(tbIssl.getText());
+		shLds.setOpis(tbOpis.getText());
+		shLds.setZakl(tbZakl.getText());
 	}
 	
 	private void checkInput() {
@@ -264,21 +316,28 @@ public class ShablonDopPanel extends JPanel {
 		
 		boolean enb = true;
 		
+		if (!prevIssl.equals(tbIssl.getText())) {
+			prevIssl = tbIssl.getText();
+			prevIsslName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_ldi, prevIssl);
+			lblIsslName.setText(prevIsslName);
+		}
 		enb &= !tbName.isEmpty();
-		enb &= !(tbText.getText().length() == 0);
+		enb &= !(tbOpis.getText().length() == 0);
+		enb &= !(tbZakl.getText().length() == 0);
 		enb &= trSearch.getSelectionPath() != null;
 		if (enb)
-			enb &= ((DefaultMutableTreeNode) trSearch.getSelectionPath().getLastPathComponent()).getLevel() == 2;
+			enb &= ((DefaultMutableTreeNode) trSearch.getSelectionPath().getLastPathComponent()).getLevel() == 3;
+		enb &= prevIsslName != null;
 		
 		btSave.setEnabled(enb);
 	}
 	
 	private void loadShablon(int id) {
 		try {
-			shDop = MainForm.tcl.getShDop(id);
+			shLds = MainForm.tcl.getShLds(id);
 			fillUIFromShablon();
 		} catch (KmiacServerException e) {
-			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -288,10 +347,13 @@ public class ShablonDopPanel extends JPanel {
 		fillingUI = true;
 		
 		try {
-			tbName.setText(shDop.name);
+			tbName.setText(shLds.name);
 			tbName.setCaretPosition(0);
-			tbText.setText(shDop.text);
-			tbText.setCaretPosition(0);
+			tbIssl.setText(shLds.c_ldi);
+			tbOpis.setText(shLds.opis);
+			tbOpis.setCaretPosition(0);
+			tbZakl.setText(shLds.zakl);
+			tbZakl.setCaretPosition(0);
 			
 			fillingUI = false;
 			btDelete.setEnabled(true);
@@ -328,11 +390,32 @@ public class ShablonDopPanel extends JPanel {
 					Object lp = event.getPath().getLastPathComponent();
 					
 					if (!changingNodes) {
-							IntClassTreeNode node = (IntClassTreeNode) lp;
-							
+						DefaultMutableTreeNode node = (DefaultMutableTreeNode) lp;
+						
+						if (node.getLevel() == 1) {
 							try {
 								node.removeAllChildren();
-								for (IntegerClassifier ic : MainForm.tcl.getShDopList(node.getCode()))
+								for (StringClassifier sc : MainForm.tcl.getShLdsIsslList(((IntClassTreeNode) node).getCode())) {
+									StrClassTreeNode sct = new StrClassTreeNode(sc);
+									sct.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
+									node.add(sct);
+								}
+								((DefaultTreeModel) getModel()).reload(node);
+								if (node.getChildCount() == 0) {
+									node.add(new StrClassTreeNode(new StringClassifier("-1", "Dummy")));
+									collapsePath(new TreePath(lp));
+								}
+							} catch (KmiacServerException e) {
+								collapsePath(new TreePath(lp));
+								JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Ошибка загрузки исследований.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+							} catch (TException e) {
+								collapsePath(new TreePath(lp));
+								MainForm.conMan.reconnect(e);
+							}
+						} else if (node.getLevel() == 2) {
+							try {
+								node.removeAllChildren();
+								for (IntegerClassifier ic : MainForm.tcl.getShLdsList(((IntClassTreeNode) node.getParent()).getCode(), ((StrClassTreeNode) node).getCode()))
 									node.add(new IntClassTreeNode(ic));
 								((DefaultTreeModel) getModel()).reload(node);
 								if (node.getChildCount() == 0) {
@@ -341,12 +424,13 @@ public class ShablonDopPanel extends JPanel {
 								}
 							} catch (KmiacServerException e) {
 								collapsePath(new TreePath(lp));
-								JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка загрузки шаблонов на данную группу.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Ошибка загрузки шаблонов на данное исследование.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 							} catch (TException e) {
 								collapsePath(new TreePath(lp));
 								MainForm.conMan.reconnect(e);
 							}
 						}
+					}
 				}
 				
 				@Override
@@ -362,13 +446,16 @@ public class ShablonDopPanel extends JPanel {
 					if (!changingNodes)
 						removeUnsavedNode();
 					if (e.getNewLeadSelectionPath() != null) {
-						Object lp = e.getNewLeadSelectionPath().getLastPathComponent();
+						DefaultMutableTreeNode lp = (DefaultMutableTreeNode) e.getNewLeadSelectionPath().getLastPathComponent();
 						
-						if ((lp instanceof IntClassTreeNode) && (((IntClassTreeNode) lp).getLevel() == 2))
-							if (!changingNodes)
+						if ((lp instanceof IntClassTreeNode) && (((IntClassTreeNode) lp).getLevel() == 3))
+							if (!changingNodes) {
 								loadShablon(((IntClassTreeNode) lp).getCode());
-							else
+								tbIssl.setEditable(false);
+							} else {
 								fillUIFromShablon();
+								tbIssl.setEditable(((StrClassTreeNode)lp.getParent()).getCode().equals("-1"));
+							}
 						else
 							clearFields();
 					} else {
@@ -413,89 +500,131 @@ public class ShablonDopPanel extends JPanel {
 			try {
 				DefaultMutableTreeNode root = new DefaultMutableTreeNode("Root");
 				
-				for (IntegerClassifier ic : MainForm.tcl.getShDopRazdList()) {
+				for (IntegerClassifier ic : MainForm.tcl.getShLdsVidIsslList()) {
 					IntClassTreeNode node = new IntClassTreeNode(ic);
 					
-					node.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
+					node.add(new StrClassTreeNode(new StringClassifier("-1", "Dummy")));
 					root.add(node);
 				}
 				setModel(new DefaultTreeModel(root));
 				if (root.getChildCount() > 0)
 					setSelectionPath(new TreePath(new Object[] {root, root.getChildAt(0)}));
 			} catch (KmiacServerException e) {
-				JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка загрузки результатов поиска.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Ошибка загрузки результатов поиска.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			} catch (TException e) {
 				MainForm.conMan.reconnect(e);
 			}
 		}
 		
-		public void removeSelected() throws KmiacServerException, TException {
+		public void removeUnsavedNode() {
+			if (newNode != null)
+				try {
+					DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+					StrClassTreeNode tnIssl = (StrClassTreeNode) newNode.getParent();
+					IntClassTreeNode tnVidIssl = (IntClassTreeNode) tnIssl.getParent();
+					int tempIdx = tnIssl.getIndex(newNode);
+					int vidIsslIdx = tnVidIssl.getIndex(tnIssl);
+					
+					changingNodes = true;
+					getModel().removeNodeFromParent(newNode);
+					newNode = null;
+					if (tnIssl.getChildCount() > 0) {
+						if (tempIdx >= tnIssl.getChildCount())
+							tempIdx = tnIssl.getChildCount() - 1;
+						changingNodes = false;
+						if (getSelectionPath() == null)
+							setSelectionPath(new TreePath(new Object[] {root, tnVidIssl, tnIssl, tnIssl.getChildAt(tempIdx)}));
+					} else {
+						getModel().removeNodeFromParent(tnIssl);
+						if (tnVidIssl.getChildCount() > 0) {
+							if (vidIsslIdx >= tnVidIssl.getChildCount())
+								vidIsslIdx = tnVidIssl.getChildCount() - 1;
+							changingNodes = false;
+							if (getSelectionPath() == null)
+								setSelectionPath(new TreePath(new Object[] {root, tnVidIssl, tnVidIssl.getChildAt(vidIsslIdx)}));
+						} else {
+							tnVidIssl.add(new StrClassTreeNode(new StringClassifier("-1", "Dummy")));
+							collapsePath(new TreePath(tnIssl));
+							if (getSelectionPath() == null)
+								setSelectionPath(new TreePath(new Object[] {root, tnVidIssl}));
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					newNode = null;
+					changingNodes = false;
+				}
+		}
+		
+		public void removeSelected() {
 			if (getSelectionPath() != null)
 				if (getSelectionPath().getLastPathComponent() != null)
-					if ((getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode) && (((IntClassTreeNode) getSelectionPath().getLastPathComponent()).getLevel() == 2)) {
-						if (shDop.id > 0)
-							MainForm.tcl.deleteShDop(shDop.id);
-						
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-						IntClassTreeNode parent = (IntClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
-						IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
-						int childIndex = parent.getIndex(child);
-						
-						changingNodes = true;
+					if ((getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode) && (((IntClassTreeNode) getSelectionPath().getLastPathComponent()).getLevel() == 3)) {
 						try {
-							getModel().removeNodeFromParent(child);
-							if (parent.getChildCount() > 0) {
-								if (childIndex >= parent.getChildCount())
-									childIndex = parent.getChildCount() - 1;
-								changingNodes = false;
-								setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
-							} else {
-								parent.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
-								collapsePath(new TreePath(parent));
-								setSelectionPath(new TreePath(new Object[] {root, parent}));
+							if (shLds.id > 0) {
+								MainForm.tcl.deleteShLds(shLds.id);
+								newNode = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
 							}
+							
+							removeUnsavedNode();
+						} catch (KmiacServerException e) {
+							JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						} catch (TException e) {
+							e.printStackTrace();
+							MainForm.conMan.reconnect(e);
 						} catch (Exception e) {
 							e.printStackTrace();
-						} finally {
-							newNode = null;
-							changingNodes = false;
 						}
 					}
 		}
 		
 		public void createNew() {
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-			IntClassTreeNode parent = null;
+			IntClassTreeNode tnVidIssl = null;
+			StrClassTreeNode tnIssl = null;
 			TreePath path;
 			
 			removeUnsavedNode();
 			
-			shDop = new ShablonDop().setName("Без названия");
+			shLds = new ShablonLds().setName("Без названия");
 			
 			if (getSelectionPath() != null)
-				if (getSelectionPath().getLastPathComponent() != null)
-					if (getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode)
-						if (((IntClassTreeNode) getSelectionPath().getLastPathComponent()).getLevel() == 2) {
-						parent = (IntClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
-					} else if (((IntClassTreeNode) getSelectionPath().getLastPathComponent()).getLevel() == 1) {
-						parent = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
-						expandPath(new TreePath(parent));
-						if (parent.getChildCount() == 1)
-							if (((IntClassTreeNode) parent.getChildAt(0)).getCode() == -1)
-								parent.remove(0);
+				if (getSelectionPath().getLastPathComponent() != null) {
+					int level = ((DefaultMutableTreeNode) getSelectionPath().getLastPathComponent()).getLevel();
+					if (level == 3) {
+						tnIssl = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
+					} else if (level == 2) {
+						tnIssl = (StrClassTreeNode) getSelectionPath().getLastPathComponent();
+						expandPath(new TreePath(tnIssl));
+						if (tnIssl.getChildCount() == 1)
+							if (((IntClassTreeNode) tnIssl.getChildAt(0)).getCode() == -1)
+								tnIssl.remove(0);
+					} else if (level == 1) {
+						tnIssl = new StrClassTreeNode(new StringClassifier("-1", "Без названия"));
+						tnVidIssl = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
+						getModel().reload(tnVidIssl);
+						expandPath(new TreePath(tnVidIssl));
+						if  (((StrClassTreeNode)tnVidIssl.getChildAt(0)).getCode().equals("-1")) {
+							tnVidIssl.remove(0);
+						}
+						getModel().insertNodeInto(tnIssl, tnVidIssl, tnVidIssl.getChildCount());
 					}
-			if (parent == null) {
-				JOptionPane.showMessageDialog(ShablonDopPanel.this, "Перед созданием шаблона необходимо выбрать раздел.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				}
+			if (tnIssl == null) {
+				JOptionPane.showMessageDialog(ShablonLdsPanel.this, "Перед созданием шаблона необходимо выбрать исследование.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 			
+			tnVidIssl = (IntClassTreeNode) tnIssl.getParent();
 			changingNodes = true;
 			try {
-				shDop.setIdNshablon(parent.getCode());
-				newNode = new IntClassTreeNode(new IntegerClassifier(0, shDop.name));
-				parent.add(newNode);
-				getModel().reload(parent);
-				path = new TreePath(new Object[] {root, parent, newNode});
+				shLds.setC_p0e1(tnVidIssl.getCode());
+				shLds.setC_ldi(tnIssl.getCode());
+				newNode = new IntClassTreeNode(new IntegerClassifier(0, shLds.name));
+				tnIssl.add(newNode);
+				getModel().reload(tnIssl);
+				path = new TreePath(new Object[] {root, tnVidIssl, tnIssl, newNode});
 				setSelectionPath(path);
 				scrollPathToVisible(path);
 			} catch (Exception e) {
@@ -506,46 +635,38 @@ public class ShablonDopPanel extends JPanel {
 		}
 		
 		public void updateSavedNode() {
-			IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
-			IntClassTreeNode parent = (IntClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
 			DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+			StrClassTreeNode tnIssl = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
+			IntClassTreeNode tnTemp = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
 			TreePath path;
 			
 			newNode = null;
-			child.ic.setPcod(shDop.id);
-			child.ic.setName(shDop.name);
-			getModel().reload(child);
-			path = new TreePath(new Object[] {root, parent, child});
+			tnIssl.sc.setPcod(shLds.c_ldi);
+			tnIssl.sc.setName(lblIsslName.getText());
+			tnTemp.ic.setPcod(shLds.id);
+			tnTemp.ic.setName(shLds.name);
+			getModel().reload(tnIssl);
+			getModel().reload(tnTemp);
+			path = new TreePath(new Object[] {root, tnIssl.getParent(), tnIssl, tnTemp});
 			setSelectionPath(path);
 			scrollPathToVisible(path);
 		}
 		
-		private void removeUnsavedNode() {
-			if (newNode != null) {
-				if (newNode.getCode() == 0) {
-					try {
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-						IntClassTreeNode parent = (IntClassTreeNode) newNode.getParent();
-						int childIndex = parent.getIndex(newNode);
-						
-						changingNodes = true;
-						getModel().removeNodeFromParent(newNode);
-						if (parent.getChildCount() > 0) {
-							if (childIndex >= parent.getChildCount())
-								childIndex = parent.getChildCount() - 1;
-							setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
-						} else {
-							parent.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
-							collapsePath(new TreePath(parent));
-							setSelectionPath(new TreePath(new Object[] {root, parent}));
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						newNode = null;
-						changingNodes = false;
-					}
-				}
+		private class StrClassTreeNode extends DefaultMutableTreeNode {
+			private static final long serialVersionUID = -1181358595138642104L;
+			private StringClassifier sc;
+			
+			public StrClassTreeNode(StringClassifier sc) {
+				this.sc = sc;
+			}
+			
+			public String getCode() {
+				return sc.pcod;
+			}
+			
+			@Override
+			public String toString() {
+				return String.format("%s %s", sc.pcod.trim(), sc.name);
 			}
 		}
 		

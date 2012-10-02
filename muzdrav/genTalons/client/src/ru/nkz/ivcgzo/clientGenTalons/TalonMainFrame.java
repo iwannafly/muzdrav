@@ -244,18 +244,17 @@ public class TalonMainFrame extends JFrame {
 			gl_tbRasp.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_tbRasp.createSequentialGroup()
 					.addGap(23)
-					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 359, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
 						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 347, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(45)
+						.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 369, GroupLayout.PREFERRED_SIZE))
+					.addGap(54)
 					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
 						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_tbRasp.createSequentialGroup()
 							.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 230, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton_1)
-							.addGap(0, 0, Short.MAX_VALUE)))
+							.addComponent(btnNewButton_1)))
 					.addContainerGap())
 		);
 		gl_tbRasp.setVerticalGroup(
@@ -264,11 +263,11 @@ public class TalonMainFrame extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_tbRasp.createSequentialGroup()
-							.addGroup(gl_tbRasp.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_tbRasp.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_tbRasp.createSequentialGroup()
 									.addComponent(panel_8, GroupLayout.PREFERRED_SIZE, 185, GroupLayout.PREFERRED_SIZE)
 									.addGap(18))
-								.addGroup(Alignment.TRAILING, gl_tbRasp.createSequentialGroup()
+								.addGroup(gl_tbRasp.createSequentialGroup()
 									.addComponent(btnNewButton_1)
 									.addGap(28)))
 							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
@@ -375,13 +374,11 @@ public class TalonMainFrame extends JFrame {
 		
 		JScrollPane sp_rasp = new JScrollPane();
 		
-		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По",9,"pfd", 5, "Схема",10,"перерыв",11,"");
+		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По");
 //		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
-		tbl_rasp.setPreferredWidths(100,90,60,60,30,30,50,50);
+		tbl_rasp.setPreferredWidths(130,100,60,60);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
-		tbl_rasp.setTimeField(6);
-		tbl_rasp.setTimeField(7);
 		tbl_rasp.setFillsViewportHeight(true);
 		sp_rasp.setViewportView(tbl_rasp);
 		
@@ -407,6 +404,8 @@ public class TalonMainFrame extends JFrame {
 						MainForm.tcl.deleteNrasp(MainForm.authInfo.cpodr, curVrach, curSpec);
 					//}
 					tbl_rasp.setData(new ArrayList<Nrasp>());
+					ClearOtmetka();
+					ClearTimePause();
 				} catch (KmiacServerException kse){
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -778,9 +777,9 @@ public class TalonMainFrame extends JFrame {
 				.addGroup(gl_tbNorm.createSequentialGroup()
 					.addGap(27)
 					.addGroup(gl_tbNorm.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 243, GroupLayout.PREFERRED_SIZE)
+						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 264, GroupLayout.PREFERRED_SIZE)
 						.addComponent(sp_norm, GroupLayout.PREFERRED_SIZE, 188, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(410, Short.MAX_VALUE))
+					.addContainerGap(545, Short.MAX_VALUE))
 		);
 		gl_tbNorm.setVerticalGroup(
 			gl_tbNorm.createParallelGroup(Alignment.TRAILING)
@@ -814,22 +813,39 @@ public class TalonMainFrame extends JFrame {
 				}
 			}
 		});
+		
+		JButton btn_del_norm = new JButton("Удалить");
+		btn_del_norm.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					MainForm.tcl.deleteNorm(MainForm.authInfo.cpodr, curSpec);
+					tbl_norm.setData(new ArrayList<Norm>());
+				} catch (KmiacServerException kse){
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btn_del_norm.setToolTipText("Удалить");
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
 					.addComponent(btn_new_norm)
-					.addGap(29)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btn_save_norm)
-					.addGap(274))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btn_del_norm)
+					.addContainerGap())
 		);
 		gl_panel_3.setVerticalGroup(
-			gl_panel_3.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_3.createSequentialGroup()
+			gl_panel_3.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_3.createSequentialGroup()
 					.addContainerGap(13, Short.MAX_VALUE)
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btn_new_norm)
-						.addComponent(btn_save_norm)))
+						.addComponent(btn_save_norm)
+						.addComponent(btn_del_norm)))
 		);
 		panel_3.setLayout(gl_panel_3);
 		
@@ -1212,7 +1228,7 @@ public class TalonMainFrame extends JFrame {
 			 			curSpec = vrach.getCdol();
 			 			curVrach = vrach.getPcod();
 			 		}
-				    System.out.println("curSpec= "+curSpec+", curVrach= "+Integer.toString(curVrach));
+//				    System.out.println("curSpec= "+curSpec+", curVrach= "+Integer.toString(curVrach));
 					if (tbMain.getSelectedIndex() == 0) {
 						ClearOtmetka();
 						ClearTimePause();

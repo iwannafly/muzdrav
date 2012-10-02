@@ -11,6 +11,9 @@
 	<property name="export.file" location="managerAuth.jar" />
 	<property name="main.class" value="ru.nkz.ivcgzo.managerAuth.ManagerAuth" />
 	<property name="muzdrav.dir" location="../../muzdrav" />
+	<condition property="muzdrav.public.dir" value="\\ivcgzo-fileserv\PUBLIC\TMP\thin\soft\muzdrav" else="unix path here">
+		<os family="windows" />
+	</condition>
 	
 	<path id="build.classpath" >
 	  <fileset dir="${lib.dir}">
@@ -63,11 +66,24 @@
 			</manifest>
 		</jar>
 	</target>
-
+	
+	<target name="copyJarsToSharedPath" unless="${debug.build}" description="Копирование скомпилированных jar-файлов на общий ресурс для последующего обновления клиента и сервера">
+		<copy todir="${muzdrav.public.dir}/plugin" overwrite="true" force="true">
+		    <fileset dir="${basedir}/plugin"/>
+		</copy>
+		<copy todir="${muzdrav.public.dir}/client" overwrite="true" force="true">
+		    <fileset dir="${basedir}/client"/>
+		</copy>
+		<copy file="${basedir}/auth.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
+		<copy file="${basedir}/managerAuth.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
+		<copy file="${basedir}/log4j.xml" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
+	</target>
+	
 	<target name="main" depends="jar" description="Компиляция всех серверных модулей">
 		<subant>
 			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
 		</subant>
+		<antcall target="copyJarsToSharedPath" />
 	</target>
 
 	<target name="main_d" description="Компиляция всех модулей с возможностью дебага">
