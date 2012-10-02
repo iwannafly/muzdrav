@@ -107,7 +107,6 @@ public class MainFrame extends JFrame {
     private JPanel pMedicalHistory;
     private JTabbedPane tbpMedicalHistory;
     private JTextField tfShablonFilter;
-    private JButton btnFilterShablon;
     private JPanel pnStatusLocalis;
     private JPanel pnRecomendation;
     private JPanel pnZakl;
@@ -133,7 +132,6 @@ public class MainFrame extends JFrame {
     private JLabel lblFarmo;
     private JScrollPane spFarmo;
     private JTextField tfLifeHShablonFilter;
-    private JButton btnLifeHShablonFilter;
     private JScrollPane spLifeHShablonNames;
     private JButton btnSaveLifeHistory;
     private JTextArea taLifeHistory;
@@ -158,7 +156,6 @@ public class MainFrame extends JFrame {
     private JLabel lblDiagMedOp;
     private JTextArea taDiagMedOp;
     private JPanel pDiagTypes;
-    private JButton btnDiagShablonFilter;
     private JScrollPane spDiagShablonNames;
     private Component hzstMainDiagSopDiag;
     private Component hzstSopDiagOslDiag;
@@ -170,7 +167,6 @@ public class MainFrame extends JFrame {
     private JLabel lblRecomend;
     private JLabel lblZakluch;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxZaklType;
-    private JButton btnZaklShablonNames;
     private JScrollPane spZaklShablonNames;
     private ThriftIntegerClassifierList lZaklShablonNames;
     private JScrollPane spRecomend;
@@ -553,8 +549,6 @@ public class MainFrame extends JFrame {
         tfLifeHShablonFilter = new JTextField();
         tfLifeHShablonFilter.setColumns(10);
 
-        btnLifeHShablonFilter = new JButton("Выбрать");
-
         spLifeHShablonNames = new JScrollPane();
         lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
         lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -707,8 +701,6 @@ public class MainFrame extends JFrame {
             }
         });
         spShablonNames.setViewportView(lShablonNames);
-
-        btnFilterShablon = new JButton("Выбрать");
     }
 
     private void setMedicalHistoryButtons() {
@@ -907,8 +899,6 @@ public class MainFrame extends JFrame {
         lDiagShablonNames = new ThriftIntegerClassifierList();
         lDiagShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
         spDiagShablonNames.setViewportView(lDiagShablonNames);
-
-        btnDiagShablonFilter = new JButton("Выбрать");
     }
 
     private void clearDiagnosisText() {
@@ -1124,8 +1114,6 @@ public class MainFrame extends JFrame {
     private void setZaklShablonComponents() {
         tfZaklShablonNames = new JTextField();
         tfZaklShablonNames.setColumns(10);
-
-        btnZaklShablonNames = new JButton("Выбрать");
 
         spZaklShablonNames = new JScrollPane();
         lZaklShablonNames = new ThriftIntegerClassifierList();
@@ -1363,23 +1351,17 @@ public class MainFrame extends JFrame {
                 .addGroup(glPMedicalHistory.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPMedicalHistory.createParallelGroup(Alignment.TRAILING)
-                        .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 700,
-                            GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE,
+                                700, GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnSaveMedicalHistory, GroupLayout.PREFERRED_SIZE,
-                            541, GroupLayout.PREFERRED_SIZE))
+                                541, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addComponent(tfShablonFilter, GroupLayout.DEFAULT_SIZE,
-                                249, Short.MAX_VALUE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnFilterShablon, GroupLayout.PREFERRED_SIZE, 90,
-                                GroupLayout.PREFERRED_SIZE)
-                            .addGap(5))
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 340,
+                        .addComponent(tfShablonFilter, GroupLayout.DEFAULT_SIZE, 373,
                                 Short.MAX_VALUE)
-                            .addContainerGap())))
+                        .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 373,
+                                Short.MAX_VALUE))
+                    .addContainerGap())
         );
         glPMedicalHistory.setVerticalGroup(
             glPMedicalHistory.createParallelGroup(Alignment.LEADING)
@@ -1387,19 +1369,17 @@ public class MainFrame extends JFrame {
                     .addContainerGap()
                     .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE, 252,
-                                Short.MAX_VALUE)
+                            .addComponent(tbpMedicalHistory, GroupLayout.DEFAULT_SIZE,
+                                    545, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(btnSaveMedicalHistory)
                             .addGap(5))
                         .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addGroup(glPMedicalHistory.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE,
+                            .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE,
                                     GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnFilterShablon))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 246,
-                                Short.MAX_VALUE)
+                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE,
+                                    539, Short.MAX_VALUE)
                             .addContainerGap())))
         );
         pMedicalHistory.setLayout(glPMedicalHistory);
@@ -1412,8 +1392,8 @@ public class MainFrame extends JFrame {
                 .addGroup(glPLifeHistory.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING, false)
-                        .addComponent(btnSaveLifeHistory, GroupLayout.PREFERRED_SIZE, 722,
-                                GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSaveLifeHistory, GroupLayout.PREFERRED_SIZE,
+                                722, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblLifeHistory)
                         .addComponent(lblAllergo)
                         .addComponent(lblFarmo)
@@ -1424,16 +1404,13 @@ public class MainFrame extends JFrame {
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addComponent(tfLifeHShablonFilter, GroupLayout.PREFERRED_SIZE, 249,
-                                    GroupLayout.PREFERRED_SIZE)
-                            .addGap(6)
-                            .addComponent(btnLifeHShablonFilter, GroupLayout.PREFERRED_SIZE, 90,
-                                    GroupLayout.PREFERRED_SIZE))
+                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE,
+                                    356, Short.MAX_VALUE)
+                            .addGap(5))
                         .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE, 349,
-                                    Short.MAX_VALUE)
-                            .addGap(5)))
-                    .addContainerGap())
+                            .addComponent(tfLifeHShablonFilter, GroupLayout.DEFAULT_SIZE,
+                                    351, Short.MAX_VALUE)
+                            .addContainerGap())))
         );
         glPLifeHistory.setVerticalGroup(
             glPLifeHistory.createParallelGroup(Alignment.LEADING)
@@ -1443,29 +1420,25 @@ public class MainFrame extends JFrame {
                             .addContainerGap()
                             .addComponent(lblLifeHistory)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spLifeHistory, GroupLayout.DEFAULT_SIZE,
-                                    135, Short.MAX_VALUE)
+                            .addComponent(spLifeHistory, GroupLayout.DEFAULT_SIZE, 152,
+                                    Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblAllergo)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spAllergo, GroupLayout.PREFERRED_SIZE, 135,
+                            .addComponent(spAllergo, GroupLayout.PREFERRED_SIZE, 152,
                                     Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblFarmo)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spFarmo, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                            .addComponent(spFarmo, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
                             .addGap(17)
                             .addComponent(btnSaveLifeHistory))
                         .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
-                                .addGroup(glPLifeHistory.createSequentialGroup()
-                                    .addGap(1)
-                                    .addComponent(tfLifeHShablonFilter,
-                                            GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addComponent(btnLifeHShablonFilter))
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE, 499,
+                            .addGap(1)
+                            .addComponent(tfLifeHShablonFilter, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addGap(8)
+                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE, 550,
                                     Short.MAX_VALUE)))
                     .addContainerGap())
         );
@@ -1483,11 +1456,14 @@ public class MainFrame extends JFrame {
                         .addGroup(glPDiagnosis.createSequentialGroup()
                             .addGroup(glPDiagnosis.createParallelGroup(Alignment.TRAILING, false)
                                 .addComponent(pDiagTypes, Alignment.LEADING,
-                                        GroupLayout.PREFERRED_SIZE, 635, GroupLayout.PREFERRED_SIZE)
+                                        GroupLayout.PREFERRED_SIZE, 635,
+                                        GroupLayout.PREFERRED_SIZE)
                                 .addComponent(scrollPane, Alignment.LEADING,
-                                        GroupLayout.PREFERRED_SIZE, 635, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(spDiag, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
-                                        635, GroupLayout.PREFERRED_SIZE))
+                                        GroupLayout.PREFERRED_SIZE, 635,
+                                        GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spDiag, Alignment.LEADING,
+                                        GroupLayout.PREFERRED_SIZE, 635,
+                                        GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING, false)
                                 .addComponent(btnAddDiag, GroupLayout.PREFERRED_SIZE,
@@ -1497,17 +1473,11 @@ public class MainFrame extends JFrame {
                                 .addComponent(btnDelDiag, 0, 0, Short.MAX_VALUE))
                             .addGap(9)
                             .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
-                                .addGroup(glPDiagnosis.createSequentialGroup()
-                                    .addComponent(tfDiagShablonFilter, GroupLayout.DEFAULT_SIZE,
-                                            276, Short.MAX_VALUE)
-                                    .addGap(6)
-                                    .addComponent(btnDiagShablonFilter, GroupLayout.PREFERRED_SIZE,
-                                            90, GroupLayout.PREFERRED_SIZE)
-                                    .addGap(10))
-                                .addGroup(glPDiagnosis.createSequentialGroup()
-                                    .addComponent(spDiagShablonNames, GroupLayout.DEFAULT_SIZE, 377,
-                                            Short.MAX_VALUE)
-                                    .addGap(5)))))
+                                .addComponent(tfDiagShablonFilter, GroupLayout.DEFAULT_SIZE,
+                                        382, Short.MAX_VALUE)
+                                .addComponent(spDiagShablonNames, GroupLayout.DEFAULT_SIZE,
+                                        382, Short.MAX_VALUE))
+                            .addGap(5)))
                     .addGap(0))
         );
         glPDiagnosis.setVerticalGroup(
@@ -1516,36 +1486,34 @@ public class MainFrame extends JFrame {
                     .addContainerGap()
                     .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPDiagnosis.createSequentialGroup()
-                            .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING)
-                                .addGroup(glPDiagnosis.createSequentialGroup()
-                                    .addGap(1)
-                                    .addComponent(tfDiagShablonFilter, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addComponent(btnDiagShablonFilter))
-                            .addGap(6)
-                            .addComponent(spDiagShablonNames, GroupLayout.DEFAULT_SIZE, 488,
-                                    Short.MAX_VALUE)
+                            .addGap(1)
+                            .addComponent(tfDiagShablonFilter, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addGap(8)
+                            .addComponent(spDiagShablonNames, GroupLayout.DEFAULT_SIZE,
+                                    539, Short.MAX_VALUE)
                             .addContainerGap())
                         .addGroup(glPDiagnosis.createSequentialGroup()
                             .addGroup(glPDiagnosis.createParallelGroup(Alignment.LEADING, false)
                                 .addGroup(glPDiagnosis.createSequentialGroup()
-                                    .addComponent(btnAddDiag, GroupLayout.PREFERRED_SIZE, 54,
-                                            GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnAddDiag, GroupLayout.PREFERRED_SIZE,
+                                            54, GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(btnDelDiag, GroupLayout.PREFERRED_SIZE, 54,
-                                            GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnDelDiag, GroupLayout.PREFERRED_SIZE,
+                                            54, GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(btnSaveDiag, GroupLayout.PREFERRED_SIZE, 54,
-                                            GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(btnSaveDiag, GroupLayout.PREFERRED_SIZE,
+                                            54, GroupLayout.PREFERRED_SIZE))
                                 .addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 299,
                                         GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblDiagMedOp)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                            .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE,
+                                    145, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(pDiagTypes, GroupLayout.PREFERRED_SIZE, 28,
-                                    GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pDiagTypes, GroupLayout.PREFERRED_SIZE,
+                                    28, GroupLayout.PREFERRED_SIZE)
                             .addGap(75))))
         );
         pDiagnosis.setLayout(glPDiagnosis);
@@ -1571,15 +1539,13 @@ public class MainFrame extends JFrame {
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 276,
-                                    Short.MAX_VALUE)
-                            .addGap(6)
-                            .addComponent(btnZaklShablonNames, GroupLayout.PREFERRED_SIZE, 90,
-                                    GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE,
+                                    377, Short.MAX_VALUE)
                             .addGap(5))
-                        .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 377,
-                                Short.MAX_VALUE))
-                    .addGap(5))
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE,
+                                    372, Short.MAX_VALUE)
+                            .addContainerGap())))
         );
         glPZakl.setVerticalGroup(
             glPZakl.createParallelGroup(Alignment.LEADING)
@@ -1587,15 +1553,12 @@ public class MainFrame extends JFrame {
                     .addContainerGap()
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                                .addGroup(glPZakl.createSequentialGroup()
-                                    .addGap(1)
-                                    .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                .addComponent(btnZaklShablonNames))
-                            .addGap(6)
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 549,
-                                    Short.MAX_VALUE)
+                            .addGap(1)
+                            .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addGap(8)
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE,
+                                    549, Short.MAX_VALUE)
                             .addGap(1))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
