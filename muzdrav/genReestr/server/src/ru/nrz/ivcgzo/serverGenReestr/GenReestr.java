@@ -151,16 +151,26 @@ private TServer thrServ;
 		String sqlpasp = "SELECT  v.id AS sl_id, 2::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
 				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
-				"0::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
+				"v.kod_ter::integer AS ter_mu, v.cpol::integer AS kod_mu, ?::date AS df_per, " +
 				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-				"(select get_fam_pr(p.npasp))::char(60) AS fam_rp, "+
-				"(select get_im_pr(p.npasp))::char(40) AS im_rp, "+
-				"(select get_ot_pr(p.npasp))::char(40) AS otch_rp," +
-				"(select get_dr_pr(p.npasp))::date AS dr_pr "+
+				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
+				"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
+				"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
+				"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
+				"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
+				"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
+				"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
+				"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
+				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
+				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
+				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
+				"(select get_region(p.poms_strg))::integer AS region," +
+				"p.ter_liv::integer AS ter_liv,  (select get_status(p.sgrp))::integer AS status, " +
+				"(select get_kov(p.npasp))::char(30) AS kob, "+
 			    " FROM p_vizit_amb v, patient p" + 
 				" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? "+sqlwhere;
-		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, cpodr, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, cpodr, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
+		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
             ResultSet rs = acrs.getResultSet();
             
             new DbfMapper(rs).mapToFile("c:\\pasp.dbf");
