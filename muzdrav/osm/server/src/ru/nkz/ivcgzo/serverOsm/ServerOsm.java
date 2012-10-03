@@ -531,7 +531,21 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-
+	
+	@Override
+	public void DeletePdiagAmbVizit(int idObr) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_diag_amb WHERE id_obr = ? ", false, idObr);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+	
 	@Override
 	public Psign getPsign(int npasp) throws KmiacServerException, PsignNotFoundException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_sign WHERE npasp = ? ", npasp)) {

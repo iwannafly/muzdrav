@@ -585,6 +585,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePdiagAmbVizit(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagAmb getPdiagAmbProsm(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 
 	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
