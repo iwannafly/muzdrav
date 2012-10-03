@@ -68,11 +68,11 @@ public class DispHron extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				pmer = new Pmer();
 		  		pmer.setNpasp(Vvod.zapVr.getNpasp());
-		  		pmer.setId_pdiag(Vvod.pdisp.getId_diag());
+//		  		pmer.setId_pdiag(Vvod.pdisp.getId_diag());
 		  		pmer.setDiag(cmbDiag.getSelectedPcod());
 		  		pmer.setCod_sp(MainForm.authInfo.getPcod());
-		  		pmer.setId_pvizit(Vvod.pvizit.getId());
-		  		pmer.setId_pos(Vvod.pvizitAmb.getId());
+//		  		pmer.setId_pvizit(Vvod.pvizit.getId());
+//		  		pmer.setId_pos(Vvod.pvizitAmb.getId());
 				try {
 					pmer.setId(MainForm.tcl.AddPmer(pmer));
 				} catch (KmiacServerException e1) {
@@ -116,7 +116,7 @@ public class DispHron extends JFrame{
 						if (tblDispHron.getSelectedItem()!= null)
 						if (JOptionPane.showConfirmDialog(bDelDispHron, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 			  			MainForm.tcl.DeletePmer(tblDispHron.getSelectedItem().getId());
-						tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), "D50"));}
+						tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));}
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -126,6 +126,25 @@ public class DispHron extends JFrame{
 		});
 		
 		 cmbDiag = new ThriftStringClassifierCombobox<>(true);
+		 cmbDiag.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+		 			try {
+		 			tblDispHron.setData(MainForm.tcl.getPmer(16164, cmbDiag.getSelectedPcod()));
+		 			tabObost.setData(MainForm.tcl.getPobost(16164, cmbDiag.getSelectedPcod()));
+		 			tblDispHron.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
+		 			tblDispHron.setStringClassifierSelector(1, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
+		 			tblDispHron.setIntegerClassifierSelector(4, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
+		 			//tabObost.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
+		 			//tabObost.setIntegerClassifierSelector(1, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
+		 		} catch (KmiacServerException e1) {
+		 			e1.printStackTrace();
+		 		} catch (TException e1) {
+		 			e1.printStackTrace();
+		 			MainForm.conMan.reconnect(e1);
+		 		}
+		 	}
+		 });
+		 
 		
 		JLabel lblDiag = new JLabel("Диагноз");
 		
@@ -136,15 +155,61 @@ public class DispHron extends JFrame{
 		JButton bAddObost = new JButton("");
 		bAddObost.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			JOptionPane.showMessageDialog(DispHron.this, Vvod.pdisp.id_diag);
-			}
+				obostr = new Pobost();
+				obostr.setNpasp(Vvod.zapVr.getNpasp());
+//				obostr.setId_pdiag(Vvod.pdisp.getId_diag());
+				obostr.setDiag(cmbDiag.getSelectedPcod());
+				obostr.setCod_sp(MainForm.authInfo.getPcod());
+				obostr.setCdol(MainForm.authInfo.getCdol());
+				obostr.setDataz(System.currentTimeMillis());
+				try {
+					obostr.setId(MainForm.tcl.AddPobost(obostr));
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+				}
+	 			tabObost.addItem(obostr);
+			}			
 		});
 		bAddObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		
 		JButton bSaveObost = new JButton("");
+		bSaveObost.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				tabObost.updateSelectedItem();
+				try {	
+				obostr.setId(tabObost.getSelectedItem().getId());
+			obostr.setSl_hron(tabObost.getSelectedItem().sl_hron);
+			obostr.setSl_obostr(tabObost.getSelectedItem().sl_obostr);
+		
+				MainForm.tcl.UpdatePobost(obostr);
+			} catch (KmiacServerException e1) {
+				e1.printStackTrace();
+			} catch (TException e1) {
+				e1.printStackTrace();
+				MainForm.conMan.reconnect(e1);
+			}
+			}
+		});
 		bSaveObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		
 		JButton bDelObost = new JButton("");
+		bDelObost.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+		  		try {
+						if (tabObost.getSelectedItem()!= null)
+						if (JOptionPane.showConfirmDialog(bDelDispHron, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+			  			MainForm.tcl.DeletePobost(tabObost.getSelectedItem().getId());
+						tabObost.setData(MainForm.tcl.getPobost(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));}
+					} catch (KmiacServerException e1) {
+						e1.printStackTrace();
+					} catch (TException e1) {
+						MainForm.conMan.reconnect(e1);
+					}
+
+			}
+		});
 		bDelObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
 		GroupLayout gl_pnlDispHron = new GroupLayout(pnlDispHron);
 		gl_pnlDispHron.setHorizontalGroup(
@@ -233,21 +298,14 @@ public class DispHron extends JFrame{
 		getContentPane().setLayout(groupLayout);
 	}
 	
-	public void ShowDispHron()
-	{	try {
-		cmbDiag.setData(MainForm.tcl.get_n_c00(16164));
-		tblDispHron.setData(MainForm.tcl.getPmer(16164, "D50.0"));
-		tabObost.setData(MainForm.tcl.getPobost(16164, "D50.0"));
-		tblDispHron.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
-		tblDispHron.setStringClassifierSelector(1, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
-		tblDispHron.setIntegerClassifierSelector(4, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
-		
-	} catch (KmiacServerException e) {
-		e.printStackTrace();
-	} catch (TException e) {
-		e.printStackTrace();
-		MainForm.conMan.reconnect(e);
-	}
+	public void ShowDispHron(){
+			try {
+				cmbDiag.setData(MainForm.tcl.get_n_c00(16164));
+			} catch (KmiacServerException e) {
+				e.printStackTrace();
+			} catch (TException e) {
+				e.printStackTrace();
+			}
 		setVisible(true);	
 	}
 }
