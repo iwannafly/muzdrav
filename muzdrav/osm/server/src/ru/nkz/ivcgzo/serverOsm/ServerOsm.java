@@ -2401,7 +2401,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public void UpdatePobost(Pobost pbst) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_obost set sl_obostr = ?, sl_hron = ? where id = ? ", false, pbst, pmerTypes, 4, 5, 0);
+			sme.execPreparedT("update p_obost set sl_obostr = ?, sl_hron = ? where id = ? ", false, pbst, pobostTypes, 4, 5, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
