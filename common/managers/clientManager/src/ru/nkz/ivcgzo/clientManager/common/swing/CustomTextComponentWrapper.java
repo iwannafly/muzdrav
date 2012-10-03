@@ -202,7 +202,10 @@ public class CustomTextComponentWrapper {
 			textComponent.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
-					super.mousePressed(e);
+					if (textComponent.isEnabled())
+						textComponent.setComponentPopupMenu(CustomTextComponentPopupMenu.this);
+					else
+						textComponent.setComponentPopupMenu(null);
 					
 					if (e.getButton() == MouseEvent.BUTTON3 && !hasFocus)
 						textComponent.requestFocusInWindow();
