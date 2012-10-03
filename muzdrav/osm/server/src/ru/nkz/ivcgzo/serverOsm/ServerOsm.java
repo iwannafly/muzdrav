@@ -59,6 +59,7 @@ import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdPatient;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct1;
 import ru.nkz.ivcgzo.thriftOsm.RdVizit;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
@@ -116,6 +117,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pdispTypes;
 	private final TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
 	private final Class<?>[] rdSlTypes;
+	private final TResultSetMapper<RdSlStruct1, RdSlStruct1._Fields> rsmRdSl1;
+	private final Class<?>[] rdSl1Types;
 	private final TResultSetMapper<RdInfStruct, RdInfStruct._Fields> rsmRdInf;
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
@@ -195,6 +198,9 @@ public class ServerOsm extends Server implements Iface {
 	
 		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
 		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+
+		rsmRdSl1 = new TResultSetMapper<>(RdSlStruct1.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
+		rdSl1Types = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr");
 		rdInfTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class};
@@ -2253,10 +2259,10 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<RdSlStruct> getRdSl() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl  ")) {
+	public List<RdSlStruct1> getRdSl() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select s.grup,s.ph,s.allerg,s.farmkol,s.vitae,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.polj,rd.vozmen,rd.prmen,rd.datam,rd.kont,rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,rd.oslrod,rd.npasp,vr.fam,vr.im,vr.ot from p_sign s,p_rd_sl rd,p_vizit v,s_vrach vr where s.npasp=rd.npasp and rd.id_pvizit=v.id and v.cod_sp=vr.pcod")) {
 			if (acrs.getResultSet().next())
-				return (List<RdSlStruct>) rsmRdSl.map(acrs.getResultSet());
+				return (List<RdSlStruct1>) rsmRdSl1.map(acrs.getResultSet());
 			else
 				throw new KmiacServerException("нет записи");
 		} catch (SQLException e) {
@@ -2347,10 +2353,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		// Con_main.csv
 		StringBuilder sb4 = new StringBuilder(0x10000);
 		sb4.append("num;uid;jdet;dvzdu;srokvzu1;grisk;dgrisk;drodr;fiovr;dred;telm;dsndu;nber;nrod;job;vp;vn;circl;dlm;kontr;dsp;dcr;dtroch;cext;solov;cs;allerg;nasl;gemotr;prich;dprich;ishodprb;ostpber");
-		List<RdSlStruct> rdSl = getRdSl();
-		for (RdSlStruct rsl : rdSl) {
+		List<RdSlStruct1> rdSl = getRdSl();
+		for (RdSlStruct1 rsl : rdSl) {
 			j = j+1;
-			sb4.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;", j));		
+			p1 = new Date(rsl.datay);
+			Date p2 = new Date(rsl.dataz);
+			Date p3 = new Date(rsl.DataZs);
+			Date p4 = new Date(rsl.dataz);
+			Date p5 = new Date(rsl.Datasn);
+			Date p6 = new Date(rsl.dataM);
+			
+			sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rsl.npasp,rsl.deti,p1,rsl.yavka1));		
 		}
 		return null;
 	}
