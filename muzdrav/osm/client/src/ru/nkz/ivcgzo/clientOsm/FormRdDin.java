@@ -373,8 +373,6 @@ public class FormRdDin extends JFrame {
 		Nbutton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-				Vvod.btnPosAdd.doClick();
-
 				RdDinStruct rddin = new RdDinStruct();
 	//			setDefaultValues();
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);

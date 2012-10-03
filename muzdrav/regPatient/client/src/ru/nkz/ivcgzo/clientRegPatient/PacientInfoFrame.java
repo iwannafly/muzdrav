@@ -2962,7 +2962,19 @@ public class PacientInfoFrame extends JFrame {
                 String servPath;
                 try {
                     String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
-                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo);
+                    String omsOrg = cmb_oms_smo.getText();
+                    String lgot = "";
+                    if (LgotaInfo.size() > 0) {
+                        for (Lgota lg : LgotaInfo) {
+                            if (lg.isSetLgota()) {
+                                lgot += ", " + String.valueOf(lg.getLgota());
+                            }
+                        }
+                        lgot = lgot.substring(1);
+                    } else {
+                        lgot = "";
+                    }
+                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo, omsOrg, lgot);
                     String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
                     MainForm.conMan.openFileInEditor(cliPath, false);
@@ -3189,8 +3201,8 @@ public class PacientInfoFrame extends JFrame {
             cmb_dms_smo.setSelectedIndex(-1);
             cmb_adm_obl.setSelectedIndex(-1);
             cmb_adp_obl.setSelectedIndex(-1);
-            cmb_adm_gorod.setData(null);
-            cmb_adp_gorod.setData(null);
+            cmb_adm_gorod.setSelectedIndex(-1);
+            cmb_adp_gorod.setSelectedIndex(-1);
             cmb_adm_ul.setData(null);
             cmb_adp_ul.setData(null);
             cmb_adp_dom.setData(null);
@@ -3283,7 +3295,7 @@ public class PacientInfoFrame extends JFrame {
         try {
             NewSign();
             SignInfo = MainForm.tcl.getSign(PatId);
-            if (SignInfo.getGrup().trim() != null){
+            if (SignInfo.getGrup() != null){
                 rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
                 rbtn_gk2.setSelected(SignInfo.grup.charAt(0) == '2');
                 rbtn_gk3.setSelected(SignInfo.grup.charAt(0) == '3');

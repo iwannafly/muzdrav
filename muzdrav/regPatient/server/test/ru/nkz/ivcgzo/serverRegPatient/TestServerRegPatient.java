@@ -376,13 +376,15 @@ public class TestServerRegPatient {
     }
 
     @Test
-    public final void printMedCard_isTemplateCorrect() throws TException, PatientNotFoundException, KmiacServerException {
+    public final void printMedCard_isTemplateCorrect() throws TException,
+        PatientNotFoundException, KmiacServerException {
         int npasp = 8;
         Nambk nambk = new Nambk();
         UserAuthInfo uai = new UserAuthInfo();
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
-        String pathToTemplate = testServer.printMedCart(nambk, patientFullInfo, uai, null);
+        String pathToTemplate = testServer.printMedCart(nambk, patientFullInfo,
+                uai, null, null, null);
         System.out.println(pathToTemplate);
     }
 

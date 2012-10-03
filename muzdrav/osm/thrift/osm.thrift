@@ -8,16 +8,15 @@ include "../../../common/thrift/classifier.thrift"
  */
 struct ZapVr{
 	1: optional i32 npasp;
-	2: optional i32 vid_p; /*вид приема-первичность*/
-	3: optional i64 timepn; /*время начала приема*/
-	4: optional string fam;
-	5: optional string im;
-	6: optional string oth;
-	7: optional string serpolis;
-	8: optional string nompolis;
-	9: optional i32 id_pvizit;
-	10: optional i32 pol;
-	11: optional i64 datar;
+	2: optional string fam;
+	3: optional string im;
+	4: optional string oth;
+	5: optional string serpolis;
+	6: optional string nompolis;
+	7: optional i32 id_pvizit;
+	8: optional i32 pol;
+	9: optional i64 datar;
+	10: optional i64 datap;
 }
 
 struct Pvizit {
@@ -288,6 +287,39 @@ struct RdConVizit{
         15: optional i32 npasp;
 }
 
+struct RdSlStruct1{
+        1: optional  i32 id;
+        2: optional i32 npasp;
+        3: optional i64 datay;
+	4: optional i32 abort;
+	5: optional i32 shet;
+	6: optional i64 dataM;
+	7: optional i32 yavka1;
+	8: optional i32 ishod;
+	9: optional i64 Datasn; 
+       10: optional i64 DataZs;
+       11: optional i32 kolrod;
+       12: optional i32 deti;
+       13: optional bool kont;
+       14: optional i32 dsp;
+       15: optional i32 dsr;
+       16: optional i32 dTroch;
+       17: optional i32 cext;
+       18: optional i32 indsol;
+       19: optional i32 prmen;
+       20: optional i64 dataz;
+       21: optional string prrod;
+       22: optional i32 vozmen;
+       23: optional i32 oslrod;
+       24: optional i32 polj;
+       25: optional i32 id_pvizit;
+       26: optional string fam;
+       27: optional string im;
+       28: optional string ot;
+       29: optional string telm;
+       30: optional string vitae;
+       31: optional string allerg;
+}
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
 	1: optional string pcod;
@@ -529,7 +561,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 * Получение списка записанных на прием на заданную дату.
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
-	list<ZapVr> getZapVrSrc(1: string npaspList) throws (1: kmiacServer.KmiacServerException kse);
+	list<ZapVr> getZapVrSrc(1: i32 npasp, 2: i32 codsp, 3: string cdol) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	
@@ -547,6 +579,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePdiagAmb(1: i32 diagId) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePdiagAmbVizit(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagAmb getPdiagAmbProsm(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 
 	Psign getPsign(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PsignNotFoundException sne);
@@ -623,7 +656,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
-        list<RdSlStruct> getRdSl() throws (1: kmiacServer.KmiacServerException kse);
+        list<RdSlStruct1> getRdSl() throws (1: kmiacServer.KmiacServerException kse);
 /*Shablon*/
 	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
@@ -643,5 +676,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePobost(1: Pobost pbst) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePobost(1: i32 pobost_id) throws (1: kmiacServer.KmiacServerException kse);
+
+/*Stoim_p*/
+	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
 
 }
