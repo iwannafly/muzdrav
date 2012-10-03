@@ -312,6 +312,17 @@ public class FormRdDin extends JFrame {
 			if (mes == 1) br = br+1;
 			if (mes == 2) br = br+1;
 			if (mes == 12) br = br+1;
+			rddin.setArt1((int) SPdad.getModel().getValue());
+			rddin.setArt2((int) SPsad.getModel().getValue());
+			rddin.setArt3((int) SLdad.getModel().getValue());
+			rddin.setArt4((int) SLsad.getModel().getValue());
+			rddin.setChcc((int) SChcc.getModel().getValue());
+			rddin.setHdm((int) SVdm.getModel().getValue());
+			rddin.setOj((int) SOkrj.getModel().getValue());
+			rddin.setSpl((int) STolP.getModel().getValue());
+			rddin.setSrok((int) SSrok.getModel().getValue());
+			rddin.setVes((double) SVes.getModel().getValue());
+			ves = (double) SVes.getModel().getValue();
 			rddin.setGrr(0);
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
@@ -334,17 +345,6 @@ public class FormRdDin extends JFrame {
 		System.out.println("риск");		
 }
 		    else rddin.unsetDspos();
-		rddin.setArt1((int) SPdad.getModel().getValue());
-		rddin.setArt2((int) SPsad.getModel().getValue());
-		rddin.setArt3((int) SLdad.getModel().getValue());
-		rddin.setArt4((int) SLsad.getModel().getValue());
-		rddin.setChcc((int) SChcc.getModel().getValue());
-		rddin.setHdm((int) SVdm.getModel().getValue());
-		rddin.setOj((int) SOkrj.getModel().getValue());
-		rddin.setSpl((int) STolP.getModel().getValue());
-		rddin.setSrok((int) SSrok.getModel().getValue());
-		rddin.setVes((double) SVes.getModel().getValue());
-		ves = (double) SVes.getModel().getValue();
 		rost = FormPostBer.rdSlStruct.getRost();	
 		if (rost<=154) br = br+1;
 		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 

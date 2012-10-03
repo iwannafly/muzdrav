@@ -45,6 +45,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.PrdslNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
@@ -134,26 +135,6 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent arg0) {
-try {
-	System.out.println(Vvod.zapVr.getNpasp());	
-	System.out.println(Vvod.zapVr.getId_pvizit());		
-	rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-	setPostBerData();
-	fam.setText(Vvod.zapVr.getFam());
-	im.setText(Vvod.zapVr.getIm());
-	ot.setText(Vvod.zapVr.getOth());
-	SimpleDateFormat frm = new SimpleDateFormat("MM");
-	int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
-	
-} catch (KmiacServerException | TException e) {
-	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-}			}
-		});
 		setTitle("Постановка на учет по беременности");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 700);
@@ -166,28 +147,6 @@ try {
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		btnNewButton.setToolTipText("Постановка на учет");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					rdSlStruct = new RdSlStruct();
-					setDefaultValues();
-					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-					RdInfStruct rdinf = new RdInfStruct();
-					rdinf.setNpasp(Vvod.zapVr.getNpasp());
-					rdinf.setDataz(System.currentTimeMillis());
-					System.out.println(rdinf);		
-		            MainForm.tcl.AddRdInf(rdinf);
-					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-					setPostBerData();
-				} catch (KmiacServerException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-				} catch (TException e1) {
-					e1.printStackTrace();
-					MainForm.conMan.reconnect(e1);
-				}
-			}
-		});
 		
 		JButton ButSave = new JButton("");
 		ButSave.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
@@ -952,7 +911,6 @@ try {
 	}
 	
 	private void setDefaultValues() {
-		// TODO Auto-generated method stub
 	try {
 		rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
 		rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
@@ -973,8 +931,8 @@ try {
 		rdSlStruct.setCdiagt(5);
 		rdSlStruct.setCvera(11);
 		rdSlStruct.setVesd(60);
-		rdSlStruct.setOslab("");
-		rdSlStruct.setPrrod("");
+		rdSlStruct.setOslab(null);
+		rdSlStruct.setPrrod(null);
 		rdSlStruct.setDataM(System.currentTimeMillis());
 		rdSlStruct.setDatay(System.currentTimeMillis());
 		rdSlStruct.setDataosl(System.currentTimeMillis());
@@ -1112,6 +1070,41 @@ try {
 		or2=1; iw1=iw1-2;	
 		}
 		or1=iw1; 
+	}
+	
+	public void showForm() {
+		fam.setText(Vvod.zapVr.getFam());
+		im.setText(Vvod.zapVr.getIm());
+		ot.setText(Vvod.zapVr.getOth());
+		
+		try {
+			rdSlStruct = new RdSlStruct();
+			setDefaultValues();
+			RdInfStruct rdinf = new RdInfStruct();
+			rdinf.setNpasp(Vvod.zapVr.getNpasp());
+			rdinf.setDataz(System.currentTimeMillis());
+            MainForm.tcl.AddRdInf(rdinf);
+			rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+			setPostBerData();
+		} catch (PrdslNotFoundException e1) {
+			try {
+				rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+				setPostBerData();
+			} catch (KmiacServerException e2) {
+				JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			} catch (TException e2) {
+				e2.printStackTrace();
+				MainForm.conMan.reconnect(e2);
+			}
+		} catch (KmiacServerException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+		} catch (TException e1) {
+			e1.printStackTrace();
+			MainForm.conMan.reconnect(e1);
+		}
+		
+		setVisible(true);	
 	}
 	
 	public void onConnect() throws PatientNotFoundException {
