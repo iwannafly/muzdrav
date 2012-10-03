@@ -147,7 +147,9 @@ struct PdiagZ{
 	21: optional i32 prizb;
 	22: optional i32 prizi;
 	23: optional string named;
-	24: optional string nameC00;
+	24: optional i32 ppi;
+	25: optional string nameC00;
+
 }
 
 struct RdSlStruct{
@@ -518,7 +520,11 @@ struct Pmer{
 	12: string cdol;
 	13: i32 id_pvizit;
 	14: i32 id_pos;
-	15: string name_pmer;
+	15: i64 dnl;
+	16: i64 dkl;
+	17: i32 lpu;
+	18: i32 ter;
+	19: string name_pmer;
 }
 
 struct Pobost{
