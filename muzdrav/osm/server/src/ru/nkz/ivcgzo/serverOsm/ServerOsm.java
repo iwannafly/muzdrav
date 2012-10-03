@@ -2274,7 +2274,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<RdSlStruct1> getRdSl() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select s.grup,s.ph,s.allerg,s.farmkol,s.vitae,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.polj,rd.vozmen,rd.prmen,rd.datam,rd.kont,rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,rd.oslrod,rd.npasp,vr.fam,vr.im,vr.ot from p_sign s,p_rd_sl rd,p_vizit v,s_vrach vr where s.npasp=rd.npasp and rd.id_pvizit=v.id and v.cod_sp=vr.pcod")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select rd.id,rd.npasp,rd.datay,rd.abort,rd.shet,rd.dataM,rd.yavka1,rd.ishod,rd.Datasn,rd.DataZs,rd.kolrod,rd.deti,rd.kont,rd.dsp,rd.dsr,rd.dTroch,rd.cext,rd.indsol,rd.prmen,rd.dataz,rd.prrod,rd.vozmen,rd.oslrod,rd.polj,rd.id_pvizit,vr.fam,vr.im,vr.ot,i.telm,s.vitae,s.allerg from p_sign s,p_rd_sl rd,p_vizit v,s_vrach vr,p_rd_inf i where s.npasp=rd.npasp and i.npasp=rd.npasp and rd.id_pvizit=v.id and v.cod_sp=vr.pcod")) {
 			if (acrs.getResultSet().next())
 				return (List<RdSlStruct1>) rsmRdSl1.map(acrs.getResultSet());
 			else
@@ -2376,8 +2376,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			Date p4 = new Date(rsl.dataz);
 			Date p5 = new Date(rsl.Datasn);
 			Date p6 = new Date(rsl.dataM);
-			
-			sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rsl.npasp,rsl.deti,p1,rsl.yavka1));		
+			Integer risk = 0;
+			Integer kontr = 0;
+			Integer rod = 0;
+			if (rsl.prrod != "") rod =1;
+			if (rsl.kont) kontr=1;
+			Date dgrisk = null;
+			sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rsl.npasp,rsl.deti,p1,rsl.yavka1,risk,dgrisk,rsl.DataZs,rsl.fam,rsl.im,rsl.ot,rsl.dataz,rsl.telm,rsl.Datasn,rsl.shet,rsl.kolrod,rsl.abort,rsl.polj,rsl.vozmen,rsl.prmen,rsl.dataM,kontr,rsl.dsp,rsl.dsr,rsl.dTroch,rsl.cext,rsl.indsol,rsl.vitae,rsl.allerg,rsl.ishod,p5,rod,rsl.oslrod));		
 		}
 		return null;
 	}
@@ -2415,7 +2420,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public void UpdatePobost(Pobost pbst) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_obost set sl_obostr = ?, sl_hron = ? where id = ? ", false, pbst, pmerTypes, 4, 5, 0);
+			sme.execPreparedT("update p_obost set sl_obostr = ?, sl_hron = ? where id = ? ", false, pbst, pobostTypes, 4, 5, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
