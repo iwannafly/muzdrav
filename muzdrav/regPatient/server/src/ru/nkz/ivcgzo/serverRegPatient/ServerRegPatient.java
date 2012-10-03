@@ -1419,16 +1419,16 @@ public class ServerRegPatient extends Server implements Iface {
         final String path;
         try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-//            AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
-//                    + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
-//            String ogrn = "";
-//            while (acrs.getResultSet().next()) {
-//                if (acrs.getResultSet().getInt(1) != 0) {
-//                    ogrn = String.valueOf(acrs.getResultSet().getInt(1));
-//                }
-//            }
-//            acrs.close();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
+            AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
+                    + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
+            String ogrn = "";
+            while (acrs.getResultSet().next()) {
+                if (acrs.getResultSet().getString(1) != null) {
+                    ogrn = acrs.getResultSet().getString(1);
+                }
+            }
+            acrs.close();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
             String gender;
             if (pat.getPol() == 1) {
                 gender = "мужской";
@@ -1443,7 +1443,7 @@ public class ServerRegPatient extends Server implements Iface {
                     + "\\plugin\\reports\\MedCardAmbPriem.htm");
             htmTemplate.replaceLabels(true,
                 uai.getClpu_name(),
-                "",//ogrn,
+                ogrn,
                 nambk.getNambk(),
                 omsOrg,
                 pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
