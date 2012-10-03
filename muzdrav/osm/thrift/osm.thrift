@@ -288,6 +288,45 @@ struct RdConVizit{
         15: optional i32 npasp;
 }
 
+struct RdSlStruct1{
+        1: optional  i32 id;
+        2: optional i32 npasp;
+        3: optional i64 datay;
+	4: optional i64 dataosl;
+	5: optional i32 abort;
+	6: optional i32 shet;
+	7: optional i64 dataM;
+	8: optional i32 yavka1;
+	9: optional i32 ishod;
+	10: optional i64 Datasn; 
+	11: optional i64 DataZs;
+        12: optional i32 kolrod;
+	13: optional i32 deti;
+	14: optional bool kont;
+	15: optional double vesd;
+	16: optional i32 dsp;
+	17: optional i32 dsr;
+	18: optional i32 dTroch;
+	19: optional i32 cext;
+	20: optional i32 indsol;
+	21: optional i32 prmen;
+	22: optional i64 dataz;
+	23: optional i64 datasert;
+	24: optional string nsert;
+	25: optional string ssert;
+	26: optional string oslab;
+	27: optional i32 plrod;
+	28: optional string prrod;
+	29: optional i32 vozmen;
+	30: optional i32 oslrod;
+	31: optional i32 polj;
+	32: optional i64 dataab;
+	33: optional i32 srokab;
+	34: optional i32 cdiagt;
+	35: optional i32 cvera;
+	36: optional i32 id_pvizit;
+        37: optional i32 rost; 
+}
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
 	1: optional string pcod;
@@ -623,7 +662,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
-        list<RdSlStruct> getRdSl() throws (1: kmiacServer.KmiacServerException kse);
+        list<RdSlStruct1> getRdSl() throws (1: kmiacServer.KmiacServerException kse);
 /*Shablon*/
 	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
