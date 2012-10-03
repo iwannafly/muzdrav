@@ -35,7 +35,7 @@ public class CurationFrame extends JDialog {
     private TSimplePatient currentPatient;
 
     public CurationFrame(final UserAuthInfo authInfo) {
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));

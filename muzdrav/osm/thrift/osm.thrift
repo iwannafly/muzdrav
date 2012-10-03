@@ -8,16 +8,15 @@ include "../../../common/thrift/classifier.thrift"
  */
 struct ZapVr{
 	1: optional i32 npasp;
-	2: optional i32 vid_p; /*вид приема-первичность*/
-	3: optional i64 timepn; /*время начала приема*/
-	4: optional string fam;
-	5: optional string im;
-	6: optional string oth;
-	7: optional string serpolis;
-	8: optional string nompolis;
-	9: optional i32 id_pvizit;
-	10: optional i32 pol;
-	11: optional i64 datar;
+	2: optional string fam;
+	3: optional string im;
+	4: optional string oth;
+	5: optional string serpolis;
+	6: optional string nompolis;
+	7: optional i32 id_pvizit;
+	8: optional i32 pol;
+	9: optional i64 datar;
+	10: optional i64 datap;
 }
 
 struct Pvizit {
@@ -568,7 +567,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 * Получение списка записанных на прием на заданную дату.
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
-	list<ZapVr> getZapVrSrc(1: string npaspList) throws (1: kmiacServer.KmiacServerException kse);
+	list<ZapVr> getZapVrSrc(1: i32 npasp, 2: i32 codsp, 3: string cdol) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	
