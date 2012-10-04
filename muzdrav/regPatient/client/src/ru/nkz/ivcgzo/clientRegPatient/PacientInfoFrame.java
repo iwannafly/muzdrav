@@ -3554,7 +3554,8 @@ public class PacientInfoFrame extends JFrame {
 
             Id_gosp.setCotd_p(MainForm.authInfo.cpodr);
             Id_gosp.setCuser(MainForm.authInfo.pcod);
-            Id_gosp.setNist(1); //подумать
+            //Id_gosp.setNist(1); //подумать
+            if (!tf_nist.getText().isEmpty()) Id_gosp.setNist(Integer.valueOf(tf_nist.getText())); 
 
 //		    System.out.println(((Date) sp_dataosm.getValue()).getTime());
 //		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
@@ -3574,13 +3575,13 @@ public class PacientInfoFrame extends JFrame {
 
             if (sp_sv_time.getValue() != null) Id_gosp.setSv_time(Integer.valueOf(sp_sv_time.getValue().toString()));
             if (sp_sv_day.getValue() != null)Id_gosp.setSv_day(Integer.valueOf(sp_sv_day.getValue().toString()));
-            if (tf_diag_n.getText().trim() != null) Id_gosp.setDiag_n(tf_diag_n.getText().trim());
-            if (tf_diag_p.getText().trim() != null) Id_gosp.setDiag_p(tf_diag_p.getText().trim());
-            if (ta_diag_n.getText().trim() != null) Id_gosp.setNamed_n(ta_diag_n.getText().trim());
-            if (ta_diag_p.getText().trim() != null) Id_gosp.setNamed_p(ta_diag_p.getText().trim());
-            if (tf_toc.getText().trim() != null) Id_gosp.setToc(tf_toc.getText().trim());
-            if (tf_ad.getText().trim() != null) Id_gosp.setAd(tf_ad.getText().trim());
-            if (ta_jal_pr.getText().trim() != null) Id_gosp.setJalob(ta_jal_pr.getText().trim());
+            if (tf_diag_n.getText() != null) Id_gosp.setDiag_n(tf_diag_n.getText());
+            if (tf_diag_p.getText() != null) Id_gosp.setDiag_p(tf_diag_p.getText());
+            if (ta_diag_n.getText() != null) Id_gosp.setNamed_n(ta_diag_n.getText());
+            if (ta_diag_p.getText() != null) Id_gosp.setNamed_p(ta_diag_p.getText());
+            if (tf_toc.getText() != null) Id_gosp.setToc(tf_toc.getText());
+            if (tf_ad.getText() != null) Id_gosp.setAd(tf_ad.getText());
+            if (ta_jal_pr.getText() != null) Id_gosp.setJalob(ta_jal_pr.getText());
             if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
             if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
 
