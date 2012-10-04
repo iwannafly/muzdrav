@@ -388,13 +388,7 @@ public class Vvod extends JFrame {
 					IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
 					client.showModal(MainForm.instance, zapVr.npasp, zapVr.im, zapVr.fam, zapVr.oth, zapVr.datar, zapVr.id_pvizit);
 					
-					if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
-						cmbZaklIsh.setSelectedIndex(-1);
-						cmbZaklIsh.setEnabled(false);
-						btnPosSave.doClick();
-					} else {
-						cmbZaklIsh.setEnabled(true);
-					}
+					checkZapVrNext();
 				} catch (Exception e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Не удалось отобразить форму записи на прием", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				}
@@ -2165,6 +2159,8 @@ public class Vvod extends JFrame {
 			if (tblDiag.getRowCount() > 0)
 				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
 			
+			checkZapVrNext();
+			
 			setVisible(true);
 			MainForm.instance.setVisible(false);
 		} catch (KmiacServerException e) {
@@ -2303,5 +2299,15 @@ public class Vvod extends JFrame {
 				else return true;
 					}
 		return true;
+	}
+
+	private void checkZapVrNext() throws KmiacServerException, TException {
+		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
+			cmbZaklIsh.setSelectedIndex(-1);
+			cmbZaklIsh.setEnabled(false);
+			btnPosSave.doClick();
+		} else {
+			cmbZaklIsh.setEnabled(true);
+		}
 	}
 }
