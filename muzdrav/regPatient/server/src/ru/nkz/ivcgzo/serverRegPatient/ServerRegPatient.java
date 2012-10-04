@@ -1538,4 +1538,11 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    @Override
+    public int addToOtd(int idGosp, int nist, int vid, int cotd)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
 }
