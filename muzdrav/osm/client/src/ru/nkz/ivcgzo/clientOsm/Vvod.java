@@ -82,6 +82,7 @@ import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import javax.swing.UIManager;
+import javax.swing.JTextField;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -144,6 +145,11 @@ public class Vvod extends JFrame {
 	private ShablonSearchListener shablonSearchListener;
 	private JButton btnPosAdd;
 	private JButton btnPosSave;
+	private ButtonGroup bgInvUst;
+	private JRadioButton rbtInvUst1;
+	private JRadioButton rbtInvUst2;
+	private JPanel pnlInvUst;
+	private CustomTextField tfNuch;
 	
 	private List<IntegerClassifier> listVidIssl;
 	public static ZapVr zapVr;
@@ -160,10 +166,7 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	private DispHron disphron;
-	private ButtonGroup bgInvUst;
-	private JRadioButton rbtInvUst1;
-	private JRadioButton rbtInvUst2;
-	private JPanel pnlInvUst;
+
 	
 	/**
 	 * Create the dialog.
@@ -763,6 +766,7 @@ public class Vvod extends JFrame {
 			  			pdiag.setCod_sp(diagamb.getCod_sp());
 			  			pdiag.setCdol_ot(diagamb.getCdol());
 			  			pdiag.setNamed(diagamb.getNamed());
+			  			pdiag.setUch(zapVr.getNuch());
 			  			if (rbtInvUst1.isSelected())pdiag.setPpi(1);
 			  			if (rbtInvUst2.isSelected())pdiag.setPpi(2);
 			  			if (rbtDiagHarOstr.isSelected()) pdiag.setXzab(1);
@@ -794,6 +798,7 @@ public class Vvod extends JFrame {
 
 		  			pdisp.setCod_sp(diagamb.getCod_sp());
 		  			pdisp.setCdol_ot(diagamb.getCdol());
+		  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
 		  			MainForm.tcl.setPdisp(pdisp);
 		  			/*pdiag*/
 		  				pdiag.setD_vz(pdisp.getD_vz());
@@ -1164,6 +1169,11 @@ public class Vvod extends JFrame {
 			disphron.ShowDispHron();
 			}
 		});
+		
+		JLabel lblNuch = new JLabel("№ уч-ка");
+		
+		tfNuch = new CustomTextField();
+		tfNuch.setColumns(10);
 		GroupLayout gl_pnlDiagDisp = new GroupLayout(pnlDiagDisp);
 		gl_pnlDiagDisp.setHorizontalGroup(
 			gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
@@ -1185,9 +1195,14 @@ public class Vvod extends JFrame {
 								.addComponent(lblDiagDispIsh, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(lblDiagDispGrup, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.TRAILING)
-								.addComponent(cmbDiagDispIsh, 0, 462, Short.MAX_VALUE)
-								.addComponent(cmbDiagDispGrup, Alignment.LEADING, 0, 462, Short.MAX_VALUE))))
+							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
+									.addComponent(cmbDiagDispIsh, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblNuch)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(cmbDiagDispGrup, 0, 462, Short.MAX_VALUE))))
 					.addContainerGap())
 		);
 		gl_pnlDiagDisp.setVerticalGroup(
@@ -1206,7 +1221,9 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.BASELINE, false)
 						.addComponent(cmbDiagDispIsh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblDiagDispIsh))
+						.addComponent(lblDiagDispIsh)
+						.addComponent(lblNuch)
+						.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(14))
 		);
 		pnlDiagDisp.setLayout(gl_pnlDiagDisp);
@@ -2217,6 +2234,7 @@ public class Vvod extends JFrame {
 		tbDiagDispDatIsh.setEnabled(value);
 		cmbDiagDispGrup.setEnabled(value);
 		cmbDiagDispIsh.setEnabled(value);
+		tfNuch.setEnabled(value);
 	}
 	
 	private boolean checkInput() throws TException {

@@ -613,6 +613,14 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
+	 * Обновление текущей строки, измененной <b>программно</b>.
+	 */
+	public void updateChangedSelectedItem() {
+		itemUpd = true;
+		updateSelectedItem();
+	}
+	
+	/**
 	 * Регистрация слушателя, принимающего сообщения о том, что произошло
 	 * добавление новой строки.
 	 * @param listener
