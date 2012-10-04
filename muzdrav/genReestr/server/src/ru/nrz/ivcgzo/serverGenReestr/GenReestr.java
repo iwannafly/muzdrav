@@ -202,7 +202,8 @@ private TServer thrServ;
     	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
     						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
     						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-    	            		sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
+    						if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
+    						else sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
     						sb.append("<br>"+str+"<br>");
     	                	
     	                }
