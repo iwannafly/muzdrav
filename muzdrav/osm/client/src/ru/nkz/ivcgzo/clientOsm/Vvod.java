@@ -243,7 +243,7 @@ public class Vvod extends JFrame {
 		       		mb1.addActionListener(new ActionListener() {
 		       			@Override
 		       			public void actionPerformed(ActionEvent arg0) {
-		       				postber.setVisible(true);	
+		       				postber.showForm();
 		       			}
 		       		});
 		       		menuBer.add(mb1);
