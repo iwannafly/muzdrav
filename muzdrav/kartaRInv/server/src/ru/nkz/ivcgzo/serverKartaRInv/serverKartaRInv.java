@@ -78,12 +78,6 @@ public class serverKartaRInv extends Server implements Iface {
 	}
 
 	@Override
-	public void DeletePinvk(int ninv) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public List<IntegerClassifier> get_n_v0a() throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
@@ -186,6 +180,12 @@ public class serverKartaRInv extends Server implements Iface {
 			TException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void DeletePinvk(int ninv) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
