@@ -504,7 +504,7 @@ struct Shablon {
 	1: i32 id;
 	2: string diag;
 	3: string din;
-	4: string next_osm;
+	4: string name;
 	5: list<ShablonText> textList;
 }
 
