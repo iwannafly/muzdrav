@@ -12,9 +12,9 @@ include "../../../common/thrift/classifier.thrift"
 service ThriftGenReestr extends kmiacServer.KmiacServer {
 
 	/**
-        * Создает реестр
+        * Создает реестр и возвращает протокол проверок реестра
 	*/
-	void getReestrInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
+	string getReestrInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
 
 	/*Классификаторы*/
 

@@ -2868,7 +2868,8 @@ public class PacientInfoFrame extends JFrame {
         JButton btnSave_priem = new JButton("Сохранить");
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                SavePriemInfo();
+            	SavePriemInfo();
+            	//здесь надо сохранять в стационар
             }
         });
 
@@ -2920,7 +2921,7 @@ public class PacientInfoFrame extends JFrame {
                 .addComponent(scrollPane_3, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
         );
 
-        tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"DS прием", 7, "Наименование");
+        tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"Диагноз", 7, "Наименование");
         tbl_priem.setDateField(1);
         tbl_priem.setPreferredWidths(70,70,65,60,600);
         tbl_priem.setFillsViewportHeight(true);
@@ -2936,7 +2937,8 @@ public class PacientInfoFrame extends JFrame {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 if (tbl_priem.getSelectedItem() !=  null) {
-                changePatientPriemInfo(curPatientId);
+                	changePatientPriemInfo(curPatientId);
+                	newPriem = tbl_priem.getSelectedItem();
                 }
             }
         }
@@ -2955,6 +2957,19 @@ public class PacientInfoFrame extends JFrame {
             return true;
             }
         });
+
+//        tbl_priem.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<AllGosp>() {
+//            @Override
+//            public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
+//                    newPriem.setId(curId);
+//                    newPriem.setNist(Id_gosp.getNist());
+//                    newPriem.setDatap(Id_gosp.getDatap());
+//                    newPriem.setCotd(Id_gosp.getCotd());
+//                    newPriem.setDiag_p(Id_gosp.getDiag_p());
+//                    newPriem.setNamed_p(Id_gosp.getNamed_p());
+//                return true;
+//            }
+//        });
 
         JButton btnPrint_ambk = new JButton("Амбул.карты");
         btnPrint_ambk.addActionListener(new ActionListener() {
@@ -3334,7 +3349,7 @@ public class PacientInfoFrame extends JFrame {
         AllGospInfo = MainForm.tcl.getAllGosp(PatId);
         tbl_priem.setData(AllGospInfo);
       } catch (GospNotFoundException gnfe) {
-            System.out.println("Обращений нет.");
+//            System.out.println("Обращений нет.");
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -3582,7 +3597,6 @@ public class PacientInfoFrame extends JFrame {
                 newPriem.setCotd(Id_gosp.getCotd());
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
-                tbl_priem.updateSelectedItem();
             }
             else{
                 MainForm.tcl.updateGosp(Id_gosp);
@@ -3591,8 +3605,8 @@ public class PacientInfoFrame extends JFrame {
                 newPriem.setCotd(Id_gosp.getCotd());
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
-                tbl_priem.updateSelectedItem();
             }
+            tbl_priem.updateSelectedItem();
         } catch (Exception e) {
             e.printStackTrace();
         }
