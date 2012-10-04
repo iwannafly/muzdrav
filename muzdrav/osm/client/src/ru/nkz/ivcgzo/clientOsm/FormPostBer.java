@@ -138,8 +138,9 @@ addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 try {
+	System.out.println(Vvod.zapVr.getNpasp());	
+	System.out.println(Vvod.zapVr.getId_pvizit());		
 	rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-	System.out.println(Vvod.zapVr.getNpasp());		
 	setPostBerData();
 	fam.setText(Vvod.zapVr.getFam());
 	im.setText(Vvod.zapVr.getIm());
