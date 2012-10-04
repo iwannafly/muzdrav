@@ -192,7 +192,14 @@ private TServer thrServ;
     	            	if (rs.getInt("ter_mu") == 0)
     	            		str += " 10. Неверная территории МО TER_MU<br>";
     	            	if (rs.getDate("df_per").getTime() == 0)
-    	            		str += " 13. Незаполнена дата предоставления реестра в ТФ DF_PER<br>";
+    	            		str += " 13. Не заполнена дата предоставления реестра в ТФ DF_PER<br>";
+    	            	if (rs.getDate("dr").getTime() == 0)
+    	            		str += " 18. Не заполнена дата рождения DR<br>";
+    	            	if (rs.getString("sex").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М' || rs.getString("sex").charAt(0) != 'ж' || rs.getString("sex").charAt(0) != 'Ж')
+    	            		str += " 21. Ошибка в кодировании пола SEX<br>";
+    	            	if (rs.getString("sex").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М')
+        	            	if (rs.getString("otch").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М')
+    	            		str += " 22. Несоответствие пола и отчества<br>";
     	            	
     	            	
     	            	if (rs.getString("diag") == null)

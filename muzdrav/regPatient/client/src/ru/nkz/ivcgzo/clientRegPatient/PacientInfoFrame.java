@@ -95,6 +95,7 @@ public class PacientInfoFrame extends JFrame {
     private int curPatientId = 0;
     private int curNgosp = 0;
     private int curId = 0;
+    private int curId_otd = 0;
     private int Terp = 0;
     private final ButtonGroup btnGroup_pol = new ButtonGroup();
     private final ButtonGroup btnGroup_gk = new ButtonGroup();
@@ -2869,7 +2870,6 @@ public class PacientInfoFrame extends JFrame {
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
             	SavePriemInfo();
-            	//здесь надо сохранять в стационар
             }
         });
 
@@ -3556,7 +3556,8 @@ public class PacientInfoFrame extends JFrame {
             Id_gosp.setCuser(MainForm.authInfo.pcod);
             //Id_gosp.setNist(1); //подумать
             if (!tf_nist.getText().isEmpty()) Id_gosp.setNist(Integer.valueOf(tf_nist.getText())); 
-
+            Id_gosp.setVid(1);
+            
 //		    System.out.println(((Date) sp_dataosm.getValue()).getTime());
 //		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
             if (tf_datap.getDate() != null) Id_gosp.setDatap(tf_datap.getDate().getTime());
@@ -3604,12 +3605,15 @@ public class PacientInfoFrame extends JFrame {
             CheckNotNullTableCgosp();
             if (curId == 0){
                 curId = MainForm.tcl.addGosp(Id_gosp);
+                curId_otd = 0;
                 newPriem.setId(curId);
                 newPriem.setNist(Id_gosp.getNist());
                 newPriem.setDatap(Id_gosp.getDatap());
                 newPriem.setCotd(Id_gosp.getCotd());
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
+                if (Id_gosp.getCotd() != 0)
+                	curId_otd = MainForm.tcl.addToOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
             else{
                 MainForm.tcl.updateGosp(Id_gosp);
@@ -3618,8 +3622,10 @@ public class PacientInfoFrame extends JFrame {
                 newPriem.setCotd(Id_gosp.getCotd());
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
+                if (curId_otd != 0)
+                	MainForm.tcl.updateOtd(curId_otd, curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
-            tbl_priem.updateSelectedItem();
+            tbl_priem.updateChangedSelectedItem();
         } catch (Exception e) {
             e.printStackTrace();
         }
