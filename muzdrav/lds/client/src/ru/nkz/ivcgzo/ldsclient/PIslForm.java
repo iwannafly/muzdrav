@@ -331,7 +331,7 @@ public class PIslForm {
 		
 		JSplitPane splitPane_1 = new JSplitPane();
 		
-		splitPane_1.setResizeWeight(1);
+		splitPane_1.setResizeWeight(0.3);
 		splitPane_1.setOrientation(JSplitPane.VERTICAL_SPLIT);
 /*		tFnaprotd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

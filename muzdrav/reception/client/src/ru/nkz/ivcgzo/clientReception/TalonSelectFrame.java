@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.GroupLayout;
+import javax.swing.SwingConstants;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -91,6 +92,11 @@ public class TalonSelectFrame extends JFrame {
     private JButton btnBackward;
     private JButton btnForward;
     private JLabel lblWeekNevigation;
+    private JLabel lblPerv;
+    private JLabel lblPovt;
+    private JLabel lblHome;
+    private JLabel lblConsult;
+    private JLabel lblAppointmentTypeHeader;
 
     public TalonSelectFrame(final UserAuthInfo authInfo) {
         curDoctorInfo = authInfo;
@@ -239,6 +245,7 @@ public class TalonSelectFrame extends JFrame {
 
         addNavigationButtons();
 
+        setAppointmentTypeLabels();
         fillTalonTypeGroupLayout();
         pnTalonType.setLayout(glPnTalonType);
     }
@@ -334,6 +341,30 @@ public class TalonSelectFrame extends JFrame {
         });
     }
 
+    private void setAppointmentTypeLabels() {
+        lblAppointmentTypeHeader = new JLabel("Цветовая схема видов приёма:");
+
+        lblPerv = new JLabel("Первичный");
+        lblPerv.setBackground(Color.green);
+        lblPerv.setHorizontalAlignment(SwingConstants.CENTER);
+        lblPerv.setOpaque(true);
+
+        lblPovt = new JLabel("Повторный");
+        lblPovt.setBackground(Color.yellow);
+        lblPovt.setHorizontalAlignment(SwingConstants.CENTER);
+        lblPovt.setOpaque(true);
+
+        lblHome = new JLabel("На дому");
+        lblHome.setBackground(Color.pink);
+        lblHome.setHorizontalAlignment(SwingConstants.CENTER);
+        lblHome.setOpaque(true);
+
+        lblConsult = new JLabel("Консультация");
+        lblConsult.setBackground(Color.magenta);
+        lblConsult.setHorizontalAlignment(SwingConstants.CENTER);
+        lblConsult.setOpaque(true);
+    }
+
     private void fillTalonTypeGroupLayout() {
         glPnTalonType = new GroupLayout(pnTalonType);
         glPnTalonType.setHorizontalGroup(
@@ -341,19 +372,35 @@ public class TalonSelectFrame extends JFrame {
                 .addGroup(glPnTalonType.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING)
-                        .addComponent(cbxDoctor, 0, 375, Short.MAX_VALUE)
-                        .addComponent(cbxSpeciality, 0, 375, Short.MAX_VALUE)
-                        .addComponent(cbxPoliclinic, 0, 375, Short.MAX_VALUE)
-                        .addGroup(glPnTalonType.createSequentialGroup()
-                            .addComponent(btnBackward, GroupLayout.PREFERRED_SIZE, 181,
-                                    GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED, 0, Short.MAX_VALUE)
-                            .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
-                                    GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbxDoctor, 0, 381, Short.MAX_VALUE)
+                        .addComponent(cbxSpeciality, 0, 381, Short.MAX_VALUE)
+                        .addComponent(cbxPoliclinic, 0, 381, Short.MAX_VALUE)
                         .addComponent(lblPoliclinicCbx)
                         .addComponent(lblSpecialityCbx)
                         .addComponent(lblDoctorCbx)
-                        .addComponent(lblWeekNevigation))
+                        .addComponent(lblWeekNevigation)
+                        .addGroup(glPnTalonType.createSequentialGroup()
+                            .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING)
+                                .addGroup(glPnTalonType.createSequentialGroup()
+                                    .addComponent(lblPerv, GroupLayout.PREFERRED_SIZE,
+                                            91, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(lblPovt, GroupLayout.PREFERRED_SIZE,
+                                            84, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnBackward, GroupLayout.PREFERRED_SIZE,
+                                        181, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                            .addGroup(glPnTalonType.createParallelGroup(Alignment.LEADING, false)
+                                .addGroup(glPnTalonType.createSequentialGroup()
+                                    .addComponent(lblHome, GroupLayout.PREFERRED_SIZE,
+                                            84, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.RELATED,
+                                            GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblConsult, GroupLayout.PREFERRED_SIZE,
+                                            84, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnForward, GroupLayout.PREFERRED_SIZE, 173,
+                                        GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lblAppointmentTypeHeader))
                     .addContainerGap())
         );
         glPnTalonType.setVerticalGroup(
@@ -379,7 +426,15 @@ public class TalonSelectFrame extends JFrame {
                     .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
                         .addComponent(btnBackward)
                         .addComponent(btnForward))
-                    .addContainerGap(77, Short.MAX_VALUE))
+                    .addPreferredGap(ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                    .addComponent(lblAppointmentTypeHeader)
+                    .addPreferredGap(ComponentPlacement.RELATED)
+                    .addGroup(glPnTalonType.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(lblPerv)
+                        .addComponent(lblPovt)
+                        .addComponent(lblHome)
+                        .addComponent(lblConsult))
+                    .addContainerGap())
         );
     }
 

@@ -2977,7 +2977,19 @@ public class PacientInfoFrame extends JFrame {
                 String servPath;
                 try {
                     String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
-                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo);
+                    String omsOrg = cmb_oms_smo.getText();
+                    String lgot = "";
+                    if (LgotaInfo.size() > 0) {
+                        for (Lgota lg : LgotaInfo) {
+                            if (lg.isSetLgota()) {
+                                lgot += ", " + String.valueOf(lg.getLgota());
+                            }
+                        }
+                        lgot = lgot.substring(1);
+                    } else {
+                        lgot = "";
+                    }
+                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo, omsOrg, lgot);
                     String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
                     MainForm.conMan.openFileInEditor(cliPath, false);
