@@ -17,6 +17,7 @@ struct ZapVr{
 	8: optional i32 pol;
 	9: optional i64 datar;
 	10: optional i64 datap;
+	11: optional i32 nuch;
 }
 
 struct Pvizit {
@@ -148,7 +149,8 @@ struct PdiagZ{
 	22: optional i32 prizi;
 	23: optional string named;
 	24: optional i32 ppi;
-	25: optional string nameC00;
+	25: optional i32 uch;
+	26: optional string nameC00;
 
 }
 
@@ -454,6 +456,7 @@ struct Pdisp{
 	15: optional string cdol_ot;
 	16: optional bool sob;
 	17: optional bool sxoch;
+	18: optional i32 d_uch;
 }
 
 struct Protokol{

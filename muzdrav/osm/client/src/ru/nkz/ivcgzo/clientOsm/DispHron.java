@@ -11,10 +11,9 @@ import javax.swing.JPanel;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -31,6 +30,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JTextField;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DispHron extends JFrame{
 	private static final long serialVersionUID = -2929416282414434095L;
@@ -39,6 +41,10 @@ public class DispHron extends JFrame{
 	private ThriftStringClassifierCombobox<StringClassifier> cmbDiag;
 	private CustomTable<Pobost,Pobost._Fields> tabObost;
 	private Pobost obostr;
+	private CustomDateEditor tfDnl;
+	private JTextField tfNaprLpu;
+	private CustomDateEditor tfDkl;
+	private int ter;
 
 
 	public DispHron() {
@@ -99,6 +105,10 @@ public class DispHron extends JFrame{
 					pmer.setDataz(System.currentTimeMillis());
 					pmer.setRez(tblDispHron.getSelectedItem().getRez());
 					pmer.setCdol(tblDispHron.getSelectedItem().getCdol());
+					if (tfDkl.getDate() != null)pmer.setDkl(tfDkl.getDate().getTime());
+					if (tfDkl.getDate() != null)pmer.setDnl(tfDnl.getDate().getTime());
+					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText()));
+					pmer.setTer(ter);
 					MainForm.tcl.UpdatePmer(pmer);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -134,8 +144,8 @@ public class DispHron extends JFrame{
 		 			tblDispHron.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
 		 			tblDispHron.setStringClassifierSelector(1, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
 		 			tblDispHron.setIntegerClassifierSelector(4, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
-		 			//tabObost.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
-		 			//tabObost.setIntegerClassifierSelector(1, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
+		 			tabObost.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
+		 			tabObost.setIntegerClassifierSelector(1, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
 		 		} catch (KmiacServerException e1) {
 		 			e1.printStackTrace();
 		 		} catch (TException e1) {
@@ -211,6 +221,34 @@ public class DispHron extends JFrame{
 			}
 		});
 		bDelObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
+		
+		JLabel lblDnl = new JLabel("Дата начала лечения");
+		
+		tfDnl = new CustomDateEditor();
+		tfDnl.setColumns(10);
+		
+		JLabel lblDkl = new JLabel("Дата конца лечения");
+		
+		tfDkl = new CustomDateEditor();
+		tfDkl.setColumns(10);
+		
+		JLabel lblNaprLpu = new JLabel("Направлен в ЛПУ");
+		
+		tfNaprLpu = new JTextField();
+		tfNaprLpu.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					 int[] res = MainForm.conMan.showPolpTreeForm("Выбор ЛПУ", 0, 0, 0);
+					 if (res != null) {
+                         tfNaprLpu.setText(Integer.toString(res[1]));
+                         ter=res[0];
+                  }
+				}
+			}
+		});
+		tfNaprLpu.setColumns(10);
 		GroupLayout gl_pnlDispHron = new GroupLayout(pnlDispHron);
 		gl_pnlDispHron.setHorizontalGroup(
 			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
@@ -220,7 +258,19 @@ public class DispHron extends JFrame{
 							.addGap(5)
 							.addComponent(lblDiag)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(cmbDiag, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE))
+							.addComponent(cmbDiag, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+							.addGap(48)
+							.addComponent(lblDnl)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tfDnl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblDkl, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(tfDkl, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+							.addGap(33)
+							.addComponent(lblNaprLpu)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tfNaprLpu, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pnlDispHron.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(bAddDispHron)
@@ -250,9 +300,19 @@ public class DispHron extends JFrame{
 			gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlDispHron.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cmbDiag, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblDiag))
+					.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.BASELINE)
+							.addComponent(cmbDiag, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblDiag)
+							.addComponent(lblDnl)
+							.addComponent(tfDnl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pnlDispHron.createSequentialGroup()
+							.addGap(3)
+							.addComponent(lblDkl))
+						.addGroup(gl_pnlDispHron.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tfDkl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblNaprLpu)
+							.addComponent(tfNaprLpu, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -284,11 +344,7 @@ public class DispHron extends JFrame{
 		tblDispHron.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-//			if (!arg0.getValueIsAdjusting()){
-//				if (tblDispHron.getSelectedItem()!= null) {
-//					
-//				}
-//			}
+
 		}
 				});
 	
