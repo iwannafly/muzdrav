@@ -341,7 +341,21 @@ public class Option {
 							}
 							
 						}else{
+							boolean check = true;
+							
+							for(int i=0; i<tmetod.getRowCount(); i++){
+								if (Boolean.valueOf(tmetod.getModel().getValueAt(i, 3).toString())==true){
+									check = false;
+									break;
+								}	
+							}
 							MainForm.ltc.DelS_ot01D(MainForm.authInfo.cpodr, tn_ldi.getSelectedItem().pcod, tmetod.getSelectedItem().c_obst, n_nz1.getSelectedPcod());
+							
+							if (check == true){
+								tn_ldi.getModel().setValueAt(false, tn_ldi.getSelectedRow(), 3);
+								tn_ldi.repaint();
+							}
+							
 							ts_ot01.setData(MainForm.ltc.GetS_ot01(MainForm.authInfo.cpodr,n_nz1.getSelectedPcod()));
 						}
 						

@@ -183,8 +183,7 @@ public class serverKartaRInv extends Server implements Iface {
 	}
 
 	@Override
-	public void DeletePinvk(int ninv, int npasp) throws KmiacServerException,
-			TException {
+	public void DeletePinvk(int ninv) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		
 	}

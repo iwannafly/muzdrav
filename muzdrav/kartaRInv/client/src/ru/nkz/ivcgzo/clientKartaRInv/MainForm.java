@@ -272,7 +272,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		cb_pr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
 		cb_pr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
 		cb_pr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
+		cb_pr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		
 		JPanel p_rez_exp = new JPanel();
 		tabbedPane.addTab("Результаты экспертизы", null, p_rez_exp, null);

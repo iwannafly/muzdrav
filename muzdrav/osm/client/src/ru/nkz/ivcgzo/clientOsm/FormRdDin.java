@@ -373,8 +373,6 @@ public class FormRdDin extends JFrame {
 		Nbutton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-				Vvod.btnPosAdd.doClick();
-
 				RdDinStruct rddin = new RdDinStruct();
 	//			setDefaultValues();
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
@@ -603,7 +601,7 @@ public class FormRdDin extends JFrame {
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()) {
 					rddin = tablePos.getSelectedItem();
-					
+					//вставить выбор даты из таблицы посещений 
 					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
 					SSrok.setValue(rddin.getSrok());
 					SVes.setValue(rddin.getVes());

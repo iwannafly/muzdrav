@@ -23,6 +23,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 public class MainForm extends Client<LDSThrift.Client> {
 	Option winOpt;
 	PIslForm winPat;
+
+	
 	public static LDSThrift.Client ltc;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -45,6 +47,7 @@ public class MainForm extends Client<LDSThrift.Client> {
 
 		winOpt = new Option();		
 		winPat = new PIslForm();
+		
 		
 		JMenuBar menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
