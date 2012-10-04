@@ -587,7 +587,8 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	 */
 	list<classifier.StringClassifier> getU10(1:string name) throws (1:kmiacServer.KmiacServerException kse);
 
-	i32 addToOtd(1:i32 idGosp, 2:i32 nist, 4:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
+	i32 addToOtd(1:i32 idGosp, 2:i32 nist, 3:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
+	void updateOtd(1:i32 id, 2:i32 idGosp, 3:i32 nist, 4:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 
 
 }
