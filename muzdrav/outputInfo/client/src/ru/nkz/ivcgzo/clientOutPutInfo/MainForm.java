@@ -89,7 +89,6 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JTabbedPane tpStac = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpPar = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpReg = new JTabbedPane(JTabbedPane.TOP);
-		tpReg.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		JTabbedPane tpZap = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpRees = new JTabbedPane(JTabbedPane.TOP);
 		JTabbedPane tpVrTabel = new JTabbedPane(JTabbedPane.TOP);

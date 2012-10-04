@@ -32,8 +32,12 @@ public class SvodVed extends JPanel {
 		
 		lblNewLabel = new JLabel("по");
 		
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("Дети до 14 лет");
-		buttonGroup.add(rdbtnNewRadioButton);
+		final JRadioButton rdbtnDet = new JRadioButton("Дети до 14 лет");
+		final JRadioButton rdbtnPod = new JRadioButton("Подростки 15-18 лет");
+		final JRadioButton rdbtnVzr = new JRadioButton("Взрослые");
+		buttonGroup.add(rdbtnVzr);
+		buttonGroup.add(rdbtnDet);
+		buttonGroup.add(rdbtnPod);
 		
 		JButton btnNewButton = new JButton("Выполнить");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -43,41 +47,36 @@ public class SvodVed extends JPanel {
 				inputSvodVed.setDatef(tfDateF.toString());
 				inputSvodVed.setKpolik(MainForm.authInfo.getCpodr());
 				inputSvodVed.setNamepol(MainForm.authInfo.getCpodr_name());
-				//if (rdbtnNewRadioButton.isSelected()) 
+				if (rdbtnDet.isSelected()) inputSvodVed.setVozcat(1);
+				else if (rdbtnPod.isSelected()) inputSvodVed.setVozcat(2);
+				else if (rdbtnVzr.isSelected()) inputSvodVed.setVozcat(3);
 			}
 		});
 		
-		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Подростки 15-18 лет");
-		buttonGroup.add(rdbtnNewRadioButton_1);
 		
-		JRadioButton rdbtnNewRadioButton_2 = new JRadioButton("Взрослые");
-		buttonGroup.add(rdbtnNewRadioButton_2);
 		
 		JLabel lblNewLabel_1 = new JLabel("Возрастная категория");
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
+			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-				.addGroup(groupLayout.createSequentialGroup()
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addGap(20)
-					.addComponent(label)
-					.addGap(4)
-					.addComponent(tfDateB, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-					.addGap(38)
-					.addComponent(lblNewLabel)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tfDateF, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
-					.addGap(33))
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-					.addContainerGap(84, Short.MAX_VALUE)
-					.addGroup(groupLayout.createSequentialGroup()
-						.addComponent(lblNewLabel_1)
-						.addPreferredGap(ComponentPlacement.UNRELATED))
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(rdbtnNewRadioButton_2)
-						.addComponent(rdbtnNewRadioButton_1)
-						.addComponent(rdbtnNewRadioButton))
-					.addGap(81))
+						.addComponent(label)
+						.addComponent(lblNewLabel_1))
+					.addGap(4)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(tfDateB, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(lblNewLabel)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(tfDateF, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
+						.addComponent(rdbtnVzr)
+						.addComponent(rdbtnPod)
+						.addComponent(rdbtnDet))
+					.addGap(53))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -88,15 +87,19 @@ public class SvodVed extends JPanel {
 						.addComponent(tfDateB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tfDateF, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel))
-					.addGap(44)
-					.addComponent(rdbtnNewRadioButton)
-					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(rdbtnNewRadioButton_1)
-						.addComponent(lblNewLabel_1))
-					.addGap(18)
-					.addComponent(rdbtnNewRadioButton_2)
-					.addPreferredGap(ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
+					.addGap(59)
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(lblNewLabel_1)
+							.addGap(87))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(rdbtnDet)
+							.addGap(18)
+							.addComponent(rdbtnPod)
+							.addGap(18)
+							.addComponent(rdbtnVzr)
+							.addGap(40)))
+					.addGap(0, 0, Short.MAX_VALUE)
 					.addComponent(btnNewButton))
 		);
 		setLayout(groupLayout);
