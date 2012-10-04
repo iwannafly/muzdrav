@@ -1269,11 +1269,12 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getN00() throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_n00";
+        final String sqlQuery = "SELECT n_n00.pcod, (n_m00.name_s || ', ' || n_n00.name) as name "
+                + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu;";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
-                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+            new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
-            return rsmN00.mapToList(acrs.getResultSet());
+        return rsmN00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -1282,9 +1283,10 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getO00() throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_o00";
+        final String sqlQuery = "SELECT n_o00.pcod, (n_m00.name_s || ', ' || n_o00.name) as name "
+            + "FROM n_o00 INNER JOIN n_m00 ON n_m00.pcod = n_o00.clpu;";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
-                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+            new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmO00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
