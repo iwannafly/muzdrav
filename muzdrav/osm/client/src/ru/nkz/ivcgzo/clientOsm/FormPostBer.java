@@ -54,8 +54,6 @@ import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 public class FormPostBer extends JFrame {
 	private static final long serialVersionUID = -1244773743749481104L;
 	public static RdSlStruct rdSlStruct;
-//	public static RdInfStruct RdInfStruct;
-    private RdInfStruct rdinf;
 	private JPanel contentPane;
 	private JTextField TNKart;
     private int oslrod;
@@ -302,10 +300,23 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		BPeshOK.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
+		
+		JButton btnNewButton_1 = new JButton("Динамическое наблюдение");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dinform = new FormRdDin();
+				dinform.setVisible(true);
+}
+		});
+		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 //		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 965, Short.MAX_VALUE)
+					.addGap(7))
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(10)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -320,33 +331,40 @@ public class FormPostBer extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(ButSave)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ButDelete)
-							.addGap(22)
+							.addComponent(ButDelete)))
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(button)
-							.addGap(18)
-							.addComponent(BPeshOK)))
-					.addContainerGap(307, Short.MAX_VALUE))
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 965, Short.MAX_VALUE)
-					.addGap(7))
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(btnNewButton_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(BPeshOK, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(9)
+					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnNewButton)
-						.addComponent(ButSave)
-						.addComponent(ButDelete)
-						.addGroup(Alignment.LEADING, gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(9)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnNewButton)
+								.addComponent(ButSave)
+								.addComponent(ButDelete)))
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(button)
-							.addComponent(BPeshOK)))
-					.addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+							.addGap(3)
+							.addComponent(btnNewButton_1)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(BPeshOK)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 581, GroupLayout.PREFERRED_SIZE))
 		);
 		
