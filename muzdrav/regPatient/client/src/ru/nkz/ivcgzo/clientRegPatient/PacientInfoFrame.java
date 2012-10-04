@@ -3222,6 +3222,12 @@ public class PacientInfoFrame extends JFrame {
             cmb_adp_ul.setData(null);
             cmb_adp_dom.setData(null);
             cmb_adm_dom.setData(null);
+
+			LgotaInfo = new ArrayList<Lgota>();
+			KontingentInfo =  new ArrayList<Kontingent>();
+			AgentInfo = new Agent();
+            SignInfo = new Sign();
+            AllGospInfo = new ArrayList<AllGosp>();
         } catch (Exception e) {
             e.printStackTrace();
         }
