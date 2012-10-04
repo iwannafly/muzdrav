@@ -1269,11 +1269,12 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getN00() throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_n00";
+        final String sqlQuery = "SELECT n_n00.pcod, (n_m00.name_s || ', ' || n_n00.name) as name "
+                + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu;";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
-                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+            new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
-            return rsmN00.mapToList(acrs.getResultSet());
+        return rsmN00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -1282,9 +1283,10 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getO00() throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_o00";
+        final String sqlQuery = "SELECT n_o00.pcod, (n_m00.name_s || ', ' || n_o00.name) as name "
+            + "FROM n_o00 INNER JOIN n_m00 ON n_m00.pcod = n_o00.clpu;";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
-                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+            new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmO00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -1414,12 +1416,21 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
-            final UserAuthInfo uai, final String docInfo) throws KmiacServerException {
+            final UserAuthInfo uai, final String docInfo, final String omsOrg,
+            final String lgot) throws KmiacServerException {
         final String path;
         try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-//            AutoCloseableResultSet acrs;
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd:MM:yyyy");
+            AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
+                    + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
+            String ogrn = "";
+            while (acrs.getResultSet().next()) {
+                if (acrs.getResultSet().getString(1) != null) {
+                    ogrn = acrs.getResultSet().getString(1);
+                }
+            }
+            acrs.close();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
             String gender;
             if (pat.getPol() == 1) {
                 gender = "мужской";
@@ -1434,13 +1445,13 @@ public class ServerRegPatient extends Server implements Iface {
                     + "\\plugin\\reports\\MedCardAmbPriem.htm");
             htmTemplate.replaceLabels(true,
                 uai.getClpu_name(),
-                "123213133",
+                ogrn,
                 nambk.getNambk(),
-                "",
+                omsOrg,
                 pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
                 String.valueOf(pat.getPolis_oms().getStrg()),
                 pat.getSnils(),
-                "123123231",
+                lgot,
                 pat.getFam(),
                 pat.getIm(),
                 pat.getOt(),

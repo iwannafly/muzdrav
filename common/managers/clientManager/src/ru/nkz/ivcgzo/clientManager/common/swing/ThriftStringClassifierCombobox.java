@@ -112,7 +112,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					loadClassifier();
-					if (items.size() > 0) {
+					if (isEnabled() && items.size() > 0) {
 						StringClassifier res = ConnectionManager.instance.showStringClassifierSelector(classifier);
 						
 						if (res != null)
