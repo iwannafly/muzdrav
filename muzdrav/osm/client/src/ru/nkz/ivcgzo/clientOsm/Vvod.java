@@ -35,6 +35,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
@@ -81,8 +82,6 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import javax.swing.UIManager;
-import javax.swing.JTextField;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -141,6 +140,7 @@ public class Vvod extends JFrame {
 	private JButton btnRecPriem;
 	private JButton btnBer;
 	private JButton btnPrint;
+	private JLabel lblLastShab;
 	private ThriftIntegerClassifierList lbShabSrc;
 	private ShablonSearchListener shablonSearchListener;
 	private JButton btnPosAdd;
@@ -183,27 +183,8 @@ public class Vvod extends JFrame {
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
-					if (!checkCmb(cmbVidOpl)) {
-						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-						cmbVidOpl.requestFocus();
-						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-						return;
-					}
-					if (!checkCmb(cmbCelObr)) {
-						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Цель посещения' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-						cmbCelObr.requestFocus();
-						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-						return;
-					}
-					if (!checkCmb(cmbRez)) {
-						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Результат' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-						cmbRez.requestFocus();
-						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-						return;
-					}
-					if (!checkCmb(cmbMobs)) {
-						JOptionPane.showMessageDialog(Vvod.this, "Поле 'Место обслуживания' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-						cmbMobs.requestFocus();
+					
+					if (!checkTalInput()) {
 						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 						return;
 					}
@@ -256,8 +237,33 @@ public class Vvod extends JFrame {
 		btnBer = new JButton("Наблюдение за беременными");
 		btnBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+<<<<<<< HEAD
 		       		postber.setVisible(true);	
 
+=======
+				  JPopupMenu menuBer = new JPopupMenu();
+		            
+		       		JMenuItem mb1 = new JMenuItem("Постановка на учет по беременности");
+		       		mb1.addActionListener(new ActionListener() {
+		       			@Override
+		       			public void actionPerformed(ActionEvent arg0) {
+		       				postber.showForm();
+		       			}
+		       		});
+		       		menuBer.add(mb1);
+		       		
+					JMenuItem mb2 = new JMenuItem("Динамическое наблюдение за беременными");
+					mb2.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+							dinform = new FormRdDin();
+							dinform.setVisible(true);
+						}
+		});
+					menuBer.add(mb2);
+					
+					menuBer.show(btnBer, 0, btnBer.getHeight());
+>>>>>>> 1e387a287544db28c401f83f2b959c4ae00d7938
 			}
 		});
 		btnPrint = new JButton("Печатные формы");
@@ -433,6 +439,8 @@ public class Vvod extends JFrame {
 		JScrollPane spShabSrc = new JScrollPane();
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		
+		lblLastShab = new JLabel("<html>Последний выбранный шаблон: </html>");
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.TRAILING)
@@ -440,11 +448,12 @@ public class Vvod extends JFrame {
 					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 763, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
+						.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
+						.addComponent(lblLastShab, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
 						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(tbShabSrc, GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+							.addComponent(tbShabSrc, GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnShabSrc, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
-						.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)))
+							.addComponent(btnShabSrc, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.TRAILING)
@@ -455,8 +464,10 @@ public class Vvod extends JFrame {
 								.addComponent(tbShabSrc, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(btnShabSrc, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE))
-						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 460, Short.MAX_VALUE))
+							.addComponent(lblLastShab)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE))
+						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 667, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		
@@ -479,7 +490,7 @@ public class Vvod extends JFrame {
 		spShabSrc.setViewportView(lbShabSrc);
 		
 		JPanel pnlJal = new JPanel();
-		tabbedPane.addTab("Жалобы", null, pnlJal, null);
+		tabbedPane.addTab("<html><br>Жалобы<br><br></html>", null, pnlJal, null);
 		
 		JScrollPane spJal = new JScrollPane();
 		GroupLayout gl_pnlJal = new GroupLayout(pnlJal);
@@ -506,7 +517,7 @@ public class Vvod extends JFrame {
 		pnlJal.setLayout(gl_pnlJal);
 		
 		JPanel pnlAnam = new JPanel();
-		tabbedPane.addTab("Anamnesis morbi", null, pnlAnam, null);
+		tabbedPane.addTab("<html><br>Anamnesis morbi<br><br></html>", null, pnlAnam, null);
 		
 		JScrollPane spAnam = new JScrollPane();
 		GroupLayout gl_pnlAnam = new GroupLayout(pnlAnam);
@@ -533,7 +544,7 @@ public class Vvod extends JFrame {
 		pnlAnam.setLayout(gl_pnlAnam);
 		
 		JPanel pnlStat = new JPanel();
-		tabbedPane.addTab("Status praesense", null, pnlStat, null);
+		tabbedPane.addTab("<html><br>Status praesense<br><br></html>", null, pnlStat, null);
 		
 		tbStatTemp = new CustomTextField();
 		tbStatTemp.setColumns(10);
@@ -628,7 +639,7 @@ public class Vvod extends JFrame {
 		pnlStat.setLayout(gl_pnlStat);
 		
 		JPanel pnlFiz = new JPanel();
-		tabbedPane.addTab("Физикальное обследование", null, pnlFiz, null);
+		tabbedPane.addTab("<html><br>Физикальное обследование<br><br></html>", null, pnlFiz, null);
 		
 		JScrollPane spFiz = new JScrollPane();
 		
@@ -656,7 +667,7 @@ public class Vvod extends JFrame {
 		pnlFiz.setLayout(gl_pnlFiz);
 		
 		JPanel pnlLoc = new JPanel();
-		tabbedPane.addTab("Localis status", null, pnlLoc, null);
+		tabbedPane.addTab("<html><br>Localis status<br><br></html>", null, pnlLoc, null);
 		
 		JScrollPane spLoc = new JScrollPane();
 		GroupLayout gl_pnlLoc = new GroupLayout(pnlLoc);
@@ -683,7 +694,7 @@ public class Vvod extends JFrame {
 		pnlLoc.setLayout(gl_pnlLoc);
 		
 		JPanel pnlDiag = new JPanel();
-		tabbedPane.addTab("Диагноз", null, pnlDiag, null);
+		tabbedPane.addTab("<html><br>Диагноз<br><br></html>", null, pnlDiag, null);
 		
 		JPanel PnlDiag = new JPanel();
 		
@@ -1272,7 +1283,7 @@ public class Vvod extends JFrame {
 		pnlDiag.setLayout(gl_pnlDiag);
 		
 		JPanel pnlLech = new JPanel();
-		tabbedPane.addTab("Назначенное лечение", null, pnlLech, null);
+		tabbedPane.addTab("<html><br>Назначенное лечение<br><br></html>", null, pnlLech, null);
 		
 		JScrollPane spLech = new JScrollPane();
 		GroupLayout gl_pnlLech = new GroupLayout(pnlLech);
@@ -1299,7 +1310,7 @@ public class Vvod extends JFrame {
 		pnlLech.setLayout(gl_pnlLech);
 		
 		JPanel pnlNapr = new JPanel();
-		tabbedPane.addTab("Направления", null, pnlNapr, null);
+		tabbedPane.addTab("<html><br>Направления<br><br></html>", null, pnlNapr, null);
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		GroupLayout gl_pnlNapr = new GroupLayout(pnlNapr);
@@ -1596,7 +1607,7 @@ public class Vvod extends JFrame {
 		pnlNapr.setLayout(gl_pnlNapr);
 		
 		JPanel pnlOcen = new JPanel();
-		tabbedPane.addTab("Оценка данных анамнеза", null, pnlOcen, null);
+		tabbedPane.addTab("<html><br>Оценка данных анамнеза<br><br></html>", null, pnlOcen, null);
 		
 		JScrollPane spOcen = new JScrollPane();
 		GroupLayout gl_pnlOcen = new GroupLayout(pnlOcen);
@@ -1623,7 +1634,7 @@ public class Vvod extends JFrame {
 		pnlOcen.setLayout(gl_pnlOcen);
 		
 		JPanel pnlZakl = new JPanel();
-		tabbedPane.addTab("Заключение", null, pnlZakl, null);
+		tabbedPane.addTab("<html><br>Заключение<br><br></html>", null, pnlZakl, null);
 		
 		JLabel lblZakl = new JLabel("Заключение специалиста");
 		
@@ -1777,7 +1788,6 @@ public class Vvod extends JFrame {
 					Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 					tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-					tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
 				} catch (KmiacServerException e2) {
 					e2.printStackTrace();
 				} catch (PvizitNotFoundException e2) {
@@ -1786,7 +1796,6 @@ public class Vvod extends JFrame {
 						zapVr.setId_pvizit(pvizit.id);
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -1825,7 +1834,6 @@ public class Vvod extends JFrame {
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						pvizitAmb.setKod_ter(MainForm.authInfo.getKdate());
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-						tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
@@ -1845,9 +1853,16 @@ public class Vvod extends JFrame {
 						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 							MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
 							MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
-							if (tblPos.getSelectedRow() == tblPos.getRowCount() - 1)
+							if (tblPos.getSelectedRow() == 0)
 								MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
+							
+							int prevIdx = tblPos.getSelectedRow();
 							tblPos.setData(MainForm.tcl.getPvizitAmb(Vvod.zapVr.getId_pvizit()));
+							if (tblPos.getRowCount() > 0)
+								if (prevIdx < tblPos.getRowCount() - 1)
+									tblPos.setRowSelectionInterval(prevIdx, prevIdx);
+								else
+									tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
 							if (tblPos.getSelectedItem() == null) {
 								MainForm.tcl.DeleteAnamZab(zapVr.getId_pvizit());
 								MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());
@@ -1871,6 +1886,17 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (tblPos.getSelectedItem() != null)
 					try {
+						for (PvizitAmb pv: tblPos.getData())
+							if (pv != pvizitAmb)
+								if (pv.getDatap() == pvizitAmb.getDatap()) {
+									JOptionPane.showMessageDialog(Vvod.this, "Посещение с такой датой уже занесено");
+									tblPos.cancelEdit();
+									pvizitAmb = tblPos.getSelectedItem();
+									return;
+								}
+						if (!checkTalInput())
+							return;
+						
 						priem = new Priem();
 						anamZab = new AnamZab();
 						priem.setId_pvizit(pvizit.getId());
@@ -1969,8 +1995,9 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
-		tblPos = new CustomTable<>(false, false, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
+		tblPos = new CustomTable<>(true, false, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
 		tblPos.setDateField(0);
+		tblPos.setEditableFields(false, 1, 2);
 		tblPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
@@ -2126,10 +2153,10 @@ public class Vvod extends JFrame {
 			int age = (int) ((System.currentTimeMillis() - zapVr.datar) / 31556952000L);
 			btnBer.setEnabled((zapVr.pol != 1) && ((age > 13) && (age < 50)));
 			chbDiagBer.setEnabled(btnBer.isEnabled());
+			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
 			
 			tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 			if (tblPos.getRowCount() > 0) {
-				tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
 				if (pvizitAmb.datap < getDateMills(System.currentTimeMillis()))
 					btnPosAdd.doClick();
 			} else {
@@ -2202,7 +2229,7 @@ public class Vvod extends JFrame {
 			}
 		}
 		
-		addDiag(new StringClassifier(sh.diag, MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, sh.diag.trim())));
+		lblLastShab.setText(String.format("<html>Последний выбранный шаблон: %s %s</html>", sh.diag.trim(), sh.name));
 	}
 
 	private void setHarZabEnabled(boolean value) {
@@ -2220,7 +2247,7 @@ public class Vvod extends JFrame {
 	private boolean checkInput() throws TException {
 		try {
 			if (tblPos.getData().size() > 0)
-				if (tblPos.getData().get(tblPos.getData().size() - 1).datap == getDateMills(System.currentTimeMillis()))
+				if (tblPos.getData().get(0).datap == getDateMills(System.currentTimeMillis()))
 					if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
 						return true;
 					} else {
@@ -2289,5 +2316,32 @@ public class Vvod extends JFrame {
 		} else {
 			cmbZaklIsh.setEnabled(true);
 		}
+	}
+
+	/**
+	 * @throws TException
+	 */
+	public boolean checkTalInput() throws TException {
+		if (!checkCmb(cmbVidOpl)) {
+			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+			cmbVidOpl.requestFocusInWindow();
+			return false;
+		}
+		if (!checkCmb(cmbCelObr)) {
+			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Цель посещения' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+			cmbCelObr.requestFocusInWindow();
+			return false;
+		}
+		if (!checkCmb(cmbRez)) {
+			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Результат' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+			cmbRez.requestFocusInWindow();
+			return false;
+		}
+		if (!checkCmb(cmbMobs)) {
+			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Место обслуживания' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+			cmbMobs.requestFocusInWindow();
+			return false;
+		}
+		return true;
 	}
 }

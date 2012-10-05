@@ -192,7 +192,14 @@ private TServer thrServ;
     	            	if (rs.getInt("ter_mu") == 0)
     	            		str += " 10. Неверная территории МО TER_MU<br>";
     	            	if (rs.getDate("df_per").getTime() == 0)
-    	            		str += " 13. Незаполнена дата предоставления реестра в ТФ DF_PER<br>";
+    	            		str += " 13. Не заполнена дата предоставления реестра в ТФ DF_PER<br>";
+    	            	if (rs.getDate("dr").getTime() == 0)
+    	            		str += " 18. Не заполнена дата рождения DR<br>";
+    	            	if (rs.getString("sex").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М' || rs.getString("sex").charAt(0) != 'ж' || rs.getString("sex").charAt(0) != 'Ж')
+    	            		str += " 21. Ошибка в кодировании пола SEX<br>";
+    	            	if (rs.getString("sex").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М')
+        	            	if (rs.getString("otch").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М')
+    	            		str += " 22. Несоответствие пола и отчества<br>";
     	            	
     	            	
     	            	if (rs.getString("diag") == null)
@@ -202,7 +209,8 @@ private TServer thrServ;
     	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
     						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
     						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-    	            		sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
+    						if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
+    						else sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
     						sb.append("<br>"+str+"<br>");
     	                	
     	                }

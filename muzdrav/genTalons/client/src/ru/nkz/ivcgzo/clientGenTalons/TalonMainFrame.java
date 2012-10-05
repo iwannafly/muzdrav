@@ -73,8 +73,6 @@ public class TalonMainFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTree treevrach;
-//	private JTabbedPane tbMain;
-//	private JTabbedPane tbRasp;
 	private String curSpec = null;
 	private int curVrach = 0;
 	private int ind = 0;
@@ -688,8 +686,8 @@ public class TalonMainFrame extends JFrame {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
 		        try {
-					//if (tbl_ndv.getSelectedItem() != null)
-						//MainForm.tcl.updateNdv(tbl_ndv.getData());
+					if (tbl_ndv.getSelectedItem() != null)
+						MainForm.tcl.updateNdv(tbl_ndv.getData());
 				} catch (Exception e) {
 					e.printStackTrace();
 					return false;
@@ -933,7 +931,7 @@ public class TalonMainFrame extends JFrame {
            		"Декабрь"
             };
 
-        cmb_month = new JComboBox(items);
+        cmb_month = new JComboBox<String>(items);
         cmb_month.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
@@ -1051,6 +1049,12 @@ public class TalonMainFrame extends JFrame {
 						RaspisanieUnit.CreateTalons(pBar, MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
 						setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						JOptionPane.showMessageDialog(null, "Формирование талонов завершено.", null, JOptionPane.INFORMATION_MESSAGE); 
+				        nday = Integer.valueOf(sp_day.getValue().toString());
+		                nmonth = cmb_month.getSelectedIndex()+1;
+		                nyear = Integer.valueOf(sp_god.getValue().toString());
+ 					    if (nmonth != 0 && nday != 0 && nyear != 0){
+			                ChangeDatap();
+						}
 					}else {
 					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
 					    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
@@ -1169,7 +1173,7 @@ public class TalonMainFrame extends JFrame {
        		"7. Количество использованных талонов"
         };
 
-		cmb_sv = new JComboBox(items1);
+		cmb_sv = new JComboBox<String>(items1);
 		cmb_sv.addActionListener(new ActionListener() {
 			@SuppressWarnings({ "rawtypes", "unused" })
 			public void actionPerformed(ActionEvent e) {
@@ -1410,7 +1414,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_rasp.setData(new ArrayList<Nrasp>());
 			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, cxm);
-            if (NraspInfo.size() > 0) {
+            if (!NraspInfo.isEmpty()) {
     			tbl_rasp.setData(NraspInfo);
     			ShowOtmetka();
     			ShowTimePause();
@@ -1426,7 +1430,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-            if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
+            tbl_norm.setData(NormInfo);
 		} catch (NormNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1436,7 +1440,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_ndv.setData(new ArrayList<Ndv>());
 			NdvInfo = MainForm.tcl.getNdv(MainForm.authInfo.cpodr, curVrach, curSpec);
-			if (NdvInfo.size() > 0)tbl_ndv.setData(NdvInfo);
+			tbl_ndv.setData(NdvInfo);
 		} catch (NdvNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1446,7 +1450,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_talon.setData(new ArrayList<Talon>());
 			TalonInfo = MainForm.tcl.getTalon(MainForm.authInfo.cpodr, curVrach, curSpec, getDatep);
-			if (TalonInfo.size() > 0)tbl_talon.setData(TalonInfo);
+			tbl_talon.setData(TalonInfo);
 		} catch (TalonNotFoundException tnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();

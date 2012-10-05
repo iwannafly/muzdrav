@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,7 @@ import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pobost;
 import ru.nkz.ivcgzo.thriftOsm.Pokaz;
 import ru.nkz.ivcgzo.thriftOsm.PokazMet;
+import ru.nkz.ivcgzo.thriftOsm.PrdslNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Prez_d;
 import ru.nkz.ivcgzo.thriftOsm.Prez_l;
 import ru.nkz.ivcgzo.thriftOsm.Priem;
@@ -441,7 +441,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<PvizitAmb> getPvizitAmb(int obrId) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ORDER BY pva.datap", obrId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ORDER BY pva.datap DESC", obrId)) {
 			return rsmPvizitAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -654,12 +654,12 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public RdSlStruct getRdSlInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
+	public RdSlStruct getRdSlInfo(int id_pvizit, int npasp) throws PrdslNotFoundException, KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where id_pvizit = ? and npasp = ? ", id_pvizit, npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmRdSl.map(acrs.getResultSet());
 			else
-				throw new KmiacServerException("нет записи");
+				throw new PrdslNotFoundException();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -773,8 +773,8 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPreparedT("INSERT INTO p_rd_inf (npasp, dataz) VALUES (?, ?) ", false, rdInf, rdInfTypes, 0, 6);
 			sme.setCommit();
 		} catch (SQLException e) {
-			if (!((SQLException)e.getCause()).getSQLState().equals("23505"))
-				throw new KmiacServerException();
+			if (((SQLException)e.getCause()).getSQLState().equals("23505"))
+				return;
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		} catch (InterruptedException e1) {
@@ -2076,7 +2076,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public Shablon getShOsm(int id_sh) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT sho.id, sho.diag, nd.name, sho.next, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT sho.id, sho.diag, nd.name, sho.name, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
 			if (acrs.getResultSet().next()) {
 				Shablon sho = new Shablon(acrs.getResultSet().getInt(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), new ArrayList<ShablonText>());
 				do {
