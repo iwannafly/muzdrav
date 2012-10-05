@@ -129,20 +129,20 @@ struct PatientVizitInfo {
 	1: optional i32 id;
 	2: optional i32 npasp;
 	3: optional i32 cpol;
-	4: optional string cobr;
-	5: optional i64 datao;
-	6: optional i32 ishod;
-	7: optional i32 rezult;
-	8: optional i32 talon;
-	9: optional i32 cod_sp;
-	10: optional string cdol;
-	11: optional i32 cuser;
-	12: optional string zakl;
-	13: optional i64 dataz;
-	14: optional string recomend;
-	15: optional i32 idzab;
-	16: optional string vrach_fio;
-	17: optional string lech;
+	4: optional i64 datao;
+	5: optional i32 ishod;
+	6: optional i32 rezult;
+	7: optional i32 talon;
+	8: optional i32 cod_sp;
+	9: optional string cdol;
+	10: optional i32 cuser;
+	11: optional string zakl;
+	12: optional i64 dataz;
+	13: optional string recomend;
+	14: optional i32 idzab;
+	15: optional string vrach_fio;
+	16: optional string lech;
+	17: optional i32 cobr;
 }
 
 struct PatientDiagZInfo {
@@ -194,6 +194,7 @@ struct PatientVizitAmbInfo {
 	19: optional i32 vpom;
 	20: optional string fio_vr;
 	21: optional i64 dataz;
+	22: optional i32 cpos;
 }
 
 struct RdSlInfo {

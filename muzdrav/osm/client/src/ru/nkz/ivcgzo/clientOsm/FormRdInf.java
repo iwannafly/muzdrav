@@ -37,7 +37,7 @@ import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 
 public class FormRdInf extends JFrame {
 	private static final long serialVersionUID = 8843590132227415590L;
-	public static RdInfStruct RdInfStruct;
+	private RdInfStruct RdInfStruct;
 	private JPanel contentPane;
 	private JLabel LObr;
 	private JLabel LSem;
@@ -145,22 +145,7 @@ public class FormRdInf extends JFrame {
 				try {
 					RdInfStruct rdinf = new RdInfStruct();
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
-					//присвоить начальные значения
 					rdinf.setDataz(System.currentTimeMillis());
-/*					rdinf.setFioOtec(Vvod.zapVr.fam);
-//					rdinf.setGrotec();//классиф.
-					rdinf.setMrOtec(TMrab.getText());
-//					rdinf.setMrOtec(TMrab.getText());
-					rdinf.setGrotec(CBGrOtec.getText());
-					rdinf.setSem(0);
-					rdinf.setObr(3);
-					rdinf.setOsoco(0);
-					rdinf.setPhOtec(TPhf.getText());
-					rdinf.setTelOtec(TTelef.getText());
-					rdinf.setUslpr(4);
-					rdinf.setVOtec(0);
-					rdinf.setVredOtec(0);*/
-//					setRdInfData();
 					System.out.println(rdinf);		
 		            MainForm.tcl.AddRdInf(rdinf);
 			} catch (KmiacServerException e1) {

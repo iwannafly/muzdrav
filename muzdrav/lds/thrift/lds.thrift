@@ -9,53 +9,55 @@ struct ObInfIsl {
 	 3: i32 kodotd;
 	 4: optional i32 nprob;
 	 5: string pcisl;
-	 6: i16 cisl;
+	 6: i32 cisl;
 	 7: optional i64 datap;
 	 8: optional i64 datav;
 	 9: optional i32 prichina;
-        10: optional i32 popl;
+       	10: optional i32 popl;
 	11: optional i32 napravl;
 	12: optional i32 naprotd;
-	13: string fio;
+	13: optional i32 vrach;
 	14: i32 vopl;
 	15: string diag;
 	16: i32 kodvr;
-	17: optional i32 kodm;
-	18: optional i32 kods;
-	19: i64 dataz;
+	17: i64 dataz;
+	18: i32 cuser;
 }
 
 struct DiagIsl {
-	 1: i32 npasp;
-	 2: i32 nisl;
+	 1: optional i32 npasp;
+	 2: optional i32 nisl;
 	 3: string kodisl;
 	 4: optional i32 rez;
 	 5: string anamnez;
 	 6: string anastezi;
 	 7: string model;
-	 8: i16 kol;
+	 8: optional i32 kol;
 	 9: string op_name;
         10: string rez_name;
-	11: double stoim;
+	11: optional double stoim;
 	12: string pcod_m;
 }
 
 struct LabIsl {
-	 1: i32 npasp;
-	 2: i32 nisl;
+	 1: optional i32 npasp;
+	 2: optional i32 nisl;
 	 3: string cpok;
-	 4: string zpok;
-	 5: double stoim;
-	 6: string pcod_m;
-	 7: i32 pvibor;
+	 4: string name;	
+	 5: string zpok;
+	 6: string norma;
+	 7: optional double stoim;
+	 8: string pcod_m;
+	 9: string name_m;
 }
 
 struct S_ot01{
 	1: i32 cotd;
 	2: string pcod;
 	3: string c_obst;
-	4: string c_nz1;	
+	4: string c_nz1;
 }
+
 
 
 struct Patient {
@@ -88,6 +90,24 @@ struct N_ldi {
 	6: i32 c_p0e1;
 	7: bool vibor;
 }
+
+
+struct N_lds {
+	1: i32 clpu;
+	2: i32 pcod;
+	3: string name;
+	4: string tip;
+}
+
+
+struct Sh_lds{
+	1: i32 c_p0e1;
+	2: string c_ldi;
+	3: string name;
+	4: string opis;
+	5: string zakl;
+}
+
 
 
 /*
@@ -165,6 +185,12 @@ exception S_ot01NotFoundException {
 }
 
 
+/**
+* Нет шаблона с таким исследованием	
+ */
+exception Sh_ldsNotFoundException {
+}
+
 service LDSThrift extends kmiacServer.KmiacServer {
 	list<ObInfIsl> GetObInfIslt(1: i32 npasp, 2: i32 kodotd);
 	ObInfIsl GetIsl(1: i32 npasp) throws (1: IslNotFoundException ine);
@@ -177,12 +203,14 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void AddDIsl(1: DiagIsl di)throws (1: DIslExistsException diee);
 	void UpdDIsl(1: DiagIsl di)throws (1: DIslExistsException diee);
 	void DelDIsl(1: i32 nisl, 2: string kodisl);
+	void DelDIslP(1: i32 nisl);
 
 	list<LabIsl> GetLabIsl(1: i32 nisl);
 	LabIsl GetLIsl(1: i32 nisl)throws (1: LIslNotFoundException line);
 	void AddLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
+	void DelLIslD(1: i32 nisl);
 
 
 	list<S_ot01> GetS_ot01(1: i32 cotd, 2: string c_nz1);
@@ -198,11 +226,17 @@ service LDSThrift extends kmiacServer.KmiacServer {
     	list<Patient> getPatDat(1: i64 datap 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
+	list<Metod> GetStoim(1: string pcod, 2: string c_obst, 3: i32 kodotd);
+	list<Metod> GetLabStoim(1: string pcisl, 2: i32 kodotd);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
 	void UpdN_ldi (1: N_ldi nldi) throws (1: LdiNotFoundException lnfe);
+	
+	list<N_lds> getN_lds (1: i32 pcod);
 
-
+	list<Sh_lds> getSh_lds (1: string c_ldi) throws (1: Sh_ldsNotFoundException slnfe);
+	list<Sh_lds> getDSh_lds (1: string c_ldi, 2: string name) throws (1: Sh_ldsNotFoundException slnfe);
+	
 	list <classifier.IntegerClassifier> GetKlasCpos2();
 	list <classifier.StringClassifier>  GetKlasS_ot01(1: i32 cotd);
 	list <classifier.StringClassifier>  GetKlasIsS_ot01(1: i32 cotd, 2: string organ);
@@ -215,5 +249,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
 	list <classifier.IntegerClassifier> GetKlasP0e1();
+	list <classifier.IntegerClassifier> GetKlasSvrach(1: i32 cpodr);
 	list <classifier.StringClassifier>  GetKlasNz1();
+	list <classifier.StringClassifier>  GetShab_lds(1: string c_lds);
 }

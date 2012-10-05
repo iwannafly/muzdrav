@@ -17,5 +17,17 @@
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>
+	<logger name="ru.nkz.ivcgzo.serverGenTalons.ServerGenTalons">
+        <level value="INFO"/>
+        <appender-ref ref="muzdrav"/>
+    </logger>
+	<logger name="ru.nkz.ivcgzo.serverReception.ServerReception">
+        <level value="INFO"/>
+        <appender-ref ref="muzdrav"/>
+    </logger>
+	<logger name="ru.nkz.ivcgzo.serverHospital.ServerHospital">
+        <level value="INFO"/>
+        <appender-ref ref="muzdrav"/>
+    </logger>
 
 </log4j:configuration>

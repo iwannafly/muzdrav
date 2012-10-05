@@ -18,6 +18,8 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
@@ -27,6 +29,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Info;
 import ru.nkz.ivcgzo.thriftRegPatient.Kontingent;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.KontingentNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Nambk;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
@@ -77,7 +80,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getAllPatientBrief_isListSizeCorrect()
-            throws TException, PatientNotFoundException {
+            throws TException, PatientNotFoundException, KmiacServerException {
         final int expectedListSize = 308;
         java.util.List <PatientBrief> testPatientList =
                 testServer.getAllPatientBrief(testPatientFull);
@@ -86,7 +89,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getAllPatientBrief_isListValueCorrect()
-            throws TException, PatientNotFoundException {
+            throws TException, PatientNotFoundException, KmiacServerException {
         java.util.List <PatientBrief> testPatientList =
                 testServer.getAllPatientBrief(testPatientFull);
         assertEquals("elemet 0 city field", "НОВОКУЗНЕЦК Г.",
@@ -95,7 +98,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getAllPatientBrief_isThrowNotFoundException()
-            throws TException, PatientNotFoundException {
+            throws TException, PatientNotFoundException, KmiacServerException {
         testException.expect(PatientNotFoundException.class);
         java.util.List <PatientBrief> testPatientList =
                 testServer.getAllPatientBrief(testPatientEmpty);
@@ -104,7 +107,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getPatientFullInfo_returnValueIsNotNull()
-            throws TException, PatientNotFoundException {
+            throws TException, PatientNotFoundException, KmiacServerException {
         int npasp = 2;
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
@@ -114,7 +117,7 @@ public class TestServerRegPatient {
     @SuppressWarnings("deprecation")
     @Test
     public final void getPatientFullInfo_isFieldValueCorrect()
-            throws TException, PatientNotFoundException {
+            throws TException, PatientNotFoundException, KmiacServerException {
         int npasp = 2;
         final int pomsStrg = 9;
         final int terp = 10;
@@ -156,7 +159,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getPatientFullInfo_isThrowNotFoundException()
-            throws TException, PatientNotFoundException {
+            throws TException, PatientNotFoundException, KmiacServerException {
         int npasp = -1;
         testException.expect(PatientNotFoundException.class);
         PatientFullInfo patientFullInfo =
@@ -166,7 +169,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getAgent_returnValueIsNotNull()
-            throws TException, AgentNotFoundException {
+            throws TException, AgentNotFoundException, KmiacServerException {
         int npasp = 2;
         Agent agent =
                 testServer.getAgent(npasp);
@@ -176,7 +179,7 @@ public class TestServerRegPatient {
     @SuppressWarnings("deprecation")
     @Test
     public final void getAgent_isFieldValueCorrect()
-            throws TException, AgentNotFoundException {
+            throws TException, AgentNotFoundException, KmiacServerException {
         final int npasp = 2;
         final int vpolis = 3;
         final int tdoc = 5;
@@ -202,7 +205,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getAgent_isThrowNotFoundException()
-            throws TException, AgentNotFoundException {
+            throws TException, AgentNotFoundException, KmiacServerException {
         int npasp = -1;
         testException.expect(AgentNotFoundException.class);
         Agent agent = testServer.getAgent(npasp);
@@ -211,7 +214,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getKontingent_isListSizeCorrect()
-            throws TException, KontingentNotFoundException {
+            throws TException, KontingentNotFoundException, KmiacServerException {
         int npasp = 2;
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
@@ -221,7 +224,7 @@ public class TestServerRegPatient {
     @SuppressWarnings("deprecation")
     @Test
     public final void getKontingent_isFieldValueCorrect()
-            throws TException, KontingentNotFoundException {
+            throws TException, KontingentNotFoundException, KmiacServerException {
         final int npasp = 2;
         final Date birthDate1 = new Date(101, 0, 1);
         final Date birthDate2 = new Date(102, 1, 2);
@@ -241,7 +244,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getKontingent_isThrowNotFoundException()
-            throws TException, KontingentNotFoundException {
+            throws TException, KontingentNotFoundException, KmiacServerException {
         int npasp = -1;
         testException.expect(KontingentNotFoundException.class);
         List<Kontingent> kontingent =
@@ -251,7 +254,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void getGosp_isFieldValueCorrect()
-            throws TException, GospNotFoundException {
+            throws TException, GospNotFoundException, KmiacServerException {
         final int id = 1;
         Gosp testGosp =
                 testServer.getGosp(id);
@@ -260,7 +263,8 @@ public class TestServerRegPatient {
 
     @Test
     public final void addGosp_isGospActuallyAdded()
-            throws TException, GospNotFoundException, GospAlreadyExistException {
+            throws TException, GospNotFoundException,
+            GospAlreadyExistException, KmiacServerException {
         final int id = 1;
         Gosp testGosp = testServer.getGosp(id);
         testGosp.ngosp = 3;
@@ -276,7 +280,8 @@ public class TestServerRegPatient {
 
     @Test
     public final void isPatientExist_isThrowAlreadyExistException()
-            throws TException, PatientNotFoundException, PatientAlreadyExistException {
+            throws TException, PatientNotFoundException,
+            PatientAlreadyExistException, KmiacServerException {
         int npasp = 2;
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
@@ -287,7 +292,8 @@ public class TestServerRegPatient {
 
     @Test
     public final void addPatient_isPatientActuallyAdded()
-            throws TException, PatientNotFoundException, PatientAlreadyExistException {
+            throws TException, PatientNotFoundException,
+            PatientAlreadyExistException, KmiacServerException {
         int npasp = 2;
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
@@ -299,7 +305,8 @@ public class TestServerRegPatient {
 
     @Test
     public final void isKontingentExist_isThrowAlreadyExistException()
-            throws TException, KontingentNotFoundException, KontingentAlreadyExistException {
+            throws TException, KontingentNotFoundException,
+            KontingentAlreadyExistException, KmiacServerException {
         int npasp = 2;
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
@@ -311,7 +318,8 @@ public class TestServerRegPatient {
 
     @Test
     public final void addKontingent_isKontingentActuallyAdded()
-            throws TException, KontingentNotFoundException, KontingentAlreadyExistException {
+            throws TException, KontingentNotFoundException,
+            KontingentAlreadyExistException, KmiacServerException {
         int npasp = 2;
         List<Kontingent> kontingent =
                 testServer.getKontingent(npasp);
@@ -322,7 +330,7 @@ public class TestServerRegPatient {
 
     @Test
     public final void addSign_isSignActuallyAdded()
-            throws TException {
+            throws TException, KmiacServerException {
         Sign s = new Sign();
         s.setNpasp(26006);
         s.setGrup("9");
@@ -336,14 +344,14 @@ public class TestServerRegPatient {
 
     @Test
     public final void deleteGosp_isGospActuallyDeleted()
-            throws TException {
+            throws TException, KmiacServerException {
         int id = 2;
         testServer.deleteGosp(id);
     }
 
     @Test
     public final void updatePatient_isPatientActuallyUpdated()
-            throws TException, PatientNotFoundException, PatientAlreadyExistException {
+            throws TException, PatientNotFoundException, PatientAlreadyExistException, KmiacServerException {
         int npasp = 2;
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
@@ -353,13 +361,13 @@ public class TestServerRegPatient {
     }
 
     @Test
-    public final void updateOgrn_isActuallyUpdated() throws TException {
+    public final void updateOgrn_isActuallyUpdated() throws TException, KmiacServerException {
         int npasp = 5;
         testServer.updateOgrn(npasp);
     }
 
     @Test
-    public final void getSmocod_isValueCorrect() throws TException, SmocodNotFoundException {
+    public final void getSmocod_isValueCorrect() throws TException, SmocodNotFoundException, KmiacServerException {
         String expectedSmocod = "06500";
         int pcod = 366;
         String ogrn = "1027739099772";
@@ -368,12 +376,15 @@ public class TestServerRegPatient {
     }
 
     @Test
-    public final void printMedCard_isTemplateCorrect() throws TException, PatientNotFoundException {
+    public final void printMedCard_isTemplateCorrect() throws TException,
+        PatientNotFoundException, KmiacServerException {
         int npasp = 8;
-        Gosp gosp = new Gosp();
+        Nambk nambk = new Nambk();
+        UserAuthInfo uai = new UserAuthInfo();
         PatientFullInfo patientFullInfo =
                 testServer.getPatientFullInfo(npasp);
-        String pathToTemplate = testServer.printMedCart(gosp, patientFullInfo);
+        String pathToTemplate = testServer.printMedCart(nambk, patientFullInfo,
+                uai, null, null, null);
         System.out.println(pathToTemplate);
     }
 

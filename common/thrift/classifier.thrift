@@ -94,7 +94,23 @@ enum IntegerClassifiers {
 	n_z90 = 76,
 	n_z11 = 77,
 	n_spec = 78,
-	n_din = 79
+	n_din = 79,
+	n_p0c = 80,
+	n_v10 = 81,
+	n_v0a = 82,
+	n_v0b = 83,
+	n_v0c = 84,
+	n_v0d = 85,
+	n_v0e = 86,
+	n_v0f = 87,
+	n_v0g = 88,
+	n_v0h = 89,
+	n_v0m = 90,
+	n_v0n = 91,
+	n_v0p = 92,
+	n_v0r = 93,
+	n_v0s = 94,
+	n_v0t = 95
 }
 
 enum StringClassifiers {
@@ -107,7 +123,6 @@ enum StringClassifiers {
 	n_ldi = 7,
 	n_nz1 = 8,
 	n_obst = 9,
-	n_p0c = 10,
 	n_r0c = 11,
 	n_r0z = 12,
 	n_s00 = 13,

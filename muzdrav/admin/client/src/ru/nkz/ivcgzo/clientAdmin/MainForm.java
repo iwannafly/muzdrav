@@ -25,7 +25,9 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private JFrame frame;
 	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
-	private ShablonPanel tpShablon;
+	private ShablonOsmPanel tpShablonOsm;
+	private ShablonDopPanel tpShablonDop;
+	private ShablonLdsPanel tpShablonLds;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftServerAdmin.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -52,8 +54,14 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		tabbedPane.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (tabbedPane.getSelectedIndex() == 1)
-					tpShablon.prepareShTextFields();
+				if (tabbedPane.getSelectedIndex() == 0)
+					tpUser.updateVrachTable();
+				else if (tabbedPane.getSelectedIndex() == 1)
+					tpShablonOsm.prepareShTextFields();
+				else if (tabbedPane.getSelectedIndex() == 2)
+					tpShablonDop.prepareShTextFields();
+				else if (tabbedPane.getSelectedIndex() == 3)
+					tpShablonLds.prepareShTextFields();
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -75,8 +83,15 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		tpUser = new UserPanel(adminMode);
 		tabbedPane.addTab("Пользователи", null, tpUser, null);
 		
-		tpShablon = new ShablonPanel();
-		tabbedPane.addTab("Шаблоны", null, tpShablon, null);
+		tpShablonOsm = new ShablonOsmPanel();
+		tabbedPane.addTab("Шаблоны осмотра", null, tpShablonOsm, null);
+		
+		tpShablonDop = new ShablonDopPanel();
+		tabbedPane.addTab("Дополнительные шаблоны", null, tpShablonDop, null);
+		
+		tpShablonLds = new ShablonLdsPanel();
+		tabbedPane.addTab("Шаблоны параотделения", null, tpShablonLds, null);
+		
 		frame.getContentPane().setLayout(groupLayout);
 		
 		frame.setLocationRelativeTo(null);

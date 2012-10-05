@@ -1,28 +1,31 @@
 package ru.nkz.ivcgzo.clientGenReestr;
 
-import javax.swing.JDialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.TitledBorder;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.TitledBorder;
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import org.apache.thrift.TException;
-import java.awt.Dialog.ModalityType;
 
 
 public class SettingsForm extends JDialog {
@@ -173,13 +176,28 @@ public class SettingsForm extends JDialog {
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
-						MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2);
+						String servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+   						String cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
+   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+   						MainForm.conMan.openFileInEditor(cliPath, false);
 						dispose();
 					}else
 						JOptionPane.showMessageDialog(null, "Укажите все параметры формирования реестра.", null, JOptionPane.INFORMATION_MESSAGE); 
 				} catch (ReestrNotFoundException | TException e) {
 					e.printStackTrace();
 				} catch (KmiacServerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OpenFileException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}

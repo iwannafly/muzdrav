@@ -56,7 +56,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 
-public class ShablonPanel extends JPanel {
+public class ShablonOsmPanel extends JPanel {
 	private static final long serialVersionUID = 3633761920972893528L;
 	private CustomTextField tbSearch;
 	private SearchTree trSearch;
@@ -80,7 +80,7 @@ public class ShablonPanel extends JPanel {
 	private String diagName;
 	private Font defFont;
 	
-	public ShablonPanel() {
+	public ShablonOsmPanel() {
 		textListener = new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -143,7 +143,7 @@ public class ShablonPanel extends JPanel {
 				try {
 					trSearch.removeSelected();
 				} catch (KmiacServerException e1) {
-					JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
 					MainForm.conMan.reconnect(e1);
 				}
@@ -491,7 +491,7 @@ public class ShablonPanel extends JPanel {
 			shOsm.setId(MainForm.tcl.saveShablonOsm(shOsm));
 			trSearch.updateSavedNode(saveAsNew);
 		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
-			JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -530,10 +530,12 @@ public class ShablonPanel extends JPanel {
 				break;
 			}
 		
+		enb &= trSearch.getSelectionPath() != null;
 		if (enb) {
 			enb &= !tbName.isEmpty();
 			enb &= !tbDiag.isEmpty();
 			enb &= !ltSpec.isAllItemsUnselected();
+			enb &= trSearch.getSelectionPath().getLastPathComponent() instanceof SearchTree.IntClassTreeNode;
 		}
 		
 		if (tbDiag.getText().length() == 0)
@@ -553,7 +555,7 @@ public class ShablonPanel extends JPanel {
 			shOsm = MainForm.tcl.getShablonOsm(id);
 			fillUIFromShablon();
 		} catch (KmiacServerException e) {
-			JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка загрузки шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -633,7 +635,7 @@ public class ShablonPanel extends JPanel {
 								((DefaultTreeModel) getModel()).reload(node);
 							} catch (KmiacServerException e) {
 								collapsePath(new TreePath(lp));
-								JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки шаблонов на данный диагноз", "Ошибка", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка загрузки шаблонов на данный диагноз", "Ошибка", JOptionPane.ERROR_MESSAGE);
 							} catch (TException e) {
 								collapsePath(new TreePath(lp));
 								MainForm.conMan.reconnect(e);
@@ -713,7 +715,7 @@ public class ShablonPanel extends JPanel {
 				}
 				setModel(new DefaultTreeModel(root));
 			} catch (KmiacServerException e) {
-				JOptionPane.showMessageDialog(ShablonPanel.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			} catch (TException e) {
 				MainForm.conMan.reconnect(e);
 			}

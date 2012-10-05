@@ -28,6 +28,7 @@ public class ReestrForm extends JFrame {
 
 	public ReestrForm() {
 		//setExtendedState(JFrame.MAXIMIZED_BOTH);
+		setBounds(50, 50, 432, 311); //ширина, высота
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle(configuration.appName+" за отчетный период");
 		
@@ -66,22 +67,22 @@ public class ReestrForm extends JFrame {
 		GroupLayout gl_panel1 = new GroupLayout(panel1);
 		gl_panel1.setHorizontalGroup(
 			gl_panel1.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 933, Short.MAX_VALUE)
+				.addGap(0, 550, Short.MAX_VALUE)	//ширина
 		);
 		gl_panel1.setVerticalGroup(
 			gl_panel1.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 719, Short.MAX_VALUE)
+				.addGap(0, 400, Short.MAX_VALUE)	//высота
 		);
 		panel1.setLayout(gl_panel1);
 		tbMain.add("Протокол проверки", panel2);
 		GroupLayout gl_panel2 = new GroupLayout(panel2);
 		gl_panel2.setHorizontalGroup(
 			gl_panel2.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 933, Short.MAX_VALUE)
+				.addGap(0, 550, Short.MAX_VALUE)
 		);
 		gl_panel2.setVerticalGroup(
 			gl_panel2.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 719, Short.MAX_VALUE)
+				.addGap(0, 400, Short.MAX_VALUE)
 		);
 		panel2.setLayout(gl_panel2);
 		getContentPane().add(tbMain);
@@ -91,7 +92,7 @@ public class ReestrForm extends JFrame {
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 938, Short.MAX_VALUE)
+				.addGap(0, 550, Short.MAX_VALUE)
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)

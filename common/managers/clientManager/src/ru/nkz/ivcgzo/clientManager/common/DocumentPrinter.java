@@ -68,28 +68,32 @@ public class DocumentPrinter {
 	}
 	
 	private static String readWindowsRegistryString(String path, String key) {
+		final String regSz = "REG_SZ";
 		InputStreamReader reader = null;
 			
 		try {
 			Process process = Runtime.getRuntime().exec(String.format("reg query \"%s\" /v \"%s\"", path, key));
-			reader = new InputStreamReader(process.getInputStream());
 			
-			process.waitFor();
-			char[] buf = new char[1000];
-			reader.read(buf);
-			reader.close();
-			String output = new String(buf);
-			
-			if(!output.contains("\t"))
-				return "";
-			String[] parsed = output.split("\t");
-			int crlfIdx = parsed[parsed.length - 1].indexOf("\r\n");
-		
-			return parsed[parsed.length - 1].substring(0, crlfIdx);
+			if (process.waitFor() == 0) {
+				reader = new InputStreamReader(process.getInputStream());
+				char[] buf = new char[1000];
+				reader.read(buf);
+				reader.close();
+				String output = new String(buf);
+				
+				String[] outputArray = output.split(System.lineSeparator());
+				String outputLine = outputArray[outputArray.length - 3];
+				int crlfIdx = outputLine.indexOf(regSz);
+				
+				if (crlfIdx > -1)
+					return outputLine.substring(crlfIdx + regSz.length(), outputLine.length()).trim();
+			}
 		}
 		catch (Exception e) {
-			return "";
+			e.printStackTrace();
 		}
+		
+		return "";
 	}
 	
 	private static boolean isPathExists(String path) {

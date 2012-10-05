@@ -45,6 +45,8 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.PrdslNotFoundException;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 //import ru.nkz.ivcgzo.thriftOsm.PsignNotFoundException;
 //import ru.nkz.ivcgzo.;
@@ -131,25 +133,6 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent arg0) {
-try {
-	rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-	setPostBerData();
-	fam.setText(Vvod.zapVr.getFam());
-	im.setText(Vvod.zapVr.getIm());
-	ot.setText(Vvod.zapVr.getOth());
-	SimpleDateFormat frm = new SimpleDateFormat("MM");
-	int mes = Integer.parseInt(frm.format(Vvod.zapVr.getDatar()));
-	System.out.println(mes);		
-	
-} catch (KmiacServerException | TException e) {
-	JOptionPane.showMessageDialog(FormPostBer.this, e.getLocalizedMessage(), "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
-	// TODO Auto-generated catch block
-	e.printStackTrace();
-}			}
-		});
 		setTitle("Постановка на учет по беременности");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1000, 700);
@@ -162,25 +145,6 @@ try {
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		btnNewButton.setToolTipText("Постановка на учет");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					rdSlStruct = new RdSlStruct();
-					setDefaultValues();
-					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-//					rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
-//					rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
-					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-					setPostBerData();
-				} catch (KmiacServerException e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-				} catch (TException e1) {
-					e1.printStackTrace();
-					MainForm.conMan.reconnect(e1);
-				}
-			}
-		});
 		
 		JButton ButSave = new JButton("");
 		ButSave.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
@@ -322,7 +286,8 @@ try {
 					kartaber.setId_rd_sl(0);
 					String servPath = MainForm.tcl.printKartaBer(kartaber);
 					String cliPath;
-					cliPath = File.createTempFile("kart1", ".htm").getAbsolutePath();
+					oslname = "kart1"+String.valueOf(rdSlStruct.getId());
+					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
 			}
@@ -335,10 +300,23 @@ try {
 			}
 		});
 		BPeshOK.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
+		
+		JButton btnNewButton_1 = new JButton("Динамическое наблюдение");
+		btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				dinform = new FormRdDin();
+				dinform.setVisible(true);
+}
+		});
+		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 //		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 965, Short.MAX_VALUE)
+					.addGap(7))
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGap(10)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -353,33 +331,40 @@ try {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(ButSave)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ButDelete)
-							.addGap(22)
+							.addComponent(ButDelete)))
+					.addGap(18)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(button)
-							.addGap(18)
-							.addComponent(BPeshOK)))
-					.addContainerGap(307, Short.MAX_VALUE))
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 965, Short.MAX_VALUE)
-					.addGap(7))
+							.addContainerGap())
+						.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(btnNewButton_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(BPeshOK, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-						.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(9)
+					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(btnNewButton)
-						.addComponent(ButSave)
-						.addComponent(ButDelete)
-						.addGroup(Alignment.LEADING, gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(9)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnNewButton)
+								.addComponent(ButSave)
+								.addComponent(ButDelete)))
+						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(button)
-							.addComponent(BPeshOK)))
-					.addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+							.addGap(3)
+							.addComponent(btnNewButton_1)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(BPeshOK)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 581, GroupLayout.PREFERRED_SIZE))
 		);
 		
@@ -944,7 +929,6 @@ try {
 	}
 	
 	private void setDefaultValues() {
-		// TODO Auto-generated method stub
 	try {
 		rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
 		rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
@@ -965,8 +949,8 @@ try {
 		rdSlStruct.setCdiagt(5);
 		rdSlStruct.setCvera(11);
 		rdSlStruct.setVesd(60);
-		rdSlStruct.setOslab("");
-		rdSlStruct.setPrrod("");
+		rdSlStruct.setOslab(null);
+		rdSlStruct.setPrrod(null);
 		rdSlStruct.setDataM(System.currentTimeMillis());
 		rdSlStruct.setDatay(System.currentTimeMillis());
 		rdSlStruct.setDataosl(System.currentTimeMillis());
@@ -1104,6 +1088,41 @@ try {
 		or2=1; iw1=iw1-2;	
 		}
 		or1=iw1; 
+	}
+	
+	public void showForm() {
+		fam.setText(Vvod.zapVr.getFam());
+		im.setText(Vvod.zapVr.getIm());
+		ot.setText(Vvod.zapVr.getOth());
+		
+		try {
+			rdSlStruct = new RdSlStruct();
+			setDefaultValues();
+			RdInfStruct rdinf = new RdInfStruct();
+			rdinf.setNpasp(Vvod.zapVr.getNpasp());
+			rdinf.setDataz(System.currentTimeMillis());
+            MainForm.tcl.AddRdInf(rdinf);
+			rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+			setPostBerData();
+		} catch (PrdslNotFoundException e1) {
+			try {
+				rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+				setPostBerData();
+			} catch (KmiacServerException e2) {
+				JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			} catch (TException e2) {
+				e2.printStackTrace();
+				MainForm.conMan.reconnect(e2);
+			}
+		} catch (KmiacServerException e1) {
+			e1.printStackTrace();
+			JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+		} catch (TException e1) {
+			e1.printStackTrace();
+			MainForm.conMan.reconnect(e1);
+		}
+		
+		setVisible(true);	
 	}
 	
 	public void onConnect() throws PatientNotFoundException {

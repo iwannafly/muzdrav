@@ -26,6 +26,7 @@
 		<table srcName="AZ9" dstName="n_az9" />
 		<table srcName="AZT" dstName="n_azt" />
 		<table srcName="B00" dstName="n_b00" />
+		<table srcName="BZ5" dstName="n_bz5" />
 		<table srcName="C00" dstName="n_c00" />
 		<table srcName="D0S" dstName="n_dos" />
 		<table srcName="DB1" dstName="n_db1" />
@@ -72,11 +73,27 @@
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
 		<table srcName="SMORF" dstName="n_smorf" />
+		<table srcName="SPEC" dstName="n_spec" />
 		<table srcName="STOIM" dstName="n_stoim" />
 		<table srcName="T00" dstName="n_t00" />
 		<table srcName="U00" dstName="n_u00" />
 		<table srcName="U10" dstName="n_u10" />
 		<table srcName="U50" dstName="n_u50" />
+		<table srcName="V0A" dstName="n_v0a" />
+		<table srcName="V0B" dstName="n_v0b" />
+		<table srcName="V0C" dstName="n_v0c" />
+		<table srcName="V0D" dstName="n_v0d" />
+		<table srcName="V0E" dstName="n_v0e" />
+		<table srcName="V0F" dstName="n_v0f" />
+		<table srcName="V0G" dstName="n_v0g" />
+		<table srcName="V0H" dstName="n_v0h" />
+		<table srcName="V0M" dstName="n_v0m" />
+		<table srcName="V0N" dstName="n_v0n" />
+		<table srcName="V0P" dstName="n_v0p" />
+		<table srcName="V0R" dstName="n_v0r" />
+		<table srcName="V0S" dstName="n_v0s" />
+		<table srcName="V0T" dstName="n_v0t" />
+		<table srcName="V10" dstName="n_v10" />
 		<table srcName="VDI" dstName="n_vdi" />
 		<table srcName="VGO" dstName="n_vgo" />
 		<table srcName="VP2" dstName="n_vp2" />

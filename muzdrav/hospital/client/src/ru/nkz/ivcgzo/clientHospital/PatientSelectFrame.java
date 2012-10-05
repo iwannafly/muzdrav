@@ -3,10 +3,11 @@ package ru.nkz.ivcgzo.clientHospital;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -50,7 +51,8 @@ public class PatientSelectFrame extends JDialog {
                 (int) ((screenSize.getHeight() - getHeight()) / 2));
         setUndecorated(true);
 
-        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo);
+        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo.getPcod(),
+                authInfo.getCpodr());
         table = new JTable();
         table.setModel(tbModel);
         scrollPane.setViewportView(table);
@@ -65,9 +67,12 @@ public class PatientSelectFrame extends JDialog {
         btnSelect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
-                        .get(table.convertRowIndexToModel(table.getSelectedRow()));
-                dispose();
+                if (table.getSelectedRow() != -1) {
+                    currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
+                            .get(table.convertRowIndexToModel(table.getSelectedRow()));
+                    PatientSelectFrame.this.dispatchEvent(new WindowEvent(
+                            PatientSelectFrame.this, WindowEvent.WINDOW_CLOSING));
+                }
             }
         });
         panel.add(btnSelect);
@@ -79,7 +84,8 @@ public class PatientSelectFrame extends JDialog {
         btnCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                dispose();
+                PatientSelectFrame.this.dispatchEvent(new WindowEvent(
+                        PatientSelectFrame.this, WindowEvent.WINDOW_CLOSING));
             }
         });
         panel.add(btnCancel);
@@ -87,6 +93,12 @@ public class PatientSelectFrame extends JDialog {
 
     public final TSimplePatient getCurrentPatient() {
         return currentPatient;
+    }
+
+    public final void refreshModel(final UserAuthInfo authInfo) {
+        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo.getPcod(),
+                authInfo.getCpodr());
+        table.setModel(tbModel);
     }
 
 
