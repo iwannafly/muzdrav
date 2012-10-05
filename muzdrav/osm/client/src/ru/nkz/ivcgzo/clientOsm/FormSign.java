@@ -55,7 +55,6 @@ public class FormSign extends JFrame {
 	private JRadioButton rbpol;
 	private JRadioButton rbotr;
 	private String vrp;
-	private JPanel pallerg;
 	public static List<IntegerClassifier> pokNames;
 
 	/**
@@ -63,7 +62,7 @@ public class FormSign extends JFrame {
 	 */
 	public FormSign() {
 		setTitle("Анамнез жизни");
-		setBounds(100, 100, 1011, 726);
+		setBounds(100, 100, 1011, 511);
 		
 		final JScrollPane spAnamn = new JScrollPane();
 		spAnamn.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -88,8 +87,6 @@ public class FormSign extends JFrame {
 							}
 			}
 		});
-		
-		JLabel lblFarm1 = new JLabel("Фармакологический анамнез");
 		
 		JScrollPane spSh = new JScrollPane();
 		
@@ -157,6 +154,77 @@ public class FormSign extends JFrame {
 		BGRez = new ButtonGroup();		
 		BGRez.add(rbpol);
 		BGRez.add(rbotr);
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(18)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addComponent(lblGrkr)
+									.addGap(5)
+									.addComponent(pgrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblRezus)
+									.addGap(4)
+									.addComponent(prezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(spAnamn, GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(spSh, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(475)
+							.addComponent(lblVr)))
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addGap(11)
+									.addComponent(lblGrkr))
+								.addComponent(pgrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addGroup(groupLayout.createSequentialGroup()
+									.addGap(13)
+									.addComponent(lblRezus))
+								.addComponent(prezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGap(20)
+							.addComponent(lblVr)))
+					.addGap(18)
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(spSh, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+						.addComponent(spAnamn, GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		
+		JPanel pAnamn = new JPanel();
+		spAnamn.setViewportView(pAnamn);
+		getContentPane().setLayout(groupLayout);
+		
+		
+		final JLabel lblFarm = new JLabel("Фармакологический анамнез");
+		
+		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
+		
+		tpfarm = new ShablonDopEditorPane(5); //5
+		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
+		
+		tpanamnz = new ShablonDopEditorPane(4); //4
+		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
+		
+		JLabel label = new JLabel("Аллергоанамнез");
+		
+		tpallerg = new ShablonDopEditorPane(3); //3
+		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
 		
 		JButton button = new JButton("Сохранить");
 		button.addActionListener(new ActionListener() {
@@ -195,89 +263,21 @@ public class FormSign extends JFrame {
 				}
 			}
 		});
-		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(lblGrkr)
-							.addGap(5)
-							.addComponent(pgrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblRezus)
-							.addGap(4)
-							.addComponent(prezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(lblVr)
-							.addGap(18)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-								.addComponent(spAnamn, GroupLayout.PREFERRED_SIZE, 549, GroupLayout.PREFERRED_SIZE)
-								.addComponent(button, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(spSh, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)))
-					.addContainerGap())
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(11)
-							.addComponent(lblGrkr))
-						.addComponent(pgrk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(13)
-							.addComponent(lblRezus))
-						.addComponent(prezus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(11)
-							.addComponent(lblVr))
-						.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(spSh, GroupLayout.PREFERRED_SIZE, 606, GroupLayout.PREFERRED_SIZE)
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
-							.addComponent(spAnamn, 0, 0, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button)))
-					.addGap(11))
-		);
-		
-		JPanel pAnamn = new JPanel();
-		spAnamn.setViewportView(pAnamn);
-		getContentPane().setLayout(groupLayout);
-		
-		
-		final JLabel lblFarm = new JLabel("Фармакологический анамнез");
-		
-		final JLabel lblAnamnz = new JLabel("Анамнез жизни");
-		
-		tpfarm = new ShablonDopEditorPane(5);
-		tpfarm.setBorder(UIManager.getBorder("TextField.border"));
-		
-		tpanamnz = new ShablonDopEditorPane(4);
-		tpanamnz.setBorder(UIManager.getBorder("TextField.border"));
-		
-		 pallerg = new JPanel();
 		GroupLayout gl_pAnamn = new GroupLayout(pAnamn);
 		gl_pAnamn.setHorizontalGroup(
 			gl_pAnamn.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pAnamn.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_pAnamn.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(tpfarm, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(lblFarm, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(tpanamnz, GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
-							.addComponent(lblAnamnz, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblFarm1, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE))
-						.addComponent(pallerg, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(1557))
+						.addComponent(lblFarm, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pAnamn.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(lblAnamnz, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 203, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tpanamnz, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+							.addComponent(label, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tpallerg, Alignment.LEADING)
+							.addComponent(tpfarm, Alignment.LEADING))
+						.addComponent(button, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(13, Short.MAX_VALUE))
 		);
 		gl_pAnamn.setVerticalGroup(
 			gl_pAnamn.createParallelGroup(Alignment.LEADING)
@@ -287,38 +287,17 @@ public class FormSign extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tpanamnz, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(pallerg, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(lblFarm)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addGap(607)
-					.addComponent(lblFarm1)
-					.addGap(184))
-		);
-		
-		JLabel label = new JLabel("Аллергоанамнез");
-		
-		tpallerg = new ShablonDopEditorPane(3);
-		tpallerg.setBorder(UIManager.getBorder("TextField.border"));
-		GroupLayout gl_pallerg = new GroupLayout(pallerg);
-		gl_pallerg.setHorizontalGroup(
-			gl_pallerg.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pallerg.createSequentialGroup()
-					.addGroup(gl_pallerg.createParallelGroup(Alignment.LEADING)
-						.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 493, GroupLayout.PREFERRED_SIZE)
-						.addComponent(label, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(20, Short.MAX_VALUE))
-		);
-		gl_pallerg.setVerticalGroup(
-			gl_pallerg.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pallerg.createSequentialGroup()
 					.addComponent(label)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(tpallerg, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGap(18)
+					.addComponent(lblFarm)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(tpfarm, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(button)
+					.addContainerGap(42, Short.MAX_VALUE))
 		);
-		pallerg.setLayout(gl_pallerg);
 		pAnamn.setLayout(gl_pAnamn);
 		getContentPane().setLayout(groupLayout);
 	}

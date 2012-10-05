@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientOsm;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -38,6 +39,8 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -166,6 +169,9 @@ public class Vvod extends JFrame {
 	private ShablonForm shablonform;
 	private FormRdDin dinform;
 	private DispHron disphron;
+	
+	private Color defCol = UIManager.getColor("TabbedPane.foreground");
+	private Color selCol = Color.red;
 
 	
 	/**
@@ -211,7 +217,7 @@ public class Vvod extends JFrame {
 		MainForm.instance.addChildFrame(disphron);
 		
 		setTitle("Врачебный осмотр");
-		setBounds(100, 100, 1010, 748);
+		setBounds(100, 100, 1024, 755);
 		
 		JButton btnAnam = new JButton("Анамнез жизни");
 		btnAnam.addActionListener(new ActionListener() {
@@ -360,11 +366,11 @@ public class Vvod extends JFrame {
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
-						.addComponent(pnlTalon, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
-						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
-						.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(pnlTalon, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1260, Short.MAX_VALUE)
+						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1260, Short.MAX_VALUE)
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addComponent(btnRecPriem, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnAnam, GroupLayout.PREFERRED_SIZE, 136, GroupLayout.PREFERRED_SIZE)
@@ -391,8 +397,8 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(pnlTalon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
-					.addGap(11))
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
+					.addGap(4))
 		);
 		
 		shablonSearchListener = new ShablonSearchListener();
@@ -412,7 +418,21 @@ public class Vvod extends JFrame {
 		
 		JScrollPane spShabSrc = new JScrollPane();
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.LEFT);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+					JLabel lbl = (JLabel) tabbedPane.getTabComponentAt(i);
+					
+					if (lbl != null)
+						if (i == tabbedPane.getSelectedIndex())
+							lbl.setForeground(selCol);
+						else
+							lbl.setForeground(defCol);
+				}
+			}
+		});
 		
 		lblLastShab = new JLabel("<html>Последний выбранный шаблон: </html>");
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
@@ -440,8 +460,8 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblLastShab)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE))
-						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 667, Short.MAX_VALUE))
+							.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE))
+						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 466, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		
@@ -465,6 +485,8 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlJal = new JPanel();
 		tabbedPane.addTab("<html><br>Жалобы<br><br></html>", null, pnlJal, null);
+		tabbedPane.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
+		((JLabel) tabbedPane.getTabComponentAt(0)).setForeground(selCol);
 		
 		JScrollPane spJal = new JScrollPane();
 		GroupLayout gl_pnlJal = new GroupLayout(pnlJal);
@@ -491,7 +513,8 @@ public class Vvod extends JFrame {
 		pnlJal.setLayout(gl_pnlJal);
 		
 		JPanel pnlAnam = new JPanel();
-		tabbedPane.addTab("<html><br>Anamnesis morbi<br><br></html>", null, pnlAnam, null);
+		tabbedPane.addTab("<html><br>История настоящего<br>заболевания<br></html>", null, pnlAnam, null);
+		tabbedPane.setTabComponentAt(1, new JLabel("<html><br>История настоящего<br>заболевания<br></html>"));
 		
 		JScrollPane spAnam = new JScrollPane();
 		GroupLayout gl_pnlAnam = new GroupLayout(pnlAnam);
@@ -519,6 +542,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlStat = new JPanel();
 		tabbedPane.addTab("<html><br>Status praesense<br><br></html>", null, pnlStat, null);
+		tabbedPane.setTabComponentAt(2, new JLabel("<html><br>Status praesense<br><br></html>"));
 		
 		tbStatTemp = new CustomTextField();
 		tbStatTemp.setColumns(10);
@@ -614,6 +638,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlFiz = new JPanel();
 		tabbedPane.addTab("<html><br>Физикальное обследование<br><br></html>", null, pnlFiz, null);
+		tabbedPane.setTabComponentAt(3, new JLabel("<html><br>Физикальное обследование<br><br></html>"));
 		
 		JScrollPane spFiz = new JScrollPane();
 		
@@ -642,6 +667,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlLoc = new JPanel();
 		tabbedPane.addTab("<html><br>Localis status<br><br></html>", null, pnlLoc, null);
+		tabbedPane.setTabComponentAt(4, new JLabel("<html><br>Localis status<br><br></html>"));
 		
 		JScrollPane spLoc = new JScrollPane();
 		GroupLayout gl_pnlLoc = new GroupLayout(pnlLoc);
@@ -669,6 +695,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlDiag = new JPanel();
 		tabbedPane.addTab("<html><br>Диагноз<br><br></html>", null, pnlDiag, null);
+		tabbedPane.setTabComponentAt(5, new JLabel("<html><br>Диагноз<br><br></html>"));
 		
 		JPanel PnlDiag = new JPanel();
 		
@@ -788,16 +815,16 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnDiagDel, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnDiagSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnDiagSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
 					.addGap(123))
 		);
 		gl_PnlDiag.setVerticalGroup(
 			gl_PnlDiag.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_PnlDiag.createSequentialGroup()
-					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.TRAILING)
-						.addComponent(spDiag, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_PnlDiag.createSequentialGroup()
+					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.LEADING)
+						.addComponent(spDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+						.addGroup(gl_PnlDiag.createSequentialGroup()
 							.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnDiagDel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
@@ -1041,6 +1068,7 @@ public class Vvod extends JFrame {
 				.addGroup(gl_pnlDiag.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING)
+						.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDiag.createSequentialGroup()
 							.addComponent(lblDiagVidTr, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1058,18 +1086,17 @@ public class Vvod extends JFrame {
 								.addPreferredGap(ComponentPlacement.UNRELATED)
 								.addComponent(chbDiagBer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 							.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlDiag.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(PnlDiag, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-							.addGroup(Alignment.LEADING, gl_pnlDiag.createSequentialGroup()
+						.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING, false)
+							.addComponent(PnlDiag, 0, 0, Short.MAX_VALUE)
+							.addGroup(gl_pnlDiag.createSequentialGroup()
 								.addComponent(lblDiagOpis, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.UNRELATED)
 								.addComponent(spDiagOpis, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))
-							.addGroup(Alignment.LEADING, gl_pnlDiag.createSequentialGroup()
+							.addGroup(gl_pnlDiag.createSequentialGroup()
 								.addComponent(pnlDiagStadZab, GroupLayout.PREFERRED_SIZE, 292, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.UNRELATED)
 								.addComponent(pnlDiagHarZab, 0, 0, Short.MAX_VALUE))
-							.addGroup(Alignment.LEADING, gl_pnlDiag.createSequentialGroup()
+							.addGroup(gl_pnlDiag.createSequentialGroup()
 								.addComponent(pnlDiagStat, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(pnlDiagPredv, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE))))
@@ -1106,8 +1133,8 @@ public class Vvod extends JFrame {
 						.addComponent(chbDiagBoe)
 						.addComponent(chbDiagBer))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, 38, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(19))
 		);
 		
 		tbDiagDispDatVz = new CustomDateEditor();
@@ -1258,6 +1285,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlLech = new JPanel();
 		tabbedPane.addTab("<html><br>Назначенное лечение<br><br></html>", null, pnlLech, null);
+		tabbedPane.setTabComponentAt(6, new JLabel("<html><br>Назначенное лечение<br><br></html>"));
 		
 		JScrollPane spLech = new JScrollPane();
 		GroupLayout gl_pnlLech = new GroupLayout(pnlLech);
@@ -1285,6 +1313,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlNapr = new JPanel();
 		tabbedPane.addTab("<html><br>Направления<br><br></html>", null, pnlNapr, null);
+		tabbedPane.setTabComponentAt(7, new JLabel("<html><br>Направления<br><br></html>"));
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		GroupLayout gl_pnlNapr = new GroupLayout(pnlNapr);
@@ -1338,7 +1367,7 @@ public class Vvod extends JFrame {
 		
 		JLabel lblNaprVidIssl = new JLabel("Органы и системы");
 		
-		JLabel lblNaprPokazMet = new JLabel("Показатели");
+		JLabel lblNaprPokazMet = new JLabel("Исследования");
 		
 		JScrollPane spNaprPokazMet = new JScrollPane();
 		
@@ -1582,6 +1611,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlOcen = new JPanel();
 		tabbedPane.addTab("<html><br>Оценка данных анамнеза<br><br></html>", null, pnlOcen, null);
+		tabbedPane.setTabComponentAt(8, new JLabel("<html><br>Оценка данных анамнеза<br><br></html>"));
 		
 		JScrollPane spOcen = new JScrollPane();
 		GroupLayout gl_pnlOcen = new GroupLayout(pnlOcen);
@@ -1609,6 +1639,7 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlZakl = new JPanel();
 		tabbedPane.addTab("<html><br>Заключение<br><br></html>", null, pnlZakl, null);
+		tabbedPane.setTabComponentAt(9, new JLabel("<html><br>Заключение<br><br></html>"));
 		
 		JLabel lblZakl = new JLabel("Заключение специалиста");
 		
@@ -1694,17 +1725,17 @@ public class Vvod extends JFrame {
 						.addComponent(lblCelObr, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(lblVidOpl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.LEADING)
 						.addComponent(cmbCelObr, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(cmbVidOpl, GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(lblMobs, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblRez, GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE))
+						.addComponent(cmbVidOpl, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(lblRez, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblMobs, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.TRAILING)
-						.addComponent(cmbMobs, GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
-						.addComponent(cmbRez, 0, 397, Short.MAX_VALUE))
+						.addComponent(cmbRez, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(cmbMobs, GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_pnlTalon.setVerticalGroup(
@@ -1713,8 +1744,8 @@ public class Vvod extends JFrame {
 					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblVidOpl)
 						.addComponent(cmbVidOpl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblRez)
-						.addComponent(cmbRez, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cmbRez, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblRez))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblCelObr)
