@@ -1543,9 +1543,10 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final int addToOtd(final int idGosp, final int nist, final int cotd)
             throws KmiacServerException {
-        String sqlQuery = "INSERT INTO c_otd (id_gosp, nist, cotd) VALUES (?, ?, ?);";
+        String sqlQuery = "INSERT INTO c_otd (id_gosp, nist, cotd, dataz) VALUES (?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd);
+            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd,
+                new Date(System.currentTimeMillis()));
             int id = sme.getGeneratedKeys().getInt("id");
             sme.setCommit();
             return id;
@@ -1558,9 +1559,11 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void updateOtd(final int id, final int idGosp, final int nist, final int cotd)
             throws KmiacServerException {
-        String sqlQuery = "UPDATE c_otd SET id_gosp = ?, nist = ?, cotd = ? WHERE id = ?";
+        String sqlQuery = "UPDATE c_otd SET id_gosp = ?, nist = ?, cotd = ?, dataz = ? "
+                + "WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd, id);
+            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd, id,
+                new Date(System.currentTimeMillis()));
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
