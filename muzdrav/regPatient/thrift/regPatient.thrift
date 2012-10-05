@@ -73,8 +73,6 @@ struct PatientFullInfo{
 	28:optional Address admAddress,
 	29:optional Polis polis_oms,
 	30:optional Polis polis_dms,
-	31:optional i32 v_sch,
-	32:optional i32 str_org
 }
 
 /*сведени о представителе табл. p_preds*/

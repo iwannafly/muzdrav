@@ -453,7 +453,7 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, "
@@ -472,11 +472,10 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void deleteMedicalHistory(final int idGosp) throws KmiacServerException,
-            TException {
-        final String sqlQuery = "DELETE * FROM c_osmotr WHERE id_gosp = ?;";
+    public final void deleteMedicalHistory(final int id) throws KmiacServerException {
+        final String sqlQuery = "DELETE FROM c_osmotr WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, idGosp);
+            sme.execPrepared(sqlQuery, false, id);
             sme.setCommit();
         } catch (SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
@@ -542,6 +541,13 @@ public class ServerHospital extends Server implements Iface {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
+    }
+
+    @Override
+    public void updateMedicalHistory(final TMedicalHistory medHist)
+            throws KmiacServerException, TException {
+        // TODO Auto-generated method stub
+
     }
 
 }
