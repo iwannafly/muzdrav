@@ -2871,7 +2871,8 @@ public class PacientInfoFrame extends JFrame {
         JButton btnSave_priem = new JButton("Сохранить");
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-            	SavePriemInfo();
+                SavePriemInfo();
+                //здесь надо сохранять в стационар
             }
         });
 
@@ -2939,8 +2940,8 @@ public class PacientInfoFrame extends JFrame {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 if (tbl_priem.getSelectedItem() !=  null) {
-                	changePatientPriemInfo(curPatientId);
-                	newPriem = tbl_priem.getSelectedItem();
+                    changePatientPriemInfo(curPatientId);
+                    newPriem = tbl_priem.getSelectedItem();
                 }
             }
         }
@@ -2981,6 +2982,7 @@ public class PacientInfoFrame extends JFrame {
                     String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
                     String omsOrg = cmb_oms_smo.getText();
                     String lgot = "";
+
                     if (tbl_lgota.getData() != null)
                     	LgotaInfo = tbl_lgota.getData();
                     if (LgotaInfo.size() > 0) {
@@ -3567,7 +3569,6 @@ public class PacientInfoFrame extends JFrame {
             //Id_gosp.setNist(1); //подумать
             if (!tf_nist.getText().isEmpty()) Id_gosp.setNist(Integer.valueOf(tf_nist.getText())); 
             Id_gosp.setVid(1);
-            
 //		    System.out.println(((Date) sp_dataosm.getValue()).getTime());
 //		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
             if (tf_datap.getDate() != null) Id_gosp.setDatap(tf_datap.getDate().getTime());

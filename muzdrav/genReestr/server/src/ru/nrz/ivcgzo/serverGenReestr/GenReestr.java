@@ -197,9 +197,12 @@ private TServer thrServ;
     	            		str += " 18. Не заполнена дата рождения DR<br>";
     	            	if ((rs.getString("sex").toUpperCase().charAt(0) != 'М') && (rs.getString("sex").toUpperCase().charAt(0) != 'Ж'))
     	            		str += " 21. Ошибка в кодировании пола SEX<br>";
-    	            	if ((rs.getString("sex").toUpperCase().charAt(0) == 'М') && (rs.getString("otch").toUpperCase().endsWith("ИЧ") || rs.getString("otch").toUpperCase().endsWith("ОГЛЫ")))
+    	            	if (((rs.getString("sex").toUpperCase().charAt(0) == 'М') && (rs.getString("otch").toUpperCase().endsWith("ИЧ") || rs.getString("otch").toUpperCase().endsWith("ОГЛЫ"))) ||
+    	            		((rs.getString("sex").toUpperCase().charAt(0) == 'Ж') && (rs.getString("otch").toUpperCase().endsWith("НА") || rs.getString("otch").toUpperCase().endsWith("КЫЗЫ"))))
     	            		str += " 22. Несоответствие пола и отчества<br>";
-//        	            	if (rs.getString("otch").toUpperCase().endsWith("ИЧ") || rs.getString("otch").toUpperCase().endsWith("ОГЛЫ"))
+    	            	if (rs.getInt("region") != 42 && (rs.getInt("type_doc") < 1 && rs.getInt("type_doc") > 18))
+    	            		str += " 31. Отсутствует / некорректный тип документа TYPE_DOC<br>";
+
     	            	System.out.println(rs.getString("sex").toUpperCase().charAt(0));
     	            	
     	            	if (rs.getString("diag") == null)

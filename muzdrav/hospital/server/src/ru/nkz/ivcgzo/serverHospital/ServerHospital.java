@@ -396,10 +396,9 @@ public class ServerHospital extends Server implements Iface {
                     + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
         }
         sql += "ORDER BY sho.name ";
-
         try (AutoCloseableResultSet acrs = (srcText == null)
-                ? sse.execPreparedQuery(sql, cspec, cslu, cslu)
-                : sse.execPreparedQuery(sql, cspec, cslu, cslu,
+                ? sse.execPreparedQuery(sql, 38, 2, 2)
+                : sse.execPreparedQuery(sql, 38, 2, 2,
                         srcText, srcText, srcText, srcText)) {
             return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {

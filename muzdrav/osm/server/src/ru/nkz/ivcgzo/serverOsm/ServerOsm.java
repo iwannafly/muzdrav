@@ -2354,12 +2354,68 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		//Con_diagn.csv
 		StringBuilder sb3 = new StringBuilder(0x10000);
 		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl");
-		try (AutoCloseableResultSet acrs1 = sse.execQuery("SELECT npasp rd FROM p_rd_sl rd")) {
-//			String npasp;
-//			if (acrs1.getResultSet().next())
-//				return npasp; //rsmRdPat.mapToList(acrs.getResultSet());
-//			else
-//				throw new KmiacServerException("нет записи");
+		j = 0;
+		try (AutoCloseableResultSet acrs1 = sse.execQuery("SELECT npasp FROM p_rd_sl rd")) {
+			Integer npasp = null;
+			j = j+1;
+	        String dex1 = "";
+	        String dex2 = null;
+	        String dex3 = null;
+	        String dex4 = null;
+	        String dex5 = null;
+	        String dex6 = null;
+	        String dex7 = null;
+	        String dex9 = null;
+	        String dex10 = null;
+	        String dex = null;
+	        String dak = null;
+	        String dsost = null;
+	        String dosl = null;
+			if (acrs1.getResultSet().next())
+				npasp = acrs1.getResultSet().getInt(0);
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",npasp)) {
+				if (acrs21.getResultSet().next()){
+	//				dex = dex + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex1") dex1 =dex1 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex2") dex2 =dex2 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex3") dex3 =dex3 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex4") dex4 =dex4 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex5") dex5 =dex5 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex6") dex6 =dex6 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex7") dex7 =dex7 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex9") dex9 =dex9 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex10") dex10 =dex10 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs1.getResultSet().getString(0);	
+				}
+			} catch (SQLException e) {
+				((SQLException) e.getCause()).printStackTrace();
+				throw new KmiacServerException();
+			}
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.dspos,c.dex from p_rd_din d,n_c00 c where c.dex is not null and d.npasp=?",npasp)) {
+				if (acrs21.getResultSet().next()){
+//					dex = dex + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex1") dex1 =dex1 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex2") dex2 =dex2 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex3") dex3 =dex3 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex4") dex4 =dex4 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex5") dex5 =dex5 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex6") dex6 =dex6 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex7") dex7 =dex7 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex9") dex9 =dex9 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dex10") dex10 =dex10 + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs1.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs1.getResultSet().getString(0);	
+				}
+			} catch (SQLException e) {
+				((SQLException) e.getCause()).printStackTrace();
+				throw new KmiacServerException();
+			}
+			dex = dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10;
+			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
+			acrs1.close();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -2447,7 +2503,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public double getStoim(String kateg, int prv, String cdol) throws TException {
+	public double getStoim(String kateg, int prv, String cdol) throws TException {   
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select stoim from n_stoim_p where kateg = ? and prv = ? and cdol = ? ", kateg, prv, cdol)) {
 			if (acrs.getResultSet().next())
 				return acrs.getResultSet().getDouble(1);
@@ -2457,6 +2513,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new TException(e);
 		}		
 	}
+
+	@Override
+	public Pmer getDispMer(int id_pmer) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_mer WHERE id = ? ", id_pmer)) {
+			return rsmPmer.map(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException(); 
+		}
+	}
+
 
 
 
