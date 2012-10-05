@@ -256,28 +256,8 @@ public class Vvod extends JFrame {
 		btnBer = new JButton("Наблюдение за беременными");
 		btnBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				  JPopupMenu menuBer = new JPopupMenu();
-		            
-		       		JMenuItem mb1 = new JMenuItem("Постановка на учет по беременности");
-		       		mb1.addActionListener(new ActionListener() {
-		       			@Override
-		       			public void actionPerformed(ActionEvent arg0) {
-		       				postber.setVisible(true);	
-		       			}
-		       		});
-		       		menuBer.add(mb1);
-		       		
-					JMenuItem mb2 = new JMenuItem("Динамическое наблюдение за беременными");
-					mb2.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							dinform = new FormRdDin();
-							dinform.setVisible(true);
-						}
-		});
-					menuBer.add(mb2);
-					
-					menuBer.show(btnBer, 0, btnBer.getHeight());
+		       		postber.setVisible(true);	
+
 			}
 		});
 		btnPrint = new JButton("Печатные формы");

@@ -2447,7 +2447,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public double getStoim(String kateg, int prv, String cdol) throws TException {
+	public double getStoim(String kateg, int prv, String cdol) throws TException {   
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select stoim from n_stoim_p where kateg = ? and prv = ? and cdol = ? ", kateg, prv, cdol)) {
 			if (acrs.getResultSet().next())
 				return acrs.getResultSet().getDouble(1);
@@ -2457,6 +2457,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new TException(e);
 		}		
 	}
+
+	@Override
+	public Pmer getDispMer(int id_pmer) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_mer WHERE id = ? ", id_pmer)) {
+			return rsmPmer.map(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException(); 
+		}
+	}
+
 
 
 
