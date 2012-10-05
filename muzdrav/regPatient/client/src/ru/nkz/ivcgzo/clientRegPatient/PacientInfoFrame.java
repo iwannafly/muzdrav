@@ -2868,8 +2868,8 @@ public class PacientInfoFrame extends JFrame {
         JButton btnSave_priem = new JButton("Сохранить");
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-            	SavePriemInfo();
-            	//здесь надо сохранять в стационар
+                SavePriemInfo();
+                //здесь надо сохранять в стационар
             }
         });
 
@@ -2937,8 +2937,8 @@ public class PacientInfoFrame extends JFrame {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 if (tbl_priem.getSelectedItem() !=  null) {
-                	changePatientPriemInfo(curPatientId);
-                	newPriem = tbl_priem.getSelectedItem();
+                    changePatientPriemInfo(curPatientId);
+                    newPriem = tbl_priem.getSelectedItem();
                 }
             }
         }
@@ -2979,7 +2979,7 @@ public class PacientInfoFrame extends JFrame {
                     String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
                     String omsOrg = cmb_oms_smo.getText();
                     String lgot = "";
-                    if (LgotaInfo.size() > 0) {
+                    if ((LgotaInfo != null) && (LgotaInfo.size() > 0)) {
                         for (Lgota lg : LgotaInfo) {
                             if (lg.isSetLgota()) {
                                 lgot += ", " + String.valueOf(lg.getLgota());
@@ -3555,7 +3555,7 @@ public class PacientInfoFrame extends JFrame {
             Id_gosp.setCotd_p(MainForm.authInfo.cpodr);
             Id_gosp.setCuser(MainForm.authInfo.pcod);
             //Id_gosp.setNist(1); //подумать
-            if (!tf_nist.getText().isEmpty()) Id_gosp.setNist(Integer.valueOf(tf_nist.getText())); 
+            if (!tf_nist.getText().isEmpty()) Id_gosp.setNist(Integer.valueOf(tf_nist.getText()));
 
 //		    System.out.println(((Date) sp_dataosm.getValue()).getTime());
 //		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
