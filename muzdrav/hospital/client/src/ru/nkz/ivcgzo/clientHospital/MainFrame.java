@@ -233,7 +233,7 @@ public class MainFrame extends JFrame {
             ClientHospital.conMan.reconnect(e);
         }
     }
-
+//TODO
     private void clearAllComponentsAndObjects() {
         patient = null;
         clearPatientText();
@@ -496,9 +496,10 @@ public class MainFrame extends JFrame {
                     patient.getSurname(), patient.getName(),
                     patient.getMiddlename()));
         } catch (PatientNotFoundException e) {
-            JOptionPane.showMessageDialog(frmPatientSelect,
-                "Персональная инфомация о данном пациенте не найдена.",
-                "Внимание!", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frmPatientSelect,
+//                "Персональная инфомация о данном пациенте не найдена.",
+//                "Внимание!", JOptionPane.WARNING_MESSAGE);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -541,10 +542,11 @@ public class MainFrame extends JFrame {
             priemInfo = ClientHospital.tcl.getPriemInfo(
                     patient.getGospitalCod());
         } catch (PriemInfoNotFoundException e) {
-            JOptionPane.showMessageDialog(frmPatientSelect,
-                "Информация из приёмного отделения "
-                    + "о данном пациенте не найдена.",
-                    "Внимание!", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frmPatientSelect,
+//                "Информация из приёмного отделения "
+//                    + "о данном пациенте не найдена.",
+//                    "Внимание!", JOptionPane.WARNING_MESSAGE);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -699,9 +701,10 @@ public class MainFrame extends JFrame {
             lifeHistory =
                     ClientHospital.tcl.getLifeHistory(patient.getPatientId());
         } catch (LifeHistoryNotFoundException e) {
-            JOptionPane.showMessageDialog(frmPatientSelect,
-                "История жизни данного пациента не найдена.",
-                "Внимание!", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frmPatientSelect,
+//                "История жизни данного пациента не найдена.",
+//                "Внимание!", JOptionPane.WARNING_MESSAGE);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -1025,6 +1028,7 @@ public class MainFrame extends JFrame {
 //    }
 
     private void clearMedicalHistoryText() {
+        tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
         taJalob.setText("");
         taDesiaseHistory.setText("");
         taFisicalObs.setText("");
@@ -1073,9 +1077,10 @@ public class MainFrame extends JFrame {
                 tbMedHist.setData(
                         ClientHospital.tcl.getMedicalHistory((patient.getGospitalCod())));
             } catch (MedicalHistoryNotFoundException e) {
-                JOptionPane.showMessageDialog(frmPatientSelect,
-                        "Медицинская история пациента не найдена.",
-                        "Внимание!", JOptionPane.WARNING_MESSAGE);
+                e.printStackTrace();
+//                JOptionPane.showMessageDialog(frmPatientSelect,
+//                        "Медицинская история пациента не найдена.",
+//                        "Внимание!", JOptionPane.WARNING_MESSAGE);
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
@@ -1126,9 +1131,10 @@ public class MainFrame extends JFrame {
                         ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
                 setDiagPriznRdbtn();
             } catch (DiagnosisNotFoundException e) {
-                JOptionPane.showMessageDialog(frmPatientSelect,
-                        "Диагнозы данного пациента не найдены.",
-                        "Внимание!", JOptionPane.WARNING_MESSAGE);
+                e.printStackTrace();
+//                JOptionPane.showMessageDialog(frmPatientSelect,
+//                        "Диагнозы данного пациента не найдены.",
+//                        "Внимание!", JOptionPane.WARNING_MESSAGE);
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
