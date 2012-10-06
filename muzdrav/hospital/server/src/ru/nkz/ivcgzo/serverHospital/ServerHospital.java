@@ -544,10 +544,21 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public void updateMedicalHistory(final TMedicalHistory medHist)
+    public final void updateMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-
+        final int[] indexes = {2, 3, 4, 5, 6, 0};
+        final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
+            + "morbi = ?, status_praesense = ?, "
+            + "status_localis = ?, fisical_obs = ? "
+            + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
 }
