@@ -236,28 +236,64 @@ struct RdInfStruct{
 /*Выгрузка для Кемерово по диспансеризации беременных*/
 struct RdPatient{
          1: optional i32    uid;
-         2: optional string fam;
-         3: optional string im;
-         4: optional string ot;
-         5: optional i64    datar;
-         6: optional string docser;
-         7: optional string docnum;
-         8: optional i32    tawn;
-         9: optional string street;
-        10: optional string house;  
-        11: optional string flat;
-        12: optional string poms_ser;
-        13: optional string poms_nom;
-        14: optional string dog;
-        15: optional i32    stat;
-        16: optional i32    lpup;
-        17: optional i32    terp;
-        18: optional i32    ftawn; 
-        19: optional string fstreet;
-        20: optional string fhouse;
-        21: optional string fflat;
-        22: optional string grk;
-        23: optional string rez;  
+         2: optional i32 npasp;
+         3: optional string fam;
+         4: optional string im;
+         5: optional string ot;
+         6: optional i64    datar;
+         7: optional string docser;
+         8: optional string docnum;
+         9: optional i32    tawn;
+        10: optional string street;
+        11: optional string house;  
+        12: optional string flat;
+        13: optional string poms_ser;
+        14: optional string poms_nom;
+        15: optional string dog;
+        16: optional i32    stat;
+        17: optional i32    lpup;
+        18: optional i32    terp;
+        19: optional i32    ftawn; 
+        20: optional string fstreet;
+        21: optional string fhouse;
+        22: optional string fflat;
+        23: optional string grk;
+        24: optional string rez;  
+        25: optional string telm;
+        26: optional string vred;
+        27: optional i32 deti;
+        28: optional i64 datay;
+	29: optional i32 yavka1;
+        30: optional i64 datazs;
+        31: optional string famv;
+        32: optional string imv;
+        33: optional string otv;
+	34: optional i64 datasn; 
+	35: optional i32 shet;
+        36: optional i32 kolrod;
+	37: optional i32 abort;
+        38: optional i32 vozmen;
+        39: optional i32 prmen;
+	40: optional i64 datam;
+        41: optional bool kont;
+        42: optional i32 dsp;
+        43: optional i32 dsr;
+        44: optional i32 dtroch;
+        45: optional i32 cext;
+        46: optional i32 indsol;
+        47: optional string vitae;
+        48: optional string allerg;
+	49: optional i32 ishod;
+        50: optional string prrod;
+        51: optional i32 oslrod;
+        52: optional i32 sem;
+        53: optional i32 rost;
+        54: optional i32 vesd; 
+        55: optional i32 osoco;
+        56: optional i32 uslpr;
+        57: optional i64 dataz;
+        58: optional i32 polj;
+        59: optional i32 obr; 
 }
 struct RdVizit{
          1: optional i32    uid;
@@ -291,39 +327,6 @@ struct RdConVizit{
         15: optional i32 npasp;
 }
 
-struct RdSlStruct1{
-        1: optional  i32 id;
-        2: optional i32 npasp;
-        3: optional i64 datay;
-	4: optional i32 abort;
-	5: optional i32 shet;
-	6: optional i64 dataM;
-	7: optional i32 yavka1;
-	8: optional i32 ishod;
-	9: optional i64 Datasn; 
-       10: optional i64 DataZs;
-       11: optional i32 kolrod;
-       12: optional i32 deti;
-       13: optional bool kont;
-       14: optional i32 dsp;
-       15: optional i32 dsr;
-       16: optional i32 dTroch;
-       17: optional i32 cext;
-       18: optional i32 indsol;
-       19: optional i32 prmen;
-       20: optional i64 dataz;
-       21: optional string prrod;
-       22: optional i32 vozmen;
-       23: optional i32 oslrod;
-       24: optional i32 polj;
-       25: optional i32 id_pvizit;
-       26: optional string fam;
-       27: optional string im;
-       28: optional string ot;
-       29: optional string telm;
-       30: optional string vitae;
-       31: optional string allerg;
-}
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
 	1: optional string pcod;
@@ -670,7 +673,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
-        list<RdSlStruct1> getRdSl() throws (1: kmiacServer.KmiacServerException kse);
+/*       list<RdSlStruct1> getRdSl() throws (1: kmiacServer.KmiacServerException kse);*/
 /*Shablon*/
 	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
