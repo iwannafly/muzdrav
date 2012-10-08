@@ -15,5 +15,6 @@ base port + 0	auth
 12	genReestr
 13	infomat
 14	Vgr
+15	lab
 
 55201	libUpd

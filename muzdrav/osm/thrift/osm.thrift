@@ -17,6 +17,7 @@ struct ZapVr{
 	8: optional i32 pol;
 	9: optional i64 datar;
 	10: optional i64 datap;
+	11: optional i32 nuch;
 }
 
 struct Pvizit {
@@ -148,7 +149,8 @@ struct PdiagZ{
 	22: optional i32 prizi;
 	23: optional string named;
 	24: optional i32 ppi;
-	25: optional string nameC00;
+	25: optional i32 uch;
+	26: optional string nameC00;
 
 }
 
@@ -454,6 +456,7 @@ struct Pdisp{
 	15: optional string cdol_ot;
 	16: optional bool sob;
 	17: optional bool sxoch;
+	18: optional i32 d_uch;
 }
 
 struct Protokol{
@@ -501,7 +504,7 @@ struct Shablon {
 	1: i32 id;
 	2: string diag;
 	3: string din;
-	4: string next_osm;
+	4: string name;
 	5: list<ShablonText> textList;
 }
 
@@ -555,6 +558,9 @@ exception PdiagNotFoundException {
 }
 
 exception PdispNotFoundException {
+}
+
+exception PrdslNotFoundException {
 }
 
 /**
@@ -631,14 +637,16 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 //classifiers
 	list<classifier.StringClassifier> get_n_nz1(1: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> get_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_m00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_lds_n_m00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_vid_issl() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_s00(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_tip() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_m00() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
-	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PrdslNotFoundException pnf);
 	list<RdDinStruct> getRdDinInfo(1: i32 id_Pvizit, 2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
@@ -673,6 +681,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*DispMer*/
 	list<Pmer> getPmer (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
+	Pmer getDispMer (1: i32 id_pmer) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePmer(1: Pmer pm) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePmer(1: i32 pmer_id) throws (1: kmiacServer.KmiacServerException kse);

@@ -166,7 +166,9 @@ public class ServerReception extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getPoliclinic() throws KmiacServerException,
             PoliclinicNotFoundException, TException {
-        final String sqlQuery = "SELECT DISTINCT n_n00.pcod, n_n00.name FROM n_n00 "
+        final String sqlQuery = "SELECT DISTINCT n_n00.pcod, "
+                + "(n_m00.name_s || ', ' || n_n00.name) as name "
+                + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu "
                 + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             List<IntegerClassifier> tmpList = rsmPoliclinic.mapToList(acrs.getResultSet());

@@ -188,23 +188,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				private static final long serialVersionUID = 8883313793725297972L;
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (getSelectedRow() < 0)
-						return;
-					
-					if (isEditing()) {
-						getCellEditor().cancelCellEditing();
-						return;
-					}
-					
-					itemUpd = true;
-					if (itemAdd) {
-						sel = null;
-					} else {
-						sel = getDeepCopyItem(cop);
-						itemAdd = false;
-					}
-					lst.set(copIdx, sel);
-					updateSelectedItem();
+					cancelEdit();
 		        }
 		    });
 		}
@@ -613,6 +597,14 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	}
 	
 	/**
+	 * Обновление текущей строки, измененной <b>программно</b>.
+	 */
+	public void updateChangedSelectedItem() {
+		itemUpd = true;
+		updateSelectedItem();
+	}
+	
+	/**
 	 * Регистрация слушателя, принимающего сообщения о том, что произошло
 	 * добавление новой строки.
 	 * @param listener
@@ -676,6 +668,29 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		}
 	}
 	
+	/**
+	 * Отменяет изменения в текущей строке.
+	 */
+	public void cancelEdit() {
+		if (getSelectedRow() < 0)
+			return;
+		
+		if (isEditing()) {
+			getCellEditor().cancelCellEditing();
+			return;
+		}
+		
+		itemUpd = true;
+		if (itemAdd) {
+			sel = null;
+		} else {
+			sel = getDeepCopyItem(cop);
+			itemAdd = false;
+		}
+		lst.set(copIdx, sel);
+		updateSelectedItem();
+	}
+
 	public class CustomTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -7716830847522898209L;
 
