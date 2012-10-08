@@ -181,7 +181,7 @@ private TServer thrServ;
    					sb.append("</head>");
    					sb.append("<body>");
 					sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-					sb.append(String.format(" от %1$td.%1$tm.%1$tY <br><br>", new Date(System.currentTimeMillis())));
+					sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
 
    					while (rs.next()){
 						String str = "";
@@ -195,12 +195,15 @@ private TServer thrServ;
     	            		str += " 13. Не заполнена дата предоставления реестра в ТФ DF_PER<br>";
     	            	if (rs.getDate("dr").getTime() == 0)
     	            		str += " 18. Не заполнена дата рождения DR<br>";
-    	            	if (rs.getString("sex").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М' || rs.getString("sex").charAt(0) != 'ж' || rs.getString("sex").charAt(0) != 'Ж')
+    	            	if ((rs.getString("sex").toUpperCase().charAt(0) != 'М') && (rs.getString("sex").toUpperCase().charAt(0) != 'Ж'))
     	            		str += " 21. Ошибка в кодировании пола SEX<br>";
-    	            	if (rs.getString("sex").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М')
-        	            	if (rs.getString("otch").charAt(0) != 'м' || rs.getString("sex").charAt(0) != 'М')
+    	            	if (((rs.getString("sex").toUpperCase().charAt(0) == 'М') && (rs.getString("otch").toUpperCase().endsWith("ИЧ") || rs.getString("otch").toUpperCase().endsWith("ОГЛЫ"))) ||
+    	            		((rs.getString("sex").toUpperCase().charAt(0) == 'Ж') && (rs.getString("otch").toUpperCase().endsWith("НА") || rs.getString("otch").toUpperCase().endsWith("КЫЗЫ"))))
     	            		str += " 22. Несоответствие пола и отчества<br>";
-    	            	
+    	            	if (rs.getInt("region") != 42 && (rs.getInt("type_doc") < 1 && rs.getInt("type_doc") > 18))
+    	            		str += " 31. Отсутствует / некорректный тип документа TYPE_DOC<br>";
+
+    	            	System.out.println(rs.getString("sex").toUpperCase().charAt(0));
     	            	
     	            	if (rs.getString("diag") == null)
     	            		str += " Отсутствует диагноз<br>";

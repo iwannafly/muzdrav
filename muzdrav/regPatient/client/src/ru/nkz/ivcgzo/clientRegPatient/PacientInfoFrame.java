@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,6 +37,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.apache.log4j.Level;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.IClient;
@@ -1398,7 +1400,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public boolean doAction(CustomTableItemChangeEvent<Lgota> event) {
                 try {
-                    MainForm.tcl.updateLgota(event.getItem());
+                	MainForm.tcl.updateLgota(event.getItem());
                 } catch (TException e) {
                     e.printStackTrace();
                     return false;
@@ -2980,7 +2982,10 @@ public class PacientInfoFrame extends JFrame {
                     String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
                     String omsOrg = cmb_oms_smo.getText();
                     String lgot = "";
-                    if ((LgotaInfo != null) && (LgotaInfo.size() > 0)) {
+
+                    if (tbl_lgota.getData() != null)
+                    	LgotaInfo = tbl_lgota.getData();
+                    if (LgotaInfo.size() > 0) {
                         for (Lgota lg : LgotaInfo) {
                             if (lg.isSetLgota()) {
                                 lgot += ", " + String.valueOf(lg.getLgota());
@@ -3619,7 +3624,7 @@ public class PacientInfoFrame extends JFrame {
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
                 if (Id_gosp.getCotd() != 0)
-                	curId_otd = MainForm.tcl.addToOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
+                   	curId_otd = MainForm.tcl.addToOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
             else{
                 MainForm.tcl.updateGosp(Id_gosp);

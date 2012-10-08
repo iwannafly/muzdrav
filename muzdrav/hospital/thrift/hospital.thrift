@@ -149,7 +149,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);
 	i32 addMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
-	void deleteMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
+	void updateMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
+	void deleteMedicalHistory(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 	
 	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
