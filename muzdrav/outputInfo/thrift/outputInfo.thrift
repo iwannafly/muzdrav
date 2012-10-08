@@ -2,12 +2,16 @@ namespace java ru.nkz.ivcgzo.thriftOutputInfo
 
 include "../../../common/thrift/kmiacServer.thrift"
 
+struct InputAuthInfo {
+	1: optional i32 userId;
+	2: optional string cpodr_name;
+	3: optional string clpu_name;
+}
+
 struct InputSvodVed {
-    1: i32 kpolik;
-    2: string namepol;
-    3: string dateb;
-    4: string datef;
-    5: i32 vozcat;
+    1: string dateb;
+    2: string datef;
+    3: i32 vozcat;
 }
 
 struct OutputSvodVed {
@@ -21,6 +25,11 @@ struct OutputSvodVed {
 	8: optional i32 pvizitId;
 	9: optional string cpodr_name;
 	10: optional string clpu_name;
+}
+
+struct OutputTest {
+    1: optional string namebz;
+    2: optional string diagsrpt;
 }
 
 struct VrachInfo {
@@ -46,5 +55,7 @@ struct VrachTabel {
 }
 
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
-    string printSvodVed(1: OutputSvodVed osv) throws (1: kmiacServer.KmiacServerException kse);
+    string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv 3: OutputSvodVed osv) throws (1: kmiacServer.KmiacServerException kse);
+
+    string printTest(1: OutputTest ot 2: InputAuthInfo iaf ) throws (1: kmiacServer.KmiacServerException kse);
 }
