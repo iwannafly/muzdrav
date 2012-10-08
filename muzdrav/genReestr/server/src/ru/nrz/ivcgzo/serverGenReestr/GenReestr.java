@@ -202,6 +202,18 @@ private TServer thrServ;
     	            		str += " 22. Несоответствие пола и отчества<br>";
     	            	if (rs.getInt("region") != 42 && (rs.getInt("type_doc") < 1 && rs.getInt("type_doc") > 18))
     	            		str += " 31. Отсутствует / некорректный тип документа TYPE_DOC<br>";
+    	            	if (rs.getInt("region") == 0)
+    	            		str += " 33. Отсутствует код области REGION<br>";
+    	            	if (rs.getInt("region") == 42 && rs.getInt("ter_liv") == 0)
+    	            		str += " 35. Отсутствует код административной территории места жительства TER_LIV<br>";
+    	            	if (rs.getInt("status") == 0)
+    	            		str += " 38. Неверный статус STATUS<br>";
+    	            	if (rs.getInt("region") == 42 && rs.getInt("vid_rstr") == 1 && rs.getInt("vid_hosp") == 1 && rs.getInt("kl_usl") == 1 && rs.getString("talon") == null)
+    	            		str += " 41. Плановый больной без талона<br>";
+    	            	if (rs.getInt("region") != 42 && rs.getString("docum") == null)
+    	            		str += " 125. Отсутствует / некорректный номер документа, удостоверяющего личность<br>";
+    	            	if (rs.getInt("region") != 42 && rs.getString("ogrn_str") == null)
+    	            		str += " 246. Ошибка заполнения инообластного реестра. Не указан ОГРН.<br>";
 
     	            	System.out.println(rs.getString("sex").toUpperCase().charAt(0));
     	            	
