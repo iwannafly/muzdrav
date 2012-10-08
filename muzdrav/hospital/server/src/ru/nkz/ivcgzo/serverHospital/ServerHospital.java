@@ -177,7 +177,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientFromOtd(final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im,"
-                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd "
+                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
@@ -453,7 +453,7 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, "
@@ -472,11 +472,10 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void deleteMedicalHistory(final int idGosp) throws KmiacServerException,
-            TException {
-        final String sqlQuery = "DELETE * FROM c_osmotr WHERE id_gosp = ?;";
+    public final void deleteMedicalHistory(final int id) throws KmiacServerException {
+        final String sqlQuery = "DELETE FROM c_osmotr WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, idGosp);
+            sme.execPrepared(sqlQuery, false, id);
             sme.setCommit();
         } catch (SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
@@ -540,6 +539,24 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateMedicalHistory(final TMedicalHistory medHist)
+            throws KmiacServerException, TException {
+        final int[] indexes = {2, 3, 4, 5, 6, 0};
+        final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
+            + "morbi = ?, status_praesense = ?, "
+            + "status_localis = ?, fisical_obs = ? "
+            + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
             throw new KmiacServerException();
         }
     }
