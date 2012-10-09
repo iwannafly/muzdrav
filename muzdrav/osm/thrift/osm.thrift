@@ -311,6 +311,9 @@ struct RdPatient{
         71: optional bool predp;
         72: optional i32 terpr;
         73: optional i32 oblpr;
+        74: optional i32 diag;
+        75: optional i32 cvera;
+        76: optional i64 dataosl;
 }
 struct RdVizit{
          1: optional i32    uid;
@@ -342,6 +345,15 @@ struct RdConVizit{
         13: optional i32    osoco;
         14: optional string vrpr;
         15: optional i32 npasp;
+        16: optional i32 hdm;
+        17: optional i32 spl; 
+        18: optional i32 oj;
+        19: optional i32 chcc;
+        20: optional i32 polpl;
+        21: optional i32 predpl;
+        22: optional i32 serd;
+        23: optional i32 serd1;
+        24: optional i32 oteki;
 }
 
 /*Список показателей исследований по выбранному методу*/
