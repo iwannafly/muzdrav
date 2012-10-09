@@ -42,6 +42,8 @@ import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 
 public class FormRdDin extends JFrame {
 	private static final long serialVersionUID = 553969304358351170L;
@@ -49,6 +51,8 @@ public class FormRdDin extends JFrame {
 	private RdDinStruct rddin;
 	public static PvizitAmb pvizitAmb;
 	public static Pvizit pvizit;
+	public static RdInfStruct RdInfStruct;
+	public static RdSlStruct rdSlStruct;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
     private String oslname;
     private String oslcode;
@@ -175,28 +179,6 @@ public class FormRdDin extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-//		rddin = new RdDinStruct();
-//		patient = new PatientCommonInfo();
-//		if (rddin.isSetPredpl())
-//			CBPredPl.setSelectedPcod(rddin.getPredpl());
-//		else
-//			CBPredPl.setSelectedItem(null);
-//		if (rddin.isSetPolpl())
-//			CBPolPl.setSelectedPcod(rddin.getPolpl());
-//		else
-//			CBPolPl.setSelectedItem(null);
-//		if (rddin.isSetSerd())
-//			CBCerd.setSelectedPcod(rddin.getSerd());
-//		else
-//			CBCerd.setSelectedItem(null);
-//		if (rddin.isSetSerd1())
-//			CBSerd1.setSelectedPcod(rddin.getSerd1());
-//		else
-//			CBSerd1.setSelectedItem(null);
-//		if (rddin.isSetOteki())
-//			CBOteki.setSelectedPcod(rddin.getOteki());
-//		else
-//			CBOteki.setSelectedItem(null);
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
 		
@@ -312,6 +294,17 @@ public class FormRdDin extends JFrame {
 			if (mes == 1) br = br+1;
 			if (mes == 2) br = br+1;
 			if (mes == 12) br = br+1;
+			rddin.setArt1((int) SPdad.getModel().getValue());
+			rddin.setArt2((int) SPsad.getModel().getValue());
+			rddin.setArt3((int) SLdad.getModel().getValue());
+			rddin.setArt4((int) SLsad.getModel().getValue());
+			rddin.setChcc((int) SChcc.getModel().getValue());
+			rddin.setHdm((int) SVdm.getModel().getValue());
+			rddin.setOj((int) SOkrj.getModel().getValue());
+			rddin.setSpl((int) STolP.getModel().getValue());
+			rddin.setSrok((int) SSrok.getModel().getValue());
+			rddin.setVes((double) SVes.getModel().getValue());
+			ves = (double) SVes.getModel().getValue();
 			rddin.setGrr(0);
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
@@ -328,42 +321,35 @@ public class FormRdDin extends JFrame {
 		if (CBOteki.getSelectedPcod() != null)
 			rddin.setOteki(CBOteki.getSelectedPcod());
 			else rddin.unsetOteki();
+		System.out.println("риск");		
 		if (CBDiag.getSelectedPcod() != null)
 		{	rddin.setDspos(CBDiag.getSelectedPcod());
-		rddin.setGrr(1);
-		System.out.println("риск");		
-}
+		rddin.setGrr(1);}
 		    else rddin.unsetDspos();
-		rddin.setArt1((int) SPdad.getModel().getValue());
-		rddin.setArt2((int) SPsad.getModel().getValue());
-		rddin.setArt3((int) SLdad.getModel().getValue());
-		rddin.setArt4((int) SLsad.getModel().getValue());
-		rddin.setChcc((int) SChcc.getModel().getValue());
-		rddin.setHdm((int) SVdm.getModel().getValue());
-		rddin.setOj((int) SOkrj.getModel().getValue());
-		rddin.setSpl((int) STolP.getModel().getValue());
-		rddin.setSrok((int) SSrok.getModel().getValue());
-		rddin.setVes((double) SVes.getModel().getValue());
-		ves = (double) SVes.getModel().getValue();
-		rost = FormPostBer.rdSlStruct.getRost();	
-		if (rost<=154) br = br+1;
-		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
-		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
-		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
-		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
-		if (rost != 0) 
-		{ves = ves/rost/rost*10000;
-		if (ves<17) br = br+1;
-		if (ves>=32) br = br+1;}
+//		rost = FormPostBer.rdSlStruct.getRost();	
+//		System.out.println(rost);
+//		if (rost<=154) br = br+1;
+//		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
+//		if (rost != 0) 
+//		{ves = ves/rost/rost*10000;
+//		if (ves<17) br = br+1;
+//		if (ves>=32) br = br+1;}
 		rddin.setBall(br); 
-		System.out.println(rost);
 			MainForm.tcl.UpdateRdDin(rddin);
 		} catch (KmiacServerException | TException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			System.out.println(rddin);		
 	}
-//		rddin.setDspos((string) CBDspos.getSelectedKod_Mkb.)//диагноз заменить на kod_mkb (вместо PCOD)
+		try {
+			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+		} catch (KmiacServerException | TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 			}
 		});
 		
@@ -417,7 +403,13 @@ public class FormRdDin extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				}
+try {
+	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+} catch (KmiacServerException | TException e1) {
+	// TODO Auto-generated catch block
+	e1.printStackTrace();
+}
+			}
 
 			private void showMessage(RdDinStruct rddin) {
 				// TODO Auto-generated method stub

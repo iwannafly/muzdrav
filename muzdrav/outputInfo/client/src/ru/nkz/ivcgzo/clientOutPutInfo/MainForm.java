@@ -41,6 +41,7 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -81,6 +82,9 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		
 		//inputInfo.setKpolik(authInfo.clpu);
 		//inputInfo.setNamepol(authInfo.clpu_name);
+		
+		
+		
 		
 		/**
 		 * Создание панелей с табами (категорий)
@@ -168,6 +172,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		if (conn instanceof ThriftOutputInfo.Client) {
 			tcl = thrClient;
 			try {
+
 				
 			} catch (Exception e) {
 				e.printStackTrace();

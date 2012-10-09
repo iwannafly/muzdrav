@@ -1,4 +1,4 @@
-package ru.nrz.ivcgzo.serverOutputInfo;
+﻿package ru.nrz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +28,9 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 import ru.nkz.ivcgzo.thriftOutputInfo.OutputPlanDisp;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.OutputSvodVed;
+import ru.nkz.ivcgzo.thriftOutputInfo.OutputTest;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
@@ -38,23 +40,28 @@ public class OutputInfo extends Server implements Iface {
 	//public Input_info inputInfo;
 	public int kolz1, kolz2, kolz3, kolz4, kolz5, kolz6, kolz7, kolz8, xind, perv;
 	public String cdiag, kat;
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	SimpleDateFormat sdfo = new SimpleDateFormat("dd.MM.yyyy");
+	// Текущая дата в формате 12.12.2012
+	String curDat = sdfo.format(java.util.Calendar.getInstance().getTime());
 	
 	
+
 	public OutputInfo(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
 	@SuppressWarnings("deprecation")
 	public void Vimotchik025() throws TException, ParseException {
-		String d1 = InputSvodVed._Fields.DATEB.toString();
-		String d2 = InputSvodVed._Fields.DATEF.toString();
-		String namepol = InputSvodVed._Fields.NAMEPOL.toString();
+		//String d1 = InputSvodVed._Fields.DATEB.toString();
+		//String d2 = InputSvodVed._Fields.DATEF.toString();
+		//String namepol = InputSvodVed._Fields.NAMEPOL.toString();
 		// Предыдущий год
-		String yaerr = String.valueOf((sdf.parse(d2).getYear()-1));
+		String yaerr = String.valueOf((sdf.parse(datef).getYear()-1));
 		// Текущий год по периоду
-		String yaetr = String.valueOf((sdf.parse(d2).getYear()));
+		String yaetr = String.valueOf((sdf.parse(datef).getYear()));
 		// Конец отчетного периода
 		Date kpo = (Date) sdf.parse(yaerr+"-12-25");
 		// Конец года по периоду
@@ -86,12 +93,17 @@ public class OutputInfo extends Server implements Iface {
 					else {
 						if ((spat.getResultSet().getDate("dataz").after(kpo)) && (spat.getResultSet().getDate("dataz").before(kpg))); {
 							// Добавить в sql условие, что ishod<>0
-							try (AutoCloseableResultSet scount = sse.execPreparedQuery("select count (*) from p_visit_amb where npasp= ? and id_diag_amb= ? and datap < ?", xind, spat.getResultSet().getInt("id_diag_amb"), d2)) {
+							try (AutoCloseableResultSet scount = sse.execPreparedQuery("select count (*) from p_visit_amb where npasp= ? and id_diag_amb= ? and datap < ? order by datap", xind, spat.getResultSet().getInt("id_diag_amb"), d2)) {
 								while (scount.getResultSet().next()) {
 									if (scount.getResultSet().getInt(0)==1) {
 										if ((scount.getResultSet().getDate("datad").after(kpo)) && (spat.getResultSet().getDate("datad").before(kpg))) perv=1; else perv=2;
 									} else {
-										
+										try (AutoCloseableResultSet sdatap = sse.execPreparedQuery("select datap from p_visit_amb where npasp= ? and id_diag_amb= ? and datap < ? order by datap", xind, spat.getResultSet().getInt("id_diag_amb"), d2)) {
+											while (scount.getResultSet().next()) {
+												if (spat.getResultSet().getString("datap").equals(sdatap.getResultSet().getString(0))) {
+													if ((scount.getResultSet().getDate("datad").after(kpo)) && (spat.getResultSet().getDate("datad").before(kpg))) perv=1; else perv=2;
+												} else perv=3;
+											}	}
 									}
 							}
 						}
@@ -106,7 +118,6 @@ public class OutputInfo extends Server implements Iface {
 	}	
 	
 
-	
 	@SuppressWarnings("deprecation")
 	public void PlanovDisp() throws TException, ParseException {
 		// Дата от ...
@@ -128,6 +139,8 @@ public class OutputInfo extends Server implements Iface {
 		
 	}	
 	
+
+	*/
 	
 	@Override
 	public void testConnection() throws TException {
@@ -156,13 +169,28 @@ public class OutputInfo extends Server implements Iface {
 	}
 
 	@Override
-	public String printSvodVed(OutputSvodVed osv) throws KmiacServerException,
-			TException {
+	public String printTest(OutputTest ot, InputAuthInfo iaf) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		return null;
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append(String.format("<h3>Поликлиника %s", iaf.getCpodr_name()));
+			osw.write(sb.toString());
+			return path;
+	//	} catch (SQLException e) {
+	//		((SQLException) e.getCause()).printStackTrace();
+	//		throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
 
 	@Override
+
 	public String printPlanDisp(OutputPlanDisp opd)
 			throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
@@ -171,5 +199,207 @@ public class OutputInfo extends Server implements Iface {
 
 	
 
-	
+	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv,
+			OutputSvodVed osv) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		String path = null;
+		
+		// Считывает входные значения с формы
+		String dateb = isv.getDateb();
+		String datef = isv.getDatef();
+		int vozcat = isv.getVozcat();
+		
+		//final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between'",datab,"'::date and '2012-12-31'::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			AutoCloseableResultSet spat;
+			
+			
+						
+			//spat = sse.execPreparedQuery("select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between ? ::date and ? ::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc", dateb, datef);
+			
+			
+			
+			// Код формы, н-р, BIPG14J - для взрослых
+			String kodForm = null;
+			// Тип сводки, н-р, У детей до 14-и лет
+			String vozcatType = null;
+			// Дата начала и конца периода в формате 12.12.2012
+			String sdfoDateB = null, sdfoDateF = null;
+			
+			
+			
+			// Преобразование переменных
+			
+				try {
+					sdfoDateB = sdfo.format(sdf.parse(dateb));
+					sdfoDateF = sdfo.format(sdf.parse(datef));
+					// Предыдущий год
+					//String yaerr = String.valueOf((sdf.parse(datef).getYear()-1));
+					// Текущий год по периоду
+					//String yaetr = String.valueOf((sdf.parse(datef).getYear()));
+					// Конец отчетного периода
+					//Date kpo = (Date) sdf.parse(yaerr+"-12-25");
+					// Конец года по периоду
+					//Date kpg = (Date) sdf.parse(yaetr+"-12-31"); 
+				} catch (ParseException e) {
+				//	// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
+				
+			
+			
+			switch ( vozcat ) 
+			{ 
+			case 1:
+					kodForm = "BIPG44J";
+					vozcatType = "у детей до 14 лет";
+					break; 
+			case 2: 
+					kodForm = "BIPG34J";
+					vozcatType = "у подростков (с 15 до 18 лет)";
+					break; 
+			case 3: 
+					kodForm = "BIPG14J";
+					vozcatType = "у взрослых";
+					break; 
+			//default: 
+			}
+			
+		
+			StringBuilder sb = new StringBuilder(0x10000);
+			// Шапка сводки
+			sb.append(String.format("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"));
+			sb.append(String.format("<HTML>"));
+			sb.append(String.format("<HEAD>"));
+			sb.append(String.format("	<META HTTP-EQUIV=\"CONTENT-TYPE\" CONTENT=\"text/html; charset=utf-8\">"));
+			sb.append(String.format("	<TITLE></TITLE>"));
+			sb.append(String.format("	<META NAME=\"GENERATOR\" CONTENT=\"LibreOffice 3.5  (Linux)\">"));
+			sb.append(String.format("	<META NAME=\"CREATED\" CONTENT=\"20121007;16130900\">"));
+			sb.append(String.format("	<META NAME=\"CHANGED\" CONTENT=\"20121007;16403000\">"));
+			sb.append(String.format("	<STYLE TYPE=\"text/css\">"));
+			sb.append(String.format("	<!--"));
+			sb.append(String.format("		@page { size: 21cm 29.7cm; margin-left: 2cm; margin-right: 1cm; margin-top: 1cm; margin-bottom: 1cm }"));
+			sb.append(String.format("		P { margin-bottom: 0.21cm; color: #000000; font-family: \"Linux Libertine\"; font-size: 10pt }"));
+			sb.append(String.format("		TD P { color: #000000; font-family: \"Linux Libertine\"; font-size: 10pt }"));
+			sb.append(String.format("		A:link { color: #000080; so-language: zxx; text-decoration: underline }"));
+			sb.append(String.format("		A:visited { color: #800000; so-language: zxx; text-decoration: underline }"));
+			sb.append(String.format("	-->"));
+			sb.append(String.format("	</STYLE>"));
+			sb.append(String.format("</HEAD>"));
+			sb.append(String.format("<BODY LANG=\"ru-RU\" TEXT=\"#000000\" LINK=\"#000080\" VLINK=\"#800000\" DIR=\"LTR\">"));
+			// Код формы
+			sb.append(String.format("<p align=right>код формы: %s", kodForm));
+			// Текущая дата
+			sb.append(String.format("<p align=right>от %s", curDat));
+			// Заголовок
+			sb.append(String.format("<p align=center> <b>Сводная ведомость учета зарегистрированных заболеваний %s", vozcatType));
+			sb.append(String.format("<p align=center> <b>За период с %s по %s", sdfoDateB, sdfoDateF));
+			sb.append(String.format("<p align=center><b>%s %s",iaf.clpu_name,iaf.cpodr_name));
+			
+			// Формирование таблицы
+			
+			sb.append(String.format("<TABLE WIDTH=624 CELLPADDING=2 CELLSPACING=0>"));
+			sb.append(String.format("	<COL WIDTH=165>"));
+			sb.append(String.format("	<COL WIDTH=64>"));
+			sb.append(String.format("	<COL WIDTH=59>"));
+			sb.append(String.format("	<COL WIDTH=75>"));
+			sb.append(String.format("	<COL WIDTH=69>"));
+			sb.append(String.format("	<COL WIDTH=68>"));
+			sb.append(String.format("	<COL WIDTH=94>"));
+			sb.append(String.format("	<TR VALIGN=TOP>"));
+			sb.append(String.format("		<TD ROWSPAN=3 WIDTH=165 HEIGHT=26 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">Наименование"));
+			sb.append(String.format("			классов и отдельных болезней</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD ROWSPAN=3 WIDTH=64 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">Шифр"));
+			sb.append(String.format("			по МКБ X пересмотра</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD COLSPAN=4 WIDTH=283 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">Зарегистрировано"));
+			sb.append(String.format("			больных с данным заболеванием</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD ROWSPAN=3 WIDTH=94 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=3 STYLE=\"font-size: 11pt\">Состоит"));
+			sb.append(String.format("			под диспансерным наблюдением на конец"));
+			sb.append(String.format("			отчетного периода</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("	</TR>"));
+			sb.append(String.format("	<TR VALIGN=TOP>"));
+			sb.append(String.format("		<TD ROWSPAN=2 WIDTH=59 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">Всего</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD ROWSPAN=2 WIDTH=75 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">в"));
+			sb.append(String.format("			том числе детей до 1 года</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD COLSPAN=2 WIDTH=141 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">в"));
+			sb.append(String.format("			том числе с диагнозами, установленными"));
+			sb.append(String.format("			впервые в жизни</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("	</TR>"));
+			sb.append(String.format("	<TR VALIGN=TOP>"));
+			sb.append(String.format("		<TD WIDTH=69 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">Всего</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=68 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">в"));
+			sb.append(String.format("			том числе детей до 1 года</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("	</TR>"));
+			sb.append(String.format("	<TR VALIGN=TOP>"));
+			sb.append(String.format("		<TD WIDTH=165 HEIGHT=17 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"1\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">1</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=64 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"2\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">2</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"3\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">3</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=75 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"4\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">4</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=69 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"5\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">5</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=68 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"6\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">6</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=94 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"7\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">7</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("	</TR>"));
+			sb.append(String.format("</TABLE>"));
+			sb.append(String.format("<P><BR><BR>"));
+			sb.append(String.format("</P>"));
+			sb.append(String.format("</BODY>"));
+			sb.append(String.format("</HTML>"));
+			//while (spat.getResultSet().next()) {
+				
+		//	}
+
+
+			
+			
+			osw.write(sb.toString());
+			//return path;
+
+		//} catch (SQLException e) {
+		//	((SQLException) e.getCause()).printStackTrace();
+		//	throw new KmiacServerException();
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		//} catch (ParseException e) {
+			// TODO Auto-generated catch block
+		//	e.printStackTrace();
+		}
+		return path;
+	}
+
 }

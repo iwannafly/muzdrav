@@ -76,9 +76,9 @@ public class PatientSelectFrame extends JDialog {
             }
         });
         panel.add(btnSelect);
-        if (table.getRowCount() == 0) {
-            btnSelect.setEnabled(false);
-        }
+//        if (table.getRowCount() == 0) {
+//            btnSelect.setEnabled(false);
+//        }
 
         btnCancel = new JButton("Отмена");
         btnCancel.addActionListener(new ActionListener() {
