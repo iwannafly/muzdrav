@@ -45,6 +45,36 @@ struct VrachTabel {
 	11: i32 nuch3;
 }
 
+
+struct InputPlanDisp {
+    1: i32 kpolik;
+    2: string namepol;
+    3: string dateb;
+    4: string datef;
+    5: optional string uchas;
+}
+
+struct OutputPlanDisp {
+	1: string dateb;
+	2: string datef;
+	3: optional string namepol;
+	4: optional string uchas;
+   	5: optional string nambk;
+	6: optional string fio;
+	7: optional i64 datar;
+	8: optional string adres;
+	9: optional string kab;
+	10: optional string diag;
+	11: optional string name;
+	12: optional i64 pdat;
+	13: optional i32 nuch1;
+	14: optional i32 d_grup;
+}
+
+
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printSvodVed(1: OutputSvodVed osv) throws (1: kmiacServer.KmiacServerException kse);
+    
+    string printPlanDisp(1: OutputPlanDisp opd) throws (1: kmiacServer.KmiacServerException kse);
+
 }

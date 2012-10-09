@@ -58,6 +58,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public SvodVed pSvodVed;
 	public FacZd pFacZd;
 	public tableVrach pTableVrach;
+	public PlanDisp pPlanDisp;
 
 
 	/**
@@ -121,6 +122,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		//tp025.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 		SvodVed pSvodVed = new SvodVed();
 		FacZd pFacZd = new FacZd();
+		PlanDisp pPlanDisp = new PlanDisp();
 		
 		tpReg.addTab("Отчеты по форме 025", tp025);
 		tpReg.addTab("Отчеты по форме 039", tp039);
@@ -135,6 +137,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		tpPol.addTab("Табель врача", pTableVrach);
 		tp025.addTab("Сводная ведомость учета зарегистрированных заболеваний", pSvodVed);
 		tp025.addTab("Факторы, влияющие на состояние здоровья", pFacZd);
+		tpDisp.addTab("План диспансерного обслуживания", pPlanDisp);
 		//tpReg.addTab("Паспорт участка", pFacZd);
 	}
 
