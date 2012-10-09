@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
+import ru.nkz.ivcgzo.thriftOsm.Cotd;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
@@ -139,7 +141,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pobostTypes;
 	private final TResultSetMapper<Cgosp, Cgosp._Fields> rsmCgosp;
 	private final Class<?>[] cgospTypes;
-	
+	private final TResultSetMapper<Cotd, Cotd._Fields> rsmCotd;
+	private final Class<?>[] cotdTypes;	
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -232,8 +235,11 @@ public class ServerOsm extends Server implements Iface {
 		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz");
 		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class};
 
-		rsmCgosp = new TResultSetMapper<>(Cgosp.class, "id",         "npasp",       "nist",         "naprav",     "diag_n",     "named_n",     "dataz",   "vid_st",      "n_org");
-		cgospTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, Date.class, Integer.class, Integer.class};
+		rsmCgosp = new TResultSetMapper<>(Cgosp.class, "id",          "ngosp",        "npasp",      "nist",        "naprav",     "diag_n",     "named_n",     "dataz",   "vid_st",      "n_org",     "pl_extr",    "datap",     "vremp",    "cotd",        "diag_p",     "named_p",    "cotd_p",      "dataosm",  "vremosm");
+		cgospTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Time.class, Integer.class, String.class, String.class, Integer.class, Date.class, Time.class};
+		
+		rsmCotd = new TResultSetMapper<>(Cotd.class, "id",          "id_gosp",      "nist",       "cotd",         "dataz");
+		cotdTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Date.class};
 
 	}
 
@@ -836,16 +842,6 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 
-	@Override
-	public List<PokazMet> getPokazMet(String c_nz1) throws KmiacServerException, TException {
-		String sql = "SELECT DISTINCT n_ldi.pcod, n_ldi.name_n FROM n_ldi JOIN s_ot01 ON (s_ot01.pcod=n_ldi.pcod) WHERE s_ot01.c_nz1 = ? ORDER BY n_ldi.pcod ";
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, c_nz1)) {
-			return rsmPokazMet.mapToList(acrs.getResultSet());
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
 
 	@Override
 	public List<Pokaz> getPokaz(int kodissl, String kodsyst) throws KmiacServerException, TException {
@@ -2587,7 +2583,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddCGosp(Cgosp cgsp) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into c_gosp (npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 1, 2, 3, 4, 5, 6, 7, 8);
+			sme.execPreparedT("insert into c_gosp (ngosp, npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org, pl_extr, datap, vremp, cotd, diag_p, named_p, cotd_p, dataosm, vremosm) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2596,6 +2592,34 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public int AddCotd(Cotd cotd) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into c_otd (id_gosp, nist, cotd, dataz) VALUES (?, ?, ?, ?) ", true, cotd, cotdTypes, 1, 2, 3, 4);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public List<PokazMet> getPokazMet(String c_nz1, int cotd)
+			throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT n_ldi.pcod, n_ldi.name_n FROM n_ldi JOIN s_ot01 ON (s_ot01.pcod=n_ldi.pcod) WHERE s_ot01.c_nz1 = ? AND s_ot01.cotd = ? ORDER BY n_ldi.pcod ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, c_nz1, cotd)) {
+			return rsmPokazMet.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}

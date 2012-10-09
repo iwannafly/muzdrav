@@ -554,6 +554,23 @@ struct Cgosp{
 	8: i64 dataz;
 	9: i32 vid_st;
 	10: i32 n_org;
+	11: i32 pl_extr;
+	12: i64 datap;
+	13: i64 vremp;
+	14: i32 cotd;
+	15: string diag_p;
+	16: string named_p;
+	17: i32 cotd_p;
+	18: i64 dataosm;
+	19: i64 vremosm;
+}
+
+struct Cotd{
+	1: i32 id;
+	2: i32 id_gosp;
+	3: i32 nist;
+	4: i32 cotd;
+	5: i64 dataz;
 }
 
 exception PvizitNotFoundException {
@@ -630,10 +647,11 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	bool isZapVrNext(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	
 	i32 AddCGosp(1: Cgosp cgsp) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddCotd(1: Cotd cotd) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
-	list<PokazMet> getPokazMet(1: string c_nz1) throws (1: kmiacServer.KmiacServerException kse);
+	list<PokazMet> getPokazMet(1: string c_nz1, 2: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
