@@ -60,7 +60,6 @@ import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdPatient;
 import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
-import ru.nkz.ivcgzo.thriftOsm.RdSlStruct1;
 import ru.nkz.ivcgzo.thriftOsm.RdVizit;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
@@ -118,8 +117,8 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pdispTypes;
 	private final TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
 	private final Class<?>[] rdSlTypes;
-	private final TResultSetMapper<RdSlStruct1, RdSlStruct1._Fields> rsmRdSl1;
-	private final Class<?>[] rdSl1Types;
+//	private final TResultSetMapper<RdSlStruct1, RdSlStruct1._Fields> rsmRdSl1;
+//	private final Class<?>[] rdSl1Types;
 	private final TResultSetMapper<RdInfStruct, RdInfStruct._Fields> rsmRdInf;
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
@@ -203,8 +202,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
 		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
-		rsmRdSl1 = new TResultSetMapper<>(RdSlStruct1.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
-		rdSl1Types = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+//		rsmRdSl1 = new TResultSetMapper<>(RdSlStruct1.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
+//		rdSl1Types = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr");
 		rdInfTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class};
@@ -212,9 +211,10 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
 		
-		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
-		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
-	
+//		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
+//		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
+		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr");
+		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class};
 		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
 		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
@@ -2240,7 +2240,16 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<RdPatient> getRdPatient() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT p.fam, p.im, p.ot, p.datar,p.docser,p.docnum,p.adp_gorod,p.adp_ul,p.adp_dom,p.adp_korp,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,n.clpu,p.terp,p.adm_gorod, p.adm_ul, p.adm_dom,p.adm_korp, p.adm_kv, p.tel,s.grup,s.ph,s.vred,a.stat FROM patient p,n_n00 n,p_sign s,n_az9 a,p_rd_sl rd WHERE p.cpol_pr=n.pcod and p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit,rd.npasp,p.fam, p.im, p.ot, p.datar,p.docser,p.docnum,p.adp_gorod,p.adp_ul, " +
+       "p.adp_dom,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,a.stat,n.clpu,p.terp,p.adm_gorod, p.adm_ul, "+
+      "p.adm_dom, p.adm_kv,s.grup,s.ph, p.tel,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs, " +
+      "vr.fam,vr.im,vr.ot,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.vozmen,rd.prmen,rd.datam,rd.kont, " +
+      "rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,s.vitae,s.allerg,rd.ishod,rd.datasn,rd.prrod,rd.oslrod,i.sem, "+
+      "rd.rost,rd.vesd,i.osoco,i.uslpr,rd.dataz,rd.polj,z0.cod_tf "+
+"FROM patient p,p_rd_sl rd,p_rd_inf i,p_sign s,p_vizit v,n_az9 a,n_n00 n,s_vrach vr,n_z00 z0 "+
+"WHERE p.npasp = 16164 and p.cpol_pr=n.pcod and "+
+"p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp "+
+"and v.cod_sp=vr.pcod and z0.pcod_s=i.obr ")) {
 			if (acrs.getResultSet().next())
 				return rsmRdPat.mapToList(acrs.getResultSet());
 			else
@@ -2279,18 +2288,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 
-	@Override
-	public List<RdSlStruct1> getRdSl() throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select rd.id,rd.npasp,rd.datay,rd.abort,rd.shet,rd.dataM,rd.yavka1,rd.ishod,rd.Datasn,rd.DataZs,rd.kolrod,rd.deti,rd.kont,rd.dsp,rd.dsr,rd.dTroch,rd.cext,rd.indsol,rd.prmen,rd.dataz,rd.prrod,rd.vozmen,rd.oslrod,rd.polj,rd.id_pvizit,vr.fam,vr.im,vr.ot,i.telm,s.vitae,s.allerg from p_sign s,p_rd_sl rd,p_vizit v,s_vrach vr,p_rd_inf i where s.npasp=rd.npasp and i.npasp=rd.npasp and rd.id_pvizit=v.id and v.cod_sp=vr.pcod")) {
-			if (acrs.getResultSet().next())
-				return (List<RdSlStruct1>) rsmRdSl1.map(acrs.getResultSet());
-			else
-				throw new KmiacServerException("нет записи");
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
+//	@Override
+//	public List<RdSlStruct1> getRdSl() throws KmiacServerException, TException {
+//		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select rd.id,rd.npasp,rd.datay,rd.abort,rd.shet,rd.dataM,rd.yavka1,rd.ishod,rd.Datasn,rd.DataZs,rd.kolrod,rd.deti,rd.kont,rd.dsp,rd.dsr,rd.dTroch,rd.cext,rd.indsol,rd.prmen,rd.dataz,rd.prrod,rd.vozmen,rd.oslrod,rd.polj,rd.id_pvizit,vr.fam,vr.im,vr.ot,i.telm,s.vitae,s.allerg from p_sign s,p_rd_sl rd,p_vizit v,s_vrach vr,p_rd_inf i where s.npasp=rd.npasp and i.npasp=rd.npasp and rd.id_pvizit=v.id and v.cod_sp=vr.pcod")) {
+//			if (acrs.getResultSet().next())
+//				return (List<RdSlStruct1>) rsmRdSl1.map(acrs.getResultSet());
+//			else
+//				throw new KmiacServerException("нет записи");
+//		} catch (SQLException e) {
+//			((SQLException) e.getCause()).printStackTrace();
+//			throw new KmiacServerException();
+//		}
+//	}
 	@Override
 	public List<StringClassifier> get_n_s00(int clpu)
 			throws KmiacServerException, TException {
@@ -2316,136 +2325,158 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		Date p1;
-		Integer ball1 = 0;
-		Integer ball2 = 0;
-		Integer ball3 = 0;
-		Integer ball4 = 0;
-		Integer ball5 = 0;
-		Integer grk = 0;
+		Date p1; Date p2; Date p3; Date p4; Date p5; Date p6; Date p7;
+		Date p8;
+		Integer ball1;Integer ball2;Integer ball3;
+		Integer ball4;Integer ball5;Integer grk;
+		Integer kod2; Integer kod3; Integer kod4;Integer kod5;
+		Integer kod6; Integer kod7; Integer kod8;
 		Integer j = 0;
+        String dex1 = "";
+        String dex2 = null;
+        String dex3 = null;
+        String dex4 = null;
+        String dex5 = null;
+        String dex6 = null;
+        String dex7 = null;
+        String dex9 = null;
+        String dex10 = null;
+        String dex = null;
+        String dak = null;
+        String dsost = null;
+        String dosl = null;
 		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
 				arcs4 = null, arsc5 = null, arsc6 = null;
 		//таблица паспортной информации Patient.csv
 		StringBuilder sb = new StringBuilder(0x10000);
 		sb.append("uid;fam;im;ot;dr;pasp;tawn;street;house;flat;polis;dog;stat;lpup;terp;ftown;fstreet;fhouse;fflat;grk;rez");
+		//Vizit.csv
+		StringBuilder sb1 = new StringBuilder(0x10000);
+		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
+		// Con_vizit.scv
+		StringBuilder sb2 = new StringBuilder(0x10000);
+		sb2.append("uicv;uiv;uid;ves;ned;lcad;ldad;rcad;rdad;ball1;ball2;ball3;ball4;ball5");
 		List<RdPatient> rdPatient = getRdPatient();
+		//Con_diagn.csv
+		StringBuilder sb3 = new StringBuilder(0x10000);
+		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl");
+		// Con_main.csv
+		StringBuilder sb4 = new StringBuilder(0x10000);
+		sb4.append("num;uid;jdet;dvzdu;srokvzu1;grisk;dgrisk;drodr;fiovr;dred;telm;dsndu;nber;nrod;job;vp;vn;circl;dlm;kontr;dsp;dcr;dtroch;cext;solov;cs;allerg;nasl;gemotr;prich;dprich;ishodprb;ostpber");
+        //  Con_sob
+		StringBuilder sb5 = new StringBuilder(0x10000);
+		sb5.append("nsob;uid;obr;sem;height;weight;priv;prof;proj;osl;ak;eks;gen;point1;point2;point3;point4;point5;sob_date");
 //		for (int j = 0; j < rdPatient.size(); j++) {
 //			RdPatient rdp = rdPatient.get(j);
 //			
 //		}
+		j = 0;
 		for (RdPatient rdp : rdPatient) {
-		p1 = new Date(rdp.datar);
+			j = j+1;
+		kod2 =0 ; kod3 =0 ; kod4 = 0; kod5 = 0; kod6 = 0; kod7 = 0; kod8 = 0;	
+		ball1 = 0;ball2 = 0;ball3 = 0;
+		ball4 = 0;ball5 = 0;grk = 0;
+        dex1 = "";dex2 = ""; dex3 = ""; dex4 = ""; dex5 = "";
+        dex6 = ""; dex7 = "";dex9 = ""; dex10 = "";
+        dex = "";  dak = ""; dsost = ""; dosl = "";
+		p7 = new Date(rdp.datar);
 		if (rdp.grk == "I") grk = 1;
 		if (rdp.grk == "II") grk = 2;
 		if (rdp.grk == "III") grk = 3;
 		if (rdp.grk == "IV") grk = 4;
-		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s%s;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%s;%s;%s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p1,rdp.docser,rdp.docnum,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
-		}
-		//Vizit.csv
-		StringBuilder sb1 = new StringBuilder(0x10000);
-		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
-		List<RdVizit> rdVizit = getRdVizit();
-		for (RdVizit rvz : rdVizit) {
-			p1 = new Date(rvz.dv);
-			sb1.append(String.format("%d;%d;%3$td.%3$tm.%3$tY;%d;%s %s %s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, rvz.famwr,rvz.imwr,rvz.otwr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
-		}
-		// Con_vizit.scv
-		StringBuilder sb2 = new StringBuilder(0x10000);
-		sb2.append("uicv;uiv;uid;ves;ned;lcad;ldad;rcad;rdad;ball1;ball2;ball3;ball4;ball5");
-		List<RdConVizit> rdConVizit = getRdConVizit();
-		for (RdConVizit rcv : rdConVizit) {
-			j = j+1;
-			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4));		
-		}
+		p1 = new Date(rdp.datay);
+		p2 = new Date(rdp.dataz);
+		p3 = new Date(rdp.datazs);
+		p4 = new Date(rdp.dataz);
+		p5 = new Date(rdp.datasn);
+		p6 = new Date(rdp.datam);
+		p8 = new Date(System.currentTimeMillis());
+		Integer risk = 0;
+		Integer kontr = 0;
+		Integer rod = 0;
+		if (rdp.prrod != "") rod =1;
+		if (rdp.kont) kontr=1;
+		Date dgrisk = null;
+		sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,dgrisk,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,rod,rdp.oslrod));		
+		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s%s;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%s;%s;%s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
+        sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,kod3,kod4,kod5,kod6,kod7,kod8,ball1,ball2,ball3,ball4,p8));
+		
 		//Con_diagn.csv
-		StringBuilder sb3 = new StringBuilder(0x10000);
-		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl");
-		j = 0;
-		try (AutoCloseableResultSet acrs1 = sse.execQuery("SELECT npasp FROM p_rd_sl rd")) {
-			Integer npasp = null;
-			j = j+1;
-	        String dex1 = "";
-	        String dex2 = null;
-	        String dex3 = null;
-	        String dex4 = null;
-	        String dex5 = null;
-	        String dex6 = null;
-	        String dex7 = null;
-	        String dex9 = null;
-	        String dex10 = null;
-	        String dex = null;
-	        String dak = null;
-	        String dsost = null;
-	        String dosl = null;
-			if (acrs1.getResultSet().next())
-				npasp = acrs1.getResultSet().getInt(0);
-			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",npasp)) {
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
 	//				dex = dex + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex1") dex1 =dex1 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex2") dex2 =dex2 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex3") dex3 =dex3 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex4") dex4 =dex4 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex5") dex5 =dex5 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex6") dex6 =dex6 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex7") dex7 =dex7 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex9") dex9 =dex9 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex10") dex10 =dex10 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex1") dex1 =dex1 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex2") dex2 =dex2 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex3") dex3 =dex3 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex4") dex4 =dex4 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex5") dex5 =dex5 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex6") dex6 =dex6 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex7") dex7 =dex7 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex9") dex9 =dex9 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex10") dex10 =dex10 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs21.getResultSet().getString(0);	
 				}
 			} catch (SQLException e) {
 				((SQLException) e.getCause()).printStackTrace();
 				throw new KmiacServerException();
 			}
-			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.dspos,c.dex from p_rd_din d,n_c00 c where c.dex is not null and d.npasp=?",npasp)) {
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.dspos,c.dex from p_rd_din d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
 //					dex = dex + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex1") dex1 =dex1 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex2") dex2 =dex2 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex3") dex3 =dex3 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex4") dex4 =dex4 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex5") dex5 =dex5 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex6") dex6 =dex6 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex7") dex7 =dex7 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex9") dex9 =dex9 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dex10") dex10 =dex10 + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs1.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs1.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex1") dex1 =dex1 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex2") dex2 =dex2 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex3") dex3 =dex3 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex4") dex4 =dex4 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex5") dex5 =dex5 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex6") dex6 =dex6 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex7") dex7 =dex7 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex9") dex9 =dex9 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dex10") dex10 =dex10 + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs21.getResultSet().getString(0);	
 				}
 			} catch (SQLException e) {
 				((SQLException) e.getCause()).printStackTrace();
 				throw new KmiacServerException();
 			}
 			dex = dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10;
-			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
-			acrs1.close();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
+			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,rdp.npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
+//			acrs21.close();
 		}
 		// Con_main.csv
-		StringBuilder sb4 = new StringBuilder(0x10000);
-		sb4.append("num;uid;jdet;dvzdu;srokvzu1;grisk;dgrisk;drodr;fiovr;dred;telm;dsndu;nber;nrod;job;vp;vn;circl;dlm;kontr;dsp;dcr;dtroch;cext;solov;cs;allerg;nasl;gemotr;prich;dprich;ishodprb;ostpber");
-		List<RdSlStruct1> rdSl = getRdSl();
-		for (RdSlStruct1 rsl : rdSl) {
+//		List<RdSlStruct1> rdSl = getRdSl();
+//		for (RdSlStruct1 rsl : rdSl) {
+//			j = j+1;
+//			p1 = new Date(rsl.datay);
+//			Date p2 = new Date(rsl.dataz);
+//			Date p3 = new Date(rsl.DataZs);
+//			Date p4 = new Date(rsl.dataz);
+//			Date p5 = new Date(rsl.Datasn);
+//			Date p6 = new Date(rsl.dataM);
+//			Integer risk = 0;
+//			Integer kontr = 0;
+//			Integer rod = 0;
+//			if (rsl.prrod != "") rod =1;
+//			if (rsl.kont) kontr=1;
+//			Date dgrisk = null;
+//			sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rsl.npasp,rsl.deti,p1,rsl.yavka1,risk,dgrisk,rsl.DataZs,rsl.fam,rsl.im,rsl.ot,rsl.dataz,rsl.telm,rsl.Datasn,rsl.shet,rsl.kolrod,rsl.abort,rsl.polj,rsl.vozmen,rsl.prmen,rsl.dataM,kontr,rsl.dsp,rsl.dsr,rsl.dTroch,rsl.cext,rsl.indsol,rsl.vitae,rsl.allerg,rsl.ishod,p5,rod,rsl.oslrod));		
+//		}
+		//Vizit.csv
+		List<RdVizit> rdVizit = getRdVizit();
+		ball1 = 0;ball2 = 0;ball3 = 0;
+		ball4 = 0;
+		for (RdVizit rvz : rdVizit) {
+			p1 = new Date(rvz.dv);
+			sb1.append(String.format("%d;%d;%3$td.%3$tm.%3$tY;%d;%s %s %s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, rvz.famwr,rvz.imwr,rvz.otwr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
+		}
+		// Con_vizit.scv
+		List<RdConVizit> rdConVizit = getRdConVizit();
+		for (RdConVizit rcv : rdConVizit) {
 			j = j+1;
-			p1 = new Date(rsl.datay);
-			Date p2 = new Date(rsl.dataz);
-			Date p3 = new Date(rsl.DataZs);
-			Date p4 = new Date(rsl.dataz);
-			Date p5 = new Date(rsl.Datasn);
-			Date p6 = new Date(rsl.dataM);
-			Integer risk = 0;
-			Integer kontr = 0;
-			Integer rod = 0;
-			if (rsl.prrod != "") rod =1;
-			if (rsl.kont) kontr=1;
-			Date dgrisk = null;
-			sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rsl.npasp,rsl.deti,p1,rsl.yavka1,risk,dgrisk,rsl.DataZs,rsl.fam,rsl.im,rsl.ot,rsl.dataz,rsl.telm,rsl.Datasn,rsl.shet,rsl.kolrod,rsl.abort,rsl.polj,rsl.vozmen,rsl.prmen,rsl.dataM,kontr,rsl.dsp,rsl.dsr,rsl.dTroch,rsl.cext,rsl.indsol,rsl.vitae,rsl.allerg,rsl.ishod,p5,rod,rsl.oslrod));		
+			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4));		
 		}
 		return null;
 	}
