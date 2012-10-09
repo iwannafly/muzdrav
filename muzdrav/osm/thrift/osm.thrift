@@ -511,23 +511,21 @@ struct Shablon {
 struct Pmer{
 	1: i32 id;
 	2: i32 npasp;
-	3: i32 id_pdiag;
-	4: string diag;
-	5: i32 pmer;
-	6: i64 pdat;
-	7: i64 fdat;
-	8: i32 cod_sp;
-	9: i64 dataz;
-	10: i32 prichina;
-	11: i32 rez;
-	12: string cdol;
-	13: i32 id_pvizit;
-	14: i32 id_pos;
-	15: i64 dnl;
-	16: i64 dkl;
-	17: i32 lpu;
-	18: i32 ter;
-	19: string name_pmer;
+	3: string diag;
+	4: i32 pmer;
+	5: i64 pdat;
+	6: i64 fdat;
+	7: i32 cod_sp;
+	8: i64 dataz;
+	9: i32 prichina;
+	10: i32 rez;
+	11: string cdol;
+	12: i64 dnl;
+	13: i64 dkl;
+	14: i32 lpu;
+	15: i32 ter;
+	16: i32 cpol;
+	17: string name_pmer;
 }
 
 struct Pobost{
@@ -540,6 +538,19 @@ struct Pobost{
 	7: i32 cod_sp;
 	8: string cdol;
 	9: i64 dataz;
+}
+
+struct Cgosp{
+	1: i32 id;
+	2: i32 ngosp;
+	3: i32 npasp;
+	4: i32 nist;
+	5: string naprav;
+	6: string diag_n;
+	7: string named_n;
+	8: i64 dataz;
+	9: i32 vid_st;
+	10: i32 n_org;
 }
 
 exception PvizitNotFoundException {
@@ -614,6 +625,8 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
 	bool isZapVrNext(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
+	
+	i32 AddCGosp(1: Cgosp cgsp) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);

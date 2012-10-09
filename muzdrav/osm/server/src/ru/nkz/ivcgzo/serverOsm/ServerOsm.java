@@ -26,6 +26,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
+import ru.nkz.ivcgzo.thriftOsm.Cgosp;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
@@ -137,6 +138,9 @@ public class ServerOsm extends Server implements Iface {
 //	private TResultSetMapper<ZapVr, _Fields> rsmPvizitAmb;
 	private final TResultSetMapper<Pobost, Pobost._Fields> rsmPobost;
 	private final Class<?>[] pobostTypes;
+	private final TResultSetMapper<Cgosp, Cgosp._Fields> rsmCgosp;
+	private final Class<?>[] cgospTypes;
+	
 
 
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -222,11 +226,14 @@ public class ServerOsm extends Server implements Iface {
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
-		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "id_pdiag",    "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",       "id_pvizit",   "id_pos",      "dnl",      "dkl",      "lpu",         "ter",         "name_pmer");
-		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, String.class};
+		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol",        "name_pmer");
+		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class, String.class};
 
 		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz");
 		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class};
+
+		rsmCgosp = new TResultSetMapper<>(Cgosp.class, "id",         "npasp",       "nist",         "naprav",     "diag_n",     "named_n",     "dataz",   "vid_st",      "n_org");
+		cgospTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, Date.class, Integer.class, Integer.class};
 
 	}
 
@@ -2186,7 +2193,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, id_pdiag, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, id_pvizit, id_pos, dnl, dkl, lpu, ter) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+			sme.execPreparedT("insert into p_mer (npasp, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, dnl, dkl, lpu, ter, cpol) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2202,7 +2209,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public void UpdatePmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_mer set pmer = ?, pdat = ?, fdat = ?, prichina = ?, rez = ?, dnl = ?, dkl = ?, lpu = ?, ter = ? where id = ? ", false, pm, pmerTypes, 4, 5, 6, 9, 10, 14, 15, 16, 17, 0);
+			sme.execPreparedT("update p_mer set pmer = ?, pdat = ?, fdat = ?, prichina = ?, rez = ?, dnl = ?, dkl = ?, lpu = ?, ter = ? where id = ? ", false, pm, pmerTypes, 3, 4, 5, 8, 9, 11, 12, 13, 14, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2542,6 +2549,22 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public int AddCGosp(Cgosp cgsp) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into c_gosp (npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 1, 2, 3, 4, 5, 6, 7, 8);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}

@@ -74,11 +74,9 @@ public class DispHron extends JFrame{
 		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		  		pmer.setNpasp(Vvod.zapVr.getNpasp());
-//		  		pmer.setId_pdiag(Vvod.pdisp.getId_diag());
+		  		pmer.setCpol(MainForm.authInfo.getCpodr());
 		  		pmer.setDiag(cmbDiag.getSelectedPcod());
 		  		pmer.setCod_sp(MainForm.authInfo.getPcod());
-//		  		pmer.setId_pvizit(Vvod.pvizit.getId());
-//		  		pmer.setId_pos(Vvod.pvizitAmb.getId());
 				try {
 					pmer.setId(MainForm.tcl.AddPmer(pmer));
 				} catch (KmiacServerException e1) {
