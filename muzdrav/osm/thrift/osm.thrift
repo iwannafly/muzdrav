@@ -191,7 +191,10 @@ struct RdSlStruct{
 	34: optional i32 cdiagt;
 	35: optional i32 cvera;
 	36: optional i32 id_pvizit;
-        37: optional i32 rost; 
+        37: optional i32 rost;
+        38: optional bool eko;
+        39: optional bool rub;
+        40: optional bool predp;
 }
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
@@ -294,6 +297,23 @@ struct RdPatient{
         57: optional i64 dataz;
         58: optional i32 polj;
         59: optional i32 obr; 
+        60: optional string fiootec;
+        61: optional string mrabotec;
+        62: optional string telotec; 
+        63: optional string grotec;
+        64: optional string photec;
+        65: optional i32 vredotec;
+        66: optional i32 vozotec;
+        67: optional string mrab;
+        68: optional string prof; 
+        69: optional bool eko;
+        70: optional bool rub;
+        71: optional bool predp;
+        72: optional i32 terpr;
+        73: optional i32 oblpr;
+        74: optional i32 diag;
+        75: optional i32 cvera;
+        76: optional i64 dataosl;
 }
 struct RdVizit{
          1: optional i32    uid;
@@ -325,6 +345,15 @@ struct RdConVizit{
         13: optional i32    osoco;
         14: optional string vrpr;
         15: optional i32 npasp;
+        16: optional i32 hdm;
+        17: optional i32 spl; 
+        18: optional i32 oj;
+        19: optional i32 chcc;
+        20: optional i32 polpl;
+        21: optional i32 predpl;
+        22: optional i32 serd;
+        23: optional i32 serd1;
+        24: optional i32 oteki;
 }
 
 /*Список показателей исследований по выбранному методу*/
