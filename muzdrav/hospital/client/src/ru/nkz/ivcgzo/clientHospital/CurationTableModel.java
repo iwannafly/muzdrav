@@ -16,16 +16,15 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
-public class AllPatientTableModel implements TableModel {
+public class CurationTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSimplePatient> patients;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
     private static final String[] COLUMN_HEADERS = {
-        "№ истории болезни", "Фамилия", "Имя", "Отчество", "Дата рождения", "Дата прибытия",
-        "Номер палаты"
+        "№ истории болезни", "Фамилия", "Имя", "Отчество", "Дата рождения", "Дата прибытия"
     };
 
-    public AllPatientTableModel(final int pcod, final int cpodr) {
+    public CurationTableModel(final int pcod, final int cpodr) {
         try {
             patients = ClientHospital.tcl.getAllPatientForDoctor(pcod, cpodr);
         } catch (PatientNotFoundException e) {
@@ -36,7 +35,7 @@ public class AllPatientTableModel implements TableModel {
         }
     }
 
-    public AllPatientTableModel(final int cpodr) {
+    public CurationTableModel(final int cpodr) {
         try {
             patients = ClientHospital.tcl.getAllPatientFromOtd(cpodr);
         } catch (PatientNotFoundException e) {
@@ -81,8 +80,6 @@ public class AllPatientTableModel implements TableModel {
                 return String.class;
             case 5:
                 return String.class;
-            case 6:
-                return Integer.class;
             default:
                 return null;
         }
@@ -109,8 +106,6 @@ public class AllPatientTableModel implements TableModel {
             case 5:
                 return DEFAULT_DATE_FORMAT.format(
                         new Date(patients.get(rowIndex).getArrivalDate()));
-            case 6:
-                return patients.get(rowIndex).getNpal();
             default:
                 return null;
         }

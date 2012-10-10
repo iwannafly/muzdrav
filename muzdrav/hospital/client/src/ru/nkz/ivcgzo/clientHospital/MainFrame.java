@@ -10,7 +10,6 @@ import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -127,11 +126,10 @@ public class MainFrame extends JFrame {
     private JTextArea taStatusPraence;
     private JTextArea taFisicalObs;
     private JTextArea taStatusLocalis;
-    private JTextArea taRecomdation;
-    private JTextArea taZakl;
+//    private JTextArea taRecomdation;
+//    private JTextArea taZakl;
     private JScrollPane spShablonNames;
     private ThriftIntegerClassifierList lShablonNames;
-    private JButton btnSaveMedicalHistory;
     private JPanel pLifeHistory;
     private JLabel lblLifeHistory;
     private JScrollPane spLifeHistory;
@@ -235,7 +233,7 @@ public class MainFrame extends JFrame {
             ClientHospital.conMan.reconnect(e);
         }
     }
-
+//TODO
     private void clearAllComponentsAndObjects() {
         patient = null;
         clearPatientText();
@@ -498,9 +496,10 @@ public class MainFrame extends JFrame {
                     patient.getSurname(), patient.getName(),
                     patient.getMiddlename()));
         } catch (PatientNotFoundException e) {
-            JOptionPane.showMessageDialog(frmPatientSelect,
-                "Персональная инфомация о данном пациенте не найдена.",
-                "Внимание!", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frmPatientSelect,
+//                "Персональная инфомация о данном пациенте не найдена.",
+//                "Внимание!", JOptionPane.WARNING_MESSAGE);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -543,10 +542,11 @@ public class MainFrame extends JFrame {
             priemInfo = ClientHospital.tcl.getPriemInfo(
                     patient.getGospitalCod());
         } catch (PriemInfoNotFoundException e) {
-            JOptionPane.showMessageDialog(frmPatientSelect,
-                "Информация из приёмного отделения"
-                    + "о данном пациенте не найдена.",
-                    "Внимание!", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frmPatientSelect,
+//                "Информация из приёмного отделения "
+//                    + "о данном пациенте не найдена.",
+//                    "Внимание!", JOptionPane.WARNING_MESSAGE);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -701,9 +701,10 @@ public class MainFrame extends JFrame {
             lifeHistory =
                     ClientHospital.tcl.getLifeHistory(patient.getPatientId());
         } catch (LifeHistoryNotFoundException e) {
-            JOptionPane.showMessageDialog(frmPatientSelect,
-                "История жизни данного пациента не найдена.",
-                "Внимание!", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+//            JOptionPane.showMessageDialog(frmPatientSelect,
+//                "История жизни данного пациента не найдена.",
+//                "Внимание!", JOptionPane.WARNING_MESSAGE);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -794,6 +795,11 @@ public class MainFrame extends JFrame {
 //TODO
     private void setMedicalHistoryTableButtons() {
         btnMedHistUpd = new JButton();
+        btnMedHistUpd.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                updateMedHistoryToTable();
+            }
+        });
         btnMedHistUpd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
 
@@ -810,7 +816,6 @@ public class MainFrame extends JFrame {
         btnMedHistAdd.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 addMedHistoryToTable();
-
             }
         });
         btnMedHistAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
@@ -843,6 +848,28 @@ public class MainFrame extends JFrame {
             tbMedHist.setData(new ArrayList<TMedicalHistory>());
         }
 
+    }
+
+    private void updateMedHistoryToTable() {
+        try {
+            if (tbMedHist.getSelectedItem() != null) {
+                int opResult = JOptionPane.showConfirmDialog(
+                    btnMedHistUpd, "Обновить информацию о диагнозе?",
+                    "Изменение диагноза", JOptionPane.YES_NO_OPTION);
+                if (opResult == JOptionPane.YES_OPTION) {
+                    tbMedHist.getSelectedItem().setFisicalObs(taFisicalObs.getText());
+                    tbMedHist.getSelectedItem().setJalob(taJalob.getText());
+                    tbMedHist.getSelectedItem().setMorbi(taDesiaseHistory.getText());
+                    tbMedHist.getSelectedItem().setStatusLocalis(taStatusLocalis.getText());
+                    tbMedHist.getSelectedItem().setStatusPraesense(taStatusPraence.getText());
+                    ClientHospital.tcl.updateMedicalHistory(tbMedHist.getSelectedItem());
+                }
+            }
+        } catch (KmiacServerException e1) {
+            e1.printStackTrace();
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
+        }
     }
 
     private void addMedHistoryToTable() {
@@ -907,28 +934,6 @@ public class MainFrame extends JFrame {
     }
 
     private void setMedicalHistoryButtons() {
-        btnSaveMedicalHistory = new JButton("Сохранить");
-        btnSaveMedicalHistory.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if (patient != null) {
-                    TMedicalHistory medicalHist = createMedicalHistory();
-                    try {
-                        medicalHist.setId(ClientHospital.tcl.addMedicalHistory(medicalHist));
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                                "Медицинская история сохранена", "Операция успешно завершена",
-                                JOptionPane.INFORMATION_MESSAGE);
-                    } catch (KmiacServerException | TException e1) {
-                        JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при записи "
-                            + "медицинской истории. Информация не будет сохранена!",
-                            "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        e1.printStackTrace();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(MainFrame.this, "Пациент не выбран!",
-                            "Ошибка", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
     }
 
     private void addJalonPanel() {
@@ -1023,6 +1028,7 @@ public class MainFrame extends JFrame {
 //    }
 
     private void clearMedicalHistoryText() {
+        tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
         taJalob.setText("");
         taDesiaseHistory.setText("");
         taFisicalObs.setText("");
@@ -1065,29 +1071,16 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private TMedicalHistory createMedicalHistory() {
-        TMedicalHistory tmpHist = new TMedicalHistory();
-        tmpHist.setIdGosp(patient.getGospitalCod());
-        tmpHist.setJalob(taJalob.getText());
-        tmpHist.setMorbi(taDesiaseHistory.getText());
-        tmpHist.setStatusPraesense(taStatusPraence.getText());
-        tmpHist.setStatusLocalis(taStatusLocalis.getText());
-        tmpHist.setFisicalObs(taFisicalObs.getText());
-        tmpHist.setPcodVrach(doctorAuth.getPcod());
-        tmpHist.setDataz(new Date().getTime());
-        tmpHist.setTimez(new Date().getTime());
-        return tmpHist;
-    }
-
     private void fillMedHistoryTable() {
         if (patient != null) {
             try {
                 tbMedHist.setData(
                         ClientHospital.tcl.getMedicalHistory((patient.getGospitalCod())));
             } catch (MedicalHistoryNotFoundException e) {
-                JOptionPane.showMessageDialog(frmPatientSelect,
-                        "Медицинская история пациента не найдена.",
-                        "Внимание!", JOptionPane.WARNING_MESSAGE);
+                e.printStackTrace();
+//                JOptionPane.showMessageDialog(frmPatientSelect,
+//                        "Медицинская история пациента не найдена.",
+//                        "Внимание!", JOptionPane.WARNING_MESSAGE);
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
@@ -1138,9 +1131,10 @@ public class MainFrame extends JFrame {
                         ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
                 setDiagPriznRdbtn();
             } catch (DiagnosisNotFoundException e) {
-                JOptionPane.showMessageDialog(frmPatientSelect,
-                        "Диагнозы данного пациента не найдены.",
-                        "Внимание!", JOptionPane.WARNING_MESSAGE);
+                e.printStackTrace();
+//                JOptionPane.showMessageDialog(frmPatientSelect,
+//                        "Диагнозы данного пациента не найдены.",
+//                        "Внимание!", JOptionPane.WARNING_MESSAGE);
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
@@ -1153,9 +1147,9 @@ public class MainFrame extends JFrame {
         if (tbDiag.getSelectedItem() != null) {
             if (tbDiag.getSelectedItem().getPrizn() == 1) {
                 rdbtnMain.setSelected(true);
-            } else if (tbDiag.getSelectedItem().getPrizn() == 2) {
-                rdbtnSoput.setSelected(true);
             } else if (tbDiag.getSelectedItem().getPrizn() == 3) {
+                rdbtnSoput.setSelected(true);
+            } else if (tbDiag.getSelectedItem().getPrizn() == 2) {
                 rdbtnOsl.setSelected(true);
             } else {
                 rdbtnMain.setSelected(false);
@@ -1585,23 +1579,27 @@ public class MainFrame extends JFrame {
                 .addGroup(glPMedicalHistory.createSequentialGroup()
                     .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addGap(16)
-                            .addGroup(glPMedicalHistory.createParallelGroup(Alignment.TRAILING)
-                                .addGroup(glPMedicalHistory.createSequentialGroup()
-                                    .addComponent(btnSaveMedicalHistory, GroupLayout.PREFERRED_SIZE, 541, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(ComponentPlacement.RELATED))
-                                .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 700, GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(spMedHist, GroupLayout.PREFERRED_SIZE, 646, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spMedHist, GroupLayout.PREFERRED_SIZE, 646,
+                                    GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                                .addComponent(btnMedHistAdd, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnMedHistDel, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnMedHistUpd, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(btnMedHistAdd, GroupLayout.PREFERRED_SIZE, 52,
+                                        GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnMedHistDel, GroupLayout.PREFERRED_SIZE, 52,
+                                        GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnMedHistUpd, GroupLayout.PREFERRED_SIZE, 52,
+                                        GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(glPMedicalHistory.createSequentialGroup()
+                            .addGap(16)
+                            .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 700,
+                                    GroupLayout.PREFERRED_SIZE)))
+                    .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                        .addComponent(tfShablonFilter, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
-                        .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE))
+                        .addComponent(tfShablonFilter, GroupLayout.DEFAULT_SIZE, 373,
+                                Short.MAX_VALUE)
+                        .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 373,
+                                Short.MAX_VALUE))
                     .addContainerGap())
         );
         glPMedicalHistory.setVerticalGroup(
@@ -1612,22 +1610,26 @@ public class MainFrame extends JFrame {
                         .addGroup(glPMedicalHistory.createSequentialGroup()
                             .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
                                 .addGroup(glPMedicalHistory.createSequentialGroup()
-                                    .addComponent(btnMedHistAdd, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnMedHistAdd, GroupLayout.PREFERRED_SIZE, 54,
+                                            GroupLayout.PREFERRED_SIZE)
                                     .addGap(6)
-                                    .addComponent(btnMedHistDel, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnMedHistDel, GroupLayout.PREFERRED_SIZE, 54,
+                                            GroupLayout.PREFERRED_SIZE)
                                     .addGap(6)
-                                    .addComponent(btnMedHistUpd, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
-                                .addComponent(spMedHist, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
+                                    .addComponent(btnMedHistUpd, GroupLayout.PREFERRED_SIZE, 54,
+                                            GroupLayout.PREFERRED_SIZE))
+                                .addComponent(spMedHist, GroupLayout.DEFAULT_SIZE, 195,
+                                        Short.MAX_VALUE))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 344, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnSaveMedicalHistory)
-                            .addGap(5))
+                            .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 367,
+                                    GroupLayout.PREFERRED_SIZE))
                         .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
-                            .addContainerGap())))
+                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 542,
+                                    Short.MAX_VALUE)))
+                    .addContainerGap())
         );
         pMedicalHistory.setLayout(glPMedicalHistory);
     }

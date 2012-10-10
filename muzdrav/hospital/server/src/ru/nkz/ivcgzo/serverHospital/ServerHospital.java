@@ -177,7 +177,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientFromOtd(final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im,"
-                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd "
+                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
@@ -544,10 +544,21 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public void updateMedicalHistory(final TMedicalHistory medHist)
+    public final void updateMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException, TException {
-        // TODO Auto-generated method stub
-
+        final int[] indexes = {2, 3, 4, 5, 6, 0};
+        final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
+            + "morbi = ?, status_praesense = ?, "
+            + "status_localis = ?, fisical_obs = ? "
+            + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
 }
