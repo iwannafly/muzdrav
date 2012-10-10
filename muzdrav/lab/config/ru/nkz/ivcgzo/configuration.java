@@ -1,4 +1,4 @@
-﻿package ru.nkz.ivcgzo;
+package ru.nkz.ivcgzo;
 
 public class configuration {
     public static final String serverClassName =
