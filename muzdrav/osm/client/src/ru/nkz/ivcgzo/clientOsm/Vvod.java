@@ -63,6 +63,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
+import ru.nkz.ivcgzo.thriftOsm.Cotd;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
@@ -171,6 +172,7 @@ public class Vvod extends JFrame {
 	private FormRdDin dinform;
 	private DispHron disphron;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbVidStacionar;
+	private JLabel lblVidStacionar;
 	private Color defCol = UIManager.getColor("TabbedPane.foreground");
 	private Color selCol = Color.red;
 
@@ -1357,7 +1359,7 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					if (cmbNaprVidIssl.getSelectedItem()!= null)
-						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet(cmbNaprVidIssl.getSelectedItem().pcod));
+						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet(cmbNaprVidIssl.getSelectedItem().pcod, cmbNaprMesto.getSelectedItem().pcod));
 				} catch (KmiacServerException e) {
 					JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
@@ -1501,7 +1503,7 @@ public class Vvod extends JFrame {
 		cmbKonsVidNapr = new JComboBox<>();
 		cmbKonsVidNapr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (cmbKonsVidNapr.getSelectedIndex() != 0){cmbVidStacionar.setVisible(false);}
+				if (cmbKonsVidNapr.getSelectedIndex() != 0){cmbVidStacionar.setVisible(false);lblVidStacionar.setVisible(false);}
 				else {try {
 					cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 				} catch (KmiacServerException e1) {
@@ -1551,6 +1553,7 @@ public class Vvod extends JFrame {
 						pnapr.setIdpvizit(tblPos.getSelectedItem().getId_obr());
 						pnapr.setVid_doc(3);
 						pnapr.setText(tbKonsObosnov.getText());
+						if ((cmbVidStacionar.getSelectedPcod()==3)||(cmbVidStacionar.getSelectedPcod()==4)){
 						Cgosp gosp = new Cgosp();
 						gosp.setNpasp(zapVr.getNpasp());
 						gosp.setNaprav("К");
@@ -1558,12 +1561,28 @@ public class Vvod extends JFrame {
 						for (PdiagAmb pd : tblDiag.getData()) {
 							if (pd.diag_stat==1) {
 								gosp.setDiag_n(pd.getDiag());
-								gosp.setNamed_n(pd.getNamed());}
+								gosp.setNamed_n(pd.getNamed());
+								gosp.setDiag_p(pd.getDiag());
+								gosp.setNamed_p(pd.getNamed());}
 						}
 						gosp.setDataz(System.currentTimeMillis());
-						gosp.setNgosp(27);
+						gosp.setNgosp(28);
 						gosp.setNist(444);
+						gosp.setPl_extr(2);
+						gosp.setDatap(System.currentTimeMillis());
+						gosp.setVremp(System.currentTimeMillis());
+						gosp.setCotd(MainForm.authInfo.getCpodr());
+						gosp.setCotd_p(MainForm.authInfo.getCpodr());
+						gosp.setDataosm(System.currentTimeMillis());
+						gosp.setVremosm(System.currentTimeMillis());
 						gosp.setId(MainForm.tcl.AddCGosp(gosp));
+						Cotd cotd = new Cotd();
+						cotd.setId_gosp(gosp.getId());
+						cotd.setCotd(gosp.getCotd());
+						cotd.setDataz(System.currentTimeMillis());
+						cotd.setNist(gosp.getNist());
+						cotd.setId(MainForm.tcl.AddCotd(cotd));
+						}
 						if ((cmbVidStacionar.getSelectedPcod()==1)||(cmbVidStacionar.getSelectedPcod()==2)){
 						napr.setUserId(MainForm.authInfo.getUser_id());
 						napr.setNpasp(Vvod.zapVr.getNpasp());
@@ -1589,7 +1608,7 @@ public class Vvod extends JFrame {
 		
 		JScrollPane spKonsObosnov = new JScrollPane();
 		
-		JLabel lblVidStacionar = new JLabel("Вид стационара");
+		lblVidStacionar = new JLabel("Вид стационара");
 		
 		cmbVidStacionar = new ThriftIntegerClassifierCombobox<>(true);
 		cmbVidStacionar.addActionListener(new ActionListener() {
@@ -2192,7 +2211,7 @@ public class Vvod extends JFrame {
 	public void onConnect() {
 		try {
 			tblPos.setStringClassifierSelector(2, ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00));
-			
+			cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 			cmbNaprMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));

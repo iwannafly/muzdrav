@@ -1,4 +1,4 @@
-package ru.nrz.ivcgzo.serverOutputInfo;
+﻿package ru.nrz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,7 +25,9 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
+import ru.nkz.ivcgzo.thriftOutputInfo.OutputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.OutputSvodVed;
 import ru.nkz.ivcgzo.thriftOutputInfo.OutputTest;
@@ -115,6 +117,29 @@ public class OutputInfo extends Server implements Iface {
 		
 	}	
 	
+
+	@SuppressWarnings("deprecation")
+	public void PlanovDisp() throws TException, ParseException {
+		// Дата от ...
+		String d1 = InputPlanDisp._Fields.DATEB.toString();
+		// Дата до ...
+		String d2 = InputPlanDisp._Fields.DATEF.toString();
+		// Код полеклиники
+		int kodpol = Integer.parseInt(InputPlanDisp._Fields.KPOLIK.toString());
+		// Наименование полеклиники
+		String namepol = InputPlanDisp._Fields.NAMEPOL.toString();
+		// № участка
+		String uc = InputPlanDisp._Fields.UCHAS.toString(); 
+		
+		final String sqlQueryPlanDis = "select pn.nambk, (p.fam||' '||p.im||' '||p.ot) as fio, p.datar, p.adm_ul,p.adm_dom,p.adm_korp," +
+				"p.adm_kv,	pm.diag, na.name, pm.pdat, pn.nuch, pd.d_grup, pm.pdat, pd.d_uch, pm.cod_sp, pm.cpol,pm.fdat, pd.ishod " +
+				"from patient p join p_nambk pn on(p.npasp = pn.npasp) join p_mer pm on(p.npasp =pm.npasp) " +
+				"join p_disp pd on(p.npasp = pd.npasp) join n_abd na on(pm.pmer = na.pcod) " +
+				"where (pm.pdata between)and(pd.diag = pm.diag)and(pm.fdat is null)and(pd.ishod is null) and(pn.dataot is null)";
+		
+	}	
+	
+
 	*/
 	
 	@Override
@@ -165,6 +190,15 @@ public class OutputInfo extends Server implements Iface {
 	}
 
 	@Override
+
+	public String printPlanDisp(OutputPlanDisp opd)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+
 	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv,
 			OutputSvodVed osv) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
@@ -368,7 +402,4 @@ public class OutputInfo extends Server implements Iface {
 		return path;
 	}
 
-
-
-	
 }
