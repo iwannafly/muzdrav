@@ -58,9 +58,11 @@ struct PrezL {
 }
 
 service ThriftLab extends kmiacServer.KmiacServer {
+	list<classifier.IntegerClassifier> getLabs(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getOrgAndSys(1: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
-	list<PokazMet> getPokazMet(1: string cNnz1) throws (1: kmiacServer.KmiacServerException kse);
+	list<PokazMet> getPokazMet(1: string cNnz1, 2: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPisl(1: Pisl npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: PrezD di) throws (1: kmiacServer.KmiacServerException kse);
