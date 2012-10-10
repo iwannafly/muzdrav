@@ -202,8 +202,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPdisp = new TResultSetMapper<>(Pdisp.class, "id_diag",     "npasp",       "id",          "diag",       "pcod",        "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "sob",         "sxoch",       "d_uch");
 		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Boolean.class, Boolean.class, Integer.class};
 	
-		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost",       "eko",        "rub",        "predp");
-		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,Boolean.class,Boolean.class,Boolean.class};
+		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost",       "eko",        "rub",        "predp",     "osp");
+		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,Boolean.class,Boolean.class,Boolean.class,Integer.class};
 
 //		rsmRdSl1 = new TResultSetMapper<>(RdSlStruct1.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
 //		rdSl1Types = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
@@ -216,8 +216,8 @@ public class ServerOsm extends Server implements Iface {
 		
 //		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
 //		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
-		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr",       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl");
-		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class};
+		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr",       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl", "osp");
+		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class,Integer.class};
 		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
 		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
@@ -2243,7 +2243,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
       "rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,s.vitae,s.allerg,rd.ishod,rd.datasn,rd.prrod,rd.oslrod,i.sem, "+
       "rd.rost,rd.vesd,i.osoco,i.uslpr,rd.dataz,rd.polj,z0.cod_tf "+
       "i.fiootec,i.mrotec,i.telotec,i.grotec,i.photec,i.vredotec,i.votec,p.name_mr,p.prof, "+
-      "rd.eko,rd.rub,rd.predp,p.ter_liv,p.region_liv,rd.cdiagt,rd.cvera,rd.dataosl "+
+      "rd.eko,rd.rub,rd.predp,p.ter_liv,p.region_liv,rd.cdiagt,rd.cvera,rd.dataosl,rd.osp "+
 "FROM patient p,p_rd_sl rd,p_rd_inf i,p_sign s,p_vizit v,n_az9 a,n_n00 n,s_vrach vr,n_z00 z0 "+
 "WHERE p.npasp = 16164 and p.cpol_pr=n.pcod and "+
 "p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp "+
@@ -2328,7 +2328,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		Integer ball1;Integer ball2;Integer ball3;
 		Integer ball4;Integer ball5;Integer grk;
 		Integer kod2; Integer kod3; Integer kod4;Integer kod5;
-		Integer kod6; Integer kod7; Integer kod8;
+		Integer kod6; Integer kod7; Integer kod8; Integer kod9;
 		Integer j = 0;
 		Integer risk ;Integer kontr;Integer rod;
 		Integer grot; Integer hsm; Integer hal; Integer hdr;
@@ -2377,7 +2377,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		j = 0;
 		for (RdPatient rdp : rdPatient) {
 			j = j+1;
-		kod2 =0 ; kod3 =0 ; kod4 = 0; kod5 = 0; kod6 = 0; kod7 = 0; kod8 = 0;	
+		kod2 =0 ; kod3 =0 ; kod4 = 0; kod5 = 0; kod6 = 0; 
+		kod7 = 0; kod8 = 0; kod9 = 0;	
 		ball1 = 0;ball2 = 0;ball3 = 0;
 		ball4 = 0;ball5 = 0;grk = 0;
 		k1 = 0; k2 = 0; k3 = 0; k4 = 0;
@@ -2429,7 +2430,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		Date dgrisk = null;
 		sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s %s %s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%30$td.%30$tm.%30$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%42$td.%42$tm.%42$tY;%d;%d;%d;%d;%47$td.%47$tm.%47$tY;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,dgrisk,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));		
 		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
-        sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,ball1,ball2,ball3,ball4,p8));
+        sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
 		
 		//Con_diagn.csv
 			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
@@ -2470,6 +2471,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				if (acrs21.getResultSet().getString(0) == "O13") kod5 = kod5+256;			
 				if (acrs21.getResultSet().getString(0) == "O14") kod5 = kod5+512;			
 				if (acrs21.getResultSet().getString(0) == "O15") kod5 = kod5+1024;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I11") kod7 =  kod7 + 1;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I12") kod7 =  kod7 + 2;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I50") kod7 =  kod7 + 4;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I49") kod7 =  kod7 + 8;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I34") kod7 =  kod7 + 16;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I35") kod7 =  kod7 + 32;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "I80") kod7 =  kod7 + 64;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "N11") kod7 =  kod7 + 128;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "N03") kod7 =  kod7 + 256;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "N18") kod7 =  kod7 + 512;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "E10") kod8 =  kod8+1;
+				
 				if (k1 >=3) kod6 = kod6+1;
 				if ((k2+k3+k4+k5+k6+k7+k8+k9+k10)>=3) kod6 = kod6 + 2;
 				if (k3>0) kod6 = kod6 + 4;
