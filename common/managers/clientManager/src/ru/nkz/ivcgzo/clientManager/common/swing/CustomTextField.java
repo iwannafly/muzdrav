@@ -35,6 +35,11 @@ public class CustomTextField extends JTextField {
 		setText(null);
 	}
 	
+	@Override
+	public void fireActionPerformed() {
+		super.fireActionPerformed();
+	}
+	
 	/**
 	 * Установка раскладки, которая будет включаться при получении
 	 * компонентом фокуса. 

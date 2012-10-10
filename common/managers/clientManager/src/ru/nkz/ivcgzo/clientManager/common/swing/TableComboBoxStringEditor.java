@@ -2,108 +2,119 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
+import java.awt.event.MouseEvent;
+import java.util.EventObject;
 import java.util.List;
-import java.util.Map;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.KeyStroke;
+import javax.swing.event.CellEditorListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 
-/**
- * Класс, представляющий собой компонент для редактирования классификаторов,
- * заменяющий стандартное поле в <code>CustomTable<code>.
- * @author bsv798
- * @see CustomTable
- */
-public class TableComboBoxStringEditor extends AbstractCellEditor implements TableCellEditor {
-	private static final long serialVersionUID = -1007012035130398318L;
-	private final JComboBox<String> cmb;
-	private List<StringClassifier> lst;
-	private TableComboBoxStringRender rnd;
-	private Map<String, Integer> pcd;
-	
-	public TableComboBoxStringEditor(List<StringClassifier> list) {
-		cmb = new JComboBox<>();
-		cmb.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "check");
-        cmb.getActionMap().put("check", new AbstractAction() {
-			private static final long serialVersionUID = 8883313793725297972L;
+public class TableComboBoxStringEditor extends ThriftStringClassifierCombobox<StringClassifier> implements TableCellEditor {
+	private static final long serialVersionUID = 7798392803203166908L;
+	private TableComboBoxIntegerRender rnd;
+	private AbstractCellEditor dce;
+	private CustomTable<?, ?> ctb;
 
-			public void actionPerformed(ActionEvent e) {
-				cmb.transferFocus();
-            }
-        });
-		rnd = new TableComboBoxStringRender();
-		setModel(list);
-	}
-	
-	public TableComboBoxStringRender getRender() {
-		return rnd;
-	}
-	
-	public Integer getIdx(String pcod) {
-		if (pcd.containsKey(pcod))
-			return pcd.get(pcod);
-		else
-			return -1;
-	}
-	
-	private void idx2pcod() {
-		pcd = new HashMap<>();
-		for (int i = 0; i < lst.size(); i++)
-			pcd.put(lst.get(i).pcod, i);
-	}
-	
-	private void setModel(List<StringClassifier> list) {
-		lst = list;
-		idx2pcod();
-		cmb.setModel(new DefaultComboBoxModel<String>() {
-			private static final long serialVersionUID = 5904161020166672433L;
-			
+	public TableComboBoxStringEditor(StringClassifiers classifierName, boolean searcheable, List<StringClassifier> list) {
+		super(classifierName, searcheable, list);
+		
+		rnd = new TableComboBoxIntegerRender();
+		dce = new AbstractCellEditor() {
+			private static final long serialVersionUID = -871983044315064563L;
+
 			@Override
-			public String getElementAt(int arg0) {
-				return lst.get(arg0).name;
+			public Object getCellEditorValue() {
+				if (getSelectedIndex() < 0)
+					return null;
+				else
+					return items.get(getSelectedIndex()).pcod;
 			}
-			
+		};
+		
+		((CustomTextField) getEditor().getEditorComponent()).addActionListener(new ActionListener() {
 			@Override
-			public int getSize() {
-				return lst.size();
+			public void actionPerformed(ActionEvent e) {
+				ctb.dispatchEvent(new KeyEvent(ctb, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
 			}
 		});
 	}
 	
 	@Override
-	public Component getTableCellEditorComponent(JTable arg0, Object arg1, boolean arg2, int arg3, int arg4) {
-		if (arg1 == null)
-			cmb.setSelectedIndex(-1);
-		else
-			cmb.setSelectedIndex(getIdx((String) arg1));
-		
-		return cmb;
+	public Object getCellEditorValue() {
+		return dce.getCellEditorValue();
 	}
-	
+
 	@Override
-	public String getCellEditorValue() {
-		if (cmb.getSelectedIndex() < 0)
-			return null;
+	public boolean isCellEditable(EventObject anEvent) {
+		if (anEvent instanceof MouseEvent) {
+			return ((MouseEvent)anEvent).getClickCount() > 1;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean shouldSelectCell(EventObject anEvent) {
+		return dce.shouldSelectCell(anEvent);
+	}
+
+	@Override
+	public boolean stopCellEditing() {
+		return dce.stopCellEditing();
+	}
+
+	@Override
+	public void cancelCellEditing() {
+		dce.cancelCellEditing();
+	}
+
+	@Override
+	public void addCellEditorListener(CellEditorListener l) {
+		dce.addCellEditorListener(l);
+	}
+
+	@Override
+	public void removeCellEditorListener(CellEditorListener l) {
+		dce.removeCellEditorListener(l);
+	}
+
+	@Override
+	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+		if (value == null)
+			setSelectedIndex(-1);
 		else
-			return lst.get(cmb.getSelectedIndex()).pcod;
+			setSelectedIndex(getIdx((String) value));
+		
+		return this;
 	}
 	
-	public class TableComboBoxStringRender extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = -2915705885392742240L;
+	public Integer getIdx(String pcod) {
+		for (int i = 0; i < items.size(); i++)
+			if (items.get(i).pcod.equals(pcod))
+				return i;
 		
+		return -1;
+	}
+	
+	public TableComboBoxIntegerRender getRender() {
+		return rnd;
+	}
+	
+	public class TableComboBoxIntegerRender extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 9082746977401450306L;
+
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			ctb = (CustomTable<?, ?>) table;
+			
 			JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			
 			if (value == null)
@@ -113,7 +124,7 @@ public class TableComboBoxStringEditor extends AbstractCellEditor implements Tab
 				if (idx < 0)
 					lbl.setText(value.toString());
 				else
-					lbl.setText(cmb.getItemAt(idx));
+					lbl.setText(getItemAt(idx).name);
 			}
 			
 			return lbl;

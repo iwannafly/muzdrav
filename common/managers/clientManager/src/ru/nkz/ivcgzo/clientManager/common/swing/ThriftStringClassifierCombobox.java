@@ -32,7 +32,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
  */
 public class ThriftStringClassifierCombobox<T extends StringClassifier> extends JComboBox<StringClassifier> {
 	private static final long serialVersionUID = -8720200365221036747L;
-	private List<StringClassifier> items;
+	protected List<StringClassifier> items;
 	private StringClassifiers classifier;
 	private boolean classifierLoaded;
 	private Searcher searcher;
