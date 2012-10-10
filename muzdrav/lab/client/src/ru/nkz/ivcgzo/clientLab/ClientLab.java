@@ -11,15 +11,14 @@ import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftLab.ThriftLab;
 
-public class ClientLab extends Client<ThriftLab.Client>{
+public class ClientLab extends Client<ThriftLab.Client> {
     public static ThriftLab.Client tcl;
     public static Client<ThriftLab.Client> instance;
     private MainFrame labFrame;
 
-    public ClientLab(ConnectionManager conMan, UserAuthInfo authInfo,
-            int accessParam) throws IllegalAccessException, NoSuchMethodException,
-            SecurityException, InstantiationException,
-            IllegalArgumentException, InvocationTargetException {
+    public ClientLab(final ConnectionManager conMan, final UserAuthInfo authInfo,
+            final int accessParam) throws IllegalAccessException, NoSuchMethodException,
+            InstantiationException, InvocationTargetException {
         super(conMan, authInfo, ThriftLab.Client.class, configuration.appId,
                 configuration.thrPort, accessParam);
         initialize(authInfo);
@@ -33,7 +32,7 @@ public class ClientLab extends Client<ThriftLab.Client>{
     }
 
     @Override
-    public String getName() {
+    public final String getName() {
         return configuration.appName;
     }
 

@@ -67,4 +67,7 @@ service ThriftLab extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: Pisl npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: PrezD di) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezl(1: PrezL li) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getPoliclinic() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getStacionarTypes() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getLpu() throws (1: kmiacServer.KmiacServerException kse);
 }
