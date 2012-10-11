@@ -317,12 +317,26 @@ public class ServerLab extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getLpu() throws KmiacServerException,
             TException {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name from n_m00 ")) {
+        final String sqlQuery = "SELECT pcod, name FROM n_m00;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             ((SQLException) e.getCause()).printStackTrace();
             throw new KmiacServerException();
         }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getVidIssled() throws KmiacServerException,
+            TException {
+        final String sqlQuery = "SELECT pcod, tip as name FROM n_lds;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
+            return rsmIntClass.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            ((SQLException) e.getCause()).printStackTrace();
+            throw new KmiacServerException();
+        }
+
     }
 }
