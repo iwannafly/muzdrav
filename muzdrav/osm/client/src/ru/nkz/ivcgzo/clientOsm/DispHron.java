@@ -74,11 +74,11 @@ public class DispHron extends JFrame{
 		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		  		pmer.setNpasp(Vvod.zapVr.getNpasp());
-//		  		pmer.setId_pdiag(Vvod.pdisp.getId_diag());
+		  		pmer.setCpol(MainForm.authInfo.getCpodr());
 		  		pmer.setDiag(cmbDiag.getSelectedPcod());
 		  		pmer.setCod_sp(MainForm.authInfo.getPcod());
-//		  		pmer.setId_pvizit(Vvod.pvizit.getId());
-//		  		pmer.setId_pos(Vvod.pvizitAmb.getId());
+		  		pmer.setDataz(System.currentTimeMillis());
+		  		pmer.setPdat(System.currentTimeMillis());
 				try {
 					pmer.setId(MainForm.tcl.AddPmer(pmer));
 				} catch (KmiacServerException e1) {
@@ -166,7 +166,6 @@ public class DispHron extends JFrame{
 		bAddObost.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				obostr.setNpasp(Vvod.zapVr.getNpasp());
-//				obostr.setId_pdiag(Vvod.pdisp.getId_diag());
 				obostr.setDiag(cmbDiag.getSelectedPcod());
 				obostr.setCod_sp(MainForm.authInfo.getPcod());
 				obostr.setCdol(MainForm.authInfo.getCdol());
@@ -337,7 +336,7 @@ public class DispHron extends JFrame{
 		tabObost.setFillsViewportHeight(true);
 		spObost.setViewportView(tabObost);
 		
-		tblDispHron = new CustomTable<>(true,true,Pmer.class,4,"Мероприятие",11,"Специалист",5,"Дата план.",6,"Дата факт.",10,"Результат");
+		tblDispHron = new CustomTable<>(true,true,Pmer.class,3,"Мероприятие",10,"Специалист",4,"Дата план.",5,"Дата факт.",9,"Результат");
 		tblDispHron.setDateField(2);
 		tblDispHron.setDateField(3);
 		

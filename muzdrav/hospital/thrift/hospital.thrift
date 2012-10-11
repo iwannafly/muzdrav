@@ -97,6 +97,16 @@ struct Shablon {
 	3: list<ShablonText> textList;
 }
 
+struct Zakl {
+	1: optional i32 ishod;
+	2: optional i32 result;
+	3: optional i64 datav;
+	4: optional i64 vremv;
+	5: optional string sostv;
+	6: optional string recom;
+	7: optional i32 idGosp;
+}
+
 /**
  * Пациент с такими данными не найден.
  */
@@ -162,19 +172,20 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 
 	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
+	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
 	
 /*Классификаторы*/
 	
 	/**
 	* Классификатор социального статуса (N_azj(pcod))
 	 */
-	list<classifier.StringClassifier> getAzj();
+	list<classifier.StringClassifier> getAzj() throws (1:kmiacServer.KmiacServerException kse);
 	/**
 	* Классификатор исхода заболевания (N_ap0(pcod))
 	 */
-	list<classifier.IntegerClassifier> getAp0();
+	list<classifier.IntegerClassifier> getAp0() throws (1:kmiacServer.KmiacServerException kse);
 	/**
-	* Классификатор результата лечения (N_aj0(pcod))
+	* Классификатор результата лечения (N_aq0(pcod))
 	 */
-	list<classifier.IntegerClassifier> getAj0();
+	list<classifier.IntegerClassifier> getAq0() throws (1:kmiacServer.KmiacServerException kse);
 }
