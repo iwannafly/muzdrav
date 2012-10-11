@@ -36,7 +36,7 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 				if (getSelectedIndex() < 0)
 					return null;
 				else
-					return items.get(getSelectedIndex()).pcod;
+					return itemsBcp.get(getIdx(getSelectedItem().pcod)).pcod;
 			}
 		};
 		
@@ -88,17 +88,20 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 
 	@Override
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-		if (value == null)
+		if (value == null) {
 			setSelectedIndex(-1);
-		else
+		} else {
+			items = itemsBcp;
 			setSelectedIndex(getIdx((int) value));
+			setText(getSelectedItem().name);
+		}
 		
 		return this;
 	}
 	
 	public Integer getIdx(int pcod) {
-		for (int i = 0; i < items.size(); i++)
-			if (items.get(i).pcod == pcod)
+		for (int i = 0; i < itemsBcp.size(); i++)
+			if (itemsBcp.get(i).pcod == pcod)
 				return i;
 		
 		return -1;
@@ -124,7 +127,7 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 				if (idx < 0)
 					lbl.setText(value.toString());
 				else
-					lbl.setText(getItemAt(idx).name);
+					lbl.setText(itemsBcp.get(idx).name);
 			}
 			
 			return lbl;
