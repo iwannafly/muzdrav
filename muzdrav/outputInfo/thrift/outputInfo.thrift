@@ -14,24 +14,6 @@ struct InputSvodVed {
     3: i32 vozcat;
 }
 
-struct OutputSvodVed {
-	1: optional i32 kodVidIssl;
-	2: optional i32 userId;
-	3: optional i32 npasp;
-	4: optional string kodMetod;
-	5: optional list<string> pokaz;
-	6: optional string mesto;
-	7: optional string kab;
-	8: optional i32 pvizitId;
-	9: optional string cpodr_name;
-	10: optional string clpu_name;
-}
-
-struct OutputTest {
-    1: optional string namebz;
-    2: optional string diagsrpt;
-}
-
 struct VrachInfo {
 	1: i32 pcod;
 	2: string fam;
@@ -88,8 +70,5 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printPlanDisp(1: OutputPlanDisp opd) throws (1: kmiacServer.KmiacServerException kse);
 
 
-    string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv 3: OutputSvodVed osv) throws (1: kmiacServer.KmiacServerException kse);
-
-    string printTest(1: OutputTest ot 2: InputAuthInfo iaf ) throws (1: kmiacServer.KmiacServerException kse);
-
+    string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 }
