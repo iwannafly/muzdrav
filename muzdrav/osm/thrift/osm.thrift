@@ -195,6 +195,7 @@ struct RdSlStruct{
         38: optional bool eko;
         39: optional bool rub;
         40: optional bool predp;
+        41: optional i32 osp;
 }
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
@@ -314,6 +315,7 @@ struct RdPatient{
         74: optional i32 diag;
         75: optional i32 cvera;
         76: optional i64 dataosl;
+        77: optional i32 osp;
 }
 struct RdVizit{
          1: optional i32    uid;

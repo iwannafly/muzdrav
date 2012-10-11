@@ -10,12 +10,15 @@ import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JFrame;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -34,6 +37,7 @@ import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
+import ru.nkz.ivcgzo.thriftHospital.Zakl;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -172,7 +176,7 @@ public class MainFrame extends JFrame {
     private JButton btnSaveZakl;
     private JLabel lblRecomend;
     private JLabel lblZakluch;
-    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxZaklType;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxIshod;
     private JScrollPane spZaklShablonNames;
     private ThriftIntegerClassifierList lZaklShablonNames;
     private JScrollPane spRecomend;
@@ -189,6 +193,13 @@ public class MainFrame extends JFrame {
     private JButton btnMedHistUpd;
     private JButton btnMedHistDel;
     private JButton btnMedHistAdd;
+    private JLabel lblResult;
+    private JLabel lblIshod;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxResult;
+    private CustomDateEditor cdeZaklDate;
+    private CustomTimeEditor cdeZaklTime;
+    private JLabel lblZaklDate;
+    private JLabel lblZaklTime;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -226,7 +237,8 @@ public class MainFrame extends JFrame {
                     doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
                     doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
-            cbxZaklType.setData(ClientHospital.tcl.getAp0());
+            cbxIshod.setData(ClientHospital.tcl.getAp0());
+            cbxResult.setData(ClientHospital.tcl.getAq0());
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -1391,6 +1403,8 @@ public class MainFrame extends JFrame {
     private void clearZaklText() {
         taRecomend.setText("");
         taZakluch.setText("");
+        cdeZaklDate.setDate(new Date());
+        cdeZaklTime.setTime(new Date());
     }
 
     private void setZaklTextAreas() {
@@ -1403,16 +1417,30 @@ public class MainFrame extends JFrame {
         spRecomend.setViewportView(taRecomend);
 
         spZakluch = new JScrollPane();
-        lblZakluch = new JLabel("Заключение");
+        lblZakluch = new JLabel("Состояние при выписке");
         taZakluch = new JTextArea();
         taZakluch.setLineWrap(true);
         taZakluch.setWrapStyleWord(true);
         taZakluch.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spZakluch.setViewportView(taZakluch);
+
+
+        lblIshod = new JLabel("Исход заболевания");
+        lblResult = new JLabel("Результат лечения");
+
+
+        lblZaklDate = new JLabel("Дата выписки");
+        cdeZaklDate = new CustomDateEditor();
+        cdeZaklDate.setColumns(10);
+
+        lblZaklTime = new JLabel("Время выписки");
+        cdeZaklTime = new CustomTimeEditor();
+        cdeZaklTime.setColumns(10);
     }
 
     private void setZaklComboboxes() {
-        cbxZaklType = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxIshod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxResult = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
     }
 
     private void setZaklButtons() {
@@ -1420,10 +1448,27 @@ public class MainFrame extends JFrame {
         btnSaveZakl.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    ClientHospital.tcl.disharge(patient.getGospitalCod());
-                    JOptionPane.showMessageDialog(MainFrame.this,
-                        "Пациент успешно выписан", "Выписка пациента",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    if ((patient != null)
+                            || (cbxIshod.getSelectedItem() != null)
+                            || (cbxResult.getSelectedItem() != null)) {
+                        Zakl tmpZakl = new Zakl();
+                        tmpZakl.setRecom(taRecomend.getText());
+                        tmpZakl.setSostv(taZakluch.getText());
+                        tmpZakl.setIshod(cbxIshod.getSelectedPcod());
+                        tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
+                        tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                        tmpZakl.setIdGosp(patient.getGospitalCod());
+                        ClientHospital.tcl.addZakl(tmpZakl);
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                            "Пациент успешно выписан", "Выписка пациента",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                            "Не выбран пациент, либо не заполнены поля \"Результат лечения\" "
+                            + "или \"Исход заболевания\"", "Ошибка!",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
                 } catch (KmiacServerException e1) {
                     JOptionPane.showMessageDialog(MainFrame.this,
                             "Ошибка при выписке пациента. Информация не сохранена", "Ошибка",
@@ -1769,31 +1814,48 @@ public class MainFrame extends JFrame {
     }
 
     private void setZaklPanelGroupLayout() {
+
         GroupLayout glPZakl = new GroupLayout(pZakl);
         glPZakl.setHorizontalGroup(
             glPZakl.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPZakl.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(glPZakl.createParallelGroup(Alignment.LEADING, false)
-                        .addComponent(cbxZaklType, GroupLayout.PREFERRED_SIZE, 701,
+                    .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPZakl.createParallelGroup(Alignment.TRAILING)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblRecomend)
+                                .addComponent(btnSaveZakl, GroupLayout.PREFERRED_SIZE,
+                                        701, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE,
+                                        701, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblZakluch)
+                                .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE,
+                                        701, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblIshod))
+                            .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, 701,
+                                    GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblResult)
+                        .addComponent(cbxResult, GroupLayout.PREFERRED_SIZE, 701,
                                 GroupLayout.PREFERRED_SIZE)
-                        .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 701,
-                                GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblRecomend)
-                        .addComponent(lblZakluch)
-                        .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE, 701,
-                                GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnSaveZakl, GroupLayout.PREFERRED_SIZE, 701,
-                                GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(ComponentPlacement.RELATED)
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addComponent(lblZaklDate)
+                            .addPreferredGap(ComponentPlacement.UNRELATED)
+                            .addComponent(cdeZaklDate, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.UNRELATED)
+                            .addComponent(lblZaklTime)
+                            .addPreferredGap(ComponentPlacement.UNRELATED)
+                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                    .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE,
-                                    377, Short.MAX_VALUE)
+                                    383, Short.MAX_VALUE)
                             .addGap(5))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE,
-                                    372, Short.MAX_VALUE)
+                                    378, Short.MAX_VALUE)
                             .addContainerGap())))
         );
         glPZakl.setVerticalGroup(
@@ -1812,16 +1874,32 @@ public class MainFrame extends JFrame {
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 241,
-                                    Short.MAX_VALUE)
+                            .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE,
+                                    148, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblZakluch)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
+                            .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE,
+                                    141, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(cbxZaklType, GroupLayout.PREFERRED_SIZE,
+                            .addComponent(lblIshod)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE,
                                     GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lblResult)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(cbxResult, GroupLayout.PREFERRED_SIZE,
+                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblZaklDate)
+                                .addComponent(cdeZaklDate, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblZaklTime)
+                                .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
                             .addComponent(btnSaveZakl)
                             .addGap(9)))
                     .addGap(0))
