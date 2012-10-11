@@ -191,7 +191,11 @@ struct RdSlStruct{
 	34: optional i32 cdiagt;
 	35: optional i32 cvera;
 	36: optional i32 id_pvizit;
-        37: optional i32 rost; 
+        37: optional i32 rost;
+        38: optional bool eko;
+        39: optional bool rub;
+        40: optional bool predp;
+        41: optional i32 osp;
 }
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
@@ -294,6 +298,24 @@ struct RdPatient{
         57: optional i64 dataz;
         58: optional i32 polj;
         59: optional i32 obr; 
+        60: optional string fiootec;
+        61: optional string mrabotec;
+        62: optional string telotec; 
+        63: optional string grotec;
+        64: optional string photec;
+        65: optional i32 vredotec;
+        66: optional i32 vozotec;
+        67: optional string mrab;
+        68: optional string prof; 
+        69: optional bool eko;
+        70: optional bool rub;
+        71: optional bool predp;
+        72: optional i32 terpr;
+        73: optional i32 oblpr;
+        74: optional i32 diag;
+        75: optional i32 cvera;
+        76: optional i64 dataosl;
+        77: optional i32 osp;
 }
 struct RdVizit{
          1: optional i32    uid;
@@ -325,6 +347,15 @@ struct RdConVizit{
         13: optional i32    osoco;
         14: optional string vrpr;
         15: optional i32 npasp;
+        16: optional i32 hdm;
+        17: optional i32 spl; 
+        18: optional i32 oj;
+        19: optional i32 chcc;
+        20: optional i32 polpl;
+        21: optional i32 predpl;
+        22: optional i32 serd;
+        23: optional i32 serd1;
+        24: optional i32 oteki;
 }
 
 /*Список показателей исследований по выбранному методу*/
@@ -554,6 +585,23 @@ struct Cgosp{
 	8: i64 dataz;
 	9: i32 vid_st;
 	10: i32 n_org;
+	11: i32 pl_extr;
+	12: i64 datap;
+	13: i64 vremp;
+	14: i32 cotd;
+	15: string diag_p;
+	16: string named_p;
+	17: i32 cotd_p;
+	18: i64 dataosm;
+	19: i64 vremosm;
+}
+
+struct Cotd{
+	1: i32 id;
+	2: i32 id_gosp;
+	3: i32 nist;
+	4: i32 cotd;
+	5: i64 dataz;
 }
 
 exception PvizitNotFoundException {
@@ -623,17 +671,19 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
+	Pdisp getPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
+	bool IfExPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);	
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
 	bool isZapVrNext(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	
-	i32 AddCGosp(1: Cgosp cgsp) throws (1: kmiacServer.KmiacServerException kse);
+	list<i32> AddCGosp(1: Cgosp cgsp) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddCotd(1: Cotd cotd) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
-	list<PokazMet> getPokazMet(1: string c_nz1) throws (1: kmiacServer.KmiacServerException kse);
+	list<PokazMet> getPokazMet(1: string c_nz1, 2: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);

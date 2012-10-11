@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>serverOutputInfo</name>
+	<name>serverLab</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -11,29 +11,25 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.ui.externaltools.ExternalToolBuilder</name>
-			<triggers>auto,</triggers>
+			<name>net.sf.eclipsecs.core.CheckstyleBuilder</name>
 			<arguments>
-				<dictionary>
-					<key>LaunchConfigHandle</key>
-					<value>&lt;project&gt;/.externalToolBuilders/serveroutputInfo build.xml [Builder].launch</value>
-				</dictionary>
 			</arguments>
 		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>net.sf.eclipsecs.core.CheckstyleNature</nature>
 	</natures>
 	<linkedResources>
 		<link>
 			<name>config</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/outputInfo/config</locationURI>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/lab/config</locationURI>
 		</link>
 		<link>
 			<name>gen-java</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/outputInfo/thrift/gen-java</locationURI>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/lab/thrift/gen-java</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
