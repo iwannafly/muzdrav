@@ -172,7 +172,7 @@ public class SettingsForm extends JDialog {
 		JButton btnRun = new JButton("Выполнить");
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 				if (rbtn1.isSelected()) vidrstr = 1;
 				if (rbtn2.isSelected()) vidrstr = 2;
 				if (rbtn3.isSelected()) vidrstr = 3;
