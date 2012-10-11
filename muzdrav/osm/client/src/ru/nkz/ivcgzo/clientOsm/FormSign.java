@@ -45,6 +45,7 @@ public class FormSign extends JFrame {
 	private Psign psign;
 	private JCheckBox cbk;
 	private JCheckBox cba;
+	private JCheckBox cba1;
 	private JCheckBox cbn;
 	private ButtonGroup BGgrk;
 	private JRadioButton rb1g;
@@ -99,9 +100,11 @@ public class FormSign extends JFrame {
 		
 		cbk = new JCheckBox("Курение");
 		
-		cba = new JCheckBox("Алкоголь");
+		cba = new JCheckBox("Злоупотребление алкоголем");
 		
 		cbn = new JCheckBox("Наркотики");
+		
+		cba1 = new JCheckBox("Алкоголизм");
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -110,6 +113,8 @@ public class FormSign extends JFrame {
 					.addComponent(cbk)
 					.addGap(18)
 					.addComponent(cba)
+					.addGap(18)
+					.addComponent(cba1)
 					.addGap(18)
 					.addComponent(cbn)
 					.addContainerGap(60, Short.MAX_VALUE))
@@ -121,6 +126,7 @@ public class FormSign extends JFrame {
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(cbk)
 						.addComponent(cba)
+						.addComponent(cba1)
 						.addComponent(cbn))
 					.addContainerGap(8, Short.MAX_VALUE))
 		);
@@ -346,7 +352,7 @@ public class FormSign extends JFrame {
 	}
 		
 		private String getVrPr() {
-			String prv,s1,s2,s3;
+			String prv,s1,s2,s3,s4;
 			if (cbk.isSelected()){
 				s1 = "1";	
 			}else {
@@ -358,13 +364,18 @@ public class FormSign extends JFrame {
 				}else {
 					s2 = "0";
 				}
-			if (cbn.isSelected()){
+			if (cba1.isSelected()){
 				s3 = "1";	
 				}else {
 					s3 = "0";
 				}
+			if (cbn.isSelected()){
+				s4 = "1";	
+				}else {
+					s4 = "0";
+				}
 			
-			prv = s1+s2+s3;
+			prv = s1+s2+s3+s4;
 
 			return prv;
 		}
@@ -396,7 +407,8 @@ public class FormSign extends JFrame {
 			vrp = psign.getVred();
 			cbk.setSelected(vrp.charAt(0) == '1');
 			cba.setSelected(vrp.charAt(1) == '1');
-			cbn.setSelected(vrp.charAt(2) == '1');
+			cba1.setSelected(vrp.charAt(2) == '1');
+			cbn.setSelected(vrp.charAt(3) == '1');
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (PsignNotFoundException e1) {
