@@ -1503,18 +1503,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 
-	@Override
-	public Pdisp getPdisp(int id_diag) throws PdispNotFoundException, KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_disp WHERE id_diag = ? ", id_diag)) {
-			if (acrs.getResultSet().next())
-				return rsmPdisp.map(acrs.getResultSet());
-			else
-				throw new PdispNotFoundException();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
 
 	@Override
 	public int setPdiag(PdiagZ diag) throws KmiacServerException, TException {
@@ -1543,7 +1531,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public int setPdisp(Pdisp disp) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
-				getPdisp(disp.id_diag);
+				getPdisp(disp.npasp, disp.diag);
 				sme.execPreparedT("UPDATE p_disp SET diag = ?, pcod = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, sob = ?, sxoch = ?, d_uch = ? WHERE id_diag = ? ", false, disp, pdispTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 0);
 				sme.setCommit();
 				return disp.getId();
@@ -2650,12 +2638,14 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public int AddCGosp(Cgosp cgsp) throws KmiacServerException, TException {
+	public List<Integer> AddCGosp(Cgosp cgsp) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into c_gosp (ngosp, npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org, pl_extr, datap, vremp, cotd, diag_p, named_p, cotd_p, dataosm, vremosm) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
-			int id = sme.getGeneratedKeys().getInt("id");
+			sme.execPreparedT("insert into c_gosp (npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org, pl_extr, datap, vremp, cotd, diag_p, named_p, cotd_p, dataosm, vremosm) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+			List<Integer> ret = new ArrayList<>();
+			ret.add(sme.getGeneratedKeys().getInt("id"));
+			ret.add(sme.getGeneratedKeys().getInt("ngosp"));
 			sme.setCommit();
-			return id;
+			return ret;
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -2687,6 +2677,31 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		String sql = "SELECT DISTINCT n_ldi.pcod, n_ldi.name_n FROM n_ldi JOIN s_ot01 ON (s_ot01.pcod=n_ldi.pcod) WHERE s_ot01.c_nz1 = ? AND s_ot01.cotd = ? ORDER BY n_ldi.pcod ";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, c_nz1, cotd)) {
 			return rsmPokazMet.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public boolean IfExPdisp(int npasp, String diag)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select diag from p_disp where (npasp = ?) and (diag = ?) ", npasp, diag)) {
+			return acrs.getResultSet().next();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public Pdisp getPdisp(int npasp, String diag) throws KmiacServerException,
+			PdispNotFoundException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_disp where npasp = ? and diag = ?", npasp, diag)) {
+			if (acrs.getResultSet().next())
+				return rsmPdisp.map(acrs.getResultSet());
+			else
+				throw new PdispNotFoundException();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
