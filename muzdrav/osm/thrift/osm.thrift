@@ -195,6 +195,7 @@ struct RdSlStruct{
         38: optional bool eko;
         39: optional bool rub;
         40: optional bool predp;
+        41: optional i32 osp;
 }
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
@@ -314,6 +315,7 @@ struct RdPatient{
         74: optional i32 diag;
         75: optional i32 cvera;
         76: optional i64 dataosl;
+        77: optional i32 osp;
 }
 struct RdVizit{
          1: optional i32    uid;
@@ -669,13 +671,14 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	Pdisp getPdisp(1: i32 id_diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
+	Pdisp getPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
+	bool IfExPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);	
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
 	bool isZapVrNext(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
 	
-	i32 AddCGosp(1: Cgosp cgsp) throws (1: kmiacServer.KmiacServerException kse);
+	list<i32> AddCGosp(1: Cgosp cgsp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddCotd(1: Cotd cotd) throws (1: kmiacServer.KmiacServerException kse);
 
 	/*Исследования*/
