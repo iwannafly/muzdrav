@@ -388,7 +388,7 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException {
+	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException, TemplateExistsException {
 		int shId = sho.id;
 		
 		try (SqlModifyExecutor sme = tse.startTransaction();
@@ -409,6 +409,9 @@ public class serverAdmin extends Server implements Iface {
 			
 			return shId;
 		} catch (SQLException | InterruptedException e) {
+			if (e instanceof SQLException)
+				if (((SQLException) e.getCause()).getSQLState().equals("23505"))
+					throw new TemplateExistsException();
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error saving template osm");
 		}

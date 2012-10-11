@@ -55,6 +55,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
+import ru.nkz.ivcgzo.thriftServerAdmin.TemplateExistsException;
 
 public class ShablonOsmPanel extends JPanel {
 	private static final long serialVersionUID = 3633761920972893528L;
@@ -140,13 +141,8 @@ public class ShablonOsmPanel extends JPanel {
 		btDelete = new JButton("Удалить");
 		btDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
+				if (JOptionPane.showConfirmDialog(ShablonOsmPanel.this, "Удалить шаблон?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 					trSearch.removeSelected();
-				} catch (KmiacServerException e1) {
-					JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-				} catch (TException e1) {
-					MainForm.conMan.reconnect(e1);
-				}
 			}
 		});
 		
@@ -218,7 +214,8 @@ public class ShablonOsmPanel extends JPanel {
 					
 					if (res != null) {
 						tbDiag.setText(res.pcod);
-						tbName.setText(res.name);
+						if (tbName.isEmpty())
+							tbName.setText(res.name);
 					}
 				}
 			}
@@ -492,6 +489,8 @@ public class ShablonOsmPanel extends JPanel {
 			trSearch.updateSavedNode(saveAsNew);
 		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
 			JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+		} catch (TemplateExistsException e) {
+			JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Шаблон с таким названием, диагнозом и динамикой уже существует.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);
 		}
@@ -721,34 +720,22 @@ public class ShablonOsmPanel extends JPanel {
 			}
 		}
 		
-		public void removeSelected() throws KmiacServerException, TException {
+		public void removeSelected() {
 			if (getSelectionPath() != null)
 				if (getSelectionPath().getLastPathComponent() != null)
 					if (getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode) {
-						if (shOsm.id > 0)
-							MainForm.tcl.deleteShablonOsm(shOsm.id);
-						
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-						StrClassTreeNode parent = (StrClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
-						IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
-						int childIndex = parent.getIndex(child);
-						
-						changingNodes = true;
 						try {
-							getModel().removeNodeFromParent(child);
-							if (parent.getChildCount() > 0) {
-								if (childIndex >= parent.getChildCount())
-									childIndex = parent.getChildCount() - 1;
-								changingNodes = false;
-								setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
-							} else {
-								getModel().removeNodeFromParent(parent);
+							if (shOsm.id > 0) {
+								MainForm.tcl.deleteShablonOsm(shOsm.id);
+								newNode = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
 							}
-						} catch (Exception e) {
+							
+							removeUnsavedNode();
+						} catch (KmiacServerException e) {
+							JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						} catch (TException e) {
 							e.printStackTrace();
-						} finally {
-							newNode = null;
-							changingNodes = false;
+							MainForm.conMan.reconnect(e);
 						}
 					}
 			
@@ -856,27 +843,25 @@ public class ShablonOsmPanel extends JPanel {
 		
 		private void removeUnsavedNode() {
 			if (newNode != null) {
-				if (newNode.getCode() == 0) {
-					try {
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-						StrClassTreeNode parent = (StrClassTreeNode) newNode.getParent();
-						int childIndex = parent.getIndex(newNode);
-						
-						changingNodes = true;
-						getModel().removeNodeFromParent(newNode);
-						if (parent.getChildCount() > 0) {
-							if (childIndex >= parent.getChildCount())
-								childIndex = parent.getChildCount() - 1;
-							setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
-						} else {
-							getModel().removeNodeFromParent(parent);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						newNode = null;
-						changingNodes = false;
+				try {
+					DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+					StrClassTreeNode parent = (StrClassTreeNode) newNode.getParent();
+					int childIndex = parent.getIndex(newNode);
+					
+					changingNodes = true;
+					getModel().removeNodeFromParent(newNode);
+					if (parent.getChildCount() > 0) {
+						if (childIndex >= parent.getChildCount())
+							childIndex = parent.getChildCount() - 1;
+						setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
+					} else {
+						getModel().removeNodeFromParent(parent);
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					newNode = null;
+					changingNodes = false;
 				}
 			}
 		}

@@ -31,12 +31,14 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
  * @param <T> - thrift-структура {@link StringClassifier}
  */
 public class ThriftStringClassifierCombobox<T extends StringClassifier> extends JComboBox<StringClassifier> {
-	private static final long serialVersionUID = -8720200365221036747L;
-	private List<StringClassifier> items;
+	private static final long serialVersionUID = 8540397050277967316L;
+	protected List<StringClassifier> items;
+	protected List<StringClassifier> itemsBcp;
+	protected List<StringClassifier> itemsLow;
 	private StringClassifiers classifier;
 	private boolean classifierLoaded;
 	private Searcher searcher;
-	private StringComboBoxModel model;
+	protected StringComboBoxModel model;
 	private boolean strict = true;
 	
 	/**
@@ -92,8 +94,12 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			list = new ArrayList<>();
 			
 		items = new ArrayList<>(list.size());
+		itemsBcp = new ArrayList<>(list.size());
+		itemsLow = new ArrayList<>(list.size());
 		for (StringClassifier item : list) {
 			items.add(new StringClassifierItem(item));
+			itemsBcp.add(new StringClassifierItem(item));
+			itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
 		}
 		setSelectedItem(null);
 		model.fireContentsChanged();
@@ -103,7 +109,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 * Получает список данных. 
 	 */
 	public List<StringClassifier> getData() {
-		return items;
+		return itemsBcp;
 	}
 	
 	private void setFormListeners() {
@@ -112,7 +118,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					loadClassifier();
-					if (isEnabled() && items.size() > 0) {
+					if (isEnabled() && itemsBcp.size() > 0) {
 						StringClassifier res = ConnectionManager.instance.showStringClassifierSelector(classifier);
 						
 						if (res != null)
@@ -122,10 +128,9 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			}
 		};
 		
-		if (searcher == null)
-			addMouseListener(ma);
-		else
-			((CustomTextField) getEditor()).addMouseListener(ma);
+		addMouseListener(ma);
+		if (searcher != null)
+			((CustomTextField) getEditor().getEditorComponent()).addMouseListener(ma);
 		
 		addPopupMenuListener(new PopupMenuListener() {
 			@Override
@@ -189,6 +194,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		StringClassifier selItem = null;
 		
 		loadClassifier();
+		items = itemsBcp;
 		
 		for (StringClassifier item : items) {
 			if (item.pcod.equals(pcod)) {
@@ -208,7 +214,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			}
 		
 		if (selItem == null)
-			throw new RuntimeException(String.format("Unknown pcod '%s'.", pcod));
+			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
 	}
 	
 	/**
@@ -236,12 +242,19 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 * Устанавливает текст в поле ввода.
 	 */
 	public void setText(String text) {
-		if (isEditable())
+		if (isEditable()) {
 			((JTextComponent) getEditor().getEditorComponent()).setText(text);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					hidePopup();
+				}
+			});
+		}
 	}
 	
 	class StringComboBoxModel extends DefaultComboBoxModel<StringClassifier> {
-		private static final long serialVersionUID = 3897339719447445357L;
+		private static final long serialVersionUID = 7014897970980414337L;
 
 		@Override
 		public StringClassifier getElementAt(int index) {
@@ -274,17 +287,16 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	class Searcher implements DocumentListener {
 		private ThriftStringClassifierCombobox<T> cmb = ThriftStringClassifierCombobox.this;
 		private CustomComboBoxEditor editor;
-		private boolean searching = false;
 		private boolean enabled = false;
-		private StringClassifier lastSelected;
+		private StringClassifier selItem;
+		private StringClassifier prevSelItem;
 		
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
 			ThriftStringClassifierCombobox.this.setEditor(editor);
 			editor.putClientProperty("doNotCancelPopup", null);
-
+			
 			cmb.addActionListener(new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					editor.selectAll();
@@ -305,83 +317,84 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		
 		@Override
 		public void insertUpdate(DocumentEvent e) {
-			search();
+			prepareSearch();
 		}
 		
 		@Override
 		public void removeUpdate(DocumentEvent e) {
-			search();
+			prepareSearch();
 		}
 		
 		@Override
 		public void changedUpdate(DocumentEvent e) {
-			search();
+			prepareSearch();
+		}
+		
+		private void prepareSearch() {
+			if (!classifierLoaded) {
+				SwingUtilities.invokeLater(new Runnable() {
+					private String srcStr = editor.getText();
+					
+					@Override
+					public void run() {
+						loadClassifier();
+						editor.setText(srcStr);
+					}
+				});
+			} else {
+				search();
+			}
 		}
 		
 		private void search() {
-			if (searching)
-				return;
-			searching = true;
+			final String srcStrLow = editor.getText().toLowerCase();
 			
+			selItem = null;
+			if (srcStrLow.length() == 0) {
+				items = itemsBcp;
+				setSelectedItem(null);
+			} else {
+				int i;
+				for (i = 0; i < itemsBcp.size(); i++)
+					if ((itemsLow.get(i).name.indexOf(srcStrLow) == 0) && (itemsLow.get(i).name.length() == srcStrLow.length())) {
+						selItem = itemsBcp.get(i);
+						break;
+					}
+				
+				if (i == itemsBcp.size()) {
+					items = new ArrayList<>();
+					for (i = 0; i < itemsBcp.size(); i++)
+						if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
+							items.add(itemsBcp.get(i));
+				}
+			}
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					boolean found = false;
+					cmb.hidePopup();
 					try {
-						lastSelected = cmb.getSelectedItem();
-						String editText = editor.getText();
-						String editTextLow = editText.toLowerCase();
-						String lastSelTextLow = (lastSelected != null) ? lastSelected.name.toLowerCase() : "";
-						loadClassifier();
-						if (editText.length() == 0) {
-							found = true;
-							cmb.setSelectedItem(null);
-							return;
-						} else if ((lastSelected != null) && (lastSelTextLow.indexOf(editTextLow) == 0)) {
-							found = true;
-							if (!lastSelTextLow.equals(editTextLow)) {
-								editor.setText(lastSelected.name);
-								setCaretPosition(lastSelTextLow.length(), editTextLow.length());
-							}
-						} else
-							for (StringClassifier item : cmb.items) {
-								if (item.name.toLowerCase().indexOf(editTextLow) == 0) {
-									found = true;
-									lastSelected = item;
-									lastSelTextLow = lastSelected.name.toLowerCase();
-									cmb.setSelectedItem(lastSelected);
-									editor.setText(lastSelected.name);
-									setCaretPosition(lastSelTextLow.length(), editTextLow.length());
-									break;
-								}
-							}
-						if (!found) {
-							cmb.setSelectedItem(null);
-							editor.setText(editText);
-							if (cmb.items.size() > 0)
-								cmb.showPopup();
-						} else if ((lastSelected == null) && (cmb.items.size() > 0))
-							cmb.showPopup();
-						else if (!lastSelTextLow.equals(editTextLow) && (cmb.items.size() > 0))
-							cmb.showPopup();
-					} finally {
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								searching = false;
-							}
-						});
-					}
-				}
-				
-				private void setCaretPosition(final int pos, final int len) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							editor.setCaretPosition(pos);
-							editor.moveCaretPosition(len);
+						int pos = editor.getCaretPosition();
+						searcher.setSearchEnabled(false);
+						if (items.size() == 0) {
+							items = itemsBcp;
+							setSelectedItem(null);
 						}
-					});
+						if (selItem != null)
+							setSelectedItem(selItem);
+						if (items.size() == 1)
+							setSelectedItem(items.get(0));
+						model.fireContentsChanged();
+						editor.setText(srcStrLow);
+						editor.setCaretPosition(pos);
+						if (getSelectedItem() != null)
+							if (getSelectedItem().name.toLowerCase().equals(srcStrLow))
+								editor.selectAll();
+					} finally {
+						searcher.setSearchEnabled(true);
+					}
+					if ((selItem == null) || (prevSelItem != selItem))
+						cmb.showPopup();
+					prevSelItem = selItem;
 				}
 			});
 		}
