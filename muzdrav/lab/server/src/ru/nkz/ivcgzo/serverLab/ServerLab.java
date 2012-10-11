@@ -25,6 +25,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftLab.Metod;
+import ru.nkz.ivcgzo.thriftLab.Napr;
 import ru.nkz.ivcgzo.thriftLab.Pisl;
 import ru.nkz.ivcgzo.thriftLab.Pokaz;
 import ru.nkz.ivcgzo.thriftLab.PokazMet;
@@ -47,6 +48,8 @@ public class ServerLab extends Server implements Iface {
     private TResultSetMapper<PrezL, PrezL._Fields> rsmPrezL;
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClass;
     private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClass;
+    @SuppressWarnings("unused")
+    private TResultSetMapper<Napr, Napr._Fields> rsmNapr;
 
     private static final String[] METOD_FIELD_NAMES = {
         "obst", "name_obst", "c_p0e1", "pcod"
@@ -59,7 +62,7 @@ public class ServerLab extends Server implements Iface {
     };
     private static final String[] PISL_FIELD_NAMES = {
         "nisl", "npasp", "cisl", "pcisl", "napravl", "naprotd", "datan", "vrach",
-        "diag", "dataz", "pvizit_id"
+        "diag", "dataz", "kodotd", "pvizit_id"
     };
     private static final String[] PREZ_D_FIELD_NAMES = {
         "id", "npasp", "nisl", "kodisl"
@@ -72,6 +75,9 @@ public class ServerLab extends Server implements Iface {
     };
     private static final String[] STR_CLASS_FIELD_NAMES = {
         "pcod", "name"
+    };
+    private static final String[] NAPR_FIELD_NAMES = {
+        "id", "id_pvizit", "vid_doc", "text", "preds", "zaved", "id_gosp"
     };
 
     @SuppressWarnings("unused")
@@ -94,8 +100,8 @@ public class ServerLab extends Server implements Iface {
         Integer.class, Integer.class, Integer.class, String.class,
     //  napravl        naprotd        datan       vrach
         Integer.class, Integer.class, Date.class, Integer.class,
-    //  diag          dataz       pvizit_id
-        String.class, Date.class, Integer.class
+    //  diag          dataz       kodotd         pvizit_id
+        String.class, Date.class, Integer.class, Integer.class
     };
     private static final Class<?>[] PREZ_D_TYPES = {
     //  id             npasp          nisl           kodisl
@@ -115,6 +121,12 @@ public class ServerLab extends Server implements Iface {
     //  pcod           name
         String.class, String.class
     };
+    private static final Class<?>[] NAPR_TYPES = {
+    //  id             id_pvizit      vidDoc         text
+        Integer.class, Integer.class, Integer.class, String.class,
+   //    preds          zaved          id_gosp
+        Integer.class, Integer.class, Integer.class
+    };
 
     public ServerLab(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
         super(sse, tse);
@@ -132,6 +144,7 @@ public class ServerLab extends Server implements Iface {
         rsmPrezL = new TResultSetMapper<>(PrezL.class, PREZ_L_FIELD_NAMES);
         rsmIntClass = new TResultSetMapper<>(IntegerClassifier.class, INT_CLASS_FIELD_NAMES);
         rsmStrClass = new TResultSetMapper<>(StringClassifier.class, STR_CLASS_FIELD_NAMES);
+        rsmNapr = new TResultSetMapper<>(Napr.class, NAPR_FIELD_NAMES);
     }
 
     @Override
@@ -206,12 +219,14 @@ public class ServerLab extends Server implements Iface {
     }
 
     @Override
-    public final int AddPisl(final Pisl npisl) throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    public final int addPisl(final Pisl npisl) throws KmiacServerException {
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, "
-                + "datan, vrach, diag, dataz, pvizit_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
+                + "datan, vrach, diag, dataz, kodotd, pvizit_id) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ",
                 true, npisl, PISL_TYPES, indexes);
+            System.out.println(npisl.getPvizitId());
             int id = sme.getGeneratedKeys().getInt("nisl");
             sme.setCommit();
             return id;
@@ -225,7 +240,7 @@ public class ServerLab extends Server implements Iface {
     }
 
     @Override
-    public final int AddPrezd(final PrezD di) throws KmiacServerException {
+    public final int addPrezd(final PrezD di) throws KmiacServerException {
         final int[] indexes = {1, 2, 3};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl) VALUES (?, ?, ?) ",
@@ -243,7 +258,7 @@ public class ServerLab extends Server implements Iface {
     }
 
     @Override
-    public final int AddPrezl(final PrezL li) throws KmiacServerException {
+    public final int addPrezl(final PrezL li) throws KmiacServerException {
         final int[] indexes = {1, 2, 3};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok) VALUES (?, ?, ?) ",
@@ -334,9 +349,31 @@ public class ServerLab extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             ((SQLException) e.getCause()).printStackTrace();
             throw new KmiacServerException();
         }
+    }
 
+    @Override
+    public final int addNapr(final Napr napr) throws KmiacServerException, TException {
+        final int[] indexes = {1, 2, 3, 4, 5, 6};
+        final String sqlQuery = "INSERT INTO p_napr "
+            + "(id_pvizit, vid_doc, text, preds, zaved, id_gosp) "
+            + "VALUES (?, ?, ?, ?, ?, ?) ";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, true, napr, NAPR_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            ((SQLException) e.getCause()).printStackTrace();
+            throw new KmiacServerException();
+        } catch (InterruptedException e1) {
+            log.log(Level.ERROR, "Exception: ", e1);
+            e1.printStackTrace();
+            throw new KmiacServerException();
+        }
     }
 }

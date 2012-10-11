@@ -25,6 +25,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftLab.Napr;
 import ru.nkz.ivcgzo.thriftLab.Patient;
 import ru.nkz.ivcgzo.thriftLab.Pisl;
 import ru.nkz.ivcgzo.thriftLab.PokazMet;
@@ -61,8 +62,6 @@ public class MainFrame extends JFrame {
     private JLabel lblNapravFrom;
     private JComboBox<String> cbxOrganizationFrom;
     private JButton btnPrintNaprav;
-    private JLabel lblVidStac;
-    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidStac;
     private JLabel lblObosn;
     private JLabel lblNapravTo;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxOrganzationTo;
@@ -72,6 +71,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
+        this.setTitle(String.format("%s", "111"));
         initialization();
     }
 
@@ -91,13 +91,13 @@ public class MainFrame extends JFrame {
     }
 
     public final void fillPatient(final int id, final String surname,
-            final String name, final String middlename) {
+            final String name, final String middlename, final int idGosp) {
         patient = new Patient();
         patient.setId(id);
         patient.setSurname(surname);
         patient.setName(name);
         patient.setMiddlename(middlename);
-        setTitle(String.format("%s %s %s", surname, name, middlename));
+        patient.setIdGosp(idGosp);
     }
 
     private void addIssledTab() {
@@ -221,13 +221,16 @@ public class MainFrame extends JFrame {
     private void fillPislFields(final Pisl pisl) throws KmiacServerException, TException {
         pisl.setNpasp(patient.getId());
         pisl.setPcisl(cbxOrgAndSystem.getSelectedPcod());
+        pisl.setKodotd(cbxLabs.getSelectedPcod());
+        System.out.println(pisl.getKodotd());
+        System.out.println(cbxLabs.getSelectedPcod());
         pisl.setNapravl(2);
         pisl.setNaprotd(doctorAuthInfo.getCpodr());
         pisl.setDatan(System.currentTimeMillis());
         pisl.setVrach(doctorAuthInfo.getPcod());
         pisl.setDataz(System.currentTimeMillis());
 //        pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
-        pisl.setNisl(ClientLab.tcl.AddPisl(pisl));
+        pisl.setNisl(ClientLab.tcl.addPisl(pisl));
     }
 
     private void fillPrezLFields(final Pisl pisl, final PokazMet pokazMet,
@@ -235,7 +238,7 @@ public class MainFrame extends JFrame {
         prezl.setNpasp(pisl.getNpasp());
         prezl.setNisl(pisl.getNisl());
         prezl.setCpok(pokazMet.pcod);
-        prezl.setId(ClientLab.tcl.AddPrezl(prezl));
+        prezl.setId(ClientLab.tcl.addPrezl(prezl));
     }
 
     private void fillPrezDFields(final Pisl pisl, final PokazMet pokazMet,
@@ -243,7 +246,7 @@ public class MainFrame extends JFrame {
         prezd.setNpasp(pisl.getNpasp());
         prezd.setNisl(pisl.getNisl());
         prezd.setKodisl(pokazMet.pcod);
-        prezd.setId(ClientLab.tcl.AddPrezd(prezd));
+        prezd.setId(ClientLab.tcl.addPrezd(prezd));
     }
 
     private void addNapravTab() {
@@ -252,7 +255,6 @@ public class MainFrame extends JFrame {
 
         setNapravTextArea();
         setNapravOrganizationFromComboBoxes();
-        setNapravVidStacComboBoxes();
         setNapravOrganizationToComboBoxes();
         setNapravButtons();
 
@@ -263,55 +265,20 @@ public class MainFrame extends JFrame {
         lblNapravFrom = new JLabel("на");
         cbxOrganizationFrom = new JComboBox<String>();
         cbxOrganizationFrom.setModel(new DefaultComboBoxModel<>(
-                new String[] {"госпитализацию", "консультацию", "обследование"}));
+//                new String[] {"госпитализацию", "консультацию", "обследование"}));
+                  new String[] {"консультацию", "обследование"}));
         cbxOrganizationFrom.setSelectedIndex(0);
         cbxOrganizationFrom.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 lblNapravTo.setVisible(true);
                 cbxOrganzationTo.setVisible(true);
-                if (cbxOrganizationFrom.getSelectedIndex() != 0) {
-                    cbxVidStac.setVisible(false);
-                    lblVidStac.setVisible(false);
-                    try {
-                        cbxOrganzationTo.setData(ClientLab.tcl.getPoliclinic());
-                    } catch (KmiacServerException e1) {
-                        e1.printStackTrace();
-                    } catch (TException e1) {
-                        ClientLab.conMan.reconnect(e1);
-                        e1.printStackTrace();
-                    }
-                } else {
-                    cbxVidStac.setSelectedIndex(0);
-                    cbxVidStac.setVisible(true);
-                    lblVidStac.setVisible(true);
-                }
-            }
-        });
-    }
-
-    private void setNapravVidStacComboBoxes() {
-        lblVidStac = new JLabel("Вид стационара");
-        cbxVidStac = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
-        cbxVidStac.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                if (cbxVidStac.getSelectedItem() != null) {
-                    if ((cbxVidStac.getSelectedPcod() == 1)
-                            || (cbxVidStac.getSelectedPcod() == 2)) {
-                        lblNapravTo.setVisible(true);
-                        cbxOrganzationTo.setVisible(true);
-                        try {
-                            cbxOrganzationTo.setData(ClientLab.tcl.getLpu());
-                        } catch (KmiacServerException e1) {
-                            e1.printStackTrace();
-                        } catch (TException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-                    if ((cbxVidStac.getSelectedPcod() == 3)
-                            || (cbxVidStac.getSelectedPcod() == 4)) {
-                        lblNapravTo.setVisible(false);
-                        cbxOrganzationTo.setVisible(false);
-                    }
+                try {
+                    cbxOrganzationTo.setData(ClientLab.tcl.getPoliclinic());
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientLab.conMan.reconnect(e1);
+                    e1.printStackTrace();
                 }
             }
         });
@@ -333,6 +300,34 @@ public class MainFrame extends JFrame {
         btnPrintNaprav = new JButton("Печать");
         btnPrintNaprav.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
+                try {
+                    Napr napr = new Napr();
+//                    pnapr.setIdpvizit(tblPos.getSelectedItem().getId_obr());
+                    napr.setVidDoc(3);
+                    napr.setText(taObosn.getText());
+                    napr.setId(ClientLab.tcl.addNapr(napr));
+                    napr.setIdGosp(patient.getIdGosp());
+//                    NaprKons naprkons = new NaprKons();
+//                    naprkons.setUserId(MainForm.authInfo.getUser_id());
+//                    naprkons.setNpasp(Vvod.zapVr.getNpasp());
+//                    naprkons.setObosnov(tbKonsObosnov.getText());
+//                    if (cmbKonsMesto.getSelectedItem() != null)
+//                        naprkons.setCpol(cmbKonsMesto.getSelectedItem().getName());
+//                    naprkons.setNazv(cmbKonsVidNapr.getSelectedItem().toString());
+//                    naprkons.setCdol(MainForm.authInfo.getCdol());
+//                    naprkons.setPvizitId(tblPos.getSelectedItem().getId_obr());
+//                    naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
+//                    naprkons.setClpu_name(MainForm.authInfo.getClpu_name());
+//                    String servPath = MainForm.tcl.printNaprKons(naprkons);
+//                    String cliPath = File.createTempFile("napk", ".htm").getAbsolutePath();
+//                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
+//                    MainForm.conMan.openFileInEditor(cliPath, false);
+                } catch (TException e1) {
+                    e1.printStackTrace();
+                    ClientLab.conMan.reconnect(e1);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
             }
         });
     }
@@ -340,7 +335,6 @@ public class MainFrame extends JFrame {
     public final void onConnect() {
         try {
             cbxLabs.setData(ClientLab.tcl.getLabs(doctorAuthInfo.getClpu()));
-            cbxVidStac.setData(ClientLab.tcl.getStacionarTypes());
             vidIssled = ClientLab.tcl.getVidIssled();
         } catch (KmiacServerException e) {
             e.printStackTrace();
@@ -426,24 +420,16 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxOrganzationTo, GroupLayout.DEFAULT_SIZE,
                                     607, Short.MAX_VALUE))
-                        .addComponent(lblObosn, GroupLayout.PREFERRED_SIZE,
-                                557, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblObosn, GroupLayout.PREFERRED_SIZE, 557,
+                                GroupLayout.PREFERRED_SIZE)
                         .addGroup(glPNaprav.createSequentialGroup()
                             .addComponent(spObosn, GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE)
                             .addGap(3))
                         .addGroup(glPNaprav.createSequentialGroup()
-                            .addGroup(glPNaprav.createParallelGroup(Alignment.LEADING)
-                                .addGroup(glPNaprav.createSequentialGroup()
-                                    .addComponent(lblVidStac, GroupLayout.PREFERRED_SIZE,
-                                            81, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(cbxVidStac, GroupLayout.DEFAULT_SIZE,
-                                            584, Short.MAX_VALUE))
-                                .addGroup(glPNaprav.createSequentialGroup()
-                                    .addComponent(lblNapravFrom, GroupLayout.PREFERRED_SIZE,
-                                            32, GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(ComponentPlacement.RELATED)
-                                    .addComponent(cbxOrganizationFrom, 0, 633, Short.MAX_VALUE)))
+                            .addComponent(lblNapravFrom, GroupLayout.PREFERRED_SIZE,
+                                    32, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(cbxOrganizationFrom, 0, 633, Short.MAX_VALUE)
                             .addGap(0)))
                     .addContainerGap())
         );
@@ -455,11 +441,7 @@ public class MainFrame extends JFrame {
                         .addComponent(lblNapravFrom)
                         .addComponent(cbxOrganizationFrom, GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPNaprav.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(lblVidStac)
-                        .addComponent(cbxVidStac, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addGap(20)
                     .addGroup(glPNaprav.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPNaprav.createSequentialGroup()
                             .addGap(125)
