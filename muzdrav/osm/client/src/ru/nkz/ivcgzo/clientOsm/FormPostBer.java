@@ -57,6 +57,7 @@ public class FormPostBer extends JFrame {
 	private JPanel contentPane;
 	private JTextField TNKart;
     private int oslrod;
+    private int osostp;
     private int or1;
     private int or2;
     private int or3;
@@ -123,6 +124,16 @@ public class FormPostBer extends JFrame {
 	private JCheckBox ChBeko;
 	private JCheckBox ChBPred;
 	private JCheckBox ChBRub;
+	private JCheckBox CHosp1;
+	private JCheckBox CHosp2;
+	private JCheckBox CHosp3;
+	private JCheckBox CHosp4;
+	private JCheckBox CHosp5;
+	private JCheckBox CHosp6;
+	private JCheckBox CHosp7;
+	private JCheckBox CHosp8;
+	private JCheckBox CHosp9;
+	private JCheckBox CHosp10;
 	private JLabel lblNewLabel_5;
 
 	/**
@@ -156,7 +167,7 @@ public class FormPostBer extends JFrame {
 		ButSave.addActionListener(new ActionListener() {
             private void calcOslrod(){
     			oslrod=0;
-        if (CBKrov.isSelected()){oslrod=oslrod+1;}
+            if (CBKrov.isSelected()){oslrod=oslrod+1;}
             if (CBEkl.isSelected()){oslrod=oslrod+2;}
             if (CBGnoin.isSelected()){oslrod=oslrod+4;}
             if (CBTromb.isSelected()){oslrod=oslrod+8;}
@@ -164,12 +175,23 @@ public class FormPostBer extends JFrame {
             if (CBAkush.isSelected()){oslrod=oslrod+32;}
             if (CBIiiiv.isSelected()){oslrod=oslrod+64;}
             if (CBRazrProm.isSelected()){oslrod=oslrod+128;}
+            osostp = 0;
+            if (CHosp1.isSelected()){osostp=osostp+1;}
+            if (CHosp2.isSelected()){osostp=osostp+2;}
+            if (CHosp3.isSelected()){osostp=osostp+4;}
+            if (CHosp4.isSelected()){osostp=osostp+8;}
+            if (CHosp5.isSelected()){osostp=osostp+16;}
+            if (CHosp6.isSelected()){osostp=osostp+32;}
+            if (CHosp7.isSelected()){osostp=osostp+64;}
+            if (CHosp8.isSelected()){osostp=osostp+128;}
+            if (CHosp9.isSelected()){osostp=osostp+256;}
+            if (CHosp10.isSelected()){osostp=osostp+512;}
 //			System.out.println(oslrod);		
             };
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 
-					rdSlStruct.setId_pvizit(Vvod.zapVr.id_pvizit);
+			rdSlStruct.setId_pvizit(Vvod.zapVr.id_pvizit);
 			rdSlStruct.setAbort((int) SKolAb.getValue());
 			rdSlStruct.setCext((int) SCext.getModel().getValue());
  			if (SDataM.getDate() != null)
@@ -213,6 +235,7 @@ public class FormPostBer extends JFrame {
            	rdSlStruct.setDataz(System.currentTimeMillis());
 			calcOslrod();
 			rdSlStruct.setOslrod(oslrod);
+			rdSlStruct.setOsp(osostp);
 			if (CBOslAb.getSelectedPcod() != null)
 				rdSlStruct.setOslab(CBOslAb.getSelectedPcod());
 				else rdSlStruct.unsetOslab();
@@ -348,8 +371,8 @@ public class FormPostBer extends JFrame {
 					.addGap(7))
 		);
 		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_contentPane.createSequentialGroup()
@@ -368,7 +391,7 @@ public class FormPostBer extends JFrame {
 							.addComponent(btnNewButton_1)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(BPeshOK)
-					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 603, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
@@ -447,31 +470,31 @@ public class FormPostBer extends JFrame {
 		SindSol.setModel(new SpinnerNumberModel(0, 0, 20,1));
 		
 		CBKrov = new JCheckBox("Кровотечение");
-		CBKrov.setSelected(or1 == 1);
+//		CBKrov.setSelected(or1 == 1);
 		
 		JLabel LIshPoslB = new JLabel("Осложнения предыдущих родов");
 		LIshPoslB.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		CBEkl = new JCheckBox("Проэкламсия - экламсия");
-		CBEkl.setSelected(or2 ==1);
+//		CBEkl.setSelected(or2 ==1);
 		
 		CBGnoin = new JCheckBox("Гнойно-септические осложнения");
-		CBGnoin.setSelected(or3 ==1);
+//		CBGnoin.setSelected(or3 ==1);
 		
 		CBTromb = new JCheckBox("Тромбоэмболитические осложнения");
-		CBTromb.setSelected(or4 ==1);
+//		CBTromb.setSelected(or4 ==1);
 		
 		CDKesar = new JCheckBox("Кесарево сечение");
-		CDKesar.setSelected(or5 ==1);
+//		CDKesar.setSelected(or5 ==1);
 		
 		CBAkush = new JCheckBox("Акушерские щипцы");
-		CBAkush.setSelected(or6 ==1);
+//		CBAkush.setSelected(or6 ==1);
 		
 		CBIiiiv = new JCheckBox("Разрав промежности III-IV степени");
-		CBIiiiv.setSelected(or7 ==1);
+//		CBIiiiv.setSelected(or7 ==1);
 		
 		CBRazrProm = new JCheckBox("Разрав шейки матки III степени");
-		CBRazrProm.setSelected(or8 ==1);
+//		CBRazrProm.setSelected(or8 ==1);
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
@@ -1066,6 +1089,7 @@ public class FormPostBer extends JFrame {
 			SCDiag.setValue(rdSlStruct.getCdiagt());
 			SCvera.setValue(rdSlStruct.getCvera());
 			oslrod = rdSlStruct.getOslrod();
+			osostp = rdSlStruct.getOsp();
 			if(rdSlStruct.isSetOslab())
 			CBOslAb.setSelectedPcod(rdSlStruct.getOslab());
 			else CBOslAb.setSelectedItem(null);
@@ -1077,14 +1101,14 @@ public class FormPostBer extends JFrame {
 			else CBPrishSn.setSelectedItem(null);
 			TNKart.setText(String.valueOf(rdSlStruct.getId()));
 			method2();
-			CBKrov.setSelected(or1 == 1);
+/*			CBKrov.setSelected(or1 == 1);
 			CBEkl.setSelected(or2 == 1);
 			CBGnoin.setSelected(or3 == 1);
 			CBTromb.setSelected(or4 == 1);
 			CDKesar.setSelected(or5 == 1);
 			CBAkush.setSelected(or6 == 1);
 			CBIiiiv.setSelected(or7 == 1);
-			CBRazrProm.setSelected(or8 == 1);
+			CBRazrProm.setSelected(or8 == 1);*/
 			CBKontr.setSelected(rdSlStruct.isKont());
 			ChBeko.setSelected(rdSlStruct.isEko());
 			ChBRub.setSelected(rdSlStruct.isRub());
@@ -1103,42 +1127,40 @@ public class FormPostBer extends JFrame {
 		return null;
 	}
 	private void method2(){
-		if ((oslrod-128)<0){
-		or8=0; iw1=oslrod;	
-		}else {
-		or8=1; iw1=oslrod-128;	
-		}
-		if ((iw1-64)<0){
-		or7=0; 
-		}else {
-		or7=1; iw1=iw1-64;	
-		}
-		if ((iw1-32)<0){
-		or6=0; 
-		}else {
-		or6=1; iw1=iw1-32;	
-		}
-		if ((iw1-16)<0){
-		or5=0; 
-		}else {
-		or5=1; iw1=iw1-16;	
-		}
-		if ((iw1-8)<0){
-		or4=0; 	
-		}else {
-		or4=1; iw1=iw1-8;	
-		}
-		if ((iw1-4)<0){
-		or3=0; 
-		}else {
-		or3=1; iw1=iw1-4;	
-		}
-		if ((iw1-2)<0){
-		or2=0; 
-		}else {
-		or2=1; iw1=iw1-2;	
-		}
-		or1=iw1; 
+		if ((oslrod-128)>=0)
+		{CBRazrProm.setSelected(true);   iw1=oslrod-128;}	
+		if ((iw1-64)>=0)
+		{CBIiiiv.setSelected(true);		iw1=iw1-64;}	
+		if ((iw1-32)>=0)
+		{CBAkush.setSelected(true);		iw1=iw1-32;}	
+		if ((iw1-16)>=0)
+		{CDKesar.setSelected(true);		iw1=iw1-16;}	
+		if ((iw1-8)>=0)
+		{CBTromb.setSelected(true);		iw1=iw1-8;}	
+		if ((iw1-4)>=0) 
+		{CBGnoin.setSelected(true);		iw1=iw1-4;}	
+		if ((iw1-2)>=0)
+		{CBEkl.setSelected(true);		iw1=iw1-2;}	
+		CBKrov.setSelected(iw1 ==1 );
+		if ((osostp-512)>=0)
+		{CHosp10.setSelected(true);   iw1=osostp-512;}	
+		if ((iw1-256)>=0)
+		{CHosp9.setSelected(true);   iw1=iw1-256;}	
+		if ((iw1-128)>=0)
+		{CHosp8.setSelected(true);   iw1=iw1-128;}	
+		if ((iw1-64)>=0)
+		{CHosp7.setSelected(true);   iw1=iw1-64;}	
+		if ((iw1-32)>=0)
+		{CHosp6.setSelected(true);   iw1=iw1-32;}	
+		if ((iw1-16)>=0)
+		{CHosp5.setSelected(true);   iw1=iw1-16;}	
+		if ((iw1-8)>=0)
+		{CHosp4.setSelected(true);   iw1=iw1-8;}	
+		if ((iw1-4)>=0)
+		{CHosp3.setSelected(true);   iw1=iw1-4;}	
+		if ((iw1-2)>=0)
+		{CHosp2.setSelected(true);   iw1=iw1-2;}	
+		CHosp1.setSelected(iw1 ==1 );
 	}
 	
 	public void showForm() {

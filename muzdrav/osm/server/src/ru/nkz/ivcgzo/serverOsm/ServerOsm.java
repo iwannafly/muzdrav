@@ -2324,6 +2324,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
         Integer k1; Integer k2;Integer k3;Integer k4;
         Integer k5; Integer k6;Integer k7;Integer k8;
         Integer k10; Integer k9;
+        double ves;
 		String dex1 = "";
         String dex2 = null;
         String dex3 = null;
@@ -2418,8 +2419,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		Date dgrisk = null;
 		sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s %s %s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%30$td.%30$tm.%30$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%42$td.%42$tm.%42$tY;%d;%d;%d;%d;%47$td.%47$tm.%47$tY;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,dgrisk,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));		
 		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
-        sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
-		
+ 		
 		//Con_diagn.csv
 			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
@@ -2470,6 +2470,21 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				if (acrs21.getResultSet().getString(0).substring(0, 2) == "N03") kod7 =  kod7 + 256;
 				if (acrs21.getResultSet().getString(0).substring(0, 2) == "N18") kod7 =  kod7 + 512;
 				if (acrs21.getResultSet().getString(0).substring(0, 2) == "E10") kod8 =  kod8+1;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "E03") kod8 =  kod8+2;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "E04") kod8 =  kod8+4;
+                ves = rdp.vesd;
+				if (rdp.rost !=0) {ves = ves/rdp.vesd/rdp.vesd*100100;
+				if (ves>= 36)kod8 = kod8 + 8;}
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "E27") kod8 =  kod8+16;
+				if (acrs21.getResultSet().getString(0).substring(0, 1) == "D6") kod8 =  kod8+32;
+				if (acrs21.getResultSet().getString(0).substring(0, 1) == "B1") kod8 =  kod8+64;
+				if (acrs21.getResultSet().getString(0) == "K72.1") kod8 =  kod8+128;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "J96") kod8 =  kod8+256;
+				if (acrs21.getResultSet().getString(0).charAt(0) == 'F') kod8 =  kod8+512;
+				if (acrs21.getResultSet().getString(0).substring(0, 1) == "A1") kod8 =  kod8+1024;
+				if (acrs21.getResultSet().getString(0).substring(0, 2) == "B20") kod8 =  kod8+2048;
+				if (acrs21.getResultSet().getString(0) == "M95.5") kod8 =  kod8+4098;
+				if (acrs21.getResultSet().getString(0).substring(0, 1) == "M3") kod8 =  kod8+8196;
 				
 				if (k1 >=3) kod6 = kod6+1;
 				if ((k2+k3+k4+k5+k6+k7+k8+k9+k10)>=3) kod6 = kod6 + 2;
@@ -2501,6 +2516,32 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			if (acrs21.getResultSet().getString(1) == "dak") dak =dak + ' '+ acrs21.getResultSet().getString(0);	
 			if (acrs21.getResultSet().getString(1) == "dsost") dsost =dsost + ' '+ acrs21.getResultSet().getString(0);	
 			if (acrs21.getResultSet().getString(1) == "dosl") dosl =dosl + ' '+ acrs21.getResultSet().getString(0);	
+			if (acrs21.getResultSet().getString(0).charAt(0) == 'N') kod2 = 1;
+			if (acrs21.getResultSet().getString(0) == "O21") kod5 = kod5+1;			
+			if (acrs21.getResultSet().getString(0) == "O44") kod5 = kod5+2;			
+			if (acrs21.getResultSet().getString(0) == "O45") kod5 = kod5+2;			
+			if (acrs21.getResultSet().getString(0) == "O23.0") kod5 = kod5+4;			
+			if (acrs21.getResultSet().getString(0) == "O24") kod5 = kod5+8;			
+			if (acrs21.getResultSet().getString(0) == "O30") kod5 = kod5+16;			
+			if (acrs21.getResultSet().getString(0) == "O32") kod5 = kod5+32;			
+			if (acrs21.getResultSet().getString(0) == "O36.0") kod5 = kod5+64;			
+			if (acrs21.getResultSet().getString(0) == "O99.0") kod5 = kod5+128;			
+			if (acrs21.getResultSet().getString(0) == "O13") kod5 = kod5+256;			
+			if (acrs21.getResultSet().getString(0) == "O14") kod5 = kod5+512;			
+			if (acrs21.getResultSet().getString(0) == "O15") kod5 = kod5+1024;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I11") kod7 =  kod7 + 1;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I12") kod7 =  kod7 + 2;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I50") kod7 =  kod7 + 4;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I49") kod7 =  kod7 + 8;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I34") kod7 =  kod7 + 16;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I35") kod7 =  kod7 + 32;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "I80") kod7 =  kod7 + 64;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "N11") kod7 =  kod7 + 128;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "N03") kod7 =  kod7 + 256;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "N18") kod7 =  kod7 + 512;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "E10") kod8 =  kod8+1;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "E03") kod8 =  kod8+2;
+			if (acrs21.getResultSet().getString(0).substring(0, 2) == "E04") kod8 =  kod8+4;
 				}
 			} catch (SQLException e) {
 				((SQLException) e.getCause()).printStackTrace();
@@ -2508,26 +2549,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			}
 			dex = dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10;
 			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,rdp.npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
+		    sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
 //			acrs21.close();
 		}
-		// Con_main.csv
-//		List<RdSlStruct1> rdSl = getRdSl();
-//		for (RdSlStruct1 rsl : rdSl) {
-//			j = j+1;
-//			p1 = new Date(rsl.datay);
-//			Date p2 = new Date(rsl.dataz);
-//			Date p3 = new Date(rsl.DataZs);
-//			Date p4 = new Date(rsl.dataz);
-//			Date p5 = new Date(rsl.Datasn);
-//			Date p6 = new Date(rsl.dataM);
-//			Integer risk = 0;
-//			Integer kontr = 0;
-//			Integer rod = 0;
-//			if (rsl.prrod != "") rod =1;
-//			if (rsl.kont) kontr=1;
-//			Date dgrisk = null;
-//			sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s%s%s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%19$td.%19$tm.%19$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%31$td.%31$tm.%31$tY;%d;%d", j,rsl.npasp,rsl.deti,p1,rsl.yavka1,risk,dgrisk,rsl.DataZs,rsl.fam,rsl.im,rsl.ot,rsl.dataz,rsl.telm,rsl.Datasn,rsl.shet,rsl.kolrod,rsl.abort,rsl.polj,rsl.vozmen,rsl.prmen,rsl.dataM,kontr,rsl.dsp,rsl.dsr,rsl.dTroch,rsl.cext,rsl.indsol,rsl.vitae,rsl.allerg,rsl.ishod,p5,rod,rsl.oslrod));		
-//		}
 		//Vizit.csv
 		List<RdVizit> rdVizit = getRdVizit();
 		ball1 = 0;ball2 = 0;ball3 = 0;
