@@ -797,6 +797,7 @@ public class Vvod extends JFrame {
 		  			pdisp.setCod_sp(diagamb.getCod_sp());
 		  			pdisp.setCdol_ot(diagamb.getCdol());
 		  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
+		  			pdisp.setDiag_n(tfNewDs.getText());
 		  			MainForm.tcl.setPdisp(pdisp);
 		  			/*pdiag*/
 		  				pdiag.setD_vz(pdisp.getD_vz());
@@ -1183,6 +1184,7 @@ public class Vvod extends JFrame {
 					StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tfNewDs.getText());
 					if (res != null) {
                         tfNewDs.setText(res.pcod);
+                        tfDataIzmNewDs.setDate(System.currentTimeMillis());
                  }
 				}
 			}
@@ -1430,6 +1432,8 @@ public class Vvod extends JFrame {
 						pisl.setVrach(MainForm.authInfo.getPcod());
 						pisl.setDataz(System.currentTimeMillis());
 						pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
+						pisl.setPrichina(pvizit.getCobr());
+						pisl.setKodotd(cmbNaprMesto.getSelectedPcod());
 						pisl.setNisl(MainForm.tcl.AddPisl(pisl));
 						List<String> selItems = new ArrayList<>();
 						for (IntegerClassifier el : listVidIssl)
@@ -1455,10 +1459,8 @@ public class Vvod extends JFrame {
 						if (selItems.size() != 0) {
 							IsslMet isslmet = new IsslMet();
 							isslmet.setPvizitId(tblPos.getSelectedItem().getId_obr());
-//							isslmet.setKodVidIssl(cbVidIssl.getSelectedItem().getPcod());
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
 							isslmet.setNpasp(Vvod.zapVr.getNpasp());
-//							isslmet.setKodMetod(tabMetod.getSelectedItem().getObst());
 							isslmet.setPokaz(selItems);
 							if (cmbNaprMesto.getSelectedItem() != null) isslmet.setMesto(cmbNaprMesto.getSelectedItem().getName());
 							isslmet.setKab(getTextOrNull(tbNaprKab.getText()));
