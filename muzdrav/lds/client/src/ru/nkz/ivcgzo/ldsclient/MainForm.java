@@ -145,7 +145,14 @@ public class MainForm extends Client<LDSThrift.Client> {
 				winPat.cBrez.setData(ltc.GetKlasArez());
 				winPat.cBSvrach.setData(ltc.GetKlasSvrach(authInfo.cpodr));
 				
-				winOpt.p0e1.setData(ltc.GetKlasP0e1());
+				
+				
+				if (PostPer.tip.equals("Л")){
+					winOpt.p0e1.setData(ltc.GetKlasP0e1(1));
+				}else{
+					winOpt.p0e1.setData(ltc.GetKlasNoLabP0e1(1));
+				}
+				
 				winOpt.n_nz1.setData(ltc.GetKlasNz1());
 				winOpt.ts_ot01.setData(ltc.GetMinS_ot01(authInfo.cpodr));
 			

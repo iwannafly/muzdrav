@@ -446,7 +446,12 @@ public class PIslForm {
 					upnisl.setVrach(cBVrach.getSelectedPcod());
 				}else {upnisl.setVrach(0);}
 				
-				upnisl.setVopl(cBvopl.getSelectedPcod());
+				if (cBvopl.getSelectedPcod() != null){
+					upnisl.setVopl(cBvopl.getSelectedPcod());
+				}else {
+					upnisl.setVopl(2);
+				}
+				
 				upnisl.setDiag(tFdiag.getText());
 				
 				if (cBSvrach.getSelectedPcod() != null){
@@ -485,7 +490,12 @@ public class PIslForm {
 					tn_ldi.getSelectedItem().setVrach(cBVrach.getSelectedPcod());
 				}else{tn_ldi.getSelectedItem().setVrach(0);}
 				
-				tn_ldi.getSelectedItem().setVopl(cBvopl.getSelectedPcod());
+				if (cBvopl.getSelectedPcod() != null){
+					tn_ldi.getSelectedItem().setVopl(cBvopl.getSelectedPcod());
+				}else{
+					tn_ldi.getSelectedItem().setVopl(2);
+				}
+				
 				tn_ldi.getSelectedItem().setDiag(tFdiag.getText());
 				
 				if (cBSvrach.getSelectedPcod() != null){
@@ -708,8 +718,11 @@ public class PIslForm {
 				}
 				
 				
-				
-				cBvopl.setSelectedPcod(tn_ldi.getSelectedItem().vopl);
+				if (cBvopl.getSelectedItem() != null){
+					cBvopl.setSelectedPcod(tn_ldi.getSelectedItem().vopl);
+				}else{
+					cBvopl.setSelectedItem(null);
+				}
 				
 				if ((tn_ldi.getSelectedItem().kodvr !=0) && (String.valueOf(tn_ldi.getSelectedItem().kodvr) != null)){
 				cBSvrach.setSelectedPcod(tn_ldi.getSelectedItem().kodvr);
@@ -1718,7 +1731,9 @@ public class PIslForm {
 			public void actionPerformed(ActionEvent arg0) {
 			
 				
-			if((cBLpcod_m.getSelectedItem() != null)&&(tlab_isl.getSelectedItem().name_m != null)&&(!tlab_isl.getSelectedItem().pcod_m.equals(cBLpcod_m.getSelectedPcod()))){
+			if((cBLpcod_m.getSelectedItem() != null)&&(tlab_isl.getSelectedItem() != null)
+				&&((tlab_isl.getSelectedItem().pcod_m == null)||(!tlab_isl.getSelectedItem().pcod_m.equals(cBLpcod_m.getSelectedPcod())))){
+
 				LabIsl upLabMet = new LabIsl();
 				try {
 					upLabMet.setPcod_m(cBLpcod_m.getSelectedPcod());
@@ -1766,6 +1781,56 @@ public class PIslForm {
 				}
 			
 								
+			/*	}else{
+					if ((tlab_isl.getSelectedItem() != null)&&(tlab_isl.getSelectedItem().pcod_m == null)){
+						LabIsl upLabMet = new LabIsl();
+						try {
+							upLabMet.setPcod_m(cBLpcod_m.getSelectedPcod());
+							upLabMet.setZpok(tlab_isl.getSelectedItem().zpok);
+							upLabMet.setNisl(tn_ldi.getSelectedItem().nisl);
+							upLabMet.setCpok(tlab_isl.getSelectedItem().cpok);
+							
+								List<Metod> Cena;
+								
+								try {
+									Cena = MainForm.ltc.GetStoim(tlab_isl.getSelectedItem().cpok, cBLpcod_m.getSelectedPcod(), MainForm.authInfo.cpodr);
+									
+									if (Cena.size() !=0){
+										upLabMet.setStoim(Cena.get(0).stoim);
+										tlab_isl.getData().get(tlab_isl.getSelectedRow()).setStoim(Cena.get(0).stoim);
+									}
+									
+								} catch (TException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} 
+							
+							
+							
+							
+							//System.out.print(upLabMet);
+						
+							MainForm.ltc.UpdLIsl(upLabMet);
+						
+							//tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl));
+							if (cBLpcod_m.getSelectedItem()!=null)	
+							tlab_isl.setValueAt(cBLpcod_m.getSelectedItem().name, tlab_isl.getSelectedRow(), 2);
+						
+							tlab_isl.getData().get(tlab_isl.getSelectedRow()).setPcod_m(cBLpcod_m.getSelectedPcod());
+						
+							tlab_isl.updateSelectedItem();
+						
+						
+						} catch (LIslExistsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (TException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+								
+						
+					}*/
 				}	
 			}
 		});

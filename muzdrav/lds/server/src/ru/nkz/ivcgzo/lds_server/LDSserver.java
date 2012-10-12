@@ -416,9 +416,9 @@ public class LDSserver extends Server implements Iface {
 	
 	
 	@Override
-	public List<Patient> getPatDat(long datap, int kodotd)
+	public List<Patient> getPatDat(long datan, int kodotd)
 			throws PatientNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT distinct Patient.npasp, Patient.fam, Patient.im, Patient.ot, Patient.datar FROM patient LEFT JOIN p_isl_ld ON (patient.npasp = p_isl_ld.npasp) where (p_isl_ld.datap = ?) and (p_isl_ld.kodotd = ?)", new Date(datap), kodotd)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT distinct Patient.npasp, Patient.fam, Patient.im, Patient.ot, Patient.datar FROM patient LEFT JOIN p_isl_ld ON (patient.npasp = p_isl_ld.npasp) where (p_isl_ld.datan = ?) and (p_isl_ld.kodotd = ?)", new Date(datan), kodotd)) {
 			return rmsPatient.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -472,14 +472,27 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public List<IntegerClassifier> GetKlasP0e1() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0e1 ")) {
+	public List<IntegerClassifier> GetKlasP0e1(int grupp) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0e1 where gruppa = ?", grupp)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
 	}
 
+	
+	@Override
+	public List<IntegerClassifier> GetKlasNoLabP0e1(int grupp)
+			throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pcod, name FROM n_p0e1 where gruppa <> ?", grupp)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}	
+	
+	
+	
 	@Override
 	public List<N_ldi> getN_ldi(String c_nz1, int c_p0e1)
 			throws LdiNotFoundException, TException {
@@ -668,6 +681,8 @@ public class LDSserver extends Server implements Iface {
 			throw new TException(e);
 		}
 	}
+
+
 
 
 
