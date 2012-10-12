@@ -19,7 +19,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pobost;
-import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -73,20 +72,7 @@ public class DispHron extends JFrame{
 		bAddDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-		  		pmer.setNpasp(Vvod.zapVr.getNpasp());
-		  		pmer.setCpol(MainForm.authInfo.getCpodr());
-		  		pmer.setDiag(cmbDiag.getSelectedPcod());
-		  		pmer.setCod_sp(MainForm.authInfo.getPcod());
-		  		pmer.setDataz(System.currentTimeMillis());
-		  		pmer.setPdat(System.currentTimeMillis());
-				try {
-					pmer.setId(MainForm.tcl.AddPmer(pmer));
-				} catch (KmiacServerException e1) {
-					e1.printStackTrace();
-				} catch (TException e1) {
-					e1.printStackTrace();
-				}
-	 			tblDispHron.addItem(pmer);
+		  		tblDispHron.addItem();
 			}
 		});
 		
@@ -97,19 +83,29 @@ public class DispHron extends JFrame{
 				tblDispHron.updateSelectedItem();
 				try {
 					Pmer pmer = new Pmer();
-					pmer.setId(tblDispHron.getSelectedItem().getId());
+					pmer.setNpasp(Vvod.zapVr.getNpasp());
+			  		pmer.setCpol(MainForm.authInfo.getCpodr());
+			  		pmer.setDiag(cmbDiag.getSelectedPcod());
+			  		pmer.setCod_sp(MainForm.authInfo.getPcod());
+			  		pmer.setDataz(System.currentTimeMillis());
+			  		pmer.setPdat(System.currentTimeMillis());
 					pmer.setDiag(tblDispHron.getSelectedItem().getDiag());
 					pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
 					pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
 					pmer.setFdat(tblDispHron.getSelectedItem().getFdat());
-					pmer.setDataz(System.currentTimeMillis());
 					pmer.setRez(tblDispHron.getSelectedItem().getRez());
 					pmer.setCdol(tblDispHron.getSelectedItem().getCdol());
 					if (tfDkl.getDate() != null)pmer.setDkl(tfDkl.getDate().getTime());
 					if (tfDkl.getDate() != null)pmer.setDnl(tfDnl.getDate().getTime());
 					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText())); 
 					pmer.setTer(ter);
-					MainForm.tcl.UpdatePmer(pmer);
+							for (Pmer pm: tblDispHron.getData()) {
+								if (pm != pmer){
+						if ((pm.getPmer()==pmer.getPmer() && pm.getPdat()==pmer.getPdat())){
+							JOptionPane.showMessageDialog(DispHron.this, "Невозможно записать два одинаковых мероприятия за одну дату");	}
+						}
+					}
+					MainForm.tcl.AddPmer(pmer);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {

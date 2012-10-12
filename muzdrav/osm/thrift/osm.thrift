@@ -672,7 +672,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
-	bool IfExPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);	
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
