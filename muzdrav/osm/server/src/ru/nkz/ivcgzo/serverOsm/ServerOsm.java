@@ -2721,17 +2721,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public boolean IfExPdisp(int npasp, String diag)
-			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select diag from p_disp where (npasp = ?) and (diag = ?) ", npasp, diag)) {
-			return acrs.getResultSet().next();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
 	public Pdisp getPdisp(int npasp, String diag) throws KmiacServerException,
 			PdispNotFoundException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_disp where npasp = ? and diag = ?", npasp, diag)) {

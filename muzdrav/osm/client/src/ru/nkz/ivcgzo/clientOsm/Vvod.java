@@ -87,6 +87,7 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import javax.swing.JTextField;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -175,6 +176,8 @@ public class Vvod extends JFrame {
 	private JLabel lblVidStacionar;
 	private Color defCol = UIManager.getColor("TabbedPane.foreground");
 	private Color selCol = Color.red;
+	private CustomTextField tfNewDs;
+	private CustomDateEditor tfDataIzmNewDs;
 
 	
 	/**
@@ -1158,6 +1161,7 @@ public class Vvod extends JFrame {
 		JLabel lblDiagDispIsh = new JLabel("Исход ДУ");
 		
 		JButton btnDispHron = new JButton("...");
+		btnDispHron.setToolTipText("Диспансерные мероприятия");
 		btnDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			disphron.ShowDispHron();
@@ -1168,6 +1172,27 @@ public class Vvod extends JFrame {
 		
 		tfNuch = new CustomTextField();
 		tfNuch.setColumns(10);
+		
+		JLabel lblNewDs = new JLabel("Новый Ds");
+		
+		tfNewDs = new CustomTextField();
+		tfNewDs.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tfNewDs.getText());
+					if (res != null) {
+                        tfNewDs.setText(res.pcod);
+                 }
+				}
+			}
+		});
+		tfNewDs.setColumns(10);
+		
+		JLabel lblDataIzmNewDs = new JLabel("Дата изм-я Ds");
+		
+		tfDataIzmNewDs = new CustomDateEditor();
+		tfDataIzmNewDs.setColumns(10);
 		GroupLayout gl_pnlDiagDisp = new GroupLayout(pnlDiagDisp);
 		gl_pnlDiagDisp.setHorizontalGroup(
 			gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
@@ -1187,13 +1212,21 @@ public class Vvod extends JFrame {
 								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 									.addComponent(lblDiagDispIsh)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(cmbDiagDispIsh, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE))
+									.addComponent(cmbDiagDispIsh, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 									.addComponent(lblNuch)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-							.addGap(18)
-							.addComponent(lblDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE)
+									.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblNewDs)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(lblDataIzmNewDs)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfDataIzmNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
@@ -1221,7 +1254,11 @@ public class Vvod extends JFrame {
 						.addComponent(lblNuch)
 						.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.BASELINE)
 							.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblNewDs)
+							.addComponent(tfNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblDataIzmNewDs)
+							.addComponent(tfDataIzmNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addGap(11))
 		);
 		pnlDiagDisp.setLayout(gl_pnlDiagDisp);
