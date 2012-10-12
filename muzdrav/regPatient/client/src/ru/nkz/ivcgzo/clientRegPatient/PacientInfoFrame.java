@@ -5,12 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -36,8 +37,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import org.apache.log4j.Level;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.IClient;
@@ -80,8 +79,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
-import java.awt.Component;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -627,28 +624,32 @@ public class PacientInfoFrame extends JFrame {
                         btnDel.setToolTipText("Удалить карту пациента");
                         btnDel.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent arg0) {
-//                              try {
+                              try {
 //				            	MainForm.tcl.deletePatient(curPatientId, MainForm.authInfo.cpodr);
-                                //MainForm.tcl.deletePatient(curPatientId);
-                                //MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
+                                MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
                                 NewPatient();
-//                              } catch (TException e) {
-//                                  e.printStackTrace();
-//                              }
+                              } catch (TException e) {
+                                  e.printStackTrace();
+                              } catch (KmiacServerException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
                             }
                         });
 
                         JButton btnShowTalonSelectModule = new JButton("Запись на приём");
                         btnShowTalonSelectModule.setToolTipText("Записать пациента на приём");
+                        btnShowTalonSelectModule.setVisible(false);
                         btnShowTalonSelectModule.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent arg0) {
                                 try {
-                                    int patientId = curPatientId;
+                                	long patientBirthdate = 0;
+                                	int patientId = curPatientId;
                                     String patientSurname = tfFam.getText();
                                     String patientName = tfIm.getText();
                                     String patientMiddlename = tfOt.getText();
-                                    long patientBirthdate = tfDr.getDate().getTime();
+                                    if (tfDr.getDate() != null) patientBirthdate = tfDr.getDate().getTime();
                                     int idPvizit = 0;
                                     IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
                                     client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename,
@@ -3037,6 +3038,12 @@ public class PacientInfoFrame extends JFrame {
             tbMain.remove(tpSign);
             tbMain.remove(tpPriem);
             btnPrint_istb.setVisible(false);
+            btnShowTalonSelectModule.setVisible(true);
+        }
+        if (MainForm.authInfo.getCslu() == 1) {
+            btnPrint_ambk.setVisible(false);
+            btnPrint_istb.setVisible(true);
+            btnShowTalonSelectModule.setVisible(false);
         }
 
         pl_print.setLayout(gl_pl_print);

@@ -1,14 +1,13 @@
-﻿package ru.nrz.ivcgzo.serverOutputInfo;
+package ru.nrz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.sql.Date;
-//import java.util.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
@@ -17,20 +16,14 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
-
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
-import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOutputInfo.InputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 import ru.nkz.ivcgzo.thriftOutputInfo.OutputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
-import ru.nkz.ivcgzo.thriftOutputInfo.OutputSvodVed;
-import ru.nkz.ivcgzo.thriftOutputInfo.OutputTest;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
@@ -42,6 +35,7 @@ public class OutputInfo extends Server implements Iface {
 	public String cdiag, kat;
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 	SimpleDateFormat sdfo = new SimpleDateFormat("dd.MM.yyyy");
+	SimpleDateFormat sdfy = new SimpleDateFormat("yyyy");
 	// Текущая дата в формате 12.12.2012
 	String curDat = sdfo.format(java.util.Calendar.getInstance().getTime());
 	
@@ -169,27 +163,6 @@ public class OutputInfo extends Server implements Iface {
 	}
 
 	@Override
-	public String printTest(OutputTest ot, InputAuthInfo iaf) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		String path;
-		
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
-			AutoCloseableResultSet acrs;
-			
-			StringBuilder sb = new StringBuilder(0x10000);
-			sb.append(String.format("<h3>Поликлиника %s", iaf.getCpodr_name()));
-			osw.write(sb.toString());
-			return path;
-	//	} catch (SQLException e) {
-	//		((SQLException) e.getCause()).printStackTrace();
-	//		throw new KmiacServerException();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
-
-	@Override
 
 	public String printPlanDisp(OutputPlanDisp opd)
 			throws KmiacServerException, TException {
@@ -199,21 +172,35 @@ public class OutputInfo extends Server implements Iface {
 
 	
 
-	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv,
-			OutputSvodVed osv) throws KmiacServerException, TException {
+	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		String path = null;
-		
+		String bokl = null;
 		// Считывает входные значения с формы
 		String dateb = isv.getDateb();
 		String datef = isv.getDatef();
 		int vozcat = isv.getVozcat();
 		
-		//final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between'",datab,"'::date and '2012-12-31'::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
+		// Первичность
+		int perv = 0;
+		// Предыдущий год
+		String yaerr = null;
+		// Текущий год
+		String yaetr = null;
+		// Конец закрытия предыдущего отчетного периода
+		Date kpo = null;
+		// Конец года по периоду
+		Date kpg = null;
+		int kolz = 0;
 		
+		//Запросы
+		final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz,d.datad,d.ishod from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between ?::date and ?::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
+		//final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between'",datab,"'::date and '2012-12-31'::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
+		//final String sqlQuerySkat = "select lgot from p_kov";
+		final String sqlQueryBok = "select * from n_bz5";
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
-			AutoCloseableResultSet spat;
+			AutoCloseableResultSet bok;
 			
 			
 						
@@ -236,13 +223,15 @@ public class OutputInfo extends Server implements Iface {
 					sdfoDateB = sdfo.format(sdf.parse(dateb));
 					sdfoDateF = sdfo.format(sdf.parse(datef));
 					// Предыдущий год
-					//String yaerr = String.valueOf((sdf.parse(datef).getYear()-1));
+					yaetr = sdfy.format(sdf.parse(datef));
+					
+					yaerr = String.valueOf(Integer.parseInt(yaetr)-1);
 					// Текущий год по периоду
 					//String yaetr = String.valueOf((sdf.parse(datef).getYear()));
 					// Конец отчетного периода
-					//Date kpo = (Date) sdf.parse(yaerr+"-12-25");
+					kpo = sdf.parse(yaerr+"-12-25");
 					// Конец года по периоду
-					//Date kpg = (Date) sdf.parse(yaetr+"-12-31"); 
+					kpg = sdf.parse(yaetr+"-12-31"); 
 				} catch (ParseException e) {
 				//	// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -267,6 +256,68 @@ public class OutputInfo extends Server implements Iface {
 			//default: 
 			}
 			
+			// Расчет значений
+			try (AutoCloseableResultSet spat = sse.execPreparedQuery(sqlQuerySpat ,dateb, datef))
+			{
+				
+				while (spat.getResultSet().next()) {
+					if (spat.getResultSet().getString("diag").trim().charAt(0)!='Z' && spat.getResultSet().getInt("ishod")!=0) {
+					//if (spat.getResultSet().getString("diag").trim().charAt(0)!='Z') {
+						
+						xind = spat.getResultSet().getInt("npasp");
+						cdiag = spat.getResultSet().getString("diag");
+						int ndiag = spat.getResultSet().getInt("id_diag_amb");
+						//System.out.println(cdiag);
+						// Здесь должна быть проверка, связанная с таблицей PBOL
+						// Здесь должна быть проверка, связанная со льготами
+						bok = sse.execPreparedQuery(sqlQueryBok);
+						bok.getResultSet().next();
+						
+						bokl = bok.getResultSet().getString("name");
+						/**
+						try (AutoCloseableResultSet skat = sse.execPreparedQuery(sqlQuerySkat))
+						{
+							while (skat.getResultSet().next()) {
+								kat = skat.getResultSet().getString("lgot");
+							}
+							
+						} 	catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						}*/
+						// Проверка на условие первичности посещения
+						if (spat.getResultSet().getInt("xzab")==1) perv=1;
+						else if (spat.getResultSet().getDate("dataz").after(kpo) && spat.getResultSet().getDate("dataz").before(kpg)) {
+							// Здесь также должен проверяться исход (<>0)
+							try (AutoCloseableResultSet arcs = sse.execPreparedQuery("select count(*) from p_vizit_amb where npasp= ? and id_diag_amb = ? and ishod<>0 and datap between ? and ?::date", xind, ndiag, kpo, datef))
+							{
+								while (arcs.getResultSet().next()) {
+									if (arcs.getResultSet().getInt(0)==1) {
+										if (spat.getResultSet().getDate("datad").after(kpo) && spat.getResultSet().getDate("datad").before(kpg)) perv=1; else perv=2;
+									} else {
+										try (AutoCloseableResultSet arcss = sse.execPreparedQuery("select datep from p_vizit_amb where npasp= ? and id_diag_amb = ? and ishod<>0 and datap between ? and ?::date order by datap", xind, ndiag, kpo, datef))
+										{
+											while (arcss.getResultSet().next()) {
+												if (spat.getResultSet().getString("datad").equals(arcss.getResultSet().getString(0))) {
+													if (spat.getResultSet().getDate("datad").after(kpo) && spat.getResultSet().getDate("datad").before(kpg)) perv=1; else perv=2;
+												} else perv=3;
+											}
+										}
+										
+																			
+									}
+								}
+							}
+						} else perv=3;
+					} else perv=3; 
+					System.out.println(String.valueOf(perv));	
+					//sb.append(String.format("<P><BR>%s<BR>", kolz));
+				}
+			} 	catch (SQLException e) {
+				((SQLException) e.getCause()).printStackTrace();
+				throw new KmiacServerException();
+			}
+
 		
 			StringBuilder sb = new StringBuilder(0x10000);
 			// Шапка сводки
@@ -373,24 +424,49 @@ public class OutputInfo extends Server implements Iface {
 			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">7</FONT></FONT></P>"));
 			sb.append(String.format("		</TD>"));
 			sb.append(String.format("	</TR>"));
+			// Подстановка значений в таблицу
+			sb.append(String.format("	<TR VALIGN=TOP>"));
+			sb.append(String.format("		<TD WIDTH=165 HEIGHT=17 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"1\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", bokl ));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=64 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"2\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"3\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=75 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"4\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=69 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"5\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=68 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"6\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("		<TD WIDTH=94 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"7\" SDNUM=\"1049;\">"));
+			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
+			sb.append(String.format("		</TD>"));
+			sb.append(String.format("	</TR>"));
+			
+			// Подвал документа
 			sb.append(String.format("</TABLE>"));
-			sb.append(String.format("<P><BR><BR>"));
+			
+			sb.append(String.format("<P><BR>%s<BR>", yaerr));
 			sb.append(String.format("</P>"));
 			sb.append(String.format("</BODY>"));
 			sb.append(String.format("</HTML>"));
-			//while (spat.getResultSet().next()) {
+			//sb.append(String.format("<p>%s", kolz));
+				//try
 				
-		//	}
-
+			
 
 			
 			
 			osw.write(sb.toString());
 			//return path;
 
-		//} catch (SQLException e) {
-		//	((SQLException) e.getCause()).printStackTrace();
-		//	throw new KmiacServerException();
+	
 		
 		} catch (IOException e) {
 			e.printStackTrace();

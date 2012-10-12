@@ -3,6 +3,13 @@ namespace java ru.nkz.ivcgzo.thriftLab
 include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
 
+struct Patient {
+	1: optional i32 id;
+	2: optional string surname;
+	3: optional string name;
+	4: optional string middlename;
+}
+
 /*Список показателей исследований по выбранному методу*/
 struct PokazMet{
 	1: optional string pcod;
@@ -58,6 +65,7 @@ struct PrezL {
 }
 
 service ThriftLab extends kmiacServer.KmiacServer {
+	list<classifier.IntegerClassifier> getVidIssled() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getLabs(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getOrgAndSys(1: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	/*Исследования*/

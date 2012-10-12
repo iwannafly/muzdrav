@@ -11,7 +11,6 @@ import javax.swing.JLabel;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
-import ru.nkz.ivcgzo.thriftOutputInfo.OutputTest;
 
 import javax.swing.JRadioButton;
 import javax.swing.JButton;
@@ -75,7 +74,7 @@ public class SvodVed extends JPanel {
 									
 					
 					//OutputTest ot = new OutputTest();
-					String servPath = MainForm.tcl.printSvodVed(iaf,isv, null);
+					String servPath = MainForm.tcl.printSvodVed(iaf,isv);
 					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, true);

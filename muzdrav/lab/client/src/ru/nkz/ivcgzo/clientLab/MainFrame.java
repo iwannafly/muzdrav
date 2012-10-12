@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientLab;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -23,7 +25,11 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftLab.Patient;
+import ru.nkz.ivcgzo.thriftLab.Pisl;
 import ru.nkz.ivcgzo.thriftLab.PokazMet;
+import ru.nkz.ivcgzo.thriftLab.PrezD;
+import ru.nkz.ivcgzo.thriftLab.PrezL;
 
 import javax.swing.JButton;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -61,6 +67,8 @@ public class MainFrame extends JFrame {
     private JLabel lblNapravTo;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxOrganzationTo;
     private JTextArea taObosn;
+    private Patient patient;
+    private List<IntegerClassifier> vidIssled;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
@@ -80,6 +88,16 @@ public class MainFrame extends JFrame {
     private void addMainTabbedPane() {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane);
+    }
+
+    public final void fillPatient(final int id, final String surname,
+            final String name, final String middlename) {
+        patient = new Patient();
+        patient.setId(id);
+        patient.setSurname(surname);
+        patient.setName(name);
+        patient.setMiddlename(middlename);
+        setTitle(String.format("%s %s %s", surname, name, middlename));
     }
 
     private void addIssledTab() {
@@ -155,6 +173,77 @@ public class MainFrame extends JFrame {
 
     private void setIssledButtons() {
         btnPrintIssled = new JButton("Печать");
+        btnPrintIssled.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (cbxOrgAndSystem.getSelectedItem() != null) {
+                    try {
+                        Pisl pisl = new Pisl();
+                        fillPislFields(pisl);
+                        List<String> selItems = new ArrayList<>();
+                        // piece of shit!!! Переписать!
+                        for (IntegerClassifier vid : vidIssled) {
+                            if (vid.pcod == cbxLabs.getSelectedPcod()) {
+                                for (PokazMet pokazMet : tbIssled.getData()) {
+                                    if (pokazMet.vybor) {
+                                        if (vid.name.equals("Л")) {
+                                            PrezL prezl = new PrezL();
+                                            fillPrezLFields(pisl, pokazMet, prezl);
+                                        } else {
+                                            PrezD prezd = new PrezD();
+                                            fillPrezDFields(pisl, pokazMet, prezd);
+                                        }
+                                        selItems.add(pokazMet.getPcod());
+                                    }
+                                }
+                            }
+                        }
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Исследования успешно сохранены!",
+                                "Запись исследования", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (KmiacServerException e1) {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                            "Ошибка записи исследования! Информация может быть не сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                            "Ошибка записи исследования! Информация может быть не сохранена!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        ClientLab.conMan.reconnect(e1);
+                        e1.printStackTrace();
+                    }
+
+                }
+            }
+        });
+    }
+
+    private void fillPislFields(final Pisl pisl) throws KmiacServerException, TException {
+        pisl.setNpasp(patient.getId());
+        pisl.setPcisl(cbxOrgAndSystem.getSelectedPcod());
+        pisl.setNapravl(2);
+        pisl.setNaprotd(doctorAuthInfo.getCpodr());
+        pisl.setDatan(System.currentTimeMillis());
+        pisl.setVrach(doctorAuthInfo.getPcod());
+        pisl.setDataz(System.currentTimeMillis());
+//        pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
+        pisl.setNisl(ClientLab.tcl.AddPisl(pisl));
+    }
+
+    private void fillPrezLFields(final Pisl pisl, final PokazMet pokazMet,
+            final PrezL prezl) throws KmiacServerException, TException {
+        prezl.setNpasp(pisl.getNpasp());
+        prezl.setNisl(pisl.getNisl());
+        prezl.setCpok(pokazMet.pcod);
+        prezl.setId(ClientLab.tcl.AddPrezl(prezl));
+    }
+
+    private void fillPrezDFields(final Pisl pisl, final PokazMet pokazMet,
+            final PrezD prezd) throws KmiacServerException, TException {
+        prezd.setNpasp(pisl.getNpasp());
+        prezd.setNisl(pisl.getNisl());
+        prezd.setKodisl(pokazMet.pcod);
+        prezd.setId(ClientLab.tcl.AddPrezd(prezd));
     }
 
     private void addNapravTab() {
@@ -175,6 +264,7 @@ public class MainFrame extends JFrame {
         cbxOrganizationFrom = new JComboBox<String>();
         cbxOrganizationFrom.setModel(new DefaultComboBoxModel<>(
                 new String[] {"госпитализацию", "консультацию", "обследование"}));
+        cbxOrganizationFrom.setSelectedIndex(0);
         cbxOrganizationFrom.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 lblNapravTo.setVisible(true);
@@ -191,6 +281,7 @@ public class MainFrame extends JFrame {
                         e1.printStackTrace();
                     }
                 } else {
+                    cbxVidStac.setSelectedIndex(0);
                     cbxVidStac.setVisible(true);
                     lblVidStac.setVisible(true);
                 }
@@ -206,7 +297,6 @@ public class MainFrame extends JFrame {
                 if (cbxVidStac.getSelectedItem() != null) {
                     if ((cbxVidStac.getSelectedPcod() == 1)
                             || (cbxVidStac.getSelectedPcod() == 2)) {
-                        System.out.println(" тут!");
                         lblNapravTo.setVisible(true);
                         cbxOrganzationTo.setVisible(true);
                         try {
@@ -241,12 +331,17 @@ public class MainFrame extends JFrame {
 
     private void setNapravButtons() {
         btnPrintNaprav = new JButton("Печать");
+        btnPrintNaprav.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+            }
+        });
     }
 
     public final void onConnect() {
         try {
             cbxLabs.setData(ClientLab.tcl.getLabs(doctorAuthInfo.getClpu()));
             cbxVidStac.setData(ClientLab.tcl.getStacionarTypes());
+            vidIssled = ClientLab.tcl.getVidIssled();
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
