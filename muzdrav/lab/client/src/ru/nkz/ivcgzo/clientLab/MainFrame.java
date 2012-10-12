@@ -71,7 +71,6 @@ public class MainFrame extends JFrame {
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
-        this.setTitle(String.format("%s", "111"));
         initialization();
     }
 
