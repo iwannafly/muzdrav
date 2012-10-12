@@ -1837,6 +1837,7 @@ public class MainFrame extends JFrame {
     }
 
     private void setZaklPanelGroupLayout() {
+
         GroupLayout glPZakl = new GroupLayout(pZakl);
         glPZakl.setHorizontalGroup(
             glPZakl.createParallelGroup(Alignment.LEADING)
