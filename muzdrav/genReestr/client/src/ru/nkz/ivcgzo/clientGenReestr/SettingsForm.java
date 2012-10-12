@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -170,6 +172,7 @@ public class SettingsForm extends JDialog {
 		JButton btnRun = new JButton("Выполнить");
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 				if (rbtn1.isSelected()) vidrstr = 1;
 				if (rbtn2.isSelected()) vidrstr = 2;
 				if (rbtn3.isSelected()) vidrstr = 3;
@@ -177,9 +180,15 @@ public class SettingsForm extends JDialog {
 				try {
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
 						String servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-   						String cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
-   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-   						MainForm.conMan.openFileInEditor(cliPath, false);
+						if (servPath.endsWith("zip")){
+							String cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+						}
+						else{
+							String cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
+	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	   						MainForm.conMan.openFileInEditor(cliPath, false);
+						}
 						dispose();
 					}else
 						JOptionPane.showMessageDialog(null, "Укажите все параметры формирования реестра.", null, JOptionPane.INFORMATION_MESSAGE); 

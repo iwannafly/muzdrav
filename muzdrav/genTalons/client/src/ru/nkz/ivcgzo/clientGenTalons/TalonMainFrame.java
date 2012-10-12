@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
+import javax.swing.ComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -21,6 +22,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.UIManager;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -67,6 +69,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
+import javax.swing.DefaultComboBoxModel;
 
 public class TalonMainFrame extends JFrame {
 
@@ -373,6 +376,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По");
 //		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
 		tbl_rasp.setPreferredWidths(130,100,60,60);
+		tbl_rasp.setEditableFields(false, 0,1);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
 		tbl_rasp.setFillsViewportHeight(true);
@@ -867,6 +871,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_norm =new CustomTable<>(true, true, Norm.class, 1,"Вид приема",2,"Длительность");
 		tbl_norm.setFillsViewportHeight(true);
 		tbl_norm.setPreferredWidths(90,90);
+		tbl_norm.setEditableFields(false, 0);
 		sp_norm.setViewportView(tbl_norm);
 		tbNorm.setLayout(gl_tbNorm);
 		
@@ -931,7 +936,8 @@ public class TalonMainFrame extends JFrame {
            		"Декабрь"
             };
 
-        cmb_month = new JComboBox<String>(items);
+        cmb_month = new JComboBox<String>();
+        cmb_month.setModel(new DefaultComboBoxModel<>(items));
         cmb_month.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
@@ -1025,6 +1031,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_talon =new CustomTable<>(true, true, Talon.class, 11,"Время", 6,"Вид приема");
 		tbl_talon.setPreferredWidths(70,90);
 		tbl_talon.setTimeField(0);
+		tbl_talon.setEditableFields(false, 0,1);
 		tbl_talon.setFillsViewportHeight(true);
 		scrollPane_1.setViewportView(tbl_talon);
 		panel_10.setLayout(gl_panel_10);
@@ -1173,7 +1180,8 @@ public class TalonMainFrame extends JFrame {
        		"7. Количество использованных талонов"
         };
 
-		cmb_sv = new JComboBox<String>(items1);
+		cmb_sv = new JComboBox<String>();
+		cmb_sv.setModel(new DefaultComboBoxModel<>(items1));
 		cmb_sv.addActionListener(new ActionListener() {
 			@SuppressWarnings({ "rawtypes", "unused" })
 			public void actionPerformed(ActionEvent e) {

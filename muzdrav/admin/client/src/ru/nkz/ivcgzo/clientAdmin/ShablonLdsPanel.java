@@ -123,7 +123,8 @@ public class ShablonLdsPanel extends JPanel {
 		btDelete = new JButton("Удалить");
 		btDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				trSearch.removeSelected();
+				if (JOptionPane.showConfirmDialog(ShablonLdsPanel.this, "Удалить шаблон?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+					trSearch.removeSelected();
 			}
 		});
 		
