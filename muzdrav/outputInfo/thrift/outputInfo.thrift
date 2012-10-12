@@ -58,8 +58,8 @@ struct VrachTabel {
 struct InputPlanDisp {
     1: i32 kpolik;
     2: string namepol;
-    3: string dateb;
-    4: string datef;
+    3: string daten;
+    4: string datek;
     5: optional string uchas;
 }
 
@@ -85,7 +85,7 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
    // string printSvodVed(1: OutputSvodVed osv) throws (1: kmiacServer.KmiacServerException kse);
     
-    string printPlanDisp(1: OutputPlanDisp opd) throws (1: kmiacServer.KmiacServerException kse);
+    string printPlanDisp(1:InputPlanDisp ipd 2:OutputPlanDisp opd ) throws (1: kmiacServer.KmiacServerException kse);
 
 
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv 3: OutputSvodVed osv) throws (1: kmiacServer.KmiacServerException kse);

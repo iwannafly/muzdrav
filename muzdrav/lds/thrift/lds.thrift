@@ -223,7 +223,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	
 
     	list<Patient> getPatient(1: string npasp) throws (1: PatientNotFoundException pnfe);
-    	list<Patient> getPatDat(1: i64 datap 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
+    	list<Patient> getPatDat(1: i64 datan 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	list<Metod> GetStoim(1: string pcod, 2: string c_obst, 3: i32 kodotd);
@@ -248,7 +248,8 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasM00();
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
-	list <classifier.IntegerClassifier> GetKlasP0e1();
+	list <classifier.IntegerClassifier> GetKlasP0e1(1: i32 grupp);
+	list <classifier.IntegerClassifier> GetKlasNoLabP0e1(1: i32 grupp);
 	list <classifier.IntegerClassifier> GetKlasSvrach(1: i32 cpodr);
 	list <classifier.StringClassifier>  GetKlasNz1();
 	list <classifier.StringClassifier>  GetShab_lds(1: string c_lds);
