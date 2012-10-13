@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -145,6 +146,40 @@ public class FormPostBer extends JFrame {
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
+//				System.out.println("постановка по +");		
+//				System.out.println(Vvod.zapVr.getNpasp());		
+				fam.setText(Vvod.zapVr.getFam());
+				im.setText(Vvod.zapVr.getIm());
+				ot.setText(Vvod.zapVr.getOth());
+				
+				try {
+					rdSlStruct = new RdSlStruct();
+//					setDefaultValues();
+					RdInfStruct rdinf = new RdInfStruct();
+					rdinf.setNpasp(Vvod.zapVr.getNpasp());
+					rdinf.setDataz(System.currentTimeMillis());
+		            MainForm.tcl.AddRdInf(rdinf);
+					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+					setPostBerData();
+				} catch (PrdslNotFoundException e1) {
+					try {
+						rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+						setPostBerData();
+					} catch (KmiacServerException e2) {
+						JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					} catch (TException e2) {
+						e2.printStackTrace();
+						MainForm.conMan.reconnect(e2);
+					}
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				}
+				
+				setVisible(true);	
 			}
 		});
 		
@@ -158,6 +193,20 @@ public class FormPostBer extends JFrame {
 		JPanel panel = new JPanel();
 		
 		JButton btnNewButton = new JButton("");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+//				try {
+//					setDefaultValues();
+//					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+//					setPostBerData();
+//				} catch (KmiacServerException e2) {
+//					JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//				} catch (TException e2) {
+//					e2.printStackTrace();
+//					MainForm.conMan.reconnect(e2);
+//				}
+			}
+		});
 		btnNewButton.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		btnNewButton.setToolTipText("Постановка на учет");
 		
@@ -175,7 +224,9 @@ public class FormPostBer extends JFrame {
             if (CBAkush.isSelected()){oslrod=oslrod+32;}
             if (CBIiiiv.isSelected()){oslrod=oslrod+64;}
             if (CBRazrProm.isSelected()){oslrod=oslrod+128;}
+//			System.out.println("состояние плода");		
             osostp = 0;
+//			System.out.println(osostp);		
             if (CHosp1.isSelected()){osostp=osostp+1;}
             if (CHosp2.isSelected()){osostp=osostp+2;}
             if (CHosp3.isSelected()){osostp=osostp+4;}
@@ -186,11 +237,11 @@ public class FormPostBer extends JFrame {
             if (CHosp8.isSelected()){osostp=osostp+128;}
             if (CHosp9.isSelected()){osostp=osostp+256;}
             if (CHosp10.isSelected()){osostp=osostp+512;}
-//			System.out.println(oslrod);		
             };
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-
+//					System.out.println("сохранение данных номер визита");		
+//					System.out.println(Vvod.zapVr.id_pvizit);		
 			rdSlStruct.setId_pvizit(Vvod.zapVr.id_pvizit);
 			rdSlStruct.setAbort((int) SKolAb.getValue());
 			rdSlStruct.setCext((int) SCext.getModel().getValue());
@@ -635,25 +686,25 @@ public class FormPostBer extends JFrame {
 		lblNewLabel_5 = new JLabel("Оценка состояния плода");
 		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		JCheckBox CHosp1 = new JCheckBox("Несоответствие ВДМ гистационному сроку");
+		 CHosp1 = new JCheckBox("Несоответствие ВДМ гистационному сроку");
 		
-		JCheckBox CHosp2 = new JCheckBox("Отставание фетометрических показателей от гестационного срока");
+		CHosp2 = new JCheckBox("Отставание фетометрических показателей от гестационного срока");
 		
-		JCheckBox Chosp3 = new JCheckBox("ЧСС плода 110 ударов в минуту и менее");
+		CHosp3 = new JCheckBox("ЧСС плода 110 ударов в минуту и менее");
 		
-		JCheckBox CHosp4 = new JCheckBox("ЧСС плода 160 ударов в минуту и более");
+		CHosp4 = new JCheckBox("ЧСС плода 160 ударов в минуту и более");
 		
-		JCheckBox CHosp5 = new JCheckBox("Многоводие");
+		CHosp5 = new JCheckBox("Многоводие");
 		
-		JCheckBox CHosp6 = new JCheckBox("Маловодие");
+		CHosp6 = new JCheckBox("Маловодие");
 		
-		JCheckBox CHosp7 = new JCheckBox("Нарушение кровотока в артерии пуповины");
+		CHosp7 = new JCheckBox("Нарушение кровотока в артерии пуповины");
 		
-		JCheckBox CHosp8 = new JCheckBox("Нулевой или реверсивный кровоток");
+		CHosp8 = new JCheckBox("Нулевой или реверсивный кровоток");
 		
-		JCheckBox CHosp9 = new JCheckBox("Средняя оценка КТГ по Fisher 6 и менее баллов");
+		CHosp9 = new JCheckBox("Средняя оценка КТГ по Fisher 6 и менее баллов");
 		
-		JCheckBox CHosp10 = new JCheckBox("Ареактивный нестрассовый тест");
+		CHosp10 = new JCheckBox("Ареактивный нестрассовый тест");
 	
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
@@ -777,7 +828,7 @@ public class FormPostBer extends JFrame {
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addComponent(CHosp2)
 								.addComponent(CHosp1)
-								.addComponent(Chosp3)
+								.addComponent(CHosp3)
 								.addComponent(CHosp4)
 								.addComponent(CHosp5))
 							.addGap(86)
@@ -885,7 +936,7 @@ public class FormPostBer extends JFrame {
 						.addComponent(CHosp7))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(Chosp3)
+						.addComponent(CHosp3)
 						.addComponent(CHosp8))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
@@ -1001,6 +1052,8 @@ public class FormPostBer extends JFrame {
 	
 	private void setDefaultValues() {
 	try {
+//		System.out.println("начальные значения");		
+//	System.out.println(Vvod.zapVr.id_pvizit);		
 		rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
 		rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
 		rdSlStruct.setCext(25);
@@ -1022,6 +1075,10 @@ public class FormPostBer extends JFrame {
 		rdSlStruct.setVesd(60);
 		rdSlStruct.setOslab(null);
 		rdSlStruct.setPrrod(null);
+		rdSlStruct.setEko(false);
+		rdSlStruct.setRub(false);
+		rdSlStruct.setPredp(false);
+		rdSlStruct.setOsp(0);
 		rdSlStruct.setDataM(System.currentTimeMillis());
 		rdSlStruct.setDatay(System.currentTimeMillis());
 		rdSlStruct.setDataosl(System.currentTimeMillis());
@@ -1158,12 +1215,16 @@ public class FormPostBer extends JFrame {
 		{CHosp4.setSelected(true);   iw1=iw1-8;}	
 		if ((iw1-4)>=0)
 		{CHosp3.setSelected(true);   iw1=iw1-4;}	
+//		System.out.println("расчет состю плода");		
+//		System.out.println(iw1);		
 		if ((iw1-2)>=0)
-		{CHosp2.setSelected(true);   iw1=iw1-2;}	
-		CHosp1.setSelected(iw1 ==1 );
+		{CHosp2.setSelected(true);   iw1=iw1-2;}
+		if (iw1 == 1) CHosp1.setSelected(true);
 	}
 	
 	public void showForm() {
+//		System.out.println("постановка на входе");		
+//		System.out.println(Vvod.zapVr.getNpasp());		
 		fam.setText(Vvod.zapVr.getFam());
 		im.setText(Vvod.zapVr.getIm());
 		ot.setText(Vvod.zapVr.getOth());
