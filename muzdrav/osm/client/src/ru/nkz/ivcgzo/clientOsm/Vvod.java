@@ -20,6 +20,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.DefaultButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -87,7 +88,6 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import javax.swing.JTextField;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -136,6 +136,7 @@ public class Vvod extends JFrame {
 	private JRadioButton rbtDiagHarHron;
 	private JRadioButton rbtDiagStadRan;
 	private JRadioButton rbtDiagStadPoz;
+	private JButton btnDispHron;
 	private JCheckBox chbDiagBoe;
 	private JCheckBox chbDiagInv;
 	private JCheckBox chbDiagBer;
@@ -774,8 +775,7 @@ public class Vvod extends JFrame {
 			  			if (rbtDiagStadRan.isSelected()) pdiag.setStady(1);
 			  			if (chbDiagBer.isSelected()) pdiag.setPat(1);
 			  			if (chbDiagBoe.isSelected()) pdiag.setPrizb(1);
-			  			if (chbDiagInv.isSelected()) {pdiag.setPrizi(1); pnlInvUst.setEnabled(true);}
-			  			else pnlInvUst.setEnabled(false);
+			  			if (chbDiagInv.isSelected()) pdiag.setPrizi(1);
 			  			if (tbDiagDispDatVz.getDate() != null) pdiag.setDisp(1);
 			  			MainForm.tcl.setPdiag(pdiag);
 			  		}
@@ -939,6 +939,11 @@ public class Vvod extends JFrame {
 					chbDiagBer.setSelected(pdiag.getPat() == 1);
 					chbDiagBoe.setSelected(pdiag.getPrizb() == 1);
 					chbDiagInv.setSelected(pdiag.getPrizi() == 1);
+		  			rbtInvUst1.setEnabled(chbDiagInv.isSelected());
+		  			rbtInvUst2.setEnabled(chbDiagInv.isSelected());
+					bgInvUst.clearSelection();
+					rbtInvUst1.setSelected(pdiag.getPpi() == 1);
+					rbtInvUst2.setSelected(pdiag.getPpi() == 2);
 					
 					if (pdisp.isSetD_vz())
 						tbDiagDispDatVz.setDate(pdisp.getD_vz());
@@ -959,7 +964,7 @@ public class Vvod extends JFrame {
 					else
 						cmbDiagDispGrup.setSelectedItem(null);
 					tfNuch.setText(String.valueOf(pdisp.getD_uch()));
-					}
+				}
 			}
 		});
 		tblDiag.setFillsViewportHeight(true);
@@ -976,6 +981,24 @@ public class Vvod extends JFrame {
 		
 		JPanel pnlDiagPredv = new JPanel();
 		pnlDiagPredv.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		
+		MouseAdapter maBtnDesel = new MouseAdapter() {
+			JRadioButton btn = null;
+			boolean deselect = false;
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				btn = (JRadioButton) e.getSource();
+				deselect = btn.isSelected();
+			}
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (deselect)
+					((DefaultButtonModel) btn.getModel()).getGroup().clearSelection();
+			}
+		};
+		
 		bgDiagPredv = new ButtonGroup();
 		
 		rbtDiagPredv = new JRadioButton("Предварительный");
@@ -1023,10 +1046,12 @@ public class Vvod extends JFrame {
 		bgDiagHarZab = new ButtonGroup();
 		
 		rbtDiagHarOstr = new JRadioButton("Острое");
+		rbtDiagHarOstr.addMouseListener(maBtnDesel);
 		bgDiagHarZab.add(rbtDiagHarOstr);
 		
 		rbtDiagHarHron = new JRadioButton("Хроническое");
-		bgDiagHarZab.add(rbtDiagHarOstr);
+		rbtDiagHarHron.addMouseListener(maBtnDesel);
+		bgDiagHarZab.add(rbtDiagHarHron);
 		
 		GroupLayout gl_pnlDiagHarZab = new GroupLayout(pnlDiagHarZab);
 		gl_pnlDiagHarZab.setHorizontalGroup(
@@ -1061,6 +1086,14 @@ public class Vvod extends JFrame {
 		chbDiagBoe = new JCheckBox("Участие в боевых действиях");
 		
 		chbDiagInv = new JCheckBox("Инвалидизирующий диагноз");
+		chbDiagInv.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				bgInvUst.clearSelection();
+	  			rbtInvUst1.setEnabled(chbDiagInv.isSelected());
+	  			rbtInvUst2.setEnabled(chbDiagInv.isSelected());
+			}
+		});
 		
 		chbDiagBer = new JCheckBox("Противопоказания для беременности");
 		
@@ -1072,9 +1105,11 @@ public class Vvod extends JFrame {
 		pnlInvUst.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0418\u043D\u0432\u0430\u043B\u0438\u0434\u043D\u043E\u0441\u0442\u044C \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		 rbtInvUst1 = new JRadioButton("Впервые");
+		 rbtInvUst1.addMouseListener(maBtnDesel);
 		 bgInvUst.add(rbtInvUst1);
 		
 		 rbtInvUst2 = new JRadioButton("Повторно");
+		 rbtInvUst2.addMouseListener(maBtnDesel);
 		 bgInvUst.add(rbtInvUst2);
 		 
 		GroupLayout gl_pnlInvUst = new GroupLayout(pnlInvUst);
@@ -1186,7 +1221,7 @@ public class Vvod extends JFrame {
 		
 		JLabel lblDiagDispIsh = new JLabel("Исход ДУ");
 		
-		JButton btnDispHron = new JButton("...");
+		btnDispHron = new JButton("...");
 		btnDispHron.setToolTipText("Диспансерные мероприятия");
 		btnDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1292,9 +1327,11 @@ public class Vvod extends JFrame {
 		pnlDiagDisp.setLayout(gl_pnlDiagDisp);
 		
 		rbtDiagStadRan = new JRadioButton("Ранняя");
+		rbtDiagStadRan.addMouseListener(maBtnDesel);
 		bgDiagStadZab.add(rbtDiagStadRan);
 		
 		rbtDiagStadPoz = new JRadioButton("Поздняя");
+		rbtDiagStadPoz.addMouseListener(maBtnDesel);
 		bgDiagStadZab.add(rbtDiagStadPoz);
 		
 		GroupLayout gl_pnlDiagStadZab = new GroupLayout(pnlDiagStadZab);
@@ -2390,6 +2427,9 @@ public class Vvod extends JFrame {
 		cmbDiagDispGrup.setEnabled(value);
 		cmbDiagDispIsh.setEnabled(value);
 		tfNuch.setEnabled(value);
+		tfNewDs.setEnabled(value);
+		tfDataIzmNewDs.setEnabled(value);
+		btnDispHron.setEnabled(value);
 	}
 	
 	private boolean checkInput() throws TException {
@@ -2407,7 +2447,6 @@ public class Vvod extends JFrame {
 //		} catch (KmiacServerException | PvizitNotFoundException e) {
 //			return false;
 //		}
-		
 		return true;
 	}
 	
@@ -2447,14 +2486,14 @@ public class Vvod extends JFrame {
 		}
 	}
 		
-	private boolean checkCmb(ThriftIntegerClassifierCombobox<IntegerClassifier> cmb) throws TException {
-			if (tblPos.getData().size() > 0){
-				if (cmb.getSelectedPcod()==null)
-					return false;
-				else return true;
-					}
-		return true;
-	}
+//	private boolean checkCmb(ThriftIntegerClassifierCombobox<IntegerClassifier> cmb) throws TException {
+//			if (tblPos.getData().size() > 0){
+//				if (cmb.getSelectedPcod()==null)
+//					return false;
+//				else return true;
+//					}
+//		return true;
+//	}
 
 	private void checkZapVrNext() throws KmiacServerException, TException {
 		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {

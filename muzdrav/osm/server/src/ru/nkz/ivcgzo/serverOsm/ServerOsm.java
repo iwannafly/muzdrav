@@ -352,7 +352,7 @@ public class ServerOsm extends Server implements Iface {
 				if (zapVrList.get(i).id_pvizit != prevIdObr)
 					prevIdObr = zapVrList.get(i).id_pvizit;
 				else
-					zapVrList.remove(i);
+					zapVrList.remove(i--);
 			}
 			
 			return zapVrList;
