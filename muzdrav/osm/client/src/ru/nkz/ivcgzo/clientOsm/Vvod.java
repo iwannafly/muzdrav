@@ -178,6 +178,7 @@ public class Vvod extends JFrame {
 	private Color selCol = Color.red;
 	private CustomTextField tfNewDs;
 	private CustomDateEditor tfDataIzmNewDs;
+	private String diag_named;
 
 	
 	/**
@@ -799,13 +800,36 @@ public class Vvod extends JFrame {
 		  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
 		  			pdisp.setDiag_n(tfNewDs.getText());
 		  			MainForm.tcl.setPdisp(pdisp);
+		  			if (!tfNewDs.isEmpty() && !tfNewDs.getText().equals(diagamb.diag)) {
+		  				diagamb.setDiag(tfNewDs.getText());
+		  				diagamb.setId_obr(zapVr.getId_pvizit());
+				  		diagamb.setNpasp(zapVr.getNpasp());
+				  		diagamb.setDatap(System.currentTimeMillis());
+				  		diagamb.setDatad(System.currentTimeMillis());
+				  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
+				  		diagamb.setCdol(MainForm.authInfo.getCdol());
+				  		diagamb.setPredv(false);
+				  		diagamb.setDiag_stat(1);
+						diagamb.setNamed(diag_named);
+						diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
+						pdiag.setId_diag_amb(diagamb.getId());
+						pdiag.setDiag(tfNewDs.getText());
+						MainForm.tcl.setPdiag(pdiag);
+						pdisp.setId_diag(diagamb.getId());
+		  				pdisp.setDiag_s(tblDiag.getSelectedItem().diag);
+		  				pdisp.setDiag(tfNewDs.getText());
+		  				pdisp.setDiag_n(null);
+		  				pdisp.setDatad(tfDataIzmNewDs.getDate().getTime());
+		  				MainForm.tcl.setPdisp(pdisp); 
+		  				tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
+		  			}
 		  			/*pdiag*/
 		  				pdiag.setD_vz(pdisp.getD_vz());
 		  				pdiag.setDataish(pdisp.getDataish());
 			  		pdiag.setIshod(pdisp.getIshod());
 			  		pdiag.setD_grup(pdisp.getD_grup());
 			  		MainForm.tcl.setPdiag(pdiag);	
-	  			}
+	  			} 
 			  	} catch (KmiacServerException e1) {
 		  		e1.printStackTrace();
 		  	} catch (TException e1) {
@@ -849,6 +873,7 @@ public class Vvod extends JFrame {
 						StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tblDiag.getSelectedItem().diag);
 						if (res != null) {
 							tblDiag.getSelectedItem().setDiag(res.pcod);
+							tbDiagOpis.setText(res.name);
 							tblDiag.updateSelectedItem();
 						}
 					}
@@ -1184,6 +1209,7 @@ public class Vvod extends JFrame {
 					StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tfNewDs.getText());
 					if (res != null) {
                         tfNewDs.setText(res.pcod);
+                        diag_named=res.name;
                         tfDataIzmNewDs.setDate(System.currentTimeMillis());
                  }
 				}
@@ -1555,7 +1581,7 @@ public class Vvod extends JFrame {
 				}cmbVidStacionar.setVisible(true);}
 			}
 		});
-		cmbKonsVidNapr.setModel(new DefaultComboBoxModel<>(new String[] {"госпитализацию", "консультацию", "обследование"}));
+		cmbKonsVidNapr.setModel(new DefaultComboBoxModel<>(new String[] {"госпитализацию", "консультацию"}));
 		
 		JLabel lblKonsVidNapr = new JLabel("на");
 		
@@ -2367,20 +2393,20 @@ public class Vvod extends JFrame {
 	}
 	
 	private boolean checkInput() throws TException {
-		try {
-			if (tblPos.getData().size() > 0)
-				if (tblPos.getData().get(0).datap == getDateMills(System.currentTimeMillis()))
-					if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
-						return true;
-					} else {
-						if (!MainForm.tcl.getPvizit(zapVr.id_pvizit).isSetIshod())
-							return false;
-						else if (tblDiag.getData().size() == 0) 
-							return false;
-					}
-		} catch (KmiacServerException | PvizitNotFoundException e) {
-			return false;
-		}
+//		try {
+//			if (tblPos.getData().size() > 0)
+//				if (tblPos.getData().get(0).datap == getDateMills(System.currentTimeMillis()))
+//					if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
+//						return true;
+//					} else {
+//						if (!MainForm.tcl.getPvizit(zapVr.id_pvizit).isSetIshod())
+//							return false;
+//						else if (tblDiag.getData().size() == 0) 
+//							return false;
+//					}
+//		} catch (KmiacServerException | PvizitNotFoundException e) {
+//			return false;
+//		}
 		
 		return true;
 	}
@@ -2444,26 +2470,26 @@ public class Vvod extends JFrame {
 	 * @throws TException
 	 */
 	public boolean checkTalInput() throws TException {
-		if (!checkCmb(cmbVidOpl)) {
-			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-			cmbVidOpl.requestFocusInWindow();
-			return false;
-		}
-		if (!checkCmb(cmbCelObr)) {
-			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Цель посещения' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-			cmbCelObr.requestFocusInWindow();
-			return false;
-		}
-		if (!checkCmb(cmbRez)) {
-			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Результат' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-			cmbRez.requestFocusInWindow();
-			return false;
-		}
-		if (!checkCmb(cmbMobs)) {
-			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Место обслуживания' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
-			cmbMobs.requestFocusInWindow();
-			return false;
-		}
+//		if (!checkCmb(cmbVidOpl)) {
+//			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+//			cmbVidOpl.requestFocusInWindow();
+//			return false;
+//		}
+//		if (!checkCmb(cmbCelObr)) {
+//			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Цель посещения' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+//			cmbCelObr.requestFocusInWindow();
+//			return false;
+//		}
+//		if (!checkCmb(cmbRez)) {
+//			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Результат' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+//			cmbRez.requestFocusInWindow();
+//			return false;
+//		}
+//		if (!checkCmb(cmbMobs)) {
+//			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Место обслуживания' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+//			cmbMobs.requestFocusInWindow();
+//			return false;
+//		}
 		return true;
 	}
 }
