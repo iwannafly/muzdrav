@@ -32,11 +32,13 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
  */
 public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extends JComboBox<IntegerClassifier> {
 	private static final long serialVersionUID = 8540397050277967316L;
-	private List<IntegerClassifier> items;
+	protected List<IntegerClassifier> items;
+	protected List<IntegerClassifier> itemsBcp;
+	protected List<IntegerClassifier> itemsLow;
 	private IntegerClassifiers classifier;
 	private boolean classifierLoaded;
 	private Searcher searcher;
-	private StringComboBoxModel model;
+	protected IntegerComboBoxModel model;
 	private boolean strict = true;
 	
 	/**
@@ -76,7 +78,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	}
 	
 	private void setModel() {
-		model = new StringComboBoxModel();
+		model = new IntegerComboBoxModel();
 		this.setModel(model);
 	}
 	
@@ -92,8 +94,12 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			list = new ArrayList<>();
 			
 		items = new ArrayList<>(list.size());
+		itemsBcp = new ArrayList<>(list.size());
+		itemsLow = new ArrayList<>(list.size());
 		for (IntegerClassifier item : list) {
 			items.add(new IntegerClassifierItem(item));
+			itemsBcp.add(new IntegerClassifierItem(item));
+			itemsLow.add(new IntegerClassifierItem(new IntegerClassifier(item.pcod, item.name.toLowerCase())));
 		}
 		setSelectedItem(null);
 		model.fireContentsChanged();
@@ -103,7 +109,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Получает список данных. 
 	 */
 	public List<IntegerClassifier> getData() {
-		return items;
+		return itemsBcp;
 	}
 	
 	private void setFormListeners() {
@@ -112,7 +118,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					loadClassifier();
-					if (items.size() > 0) {
+					if (isEnabled() && itemsBcp.size() > 0) {
 						IntegerClassifier res = ConnectionManager.instance.showIntegerClassifierSelector(classifier);
 						
 						if (res != null)
@@ -122,10 +128,9 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			}
 		};
 		
-		if (searcher == null)
-			addMouseListener(ma);
-		else
-			((CustomTextField) getEditor()).addMouseListener(ma);
+		addMouseListener(ma);
+		if (searcher != null)
+			((CustomTextField) getEditor().getEditorComponent()).addMouseListener(ma);
 		
 		addPopupMenuListener(new PopupMenuListener() {
 			@Override
@@ -189,6 +194,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		IntegerClassifier selItem = null;
 		
 		loadClassifier();
+		items = itemsBcp;
 		
 		for (IntegerClassifier item : items) {
 			if (item.pcod == pcod) {
@@ -236,11 +242,18 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Устанавливает текст в поле ввода.
 	 */
 	public void setText(String text) {
-		if (isEditable())
+		if (isEditable()) {
 			((JTextComponent) getEditor().getEditorComponent()).setText(text);
+			SwingUtilities.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+					hidePopup();
+				}
+			});
+		}
 	}
 	
-	class StringComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
+	class IntegerComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
 		private static final long serialVersionUID = 1612989647638575239L;
 
 		@Override
@@ -274,18 +287,16 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	class Searcher implements DocumentListener {
 		private ThriftIntegerClassifierCombobox<T> cmb = ThriftIntegerClassifierCombobox.this;
 		private CustomComboBoxEditor editor;
-		private boolean searching = false;
 		private boolean enabled = false;
-		private IntegerClassifier lastSelected;
+		private IntegerClassifier selItem;
+		private IntegerClassifier prevSelItem;
 		
 		public Searcher() {
 			editor = new CustomComboBoxEditor();
 			ThriftIntegerClassifierCombobox.this.setEditor(editor);
 			editor.putClientProperty("doNotCancelPopup", null);
-
 			
 			cmb.addActionListener(new ActionListener() {
-				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					editor.selectAll();
@@ -306,83 +317,80 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		
 		@Override
 		public void insertUpdate(DocumentEvent e) {
-			search();
+			prepareSearch();
 		}
 		
 		@Override
 		public void removeUpdate(DocumentEvent e) {
-			search();
+			prepareSearch();
 		}
 		
 		@Override
 		public void changedUpdate(DocumentEvent e) {
-			search();
+			prepareSearch();
+		}
+		
+		private void prepareSearch() {
+			if (!classifierLoaded) {
+				SwingUtilities.invokeLater(new Runnable() {
+					private String srcStr = editor.getText();
+					
+					@Override
+					public void run() {
+						loadClassifier();
+						editor.setText(srcStr);
+					}
+				});
+			} else {
+				search();
+			}
 		}
 		
 		private void search() {
-			if (searching)
-				return;
-			searching = true;
+			final String srcStrLow = editor.getText().toLowerCase();
 			
+			selItem = null;
+			if (srcStrLow.length() == 0) {
+				items = itemsBcp;
+				setSelectedItem(null);
+			} else {
+				int i;
+				for (i = 0; i < itemsBcp.size(); i++)
+					if ((itemsLow.get(i).name.indexOf(srcStrLow) == 0) && (itemsLow.get(i).name.length() == srcStrLow.length())) {
+						selItem = itemsBcp.get(i);
+						break;
+					}
+				
+				if (i == itemsBcp.size()) {
+					items = new ArrayList<>();
+					for (i = 0; i < itemsBcp.size(); i++)
+						if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
+							items.add(itemsBcp.get(i));
+				}
+			}
 			SwingUtilities.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-					boolean found = false;
+					cmb.hidePopup();
 					try {
-						lastSelected = cmb.getSelectedItem();
-						String editText = editor.getText();
-						String editTextLow = editText.toLowerCase();
-						String lastSelTextLow = (lastSelected != null) ? lastSelected.name.toLowerCase() : "";
-						loadClassifier();
-						if (editText.length() == 0) {
-							found = true;
-							cmb.setSelectedItem(null);
-							return;
-						} else if ((lastSelected != null) && (lastSelTextLow.indexOf(editTextLow) == 0)) {
-							found = true;
-							if (!lastSelTextLow.equals(editTextLow)) {
-								editor.setText(lastSelected.name);
-								setCaretPosition(lastSelTextLow.length(), editTextLow.length());
-							}
-						} else							
-							for (IntegerClassifier item : cmb.items) {
-								if (item.name.toLowerCase().indexOf(editTextLow) == 0) {
-									found = true;
-									lastSelected = item;
-									lastSelTextLow = lastSelected.name.toLowerCase();
-									cmb.setSelectedItem(lastSelected);
-									editor.setText(lastSelected.name);
-									setCaretPosition(lastSelTextLow.length(), editTextLow.length());
-									break;
-								}
-							}
-						if (!found) {
-							cmb.setSelectedItem(null);
-							editor.setText(editText);
-							if (cmb.items.size() > 0)
-								cmb.showPopup();
-						} else if ((lastSelected == null) && (cmb.items.size() > 0))
-							cmb.showPopup();
-						else if (!lastSelTextLow.equals(editTextLow) && (cmb.items.size() > 0))
-							cmb.showPopup();
-					} finally {
-						SwingUtilities.invokeLater(new Runnable() {
-							@Override
-							public void run() {
-								searching = false;
-							}
-						});
-					}
-				}
-				
-				private void setCaretPosition(final int pos, final int len) {
-					SwingUtilities.invokeLater(new Runnable() {
-						@Override
-						public void run() {
-							editor.setCaretPosition(pos);
-							editor.moveCaretPosition(len);
+						int pos = editor.getCaretPosition();
+						searcher.setSearchEnabled(false);
+						if (items.size() == 0) {
+							items = itemsBcp;
+							setSelectedItem(null);
 						}
-					});
+						model.fireContentsChanged();
+						editor.setText(srcStrLow);
+						editor.setCaretPosition(pos);
+						if (getSelectedItem() != null)
+							if (getSelectedItem().name.toLowerCase().equals(srcStrLow))
+								editor.selectAll();
+					} finally {
+						searcher.setSearchEnabled(true);
+					}
+					if ((selItem == null) || (prevSelItem != selItem))
+						cmb.showPopup();
+					prevSelItem = selItem;
 				}
 			});
 		}

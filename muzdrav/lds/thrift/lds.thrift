@@ -100,6 +100,16 @@ struct N_lds {
 }
 
 
+struct Sh_lds{
+	1: i32 c_p0e1;
+	2: string c_ldi;
+	3: string name;
+	4: string opis;
+	5: string zakl;
+}
+
+
+
 /*
 *Исследование уже существует
 */
@@ -175,6 +185,12 @@ exception S_ot01NotFoundException {
 }
 
 
+/**
+* Нет шаблона с таким исследованием	
+ */
+exception Sh_ldsNotFoundException {
+}
+
 service LDSThrift extends kmiacServer.KmiacServer {
 	list<ObInfIsl> GetObInfIslt(1: i32 npasp, 2: i32 kodotd);
 	ObInfIsl GetIsl(1: i32 npasp) throws (1: IslNotFoundException ine);
@@ -207,7 +223,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	
 
     	list<Patient> getPatient(1: string npasp) throws (1: PatientNotFoundException pnfe);
-    	list<Patient> getPatDat(1: i64 datap 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
+    	list<Patient> getPatDat(1: i64 datan 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	list<Metod> GetStoim(1: string pcod, 2: string c_obst, 3: i32 kodotd);
@@ -218,6 +234,9 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	
 	list<N_lds> getN_lds (1: i32 pcod);
 
+	list<Sh_lds> getSh_lds (1: string c_ldi) throws (1: Sh_ldsNotFoundException slnfe);
+	list<Sh_lds> getDSh_lds (1: string c_ldi, 2: string name) throws (1: Sh_ldsNotFoundException slnfe);
+	
 	list <classifier.IntegerClassifier> GetKlasCpos2();
 	list <classifier.StringClassifier>  GetKlasS_ot01(1: i32 cotd);
 	list <classifier.StringClassifier>  GetKlasIsS_ot01(1: i32 cotd, 2: string organ);
@@ -229,7 +248,9 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasM00();
 	list <classifier.IntegerClassifier> GetKlasOpl();
 	list <classifier.IntegerClassifier> GetKlasArez();
-	list <classifier.IntegerClassifier> GetKlasP0e1();
+	list <classifier.IntegerClassifier> GetKlasP0e1(1: i32 grupp);
+	list <classifier.IntegerClassifier> GetKlasNoLabP0e1(1: i32 grupp);
 	list <classifier.IntegerClassifier> GetKlasSvrach(1: i32 cpodr);
 	list <classifier.StringClassifier>  GetKlasNz1();
+	list <classifier.StringClassifier>  GetShab_lds(1: string c_lds);
 }

@@ -30,6 +30,7 @@ import ru.nkz.ivcgzo.thriftServerAdmin.MestoRab;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabNotFoundException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonDop;
+import ru.nkz.ivcgzo.thriftServerAdmin.ShablonLds;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 import ru.nkz.ivcgzo.thriftServerAdmin.TemplateExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
@@ -48,6 +49,7 @@ public class serverAdmin extends Server implements Iface {
 	private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 	private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
 	private TResultSetMapper<ShablonDop, ShablonDop._Fields> rsmShDopClas;
+	private TResultSetMapper<ShablonLds, ShablonLds._Fields> rsmShLdsClas;
 	
 	@Override
 	public void start() throws Exception {
@@ -71,6 +73,7 @@ public class serverAdmin extends Server implements Iface {
 		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
 		rsmShDopClas = new TResultSetMapper<>(ShablonDop.class, "id", "id_n_shablon", "name", "text");
+		rsmShLdsClas = new TResultSetMapper<>(ShablonLds.class, "id", "c_p0e1", "c_ldi", "name", "opis", "zakl");
 	}
 
 	@Override
@@ -385,7 +388,7 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException {
+	public int saveShablonOsm(ShablonOsm sho) throws KmiacServerException, TemplateExistsException {
 		int shId = sho.id;
 		
 		try (SqlModifyExecutor sme = tse.startTransaction();
@@ -406,6 +409,9 @@ public class serverAdmin extends Server implements Iface {
 			
 			return shId;
 		} catch (SQLException | InterruptedException e) {
+			if (e instanceof SQLException)
+				if (((SQLException) e.getCause()).getSQLState().equals("23505"))
+					throw new TemplateExistsException();
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error saving template osm");
 		}
@@ -555,6 +561,84 @@ public class serverAdmin extends Server implements Iface {
 		} catch (SQLException | InterruptedException e) {
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error deleting template dop");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShLdsVidIsslList() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_p0e1 WHERE gruppa = 2 ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates lds vid issl list");
+		}
+	}
+
+	@Override
+	public List<StringClassifier> getShLdsIsslList(int cP0e1) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT ldi.pcod, ldi.name FROM sh_lds shl JOIN n_ldi ldi ON (ldi.pcod = shl.c_ldi) WHERE shl.c_p0e1 = ? ", cP0e1)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates lds issl list");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShLdsList(int cP0e1, String cLdi) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, name FROM sh_lds WHERE (c_p0e1 = ?) AND (c_ldi = ?) ", cP0e1, cLdi)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates lds vid issl list");
+		}
+	}
+
+	@Override
+	public ShablonLds getShLds(int id) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM sh_lds WHERE id = ? ", id)) {
+			if (acrs.getResultSet().next())
+				return rsmShLdsClas.map(acrs.getResultSet());
+			else
+				throw new KmiacServerException("No template dop found with this id");
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting template lds by id");
+		}
+	}
+
+	@Override
+	public int saveShLds(ShablonLds shLds) throws KmiacServerException, TemplateExistsException, TException {
+		int shId = shLds.id;
+		
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT id FROM sh_lds WHERE id = ? ", shId)) {
+			if (acrs.getResultSet().next()) {
+				sme.execPrepared("UPDATE sh_lds SET c_ldi = ?, name = ?, opis = ?, zakl = ? WHERE id = ? ", false, shLds.c_ldi, shLds.name, shLds.opis, shLds.zakl, shId);
+			} else {
+				sme.execPrepared("INSERT INTO sh_lds (c_p0e1, c_ldi, name, opis, zakl) VALUES (?, ?, ?, ?, ?) ", true, shLds.c_p0e1, shLds.c_ldi, shLds.name, shLds.opis, shLds.zakl);
+				shId = sme.getGeneratedKeys().getInt("id");
+			}
+			sme.setCommit();
+			
+			return shId;
+		} catch (SQLException | InterruptedException e) {
+			if (e instanceof SQLException)
+				if (((SQLException) e.getCause()).getSQLState().equals("23505"))
+					throw new TemplateExistsException();
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error saving template lds");
+		}
+	}
+
+	@Override
+	public void deleteShLds(int id) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM sh_lds WHERE id = ? ", false, id);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error deleting template lds");
 		}
 	}
 }

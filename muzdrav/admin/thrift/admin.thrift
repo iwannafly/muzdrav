@@ -50,6 +50,15 @@ struct ShablonDop {
 	4: string text;
 }
 
+struct ShablonLds {
+	1: i32 id;
+	2: i32 c_p0e1;
+	3: string c_ldi;
+	4: string name;
+	5: string opis;
+	6: string zakl;
+}
+
 /**
  * Врач с такими данными уже существует.
  */
@@ -167,7 +176,7 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
 
 	list<classifier.IntegerClassifier> getReqShOsmList() throws (1: kmiacServer.KmiacServerException kse);
-	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
 	list<classifier.IntegerClassifier> getAllShablonOsm() throws (1: kmiacServer.KmiacServerException kse);
 	ShablonOsm getShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getShablonOsmDiagList(1: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
@@ -178,4 +187,10 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	ShablonDop getShDop(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	i32 saveShDop(1: ShablonDop shDop) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
 	void deleteShDop(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShLdsVidIsslList() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShLdsIsslList(1: i32 cP0e1) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShLdsList(1: i32 cP0e1, 2: string cLdi) throws (1: kmiacServer.KmiacServerException kse);
+	ShablonLds getShLds(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShLds(1: ShablonLds shLds) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
+	void deleteShLds(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

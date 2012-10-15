@@ -5,11 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -35,7 +37,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.IClient;
@@ -54,6 +55,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
@@ -77,8 +79,6 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
-import java.awt.Component;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -94,6 +94,7 @@ public class PacientInfoFrame extends JFrame {
     private int curPatientId = 0;
     private int curNgosp = 0;
     private int curId = 0;
+    private int curId_otd = 0;
     private int Terp = 0;
     private final ButtonGroup btnGroup_pol = new ButtonGroup();
     private final ButtonGroup btnGroup_gk = new ButtonGroup();
@@ -241,6 +242,8 @@ public class PacientInfoFrame extends JFrame {
                             cmb_adp_gorod.setData(MainForm.tcl.getL00(cmb_adp_obl.getSelectedPcod()));
                         } catch (TException e) {
                             MainForm.conMan.reconnect(e);
+                        } catch (KmiacServerException e) {
+                            e.printStackTrace();
                         }
                     } else {
                         cmb_adp_gorod.setData(null);
@@ -256,6 +259,8 @@ public class PacientInfoFrame extends JFrame {
                             cmb_adm_gorod.setData(MainForm.tcl.getL00(cmb_adm_obl.getSelectedPcod()));
                         } catch (TException e) {
                             MainForm.conMan.reconnect(e);
+                        } catch (KmiacServerException e) {
+                            e.printStackTrace();
                         }
                     } else {
                         cmb_adm_gorod.setData(null);
@@ -293,6 +298,8 @@ public class PacientInfoFrame extends JFrame {
                             cmb_adp_dom.setData(MainForm.tcl.getU10(cmb_adp_ul.getText()));
                         } catch (TException e) {
                             MainForm.conMan.reconnect(e);
+                        } catch (KmiacServerException e) {
+                            e.printStackTrace();
                         }
                     } else {
                         cmb_adp_dom.setData(new ArrayList<StringClassifier>());
@@ -308,6 +315,8 @@ public class PacientInfoFrame extends JFrame {
                             cmb_adm_dom.setData(MainForm.tcl.getU10(cmb_adm_ul.getText()));
                         } catch (TException e) {
                             MainForm.conMan.reconnect(e);
+                        } catch (KmiacServerException e) {
+                            e.printStackTrace();
                         }
                     } else {
                         cmb_adm_dom.setData(new ArrayList<StringClassifier>());
@@ -350,6 +359,8 @@ public class PacientInfoFrame extends JFrame {
                             if (cmb_naprav.getSelectedPcod().equals("Т"))cmb_org.setData(MainForm.tcl.getO00());
                         }
                     } catch (TException e) {
+                        e.printStackTrace();
+                    } catch (KmiacServerException e) {
                         e.printStackTrace();
                     }
                 }
@@ -531,23 +542,23 @@ public class PacientInfoFrame extends JFrame {
                     //PersonalInfo.nambk = new Nambk();
                     PersonalInfo.setDataz(new Date().getTime());
                     PersonalInfo.setNpasp(curPatientId);
-                    PersonalInfo.setFam(tfFam.getText().toUpperCase().trim());
-                    PersonalInfo.setIm(tfIm.getText().toUpperCase().trim());
-                    PersonalInfo.setOt(tfOt.getText().toUpperCase().trim());
-                    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase().trim());
-                    PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase().trim());
-                    PersonalInfo.setNamemr(tfMrname.getText().toUpperCase().trim());
+                    PersonalInfo.setFam(tfFam.getText().toUpperCase());
+                    PersonalInfo.setIm(tfIm.getText().toUpperCase());
+                    PersonalInfo.setOt(tfOt.getText().toUpperCase());
+                    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase());
+                    PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase());
+                    PersonalInfo.setNamemr(tfMrname.getText().toUpperCase());
                     if (!tfMr.getText().isEmpty()) PersonalInfo.setMrab(Integer.valueOf(tfMr.getText()));
-                    PersonalInfo.setProf(tfDolj.getText().trim());
-                    PersonalInfo.setTel(tfTel.getText().trim());
-                    PersonalInfo.setSnils(tf_Snils.getText().toUpperCase().trim());
-                    PersonalInfo.setOdoc(tf_Odoc.getText().trim());
-                    PersonalInfo.setDocser(tf_serdoc.getText().trim());
-                    PersonalInfo.setDocnum(tf_nomdoc.getText().trim());
-                    PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().toUpperCase().trim());
-                    PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().toUpperCase().trim());
-                    PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().toUpperCase().trim());
-                    PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().toUpperCase().trim());
+                    PersonalInfo.setProf(tfDolj.getText());
+                    PersonalInfo.setTel(tfTel.getText());
+                    PersonalInfo.setSnils(tf_Snils.getText().toUpperCase());
+                    PersonalInfo.setOdoc(tf_Odoc.getText());
+                    PersonalInfo.setDocser(tf_serdoc.getText());
+                    PersonalInfo.setDocnum(tf_nomdoc.getText());
+                    PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().toUpperCase());
+                    PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().toUpperCase());
+                    PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().toUpperCase());
+                    PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().toUpperCase());
 
                     if (tfDr.getDate() != null) PersonalInfo.setDatar(tfDr.getDate().getTime());
                     if (tf_datadoc.getDate() != null) PersonalInfo.setDatadoc(tf_datadoc.getDate().getTime());
@@ -564,7 +575,7 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_status.getSelectedItem() != null) PersonalInfo.setSgrp(cmb_status.getSelectedPcod());
                     if (cmb_oms_doc.getSelectedItem() != null) PersonalInfo.polis_oms.setTdoc(cmb_oms_doc.getSelectedPcod());
                     if (cmb_tdoc.getSelectedItem() != null) PersonalInfo.setTdoc(cmb_tdoc.getSelectedPcod());
-//				    PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase().trim());
+//				    PersonalInfo.adpAddress.setRegion(tf_Adp_obl.getText().toUpperCase());
                     if (cmb_adp_obl.getSelectedItem() != null) PersonalInfo.setRegion_liv(cmb_adp_obl.getSelectedPcod());
                     PersonalInfo.adpAddress.setRegion(cmb_adp_obl.getText());
                     PersonalInfo.admAddress.setRegion(cmb_adm_obl.getText());
@@ -613,28 +624,32 @@ public class PacientInfoFrame extends JFrame {
                         btnDel.setToolTipText("Удалить карту пациента");
                         btnDel.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent arg0) {
-//                              try {
+                              try {
 //				            	MainForm.tcl.deletePatient(curPatientId, MainForm.authInfo.cpodr);
-                                //MainForm.tcl.deletePatient(curPatientId);
-                                //MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
+                                MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
                                 NewPatient();
-//                              } catch (TException e) {
-//                                  e.printStackTrace();
-//                              }
+                              } catch (TException e) {
+                                  e.printStackTrace();
+                              } catch (KmiacServerException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
                             }
                         });
 
                         JButton btnShowTalonSelectModule = new JButton("Запись на приём");
                         btnShowTalonSelectModule.setToolTipText("Записать пациента на приём");
+                        btnShowTalonSelectModule.setVisible(false);
                         btnShowTalonSelectModule.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent arg0) {
                                 try {
-                                    int patientId = curPatientId;
+                                	long patientBirthdate = 0;
+                                	int patientId = curPatientId;
                                     String patientSurname = tfFam.getText();
                                     String patientName = tfIm.getText();
                                     String patientMiddlename = tfOt.getText();
-                                    long patientBirthdate = tfDr.getDate().getTime();
+                                    if (tfDr.getDate() != null) patientBirthdate = tfDr.getDate().getTime();
                                     int idPvizit = 0;
                                     IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
                                     client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename,
@@ -1346,6 +1361,9 @@ public class PacientInfoFrame extends JFrame {
                 } catch (TException e) {
                     e.printStackTrace();
                     return false;
+                } catch (KmiacServerException e) {
+                    e.printStackTrace();
+                    return false;
                 }
                 return true;
             }
@@ -1370,6 +1388,10 @@ public class PacientInfoFrame extends JFrame {
                 } catch (TException e) {
                     e.printStackTrace();
                     return false;
+                } catch (KmiacServerException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return false;
                 }
                 return true;
             }
@@ -1379,8 +1401,11 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public boolean doAction(CustomTableItemChangeEvent<Lgota> event) {
                 try {
-                    MainForm.tcl.updateLgota(event.getItem());
+                	MainForm.tcl.updateLgota(event.getItem());
                 } catch (TException e) {
+                    e.printStackTrace();
+                    return false;
+                } catch (KmiacServerException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1518,7 +1543,7 @@ public class PacientInfoFrame extends JFrame {
                 try {
                     curId = tbl_kateg.getSelectedItem().id;
                     MainForm.tcl.deleteKont(curId);
-                } catch (TException e) {
+                } catch (TException | KmiacServerException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1545,6 +1570,9 @@ public class PacientInfoFrame extends JFrame {
                 } catch (TException e) {
                     e.printStackTrace();
                     return false;
+                } catch (KmiacServerException e) {
+                    e.printStackTrace();
+                    return false;
                 }
                 return true;
             }
@@ -1555,7 +1583,7 @@ public class PacientInfoFrame extends JFrame {
             public boolean doAction(CustomTableItemChangeEvent<Kontingent> event) {
                 try {
                     MainForm.tcl.updateKont(event.getItem());
-                } catch (TException e) {
+                } catch (TException | KmiacServerException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1683,16 +1711,16 @@ public class PacientInfoFrame extends JFrame {
                 try{
                     AgentInfo = new Agent();
                     AgentInfo.setNpasp(curPatientId);
-                    AgentInfo.setFam(tf_Fam_pr.getText().toUpperCase().trim());
-                    AgentInfo.setIm(tf_Im_pr.getText().toUpperCase().trim());
-                    AgentInfo.setOt(tf_Ot_pr.getText().toUpperCase().trim());
+                    AgentInfo.setFam(tf_Fam_pr.getText().toUpperCase());
+                    AgentInfo.setIm(tf_Im_pr.getText().toUpperCase());
+                    AgentInfo.setOt(tf_Ot_pr.getText().toUpperCase());
                     if (tf_dr_pr.getDate() != null)  AgentInfo.setDatar(tf_dr_pr.getDate().getTime());
-                    AgentInfo.setBirthplace(tf_Mr_pr.getText().trim());
-                    AgentInfo.setSpolis(tf_Polis_ser_pr.getText().toUpperCase().trim());
-                    AgentInfo.setNpolis(tf_Polis_nom_pr.getText().toUpperCase().trim());
-                    AgentInfo.setName_str(tf_Name_sk_pr.getText().trim());
-                    AgentInfo.setDocser(tf_Ser_doc_pr.getText().toUpperCase().trim());
-                    AgentInfo.setDocnum(tf_Nomdoc_pr.getText().toUpperCase().trim());
+                    AgentInfo.setBirthplace(tf_Mr_pr.getText());
+                    AgentInfo.setSpolis(tf_Polis_ser_pr.getText().toUpperCase());
+                    AgentInfo.setNpolis(tf_Polis_nom_pr.getText().toUpperCase());
+                    AgentInfo.setName_str(tf_Name_sk_pr.getText());
+                    AgentInfo.setDocser(tf_Ser_doc_pr.getText().toUpperCase());
+                    AgentInfo.setDocnum(tf_Nomdoc_pr.getText().toUpperCase());
                     if (rbtn_pol_pr_m.isSelected()) AgentInfo.setPol(1);
                     if (rbtn_pol_pr_j.isSelected()) AgentInfo.setPol(2);
                     if (cmb_Tdoc_pr.getSelectedItem() != null) AgentInfo.setVpolis(cmb_Tdoc_pr.getSelectedPcod());
@@ -2074,9 +2102,9 @@ public class PacientInfoFrame extends JFrame {
                     }else {
                         SignInfo.vred += "0";
                     }
-                    SignInfo.setAllerg(ta_allerg.getText().trim());
-                    SignInfo.setFarmkol(ta_farm.getText().trim());
-                    SignInfo.setVitae(ta_vitae.getText().trim());
+                    SignInfo.setAllerg(ta_allerg.getText());
+                    SignInfo.setFarmkol(ta_farm.getText());
+                    SignInfo.setVitae(ta_vitae.getText());
                     MainForm.tcl.addOrUpdateSign(SignInfo);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -2845,6 +2873,7 @@ public class PacientInfoFrame extends JFrame {
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 SavePriemInfo();
+                //здесь надо сохранять в стационар
             }
         });
 
@@ -2896,7 +2925,7 @@ public class PacientInfoFrame extends JFrame {
                 .addComponent(scrollPane_3, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
         );
 
-        tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"DS прием", 7, "Наименование");
+        tbl_priem = new CustomTable<>(true, false, AllGosp.class, 3,"N ист. бол.",4,"Дата",5,"Отделение",6,"Диагноз", 7, "Наименование");
         tbl_priem.setDateField(1);
         tbl_priem.setPreferredWidths(70,70,65,60,600);
         tbl_priem.setFillsViewportHeight(true);
@@ -2912,7 +2941,8 @@ public class PacientInfoFrame extends JFrame {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 if (tbl_priem.getSelectedItem() !=  null) {
-                changePatientPriemInfo(curPatientId);
+                    changePatientPriemInfo(curPatientId);
+                    newPriem = tbl_priem.getSelectedItem();
                 }
             }
         }
@@ -2924,7 +2954,7 @@ public class PacientInfoFrame extends JFrame {
         public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
             try {
                 MainForm.tcl.deleteGosp(curId);
-            } catch (TException e) {
+            } catch (TException | KmiacServerException e) {
                 e.printStackTrace();
                 return false;
             }
@@ -2932,16 +2962,45 @@ public class PacientInfoFrame extends JFrame {
             }
         });
 
+//        tbl_priem.registerUpdateSelectedRowListener(new CustomTableItemChangeEventListener<AllGosp>() {
+//            @Override
+//            public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
+//                    newPriem.setId(curId);
+//                    newPriem.setNist(Id_gosp.getNist());
+//                    newPriem.setDatap(Id_gosp.getDatap());
+//                    newPriem.setCotd(Id_gosp.getCotd());
+//                    newPriem.setDiag_p(Id_gosp.getDiag_p());
+//                    newPriem.setNamed_p(Id_gosp.getNamed_p());
+//                return true;
+//            }
+//        });
+
         JButton btnPrint_ambk = new JButton("Амбул.карты");
         btnPrint_ambk.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 String servPath;
                 try {
-                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo);
+                    String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
+                    String omsOrg = cmb_oms_smo.getText();
+                    String lgot = "";
+
+                    if (tbl_lgota.getData() != null)
+                    	LgotaInfo = tbl_lgota.getData();
+                    if (LgotaInfo.size() > 0) {
+                        for (Lgota lg : LgotaInfo) {
+                            if (lg.isSetLgota()) {
+                                lgot += ", " + String.valueOf(lg.getLgota());
+                            }
+                        }
+                        lgot = lgot.substring(1);
+                    } else {
+                        lgot = "";
+                    }
+                    servPath = MainForm.tcl.printMedCart(NambInfo, PersonalInfo, MainForm.authInfo, docInfo, omsOrg, lgot);
                     String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
                     MainForm.conMan.openFileInEditor(cliPath, false);
-                } catch (TException | IOException | FileNotFoundException | OpenFileException e) {
+                } catch (TException | IOException | FileNotFoundException | OpenFileException | KmiacServerException e) {
                     e.printStackTrace();
                 }
             }
@@ -2979,6 +3038,12 @@ public class PacientInfoFrame extends JFrame {
             tbMain.remove(tpSign);
             tbMain.remove(tpPriem);
             btnPrint_istb.setVisible(false);
+            btnShowTalonSelectModule.setVisible(true);
+        }
+        if (MainForm.authInfo.getCslu() == 1) {
+            btnPrint_ambk.setVisible(false);
+            btnPrint_istb.setVisible(true);
+            btnShowTalonSelectModule.setVisible(false);
         }
 
         pl_print.setLayout(gl_pl_print);
@@ -3001,6 +3066,8 @@ public class PacientInfoFrame extends JFrame {
         } catch (TException e) {
             e.printStackTrace();
             MainForm.conMan.reconnect(e);
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
         }
     }
     //слушатель таб контрола персональной информации о пациенте
@@ -3085,27 +3152,27 @@ public class PacientInfoFrame extends JFrame {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (PersonalInfo.getFam() != null) tfFam.setText(PersonalInfo.getFam().trim());
-            if (PersonalInfo.getIm() != null) tfIm.setText(PersonalInfo.getIm().trim());
-            if (PersonalInfo.getOt() != null) tfOt.setText(PersonalInfo.getOt().trim());
+            if (PersonalInfo.getFam() != null) tfFam.setText(PersonalInfo.getFam());
+            if (PersonalInfo.getIm() != null) tfIm.setText(PersonalInfo.getIm());
+            if (PersonalInfo.getOt() != null) tfOt.setText(PersonalInfo.getOt());
             if (PersonalInfo.isSetDatar()) tfDr.setDate(PersonalInfo.datar);
-            if (PersonalInfo.getAdmAddress().flat != null) tf_Adm_kv.setText(PersonalInfo.admAddress.flat.trim());
-            if (PersonalInfo.getAdpAddress().flat != null) tf_Adp_kv.setText(PersonalInfo.adpAddress.flat.trim());
-            if (PersonalInfo.getNamemr() != null) tfMrname.setText(PersonalInfo.namemr.trim());
+            if (PersonalInfo.getAdmAddress().flat != null) tf_Adm_kv.setText(PersonalInfo.admAddress.flat);
+            if (PersonalInfo.getAdpAddress().flat != null) tf_Adp_kv.setText(PersonalInfo.adpAddress.flat);
+            if (PersonalInfo.getNamemr() != null) tfMrname.setText(PersonalInfo.namemr);
             if (PersonalInfo.getMrab() != 0) tfMr.setText(Integer.toString(PersonalInfo.getMrab()));
-            if (PersonalInfo.getProf() != null) tfDolj.setText(PersonalInfo.prof.trim());
-            if (PersonalInfo.getTel() != null)tfTel.setText(PersonalInfo.tel.trim());
-            if (PersonalInfo.getSnils() != null)tf_Snils.setText(PersonalInfo.snils.trim());
-            if (PersonalInfo.odoc != null) tf_Odoc.setText(PersonalInfo.odoc.trim());
-            if (PersonalInfo.getDocser() != null) tf_serdoc.setText(PersonalInfo.docser.trim());
-            if (PersonalInfo.getDocnum() != null) tf_nomdoc.setText(PersonalInfo.docnum.trim());
-            if (PersonalInfo.getPolis_dms().ser != null)tf_dms_ser.setText(PersonalInfo.polis_dms.ser.trim());
-            if (PersonalInfo.getPolis_dms().nom != null)tf_dms_nom.setText(PersonalInfo.polis_dms.nom.trim());
-            if (PersonalInfo.getPolis_oms().ser != null)tf_oms_ser.setText(PersonalInfo.polis_oms.ser.trim());
-            if (PersonalInfo.getPolis_dms().nom != null)tf_oms_nom.setText(PersonalInfo.polis_oms.nom.trim());
+            if (PersonalInfo.getProf() != null) tfDolj.setText(PersonalInfo.prof);
+            if (PersonalInfo.getTel() != null)tfTel.setText(PersonalInfo.tel);
+            if (PersonalInfo.getSnils() != null)tf_Snils.setText(PersonalInfo.snils);
+            if (PersonalInfo.odoc != null) tf_Odoc.setText(PersonalInfo.odoc);
+            if (PersonalInfo.getDocser() != null) tf_serdoc.setText(PersonalInfo.docser);
+            if (PersonalInfo.getDocnum() != null) tf_nomdoc.setText(PersonalInfo.docnum);
+            if (PersonalInfo.getPolis_dms().ser != null)tf_dms_ser.setText(PersonalInfo.polis_dms.ser);
+            if (PersonalInfo.getPolis_dms().nom != null)tf_dms_nom.setText(PersonalInfo.polis_dms.nom);
+            if (PersonalInfo.getPolis_oms().ser != null)tf_oms_ser.setText(PersonalInfo.polis_oms.ser);
+            if (PersonalInfo.getPolis_dms().nom != null)tf_oms_nom.setText(PersonalInfo.polis_oms.nom);
             if (PersonalInfo.isSetCpol_pr())tf_Cpol.setText(Integer.toString(PersonalInfo.cpol_pr));
 
-            if (NambInfo.nambk != null)tf_Nambk.setText(NambInfo.getNambk().trim());
+            if (NambInfo.nambk != null)tf_Nambk.setText(NambInfo.getNambk());
             if (NambInfo.getNuch() != 0)tf_Nuch.setText(Integer.toString(NambInfo.getNuch()));
             if (NambInfo.getDatapr() != 0)tf_datapr.setDate(NambInfo.getDatapr());
             if (NambInfo.getDataot() != 0)tf_dataot.setDate(NambInfo.getDataot());
@@ -3162,12 +3229,18 @@ public class PacientInfoFrame extends JFrame {
             cmb_dms_smo.setSelectedIndex(-1);
             cmb_adm_obl.setSelectedIndex(-1);
             cmb_adp_obl.setSelectedIndex(-1);
-            cmb_adm_gorod.setData(null);
-            cmb_adp_gorod.setData(null);
+            cmb_adm_gorod.setSelectedIndex(-1);
+            cmb_adp_gorod.setSelectedIndex(-1);
             cmb_adm_ul.setData(null);
             cmb_adp_ul.setData(null);
             cmb_adp_dom.setData(null);
             cmb_adm_dom.setData(null);
+
+			LgotaInfo = new ArrayList<Lgota>();
+			KontingentInfo =  new ArrayList<Kontingent>();
+			AgentInfo = new Agent();
+            SignInfo = new Sign();
+            AllGospInfo = new ArrayList<AllGosp>();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3200,16 +3273,16 @@ public class PacientInfoFrame extends JFrame {
         try {
             NewAgent();
             AgentInfo = MainForm.tcl.getAgent(PatId);
-            if (AgentInfo.getFam() != null)	tf_Fam_pr.setText(AgentInfo.fam.trim());
-            if (AgentInfo.getIm() != null) tf_Im_pr.setText(AgentInfo.im.trim());
-            if (AgentInfo.getOt() != null) tf_Ot_pr.setText(AgentInfo.ot.trim());
+            if (AgentInfo.getFam() != null)	tf_Fam_pr.setText(AgentInfo.fam);
+            if (AgentInfo.getIm() != null) tf_Im_pr.setText(AgentInfo.im);
+            if (AgentInfo.getOt() != null) tf_Ot_pr.setText(AgentInfo.ot);
             if (AgentInfo.isSetDatar())	tf_dr_pr.setDate(AgentInfo.datar);
-            if (AgentInfo.getBirthplace() != null) tf_Mr_pr.setText(AgentInfo.birthplace.trim());
-            if (AgentInfo.getSpolis() != null) tf_Polis_ser_pr.setText(AgentInfo.spolis.trim());
-            if (AgentInfo.getNpolis() != null) tf_Polis_nom_pr.setText(AgentInfo.npolis.trim());
-            if (AgentInfo.getName_str() != null) tf_Name_sk_pr.setText(AgentInfo.name_str.trim());
-            if (AgentInfo.getDocser() != null) tf_Ser_doc_pr.setText(AgentInfo.docser.trim());
-            if (AgentInfo.getDocnum() != null) tf_Nomdoc_pr.setText(AgentInfo.docnum.trim());
+            if (AgentInfo.getBirthplace() != null) tf_Mr_pr.setText(AgentInfo.birthplace);
+            if (AgentInfo.getSpolis() != null) tf_Polis_ser_pr.setText(AgentInfo.spolis);
+            if (AgentInfo.getNpolis() != null) tf_Polis_nom_pr.setText(AgentInfo.npolis);
+            if (AgentInfo.getName_str() != null) tf_Name_sk_pr.setText(AgentInfo.name_str);
+            if (AgentInfo.getDocser() != null) tf_Ser_doc_pr.setText(AgentInfo.docser);
+            if (AgentInfo.getDocnum() != null) tf_Nomdoc_pr.setText(AgentInfo.docnum);
             if (AgentInfo.isSetPol()){
                 rbtn_pol_pr_m.setSelected(AgentInfo.pol == 1);
                 rbtn_pol_pr_j.setSelected(AgentInfo.pol == 2);
@@ -3256,7 +3329,7 @@ public class PacientInfoFrame extends JFrame {
         try {
             NewSign();
             SignInfo = MainForm.tcl.getSign(PatId);
-            if (SignInfo.getGrup().trim() != null){
+            if (SignInfo.getGrup() != null){
                 rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
                 rbtn_gk2.setSelected(SignInfo.grup.charAt(0) == '2');
                 rbtn_gk3.setSelected(SignInfo.grup.charAt(0) == '3');
@@ -3272,13 +3345,13 @@ public class PacientInfoFrame extends JFrame {
                 rbtn_vp3.setSelected(SignInfo.vred.charAt(2) == '1');
             }
             if (SignInfo.getAllerg() != null){
-                ta_allerg.setText(SignInfo.allerg.trim());
+                ta_allerg.setText(SignInfo.allerg);
             }
             if (SignInfo.getFarmkol() != null){
-                ta_farm.setText(SignInfo.farmkol.trim());
+                ta_farm.setText(SignInfo.farmkol);
             }
             if (SignInfo.getVitae() != null){
-                ta_vitae.setText(SignInfo.vitae.trim());
+                ta_vitae.setText(SignInfo.vitae);
             }
         } catch (SignNotFoundException snfe) {
             System.out.println("Информации нет.");
@@ -3307,7 +3380,7 @@ public class PacientInfoFrame extends JFrame {
         AllGospInfo = MainForm.tcl.getAllGosp(PatId);
         tbl_priem.setData(AllGospInfo);
       } catch (GospNotFoundException gnfe) {
-            System.out.println("Обращений нет.");
+//            System.out.println("Обращений нет.");
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -3323,7 +3396,7 @@ public class PacientInfoFrame extends JFrame {
 //			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
             NewPriemInfo();
             if (Id_gosp.getJalob() != null){
-                ta_jal_pr.setText(Id_gosp.jalob.trim());
+                ta_jal_pr.setText(Id_gosp.jalob);
             }
             if (Id_gosp.isSetPl_extr()){
                 rbtn_plan.setSelected(Id_gosp.pl_extr == 1);
@@ -3339,22 +3412,22 @@ public class PacientInfoFrame extends JFrame {
                 cbx_messr.setSelected(Id_gosp.messr);
             }
             if (Id_gosp.getDiag_n() != null){
-                tf_diag_n.setText(Id_gosp.diag_n.trim());
+                tf_diag_n.setText(Id_gosp.diag_n);
             }
             if (Id_gosp.getDiag_p() != null){
-                tf_diag_p.setText(Id_gosp.diag_p.trim());
+                tf_diag_p.setText(Id_gosp.diag_p);
             }
             if (Id_gosp.getNamed_n() != null){
-                ta_diag_n.setText(Id_gosp.named_n.trim());
+                ta_diag_n.setText(Id_gosp.named_n);
             }
             if (Id_gosp.getNamed_p() != null){
-                ta_diag_p.setText(Id_gosp.named_p.trim());
+                ta_diag_p.setText(Id_gosp.named_p);
             }
             if (Id_gosp.getToc() != null){
-                tf_toc.setText(Id_gosp.toc.trim());
+                tf_toc.setText(Id_gosp.toc);
             }
             if (Id_gosp.getAd() != null){
-                tf_ad.setText(Id_gosp.ad.trim());
+                tf_ad.setText(Id_gosp.ad);
             }
 
             if (Id_gosp.getSmp_num() != 0) {
@@ -3500,8 +3573,9 @@ public class PacientInfoFrame extends JFrame {
 
             Id_gosp.setCotd_p(MainForm.authInfo.cpodr);
             Id_gosp.setCuser(MainForm.authInfo.pcod);
-            Id_gosp.setNist(1); //подумать
-
+            //Id_gosp.setNist(1); //подумать
+            if (!tf_nist.getText().isEmpty()) Id_gosp.setNist(Integer.valueOf(tf_nist.getText())); 
+            Id_gosp.setVid(1);
 //		    System.out.println(((Date) sp_dataosm.getValue()).getTime());
 //		    System.out.println(stf.format((Date) sp_dataosm.getValue()));
             if (tf_datap.getDate() != null) Id_gosp.setDatap(tf_datap.getDate().getTime());
@@ -3520,13 +3594,13 @@ public class PacientInfoFrame extends JFrame {
 
             if (sp_sv_time.getValue() != null) Id_gosp.setSv_time(Integer.valueOf(sp_sv_time.getValue().toString()));
             if (sp_sv_day.getValue() != null)Id_gosp.setSv_day(Integer.valueOf(sp_sv_day.getValue().toString()));
-            if (tf_diag_n.getText().trim() != null) Id_gosp.setDiag_n(tf_diag_n.getText().trim());
-            if (tf_diag_p.getText().trim() != null) Id_gosp.setDiag_p(tf_diag_p.getText().trim());
-            if (ta_diag_n.getText().trim() != null) Id_gosp.setNamed_n(ta_diag_n.getText().trim());
-            if (ta_diag_p.getText().trim() != null) Id_gosp.setNamed_p(ta_diag_p.getText().trim());
-            if (tf_toc.getText().trim() != null) Id_gosp.setToc(tf_toc.getText().trim());
-            if (tf_ad.getText().trim() != null) Id_gosp.setAd(tf_ad.getText().trim());
-            if (ta_jal_pr.getText().trim() != null) Id_gosp.setJalob(ta_jal_pr.getText().trim());
+            if (tf_diag_n.getText() != null) Id_gosp.setDiag_n(tf_diag_n.getText());
+            if (tf_diag_p.getText() != null) Id_gosp.setDiag_p(tf_diag_p.getText());
+            if (ta_diag_n.getText() != null) Id_gosp.setNamed_n(ta_diag_n.getText());
+            if (ta_diag_p.getText() != null) Id_gosp.setNamed_p(ta_diag_p.getText());
+            if (tf_toc.getText() != null) Id_gosp.setToc(tf_toc.getText());
+            if (tf_ad.getText() != null) Id_gosp.setAd(tf_ad.getText());
+            if (ta_jal_pr.getText() != null) Id_gosp.setJalob(ta_jal_pr.getText());
             if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
             if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
 
@@ -3549,13 +3623,15 @@ public class PacientInfoFrame extends JFrame {
             CheckNotNullTableCgosp();
             if (curId == 0){
                 curId = MainForm.tcl.addGosp(Id_gosp);
+                curId_otd = 0;
                 newPriem.setId(curId);
                 newPriem.setNist(Id_gosp.getNist());
                 newPriem.setDatap(Id_gosp.getDatap());
                 newPriem.setCotd(Id_gosp.getCotd());
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
-                tbl_priem.updateSelectedItem();
+                if (Id_gosp.getCotd() != 0)
+                   	curId_otd = MainForm.tcl.addToOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
             else{
                 MainForm.tcl.updateGosp(Id_gosp);
@@ -3564,8 +3640,10 @@ public class PacientInfoFrame extends JFrame {
                 newPriem.setCotd(Id_gosp.getCotd());
                 newPriem.setDiag_p(Id_gosp.getDiag_p());
                 newPriem.setNamed_p(Id_gosp.getNamed_p());
-                tbl_priem.updateSelectedItem();
+                if (curId_otd != 0)
+                	MainForm.tcl.updateOtd(curId_otd, curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
+            tbl_priem.updateChangedSelectedItem();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3574,18 +3652,18 @@ public class PacientInfoFrame extends JFrame {
 //    private void RefreshTablePatient(){
 //        try {
 //            PatientBrief patBr = new PatientBrief();
-//            if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase().trim());
-//            if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase().trim());
-//            if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase().trim());
-//            if (!tf_oms_ser.getText().isEmpty()) patBr.setSpolis(tf_oms_ser.getText().toUpperCase().trim());
-//            if (!tf_oms_nom.getText().isEmpty()) patBr.setNpolis(tf_oms_nom.getText().toUpperCase().trim());
+//            if (!tfFam.getText().isEmpty()) patBr.setFam(tfFam.getText().toUpperCase());
+//            if (!tfIm.getText().isEmpty()) patBr.setIm(tfIm.getText().toUpperCase());
+//            if (!tfOt.getText().isEmpty()) patBr.setOt(tfOt.getText().toUpperCase());
+//            if (!tf_oms_ser.getText().isEmpty()) patBr.setSpolis(tf_oms_ser.getText().toUpperCase());
+//            if (!tf_oms_nom.getText().isEmpty()) patBr.setNpolis(tf_oms_nom.getText().toUpperCase());
 //            try {
 //                pat = MainForm.tcl.getAllPatientBrief(patBr);
 //                refresh(pat);
 //            }
 //            catch (PatientNotFoundException e) {
 //                JOptionPane.showMessageDialog(tfFam, "По заданным критериям сведения о пациенте отсутствуют.");
-//                System.out.println(patBr.setFam(tfFam.getText().trim())+", "+patBr.setIm(tfIm.getText().trim())+", "+patBr.setOt(tfOt.getText().trim()));
+//                System.out.println(patBr.setFam(tfFam.getText())+", "+patBr.setIm(tfIm.getText())+", "+patBr.setOt(tfOt.getText()));
 //                System.out.println("По заданным критериям сведения о пациенте отсутствуют.");
 //            }
 //        } catch (Exception e) {

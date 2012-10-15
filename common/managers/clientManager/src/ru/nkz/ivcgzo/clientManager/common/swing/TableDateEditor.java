@@ -2,7 +2,8 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.ParseException;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
@@ -19,14 +20,25 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class TableDateEditor extends DefaultCellEditor {
 	private static final long serialVersionUID = -6671230063586063616L;
 	private CustomDateEditor txt;
+	private CustomTable<?, ?> ctb;
 	private TableDateRenderer renderer;
 	private static Border blackBorder = new LineBorder(Color.black);
-	private static Border redBorder = new LineBorder(Color.red);
 	
 	public TableDateEditor() {
 		super(new CustomDateEditor());
 		
 		txt = (CustomDateEditor) this.getComponent();
+		
+		txt.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					ctb.dispatchEvent(new KeyEvent(ctb, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
+				} else {
+					super.keyPressed(e);
+				}
+			}
+		});
 		renderer = new TableDateRenderer();
 	}
 	
@@ -37,24 +49,11 @@ public class TableDateEditor extends DefaultCellEditor {
 
 	@Override
 	public Component getTableCellEditorComponent(JTable arg0, Object arg1, boolean arg2, int arg3, int arg4) {
+		ctb = (CustomTable<?, ?>) arg0;
+		
 		txt.setBorder(blackBorder);
 		txt.setValue((arg1 == null) ? null : txt.dateFormatter.format(arg1));
 		return txt;
-	}
-	
-	@Override
-	public boolean stopCellEditing() {
-			try {
-				if (txt.getText().equals(txt.placeHolder))
-					txt.setValue(null);	
-				else if (txt.getDate() == null)
-					throw new ParseException(null, 0);
-				txt.setBorder(blackBorder);
-				return super.stopCellEditing();
-			} catch (ParseException e) {
-			}
-		txt.setBorder(redBorder);
-		return false;
 	}
 	
 	public TableDateRenderer getRenderer() {

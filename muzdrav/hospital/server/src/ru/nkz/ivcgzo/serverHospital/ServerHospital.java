@@ -37,6 +37,7 @@ import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
+import ru.nkz.ivcgzo.thriftHospital.Zakl;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -77,17 +78,17 @@ public class ServerHospital extends Server implements Iface {
         "t0c", "ad", "nal_z", "nal_p", "vid_tran", "alkg", "jalob"
     };
     private static final String[] DIAGNOSIS_FIELD_NAMES = {
-        "id", "id_gosp", "diag", "prizn", "ustan", "named", "dataz"
+        "id", "id_gosp", "cod", "med_op", "date_ustan", "prizn", "vrach" , "diagname"
     };
     private static final String[] INT_CLAS_FIELD_NAMES = {
         "pcod", "name"
     };
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
-    //  id             id_gosp        diag          prizn
-        Integer.class, Integer.class, String.class, Integer.class,
-    //  ustan          named         dataz
-        Integer.class, String.class, Date.class
+    //  id             id_gosp         cod           med_op        date_ustan
+        Integer.class, Integer.class , String.class, String.class, Date.class,
+    //  prizn          vrach          diagName
+        Integer.class, Integer.class, String.class
     };
     private static final Class<?>[] MEDICAL_HISTORY_TYPES = {
     //  id             id_gosp       jalob         morbi          st_praesense  status_localis
@@ -177,7 +178,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientFromOtd(final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im,"
-                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd "
+                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
@@ -189,7 +190,7 @@ public class ServerHospital extends Server implements Iface {
                 log.log(Level.INFO, "PatientNotFoundException, otdNum = " + otdNum);
                 throw new PatientNotFoundException();
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
@@ -268,96 +269,44 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void addPatientToDoctor(final int gospId, final int doctorId) throws TException {
+    public final void addPatientToDoctor(final int gospId, final int doctorId)
+            throws KmiacServerException {
         final String sqlQuery = "UPDATE c_otd SET vrach = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false, doctorId, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final TDiagnosis getMainDiagnosis(final int gospId)
-            throws TException, DiagnosisNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, diag, prizn, ustan, named, dataz "
-                + "FROM c_diag WHERE id_gosp = ? AND prizn = 1";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
-            if (acrs.getResultSet().next()) {
-                return rsmDiagnosis.map(acrs.getResultSet());
-            } else {
-                throw new DiagnosisNotFoundException();
-            }
-        } catch (Exception e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final int addMainDiagnosis(final TDiagnosis inDiagnos)
-            throws TException {
-        final int[] indexes = {1, 2, 4, 5, 6};
-        final String sqlQuery = "INSERT INTO c_diag (id_gosp, diag, 1, ustan, named, dataz) "
-                + "VALUES (?, ?, ?, ?, ?, ?);";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT(sqlQuery, true, inDiagnos,
-                    DIAGNOSIS_TYPES, indexes);
-            int id = sme.getGeneratedKeys().getInt("id");
-            sme.setCommit();
-            return id;
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void updateMainDiagnosis(final int id, final TDiagnosis inDiagnos)
-            throws TException {
-        final String sqlQuery = "UPDATE c_diag SET ustan = ?, named = ?, dataz = ? "
-                + "WHERE id = ? AND pizn = 1;";
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, inDiagnos.getUstan(),
-                    inDiagnos.getNamed(), new Date(inDiagnos.getDataz()), id);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final void deleteMainDiagnosis(final int id) throws TException {
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_diag WHERE id = ? AND prizn = 1;", false, id);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
-        }
-    }
-
-    @Override
-    public final List<TDiagnosis> getAccompDiagnosis(final int gospId)
-            throws TException, DiagnosisNotFoundException {
-        String sqlQuery = "SELECT id, id_gosp, diag, prizn, ustan, named, dataz "
-                + "FROM c_diag WHERE id_gosp = ? AND prizn = 2";
+    public final List<TDiagnosis> getDiagnosis(final int gospId)
+            throws KmiacServerException, DiagnosisNotFoundException {
+        String sqlQuery = "SELECT c_diag.id, c_diag.id_gosp, c_diag.cod, c_diag.med_op, "
+            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach , n_c00.name as diagname "
+            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
             List<TDiagnosis> diagList = rsmDiagnosis.mapToList(acrs.getResultSet());
             if (diagList.size() > 0) {
                 return diagList;
             } else {
+                log.log(Level.INFO, "DiagnosisNotFoundException, idGosp = " + gospId);
                 throw new DiagnosisNotFoundException();
             }
-        } catch (Exception e) {
-            throw new TException(e);
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final int addAccompDiagnosis(final TDiagnosis inDiagnos)
-            throws TException {
-        final int[] indexes = {1, 2, 4, 5, 6};
-        final String sqlQuery = "INSERT INTO c_diag (id_gosp, diag, 2, ustan, named, dataz) "
-                + "VALUES (?, ?, ?, ?, ?, ?);";
+    public final int addDiagnosis(final TDiagnosis inDiagnos)
+            throws KmiacServerException {
+        final int[] indexes = {1, 2, 4, 6};
+        final String sqlQuery = "INSERT INTO c_diag (id_gosp, cod, date_ustan, vrach) "
+                + "VALUES (?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, true, inDiagnos,
                     DIAGNOSIS_TYPES, indexes);
@@ -365,73 +314,80 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
             return id;
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final void updateAccompDiagnosis(final int id, final TDiagnosis inDiagnos)
-            throws TException {
-        final String sqlQuery = "UPDATE c_diag SET ustan = ?, named = ?, dataz = ? "
-                + "WHERE id = ? AND prizn = 2;";
+    public final void updateDiagnosis(final TDiagnosis inDiagnos)
+            throws KmiacServerException {
+        final int[] indexes = {3, 5, 0};
+        final String sqlQuery = "UPDATE c_diag SET med_op = ?, prizn = ? "
+                + "WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, inDiagnos.getUstan(),
-                    inDiagnos.getNamed(), new Date(inDiagnos.getDataz()), id);
+            sme.execPreparedT(sqlQuery, false, inDiagnos, DIAGNOSIS_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final void deleteAccompDiagnosis(final int id) throws TException {
+    public final void deleteDiagnosis(final int id) throws KmiacServerException {
+        final String sqlQuery = "DELETE FROM c_diag WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared("DELETE FROM c_diag WHERE id = ? AND prizn = 2;", false, id);
+            sme.execPrepared(sqlQuery, false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final List<StringClassifier> getAzj() throws TException {
+    public final List<StringClassifier> getAzj() throws KmiacServerException {
         final String sqlQuery = "SELECT pcod, name FROM n_azj";
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmAzj =
                 new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAzj.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final List<IntegerClassifier> getAp0() throws TException {
+    public final List<IntegerClassifier> getAp0() throws KmiacServerException {
         final String sqlQuery = "SELECT pcod, name FROM n_ap0";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAp0 =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAp0.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
-    public final List<IntegerClassifier> getAj0() throws TException {
+    public final List<IntegerClassifier> getAq0() throws KmiacServerException {
         final String sqlQuery = "SELECT pcod, name FROM n_aq0";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAq0 =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             return rsmAq0.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
     @Override
     public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
-            final String srcText) throws KmiacServerException, TException {
+            final String srcText) throws KmiacServerException {
         String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
                 + "sho.diag || ' ' || sho.name AS name "
                 + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
@@ -444,10 +400,9 @@ public class ServerHospital extends Server implements Iface {
                     + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
         }
         sql += "ORDER BY sho.name ";
-
         try (AutoCloseableResultSet acrs = (srcText == null)
-                ? sse.execPreparedQuery(sql, cspec, cslu, cslu)
-                : sse.execPreparedQuery(sql, cspec, cslu, cslu,
+                ? sse.execPreparedQuery(sql, 38, 2, 2)
+                : sse.execPreparedQuery(sql, 38, 2, 2,
                         srcText, srcText, srcText, srcText)) {
             return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -502,7 +457,7 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final int addMedicalHistory(final TMedicalHistory medHist)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         final String sqlQuery = "INSERT INTO c_osmotr (id_gosp, jalob, "
             + "morbi, status_praesense, "
@@ -521,11 +476,10 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void deleteMedicalHistory(final int idGosp) throws KmiacServerException,
-            TException {
-        final String sqlQuery = "DELETE * FROM c_osmotr WHERE id_gosp = ?;";
+    public final void deleteMedicalHistory(final int id) throws KmiacServerException {
+        final String sqlQuery = "DELETE FROM c_osmotr WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, idGosp);
+            sme.execPrepared(sqlQuery, false, id);
             sme.setCommit();
         } catch (SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
@@ -576,6 +530,54 @@ public class ServerHospital extends Server implements Iface {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void disharge(final int idGosp) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET vrach = ? "
+                + "WHERE id_gosp = ?";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, null, idGosp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateMedicalHistory(final TMedicalHistory medHist)
+            throws KmiacServerException {
+        final int[] indexes = {2, 3, 4, 5, 6, 0};
+        final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
+            + "morbi = ?, status_praesense = ?, "
+            + "status_localis = ?, fisical_obs = ? "
+            + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void addZakl(final Zakl zakl) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
+                + "sostv = ?, recom = ?, vrach = ? "
+                + "WHERE id_gosp = ?";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
+                    new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                    zakl.getSostv(), zakl.getRecom(),
+                    null, zakl.getIdGosp());
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }

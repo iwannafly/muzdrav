@@ -51,7 +51,8 @@ public class PatientSelectFrame extends JDialog {
                 (int) ((screenSize.getHeight() - getHeight()) / 2));
         setUndecorated(true);
 
-        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo);
+        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo.getPcod(),
+                authInfo.getCpodr());
         table = new JTable();
         table.setModel(tbModel);
         scrollPane.setViewportView(table);
@@ -75,15 +76,16 @@ public class PatientSelectFrame extends JDialog {
             }
         });
         panel.add(btnSelect);
-        if (table.getRowCount() == 0) {
-            btnSelect.setEnabled(false);
-        }
+//        if (table.getRowCount() == 0) {
+//            btnSelect.setEnabled(false);
+//        }
 
         btnCancel = new JButton("Отмена");
         btnCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                dispose();
+                PatientSelectFrame.this.dispatchEvent(new WindowEvent(
+                        PatientSelectFrame.this, WindowEvent.WINDOW_CLOSING));
             }
         });
         panel.add(btnCancel);
@@ -91,6 +93,12 @@ public class PatientSelectFrame extends JDialog {
 
     public final TSimplePatient getCurrentPatient() {
         return currentPatient;
+    }
+
+    public final void refreshModel(final UserAuthInfo authInfo) {
+        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo.getPcod(),
+                authInfo.getCpodr());
+        table.setModel(tbModel);
     }
 
 

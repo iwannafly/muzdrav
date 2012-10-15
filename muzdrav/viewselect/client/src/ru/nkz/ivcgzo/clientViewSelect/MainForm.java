@@ -3,12 +3,8 @@ package ru.nkz.ivcgzo.clientViewSelect;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -27,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.apache.thrift.TException;
@@ -78,13 +75,6 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		instance = this;
 	}
 
-	/**
-	 * Create the application.
-	 */
-	//public NSForm() {
-	//	initialize();
-	//}
-
 	@Override
 	public String getName() {
 		return configuration.appName;
@@ -99,12 +89,6 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		frame.setTitle("Нормативно-справочная информация");
 		frame.setBounds(100, 100, 750, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowOpened(WindowEvent e) {
-				//frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-				}
-		});
 		
 		ButtonGroup group = new ButtonGroup();
 		
@@ -123,42 +107,27 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 			public void actionPerformed(ActionEvent arg0) {
 				if (rbMenuItemAll.isSelected()) {
 					table.setRowSorter(null);
-					}
-				
-				
+				}
 			}
 		});
 		
 		final JMenuItem rbMenuItemStat = new JRadioButtonMenuItem("Статические");
-		//cbMenuItem.setMnemonic(KeyEvent.VK_C);
 
 		mnNewMenu.add(rbMenuItemStat);
 		group.add(rbMenuItemStat);
 
 		rbMenuItemStat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				/**TableRowSorter sorter = new TableRowSorter(table.getModel());
-				table.setRowSorter(sorter);
-				RowFilter rf;
-				try {
-				rf = RowFilter.regexFilter("^n_", 0);
-				} catch (java.util.regex.PatternSyntaxException e) {
-				return;
-				}
-				sorter.setRowFilter(rf);*/
 				if (rbMenuItemStat.isSelected()) {
 					table.setRowSorter(null);
 					setClassifierFilter("n_");
-					}
-				
-				
+				}
 			}
 		});
 
 
 		
 		final JMenuItem rbMenuItemDyn = new JRadioButtonMenuItem("Редактируемые");
-		//cbMenuItem.setMnemonic(KeyEvent.VK_H);
 		mnNewMenu.add(rbMenuItemDyn);
 		group.add(rbMenuItemDyn);
 
@@ -168,8 +137,6 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					table.setRowSorter(null);					
 					setClassifierFilter("s_");
 				}
-				//else setClassifierFilter();
-				//setClassifierFilter("s_");
 			}
 			
 		});
@@ -201,67 +168,35 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		spClassifier.setViewportView(table);
 		
-		table.addMouseListener(new MouseAdapter(){
-		     public void mouseClicked(MouseEvent e){
-		      if (e.getClickCount() == 2){
-		    	  // Вывод значения на консоль
-		    	  //System.out.print(getViewTableValues().getName());
-		    	  String className = table.getSelectedItem().pcod;
-		    	  try {
-		    		if (className.equals("n_c00")) {
-		    			conMan.showMkbTreeForm("Диагноз", "");
-		    		  }
-		    		else if (className.equals("n_nsipol")) {
-		    			conMan.showPolpTreeForm("Поликлиники Кемеровской Области", -1, -1, -1);
-		    		}
-		    		else if (className.equals("n_z43")) {
-		    			conMan.showMrabTreeForm("Место работы", -1);
-		    		}
-		    		else if (tcl.isClassifierPcodInteger(className)) {
-						  ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
-						  MainForm.instance.addChildFrame(VSPIForm);
-						  VSPIForm.tableFill(className);
-						  VSPIForm.setVisible(true);
-						//System.out.print(className);
-					  }
-					else {
-						  ViewTablePcodStringForm VSPSForm = new ViewTablePcodStringForm();
-						  MainForm.instance.addChildFrame(VSPSForm);
-						  VSPSForm.tableFill(className);
-						  VSPSForm.setVisible(true);
-					}
-				} catch (TException e1) {
+		table.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					String className = table.getSelectedItem().pcod;
+					try {
+						if (className.equals("n_c00")) {
+							conMan.showMkbTreeForm("Диагноз", "");
+						} else if (className.equals("n_nsipol")) {
+							conMan.showPolpTreeForm("Поликлиники Кемеровской Области", -1, -1, -1);
+						} else if (className.equals("n_z43")) {
+							conMan.showMrabTreeForm("Место работы", -1);
+						} else if (tcl.isClassifierPcodInteger(className)) {
+							ViewTablePcodIntForm VSPIForm = new ViewTablePcodIntForm();
+							MainForm.instance.addChildFrame(VSPIForm);
+							ViewTablePcodIntForm.tableFill(className);
+							VSPIForm.setVisible(true);
+						} else {
+							ViewTablePcodStringForm VSPSForm = new ViewTablePcodStringForm();
+							MainForm.instance.addChildFrame(VSPSForm);
+							ViewTablePcodStringForm.tableFill(className);
+							VSPSForm.setVisible(true);
+						}
+					} catch (TException e1) {
+						e1.printStackTrace();
 						conMan.reconnect(e1);
+					}
 				}
-		   
-		         }
-		      }
-		     } );
-		
-		table.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode()== KeyEvent.VK_ENTER) { 
-		    	  // Вывод значения на консоль
-		    	  //System.out.print(getViewTableValues().getName());
-		    	  System.out.println();
-		         }
-		      }
-			
-			
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
 			}
 		});
-		
-		
 	}
 
 	@Override
@@ -269,14 +204,13 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftViewSelect.Client) {
 			tcl = thrClient;
-			try { 
+			try {
 				table.setData(tcl.getVSStringClassifierView("n_spr"));
-			} catch (Exception e) {
+			} catch (TException e) {
 				e.printStackTrace();
-			} 
-			
+				conMan.reconnect(e);
+			}
 		}
-		
 	}
 
 	// Быстрый поиск по таблице
@@ -296,21 +230,14 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
     				return;
     			}
     		}
-    
     }
     
     //Фильтрация классификаторов
 	public void setClassifierFilter (String beginsWith) {
-		TableRowSorter sorter = new TableRowSorter(table.getModel());
+		TableRowSorter<AbstractTableModel> sorter = new TableRowSorter<>(table.getModel());
+		RowFilter<Object, Object> rf = RowFilter.regexFilter("^"+beginsWith, 0);
 		table.setRowSorter(sorter);
-		RowFilter rf;
-		try {
-		rf = RowFilter.regexFilter("^"+beginsWith, 0);
-		} catch (java.util.regex.PatternSyntaxException e) {
-		return;
-		}
 		sorter.setRowFilter(rf);
-		
 	}
 	
 	private void initModalForms() {
@@ -502,7 +429,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						infFrm.removeModalityListener();
 						disposeModal();
 					}
-			}}
+				}
+			}
 		
 		return null;
 	}

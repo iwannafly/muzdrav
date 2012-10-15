@@ -15,14 +15,13 @@ import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainDocument;
 import javax.swing.text.TextAction;
 
 /**
@@ -97,31 +96,28 @@ public class CustomTextComponentWrapper {
 	}
 	
 	public void setUpperCase() {
-		textComponent.getDocument().addDocumentListener(new DocumentListener() {
-			boolean running;
-			
+		textComponent.setDocument(new PlainDocument() {
+			private static final long serialVersionUID = 8902350626240377863L;
+
 			@Override
-			public void removeUpdate(DocumentEvent e) {
-			}
-			
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				if (!running) {
-					running = true;
-					SwingUtilities.invokeLater(new Runnable() {
-						
-						@Override
-						public void run() {
-							textComponent.setText(textComponent.getText().toUpperCase());
-							
-							running = false;
-						}
-					});
+			public void replace(int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+				if (length == 0 && (text == null || text.length() == 0))
+					return;
+				
+				writeLock();
+				try {
+					if (length > 0)
+						getContent().remove(offset, length);
+					if (text != null && text.length() > 0)
+						insertString(offset, text, attrs);
+				} finally {
+					writeUnlock();
 				}
 			}
 			
 			@Override
-			public void changedUpdate(DocumentEvent e) {
+			public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+				super.insertString(offs, str.toUpperCase(), a);
 			}
 		});
 	}
@@ -199,7 +195,10 @@ public class CustomTextComponentWrapper {
 			textComponent.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mousePressed(MouseEvent e) {
-					super.mousePressed(e);
+					if (textComponent.isEnabled())
+						textComponent.setComponentPopupMenu(CustomTextComponentPopupMenu.this);
+					else
+						textComponent.setComponentPopupMenu(null);
 					
 					if (e.getButton() == MouseEvent.BUTTON3 && !hasFocus)
 						textComponent.requestFocusInWindow();

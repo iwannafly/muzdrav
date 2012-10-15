@@ -37,7 +37,7 @@ import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
 
 public class FormRdInf extends JFrame {
 	private static final long serialVersionUID = 8843590132227415590L;
-	public static RdInfStruct RdInfStruct;
+	private RdInfStruct RdInfStruct;
 	private JPanel contentPane;
 	private JLabel LObr;
 	private JLabel LSem;
