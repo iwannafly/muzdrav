@@ -107,7 +107,7 @@ public class ModulesUpdater {
 		String path = checkAndCreateLibFolder();
 		byte[] buf = new byte[65536];
 		for (LibraryInfo libInfo : updList) {
-			try (Socket servSct = new Socket("localhost", client.openModuleReadSocket(libInfo.id))) {
+			try (Socket servSct = new Socket("10.0.0.243", client.openModuleReadSocket(libInfo.id))) {
 				try (FileOutputStream fos = new FileOutputStream(new File(path, libInfo.name))) {
 					fos.getChannel().lock();
 					int read = servSct.getInputStream().read(buf);

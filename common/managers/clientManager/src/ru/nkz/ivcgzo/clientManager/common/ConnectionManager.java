@@ -159,7 +159,7 @@ public class ConnectionManager {
 		T connection;
 		
 		Constructor<T> constructor = cls.getConstructor(TProtocol.class);
-		TTransport transport = new TFramedTransport(new TSocket("localhost", port));
+		TTransport transport = new TFramedTransport(new TSocket("10.0.0.243", port));
 		connection = constructor.newInstance(new TBinaryProtocol(transport));
 		transports.put(port, transport);
 		connections.put(port, connection);
@@ -394,7 +394,7 @@ public class ConnectionManager {
 	public void transferFileToServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, OpenFileException, TException {
 		int port = openWriteServerSocket(dstPath);
 		try (FileInputStream fis = new FileInputStream(srcPath);
-				Socket socket = new Socket("localhost", port);) {
+				Socket socket = new Socket("10.0.0.243", port);) {
 			byte[] buf = new byte[Constants.bufSize];
 			int read = Constants.bufSize;
 			while (read == Constants.bufSize) {
@@ -410,7 +410,7 @@ public class ConnectionManager {
 	public void transferFileFromServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, FileNotFoundException, OpenFileException, TException {
 		int port = openReadServerSocket(srcPath);
 		try (FileOutputStream fos = new FileOutputStream(dstPath);
-				Socket socket = new Socket("localhost", port);) {
+				Socket socket = new Socket("10.0.0.243", port);) {
 			byte[] buf = new byte[Constants.bufSize];
 			int read = socket.getInputStream().read(buf);
 			while (read > -1) {
