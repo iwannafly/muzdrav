@@ -1054,7 +1054,7 @@ public class FormPostBer extends JFrame {
 	private void setDefaultValues() {
 	try {
 //		System.out.println("начальные значения");		
-//	System.out.println(Vvod.zapVr.id_pvizit);		
+	System.out.println(Vvod.zapVr.id_pvizit);		
 		rdSlStruct.setId_pvizit(Vvod.zapVr.getId_pvizit());
 		rdSlStruct.setNpasp(Vvod.zapVr.getNpasp());
 		rdSlStruct.setCext(25);
@@ -1076,12 +1076,12 @@ public class FormPostBer extends JFrame {
 		rdSlStruct.setVesd(60);
 		rdSlStruct.setOslab(null);
 		rdSlStruct.setPrrod(null);
-		rdSlStruct.setIshod((Integer) null);
+//		rdSlStruct.setIshod((Integer) null);
 		rdSlStruct.setNsert(null);
 		rdSlStruct.setSsert(null);
-		rdSlStruct.setDatasert((Long) null);
-		rdSlStruct.setDatasn((Long) null);
-		rdSlStruct.setSrokab((Integer) null);
+//		rdSlStruct.setDatasert((Long) null);
+//		rdSlStruct.setDatasn((Long) null);
+		rdSlStruct.setSrokab(0);
 		rdSlStruct.setEko(false);
 		rdSlStruct.setRub(false);
 		rdSlStruct.setPredp(false);
