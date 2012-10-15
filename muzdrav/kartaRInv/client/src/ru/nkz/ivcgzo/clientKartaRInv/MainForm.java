@@ -12,6 +12,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftKartaRInv.Pinvk;
 import ru.nkz.ivcgzo.thriftKartaRInv.thriftKartaRInv;
@@ -44,6 +45,8 @@ import java.awt.ComponentOrientation;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainForm extends Client<thriftKartaRInv.Client> {
 
@@ -217,61 +220,61 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 					.addContainerGap(34, Short.MAX_VALUE))
 		);
 		
-		cb_mesto1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_preds = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_rez_mse = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_srok_inv = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_factor = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_fact1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_fact2 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_fact3 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_fact4 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_prognoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_potencial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_med_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_ps_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_prof_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_soc_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_zakl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_klin_prognoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr1v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr2v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr3v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr4v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr5v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr6v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr7v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr8v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr9v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr10v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr11v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr12v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr17v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr18v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr19v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr20v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr21v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr22v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_mr23v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr1v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr2v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr3v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr4v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr5v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr6v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr7v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr8v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr9v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr10v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr11v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr12v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
-		cb_pr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z70);
+		cb_mesto1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0m);
+		cb_preds = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0p);
+		cb_rez_mse = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0r);
+		cb_srok_inv = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0s);
+		cb_factor = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0a);
+		cb_fact1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0b);
+		cb_fact2 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0c);
+		cb_fact3 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0d);
+		cb_fact4 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0e);
+		cb_prognoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0f);
+		cb_potencial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0g);
+		cb_med_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
+		cb_ps_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
+		cb_prof_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
+		cb_soc_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
+		cb_zakl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0h);
+		cb_klin_prognoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0f);
+		cb_mr1v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr2v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr3v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr4v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr5v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr6v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr7v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr8v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr9v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr10v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr11v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr12v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr17v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr18v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr19v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr20v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr21v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr22v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_mr23v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr1v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr2v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr3v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr4v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr5v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr6v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr7v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr8v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr9v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr10v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr11v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr12v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
+		cb_pr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		cb_pr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		
 		JPanel p_rez_exp = new JPanel();
@@ -634,15 +637,71 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		
 		t_diag = new JTextField();
 		t_diag.setColumns(10);
+		t_diag.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					StringClassifier res = MainForm.conMan.showMkbTreeForm("МКБ",(( JTextField) e.getSource()).getText());
+					if (res != null) {
+						t_diag.setText(res.pcod);
+						if (t_diag.getText().isEmpty());
+					//	 t_diag.setText(res.name)
+					}
+				}
+			}
+			
+		});
+		
+		
 		
 		t_diag_s1 = new JTextField();
 		t_diag_s1.setColumns(10);
+		t_diag_s1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					StringClassifier res = MainForm.conMan.showMkbTreeForm("МКБ",(( JTextField) e.getSource()).getText());
+					if (res != null) {
+						t_diag_s1.setText(res.pcod);
+						if (t_diag_s1.getText().isEmpty());
+					}
+				}
+			}
+			
+		});
 		
 		t_diag_s2 = new JTextField();
 		t_diag_s2.setColumns(10);
-		
+		t_diag_s2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					StringClassifier res = MainForm.conMan.showMkbTreeForm("МКБ",(( JTextField) e.getSource()).getText());
+					if (res != null) {
+						t_diag_s2.setText(res.pcod);
+						if (t_diag_s2.getText().isEmpty());
+					}
+				}
+			}
+			
+		});
 		t_diag_s3 = new JTextField();
 		t_diag_s3.setColumns(10);
+		t_diag_s3.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					StringClassifier res = MainForm.conMan.showMkbTreeForm("МКБ",(( JTextField) e.getSource()).getText());
+					if (res != null) {
+						t_diag_s3.setText(res.pcod);
+						if (t_diag_s3.getText().isEmpty());
+					//	 t_diag.setText(res.name)
+					}
+				}
+			}
+			
+		});
+		
 		GroupLayout gl_p_nar = new GroupLayout(p_nar);
 		gl_p_nar.setHorizontalGroup(
 			gl_p_nar.createParallelGroup(Alignment.LEADING)
