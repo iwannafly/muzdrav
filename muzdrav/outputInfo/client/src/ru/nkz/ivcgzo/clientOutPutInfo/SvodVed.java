@@ -9,14 +9,20 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JLabel;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 
 import javax.swing.JRadioButton;
 import javax.swing.JButton;
 import javax.swing.ButtonGroup;
+
+import org.apache.thrift.TException;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 //import ru.nkz.ivcgzo.thriftOsm.InputSvodVed;
+import java.io.File;
+import java.text.SimpleDateFormat;
 
 public class SvodVed extends JPanel {
 	private CustomDateEditor tfDateB;
@@ -26,9 +32,13 @@ public class SvodVed extends JPanel {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	public SvodVed() {
 		
+		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		
 		JLabel label = new JLabel("Период формирования: с ");
 		tfDateB = new CustomDateEditor();
+		tfDateB.setText("01012012");
 		tfDateF = new CustomDateEditor();
+		tfDateF.setText("25122012");
 		
 		lblNewLabel = new JLabel("по");
 		
@@ -38,18 +48,42 @@ public class SvodVed extends JPanel {
 		buttonGroup.add(rdbtnVzr);
 		buttonGroup.add(rdbtnDet);
 		buttonGroup.add(rdbtnPod);
+		rdbtnDet.setSelected(true);
 		
 		JButton btnNewButton = new JButton("Выполнить");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				InputSvodVed inputSvodVed = new InputSvodVed();
-				inputSvodVed.setDateb(tfDateB.toString());
-				inputSvodVed.setDatef(tfDateF.toString());
-				inputSvodVed.setKpolik(MainForm.authInfo.getCpodr());
-				inputSvodVed.setNamepol(MainForm.authInfo.getCpodr_name());
-				if (rdbtnDet.isSelected()) inputSvodVed.setVozcat(1);
-				else if (rdbtnPod.isSelected()) inputSvodVed.setVozcat(2);
-				else if (rdbtnVzr.isSelected()) inputSvodVed.setVozcat(3);
+				try{
+				//InputSvodVed inputSvodVed = new InputSvodVed();
+				//inputSvodVed.setDateb(tfDateB.toString());
+				//inputSvodVed.setDatef(tfDateF.toString());
+				//inputSvodVed.setKpolik(MainForm.authInfo.getCpodr());
+				//inputSvodVed.setNamepol(MainForm.authInfo.getCpodr_name());
+					
+				InputSvodVed isv = new InputSvodVed();	
+				if (rdbtnDet.isSelected()) isv.setVozcat(1);
+				else if (rdbtnPod.isSelected()) isv.setVozcat(2);
+				else if (rdbtnVzr.isSelected()) isv.setVozcat(3);
+				
+				isv.setDateb(sdf.format(tfDateB.getDate()));
+				isv.setDatef(sdf.format(tfDateF.getDate()));
+					InputAuthInfo iaf = new InputAuthInfo();
+					iaf.setUserId(MainForm.authInfo.getUser_id());
+					iaf.setCpodr_name(MainForm.authInfo.getCpodr_name());
+					iaf.setClpu_name(MainForm.authInfo.getClpu_name());
+									
+					
+					//OutputTest ot = new OutputTest();
+					String servPath = MainForm.tcl.printSvodVed(iaf,isv);
+					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, true);
+					//catch (TException e1) {
+					//	MainForm.conMan.reconnect(e1);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			
 			}
 		});
 		

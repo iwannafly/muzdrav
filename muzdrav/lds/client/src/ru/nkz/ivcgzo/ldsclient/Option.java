@@ -32,6 +32,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 
@@ -205,6 +206,8 @@ public class Option {
 				} catch (TException | S_ot01ExistsException e) {
 					e.printStackTrace();
 				}
+				
+				
 			}
 		});
 
@@ -461,6 +464,9 @@ public class Option {
 				chekTrue();
 				checkTrueMet();
 				
+				
+				
+				
 			}
 		} catch (LdiNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -477,6 +483,10 @@ public class Option {
 			if ((p0e1.getSelectedItem() != null) && (tn_ldi.getSelectedItem() != null)) {
 				tmetod.setData(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod(), String.format("%%.%02d.%%", p0e1.getSelectedPcod())));
 				//System.out.print(MainForm.ltc.getMetod(p0e1.getSelectedPcod(), tn_ldi.getSelectedItem().getPcod(), String.format("%%.%02d.%%", p0e1.getSelectedPcod())));
+			}else{
+				List<Metod> nMetod = new ArrayList<>();
+				
+				tmetod.setData(nMetod);
 			}
 		} catch (MetodNotFoundException e) {
 			// TODO Auto-generated catch block

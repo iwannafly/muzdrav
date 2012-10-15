@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.EventObject;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.GroupLayout;
@@ -327,10 +328,10 @@ public class UserPanel extends JPanel {
 			
 			cmbs = new TableComboBoxIntegerEditor[sluCount];
 			
-			cmbs[0] = new TableComboBoxIntegerEditor(new ArrayList<IntegerClassifier>());
-			cmbs[1] = new TableComboBoxIntegerEditor(MainForm.tcl.get_n_o00(MainForm.authInfo.clpu));
-			cmbs[2] = new TableComboBoxIntegerEditor(MainForm.tcl.get_n_n00(MainForm.authInfo.clpu));
-			cmbs[3] = new TableComboBoxIntegerEditor(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
+			cmbs[0] = new TableComboBoxIntegerEditor(null, true, new ArrayList<IntegerClassifier>());
+			cmbs[1] = new TableComboBoxIntegerEditor(null, true, MainForm.tcl.get_n_o00(MainForm.authInfo.clpu));
+			cmbs[2] = new TableComboBoxIntegerEditor(null, true, MainForm.tcl.get_n_n00(MainForm.authInfo.clpu));
+			cmbs[3] = new TableComboBoxIntegerEditor(null, true, MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
 			
 			resetColumnModel();
 		}
@@ -344,12 +345,17 @@ public class UserPanel extends JPanel {
 		public Object getCellEditorValue() {
 			return curCmb.getCellEditorValue();
 		}
-
+		
+		@Override
+		public boolean isCellEditable(EventObject e) {
+			return curCmb.isCellEditable(e);
+		}
+		
 		@Override
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
 			curCmb = cmbs[(int) this.table.getValueAt(row, sluColIdx)];
 			
-			return curCmb.getEditor();
+			return curCmb.getTableCellEditorComponent(table, value, isSelected, row, column);
 		}
 		
 		@Override
