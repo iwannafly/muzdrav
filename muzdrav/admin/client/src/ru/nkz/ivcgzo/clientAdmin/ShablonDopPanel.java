@@ -116,13 +116,8 @@ public class ShablonDopPanel extends JPanel {
 		btDelete = new JButton("Удалить");
 		btDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
+				if (JOptionPane.showConfirmDialog(ShablonDopPanel.this, "Удалить шаблон?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 					trSearch.removeSelected();
-				} catch (KmiacServerException e1) {
-					JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
-				} catch (TException e1) {
-					MainForm.conMan.reconnect(e1);
-				}
 			}
 		});
 		
@@ -429,37 +424,24 @@ public class ShablonDopPanel extends JPanel {
 			}
 		}
 		
-		public void removeSelected() throws KmiacServerException, TException {
+		public void removeSelected() {
 			if (getSelectionPath() != null)
 				if (getSelectionPath().getLastPathComponent() != null)
 					if ((getSelectionPath().getLastPathComponent() instanceof IntClassTreeNode) && (((IntClassTreeNode) getSelectionPath().getLastPathComponent()).getLevel() == 2)) {
-						if (shDop.id > 0)
-							MainForm.tcl.deleteShDop(shDop.id);
-						
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-						IntClassTreeNode parent = (IntClassTreeNode) getSelectionPath().getParentPath().getLastPathComponent();
-						IntClassTreeNode child = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
-						int childIndex = parent.getIndex(child);
-						
-						changingNodes = true;
 						try {
-							getModel().removeNodeFromParent(child);
-							if (parent.getChildCount() > 0) {
-								if (childIndex >= parent.getChildCount())
-									childIndex = parent.getChildCount() - 1;
-								changingNodes = false;
-								setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
-							} else {
-								parent.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
-								collapsePath(new TreePath(parent));
-								setSelectionPath(new TreePath(new Object[] {root, parent}));
+							if (shDop.id > 0) {
+								MainForm.tcl.deleteShDop(shDop.id);
+								newNode = (IntClassTreeNode) getSelectionPath().getLastPathComponent();
 							}
-						} catch (Exception e) {
+							
+							removeUnsavedNode();
+						} catch (KmiacServerException e) {
+							JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка удаления шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						} catch (TException e) {
 							e.printStackTrace();
-						} finally {
-							newNode = null;
-							changingNodes = false;
+							MainForm.conMan.reconnect(e);
 						}
+						
 					}
 		}
 		
@@ -522,29 +504,27 @@ public class ShablonDopPanel extends JPanel {
 		
 		private void removeUnsavedNode() {
 			if (newNode != null) {
-				if (newNode.getCode() == 0) {
-					try {
-						DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
-						IntClassTreeNode parent = (IntClassTreeNode) newNode.getParent();
-						int childIndex = parent.getIndex(newNode);
-						
-						changingNodes = true;
-						getModel().removeNodeFromParent(newNode);
-						if (parent.getChildCount() > 0) {
-							if (childIndex >= parent.getChildCount())
-								childIndex = parent.getChildCount() - 1;
-							setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
-						} else {
-							parent.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
-							collapsePath(new TreePath(parent));
-							setSelectionPath(new TreePath(new Object[] {root, parent}));
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						newNode = null;
-						changingNodes = false;
+				try {
+					DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+					IntClassTreeNode parent = (IntClassTreeNode) newNode.getParent();
+					int childIndex = parent.getIndex(newNode);
+					
+					changingNodes = true;
+					getModel().removeNodeFromParent(newNode);
+					if (parent.getChildCount() > 0) {
+						if (childIndex >= parent.getChildCount())
+							childIndex = parent.getChildCount() - 1;
+						setSelectionPath(new TreePath(new Object[] {root, parent, parent.getChildAt(childIndex)}));
+					} else {
+						parent.add(new IntClassTreeNode(new IntegerClassifier(-1, "Dummy")));
+						collapsePath(new TreePath(parent));
+						setSelectionPath(new TreePath(new Object[] {root, parent}));
 					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					newNode = null;
+					changingNodes = false;
 				}
 			}
 		}

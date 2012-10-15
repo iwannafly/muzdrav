@@ -396,6 +396,8 @@ struct P_isl_ld {
 	 9: optional string diag;
 	10: optional i64 dataz;
 	11: optional i32 pvizit_id;
+	12: optional i32 prichina;
+	13: optional i32 kodotd;
 }
 
 struct Prez_d {
@@ -488,9 +490,8 @@ struct Pdisp{
 	13: optional i32 d_grup_s;
 	14: optional i32 cod_sp;
 	15: optional string cdol_ot;
-	16: optional bool sob;
-	17: optional bool sxoch;
-	18: optional i32 d_uch;
+	16: optional i32 d_uch;
+	17: optional string diag_n;
 }
 
 struct Protokol{
@@ -672,7 +673,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
-	bool IfExPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);	
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
