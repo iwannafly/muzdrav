@@ -1254,7 +1254,7 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getM00() throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name_s FROM n_m00";
+        final String sqlQuery = "SELECT pcod, name_s FROM n_m00 WHERE pr='Л' ORDER BY pcod";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmM00 =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name_s");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -1267,8 +1267,11 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getN00() throws KmiacServerException {
-        final String sqlQuery = "SELECT n_n00.pcod, (n_m00.name_s || ', ' || n_n00.name) as name "
-                + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu;";
+//        final String sqlQuery = "SELECT n_n00.pcod, (n_m00.name_s || ', ' || n_n00.name) as name "
+//                + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu;";
+        final String sqlQuery = "SELECT pcod, name_u as name "+
+                                "FROM n_n00 WHERE amb='П' "+
+                                "ORDER BY pcod;";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmN00 =
             new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -1281,8 +1284,11 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getO00() throws KmiacServerException {
-        final String sqlQuery = "SELECT n_o00.pcod, (n_m00.name_s || ', ' || n_o00.name) as name "
-            + "FROM n_o00 INNER JOIN n_m00 ON n_m00.pcod = n_o00.clpu;";
+//        final String sqlQuery = "SELECT n_o00.pcod, (n_m00.name_s || ', ' || n_o00.name) as name "
+//            + "FROM n_o00 INNER JOIN n_m00 ON n_m00.pcod = n_o00.clpu;";
+        final String sqlQuery = "SELECT pcod, name_u as name "+
+                "FROM n_o00 "+
+        		"ORDER BY pcod;";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
             new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {

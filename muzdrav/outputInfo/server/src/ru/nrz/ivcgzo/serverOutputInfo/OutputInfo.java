@@ -638,4 +638,16 @@ public class OutputInfo extends Server implements Iface {
 		return svod;
 	}
 
+public String ZagShap(String d1, String d2, String npol, int uchas){
+	
+	String shap = null;
+	
+	
+	
+	return shap;
+	
+} 
+
+
+
 }
