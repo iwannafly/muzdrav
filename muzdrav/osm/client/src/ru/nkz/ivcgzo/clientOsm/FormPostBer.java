@@ -1219,7 +1219,7 @@ public class FormPostBer extends JFrame {
 		{CHosp4.setSelected(true);   iw1=iw1-8;}	
 		if ((iw1-4)>=0)
 		{CHosp3.setSelected(true);   iw1=iw1-4;}	
-//		System.out.println("расчет состю плода");		
+//		System.out.println("расчет сост. плода");		
 //		System.out.println(iw1);		
 		if ((iw1-2)>=0)
 		{CHosp2.setSelected(true);   iw1=iw1-2;}
