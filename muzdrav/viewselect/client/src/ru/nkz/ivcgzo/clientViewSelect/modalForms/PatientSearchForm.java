@@ -484,9 +484,9 @@ public class PatientSearchForm extends ModalForm {
 	private PatientSearchParams createSearchParams() {
 		PatientSearchParams params = new PatientSearchParams();
 		
-		if (!tbFam.isEmpty()) params.setFam(tbFam.getText());
-		if (!tbIm.isEmpty()) params.setIm(tbIm.getText());
-		if (!tbOt.isEmpty()) params.setOt(tbOt.getText());
+		if (!tbFam.isEmpty()) params.setFam(tbFam.getText().trim());
+		if (!tbIm.isEmpty()) params.setIm(tbIm.getText().trim());
+		if (!tbOt.isEmpty()) params.setOt(tbOt.getText().trim());
 		if (!rbtIllegible.isSelected() && (tbBirDate.getDate() != null)) {
 			params.setDatar(tbBirDate.getDate().getTime());
 			params.unsetDatar2();
@@ -494,8 +494,8 @@ public class PatientSearchForm extends ModalForm {
 			params.setDatar(tbBirDate.getDate().getTime());
 			params.setDatar2(tbBirDate2.getDate().getTime());
 		}
-		if (!tbSerPol.isEmpty()) params.setSpolis(tbSerPol.getText());
-		if (!tbNumPol.isEmpty()) params.setNpolis(tbNumPol.getText());
+		if (!tbSerPol.isEmpty()) params.setSpolis(tbSerPol.getText().trim());
+		if (!tbNumPol.isEmpty()) params.setNpolis(tbNumPol.getText().trim());
 		params.setManyPatients(rbtManyPat.isSelected());
 		params.setIllegibleSearch(rbtIllegible.isSelected());
 		

@@ -379,10 +379,6 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 							items = itemsBcp;
 							setSelectedItem(null);
 						}
-						if (selItem != null)
-							setSelectedItem(selItem);
-						if (items.size() == 1)
-							setSelectedItem(items.get(0));
 						model.fireContentsChanged();
 						editor.setText(srcStrLow);
 						editor.setCaretPosition(pos);
