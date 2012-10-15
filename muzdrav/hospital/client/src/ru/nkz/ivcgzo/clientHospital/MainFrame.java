@@ -526,7 +526,8 @@ public class MainFrame extends JFrame {
     private void fillPersonalInfoTextFields() {
         try {
             patient = ClientHospital.tcl.getPatientPersonalInfo(
-                frmPatientSelect.getCurrentPatient().getPatientId());
+                frmPatientSelect.getCurrentPatient().getPatientId(),
+                frmPatientSelect.getCurrentPatient().getIdGosp());
             setTitle(String.format("%s %s %s",
                     patient.getSurname(), patient.getName(),
                     patient.getMiddlename()));
