@@ -54,18 +54,18 @@ public class FormRdDin extends JFrame {
 	public static RdInfStruct RdInfStruct;
 	public static RdSlStruct rdSlStruct;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
-    private String oslname;
+//    private String oslname;
     private String oslcode;
     private int iw1;
     private int iw2;
     private int iw3;
     private int iw4;
-    private int iw5;
-    private String otname;
-    private String polplname;
-    private String predname;
-    private String cerdname;
-    private String cerdname1;
+//    private int iw5;
+    private int otname;
+    private int polplname;
+    private int predname;
+    private int cerdname;
+    private int cerdname1;
     CustomDateEditor SDataPos;
     CustomDateEditor SDataSl;
 	private ThriftStringClassifierCombobox<StringClassifier> CBDiag;
@@ -81,6 +81,11 @@ public class FormRdDin extends JFrame {
 	private int br;
 	private int rost;
 	private double ves;
+	private int chcc;
+	private int hdm;
+	private int oj;
+	private int spl;
+	private int srok;
     JSpinner SSrok ;
 	JSpinner SVes;
 	JSpinner SOkrj;
@@ -360,7 +365,7 @@ public class FormRdDin extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 				RdDinStruct rddin = new RdDinStruct();
-	//			setDefaultValues();
+				setDefaultValues();
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
@@ -594,7 +599,13 @@ try {
 				if (!arg0.getValueIsAdjusting()) {
 					rddin = tablePos.getSelectedItem();
 					//вставить выбор даты из таблицы посещений 
-					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
+//					try {
+//						SDataPos.setDate(MainForm.tcl.getdatap(rddin.id_pos));
+//					} catch (TException e3) {
+//						e3.printStackTrace();
+//					}
+////					SDataPos.setDate(MainForm.tcl.getDatap(rddin.id_pos,date));
+					SDataPos.setDate(rddin.getDatap());
 					SSrok.setValue(rddin.getSrok());
 					SVes.setValue(rddin.getVes());
 					SOkrj.setValue(rddin.getOj());
@@ -637,17 +648,35 @@ try {
 		// TODO Auto-generated method stub
 //	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
 //	rddin.setNpasp(Vvod.zapVr.getNpasp());
-	rddin.setArt1(120);
-	rddin.setArt2(80);
-	rddin.setArt3(120);
-	rddin.setArt4(80);
-	rddin.setChcc(70);
-	rddin.setHdm(0);
+	ves = 60; chcc = 110; hdm = 20;oj = 90; spl = 2;srok = 8;iw1 = 120; iw2 = 80; iw3 = 120; iw4 = 80;
+	ves = rddin.getVes();
+	chcc = rddin.getChcc();
+	hdm = rddin.getHdm();
+	oj = rddin.getOj();
+	spl = rddin.getSpl();
+	srok = rddin.getSrok();
+	polplname = rddin.getPolpl();
+	predname = rddin.getPredpl();
+	cerdname = rddin.getSerd();
+	cerdname1 = rddin.getSerd1();
+	otname = rddin.getOteki();
+	
+	rddin.setArt1(iw1);
+	rddin.setArt2(iw2);
+	rddin.setArt3(iw3);
+	rddin.setArt4(iw4);
+	rddin.setChcc(chcc);
+	rddin.setHdm(hdm);
 //	rddin.setDspos(Vvod.zapVr.)//диагноз при постановке
 //	rddin.setId_rd_sl(FormRdSl.rdsl.id);
-	rddin.setOj(60);
-	rddin.setSpl(0);
-//	rddin.setSrok(srok);
+	rddin.setOj(oj);
+	rddin.setSpl(spl);
+	rddin.setSrok(srok);
+	rddin.setPolpl(polplname);
+	rddin.setPredpl(predname);
+	rddin.setSerd(cerdname);
+	rddin.setSerd1(cerdname1);
+	rddin.setOteki(otname);
 	System.out.println("присвоение");		
 	System.out.println(rddin);		
 	}
