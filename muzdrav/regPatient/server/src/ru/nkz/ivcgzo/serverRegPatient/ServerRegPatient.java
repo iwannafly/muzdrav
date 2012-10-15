@@ -120,8 +120,8 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv     v_sch          str_org
-        Integer.class, Integer.class, Integer.class, Integer.class
+    //  ter_liv        region_liv
+        Integer.class, Integer.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg          datal
@@ -161,7 +161,9 @@ public class ServerRegPatient extends Server implements Iface {
     //  smp_time    smp_num        cotd_p         datagos     vremgos
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
     //  cuser          dataosm     vremosm     dataz       jalob
-        Integer.class, Date.class, Time.class, Date.class, String.class
+        Integer.class, Date.class, Time.class, Date.class, String.class,
+    //  vid_st
+        Integer.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
     //  npasp          nambk         nuch           cpol
@@ -197,8 +199,7 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
-        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv",
-        "v_sch", "str_org"
+        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
@@ -221,7 +222,7 @@ public class ServerRegPatient extends Server implements Iface {
         "cotd", "sv_time", "sv_day", "ntalon", "vidtr", "pr_out", "alkg", "meesr",
         "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c",
         "ad", "smp_data", "smp_time", "smp_num", "cotd_p", "datagos", "vremgos", "cuser",
-        "dataosm", "vremosm", "dataz", "jalob"
+        "dataosm", "vremosm", "dataz", "jalob", "vid_st"
     };
     private static final String[] LGOTA_FIELD_NAMES = {
         "id", "npasp", "lgot", "datal", "name"
@@ -552,7 +553,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
                 + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
                 + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
-                + "patient.region_liv, patient.v_sch, patient.str_org "
+                + "patient.region_liv "
                 + "FROM patient "
                 + "WHERE patient.npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
@@ -782,11 +783,10 @@ public class ServerRegPatient extends Server implements Iface {
                         + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
                         + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
                         + "cpol_pr, terp, tdoc, docser, docnum, datadoc, "
-                        + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv, "
-                        + "v_sch, str_org) "
+                        + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?);", true,
+                        + "?, ?);", true,
                         patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                         avoidDefaultSqlDateValue(patinfo.getDatar()),
                         patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -805,8 +805,7 @@ public class ServerRegPatient extends Server implements Iface {
                         patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                         patinfo.getProf(), patinfo.getTel(),
                         avoidDefaultSqlDateValue(patinfo.getDsv()), patinfo.getPrizn(),
-                        patinfo.getTer_liv(), patinfo.getRegion_liv(),
-                        patinfo.getV_sch(), patinfo.getStr_org());
+                        patinfo.getTer_liv(), patinfo.getRegion_liv());
                 int id = sme.getGeneratedKeys().getInt("npasp");
                 sme.setCommit();
                 return id;
@@ -929,7 +928,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException,
             KmiacServerException {
         final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36};
+                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
@@ -938,10 +937,10 @@ public class ServerRegPatient extends Server implements Iface {
                         + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
                         + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
                         + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
-                        + "dataosm, vremosm, dataz, jalob) "
+                        + "dataosm, vremosm, dataz, jalob, vid_st) "
                         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                         + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?);", true, gosp, GOSP_TYPES, indexes);
+                        + "?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
                 return id;
@@ -1074,7 +1073,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "pdms_ser = ?, pdms_nom = ?, cpol_pr = ?, terp = ?, tdoc=?, "
                 + "docser = ?, docnum = ?, datadoc = ?, odoc = ?, snils = ?, "
                 + "dataz = ?, prof = ?, tel = ?, dsv = ?, prizn = ?, ter_liv = ?, "
-                + "region_liv = ?, v_sch = ?, str_org = ? WHERE npasp = ?", false,
+                + "region_liv = ? WHERE npasp = ?", false,
                 patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                 avoidDefaultSqlDateValue(patinfo.getDatar()),
                 patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -1093,8 +1092,7 @@ public class ServerRegPatient extends Server implements Iface {
                 patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                 patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),
                 patinfo.getPrizn(), patinfo.getTer_liv(),
-                patinfo.getRegion_liv(), patinfo.getV_sch(), patinfo.getStr_org(),
-                patinfo.getNpasp());
+                patinfo.getRegion_liv(), patinfo.getNpasp());
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1149,7 +1147,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void updateGosp(final Gosp gosp) throws KmiacServerException {
         final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 0
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 0
         };
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("UPDATE c_gosp SET "
@@ -1161,7 +1159,7 @@ public class ServerRegPatient extends Server implements Iface {
                     + "nal_z = ?, nal_p = ?, t0c = ?, ad = ?, smp_data = ?, "
                     + "smp_time = ?, smp_num = ?, cotd_p = ?, datagos = ?, "
                     + "vremgos = ?, cuser = ?, dataosm = ?, vremosm = ?, "
-                    + "dataz = ?, jalob = ? WHERE id = ?;", false,
+                    + "dataz = ?, jalob = ?, vid_st = ? WHERE id = ?;", false,
                     gosp, GOSP_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
@@ -1449,8 +1447,8 @@ public class ServerRegPatient extends Server implements Iface {
                 nambk.getNambk(),
                 omsOrg,
                 pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
-                String.valueOf(pat.getPolis_oms().getStrg()),
                 pat.getSnils(),
+                "",
                 lgot,
                 pat.getFam(),
                 pat.getIm(),
@@ -1533,6 +1531,37 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, name)) {
             return rsmU10.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final int addToOtd(final int idGosp, final int nist, final int cotd)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_otd (id_gosp, nist, cotd, dataz) VALUES (?, ?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd,
+                new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateOtd(final int id, final int idGosp, final int nist, final int cotd)
+            throws KmiacServerException {
+        String sqlQuery = "UPDATE c_otd SET id_gosp = ?, nist = ?, cotd = ?, dataz = ? "
+                + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd, id,
+                new Date(System.currentTimeMillis()));
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }

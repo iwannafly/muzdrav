@@ -56,7 +56,7 @@ public class CurationFrame extends JDialog {
                 (int) ((screenSize.getHeight() - getHeight()) / 2));
         setUndecorated(true);
 
-        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo.getCpodr());
+        CurationTableModel tbModel = new CurationTableModel(authInfo.getCpodr());
         table = new JTable();
         table.setModel(tbModel);
         scrollPane.setViewportView(table);
@@ -72,13 +72,13 @@ public class CurationFrame extends JDialog {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 if (table.getSelectedRow() != -1) {
-                    currentPatient = ((AllPatientTableModel) table.getModel()).getPatientList()
+                    currentPatient = ((CurationTableModel) table.getModel()).getPatientList()
                             .get(table.convertRowIndexToModel(table.getSelectedRow()));
                     try {
                         ClientHospital.tcl.addPatientToDoctor(currentPatient.getIdGosp(),
                                 authInfo.getPcod());
-                        AllPatientTableModel tbModel =
-                                new AllPatientTableModel(authInfo.getCpodr());
+                        CurationTableModel tbModel =
+                                new CurationTableModel(authInfo.getCpodr());
                         table.setModel(tbModel);
                     } catch (PatientNotFoundException e1) {
                         e1.printStackTrace();
@@ -110,7 +110,7 @@ public class CurationFrame extends JDialog {
     }
 
     public final void refreshModel(final UserAuthInfo authInfo) {
-        AllPatientTableModel tbModel = new AllPatientTableModel(authInfo.getCpodr());
+        CurationTableModel tbModel = new CurationTableModel(authInfo.getCpodr());
         table.setModel(tbModel);
     }
 

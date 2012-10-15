@@ -3,18 +3,16 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.LineBorder;
@@ -24,7 +22,6 @@ import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterEvent.Type;
 import javax.swing.event.RowSorterListener;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -32,7 +29,9 @@ import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 
 /**
  * Параметризованный класс для работы с таблицами swing. В качестве параметра
@@ -106,23 +105,24 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		}
 		
 		setModel();
+		
+		TableNumberEditor tne = new TableNumberEditor();
+		this.setDefaultRenderer(Double.class, tne.getRenderer());
+		
+		TableDateEditor tde = new TableDateEditor();
+		this.setDefaultRenderer(Date.class, tde.getRenderer());
+		
+		TableTimeEditor tte = new TableTimeEditor();
+		this.setDefaultRenderer(Time.class, tte.getRenderer());
+		
 		if (editable) {
-//			this.setSurrendersFocusOnKeystroke(true);
-			CustomTextField ctf = new CustomTextField();
-			ctf.setBorder(new LineBorder(Color.black));
-			this.setDefaultEditor(Object.class, new DefaultCellEditor(ctf));
+			this.setDefaultEditor(Object.class, new CustomTableDefaultEditor());
 			
-			TableNumberEditor tne = new TableNumberEditor();
 			this.setDefaultEditor(Number.class, tne);
-			this.setDefaultRenderer(Double.class, tne.getRenderer());
 			
-			TableDateEditor tde = new TableDateEditor();
 			this.setDefaultEditor(Date.class, tde);
-			this.setDefaultRenderer(Date.class, tde.getRenderer());
 			
-			TableTimeEditor tte = new TableTimeEditor();
 			this.setDefaultEditor(Time.class, tte);
-			this.setDefaultRenderer(Time.class, tte.getRenderer());
 			
 			this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 				@Override
@@ -156,27 +156,34 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 					
 					if (lst.size() > 0) {
 						if (isEditing()) {
-							if (getCellEditor().getCellEditorValue() != null)
-								if (getCellEditor().getCellEditorValue().toString().length() > 0)
-									if (!getCellEditor().stopCellEditing())
-										return;
+							if (!getCellEditor().stopCellEditing())
+								return;
 						} else {
-							editCellAt(selRow, selCol);
-							return;
+							while (selCol < getColumnCount()) {
+								if (isCellEditable(selRow, selCol)) {
+									editCellAt(selRow, selCol, null);
+									return;
+								}
+								selCol++;
+							}
 						}
 						
-						++selCol;
+						while (++selCol < getColumnCount()) {
+							if (isCellEditable(selRow, selCol))
+								break;
+						}
+						
 						if (selCol == getColumnCount()) {
 							++selRow;
 							if (selRow == getRowCount())
 								addItem();
 							else {
+								changeSelection(selRow - 1, 0, false, false);
 								updateSelectedItem();
-								changeSelection(selRow, 0, false, false);
 							}
 						} else {
 							changeSelection(selRow, selCol, false, false);
-							editCellAt(selRow, selCol);
+							editCellAt(selRow, selCol, null);
 						}
 					} else
 						addItem();
@@ -188,23 +195,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				private static final long serialVersionUID = 8883313793725297972L;
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					if (getSelectedRow() < 0)
-						return;
-					
-					if (isEditing()) {
-						getCellEditor().cancelCellEditing();
-						return;
-					}
-					
-					itemUpd = true;
-					if (itemAdd) {
-						sel = null;
-					} else {
-						sel = getDeepCopyItem(cop);
-						itemAdd = false;
-					}
-					lst.set(copIdx, sel);
-					updateSelectedItem();
+					cancelEdit();
 		        }
 		    });
 		}
@@ -275,7 +266,25 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				colIdx = i;
 				break;
 			}
-		TableComboBoxStringEditor edt = new TableComboBoxStringEditor(lst);
+		TableComboBoxStringEditor edt = new TableComboBoxStringEditor(null, true, lst);
+		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
+		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
+	}
+	
+	/**
+	 * Генерирует на основе списка <code>JComboBox</code> и заменяет им
+	 * указанный столбец. Номер столбца должен указываться без учета сортировки
+	 * методом {@link #sortColumns(int...)}.
+	 * @param colIdx
+	 * @param className
+	 */
+	public void setStringClassifierSelector(int colIdx, StringClassifiers className) {
+		for (int i = 0; i < colCount; i++)
+			if (colOrder[i] == colIdx) {
+				colIdx = i;
+				break;
+			}
+		TableComboBoxStringEditor edt = new TableComboBoxStringEditor(className, true, null);
 		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
 		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
 	}
@@ -293,7 +302,25 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				colIdx = i;
 				break;
 			}
-		TableComboBoxIntegerEditor edt = new TableComboBoxIntegerEditor(lst);
+		TableComboBoxIntegerEditor edt = new TableComboBoxIntegerEditor(null, true, lst);
+		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
+		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
+	}
+	
+	/**
+	 * Генерирует на основе списка <code>JComboBox</code> и заменяет им
+	 * указанный столбец. Номер столбца должен указываться без учета сортировки
+	 * методом {@link #sortColumns(int...)}.
+	 * @param colIdx
+	 * @param className
+	 */
+	public void setIntegerClassifierSelector(int colIdx, IntegerClassifiers className) {
+		for (int i = 0; i < colCount; i++)
+			if (colOrder[i] == colIdx) {
+				colIdx = i;
+				break;
+			}
+		TableComboBoxIntegerEditor edt = new TableComboBoxIntegerEditor(className, true, null);
 		this.getColumnModel().getColumn(colIdx).setCellEditor(edt);
 		this.getColumnModel().getColumn(colIdx).setCellRenderer(edt.getRender());
 	}
@@ -476,21 +503,52 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		return (AbstractTableModel) super.getModel();
 	}
 	
+	private boolean dispatching;
 	@Override
-	public boolean editCellAt(int row, int column, EventObject e) {
-		boolean result = super.editCellAt(row, column, e);
-		TableCellEditor editor = this.getCellEditor();
+	protected boolean processKeyBinding(KeyStroke ks, final KeyEvent e, int condition, boolean pressed) {
+		Component cmp = getEditorComponent();
 		
-		if (editor != null)
-			if (e instanceof KeyEvent) {
-				Component cmp = super.prepareEditor(editor, row, column);
-				if (cmp instanceof JTextField)
-					((JTextField)cmp).selectAll();
-				else if (cmp instanceof JComboBox<?>)
-					((JComboBox<?>)cmp).showPopup();
-		}
-		
-		return result;
+			if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				if (!dispatching) {
+					if (super.processKeyBinding(ks, e, condition, pressed)) {
+						cmp = getEditorComponent();
+						if (cmp != null) {
+							cmp.requestFocusInWindow();
+							dispatching = true;
+							try {
+								CustomTable.this.dispatchEvent(new KeyEvent(this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
+							} finally {
+								dispatching = false;
+							}
+							return true;
+						} else {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			else if (cmp == null)
+				switch (e.getKeyCode()) {
+				case KeyEvent.VK_ESCAPE:
+				case KeyEvent.VK_F2:
+				case KeyEvent.VK_DELETE:
+				case KeyEvent.VK_TAB:
+				case KeyEvent.VK_LEFT:
+				case KeyEvent.VK_RIGHT:
+				case KeyEvent.VK_UP:
+				case KeyEvent.VK_DOWN:
+				case KeyEvent.VK_PAGE_UP:
+				case KeyEvent.VK_PAGE_DOWN:
+				case KeyEvent.VK_HOME:
+				case KeyEvent.VK_END:
+					return super.processKeyBinding(ks, e, condition, pressed);
+				default:
+					return false;
+				}
+			return super.processKeyBinding(ks, e, condition, pressed);
 	}
 	
 	/**
@@ -561,6 +619,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			this.changeSelection(selRow, 0, false, false);
 			getSelectionModel().setValueIsAdjusting(false);
 			this.editCellAt(selRow, 0);
+			this.getEditorComponent().requestFocusInWindow();
 			break;
 		case 2: //update
 			getSelectionModel().setValueIsAdjusting(true);
@@ -610,6 +669,14 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				itemAdd = false;
 			}
 		}
+	}
+	
+	/**
+	 * Обновление текущей строки, измененной <b>программно</b>.
+	 */
+	public void updateChangedSelectedItem() {
+		itemUpd = true;
+		updateSelectedItem();
 	}
 	
 	/**
@@ -676,6 +743,29 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		}
 	}
 	
+	/**
+	 * Отменяет изменения в текущей строке.
+	 */
+	public void cancelEdit() {
+		if (getSelectedRow() < 0)
+			return;
+		
+		if (isEditing()) {
+			getCellEditor().cancelCellEditing();
+			return;
+		}
+		
+		itemUpd = true;
+		if (itemAdd) {
+			sel = null;
+		} else {
+			sel = getDeepCopyItem(cop);
+			itemAdd = false;
+		}
+		lst.set(copIdx, sel);
+		updateSelectedItem();
+	}
+
 	public class CustomTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = -7716830847522898209L;
 
@@ -739,6 +829,30 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			return colTypes[colOrder[columnIndex]];
 		}
 		
+	}
+	
+	private class CustomTableDefaultEditor extends DefaultCellEditor {
+		private static final long serialVersionUID = 8972780790646236150L;
+
+		public CustomTableDefaultEditor() {
+			super(new CustomTextField());
+			
+			setActionPerformed();
+		}
+		
+		private void setActionPerformed() {
+			CustomTextField ctf = (CustomTextField) getComponent();
+			
+			ctf.setBorder(new LineBorder(Color.black));
+			ctf.removeActionListener(delegate);
+			ctf.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					CustomTable.this.dispatchEvent(new KeyEvent(CustomTable.this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
+				}
+			});
+			
+		}
 	}
 }
 

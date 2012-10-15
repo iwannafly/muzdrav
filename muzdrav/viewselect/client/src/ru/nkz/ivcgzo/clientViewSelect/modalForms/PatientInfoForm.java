@@ -204,9 +204,10 @@ public class PatientInfoForm extends ModalForm {
 							addLineToDetailInfo("Анамнез жизни", psign.getVitae());
 							addHeader("Вредные привычки");
 							if (psign.getVred().charAt(0) == '1') addHeader("курение");
-							if (psign.getVred().charAt(1) == '1') addHeader("алкоголь");
-							if (psign.getVred().charAt(2) == '1') addHeader("наркотики");
-							if (psign.getVred() == "000") addHeader("-");
+							if (psign.getVred().charAt(1) == '1') addHeader("злоупотребление алкоголем");
+							if (psign.getVred().charAt(2) == '1') addHeader("алкоголизм");
+							if (psign.getVred().charAt(3) == '1') addHeader("наркотики");
+							if (psign.getVred() == "0000") addHeader("-");
 						} catch (KmiacServerException e1) {
 							System.err.println(e1.getMessage());
 							eptxt.setText("");

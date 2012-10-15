@@ -2,7 +2,9 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.text.ParseException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
@@ -22,14 +24,20 @@ public class TableNumberEditor extends DefaultCellEditor {
 	private CustomNumberEditor txt;
 	private TableNumberRenderer renderer;
 	private Class<?> editorClass;
+	private CustomTable<?, ?> ctb;
 	private static Border blackBorder = new LineBorder(Color.black);
-	private static Border redBorder = new LineBorder(Color.red);
 	
 	public TableNumberEditor() {
 		super(new CustomNumberEditor());
 		
 		txt = (CustomNumberEditor) this.getComponent();
 		txt.setHorizontalAlignment(JTextField.RIGHT);
+		txt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ctb.dispatchEvent(new KeyEvent(ctb, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
+			}
+		});
 		renderer = new TableNumberRenderer();
 	}
 	
@@ -40,26 +48,13 @@ public class TableNumberEditor extends DefaultCellEditor {
 
 	@Override
 	public Component getTableCellEditorComponent(JTable arg0, Object arg1, boolean arg2, int arg3, int arg4) {
+		ctb = (CustomTable<?, ?>) arg0;
 		editorClass = arg0.getColumnClass(arg4);
 		
 		txt.setBorder(blackBorder);
 		txt.setText((arg1 == null) ? null : arg1.toString());
 		
 		return txt;
-	}
-	
-	@Override
-	public boolean stopCellEditing() {
-			try {
-				if (txt.getText().length() > 0)
-					if (txt.getNumber(editorClass) == null)
-						throw new ParseException(null, 0);
-				txt.setBorder(blackBorder);
-				return super.stopCellEditing();
-			} catch (ParseException e) {
-			}
-		txt.setBorder(redBorder);
-		return false;
 	}
 	
 	public TableNumberRenderer getRenderer() {

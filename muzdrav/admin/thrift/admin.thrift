@@ -176,7 +176,7 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
 
 	list<classifier.IntegerClassifier> getReqShOsmList() throws (1: kmiacServer.KmiacServerException kse);
-	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
 	list<classifier.IntegerClassifier> getAllShablonOsm() throws (1: kmiacServer.KmiacServerException kse);
 	ShablonOsm getShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getShablonOsmDiagList(1: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
