@@ -36,6 +36,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftReception.Patient;
+import ru.nkz.ivcgzo.thriftReception.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
@@ -487,6 +488,11 @@ public class TalonSelectFrame extends JFrame {
                     } catch (KmiacServerException
                             | ReserveTalonOperationFailedException | TException e1) {
                         e1.printStackTrace();
+                    } catch (PatientHasSomeReservedTalonsOnThisDay e1) {
+                        JOptionPane.showMessageDialog(
+                                TalonSelectFrame.this.getContentPane(),
+                                "Пациент уже записан на выбранную дату к выбранному врачу",
+                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
