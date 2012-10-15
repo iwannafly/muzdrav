@@ -1,5 +1,8 @@
 package ru.nkz.ivcgzo.serverMss;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +17,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverMss.HtmShablon;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -319,7 +323,53 @@ public class serverMss extends Server implements Iface {
 		}
 	}
 
+	/** печать медицинского свидетельства о смерти 
+	 * и корешка медицинского свидетельства
+	 * @throws Exception 
+	 */
+    public final String printMedSS(final String docInfo) throws KmiacServerException {
+    	final String path;
+    	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+       	String medsv = setReportPath();
+    	// загружаем шаблон
+    	HtmShablon htmTemplate = new HtmShablon( new File(this.getClass().getProtectionDomain().getCodeSource()
+                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                + "\\plugin\\reports\\ShMSS.htm");
+    	System.out.println(htmTemplate.getLabelsCount());
+    	System.out.println(htmTemplate);
+  //  	htmTemplate.replaceLabels(true,
+ //   			tfSer.getText().trim(),
+ //   			tfNomer.getText().trim()
+ //   			);
+        return path;
+    } catch (Exception e) {
+        throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+    }   	
+   }
+    
+    private boolean isWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //windows
+        return (os.indexOf("win") >= 0);
+    }
 
+    private boolean isUnix() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //linux or unix
+        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
+    }
+    private String setReportPath() {
+        if (isWindows()) {
+            System.out.println("Нашли винду");
+            return "C:\\work\\МСС\\м_свид_"+".htm";
+        } else if (isUnix()) {
+            return System.getProperty("user.home")
+                    + "/Work/МСС/м_свид_"+".htm";
+        } else {
+            return "м_свид_"+".htm";
+        }
+    }
 
 
 		

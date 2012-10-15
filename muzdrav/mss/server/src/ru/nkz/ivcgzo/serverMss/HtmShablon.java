@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientMss;
+package ru.nkz.ivcgzo.serverMss;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -252,3 +252,4 @@ public class HtmShablon {
 
 
 }
+
