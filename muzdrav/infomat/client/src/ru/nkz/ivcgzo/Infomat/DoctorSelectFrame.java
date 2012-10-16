@@ -2,18 +2,13 @@ package ru.nkz.ivcgzo.Infomat;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JList;
 import java.awt.Font;
@@ -112,5 +107,4 @@ public class DoctorSelectFrame extends JFrame {
         list1.setFont(new Font("Courier New", Font.PLAIN, 25));
         scrollPane_1.setViewportView(list1);
     }
-
 }

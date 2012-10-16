@@ -644,7 +644,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? ", id_pvizit, npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? order by v.datap", id_pvizit, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2733,19 +2733,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}
 	}
-	@Override
-	public long getdatap(int id) throws TException {   
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select datap from p_vizit_amb where id = ? ", id)) {
-			if (acrs.getResultSet().next())
-				return acrs.getResultSet().getLong(0);
-			else
-				return 0;
-		} catch (SQLException e) {
-			throw new TException(e);
-		}		
-	}
-
-
 
 
 	
