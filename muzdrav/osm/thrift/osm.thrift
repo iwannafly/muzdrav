@@ -560,7 +560,6 @@ struct Pmer{
 	14: i32 lpu;
 	15: i32 ter;
 	16: i32 cpol;
-	17: string name_pmer;
 }
 
 struct Pobost{

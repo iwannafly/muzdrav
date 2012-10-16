@@ -1,12 +1,25 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 
-import javax.swing.JFrame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.GroupLayout;
-import javax.swing.JOptionPane;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JScrollPane;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.thrift.TException;
 
@@ -19,20 +32,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pobost;
-
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.JTextField;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class DispHron extends JFrame{
 	private static final long serialVersionUID = -2929416282414434095L;
@@ -72,7 +71,9 @@ public class DispHron extends JFrame{
 		bAddDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-		  		tblDispHron.addItem();
+				tblDispHron.requestFocus();
+				tblDispHron.addItem();
+		
 			}
 		});
 		
@@ -80,16 +81,14 @@ public class DispHron extends JFrame{
 		bSaveDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		bSaveDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tblDispHron.updateSelectedItem();
 				try {
-					Pmer pmer = new Pmer();
 					pmer.setNpasp(Vvod.zapVr.getNpasp());
-			  		pmer.setCpol(MainForm.authInfo.getCpodr());
-			  		pmer.setDiag(cmbDiag.getSelectedPcod());
-			  		pmer.setCod_sp(MainForm.authInfo.getPcod());
-			  		pmer.setDataz(System.currentTimeMillis());
-			  		pmer.setPdat(System.currentTimeMillis());
-					pmer.setDiag(tblDispHron.getSelectedItem().getDiag());
+					pmer.setCpol(MainForm.authInfo.getCpodr());
+					pmer.setDiag(cmbDiag.getSelectedPcod());
+					pmer.setDataz(System.currentTimeMillis());
+				
+					pmer.setId(MainForm.tcl.AddPmer(pmer));
+					pmer.setCod_sp(tblDispHron.getSelectedItem().getCod_sp());
 					pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
 					pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
 					pmer.setFdat(tblDispHron.getSelectedItem().getFdat());
@@ -99,13 +98,7 @@ public class DispHron extends JFrame{
 					if (tfDkl.getDate() != null)pmer.setDnl(tfDnl.getDate().getTime());
 					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText())); 
 					pmer.setTer(ter);
-							for (Pmer pm: tblDispHron.getData()) {
-								if (pm != pmer){
-						if ((pm.getPmer()==pmer.getPmer() && pm.getPdat()==pmer.getPdat())){
-							JOptionPane.showMessageDialog(DispHron.this, "Невозможно записать два одинаковых мероприятия за одну дату");	}
-						}
-					}
-					MainForm.tcl.AddPmer(pmer);
+					MainForm.tcl.UpdatePmer(pmer);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
