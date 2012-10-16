@@ -197,7 +197,7 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final TPatient getPatientPersonalInfo(final int patientId)
+    public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
                 + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, patient.sgrp, "
@@ -206,14 +206,14 @@ public class ServerHospital extends Server implements Iface {
                 + "n_z43.name_s as mrab, c_otd.npal, "
                 + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
                 + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
-                + "FROM patient LEFT JOIN c_gosp ON c_gosp.npasp = patient.npasp "
-                + "LEFT JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
+                + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
                 + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
                 + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
-                + "WHERE patient.npasp= ?;";
+                + "WHERE patient.npasp= ? AND c_otd.id_gosp = ?;";
         ResultSet rs = null;
 
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId, idGosp)) {
             rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmPatient.map(rs);

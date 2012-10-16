@@ -173,19 +173,27 @@ public class SettingsForm extends JDialog {
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+				String servPath = null;
+				String cliPath = null;
 				if (rbtn1.isSelected()) vidrstr = 1;
 				if (rbtn2.isSelected()) vidrstr = 2;
 				if (rbtn3.isSelected()) vidrstr = 3;
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
-						String servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        if (MainForm.authInfo.getCslu() == 1)
+				        	servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        if (MainForm.authInfo.getCslu() == 2)
+				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        if (MainForm.authInfo.getCslu() == 3)
+				        	servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
 						if (servPath.endsWith("zip")){
-							String cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
 	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+							JOptionPane.showMessageDialog(null, "Файл : "+cliPath, null, JOptionPane.INFORMATION_MESSAGE); 
 						}
 						else{
-							String cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
+							cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
 	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
 	   						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
@@ -247,17 +255,25 @@ public class SettingsForm extends JDialog {
         if (tfDn.getDate() == null) tfDn.setDate(System.currentTimeMillis());
         if (tfDk.getDate() == null) tfDk.setDate(System.currentTimeMillis());
         if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected()) rbtn1.setSelected(true);
-        if (MainForm.authInfo.getCslu() == 2){
 			try{
-				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-				cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+		        if (MainForm.authInfo.getCslu() == 1){
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 4) cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+				}
+		        if (MainForm.authInfo.getCslu() == 2){
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+				}
+		        if (MainForm.authInfo.getCslu() == 3){
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+				}
+	        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 			} catch (TException e) {
 				e.printStackTrace();
 				MainForm.conMan.reconnect(e);
 			} catch (KmiacServerException e) {
 				e.printStackTrace();
-			}
 		}
 		setVisible(true);
 	}

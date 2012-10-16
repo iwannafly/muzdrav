@@ -220,6 +220,7 @@ struct RdDinStruct{
 	20: optional i32 serd1;
 	21: optional i32 id_pos;
 	22: optional double ves;
+        23: optional i64 datap;
 }
 /*. Rd_Inf*/
 struct RdInfStruct{
@@ -759,5 +760,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*Stoim_p*/
 	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
+/*Datap*/
+        i64 getdatap(1: i32 id);
 
 }
