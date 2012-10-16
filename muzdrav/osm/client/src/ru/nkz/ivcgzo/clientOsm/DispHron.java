@@ -71,8 +71,25 @@ public class DispHron extends JFrame{
 		bAddDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				tblDispHron.requestFocus();
-				tblDispHron.addItem();
+				
+				try {
+					tblDispHron.requestFocus();
+					pmer = new Pmer();
+					pmer.setNpasp(Vvod.zapVr.getNpasp());
+					pmer.setDiag(cmbDiag.getSelectedPcod());
+					pmer.setCpol(MainForm.authInfo.getCpodr());
+					pmer.setDataz(System.currentTimeMillis());
+					pmer.setId(MainForm.tcl.AddPmer(pmer));
+					tblDispHron.addItem(pmer);
+					//tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 		
 			}
 		});
@@ -82,12 +99,6 @@ public class DispHron extends JFrame{
 		bSaveDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					pmer.setNpasp(Vvod.zapVr.getNpasp());
-					pmer.setCpol(MainForm.authInfo.getCpodr());
-					pmer.setDiag(cmbDiag.getSelectedPcod());
-					pmer.setDataz(System.currentTimeMillis());
-				
-					pmer.setId(MainForm.tcl.AddPmer(pmer));
 					pmer.setCod_sp(tblDispHron.getSelectedItem().getCod_sp());
 					pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
 					pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
@@ -98,6 +109,10 @@ public class DispHron extends JFrame{
 					if (tfDkl.getDate() != null)pmer.setDnl(tfDnl.getDate().getTime());
 					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText())); 
 					pmer.setTer(ter);
+					if (!Dsph()) {
+						JOptionPane.showMessageDialog(DispHron.this, "Плановая дата не может быть меньше фактической", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+							return;
+					}
 					MainForm.tcl.UpdatePmer(pmer);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -366,5 +381,12 @@ public class DispHron extends JFrame{
 				e.printStackTrace();
 			}
 		setVisible(true);	
+	}
+	
+	public boolean Dsph() throws TException{
+		if (tblDispHron.getData().size() > 0){
+			if (tblDispHron.getSelectedItem().getPdat()>tblDispHron.getSelectedItem().getFdat()) return false;
+		}
+		return true;
 	}
 }

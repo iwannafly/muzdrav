@@ -760,7 +760,5 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*Stoim_p*/
 	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
-/*Datap*/
-        i64 getdatap(1: i32 id);
 
 }

@@ -644,7 +644,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? ", id_pvizit, npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? order by v.datap", id_pvizit, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2177,7 +2177,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, dnl, dkl, lpu, ter, cpol) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz) values (?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 15, 7);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2670,7 +2670,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
+			throw new KmiacServerException(); 
 		}
 	}
 
@@ -2733,19 +2733,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}
 	}
-	@Override
-	public long getdatap(int id) throws TException {   
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select datap from p_vizit_amb where id = ? ", id)) {
-			if (acrs.getResultSet().next())
-				return acrs.getResultSet().getLong(0);
-			else
-				return 0;
-		} catch (SQLException e) {
-			throw new TException(e);
-		}		
-	}
-
-
 
 
 	
