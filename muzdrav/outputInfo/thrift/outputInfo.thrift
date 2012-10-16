@@ -1,6 +1,7 @@
 namespace java ru.nkz.ivcgzo.thriftOutputInfo
 
 include "../../../common/thrift/kmiacServer.thrift"
+include "../../../common/thrift/classifier.thrift"
 
 struct InputSvodVed {
     1: i32 kpolik;
@@ -45,6 +46,42 @@ struct VrachTabel {
 	11: i32 nuch3;
 }
 
+/**
+ * информация отстутствует
+ */
+exception VINotFoundException {
+}
+
+/**
+ * Такая уже запись существует
+ */
+exception VTDuplException {
+}
+
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printSvodVed(1: InputSvodVed sv) throws (1: kmiacServer.KmiacServerException kse);
+    
+    /**
+     * Возвращает список врачей, ведущих прием
+     * @param pcod - Уникальный код специалиста
+     * @return список thrift-объектов, содержащих информацию о врачах
+     */
+    list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: VINotFoundException sse,
+		2:kmiacServer.KmiacServerException kse);
+    
+
+     /**
+     * Возвращает время работы врачей
+     */
+    list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: VTDuplException tse,
+		2:kmiacServer.KmiacServerException kse);
+
+
+    /**
+     * Добавляет или обновляет информацию о враче
+     */
+    void addOrUpdateVrachTabel(1:i32 pcod) throws (1:VTDuplException ase,
+		2:kmiacServer.KmiacServerException kse);
+
 }
+
