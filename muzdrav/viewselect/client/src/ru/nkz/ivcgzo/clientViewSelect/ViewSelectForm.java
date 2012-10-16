@@ -3,20 +3,12 @@ package ru.nkz.ivcgzo.clientViewSelect;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 public class ViewSelectForm extends JFrame {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5779413219773068517L;
 	public JTextField tfSearch;
 	public JScrollPane spClassifier;

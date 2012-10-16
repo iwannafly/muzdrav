@@ -18,6 +18,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Patient;
+import ru.nkz.ivcgzo.thriftReception.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
@@ -109,7 +110,7 @@ public class TestServerReception {
 
     @Test
     public void reserveTalon_IsActuallyReserved() throws KmiacServerException,
-            TException, ReserveTalonOperationFailedException {
+            TException, ReserveTalonOperationFailedException, PatientHasSomeReservedTalonsOnThisDay {
         Patient patient = new Patient();
         patient.setId(48);
         Talon talon = new Talon();

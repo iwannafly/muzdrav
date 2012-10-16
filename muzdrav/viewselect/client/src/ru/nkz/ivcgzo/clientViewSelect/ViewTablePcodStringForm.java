@@ -2,10 +2,6 @@ package ru.nkz.ivcgzo.clientViewSelect;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.regex.Matcher;
@@ -15,15 +11,14 @@ import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.apache.thrift.TException;
+
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 
 public class ViewTablePcodStringForm extends ViewSelectForm {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8600318603287809954L;
 	public static ThriftViewSelect.Client tcl;
 	private static CustomTable<StringClassifier, StringClassifier._Fields> table;
@@ -33,9 +28,7 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 		initialize();
 		setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
 	}
-		/**
-		 * Initialize the contents of the frame.
-		 */
+	
 	private void initialize() {
 		
 		addWindowListener(new WindowAdapter() {
@@ -72,54 +65,16 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
 		table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 		table.getColumnModel().getColumn(0).setMaxWidth(100);
 		spClassifier.setViewportView(table);
-		
-		table.addMouseListener(new MouseAdapter(){
-		     public void mouseClicked(MouseEvent e){
-		      if (e.getClickCount() == 2){
-		    	  // Вывод значения на консоль
-		    	  System.out.print(getViewTableValues().getName());
-		    	  System.out.println();
-		   
-		         }
-		      }
-		     } );
-		
-		table.addKeyListener(new KeyListener(){
-			public void keyPressed(KeyEvent e){
-				if(e.getKeyCode()== KeyEvent.VK_ENTER){ 
-		    	  // Вывод значения на консоль
-		    	  System.out.print(getViewTableValues().getName());
-		    	  System.out.println();
-		         }
-		      }
-
-			@Override
-			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		     } );
 	}
 
 	// Заполнение таблицы
-	public static void tableFill(String className){
-		try { 
-			table.setData(MainForm.tcl.getVSStringClassifierView(className));
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
+	public static void tableFill(String className) throws TException{
+		table.setData(MainForm.tcl.getVSStringClassifierView(className));
 	}
 	
 	// Запоминание выбранных ячеек
 	public StringClassifier getViewTableValues() {
 		return table.getSelectedItem();
-	
 	}
 	
 	// Быстрый поиск по таблице
@@ -139,9 +94,7 @@ public class ViewTablePcodStringForm extends ViewSelectForm {
     				return;
     			}
     		}
-    
     }
-
 }
 
 
