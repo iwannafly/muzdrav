@@ -14,6 +14,11 @@ import javax.swing.JList;
 import java.awt.Font;
 import javax.swing.ListSelectionModel;
 import java.awt.Dimension;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DoctorSelectFrame extends JFrame {
     private static final long serialVersionUID = -7345770092441907375L;
@@ -35,6 +40,7 @@ public class DoctorSelectFrame extends JFrame {
         pack();
     }
 
+    @SuppressWarnings("rawtypes")
     private class MyCellRenderer extends JLabel implements ListCellRenderer {
         private static final long serialVersionUID = -5424295659452002306L;
         private Color unfocusedColor;
@@ -55,7 +61,7 @@ public class DoctorSelectFrame extends JFrame {
         public Component getListCellRendererComponent(JList list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
             setText(value.toString());
-            setFont(new Font("Courier New", Font.PLAIN, 30));
+            setFont(new Font("Courier New", Font.PLAIN, 25));
             setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
             setHorizontalAlignment(JLabel.CENTER);
             setBackground(isSelected ? focusedColor : unfocusedColor);// Color.white);
@@ -73,13 +79,12 @@ public class DoctorSelectFrame extends JFrame {
         scrollPane.getVerticalScrollBar().setPreferredSize(
                 new Dimension(50, Integer.MAX_VALUE));
         mainPanel.add(scrollPane);
-        JList list = new JList(new String[] {"Терапевт", "Офтальмолог", "Эндокринолог",
-                "Терапевт-участковый", "Офтальмолог", "Эндокринолог", "Терапевт-участковый",
-                "Офтальмолог", "Эндокринолог", "Терапевт-участковый", "Офтальмолог", "Эндокринолог",
-                "Терапевт-участковый", "Офтальмолог", "Эндокринолог", "Терапевт-участковый",
-                "Офтальмолог", "Эндокринолог", "Терапевт-участковый", "Офтальмолог",
-                "Эндокринолог", "Терапевт-участковый", "Офтальмолог", "Эндокринолог",
-                "Терапевт-участковый", "Офтальмолог", "Эндокринолог", "Терапевт-участковый"});
+
+
+
+
+        SpecialityListModel slm = new SpecialityListModel();
+        JList list = new JList(slm);
         list.setCellRenderer(new MyCellRenderer(new Color(153, 204, 255), Color.red));
         list.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -91,16 +96,8 @@ public class DoctorSelectFrame extends JFrame {
         scrollPane_1.getVerticalScrollBar().setPreferredSize(
                 new Dimension(50, Integer.MAX_VALUE));
         mainPanel.add(scrollPane_1);
-        JList list1 = new JList(new String[] {"Иванов И.С. (кабинет 405)", "Петров В.А. (кабинет 408)",
-                "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)",
-                "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)",
-                "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)",
-                "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)",
-                "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)",
-                "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)",
-                "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)",
-                "Петров В.А. (кабинет 408)", "Имунбекова И.Г. (кабинет 2)", "Петров В.А. (кабинет 408)",
-                "Имунбекова И.Г. (кабинет 2)"});
+        DoctorListModel dlm = new DoctorListModel("52");
+        JList list1 = new JList(dlm);
         list1.setCellRenderer(new MyCellRenderer());
         list1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
