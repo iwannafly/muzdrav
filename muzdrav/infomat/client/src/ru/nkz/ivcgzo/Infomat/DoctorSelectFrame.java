@@ -4,25 +4,37 @@ import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.JList;
 import java.awt.Font;
 import javax.swing.ListSelectionModel;
 import java.awt.Dimension;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.JButton;
+import javax.swing.Box;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class DoctorSelectFrame extends JFrame {
     private static final long serialVersionUID = -7345770092441907375L;
-    private JPanel mainPanel;
+    private JPanel pnLists;
+    private JPanel pnMain;
+    private JPanel pnButton;
+    private JButton btnBackward;
+    private JButton btnForward;
+    private JScrollPane spSpeciality;
+    private JList<Speciality> lSpeciality;
+    private JScrollPane spDoctor;
+    private JList<Doctor> lDoctor;
+    private DoctorListModel dlm;
+
 
     public DoctorSelectFrame () {
         initialization();
@@ -41,18 +53,18 @@ public class DoctorSelectFrame extends JFrame {
     }
 
     @SuppressWarnings("rawtypes")
-    private class MyCellRenderer extends JLabel implements ListCellRenderer {
+    private class InfomatListCellRenderer extends JLabel implements ListCellRenderer {
         private static final long serialVersionUID = -5424295659452002306L;
         private Color unfocusedColor;
         private Color focusedColor;
 
-        public MyCellRenderer() {
+        public InfomatListCellRenderer() {
             setOpaque(true);
             unfocusedColor = Color.white;
             focusedColor = Color.red;
         }
 
-        public MyCellRenderer(Color inUnfocusedColor, Color inFocusedColor) {
+        public InfomatListCellRenderer(Color inUnfocusedColor, Color inFocusedColor) {
             setOpaque(true);
             unfocusedColor = inUnfocusedColor;
             focusedColor = inFocusedColor;
@@ -71,37 +83,105 @@ public class DoctorSelectFrame extends JFrame {
     }
 
     private void addMainPanel() {
-        mainPanel = new JPanel();
-        getContentPane().add(mainPanel);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
-        
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.getVerticalScrollBar().setPreferredSize(
+        pnMain = new JPanel();
+        pnMain.setBackground(Color.WHITE);
+        getContentPane().add(pnMain);
+        pnMain.setLayout(new BoxLayout(pnMain, BoxLayout.Y_AXIS));
+
+        addButtonPanel();
+        addListPanel();
+    }
+
+    private void addButtonPanel() {
+        pnButton = new JPanel();
+        pnButton.setBackground(Color.WHITE);
+        pnMain.add(pnButton);
+        pnButton.setLayout(new BoxLayout(pnButton, BoxLayout.X_AXIS));
+
+        addBackwardButton();
+        addHorizontalDelimiter();
+        addForwardButton();
+    }
+
+    private void addBackwardButton() {
+        btnBackward = new JButton("");
+        btnBackward.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "resources/backwardButton.png")));
+        btnBackward.setBorder(null);
+        btnBackward.setBackground(Color.WHITE);
+        btnBackward.setForeground(Color.BLACK);
+        pnButton.add(btnBackward);
+    }
+
+    private void addHorizontalDelimiter() {
+        Component horizontalGlue = Box.createHorizontalGlue();
+        pnButton.add(horizontalGlue);
+    }
+
+    private void addForwardButton() {
+        btnForward = new JButton("");
+        btnForward.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "resources/forwardButton.png")));
+        btnForward.setBorder(null);
+        btnForward.setBackground(Color.WHITE);
+        btnForward.setForeground(Color.BLACK);
+        pnButton.add(btnForward);
+    }
+
+    private void addListPanel() {
+        pnLists = new JPanel();
+        pnMain.add(pnLists);
+        pnLists.setLayout(new BoxLayout(pnLists, BoxLayout.X_AXIS));
+
+        addSpecialityListScrollPane();
+        addDoctorListScrollPane();
+    }
+
+    private void addSpecialityListScrollPane() {
+        spSpeciality = new JScrollPane();
+        spSpeciality.getVerticalScrollBar().setPreferredSize(
                 new Dimension(50, Integer.MAX_VALUE));
-        mainPanel.add(scrollPane);
+        addSpecialityList();
+        pnLists.add(spSpeciality);
+    }
 
+    @SuppressWarnings("unchecked")
+    private void addSpecialityList() {
+        SpecialityListModel slm = new SpecialityListModel();        
+        lSpeciality = new JList<Speciality>(slm);
+        lSpeciality.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (lSpeciality.getSelectedValue() != null) {
+                    dlm.updateModel(lSpeciality.getSelectedValue().getCdol());
+                    lDoctor.setModel(dlm);
+                    spDoctor.setViewportView(lDoctor);
+                }
+            }
+        });
+        lSpeciality.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255), Color.red));
+        lSpeciality.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+        lSpeciality.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lSpeciality.setFont(new Font("Courier New", Font.PLAIN, 25));
+        spSpeciality.setViewportView(lSpeciality);
+    }
 
-
-
-        SpecialityListModel slm = new SpecialityListModel();
-        JList list = new JList(slm);
-        list.setCellRenderer(new MyCellRenderer(new Color(153, 204, 255), Color.red));
-        list.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setFont(new Font("Courier New", Font.PLAIN, 25));
-//        scrollPane.getVerticalScrollBar().setSize(150, scrollPane.getHeight());
-        scrollPane.setViewportView(list);
-        
-        JScrollPane scrollPane_1 = new JScrollPane();
-        scrollPane_1.getVerticalScrollBar().setPreferredSize(
+    private void addDoctorListScrollPane() {
+        spDoctor = new JScrollPane();
+        spDoctor.getVerticalScrollBar().setPreferredSize(
                 new Dimension(50, Integer.MAX_VALUE));
-        mainPanel.add(scrollPane_1);
-        DoctorListModel dlm = new DoctorListModel("52");
-        JList list1 = new JList(dlm);
-        list1.setCellRenderer(new MyCellRenderer());
-        list1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-        list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list1.setFont(new Font("Courier New", Font.PLAIN, 25));
-        scrollPane_1.setViewportView(list1);
+        addDoctorList();
+        pnLists.add(spDoctor);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addDoctorList() {
+        dlm = new DoctorListModel();
+        lDoctor = new JList<Doctor>();
+        lDoctor.setCellRenderer(new InfomatListCellRenderer());
+        lDoctor.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+        lDoctor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lDoctor.setFont(new Font("Courier New", Font.PLAIN, 25));
+        spDoctor.setViewportView(lDoctor);
     }
 }

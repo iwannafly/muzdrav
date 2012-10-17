@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,10 @@ import javax.swing.event.ListDataListener;
 public class DoctorListModel implements ListModel<Doctor> {
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
     private List<Doctor> items;
+
+    public DoctorListModel() {
+        items = Collections.emptyList();
+    }
 
     public DoctorListModel(String cdol) {
         items = getItemsFromDb(cdol);
@@ -65,6 +70,10 @@ public class DoctorListModel implements ListModel<Doctor> {
     @Override
     public int getSize() {
         return items.size();
+    }
+
+    public void updateModel(String cdol) {
+        items = getItemsFromDb(cdol);
     }
 
     @Override

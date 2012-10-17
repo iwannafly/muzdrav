@@ -184,7 +184,8 @@ public class ServerGenTalons extends Server implements Iface {
                 false, new Date(datan), new Date(datak), cpodr, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -204,7 +205,8 @@ public class ServerGenTalons extends Server implements Iface {
                 endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -224,7 +226,8 @@ public class ServerGenTalons extends Server implements Iface {
                 startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
