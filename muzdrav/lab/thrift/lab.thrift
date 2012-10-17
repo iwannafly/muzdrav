@@ -8,17 +8,28 @@ struct Patient {
 	2: optional string surname;
 	3: optional string name;
 	4: optional string middlename;
+	5: optional i32 idGosp;
 }
 
 /*Список показателей исследований по выбранному методу*/
-struct PokazMet{
+struct PokazMet {
 	1: optional string pcod;
 	2: optional string nameN;
 	3: optional bool vybor;
 }
 
+struct Napr {
+	1: i32 id;
+	2: optional i32 pVizit;
+	3: optional i32 vidDoc;
+	4: optional string text;
+	5: optional i32 preds;
+	6: optional i32 zaved;
+	7: optional i32 idGosp;
+}
+
 /*метод по виду исследования*/
-struct Metod{
+struct Metod {
 	1: optional string obst;
 	2: optional string nameObst;
 	3: optional i32 cP0e1;
@@ -26,7 +37,7 @@ struct Metod{
 }
 
 /*Список показателей исследований по выбранной системе*/
-struct Pokaz{
+struct Pokaz {
 	1: optional string pcod;
 	2: optional string nameN;
 	3: optional double stoim;
@@ -46,8 +57,8 @@ struct Pisl {
 	 8: optional i32 vrach;
 	 9: optional string diag;
 	10: optional i64 dataz;
-	11: optional i32 pvizitId;
-	12: optional i32 gospId;
+	11: optional i32 kodotd;
+	12: optional i32 pvizitId;
 }
 
 struct PrezD {
@@ -72,10 +83,11 @@ service ThriftLab extends kmiacServer.KmiacServer {
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
 	list<PokazMet> getPokazMet(1: string cNnz1, 2: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
-	i32 AddPisl(1: Pisl npisl) throws (1: kmiacServer.KmiacServerException kse);
-	i32 AddPrezd(1: PrezD di) throws (1: kmiacServer.KmiacServerException kse);
-	i32 AddPrezl(1: PrezL li) throws (1: kmiacServer.KmiacServerException kse);
+	i32 addPisl(1: Pisl npisl) throws (1: kmiacServer.KmiacServerException kse);
+	i32 addPrezd(1: PrezD di) throws (1: kmiacServer.KmiacServerException kse);
+	i32 addPrezl(1: PrezL li) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getPoliclinic() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getStacionarTypes() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getLpu() throws (1: kmiacServer.KmiacServerException kse);
+	i32 addNapr(1: Napr napr) throws (1: kmiacServer.KmiacServerException kse);
 }

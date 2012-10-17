@@ -40,6 +40,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	private Searcher searcher;
 	protected IntegerComboBoxModel model;
 	private boolean strict = true;
+	private boolean illegible = true;
 	
 	/**
 	 * Конструктор комбобокса с неотсортированным классификатором.
@@ -96,11 +97,13 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		items = new ArrayList<>(list.size());
 		itemsBcp = new ArrayList<>(list.size());
 		itemsLow = new ArrayList<>(list.size());
-		for (IntegerClassifier item : list) {
-			items.add(new IntegerClassifierItem(item));
-			itemsBcp.add(new IntegerClassifierItem(item));
-			itemsLow.add(new IntegerClassifierItem(new IntegerClassifier(item.pcod, item.name.toLowerCase())));
-		}
+		for (IntegerClassifier item : list)
+			if (item.isSetName())
+			{
+				items.add(new IntegerClassifierItem(item));
+				itemsBcp.add(new IntegerClassifierItem(item));
+				itemsLow.add(new IntegerClassifierItem(new IntegerClassifier(item.pcod, item.name.toLowerCase())));
+			}
 		setSelectedItem(null);
 		model.fireContentsChanged();
 	}
@@ -224,6 +227,13 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		if (isEditable()) {
 			strict = value;
 		}
+	}
+	
+	/**
+	 * Устанавливает нечеткий поиск.
+	 */
+	public void setIllegibleSearch(boolean value) {
+		illegible = value;
 	}
 	
 	/**
@@ -363,9 +373,15 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 				
 				if (i == itemsBcp.size()) {
 					items = new ArrayList<>();
-					for (i = 0; i < itemsBcp.size(); i++)
-						if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
-							items.add(itemsBcp.get(i));
+					if (illegible) {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
+								items.add(itemsBcp.get(i));
+					} else {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) == 0)
+								items.add(itemsBcp.get(i));
+					}
 				}
 			}
 			SwingUtilities.invokeLater(new Runnable() {

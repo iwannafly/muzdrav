@@ -139,7 +139,7 @@ public class FormRdInf extends JFrame {
 	
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Новая запись");
-		btnNewButton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
+/*		btnNewButton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -157,7 +157,7 @@ public class FormRdInf extends JFrame {
 				}
 			}
 
-		});
+		});*/
 		
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));

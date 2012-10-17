@@ -54,18 +54,18 @@ public class FormRdDin extends JFrame {
 	public static RdInfStruct RdInfStruct;
 	public static RdSlStruct rdSlStruct;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
-    private String oslname;
+//    private String oslname;
     private String oslcode;
     private int iw1;
     private int iw2;
     private int iw3;
     private int iw4;
-    private int iw5;
-    private String otname;
-    private String polplname;
-    private String predname;
-    private String cerdname;
-    private String cerdname1;
+//    private int iw5;
+    private int otname;
+    private int polplname;
+    private int predname;
+    private int cerdname;
+    private int cerdname1;
     CustomDateEditor SDataPos;
     CustomDateEditor SDataSl;
 	private ThriftStringClassifierCombobox<StringClassifier> CBDiag;
@@ -81,6 +81,11 @@ public class FormRdDin extends JFrame {
 	private int br;
 	private int rost;
 	private double ves;
+	private int chcc;
+	private int hdm;
+	private int oj;
+	private int spl;
+	private int srok;
     JSpinner SSrok ;
 	JSpinner SVes;
 	JSpinner SOkrj;
@@ -107,7 +112,7 @@ public class FormRdDin extends JFrame {
 	 			    fam.setText(Vvod.zapVr.getFam());
 					im.setText(Vvod.zapVr.getIm());
 					ot.setText(Vvod.zapVr.getOth());
-					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
+//					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
 					tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
 //					System.out.println(tablePos.getRowCount());		
 				} catch (KmiacServerException e) {
@@ -360,7 +365,7 @@ public class FormRdDin extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 				RdDinStruct rddin = new RdDinStruct();
-	//			setDefaultValues();
+				setDefaultValues();
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
@@ -394,7 +399,7 @@ public class FormRdDin extends JFrame {
 				if (CBDiag.getSelectedPcod() != null)
 					rddin.setDspos(CBDiag.getSelectedPcod());
 					else rddin.unsetDspos();
-			System.out.println(rddin);		
+//			System.out.println(rddin);		
 				MainForm.tcl.AddRdDin(rddin);
 				} catch (KmiacServerException e1) {
 					// TODO Auto-generated catch block
@@ -405,6 +410,7 @@ public class FormRdDin extends JFrame {
 				}
 try {
 	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+	tablePos.requestFocusInWindow();	
 } catch (KmiacServerException | TException e1) {
 	// TODO Auto-generated catch block
 	e1.printStackTrace();
@@ -584,8 +590,8 @@ try {
 		JScrollPane scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 		
-		tablePos = new CustomTable<>(true, true, RdDinStruct.class, 3, "Срок", 21, "Вес", 6, "Окружность живота", 7 ,"ВДМ", 8 , "Диагноз");
-//		tablePos.setDateField(0);
+		tablePos = new CustomTable<>(true, true, RdDinStruct.class, 22, "Дата", 3, "Срок", 21, "Вес", 6, "Объем живота", 7 ,"ВДМ", 8 , "Диагноз",9,"ДАД",10,"САД");
+		tablePos.setDateField(0);
 		scrollPane.setViewportView(tablePos);
 		tablePos.setFillsViewportHeight(true);
 		tablePos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -594,7 +600,7 @@ try {
 				if (!arg0.getValueIsAdjusting()) {
 					rddin = tablePos.getSelectedItem();
 					//вставить выбор даты из таблицы посещений 
-					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
+					SDataPos.setDate(rddin.getDatap());
 					SSrok.setValue(rddin.getSrok());
 					SVes.setValue(rddin.getVes());
 					SOkrj.setValue(rddin.getOj());
@@ -628,6 +634,8 @@ try {
 						CBOteki.setSelectedItem(null);
 					if (rddin.isSetDspos())
 						CBDiag.setSelectedPcod(rddin.getDspos());
+					else
+						CBDiag.setSelectedItem(null);
 				}
 			}
 		});
@@ -637,17 +645,49 @@ try {
 		// TODO Auto-generated method stub
 //	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
 //	rddin.setNpasp(Vvod.zapVr.getNpasp());
-	rddin.setArt1(120);
-	rddin.setArt2(80);
-	rddin.setArt3(120);
-	rddin.setArt4(80);
-	rddin.setChcc(70);
-	rddin.setHdm(0);
+	ves = (double) SVes.getModel().getValue();
+	if (ves == 0) ves = 60; 
+	chcc = (int) SChcc.getModel().getValue();
+	if (chcc == 0) chcc = 110; 
+	hdm = (int) SVdm.getModel().getValue();
+	if (hdm == 0) hdm = 20;
+	oj = (int) SOkrj.getModel().getValue();
+	if (oj == 0) oj = 90; 
+	spl = (int) STolP.getModel().getValue();
+	if (spl == 0) spl = 2;
+	srok = (int) SSrok.getModel().getValue();
+	if (srok == 0)srok = 8;
+	iw1 = (int) SLdad.getModel().getValue();
+	if (iw1 == 0) iw1 = 120;
+	iw2 = (int) SLsad.getModel().getValue();
+	if (iw2 == 0) iw2 = 80;
+	iw3 = (int) SPdad.getModel().getValue();
+	if (iw3 == 0) iw3 = 120;
+	iw4 = (int) SPsad.getModel().getValue();
+	if (iw4 == 0) iw4 = 80;
+//	polplname = rddin.getPolpl();
+//	predname = rddin.getPredpl();
+//	cerdname = rddin.getSerd();
+//	cerdname1 = rddin.getSerd1();
+//	otname = rddin.getOteki();
+	
+	rddin.setArt1(iw1);
+	rddin.setArt2(iw2);
+	rddin.setArt3(iw3);
+	rddin.setArt4(iw4);
+	rddin.setChcc(chcc);
+	rddin.setHdm(hdm);
 //	rddin.setDspos(Vvod.zapVr.)//диагноз при постановке
 //	rddin.setId_rd_sl(FormRdSl.rdsl.id);
-	rddin.setOj(60);
-	rddin.setSpl(0);
-//	rddin.setSrok(srok);
+	rddin.setOj(oj);
+	rddin.setSpl(spl);
+	rddin.setSrok(srok);
+	rddin.setPolpl(polplname);
+	rddin.setPredpl(predname);
+	rddin.setSerd(cerdname);
+	rddin.setSerd1(cerdname1);
+	rddin.setOteki(otname);
+	rddin.setDatap(Vvod.zapVr.datap);
 	System.out.println("присвоение");		
 	System.out.println(rddin);		
 	}

@@ -211,8 +211,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr");
 		rdInfTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class};
 
-		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves"      );
-		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class};
+		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves" ,     "datap"      );
+		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class,Date.class};
 		
 //		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
 //		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
@@ -229,8 +229,8 @@ public class ServerOsm extends Server implements Iface {
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
-		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol",        "name_pmer");
-		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class, String.class};
+		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol");
+		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class};
 
 		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz");
 		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class};
@@ -644,7 +644,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_rd_din where id_pvizit = ? and npasp = ? ", id_pvizit, npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? order by v.datap", id_pvizit, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2140,7 +2140,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	
 	@Override
 	public List<Pmer> getPmer(int npasp, String diag) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_mer.*, n_abd.name as name_pmer from p_mer join n_abd on (p_mer.pmer=n_abd.pcod) where p_mer.npasp = ? and diag = ?", npasp, diag)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_mer where p_mer.npasp = ? and diag = ?", npasp, diag)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2177,7 +2177,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, dnl, dkl, lpu, ter, cpol) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz) values (?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 15, 7);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2644,7 +2644,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public Pmer getDispMer(int id_pmer) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_mer WHERE id = ? ", id_pmer)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_mer where id = ? ", id_pmer)) {
 			return rsmPmer.map(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2670,7 +2670,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
+			throw new KmiacServerException(); 
 		}
 	}
 
@@ -2733,8 +2733,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}
 	}
-
-
 
 
 	

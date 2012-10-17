@@ -864,22 +864,24 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
-		tblDiag = new CustomTable<>(false, true, PdiagAmb.class, 7, "Дата", 3, "Код МКБ");
+		tblDiag = new CustomTable<>(true, true, PdiagAmb.class, 7, "Дата", 3, "Код МКБ");
 		tblDiag.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseClicked(MouseEvent  e) {
 				if (e.getClickCount() == 2)
-					if (tblDiag.getSelectedItem() != null) {
-						StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tblDiag.getSelectedItem().diag);
-						if (res != null) {
-							tblDiag.getSelectedItem().setDiag(res.pcod);
-							tbDiagOpis.setText(res.name);
-							tblDiag.updateSelectedItem();
-						}
+					if (tblDiag.getSelectedItem().diag != null)
+						if (tblDiag.getSelectedColumn() == 1) {
+							StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tblDiag.getSelectedItem().diag);
+							if (res != null) {
+								tblDiag.getSelectedItem().setDiag(res.pcod);
+								tbDiagOpis.setText(res.name);
+								tblDiag.updateSelectedItem();
+							}
 					}
 			}
 		});
 		tblDiag.setDateField(0);
+		tblDiag.setEditableFields(false, 1);
 		tblDiag.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {

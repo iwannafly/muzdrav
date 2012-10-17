@@ -220,6 +220,7 @@ struct RdDinStruct{
 	20: optional i32 serd1;
 	21: optional i32 id_pos;
 	22: optional double ves;
+        23: optional i64 datap;
 }
 /*. Rd_Inf*/
 struct RdInfStruct{
@@ -560,7 +561,6 @@ struct Pmer{
 	14: i32 lpu;
 	15: i32 ter;
 	16: i32 cpol;
-	17: string name_pmer;
 }
 
 struct Pobost{
