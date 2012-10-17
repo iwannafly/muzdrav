@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
@@ -625,9 +626,12 @@ public class PacientInfoFrame extends JFrame {
                         btnDel.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent arg0) {
                               try {
-//				            	MainForm.tcl.deletePatient(curPatientId, MainForm.authInfo.cpodr);
-                                MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
-                                NewPatient();
+                            	  int res = JOptionPane.showConfirmDialog(null, "Действительно удалить ?");
+                            	  if (res == JOptionPane.YES_OPTION){
+//    	                         	  MainForm.tcl.deletePatient(curPatientId, MainForm.authInfo.cpodr);
+                                	  MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
+                                	  NewPatient();
+                            	  }
                               } catch (TException e) {
                                   e.printStackTrace();
                               } catch (KmiacServerException e) {
@@ -1338,6 +1342,8 @@ public class PacientInfoFrame extends JFrame {
         tbl_lgota.setDateField(0);
         tbl_lgota.setFillsViewportHeight(true);
         tbl_lgota.setPreferredWidths(75,600);
+        tbl_lgota.setColumnSelectionAllowed(true);
+        tbl_lgota.setRowSelectionAllowed(true);
         //tbl_lgota.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         scrollPane_1.setViewportView(tbl_lgota);
         panel_10.setLayout(gl_panel_10);
@@ -1523,6 +1529,8 @@ public class PacientInfoFrame extends JFrame {
         tbl_kateg.setFont(new Font("Tahoma", Font.PLAIN, 11));
         tbl_kateg.setDateField(0);
         tbl_kateg.setPreferredWidths(75,600);
+        tbl_kateg.setColumnSelectionAllowed(true);
+        tbl_kateg.setRowSelectionAllowed(true);
         tbl_kateg.setFillsViewportHeight(true);
         scrollPane_2.setViewportView(tbl_kateg);
         panel_12.setLayout(gl_panel_12);

@@ -2,6 +2,8 @@ package ru.nkz.ivcgzo.clientGenReestr;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,12 +25,12 @@ import javax.swing.border.TitledBorder;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
-
 
 public class SettingsForm extends JDialog {
 	private static final long serialVersionUID = -48586555281952961L;
@@ -40,11 +42,14 @@ public class SettingsForm extends JDialog {
 	private JRadioButton rbtn3;
 	private JRadioButton rbtn4;
 	private int vidrstr;
+    private CustomTextField tf_Cpol;
+    private int Terp = 0;
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_podr;
-	
+	private JPanel panel_4;
+    
 	public SettingsForm() {
-		setModalityType(ModalityType.TOOLKIT_MODAL);
-		setBounds(100, 100, 344, 382); //ширина, высота
+//		setModalityType(ModalityType.TOOLKIT_MODAL);
+		setBounds(100, 100, 344, 411); //ширина, высота
 		setTitle("Реестры пациентов");
 		
 		JPanel panel = new JPanel();
@@ -57,18 +62,26 @@ public class SettingsForm extends JDialog {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new TitledBorder(null, "Подразделение ЛПУ :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		panel_4 = new JPanel();
+		panel_4.setBorder(new TitledBorder(null, "Поликлиника обслуживания", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setVisible(false);
+
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addContainerGap()
+							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+							.addContainerGap()
 							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
-						.addGroup(groupLayout.createSequentialGroup()
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addGap(10)
 							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
-						.addGroup(groupLayout.createSequentialGroup()
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
 						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
@@ -85,10 +98,44 @@ public class SettingsForm extends JDialog {
 					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 120, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
+		
+        tf_Cpol = new CustomTextField();
+        tf_Cpol.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                if (arg0.getClickCount() == 2) {
+                    int[] res = MainForm.conMan.showPolpTreeForm("прикрепление", 0, 0, 0);
+                    if (res != null) {
+                           tf_Cpol.setText(Integer.toString(res[2]));
+                           Terp = res[0];
+                    }
+                }
+            }
+        });
+        tf_Cpol.setColumns(10);
+        tf_Cpol.setVisible(false);
+
+        GroupLayout gl_panel_4 = new GroupLayout(panel_4);
+		gl_panel_4.setHorizontalGroup(
+			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(tf_Cpol, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(209, Short.MAX_VALUE))
+		);
+		gl_panel_4.setVerticalGroup(
+			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addComponent(tf_Cpol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(12, Short.MAX_VALUE))
+		);
+		panel_4.setLayout(gl_panel_4);
 		
 		cmb_podr = new ThriftIntegerClassifierCombobox<>(true);
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
@@ -187,7 +234,8 @@ public class SettingsForm extends JDialog {
 				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
 				        if (MainForm.authInfo.getCslu() == 3)
 				        	servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-						if (servPath.endsWith("zip")){
+				        
+				        if (servPath.endsWith("zip")){
 							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
 	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
 							JOptionPane.showMessageDialog(null, "Файл : "+cliPath, null, JOptionPane.INFORMATION_MESSAGE); 
@@ -267,7 +315,9 @@ public class SettingsForm extends JDialog {
 		        if (MainForm.authInfo.getCslu() == 3){
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
-				}
+		            tf_Cpol.setVisible(true);
+		            panel_4.setVisible(true);
+		        }
 	        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 			} catch (TException e) {
 				e.printStackTrace();
