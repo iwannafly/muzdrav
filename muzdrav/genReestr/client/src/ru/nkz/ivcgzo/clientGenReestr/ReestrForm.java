@@ -75,6 +75,7 @@ public class ReestrForm extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 		        OpenWindowFileChooser();
 				try {
+					MainForm.conMan.transferFileToServer(pathfile, pathfile = new File(pathfile).getName());
 					String servPath = MainForm.tcl.getProtokolErrPol(pathfile);
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -82,16 +83,12 @@ public class ReestrForm extends JFrame {
 				} catch (TException e) {
 					e.printStackTrace();
 				} catch (KmiacServerException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (OpenFileException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -156,7 +153,7 @@ public class ReestrForm extends JFrame {
 		// TODO Auto-generated method stub
 		fc = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				".rar files", "rar");
+				".rar", "rar");
 		fc.setFileFilter(filter);
         int returnVal = fc.showOpenDialog(null);
 

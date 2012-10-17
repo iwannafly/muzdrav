@@ -70,6 +70,8 @@ import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
 import javax.swing.DefaultComboBoxModel;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class TalonMainFrame extends JFrame {
 
@@ -379,6 +381,8 @@ public class TalonMainFrame extends JFrame {
 		tbl_rasp.setEditableFields(false, 0,1);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
+		tbl_rasp.setColumnSelectionAllowed(true);
+        tbl_rasp.setRowSelectionAllowed(true);
 		tbl_rasp.setFillsViewportHeight(true);
 		sp_rasp.setViewportView(tbl_rasp);
 
@@ -646,6 +650,8 @@ public class TalonMainFrame extends JFrame {
 		tbl_ndv.setPreferredWidths(90,90);
 		tbl_ndv.setDateField(0);
 		tbl_ndv.setDateField(1);
+        tbl_ndv.setColumnSelectionAllowed(true);
+        tbl_ndv.setRowSelectionAllowed(true);
 		tbl_ndv.setFillsViewportHeight(true);
 		sp_ndv.setViewportView(tbl_ndv);
 		panel_4.setLayout(gl_panel_4);
@@ -872,6 +878,8 @@ public class TalonMainFrame extends JFrame {
 		tbl_norm.setFillsViewportHeight(true);
 		tbl_norm.setPreferredWidths(90,90);
 		tbl_norm.setEditableFields(false, 0);
+        tbl_norm.setColumnSelectionAllowed(true);
+        tbl_norm.setRowSelectionAllowed(true);
 		sp_norm.setViewportView(tbl_norm);
 		tbNorm.setLayout(gl_tbNorm);
 		
