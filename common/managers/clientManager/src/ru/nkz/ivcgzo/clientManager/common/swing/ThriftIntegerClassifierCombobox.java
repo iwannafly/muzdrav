@@ -96,11 +96,13 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		items = new ArrayList<>(list.size());
 		itemsBcp = new ArrayList<>(list.size());
 		itemsLow = new ArrayList<>(list.size());
-		for (IntegerClassifier item : list) {
-			items.add(new IntegerClassifierItem(item));
-			itemsBcp.add(new IntegerClassifierItem(item));
-			itemsLow.add(new IntegerClassifierItem(new IntegerClassifier(item.pcod, item.name.toLowerCase())));
-		}
+		for (IntegerClassifier item : list)
+			if (item.isSetName())
+			{
+				items.add(new IntegerClassifierItem(item));
+				itemsBcp.add(new IntegerClassifierItem(item));
+				itemsLow.add(new IntegerClassifierItem(new IntegerClassifier(item.pcod, item.name.toLowerCase())));
+			}
 		setSelectedItem(null);
 		model.fireContentsChanged();
 	}

@@ -96,11 +96,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		items = new ArrayList<>(list.size());
 		itemsBcp = new ArrayList<>(list.size());
 		itemsLow = new ArrayList<>(list.size());
-		for (StringClassifier item : list) {
-			items.add(new StringClassifierItem(item));
-			itemsBcp.add(new StringClassifierItem(item));
-			itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
-		}
+		for (StringClassifier item : list)
+			if (item.isSetName())
+			{
+				items.add(new StringClassifierItem(item));
+				itemsBcp.add(new StringClassifierItem(item));
+				itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
+			}
 		setSelectedItem(null);
 		model.fireContentsChanged();
 	}
