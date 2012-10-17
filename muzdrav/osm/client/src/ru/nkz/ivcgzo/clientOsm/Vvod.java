@@ -360,7 +360,7 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
                 try {
 					IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
-					client.showModal(MainForm.instance, zapVr.npasp, zapVr.im, zapVr.fam, zapVr.oth, zapVr.datar, zapVr.id_pvizit);
+					client.showModal(MainForm.instance, zapVr.npasp, zapVr.fam, zapVr.im, zapVr.oth, zapVr.datar, zapVr.id_pvizit);
 					
 					checkZapVrNext();
 				} catch (Exception e1) {
