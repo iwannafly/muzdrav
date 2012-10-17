@@ -40,6 +40,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	private Searcher searcher;
 	protected StringComboBoxModel model;
 	private boolean strict = true;
+	private boolean illegible = true;
 	
 	/**
 	 * Конструктор комбобокса с неотсортированным классификатором.
@@ -229,6 +230,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	}
 	
 	/**
+	 * Устанавливает нечеткий поиск.
+	 */
+	public void setIllegibleSearch(boolean value) {
+		illegible = value;
+	}
+	
+	/**
 	 * Получает текст из поля ввода.
 	 */
 	public String getText() {
@@ -365,9 +373,15 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 				
 				if (i == itemsBcp.size()) {
 					items = new ArrayList<>();
-					for (i = 0; i < itemsBcp.size(); i++)
-						if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
-							items.add(itemsBcp.get(i));
+					if (illegible) {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
+								items.add(itemsBcp.get(i));
+					} else {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) == 0)
+								items.add(itemsBcp.get(i));
+					}
 				}
 			}
 			SwingUtilities.invokeLater(new Runnable() {
