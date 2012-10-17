@@ -236,6 +236,7 @@ public class PacientInfoFrame extends JFrame {
         try {
             cmb_adp_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
             cmb_adp_obl.setStrictCheck(false);
+            cmb_adp_obl.setIllegibleSearch(false);
             cmb_adp_obl.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     if (cmb_adp_obl.getSelectedItem() != null) {
@@ -253,6 +254,7 @@ public class PacientInfoFrame extends JFrame {
             });
             cmb_adm_obl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_l02);
             cmb_adm_obl.setStrictCheck(false);
+            cmb_adm_obl.setIllegibleSearch(false);
             cmb_adm_obl.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     if (cmb_adm_obl.getSelectedItem() != null) {
@@ -271,6 +273,7 @@ public class PacientInfoFrame extends JFrame {
             });
             cmb_adp_gorod = new ThriftIntegerClassifierCombobox<>(true);
             cmb_adp_gorod.setStrictCheck(false);
+            cmb_adp_gorod.setIllegibleSearch(false);
             cmb_adp_gorod.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     if (!cmb_adp_gorod.getText().substring(0, cmb_adp_gorod.getText().indexOf('.')+1).equals("НОВОКУЗНЕЦК Г."))
@@ -281,6 +284,7 @@ public class PacientInfoFrame extends JFrame {
             });
             cmb_adm_gorod = new ThriftIntegerClassifierCombobox<>(true);
             cmb_adm_gorod.setStrictCheck(false);
+            cmb_adm_gorod.setIllegibleSearch(false);
             cmb_adm_gorod.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
 
@@ -292,6 +296,7 @@ public class PacientInfoFrame extends JFrame {
             });
             cmb_adp_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
             cmb_adp_ul.setStrictCheck(false);
+            cmb_adp_ul.setIllegibleSearch(false);
             cmb_adp_ul.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     if (cmb_adp_ul.getSelectedItem() != null) {
@@ -309,6 +314,7 @@ public class PacientInfoFrame extends JFrame {
             });
             cmb_adm_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
             cmb_adm_ul.setStrictCheck(false);
+            cmb_adm_ul.setIllegibleSearch(false);
             cmb_adm_ul.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     if (cmb_adm_ul.getSelectedItem() != null) {
