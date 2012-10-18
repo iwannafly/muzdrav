@@ -230,13 +230,19 @@ public class SettingsForm extends JDialog {
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
 				        if (MainForm.authInfo.getCslu() == 1)
 				        	servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-				        if (MainForm.authInfo.getCslu() == 2)
+				        if (MainForm.authInfo.getCslu() == 2){
 				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-				        if (MainForm.authInfo.getCslu() == 3)
-				        	servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+				        }
+				        if (MainForm.authInfo.getCslu() == 3){
+				        	if(!tf_Cpol.getText().isEmpty() && Terp != 0){
+				        		servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
+								cliPath = "C:\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+ tf_Cpol.getText()+"_usl.rar";
+				        	}else 
+				        		JOptionPane.showMessageDialog(null, "Выберите поликлинику обслуживания из классификатора.", null, JOptionPane.INFORMATION_MESSAGE);
+				        }
 				        
 				        if (servPath.endsWith("zip")){
-							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
 	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
 							JOptionPane.showMessageDialog(null, "Файл : "+cliPath, null, JOptionPane.INFORMATION_MESSAGE); 
 						}

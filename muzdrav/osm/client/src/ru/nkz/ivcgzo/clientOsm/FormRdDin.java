@@ -369,22 +369,32 @@ public class FormRdDin extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 				RdDinStruct rddin = new RdDinStruct();
-				setDefaultValues();
+				rddin.setDatap(Vvod.zapVr.datap);
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
 				rddin.setGrr(0);
 				rddin.setBall(0);
 				rddin.setArt1((int) SPdad.getModel().getValue());
+				if ( (int) SPdad.getModel().getValue() == 0) rddin.setArt1(120);
 				rddin.setArt2((int) SPsad.getModel().getValue());
+				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt2(80);
 				rddin.setArt3((int) SLdad.getModel().getValue());
+				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt3(120);
 				rddin.setArt4((int) SLsad.getModel().getValue());
+				if ( (int) SLdad.getModel().getValue() == 0) rddin.setArt4(80);
 				rddin.setChcc((int) SChcc.getModel().getValue());
+				if ( (int) SChcc.getModel().getValue() == 0) rddin.setChcc(120);
 				rddin.setHdm((int) SVdm.getModel().getValue());
+				if ( (int) SVdm.getModel().getValue() == 0) rddin.setHdm(20);
 				rddin.setOj((int) SOkrj.getModel().getValue());
-				rddin.setSpl((int) STolP.getModel().getValue());
-				rddin.setSrok((int) SSrok.getModel().getValue());
+				if ( (int) SOkrj.getModel().getValue() == 0) rddin.setOj(100);
+  		        rddin.setSpl((int) STolP.getModel().getValue());
+				if ( (int) STolP.getModel().getValue() == 0) rddin.setSpl(2);
+			    rddin.setSrok((int) SSrok.getModel().getValue());
+				if ( (int) SSrok.getModel().getValue() == 0) rddin.setSrok(4);
 				rddin.setVes((double) SVes.getModel().getValue());
+				if ( (double) SVes.getModel().getValue() == 0) rddin.setVes(60);
 				if (CBPredPl.getSelectedPcod() != null)
 					rddin.setPredpl(CBPredPl.getSelectedPcod());
 					else rddin.unsetPredpl();
@@ -663,9 +673,9 @@ try {
 	}
 	protected void setDefaultValues() {
 		// TODO Auto-generated method stub
-		rddin.setNpasp(Vvod.pvizitAmb.npasp);
-		rddin.setId_pos(Vvod.pvizitAmb.id);
-		rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
+//		rddin.setNpasp(Vvod.pvizitAmb.npasp);
+//		rddin.setId_pos(Vvod.pvizitAmb.id);
+//		rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
 	ves = (double) SVes.getModel().getValue();
 	if (ves == 0) ves = 60; 
 	chcc = (int) SChcc.getModel().getValue();
@@ -692,23 +702,21 @@ try {
 //	cerdname1 = rddin.getSerd1();
 //	otname = rddin.getOteki();
 	
-	rddin.setArt1(iw1);
-	rddin.setArt2(iw2);
-	rddin.setArt3(iw3);
-	rddin.setArt4(iw4);
-	rddin.setChcc(chcc);
-	rddin.setHdm(hdm);
-//	rddin.setDspos(Vvod.zapVr.)//диагноз при постановке
-//	rddin.setId_rd_sl(FormRdSl.rdsl.id);
-	rddin.setOj(oj);
-	rddin.setSpl(spl);
-	rddin.setSrok(srok);
-	rddin.setPolpl(polplname);
-	rddin.setPredpl(predname);
-	rddin.setSerd(cerdname);
-	rddin.setSerd1(cerdname1);
-	rddin.setOteki(otname);
-	rddin.setDatap(Vvod.zapVr.datap);
+//	rddin.setArt1(iw1);
+//	rddin.setArt2(iw2);
+//	rddin.setArt3(iw3);
+//	rddin.setArt4(iw4);
+//	rddin.setChcc(chcc);
+//	rddin.setHdm(hdm);
+//	rddin.setOj(oj);
+//	rddin.setSpl(spl);
+//	rddin.setSrok(srok);
+//	rddin.setPolpl(polplname);
+//	rddin.setPredpl(predname);
+//	rddin.setSerd(cerdname);
+//	rddin.setSerd1(cerdname1);
+//	rddin.setOteki(otname);
+//	rddin.setDatap(Vvod.zapVr.datap);
 	}
 	public void onConnect() throws PatientNotFoundException {
 		fam.setText(Vvod.zapVr.fam);
