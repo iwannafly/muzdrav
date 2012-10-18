@@ -414,7 +414,6 @@ public class FormRdDin extends JFrame {
 				}
 try {
 	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-	rddin = tablePos.getSelectedItem();
 	if (tablePos.getRowCount() > 0)
 		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
 } catch (KmiacServerException | TException e1) {
@@ -615,8 +614,7 @@ try {
 		tablePos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
-				if (!arg0.getValueIsAdjusting()) {
-					tablePos.setFocusable(true);
+				if (!arg0.getValueIsAdjusting() && tablePos.getSelectedItem() != null) {
 					rddin = tablePos.getSelectedItem();
 //					if (tablePos.getRowCount() > 0)
 //					tablePos.setRowSelectionInterval(0, tablePos.getRowCount() -1);
