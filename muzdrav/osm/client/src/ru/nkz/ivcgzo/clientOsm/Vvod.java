@@ -2040,6 +2040,7 @@ public class Vvod extends JFrame {
 						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
 							MainForm.tcl.DeletePriem(tblPos.getSelectedItem().getId());
 							MainForm.tcl.DeletePvizitAmb(tblPos.getSelectedItem().getId());
+							MainForm.tcl.DeleteRdDin(tblPos.getSelectedItem().getId());
 							if (tblPos.getSelectedRow() == 0)
 								MainForm.tcl.DeleteEtalon(zapVr.getId_pvizit());
 							

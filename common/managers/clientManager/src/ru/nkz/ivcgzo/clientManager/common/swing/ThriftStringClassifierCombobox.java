@@ -397,7 +397,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 						}
 						model.fireContentsChanged();
 						editor.setText(srcStrLow);
-						editor.setCaretPosition(pos);
+						if (pos < editor.getText().length())
+							editor.setCaretPosition(pos);
 						if (getSelectedItem() != null)
 							if (getSelectedItem().name.toLowerCase().equals(srcStrLow))
 								editor.selectAll();
