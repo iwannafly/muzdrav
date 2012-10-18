@@ -32,6 +32,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pobost;
+import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 
 public class DispHron extends JFrame{
 	private static final long serialVersionUID = -2929416282414434095L;
@@ -113,6 +114,15 @@ public class DispHron extends JFrame{
 						JOptionPane.showMessageDialog(DispHron.this, "Плановая дата не может быть меньше фактической", "Предупреждение", JOptionPane.ERROR_MESSAGE);
 							return;
 					}
+					if (tblDispHron.getSelectedItem() != null)
+							for (Pmer pm: tblDispHron.getData())
+								if (pm != pmer)
+									if (pm.getPmer() == pmer.getPmer() && pm.getPdat() == pmer.getPdat()) {
+										JOptionPane.showMessageDialog(DispHron.this, "Такое мероприятие уже существует");
+										tblDispHron.cancelEdit();
+										pmer = tblDispHron.getSelectedItem();
+										return;
+									}
 					MainForm.tcl.UpdatePmer(pmer);
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -385,7 +395,7 @@ public class DispHron extends JFrame{
 	
 	public boolean Dsph() throws TException{
 		if (tblDispHron.getData().size() > 0){
-			if (tblDispHron.getSelectedItem().getPdat()>tblDispHron.getSelectedItem().getFdat()) return false;
+			if ((tblDispHron.getSelectedItem().getPdat()>tblDispHron.getSelectedItem().getFdat())&&(tblDispHron.getSelectedItem().getFdat()!=0)) return false;
 		}
 		return true;
 	}
