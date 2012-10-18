@@ -152,7 +152,6 @@ public class PermForm extends JDialog {
 		pnlPermChb.add(chbLds);
 
 		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Регистрация пациентов больницы", 5, CsluPdost.CsluAll);
-		chbRegPat.setText("Регистрация пациентов больницы");
 		pnlPermChb.add(chbRegPat);
 
 		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluStat | CsluPdost.CsluPol);
@@ -166,9 +165,6 @@ public class PermForm extends JDialog {
 
 		TaggedJCheckBox chbOutInf = new TaggedJCheckBox("Выходная информация системы", 9, CsluPdost.CsluAll);
 		pnlPermChb.add(chbOutInf);
-
-		TaggedJCheckBox chbRecep = new TaggedJCheckBox("Запись на приём к врачу поликлиники", 10, CsluPdost.CsluAll);
-		pnlPermChb.add(chbRecep);
 
 		TaggedJCheckBox chbRebInv = new TaggedJCheckBox("Карта ребенка-инвалида", 11, CsluPdost.CsluAll);
 		pnlPermChb.add(chbRebInv);

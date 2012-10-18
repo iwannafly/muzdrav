@@ -1,15 +1,5 @@
 package ru.nkz.ivcgzo.clientReception;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.GroupLayout;
-import javax.swing.SwingConstants;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -17,12 +7,21 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -70,8 +69,6 @@ public class TalonSelectFrame extends JFrame {
     private JLabel lblName;
     private JLabel lblMiddlenameHeader;
     private JLabel lblMiddlename;
-    private JLabel lblBirthdateHeader;
-    private JLabel lblBirthdate;
     private JLabel lblPoliclinicCbx;
     private JLabel lblSpecialityCbx;
     private JLabel lblDoctorCbx;
@@ -168,74 +165,57 @@ public class TalonSelectFrame extends JFrame {
         lblName = new JLabel("Иван");
         lblMiddlenameHeader = new JLabel("Отечество");
         lblMiddlename = new JLabel("Иванович");
-        lblBirthdateHeader = new JLabel("Дата рождения");
-        lblBirthdate = new JLabel("12.05.2006");
         glPnPatientInfo = new GroupLayout(pnPatientInfo);
+        glPnPatientInfo.setHorizontalGroup(
+        	glPnPatientInfo.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(glPnPatientInfo.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(glPnPatientInfo.createParallelGroup(Alignment.TRAILING)
+        				.addGroup(glPnPatientInfo.createSequentialGroup()
+        					.addComponent(lblMiddlenameHeader)
+        					.addPreferredGap(ComponentPlacement.RELATED, 257, Short.MAX_VALUE)
+        					.addComponent(lblMiddlename))
+        				.addGroup(glPnPatientInfo.createSequentialGroup()
+        					.addComponent(lblNameHeader)
+        					.addPreferredGap(ComponentPlacement.RELATED, 317, Short.MAX_VALUE)
+        					.addComponent(lblName))
+        				.addGroup(glPnPatientInfo.createSequentialGroup()
+        					.addComponent(lblSurnameHeader)
+        					.addPreferredGap(ComponentPlacement.RELATED, 280, Short.MAX_VALUE)
+        					.addComponent(lblSurname))
+        				.addGroup(glPnPatientInfo.createSequentialGroup()
+        					.addComponent(lblIdHeader, GroupLayout.DEFAULT_SIZE, 343, Short.MAX_VALUE)
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addComponent(lblId)))
+        			.addContainerGap())
+        );
+        glPnPatientInfo.setVerticalGroup(
+        	glPnPatientInfo.createParallelGroup(Alignment.LEADING)
+        		.addGroup(glPnPatientInfo.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblIdHeader, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(lblId))
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblSurnameHeader)
+        				.addComponent(lblSurname))
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblNameHeader)
+        				.addComponent(lblName))
+        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblMiddlenameHeader)
+        				.addComponent(lblMiddlename))
+        			.addGap(193))
+        );
         glPnPatientInfo.setAutoCreateContainerGaps(true);
         fillPatientInfoGroupLayout();
         pnPatientInfo.setLayout(glPnPatientInfo);
     }
 
     private void fillPatientInfoGroupLayout() {
-        glPnPatientInfo.setHorizontalGroup(
-            glPnPatientInfo.createParallelGroup(Alignment.LEADING)
-                .addGroup(Alignment.TRAILING, glPnPatientInfo.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(glPnPatientInfo.createParallelGroup(Alignment.TRAILING)
-                        .addGroup(glPnPatientInfo.createSequentialGroup()
-                            .addComponent(lblBirthdateHeader)
-                            .addPreferredGap(
-                                    ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
-                            .addComponent(lblBirthdate))
-                        .addGroup(glPnPatientInfo.createSequentialGroup()
-                            .addComponent(lblMiddlenameHeader)
-                            .addPreferredGap(
-                                    ComponentPlacement.RELATED, 140, Short.MAX_VALUE)
-                            .addComponent(lblMiddlename))
-                        .addGroup(glPnPatientInfo.createSequentialGroup()
-                            .addComponent(lblNameHeader)
-                            .addPreferredGap(
-                                    ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
-                            .addComponent(lblName))
-                        .addGroup(glPnPatientInfo.createSequentialGroup()
-                            .addComponent(lblSurnameHeader)
-                            .addPreferredGap(
-                                    ComponentPlacement.RELATED, 163, Short.MAX_VALUE)
-                            .addComponent(lblSurname))
-                        .addGroup(glPnPatientInfo.createSequentialGroup()
-                            .addComponent(
-                                    lblIdHeader, GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(lblId)))
-                        .addContainerGap())
-        );
-        glPnPatientInfo.setVerticalGroup(
-            glPnPatientInfo.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPnPatientInfo.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(lblIdHeader, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblId))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(lblSurnameHeader)
-                        .addComponent(lblSurname))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(lblNameHeader)
-                        .addComponent(lblName))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(lblMiddlenameHeader)
-                        .addComponent(lblMiddlename))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPnPatientInfo.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(lblBirthdateHeader, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblBirthdate))
-                    .addGap(173))
-        );
     }
 
     private void fillTalonTypePanel() {
@@ -558,13 +538,11 @@ public class TalonSelectFrame extends JFrame {
     }
 
     public final void fillPatientInfoLabels(final int patientId, final String patientSurname,
-            final String patientName, final String patientMiddlename, final long patientBirthdate,
-            final int idPvizit) {
+            final String patientName, final String patientMiddlename, final int idPvizit) {
         lblId.setText(String.valueOf(patientId));
         lblSurname.setText(patientSurname);
         lblName.setText(patientName);
         lblMiddlename.setText(patientMiddlename);
-        lblBirthdate.setText(DEFAULT_DATE_FORMAT.format(new Date(patientBirthdate)));
         curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
                 idPvizit);
     }
