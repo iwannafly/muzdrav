@@ -476,9 +476,9 @@ public class PacientInfoFrame extends JFrame {
             public void actionPerformed(ActionEvent arg0) {
                 try {
 //                    newPatBr = tbl_patient.addExternalItem();
-                    tfFam.requestFocus();
                     curPatientId = 0;
                     NewPatient();
+                    tfFam.requestFocus();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -549,23 +549,23 @@ public class PacientInfoFrame extends JFrame {
                     //PersonalInfo.nambk = new Nambk();
                     PersonalInfo.setDataz(new Date().getTime());
                     PersonalInfo.setNpasp(curPatientId);
-                    PersonalInfo.setFam(tfFam.getText().toUpperCase());
-                    PersonalInfo.setIm(tfIm.getText().toUpperCase());
-                    PersonalInfo.setOt(tfOt.getText().toUpperCase());
-                    PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText().toUpperCase());
-                    PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText().toUpperCase());
-                    PersonalInfo.setNamemr(tfMrname.getText().toUpperCase());
+                    if (!tfFam.getText().isEmpty()) PersonalInfo.setFam(tfFam.getText());
+                    if (!tfIm.getText().isEmpty()) PersonalInfo.setIm(tfIm.getText());
+                    if (!tfOt.getText().isEmpty()) PersonalInfo.setOt(tfOt.getText());
+                    if (!tf_Adm_kv.getText().isEmpty()) PersonalInfo.admAddress.setFlat(tf_Adm_kv.getText());
+                    if (!tf_Adp_kv.getText().isEmpty()) PersonalInfo.adpAddress.setFlat(tf_Adp_kv.getText());
+                    if (!tfMrname.getText().isEmpty()) PersonalInfo.setNamemr(tfMrname.getText());
                     if (!tfMr.getText().isEmpty()) PersonalInfo.setMrab(Integer.valueOf(tfMr.getText()));
-                    PersonalInfo.setProf(tfDolj.getText());
-                    PersonalInfo.setTel(tfTel.getText());
-                    PersonalInfo.setSnils(tf_Snils.getText().toUpperCase());
-                    PersonalInfo.setOdoc(tf_Odoc.getText());
-                    PersonalInfo.setDocser(tf_serdoc.getText());
-                    PersonalInfo.setDocnum(tf_nomdoc.getText());
-                    PersonalInfo.polis_dms.setSer(tf_dms_ser.getText().toUpperCase());
-                    PersonalInfo.polis_dms.setNom(tf_dms_nom.getText().toUpperCase());
-                    PersonalInfo.polis_oms.setSer(tf_oms_ser.getText().toUpperCase());
-                    PersonalInfo.polis_oms.setNom(tf_oms_nom.getText().toUpperCase());
+                    if (!tfDolj.getText().isEmpty()) PersonalInfo.setProf(tfDolj.getText());
+                    if (!tfTel.getText().isEmpty()) PersonalInfo.setTel(tfTel.getText());
+                    if (!tf_Snils.getText().isEmpty()) PersonalInfo.setSnils(tf_Snils.getText());
+                    if (!tf_Odoc.getText().isEmpty()) PersonalInfo.setOdoc(tf_Odoc.getText());
+                    if (!tf_serdoc.getText().isEmpty()) PersonalInfo.setDocser(tf_serdoc.getText());
+                    if (!tf_nomdoc.getText().isEmpty()) PersonalInfo.setDocnum(tf_nomdoc.getText());
+                    if (!tf_dms_ser.getText().isEmpty()) PersonalInfo.polis_dms.setSer(tf_dms_ser.getText());
+                    if (!tf_dms_nom.getText().isEmpty()) PersonalInfo.polis_dms.setNom(tf_dms_nom.getText());
+                    if (!tf_oms_ser.getText().isEmpty()) PersonalInfo.polis_oms.setSer(tf_oms_ser.getText());
+                    if (!tf_oms_nom.getText().isEmpty()) PersonalInfo.polis_oms.setNom(tf_oms_nom.getText());
 
                     if (tfDr.getDate() != null) PersonalInfo.setDatar(tfDr.getDate().getTime());
                     if (tf_datadoc.getDate() != null) PersonalInfo.setDatadoc(tf_datadoc.getDate().getTime());
@@ -586,20 +586,24 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_adp_obl.getSelectedItem() != null) PersonalInfo.setRegion_liv(cmb_adp_obl.getSelectedPcod());
                     PersonalInfo.adpAddress.setRegion(cmb_adp_obl.getText());
                     PersonalInfo.admAddress.setRegion(cmb_adm_obl.getText());
-                    if (cmb_adp_obl.getSelectedPcod() ==42)
-                        PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText().substring(0,cmb_adp_gorod.getText().indexOf('.')+1));
-                    else
-                        PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText());
-                    if (cmb_adm_obl.getSelectedPcod() ==42)
-                        PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText().substring(0,cmb_adm_gorod.getText().indexOf('.')+1));
-                    else
-                        PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText());
-                    PersonalInfo.admAddress.setStreet(cmb_adm_ul.getText());
-                    PersonalInfo.adpAddress.setStreet(cmb_adp_ul.getText());
+                    if (cmb_adp_obl.getSelectedPcod() != null){
+                        if (cmb_adp_obl.getSelectedPcod() == 42)
+                            PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText().substring(0,cmb_adp_gorod.getText().indexOf('.')+1));
+                        else
+                            PersonalInfo.adpAddress.setCity(cmb_adp_gorod.getText());
+                    }
+                    if (cmb_adm_obl.getSelectedPcod() != null){
+                        if (cmb_adm_obl.getSelectedPcod() == 42)
+                            PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText().substring(0,cmb_adm_gorod.getText().indexOf('.')+1));
+                        else
+                            PersonalInfo.admAddress.setCity(cmb_adm_gorod.getText());
+                    }
+                    if (!cmb_adm_ul.getText().isEmpty()) PersonalInfo.admAddress.setStreet(cmb_adm_ul.getText());
+                    if (!cmb_adp_ul.getText().isEmpty()) PersonalInfo.adpAddress.setStreet(cmb_adp_ul.getText());
                     if (cmb_adp_gorod.getSelectedItem() != null) PersonalInfo.setTer_liv(cmb_adp_gorod.getSelectedPcod());
-                    PersonalInfo.admAddress.setHouse(cmb_adm_dom.getText());
-                    PersonalInfo.adpAddress.setHouse(cmb_adp_dom.getText());
-                    PersonalInfo.setTerp(Terp);
+                    if (!cmb_adm_dom.getText().isEmpty()) PersonalInfo.admAddress.setHouse(cmb_adm_dom.getText());
+                    if (!cmb_adp_dom.getText().isEmpty()) PersonalInfo.adpAddress.setHouse(cmb_adp_dom.getText());
+                    if (Terp != 0) PersonalInfo.setTerp(Terp); else PersonalInfo.setTerp(0);
                     if (!tf_Cpol.getText().isEmpty()) PersonalInfo.setCpol_pr(Integer.valueOf(tf_Cpol.getText()));
 
                     if (!tf_Nambk.getText().isEmpty()) NambInfo.setNambk(tf_Nambk.getText());
@@ -620,9 +624,10 @@ public class PacientInfoFrame extends JFrame {
                         MainForm.tcl.updateNambk(NambInfo);
                         }
                 } catch (PatientAlreadyExistException paee) {
-                        System.out.println("Пациент не найден.");
+                	JOptionPane.showMessageDialog(tfFam, "Пациент существует. Сделайте поиск.");
+                    System.out.println("Пациент существует. Сделайте поиск.");
                 } catch (Exception e) {
-                        e.printStackTrace();
+                	e.printStackTrace();
                 }
              }
             });
@@ -3074,7 +3079,7 @@ public class PacientInfoFrame extends JFrame {
             cmb_Tdoc_pr.setVisible(false);
             cmb_org.setSelectedItem(null);
             cmb_ogrn.setData(null);
-            cmb_adm_obl.setData(null);
+//            cmb_adm_obl.setData(null);
             try {
                 tbl_lgota.setIntegerClassifierSelector(1, MainForm.tcl.getLKN());
                 tbl_kateg.setIntegerClassifierSelector(1, MainForm.tcl.getLKR());
@@ -3247,6 +3252,8 @@ public class PacientInfoFrame extends JFrame {
             cmb_dms_smo.setSelectedIndex(-1);
             cmb_adm_obl.setSelectedIndex(-1);
             cmb_adp_obl.setSelectedIndex(-1);
+            cmb_adm_obl.setText(null);
+            cmb_adp_obl.setText(null);
             cmb_adm_gorod.setSelectedIndex(-1);
             cmb_adp_gorod.setSelectedIndex(-1);
             cmb_adm_ul.setData(null);
