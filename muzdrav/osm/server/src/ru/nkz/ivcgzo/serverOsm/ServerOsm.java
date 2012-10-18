@@ -726,20 +726,6 @@ public class ServerOsm extends Server implements Iface {
 		
 	}
 
-	@Override
-	public void DeleteRdDin(int id_pos, int iD) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pos = ? and iD = ?", false, id_pos,iD);
-			sme.setCommit();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-			throw new KmiacServerException();
-		}
-		
-	}
 	
 //	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 //		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -2730,6 +2716,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				throw new PdispNotFoundException();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public void DeleteRdDin(int id_pos) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pos = ? ", false, id_pos);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
