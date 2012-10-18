@@ -106,10 +106,13 @@ public class CustomTextComponentWrapper {
 				
 				writeLock();
 				try {
-					if (length > 0)
-						getContent().remove(offset, length);
-					if (text != null && text.length() > 0)
+					if (text != null && text.length() > 0) {
+						if (length > 0)
+							getContent().remove(offset, length);
 						insertString(offset, text, attrs);
+					} else if (length > 0) {
+						remove(offset, length);
+					}
 				} finally {
 					writeUnlock();
 				}
