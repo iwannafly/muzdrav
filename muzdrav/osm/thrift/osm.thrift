@@ -719,7 +719,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
  
 	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void DeleteRdDin(1:i32 id_pos,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteRdDin(1:i32 id_pos) throws (1: kmiacServer.KmiacServerException kse);
 
 	void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
