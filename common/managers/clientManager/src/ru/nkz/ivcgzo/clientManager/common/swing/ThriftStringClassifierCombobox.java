@@ -40,6 +40,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	private Searcher searcher;
 	protected StringComboBoxModel model;
 	private boolean strict = true;
+	private boolean illegible = true;
 	
 	/**
 	 * Конструктор комбобокса с неотсортированным классификатором.
@@ -96,11 +97,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		items = new ArrayList<>(list.size());
 		itemsBcp = new ArrayList<>(list.size());
 		itemsLow = new ArrayList<>(list.size());
-		for (StringClassifier item : list) {
-			items.add(new StringClassifierItem(item));
-			itemsBcp.add(new StringClassifierItem(item));
-			itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
-		}
+		for (StringClassifier item : list)
+			if (item.isSetName())
+			{
+				items.add(new StringClassifierItem(item));
+				itemsBcp.add(new StringClassifierItem(item));
+				itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
+			}
 		setSelectedItem(null);
 		model.fireContentsChanged();
 	}
@@ -224,6 +227,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		if (isEditable()) {
 			strict = value;
 		}
+	}
+	
+	/**
+	 * Устанавливает нечеткий поиск.
+	 */
+	public void setIllegibleSearch(boolean value) {
+		illegible = value;
 	}
 	
 	/**
@@ -363,9 +373,15 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 				
 				if (i == itemsBcp.size()) {
 					items = new ArrayList<>();
-					for (i = 0; i < itemsBcp.size(); i++)
-						if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
-							items.add(itemsBcp.get(i));
+					if (illegible) {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
+								items.add(itemsBcp.get(i));
+					} else {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) == 0)
+								items.add(itemsBcp.get(i));
+					}
 				}
 			}
 			SwingUtilities.invokeLater(new Runnable() {
@@ -381,7 +397,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 						}
 						model.fireContentsChanged();
 						editor.setText(srcStrLow);
-						editor.setCaretPosition(pos);
+						if (pos < editor.getText().length())
+							editor.setCaretPosition(pos);
 						if (getSelectedItem() != null)
 							if (getSelectedItem().name.toLowerCase().equals(srcStrLow))
 								editor.selectAll();

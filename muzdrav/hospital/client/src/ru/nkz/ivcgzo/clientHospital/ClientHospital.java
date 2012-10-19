@@ -18,6 +18,7 @@ public class ClientHospital extends Client<ThriftHospital.Client> {
 
     public static ThriftHospital.Client tcl;
     private MainFrame mainFrame;
+    public static Client<ThriftHospital.Client> instance;
 
     public ClientHospital(final ConnectionManager conMan, final UserAuthInfo authInfo,
             final int accessParam) throws IllegalAccessException, NoSuchMethodException,
@@ -27,6 +28,7 @@ public class ClientHospital extends Client<ThriftHospital.Client> {
         super(conMan, authInfo, ThriftHospital.Client.class, configuration.appId,
                 configuration.thrPort, accessParam);
         initialize(authInfo);
+        instance = this;
     }
 
     private void initialize(final UserAuthInfo authInfo) throws MalformedURLException,

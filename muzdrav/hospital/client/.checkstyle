@@ -5,6 +5,7 @@
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
   <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/ru/nkz/ivcgzo/clientHospital/resources"/>
     <filter-data value="config"/>
     <filter-data value="gen-java"/>
   </filter>

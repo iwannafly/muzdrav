@@ -142,7 +142,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	list<TSimplePatient> getAllPatientFromOtd(1:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);	
-	TPatient getPatientPersonalInfo(1:i32 patientId) throws (1:PatientNotFoundException pnfe,
+	TPatient getPatientPersonalInfo(1:i32 patientId, 2:i32 idGosp) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
