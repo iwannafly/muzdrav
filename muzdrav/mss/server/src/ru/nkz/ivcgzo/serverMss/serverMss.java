@@ -315,7 +315,7 @@ public class serverMss extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_z00() throws TException, KmiacServerException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod_s AS pcod, name_s AS name FROM n_z00 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod_s AS pcod, name_s AS name FROM n_z00 WHERE pcod_s > 0")) {
 			return 	mssClass.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -327,24 +327,41 @@ public class serverMss extends Server implements Iface {
 	 * и корешка медицинского свидетельства
 	 * @throws Exception 
 	 */
+	@Override
     public final String printMedSS(final String docInfo) throws KmiacServerException {
     	final String path;
+    	String per1 = "";
+    	int counter = 0;
+    	int i = 0;
+    	int lens = docInfo.length();
+//		System.out.println(docInfo);
+
     	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-       	String medsv = setReportPath();
+       //	String medsv = setReportPath();
     	// загружаем шаблон
     	HtmShablon htmTemplate = new HtmShablon( new File(this.getClass().getProtectionDomain().getCodeSource()
                 .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
                 + "\\plugin\\reports\\ShMSS.htm");
+   // 	for (String label:htmTemplate.getLabels()){
+   // 		System.out.println(label);
+   // 	}
+    	while ( counter < lens) {
+    		if (!docInfo.substring(counter,counter+1).equals("#") ) {
+    			per1 += docInfo.substring(counter, counter+1);
+    		}else { if (per1.length() == 0) per1 ="null";
+    		htmTemplate.replaceText(htmTemplate.getLabels().get(i), per1);
+    	//	System.out.println(String.valueOf(i)+";"+per1);
+    		per1 = "";
+    		i++;
+    	}
+    		counter++;
+    	}
     	System.out.println(htmTemplate.getLabelsCount());
-    	System.out.println(htmTemplate);
-  //  	htmTemplate.replaceLabels(true,
- //   			tfSer.getText().trim(),
- //   			tfNomer.getText().trim()
- //   			);
+    	osw.write(htmTemplate.getTemplateText());
         return path;
     } catch (Exception e) {
-        throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+        throw new  KmiacServerException(); 
     }   	
    }
     
