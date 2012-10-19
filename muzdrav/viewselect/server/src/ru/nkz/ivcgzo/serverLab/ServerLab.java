@@ -153,7 +153,7 @@ public class ServerLab extends Server implements Iface {
                 new ThriftLab.Processor<Iface>(this);
 
         tServer = new TThreadedSelectorServer(new Args(
-                new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
+                new TNonblockingServerSocket(configuration.labThrPort)).processor(proc));
         log.log(Level.INFO, "lab server started");
         tServer.serve();
     }

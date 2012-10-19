@@ -17,10 +17,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultButtonModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.DefaultButtonModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -50,7 +50,6 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -171,7 +170,6 @@ public class Vvod extends JFrame {
 	private FormSign sign;
 	private FormPostBer postber;
 	private ShablonForm shablonform;
-	private FormRdDin dinform;
 	private DispHron disphron;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbVidStacionar;
 	private JLabel lblVidStacionar;
@@ -359,8 +357,7 @@ public class Vvod extends JFrame {
 		btnRecPriem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                 try {
-					IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
-					client.showModal(MainForm.instance, zapVr.npasp, zapVr.fam, zapVr.im, zapVr.oth, zapVr.datar, zapVr.id_pvizit);
+                	MainForm.conMan.showReceptionRecordForm(zapVr.npasp, zapVr.fam, zapVr.im, zapVr.oth, zapVr.id_pvizit);
 					
 					checkZapVrNext();
 				} catch (Exception e1) {

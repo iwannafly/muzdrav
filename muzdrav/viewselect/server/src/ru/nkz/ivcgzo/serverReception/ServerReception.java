@@ -121,7 +121,7 @@ public class ServerReception extends Server implements Iface {
         ThriftReception.Processor<Iface> proc =
                 new ThriftReception.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(
-                new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
+                new TNonblockingServerSocket(configuration.recThrPort)).processor(proc));
         log.info("Start serverReception");
         thrServ.serve();
     }
