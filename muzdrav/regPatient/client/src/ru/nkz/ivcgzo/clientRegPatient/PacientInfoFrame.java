@@ -1,17 +1,16 @@
 package ru.nkz.ivcgzo.clientRegPatient;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -27,10 +26,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -38,9 +36,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.clientManager.common.IClient;
+import org.apache.thrift.TException;
+import org.eclipse.wb.swing.FocusTraversalOnArray;
+
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
@@ -661,20 +660,7 @@ public class PacientInfoFrame extends JFrame {
                         btnShowTalonSelectModule.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent arg0) {
-                                try {
-                                	long patientBirthdate = 0;
-                                	int patientId = curPatientId;
-                                    String patientSurname = tfFam.getText();
-                                    String patientName = tfIm.getText();
-                                    String patientMiddlename = tfOt.getText();
-                                    if (tfDr.getDate() != null) patientBirthdate = tfDr.getDate().getTime();
-                                    int idPvizit = 0;
-                                    IClient client = MainForm.conMan.getPluginLoader().loadPluginByAppId(10);
-                                    client.showModal(MainForm.instance, patientId, patientSurname, patientName, patientMiddlename,
-                                            patientBirthdate,  idPvizit);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                            	MainForm.conMan.showReceptionRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), 0);
                             }
                         });
 
