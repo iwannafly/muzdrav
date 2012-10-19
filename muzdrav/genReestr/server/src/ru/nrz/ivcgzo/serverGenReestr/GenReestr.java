@@ -506,10 +506,10 @@ public class GenReestr extends Server implements Iface {
         String isl = null;
         boolean flag = false;
 		AutoCloseableResultSet acr;
-		
-        if (vidr == 1) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0";
-        if (vidr == 2) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11))";
-        if (vidr == 3) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)";
+
+        if (vidr == 1) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0";
+        if (vidr == 2) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11))";
+        if (vidr == 3) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)";
 
         try {
 			acr = sse.execPreparedQuery("select tip from n_lds where pcod=?", cpodr);
@@ -552,7 +552,8 @@ public class GenReestr extends Server implements Iface {
 							"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
 							"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
 							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
-					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
+							  "JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
 					isl = "Л";
 				}
 				if (acr.getResultSet().getString("tip").equals("Д") || acr.getResultSet().getString("tip").equals("Т")){
@@ -593,7 +594,8 @@ public class GenReestr extends Server implements Iface {
 							"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
 							"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
 							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
-					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_d d ON (ld.nisl = d.nisl) ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_d d ON (ld.nisl = d.nisl) "+
+							  "JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
 					isl = "Д";
 				}
 			}
@@ -657,7 +659,8 @@ public class GenReestr extends Server implements Iface {
 
 				if (isl.equals("Л"))
 					sqlmed = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.cpok,2)::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+							"substr(d.cpok,2,length(d.cpok))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+//							"substr(?,2,length(?))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
 							"1::integer AS c_mu, 1::integer AS pl_extr, "+
 							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
 							"(select get_kodsp(ld.cuser))::integer AS spec, " +
@@ -668,7 +671,8 @@ public class GenReestr extends Server implements Iface {
 							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt ";
 				if (isl.equals("Д"))
 					sqlmed = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.kodisl,2)::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+							"substr(d.kodisl,2,length(d.kodisl))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+//							"substr(?,2,length(?))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
 							"1::integer AS c_mu, 1::integer AS pl_extr, "+
 							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
 							"(select get_kodsp(ld.cuser))::integer AS spec, " +

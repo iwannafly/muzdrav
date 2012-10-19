@@ -80,6 +80,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
+import java.awt.Color;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -382,7 +383,8 @@ public class PacientInfoFrame extends JFrame {
         setContentPane(contentPane);
 
         JPanel pl_print = new JPanel();
-        pl_print.setBorder(new TitledBorder(null, "\u041F\u0435\u0447\u0430\u0442\u044C \u0442\u0438\u0442\u0443\u043B\u044C\u043D\u043E\u0433\u043E \u043B\u0438\u0441\u0442\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        pl_print.setForeground(Color.BLUE);
+        pl_print.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u041F\u0435\u0447\u0430\u0442\u044C \u0442\u0438\u0442\u0443\u043B\u044C\u043D\u043E\u0433\u043E \u043B\u0438\u0441\u0442\u0430", TitledBorder.LEADING, TitledBorder.TOP, null, Color.BLUE));
 
         final JTabbedPane tbMain = new JTabbedPane(JTabbedPane.TOP);
         tbMain.addChangeListener(new ChangeListener() {
@@ -506,6 +508,7 @@ public class PacientInfoFrame extends JFrame {
                         public void run() {
                             cmb_adp_obl.setText(PersonalInfo.adpAddress.region);
                             cmb_adm_obl.setText(PersonalInfo.admAddress.region);
+                            cmb_adp_obl.setSelectedPcod(PersonalInfo.getRegion_liv());
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -968,7 +971,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    IntegerClassifier res = MainForm.conMan.showMrabTreeForm("место работы", 0);
+                    IntegerClassifier res = MainForm.conMan.showMrabTreeForm("место работы", Integer.valueOf(tfMr.getText()));
 
                     if (res != null) {
                            tfMr.setText(Integer.toString(res.pcod));
@@ -3252,14 +3255,20 @@ public class PacientInfoFrame extends JFrame {
             cmb_dms_smo.setSelectedIndex(-1);
             cmb_adm_obl.setSelectedIndex(-1);
             cmb_adp_obl.setSelectedIndex(-1);
-            cmb_adm_obl.setText(null);
-            cmb_adp_obl.setText(null);
             cmb_adm_gorod.setSelectedIndex(-1);
             cmb_adp_gorod.setSelectedIndex(-1);
             cmb_adm_ul.setData(null);
             cmb_adp_ul.setData(null);
             cmb_adp_dom.setData(null);
             cmb_adm_dom.setData(null);
+//            cmb_adm_obl.setText(null);
+//            cmb_adp_obl.setText(null);
+//            cmb_adm_gorod.setText(null);
+//            cmb_adp_gorod.setText(null);
+//            cmb_adm_ul.setText(null);
+//            cmb_adp_ul.setText(null);
+//            cmb_adm_dom.setText(null);
+//            cmb_adp_dom.setText(null);
 
 			LgotaInfo = new ArrayList<Lgota>();
 			KontingentInfo =  new ArrayList<Kontingent>();
