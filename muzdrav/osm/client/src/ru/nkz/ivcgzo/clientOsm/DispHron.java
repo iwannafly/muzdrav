@@ -100,12 +100,7 @@ public class DispHron extends JFrame{
 		bSaveDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					pmer.setCod_sp(tblDispHron.getSelectedItem().getCod_sp());
-					pmer.setPmer(tblDispHron.getSelectedItem().getPmer());
-					pmer.setPdat(tblDispHron.getSelectedItem().getPdat());
-					pmer.setFdat(tblDispHron.getSelectedItem().getFdat());
-					pmer.setRez(tblDispHron.getSelectedItem().getRez());
-					pmer.setCdol(tblDispHron.getSelectedItem().getCdol());
+					pmer = tblDispHron.getSelectedItem();
 					if (tfDkl.getDate() != null)pmer.setDkl(tfDkl.getDate().getTime());
 					if (tfDkl.getDate() != null)pmer.setDnl(tfDnl.getDate().getTime());
 					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText())); 
@@ -119,7 +114,6 @@ public class DispHron extends JFrame{
 								if (pm != pmer)
 									if (pm.getPmer() == pmer.getPmer() && pm.getPdat() == pmer.getPdat()) {
 										JOptionPane.showMessageDialog(DispHron.this, "Такое мероприятие уже существует");
-										tblDispHron.cancelEdit();
 										pmer = tblDispHron.getSelectedItem();
 										return;
 									}

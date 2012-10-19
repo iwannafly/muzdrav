@@ -1,5 +1,8 @@
 package ru.nkz.ivcgzo.serverMss;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +17,7 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverMss.HtmShablon;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
@@ -311,7 +315,7 @@ public class serverMss extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> get_n_z00() throws TException, KmiacServerException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod_s AS pcod, name_s AS name FROM n_z00 ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod_s AS pcod, name_s AS name FROM n_z00 WHERE pcod_s > 0")) {
 			return 	mssClass.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -319,7 +323,70 @@ public class serverMss extends Server implements Iface {
 		}
 	}
 
+	/** печать медицинского свидетельства о смерти 
+	 * и корешка медицинского свидетельства
+	 * @throws Exception 
+	 */
+	@Override
+    public final String printMedSS(final String docInfo) throws KmiacServerException {
+    	final String path;
+    	String per1 = "";
+    	int counter = 0;
+    	int i = 0;
+    	int lens = docInfo.length();
+//		System.out.println(docInfo);
 
+    	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+       //	String medsv = setReportPath();
+    	// загружаем шаблон
+    	HtmShablon htmTemplate = new HtmShablon( new File(this.getClass().getProtectionDomain().getCodeSource()
+                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                + "\\plugin\\reports\\ShMSS.htm");
+   // 	for (String label:htmTemplate.getLabels()){
+   // 		System.out.println(label);
+   // 	}
+    	while ( counter < lens) {
+    		if (!docInfo.substring(counter,counter+1).equals("#") ) {
+    			per1 += docInfo.substring(counter, counter+1);
+    		}else { if (per1.length() == 0) per1 ="null";
+    		htmTemplate.replaceText(htmTemplate.getLabels().get(i), per1);
+    	//	System.out.println(String.valueOf(i)+";"+per1);
+    		per1 = "";
+    		i++;
+    	}
+    		counter++;
+    	}
+    	System.out.println(htmTemplate.getLabelsCount());
+    	osw.write(htmTemplate.getTemplateText());
+        return path;
+    } catch (Exception e) {
+        throw new  KmiacServerException(); 
+    }   	
+   }
+    
+    private boolean isWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //windows
+        return (os.indexOf("win") >= 0);
+    }
+
+    private boolean isUnix() {
+        String os = System.getProperty("os.name").toLowerCase();
+        //linux or unix
+        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
+    }
+    private String setReportPath() {
+        if (isWindows()) {
+            System.out.println("Нашли винду");
+            return "C:\\work\\МСС\\м_свид_"+".htm";
+        } else if (isUnix()) {
+            return System.getProperty("user.home")
+                    + "/Work/МСС/м_свид_"+".htm";
+        } else {
+            return "м_свид_"+".htm";
+        }
+    }
 
 
 		
