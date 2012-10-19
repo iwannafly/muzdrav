@@ -29,6 +29,7 @@ import javax.swing.table.TableRowSorter;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.clientLab.ClientLab;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
@@ -64,6 +65,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ViewPolpTreeForm polpFrm;
 	public ViewMrabTreeForm mrabFrm;
 	public PatientInfoForm infFrm;
+	public ClientLab labFrm;
+	public ru.nkz.ivcgzo.clientReception.MainForm recFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -240,7 +243,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		sorter.setRowFilter(rf);
 	}
 	
-	private void initModalForms() {
+	private void initModalForms() throws IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
 		if (ccm == null)
 			ccm = new ClassifierManager();
 		
@@ -251,6 +254,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		polpFrm = new ViewPolpTreeForm();
 		mrabFrm = new ViewMrabTreeForm();
 		infFrm = new PatientInfoForm();
+		labFrm = new ClientLab(conMan, authInfo, 0);
+		recFrm = new ru.nkz.ivcgzo.clientReception.MainForm(conMan, authInfo, 0);
 	}
 	
 	@Override
@@ -429,6 +434,14 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						infFrm.removeModalityListener();
 						disposeModal();
 					}
+					
+				case 18:
+					labFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
+					break;
+					
+				case 19:
+					recFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
+					break;
 				}
 			}
 		
