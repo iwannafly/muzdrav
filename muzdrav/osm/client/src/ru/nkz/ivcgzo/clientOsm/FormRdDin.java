@@ -67,7 +67,6 @@ public class FormRdDin extends JFrame {
     private int cerdname;
     private int cerdname1;
     CustomDateEditor SDataPos;
-    CustomDateEditor SDataSl;
 	private ThriftStringClassifierCombobox<StringClassifier> CBDiag;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPolPl;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPredPl;
@@ -183,8 +182,6 @@ public class FormRdDin extends JFrame {
 		STolP.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		
 		CBOteki = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db5);
-		
-		SDataSl = new CustomDateEditor();
 		setBounds(100, 100, 810, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -234,13 +231,14 @@ public class FormRdDin extends JFrame {
 						.addComponent(LSerd)
 						.addComponent(LPredPl))
 					.addGap(29)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addComponent(CBSerd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(CBPredPl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(CBCerd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(CBPolPl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(SChcc, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(115, Short.MAX_VALUE))
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(SChcc, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+						.addComponent(CBPredPl, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+						.addComponent(CBSerd1, 0, 0, Short.MAX_VALUE)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(CBPolPl, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+							.addComponent(CBCerd, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 91, Short.MAX_VALUE)))
+					.addContainerGap(41, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
@@ -290,8 +288,6 @@ public class FormRdDin extends JFrame {
 		JLabel LtolPlac = new JLabel("Толщина плаценты");
 		
 		JLabel LOteki = new JLabel("Отеки");
-		
-		JLabel LDataSl = new JLabel("Дата следующего посещения");
 		
 		
 		JButton SButton = new JButton("");
@@ -484,7 +480,7 @@ try {
 										.addGroup(gl_panel_1.createSequentialGroup()
 											.addComponent(LPsad)
 											.addGap(18)
-											.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+											.addComponent(SPsad))))
 								.addComponent(LVes)
 								.addComponent(LSrok)
 								.addGroup(gl_panel_1.createSequentialGroup()
@@ -493,7 +489,7 @@ try {
 									.addComponent(STolP, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(LOteki)
-									.addPreferredGap(ComponentPlacement.RELATED, 116, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED, 115, Short.MAX_VALUE)
 									.addComponent(CBOteki, GroupLayout.PREFERRED_SIZE, 318, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -501,26 +497,21 @@ try {
 									.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
 									.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-										.addComponent(LDataPos)
-										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
-											.addGroup(gl_panel_1.createSequentialGroup()
-												.addComponent(LVdm)
-												.addGap(100)
-												.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE))
-											.addGroup(gl_panel_1.createSequentialGroup()
-												.addComponent(LOkrJ)
-												.addGap(18)
-												.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-													.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-													.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
-													.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
-													.addComponent(SOkrj, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)))))
-									.addGap(18)
-									.addComponent(LDataSl)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(SDataSl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+									.addComponent(LDataPos)
+									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
+										.addGroup(gl_panel_1.createSequentialGroup()
+											.addComponent(LVdm)
+											.addGap(100)
+											.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE))
+										.addGroup(gl_panel_1.createSequentialGroup()
+											.addComponent(LOkrJ)
+											.addGap(18)
+											.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+												.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+												.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+												.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
+												.addComponent(SOkrj, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)))))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(LDiag)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -544,10 +535,7 @@ try {
 							.addComponent(LDataPos))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(LDataSl)
-								.addComponent(SDataSl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+							.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(LSrok)
