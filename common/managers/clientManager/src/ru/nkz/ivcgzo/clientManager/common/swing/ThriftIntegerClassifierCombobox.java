@@ -397,6 +397,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 						}
 						model.fireContentsChanged();
 						editor.setText(srcStrLow);
+
 						if (pos < editor.getText().length())
 							editor.setCaretPosition(pos);
 						if (getSelectedItem() != null)

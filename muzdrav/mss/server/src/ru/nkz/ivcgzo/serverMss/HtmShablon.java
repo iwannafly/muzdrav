@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientMss;
+package ru.nkz.ivcgzo.serverMss;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -233,7 +233,9 @@ public class HtmShablon {
      * @param value - текст, заменяющий метку в шаблоне
      */
     public final void replaceText(final String textForReplace, final String value) {
-        template = template.replace(textForReplace, value);
+    	System.out.println(textForReplace+";"+value);
+
+    	template = template.replace(textForReplace, value);
     }
 
     /**
@@ -249,6 +251,8 @@ public class HtmShablon {
             e.printStackTrace();
         }
     }
+    
 
 
 }
+
