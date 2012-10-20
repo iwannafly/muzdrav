@@ -2300,12 +2300,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		Date p1; Date p2; Date p3; Date p4; Date p5; Date p6; Date p7;
-		Date p8;
+		Date p8; Date p9; Date p10;
 		Integer ball1;Integer ball2;Integer ball3;
 		Integer ball4;Integer ball5;Integer grk;
 		Integer kod2; Integer kod3; Integer kod4;Integer kod5;
 		Integer kod6; Integer kod7; Integer kod8; Integer kod9;
-		Integer j = 0;
+		Integer j = 0;Integer hr; Integer disp1;
 		Integer risk ;Integer kontr;Integer rod;
 		Integer grot; Integer hsm; Integer hal; Integer hdr;
 		Integer pr; Integer ek; Integer ru;Integer otec; Integer iw2;
@@ -2347,6 +2347,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
         //  Con_sob
 		StringBuilder sb5 = new StringBuilder(0x10000);
 		sb5.append("nsob;uid;obr;sem;height;weight;priv;prof;proj;osl;ak;eks;gen;sost;point1;point2;point3;point4;point5;sob_date");
+		
+		StringBuilder sb6 = new StringBuilder(0x10000);
+		sb6.append("numd;uid;uid_pol;ddiag;spz;diag;dpdiag;un;vp");
 //		for (int j = 0; j < rdPatient.size(); j++) {
 //			RdPatient rdp = rdPatient.get(j);
 //			
@@ -2409,8 +2412,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
  		
 		//Con_diagn.csv
-			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex,d.d_vz,d.xzab,d.disp,s.name from p_diag d,n_c00 c,n_s00 s where d.diag = c.pcod and d.cdol_ot = s.pcod and d.npasp=?",rdp.npasp)) {
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("select d.diag,c.dex,d.d_vz,d.xzab,d.disp,s.name,da.datad from p_diag d,n_c00 c,n_s00 s, p_diag_amb da  where d.diag = c.pcod and d.cdol_ot = s.pcod  and da.id = d.id_diag_amb and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
+					p9 = new Date(acrs21.getResultSet().getLong(6));
+					p10 = new Date(acrs21.getResultSet().getLong(6));
+					if (acrs21.getResultSet().getInt(4) == 1) disp1 = 0; else disp1 = 0;
+					if (acrs21.getResultSet().getInt(3) == 1) hr = 1; else hr = 0;
+					sb6.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%s;%s;%7$td.%7$tm.%7$tY;%s;%d", j,rdp.npasp,rdp.npasp,p1,acrs21.getResultSet().getString(5),acrs21.getResultSet().getString(0),p2,acrs21.getResultSet().getString(5),disp1,hr));		
 	//				dex = dex + ' '+ acrs1.getResultSet().getString(0);	
 			if (acrs21.getResultSet().getString(1) == "dex1"){ dex1 =dex1 + ' '+ acrs21.getResultSet().getString(0);
 			k1 = k1+1; k2 = 1;}	
