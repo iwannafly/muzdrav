@@ -2409,7 +2409,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
  		
 		//Con_diagn.csv
-			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex,d.d_vz,d.xzab,d.disp,s.name from p_diag d,n_c00 c,n_s00 s where d.diag = c.pcod and d.cdol_ot = s.pcod and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
 	//				dex = dex + ' '+ acrs1.getResultSet().getString(0);	
 			if (acrs21.getResultSet().getString(1) == "dex1"){ dex1 =dex1 + ' '+ acrs21.getResultSet().getString(0);
