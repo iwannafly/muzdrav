@@ -507,7 +507,7 @@ public class PacientInfoFrame extends JFrame {
                         public void run() {
                             cmb_adp_obl.setText(PersonalInfo.adpAddress.region);
                             cmb_adm_obl.setText(PersonalInfo.admAddress.region);
-                            cmb_adp_obl.setSelectedPcod(PersonalInfo.getRegion_liv());
+//                            cmb_adp_obl.setSelectedPcod(PersonalInfo.getRegion_liv());
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
