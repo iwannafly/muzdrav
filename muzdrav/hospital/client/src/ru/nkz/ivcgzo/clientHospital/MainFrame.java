@@ -7,8 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +15,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -709,7 +706,7 @@ public class MainFrame extends JFrame {
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "История жизни сохранена", "Операция успешно завершена",
                             JOptionPane.INFORMATION_MESSAGE);
-                    } catch (KmiacServerException | TException e1) {
+                    } catch (TException e1) {
                         JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
                             + "изменении истории жизни. Информация не будет сохранена!",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -869,10 +866,10 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (MedicalHistoryNotFoundException e1) {
             tbMedHist.setData(new ArrayList<TMedicalHistory>());
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
 
     }
@@ -914,10 +911,10 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (MedicalHistoryNotFoundException e) {
             tbMedHist.setData(new ArrayList<TMedicalHistory>());
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
     }
 
@@ -1239,11 +1236,11 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (DiagnosisNotFoundException e1) {
             tbDiag.setData(new ArrayList<TDiagnosis>());
             //e1.printStackTrace();
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
     }
 
@@ -1291,10 +1288,10 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (DiagnosisNotFoundException e) {
             tbDiag.setData(new ArrayList<TDiagnosis>());
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
     }
 

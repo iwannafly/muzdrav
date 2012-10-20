@@ -236,7 +236,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					nomerMss = MainForm.tcl.getPsmertdop(cuserPodr, cuserCslu, cuserClpu);
 					nextNomer = nomerMss.nomer_t+1;
 					
-				} catch (MssdopNotFoundException | TException e0) {
+				} catch (TException e0) {
 					
 					e0.printStackTrace();
 				}
@@ -244,7 +244,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 					try {
 						UFio = MainForm.tcl.getUserFio(cuserId);
 						cuserFio = UFio.getFam().trim() + ' '+ UFio.getIm().trim()+ ' ' + UFio.getOt().trim();
-					} catch (UserNotFoundException | TException e2) {
+					} catch (TException e2) {
 						// TODO Auto-generated catch block
 						e2.printStackTrace();
 					}
@@ -317,7 +317,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 							UFio = MainForm.tcl.getUserFio(cuserId);
 							cuserFio = UFio.getFam().trim() + ' '+ UFio.getIm().trim()+ ' ' + UFio.getOt().trim();
 							tfZapolnil.setText(cuserFio);
-						} catch (UserNotFoundException | TException e2) {
+						} catch (TException e2) {
 							// TODO Auto-generated catch block
 							e2.printStackTrace();
 						}
@@ -412,15 +412,15 @@ public class MainForm extends Client<ThriftMss.Client> {
 							
 						//	JOptionPane.showMessageDialog(frame, String.format("Нет информации на пациента %d", res[0]));
 					}
-					} catch (TException e1) {
-						e1.printStackTrace();
-						MainForm.conMan.reconnect(e1);
 					} catch (KmiacServerException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (PatientNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+					} catch (TException e1) {
+						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
 					}
 				}
 			}
@@ -2374,7 +2374,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 			tfCvrach.setData(MainForm.tcl.gets_vrach(cuserClpu, cuserCslu, cuserPodr));
 			cmbCdol.setData(MainForm.tcl.gets_dolj(cuserClpu, cuserCslu, cuserPodr));
 			
-		} catch (KmiacServerException | TException e) {
+		} catch (TException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

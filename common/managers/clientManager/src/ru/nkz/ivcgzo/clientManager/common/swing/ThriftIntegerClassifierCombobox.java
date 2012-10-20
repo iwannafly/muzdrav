@@ -206,15 +206,17 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			}
 		}
 		
-		if (searcher == null)
+		if (searcher == null) {
 			setSelectedItem(selItem);
-		else
+		} else {
 			try {
 				searcher.setSearchEnabled(false);
 				setSelectedItem(selItem);
+				setText(selItem.name);
 			} finally {
 				searcher.setSearchEnabled(true);
 			}
+		}
 		
 		if (selItem == null)
 			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
@@ -252,15 +254,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 	 * Устанавливает текст в поле ввода.
 	 */
 	public void setText(String text) {
-		if (isEditable()) {
+		if (isEditable())
 			((JTextComponent) getEditor().getEditorComponent()).setText(text);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					hidePopup();
-				}
-			});
-		}
 	}
 	
 	class IntegerComboBoxModel extends DefaultComboBoxModel<IntegerClassifier> {
@@ -363,6 +358,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			if (srcStrLow.length() == 0) {
 				items = itemsBcp;
 				setSelectedItem(null);
+				model.fireContentsChanged();
+				return;
 			} else {
 				int i;
 				for (i = 0; i < itemsBcp.size(); i++)
@@ -396,9 +393,14 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 							setSelectedItem(null);
 						}
 						model.fireContentsChanged();
+						if (items.size() == 1)
+							setSelectedIndex(0);
+						else if (selItem != null)
+							setSelectedItem(selItem);
 						editor.setText(srcStrLow);
-
-						if (pos < editor.getText().length())
+						if (pos == 0)
+							pos = editor.getText().length();
+						if (pos <= editor.getText().length())
 							editor.setCaretPosition(pos);
 						if (getSelectedItem() != null)
 							if (getSelectedItem().name.toLowerCase().equals(srcStrLow))
@@ -406,7 +408,7 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 					} finally {
 						searcher.setSearchEnabled(true);
 					}
-					if ((selItem == null) || (prevSelItem != selItem))
+					if (((selItem == null) || (prevSelItem != selItem)) && editor.hasFocus())
 						cmb.showPopup();
 					prevSelItem = selItem;
 				}
@@ -432,8 +434,15 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 		public Object getItem() {
 			IntegerClassifier selItem = ThriftIntegerClassifierCombobox.this.getSelectedItem();
 			
-			if (selItem == null && strict)
-				setText(null);
+			try {
+				searcher.setSearchEnabled(false);
+				if (selItem != null)
+					setText(selItem.name);
+				else if (strict)
+					setText(null);
+			} finally {
+				searcher.setSearchEnabled(true);
+			}
 			
 			return selItem;
 		}
