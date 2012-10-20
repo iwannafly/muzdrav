@@ -30,7 +30,7 @@ public class ReservedTalonTableModel implements TableModel {
             reservedTalons = MainForm.tcl.getReservedTalons(cpol, cdol, doctorId, patientId);
         } catch (TalonNotFoundException e) {
             reservedTalons = Collections.emptyList();
-        } catch (KmiacServerException | TException e) {
+        } catch (TException e) {
             e.printStackTrace();
         }
     }

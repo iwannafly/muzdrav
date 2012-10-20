@@ -40,7 +40,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.fileTransferConstants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
@@ -395,9 +395,9 @@ public class ConnectionManager {
 		int port = openWriteServerSocket(dstPath);
 		try (FileInputStream fis = new FileInputStream(srcPath);
 				Socket socket = new Socket("localhost", port);) {
-			byte[] buf = new byte[Constants.bufSize];
-			int read = Constants.bufSize;
-			while (read == Constants.bufSize) {
+			byte[] buf = new byte[fileTransferConstants.bufSize];
+			int read = fileTransferConstants.bufSize;
+			while (read == fileTransferConstants.bufSize) {
 				read = fis.read(buf);
 				socket.getOutputStream().write(buf, 0, read);
 			}
@@ -411,7 +411,7 @@ public class ConnectionManager {
 		int port = openReadServerSocket(srcPath);
 		try (FileOutputStream fos = new FileOutputStream(dstPath);
 				Socket socket = new Socket("localhost", port);) {
-			byte[] buf = new byte[Constants.bufSize];
+			byte[] buf = new byte[fileTransferConstants.bufSize];
 			int read = socket.getInputStream().read(buf);
 			while (read > -1) {
 				fos.write(buf, 0, read);

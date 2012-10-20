@@ -203,7 +203,7 @@ public class Option {
 							}
 						} 
 						
-				} catch (TException | S_ot01ExistsException e) {
+				} catch (TException e) {
 					e.printStackTrace();
 				}
 				
@@ -365,7 +365,7 @@ public class Option {
 						ts_ot01.repaint();
 					} 
 					
-			} catch (TException | S_ot01ExistsException e) {
+			} catch (TException e) {
 				e.printStackTrace();
 			}
 				

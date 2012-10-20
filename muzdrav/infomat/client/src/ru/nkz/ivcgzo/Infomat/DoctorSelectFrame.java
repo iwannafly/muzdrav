@@ -28,13 +28,12 @@ public class DoctorSelectFrame extends JFrame {
     private JPanel pnMain;
     private JPanel pnButton;
     private JButton btnBackward;
-    private JButton btnForward;
+//    private JButton btnForward;
     private JScrollPane spSpeciality;
     private JList<Speciality> lSpeciality;
     private JScrollPane spDoctor;
     private JList<Doctor> lDoctor;
     private DoctorListModel dlm;
-    private Component horizontalGlue_1;
 
 
     public DoctorSelectFrame () {
@@ -98,9 +97,10 @@ public class DoctorSelectFrame extends JFrame {
         pnButton.setBackground(Color.WHITE);
         pnMain.add(pnButton);
         pnButton.setLayout(new BoxLayout(pnButton, BoxLayout.X_AXIS));
-
+        
+        addLeftHorizontalDelimiter();
         addBackwardButton();
-        addHorizontalDelimiter();
+        addRightHorizontalDelimiter();
 //        addForwardButton();
     }
 
@@ -111,21 +111,22 @@ public class DoctorSelectFrame extends JFrame {
                 setVisible(false);
             }
         });
-        {
-            horizontalGlue_1 = Box.createHorizontalGlue();
-            pnButton.add(horizontalGlue_1);
-        }
         btnBackward.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/backwardButton.png")));
+                "resources/backward.png")));
         btnBackward.setBorder(null);
         btnBackward.setBackground(Color.WHITE);
         btnBackward.setForeground(Color.BLACK);
         pnButton.add(btnBackward);
     }
 
-    private void addHorizontalDelimiter() {
-        Component horizontalGlue = Box.createHorizontalGlue();
-        pnButton.add(horizontalGlue);
+    private void addLeftHorizontalDelimiter() {
+        Component hgLeft = Box.createHorizontalGlue();
+        pnButton.add(hgLeft);
+    }
+
+    private void addRightHorizontalDelimiter() {
+        Component hgRigth = Box.createHorizontalGlue();
+        pnButton.add(hgRigth);
     }
 
 //    private void addForwardButton() {
