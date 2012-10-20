@@ -794,6 +794,7 @@ public class Vvod extends JFrame {
 
 		  			pdisp.setCod_sp(diagamb.getCod_sp());
 		  			pdisp.setCdol_ot(diagamb.getCdol());
+		  			tfNuch.setText(pdisp.getCdol_ot()+zapVr.getNuch());
 		  			pdisp.setD_uch(Integer.valueOf(tfNuch.getText()));
 		  			pdisp.setDiag_n(tfNewDs.getText());
 		  			MainForm.tcl.setPdisp(pdisp);
@@ -1553,28 +1554,28 @@ public class Vvod extends JFrame {
 			gl_pnlIssl.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_pnlIssl.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.TRAILING)
-						.addComponent(spNaprPokazMet, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-						.addComponent(lblNaprPokazMet, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_pnlIssl.createSequentialGroup()
-							.addComponent(lblNaprMesto, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbNaprMesto, 0, 463, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, gl_pnlIssl.createSequentialGroup()
-							.addComponent(lblNaprVidIssl, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbNaprVidIssl, 0, 424, Short.MAX_VALUE))
-						.addComponent(btnNaprPrint, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-						.addGroup(Alignment.LEADING, gl_pnlIssl.createSequentialGroup()
+					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.LEADING)
+						.addComponent(spNaprPokazMet, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
+						.addComponent(btnNaprPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pnlIssl.createSequentialGroup()
 							.addComponent(lblNaprKab, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblNaprPokazMet, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(lblNaprMesto, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmbNaprMesto, 0, 457, Short.MAX_VALUE))
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(lblNaprVidIssl, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmbNaprVidIssl, 0, 418, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_pnlIssl.setVerticalGroup(
 			gl_pnlIssl.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlIssl.createSequentialGroup()
-					.addContainerGap()
+				.addGroup(Alignment.TRAILING, gl_pnlIssl.createSequentialGroup()
+					.addContainerGap(38, Short.MAX_VALUE)
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNaprMesto)
 						.addComponent(cmbNaprMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -1585,7 +1586,7 @@ public class Vvod extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNaprPokazMet)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spNaprPokazMet, GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
+					.addComponent(spNaprPokazMet, GroupLayout.PREFERRED_SIZE, 235, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNaprKab)
