@@ -29,7 +29,7 @@ public class CurationTableModel implements TableModel {
             patients = ClientHospital.tcl.getAllPatientForDoctor(pcod, cpodr);
         } catch (PatientNotFoundException e) {
             patients = Collections.<TSimplePatient>emptyList();
-        } catch (KmiacServerException | TException e) {
+        } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
         }
@@ -40,7 +40,7 @@ public class CurationTableModel implements TableModel {
             patients = ClientHospital.tcl.getAllPatientFromOtd(cpodr);
         } catch (PatientNotFoundException e) {
             patients = Collections.<TSimplePatient>emptyList();
-        } catch (KmiacServerException | TException e) {
+        } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
         }

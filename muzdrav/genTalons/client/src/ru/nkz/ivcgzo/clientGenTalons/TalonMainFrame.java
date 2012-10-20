@@ -393,10 +393,10 @@ public class TalonMainFrame extends JFrame {
                 try {
 					if (tbl_rasp.getSelectedItem() != null)
 						MainForm.tcl.updateNrasp(tbl_rasp.getData());
-                } catch (TException e) {
+                } catch (KmiacServerException e) {
                     e.printStackTrace();
                     return false;
-                } catch (KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -890,10 +890,10 @@ public class TalonMainFrame extends JFrame {
                 try {
 					if (tbl_norm.getSelectedItem() != null)
 						MainForm.tcl.updateNorm(tbl_norm.getData());
-                } catch (TException e) {
+                } catch (KmiacServerException e) {
                     e.printStackTrace();
                     return false;
-                } catch (KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }

@@ -255,21 +255,15 @@ public class SettingsForm extends JDialog {
 						dispose();
 					}else
 						JOptionPane.showMessageDialog(null, "Укажите все параметры формирования реестра.", null, JOptionPane.INFORMATION_MESSAGE); 
-				} catch (ReestrNotFoundException | TException e) {
-					e.printStackTrace();
 				} catch (KmiacServerException e) {
 					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TException e) {
 					e.printStackTrace();
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (OpenFileException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -326,11 +320,11 @@ public class SettingsForm extends JDialog {
 		            panel_4.setVisible(true);
 		        }
 	        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+			} catch (KmiacServerException e) {
+				e.printStackTrace();
 			} catch (TException e) {
 				e.printStackTrace();
 				MainForm.conMan.reconnect(e);
-			} catch (KmiacServerException e) {
-				e.printStackTrace();
 		}
 		setVisible(true);
 	}

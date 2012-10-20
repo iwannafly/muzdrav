@@ -206,15 +206,17 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			}
 		}
 		
-		if (searcher == null)
+		if (searcher == null) {
 			setSelectedItem(selItem);
-		else
+		} else {
 			try {
 				searcher.setSearchEnabled(false);
 				setSelectedItem(selItem);
+				setText(selItem.name);
 			} finally {
 				searcher.setSearchEnabled(true);
 			}
+		}
 		
 		if (selItem == null)
 			throw new RuntimeException(String.format("Unknown pcod '%d'.", pcod));
@@ -356,6 +358,8 @@ public class ThriftIntegerClassifierCombobox<T extends IntegerClassifier> extend
 			if (srcStrLow.length() == 0) {
 				items = itemsBcp;
 				setSelectedItem(null);
+				model.fireContentsChanged();
+				return;
 			} else {
 				int i;
 				for (i = 0; i < itemsBcp.size(); i++)
