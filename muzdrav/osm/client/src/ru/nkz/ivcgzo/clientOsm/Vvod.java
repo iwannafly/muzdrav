@@ -2200,10 +2200,10 @@ public class Vvod extends JFrame {
 						e.printStackTrace();
 					} catch (PriemNotFoundException e) {
 						e.printStackTrace();
-					} catch (TException e) {
-						MainForm.conMan.reconnect(e);
 					} catch (PvizitNotFoundException e) {
 						e.printStackTrace();
+					} catch (TException e) {
+						MainForm.conMan.reconnect(e);
 					}
 				} else {
 					pvizitAmb = new PvizitAmb();

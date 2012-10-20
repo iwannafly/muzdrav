@@ -105,7 +105,7 @@ public class FormRdInf extends JFrame {
 				fam.setText(Vvod.zapVr.getFam());
 				im.setText(Vvod.zapVr.getIm());
 				ot.setText(Vvod.zapVr.getOth());
-} catch (KmiacServerException | TException e) {
+} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -461,7 +461,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 	else rdinf.unsetGrotec();
 System.out.println(rdinf);		
 	MainForm.tcl.UpdateRdInf(rdinf);
-} catch (KmiacServerException | TException e) {
+} catch (TException e) {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
 }

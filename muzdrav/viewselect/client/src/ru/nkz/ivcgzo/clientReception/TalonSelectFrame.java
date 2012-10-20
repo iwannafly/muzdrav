@@ -250,8 +250,7 @@ public class TalonSelectFrame extends JFrame {
                         );
                         cbxSpeciality.setSelectedPcod(curDoctorInfo.getCdol());
                     }
-                } catch (KmiacServerException | SpecNotFoundException
-                        | TException e1) {
+                } catch (TException e1) {
                     e1.printStackTrace();
                 } catch (RuntimeException re) {
                     cbxSpeciality.setSelectedIndex(0);
@@ -275,8 +274,7 @@ public class TalonSelectFrame extends JFrame {
                         );
                         cbxDoctor.setSelectedPcod(curDoctorInfo.getPcod());
                     }
-                } catch (KmiacServerException | VrachNotFoundException
-                        | TException e1) {
+                } catch (TException e1) {
                     e1.printStackTrace();
                 } catch (RuntimeException re) {
                     cbxDoctor.setSelectedIndex(0);
@@ -465,14 +463,13 @@ public class TalonSelectFrame extends JFrame {
                                     TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
                                     "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
                         }
-                    } catch (KmiacServerException
-                            | ReserveTalonOperationFailedException | TException e1) {
-                        e1.printStackTrace();
                     } catch (PatientHasSomeReservedTalonsOnThisDay e1) {
                         JOptionPane.showMessageDialog(
                                 TalonSelectFrame.this.getContentPane(),
                                 "Пациент уже записан на выбранную дату к выбранному врачу",
                                 "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    } catch (TException e1) {
+                        e1.printStackTrace();
                     }
                 }
             }
@@ -527,8 +524,7 @@ public class TalonSelectFrame extends JFrame {
                                     TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
                                     "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
                         }
-                    } catch (KmiacServerException
-                            | TException | ReleaseTalonOperationFailedException e1) {
+                    } catch (TException e1) {
                         e1.printStackTrace();
                     }
                 }
@@ -555,8 +551,7 @@ public class TalonSelectFrame extends JFrame {
         try {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
             cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
-        } catch (KmiacServerException | PoliclinicNotFoundException
-                | TException e) {
+        } catch (TException e) {
             e.printStackTrace();
         } catch (RuntimeException e) {
             cbxPoliclinic.setSelectedIndex(0);

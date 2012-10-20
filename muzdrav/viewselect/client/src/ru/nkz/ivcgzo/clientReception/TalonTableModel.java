@@ -30,7 +30,7 @@ public final class TalonTableModel implements TableModel {
             talonList = new TalonList(MainForm.tcl.getTalon(cpol, cdol, pcod));
         } catch (TalonNotFoundException e) {
             talonList = new TalonList();
-        } catch (KmiacServerException | TException e) {
+        } catch (TException e) {
             e.printStackTrace();
         }
     }

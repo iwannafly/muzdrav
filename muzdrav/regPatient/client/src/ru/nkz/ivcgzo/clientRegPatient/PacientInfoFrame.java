@@ -241,10 +241,10 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_adp_obl.getSelectedItem() != null) {
                         try {
                             cmb_adp_gorod.setData(MainForm.tcl.getL00(cmb_adp_obl.getSelectedPcod()));
-                        } catch (TException e) {
-                            MainForm.conMan.reconnect(e);
                         } catch (KmiacServerException e) {
                             e.printStackTrace();
+                        } catch (TException e) {
+                            MainForm.conMan.reconnect(e);
                         }
                     } else {
                         cmb_adp_gorod.setData(null);
@@ -259,10 +259,10 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_adm_obl.getSelectedItem() != null) {
                         try {
                             cmb_adm_gorod.setData(MainForm.tcl.getL00(cmb_adm_obl.getSelectedPcod()));
-                        } catch (TException e) {
-                            MainForm.conMan.reconnect(e);
                         } catch (KmiacServerException e) {
                             e.printStackTrace();
+                        } catch (TException e) {
+                            MainForm.conMan.reconnect(e);
                         }
                     } else {
                         cmb_adm_gorod.setData(null);
@@ -301,10 +301,10 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_adp_ul.getSelectedItem() != null) {
                         try {
                             cmb_adp_dom.setData(MainForm.tcl.getU10(cmb_adp_ul.getText()));
-                        } catch (TException e) {
-                            MainForm.conMan.reconnect(e);
                         } catch (KmiacServerException e) {
                             e.printStackTrace();
+                        } catch (TException e) {
+                            MainForm.conMan.reconnect(e);
                         }
                     } else {
                         cmb_adp_dom.setData(new ArrayList<StringClassifier>());
@@ -319,10 +319,10 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_adm_ul.getSelectedItem() != null) {
                         try {
                             cmb_adm_dom.setData(MainForm.tcl.getU10(cmb_adm_ul.getText()));
-                        } catch (TException e) {
-                            MainForm.conMan.reconnect(e);
                         } catch (KmiacServerException e) {
                             e.printStackTrace();
+                        } catch (TException e) {
+                            MainForm.conMan.reconnect(e);
                         }
                     } else {
                         cmb_adm_dom.setData(new ArrayList<StringClassifier>());
@@ -364,9 +364,9 @@ public class PacientInfoFrame extends JFrame {
                             if (cmb_naprav.getSelectedPcod().equals("Р"))cmb_org.setData(MainForm.tcl.getW04());
                             if (cmb_naprav.getSelectedPcod().equals("Т"))cmb_org.setData(MainForm.tcl.getO00());
                         }
-                    } catch (TException e) {
-                        e.printStackTrace();
                     } catch (KmiacServerException e) {
+                        e.printStackTrace();
+                    } catch (TException e) {
                         e.printStackTrace();
                     }
                 }
@@ -642,11 +642,11 @@ public class PacientInfoFrame extends JFrame {
                                 	  MainForm.tcl.deleteNambk(curPatientId, MainForm.authInfo.cpodr);
                                 	  NewPatient();
                             	  }
-                              } catch (TException e) {
-                                  e.printStackTrace();
                               } catch (KmiacServerException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
+                              } catch (TException e) {
+                                  e.printStackTrace();
 							}
                             }
                         });
@@ -1361,10 +1361,10 @@ public class PacientInfoFrame extends JFrame {
                 try {
                     curId = tbl_lgota.getSelectedItem().id;
                     MainForm.tcl.deleteLgota(curId);
-                } catch (TException e) {
+                } catch (KmiacServerException e) {
                     e.printStackTrace();
                     return false;
-                } catch (KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1388,11 +1388,11 @@ public class PacientInfoFrame extends JFrame {
                 } catch (LgotaAlreadyExistException laee) {
                     laee.printStackTrace();
                     return false;
-                } catch (TException e) {
-                    e.printStackTrace();
-                    return false;
                 } catch (KmiacServerException e) {
                     // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return false;
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1405,10 +1405,10 @@ public class PacientInfoFrame extends JFrame {
             public boolean doAction(CustomTableItemChangeEvent<Lgota> event) {
                 try {
                 	MainForm.tcl.updateLgota(event.getItem());
-                } catch (TException e) {
+                } catch (KmiacServerException e) {
                     e.printStackTrace();
                     return false;
-                } catch (KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1548,7 +1548,7 @@ public class PacientInfoFrame extends JFrame {
                 try {
                     curId = tbl_kateg.getSelectedItem().id;
                     MainForm.tcl.deleteKont(curId);
-                } catch (TException | KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1572,10 +1572,10 @@ public class PacientInfoFrame extends JFrame {
                 } catch (KontingentAlreadyExistException kaee) {
                     kaee.printStackTrace();
                     return false;
-                } catch (TException e) {
+                } catch (KmiacServerException e) {
                     e.printStackTrace();
                     return false;
-                } catch (KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -1588,7 +1588,7 @@ public class PacientInfoFrame extends JFrame {
             public boolean doAction(CustomTableItemChangeEvent<Kontingent> event) {
                 try {
                     MainForm.tcl.updateKont(event.getItem());
-                } catch (TException | KmiacServerException e) {
+                } catch (TException e) {
                     e.printStackTrace();
                     return false;
                 }
@@ -2963,7 +2963,7 @@ public class PacientInfoFrame extends JFrame {
         public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
             try {
                 MainForm.tcl.deleteGosp(curId);
-            } catch (TException | KmiacServerException e) {
+            } catch (TException e) {
                 e.printStackTrace();
                 return false;
             }
@@ -3009,7 +3009,7 @@ public class PacientInfoFrame extends JFrame {
                     String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
                     MainForm.conMan.transferFileFromServer(servPath, cliPath);
                     MainForm.conMan.openFileInEditor(cliPath, false);
-                } catch (TException | IOException | FileNotFoundException | OpenFileException | KmiacServerException e) {
+                } catch (TException | IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -3072,11 +3072,11 @@ public class PacientInfoFrame extends JFrame {
                 } catch (Exception e1) {
                 e1.printStackTrace();
             }
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
         } catch (TException e) {
             e.printStackTrace();
             MainForm.conMan.reconnect(e);
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
         }
     }
     //слушатель таб контрола персональной информации о пациенте

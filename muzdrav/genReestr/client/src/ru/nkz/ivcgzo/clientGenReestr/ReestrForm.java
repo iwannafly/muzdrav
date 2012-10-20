@@ -80,15 +80,11 @@ public class ReestrForm extends JFrame {
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);
-				} catch (TException e) {
-					e.printStackTrace();
 				} catch (KmiacServerException e) {
 					e.printStackTrace();
+				} catch (TException e) {
+					e.printStackTrace();
 				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (OpenFileException e) {
 					e.printStackTrace();
 				}
 			}
