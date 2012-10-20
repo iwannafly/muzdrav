@@ -501,6 +501,7 @@ public class PacientInfoFrame extends JFrame {
                     changePatientAgentInfo(curPatientId);
                     changePatientSignInfo(curPatientId);
                     selectAllPatientPriemInfo(curPatientId);
+                    changePatientPriemInfo(curPatientId);
 
                   SwingUtilities.invokeLater(new Runnable() {
                         @Override
@@ -3407,14 +3408,15 @@ public class PacientInfoFrame extends JFrame {
     }
     // просмотр информации о госпитализациях
     private void changePatientPriemInfo(int PatId){
-        if (tbl_priem.getSelectedItem() == null)
+        if (tbl_priem.getSelectedItem() == null){
+            NewPriemInfo();
             return;
-        try {
+        }
+           try {
             curId = tbl_priem.getSelectedItem().id;
             curNgosp = tbl_priem.getSelectedItem().ngosp;
             Id_gosp = MainForm.tcl.getGosp(curId);
 //			SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy hh:mm");
-            NewPriemInfo();
             if (Id_gosp.getJalob() != null){
                 ta_jal_pr.setText(Id_gosp.jalob);
             }

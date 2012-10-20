@@ -90,7 +90,7 @@ public class GenReestr extends Server implements Iface {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
+	@Override		//ПОЛИКЛИНИКА
 	public String getReestrInfoPol(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df) throws KmiacServerException,
 			ReestrNotFoundException, TException {
@@ -529,7 +529,7 @@ public class GenReestr extends Server implements Iface {
 		}
 	}
 
-	@Override
+	@Override		//ЛДС
 	public String getReestrInfoLDS(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df, int ter_mu, int kod_mu)
 			throws KmiacServerException, ReestrNotFoundException, TException {
@@ -783,36 +783,37 @@ public class GenReestr extends Server implements Iface {
 		return path;
 	}
 
-	@Override
+	@Override		//СТАЦИОНАР
 	public String getReestrInfoOtd(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df) throws KmiacServerException,
 			ReestrNotFoundException, TException {
-        String sqlwhere;
-        String sqlmed;
-        String sqlpasp;
-        String sqlr;
-        String path;
+        String path = null;
+        String sqlr = null;
+        String sqlmed = null;
+        String sqlpasp = null;
+        String sqlfrom = null;
+        String sqlwhere = null;
         boolean flag = false;
-        sqlwhere = "";
-        if (vidr == 1) sqlwhere = "AND v.dataz >= ? AND v.dataz <= ? AND v.kod_rez = 0";
-        if (vidr == 2) sqlwhere = "AND (v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11))";
-        if (vidr == 3) sqlwhere = "AND v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
 
-        sqlr = "SELECT v.id::integer AS sl_id, v.id::integer AS id_med, v.kod_rez::integer AS kod_rez, v.datap::date as d_pst, 2::integer AS kl_usl, v.pl_extr::integer AS pl_extr, " +
-				"v.uet::double precision AS kol_usl, v.diag::char(7) AS diag, v.stoim::double precision AS stoim, v.cpos::integer AS case, v.rezult::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-				"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end)::integer AS c_mu, "+
-				"(select get_prof(?, v.cdol))::integer AS prof_fn, " +
-				"(select get_kodsp(v.cdol))::integer AS spec, " +
-				"(select get_kodvr(v.cdol)::integer) AS prvd, " +
-				"(select get_vmu(v.cdol))::integer AS v_mu, " +
-				"(select get_vrach_snils(v.cod_sp))::char(14) AS ssd, " +
-				"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end)::integer AS place, " +
+        if (vidr == 1) sqlwhere = "WHERE g.pr_out<>0 AND g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0";
+        if (vidr == 2) sqlwhere = "WHERE g.pr_out<>0 AND (g.kod_rez = 0 AND g.dataz >= ? AND g.dataz <= ?) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11))";
+        if (vidr == 3) sqlwhere = "WHERE g.pr_out<>0 AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
+
+        sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
+				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+				"1::integer AS c_mu, "+
+				"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
+				"(select get_kodsp(ld.cuser))::integer AS spec, " +
+				"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
+				"(select get_vmu(ld.cuser))::integer AS v_mu, " +
+				"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
 				"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-				"null::integer AS kod_otd, null::date AS d_end, null::integer AS pr_exp, null::integer AS etap, null::char(15) AS usl, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
+				"null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
+				
 				" 1::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
 				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
-				"v.kod_ter::integer AS ter_mu, v.cpol::integer AS kod_mu, ?::date AS df_per, " +
+				"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
 				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
@@ -831,14 +832,16 @@ public class GenReestr extends Server implements Iface {
 				"(select get_region(p.poms_strg))::integer AS region," +
 				"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 				"(select get_kov(p.npasp))::char(30) AS kob, " +
-				"v.pl_extr::integer AS vid_hosp, (select get_talon(v.id_obr))::char(11) AS talon, " +
+				"1::integer AS vid_hosp, null::char(11) AS talon, " +
 				"p.terp::integer AS ter_pol, p.cpol_pr::integer AS pol, p.npasp::integer AS id_lpu, " +
-				"(select get_namb(p.npasp,v.cpol))::char(20) AS n_mk, " +
-				"null::char(10) AS ist_bol, null::integer AS id_smo, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir "+
-			    "FROM p_vizit_amb v, patient p " + 
-				"WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? ";
+				"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
+				"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
+				"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
+
+        	sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
+        			"JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
         	sqlr += sqlwhere;
-        	sqlr += " ORDER BY v.npasp";
+        	sqlr += " ORDER BY p.npasp";
 		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df),vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
             ResultSet rs = acrs.getResultSet();
             
