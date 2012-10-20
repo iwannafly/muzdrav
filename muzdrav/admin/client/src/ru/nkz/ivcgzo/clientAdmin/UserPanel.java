@@ -142,7 +142,8 @@ public class UserPanel extends JPanel {
 		btnVrDel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tblVrach.deleteSelectedRow();
+				if (JOptionPane.showConfirmDialog(UserPanel.this, "Удалить пользователя? Так же произойдет удаление информации о профилях и учетных записях.", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+					tblVrach.deleteSelectedRow();
 			}
 		});
 		btnVrDel.setEnabled(tblVrach.isEditable());
@@ -239,7 +240,8 @@ public class UserPanel extends JPanel {
 		btnMrDel.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				tblMrab.deleteSelectedRow();
+				if (JOptionPane.showConfirmDialog(UserPanel.this, "Удалить профиль? Так же произойдет удаление информации об учетных записях.", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+					tblMrab.deleteSelectedRow();
 			}
 		});
 		btnMrDel.setEnabled(tblMrab.isEditable());
