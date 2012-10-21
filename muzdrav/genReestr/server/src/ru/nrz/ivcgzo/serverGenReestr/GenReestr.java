@@ -90,7 +90,7 @@ public class GenReestr extends Server implements Iface {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
+	@Override		//ПОЛИКЛИНИКА
 	public String getReestrInfoPol(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df) throws KmiacServerException,
 			ReestrNotFoundException, TException {
@@ -297,6 +297,44 @@ public class GenReestr extends Server implements Iface {
     		str += " 125. Отсутствует / некорректный номер документа, удостоверяющего личность<br>";
     	if (rs.getInt("region") != 42 && rs.getString("ogrn_str") == null)
     		str += " 246. Ошибка заполнения инообластного реестра. Не указан ОГРН.<br>";
+    	if (rs.getInt("stoim") == 0)
+    		str += " 230. Отсутствует тариф<br>";
+
+    	if (rs.getInt("vid_rstr") == 1){
+        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8) && rs.getString("ist_bol") == null)
+        		str += " 39. Отсутствует номер истории болезни<br>";
+        	if (rs.getInt("kod_otd") == 0)
+        		str += " 47. Отсутствует код отделения<br>";
+        	if (rs.getDate("d_pst").getTime() == 0)
+        		str += " 51. Не заполнена дата госпитализации D_PST<br>";
+        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 7 && rs.getInt("kl_usl") != 8) && rs.getDate("d_end").getTime() == 0)
+        		str += " 52. Отсутствует дата выписки<br>";
+        	if (rs.getDate("d_pst").getTime() != 0 && rs.getDate("d_end").getTime() != 0)
+            	if (rs.getDate("d_pst").getTime() > rs.getDate("d_end").getTime() || (rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>=365)
+            	str += " 53. Ошибка в датах госпитализации и выписки<br>";
+        	if (rs.getInt("kl_usl") < 1 && rs.getInt("kl_usl") > 11)
+        		str += " 54. Неверный вид помощи KL_USL<br>";
+        	if (rs.getInt("kl_usl") != 1 && rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8)
+        		str += " 55. Несоответствие вида реестра VID_RSTR виду помощи KL_USL<br>";
+        	if (rs.getInt("kl_usl") == 1 && rs.getInt("etap") == 0)
+        		str += " 58. Не задан этап<br>";
+        	if (rs.getInt("kl_usl") == 1 && (rs.getInt("pr_out") == 8 || rs.getInt("pr_out") == 15))
+        		str += " 60. Ошибка кода причины выбытия<br>";
+        	if (rs.getInt("region") != 42 && rs.getInt("spec") == 0)
+        		str += " 67. Отсутствует код врачебной специальности SPEC<br>";
+        	if (rs.getInt("res_g") != 0)
+        		str += " 77. Неверный код результата обращения RES_G<br>";
+        	if (rs.getInt("region") == 42 && rs.getInt("str_org") == 0 && rs.getInt("etap") == 4)
+        		str += " 93. Для незастрахованного указан этап долечивания<br>";
+        	if (rs.getInt("region") == 42 && rs.getInt("str_org") == 0 && rs.getInt("vid_hosp") == 1)
+        		str += " 93. Для незастрахованного указан признак планового больного<br>";
+        	if (rs.getInt("kl_usl") == 1 && rs.getInt("etap") != 3 && rs.getInt("etap") != 4)
+        		str += " 96. Неверно указан код этапа<br>";
+        	if ((rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>150)
+        		str += " 215. Срок госпитализации >150 дней<br>";
+        	if (rs.getInt("prof_fn") == 0 && rs.getInt("kl_usl") != 8 && rs.getInt("pr_exp") != 1)
+        		str += " 216. Отсутствует код профиля финансового норматива<br>";
+    	}
 
     	if (rs.getInt("vid_rstr") == 2){
     		if (rs.getDate("d_pst").getTime() > rs.getDate("df_per").getTime())
@@ -331,8 +369,6 @@ public class GenReestr extends Server implements Iface {
         		str += " 79. Отсутствует код единицы учета медицинской помощи C_MU<br>";
         	if (rs.getInt("kl_usl") == 9 && rs.getString("usl") == null)
         		str += " 86. Некорректные код услуги/ обстоятельства<br>";
-        	if (rs.getInt("stoim") == 0)
-        		str += " 230. Отсутствует тариф<br>";
     	}
     	if (rs.getString("diag") == null)
     		str += " Отсутствует диагноз<br>";
@@ -493,7 +529,7 @@ public class GenReestr extends Server implements Iface {
 		}
 	}
 
-	@Override
+	@Override		//ЛДС
 	public String getReestrInfoLDS(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df, int ter_mu, int kod_mu)
 			throws KmiacServerException, ReestrNotFoundException, TException {
@@ -506,10 +542,13 @@ public class GenReestr extends Server implements Iface {
         String isl = null;
         boolean flag = false;
 		AutoCloseableResultSet acr;
-		
-        if (vidr == 1) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0";
-        if (vidr == 2) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11))";
-        if (vidr == 3) sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)";
+
+        if (vidr == 1) 
+        	sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0 ";
+        if (vidr == 2) 
+        	sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)) ";
+        if (vidr == 3) 
+        	sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11) ";
 
         try {
 			acr = sse.execPreparedQuery("select tip from n_lds where pcod=?", cpodr);
@@ -552,7 +591,10 @@ public class GenReestr extends Server implements Iface {
 							"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
 							"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
 							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
-					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
+							  "JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+
+		        	sqlwhere += " AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) OR ((substr(d.cpok,1,1)='B') AND (substr(cast(ld.kodotd as varchar(7)),1,2)=substr(cast(ld.naprotd as varchar(7)),1,2)))) ";        
 					isl = "Л";
 				}
 				if (acr.getResultSet().getString("tip").equals("Д") || acr.getResultSet().getString("tip").equals("Т")){
@@ -593,7 +635,10 @@ public class GenReestr extends Server implements Iface {
 							"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
 							"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
 							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
-					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_d d ON (ld.nisl = d.nisl) ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_d d ON (ld.nisl = d.nisl) "+
+							  "JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+
+		        	sqlwhere += " AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) OR ((substr(d.kodisl,1,1)='B') AND (substr(cast(ld.kodotd as varchar(7)),1,2)=substr(cast(ld.naprotd as varchar(7)),1,2)))) ";        
 					isl = "Д";
 				}
 			}
@@ -649,7 +694,7 @@ public class GenReestr extends Server implements Iface {
     		throw new KmiacServerException();
 		}
 
-		if (flag){
+		if (!flag){
 			try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoPol", ".zip").getAbsolutePath());
 					ZipOutputStream zos = new ZipOutputStream(fos)) {
 				byte[] buffer = new byte[8192];
@@ -657,7 +702,7 @@ public class GenReestr extends Server implements Iface {
 
 				if (isl.equals("Л"))
 					sqlmed = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.cpok,2)::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+							"substr(d.cpok,2,length(d.cpok))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
 							"1::integer AS c_mu, 1::integer AS pl_extr, "+
 							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
 							"(select get_kodsp(ld.cuser))::integer AS spec, " +
@@ -668,7 +713,7 @@ public class GenReestr extends Server implements Iface {
 							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt ";
 				if (isl.equals("Д"))
 					sqlmed = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.kodisl,2)::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+							"substr(d.kodisl,2,length(d.kodisl))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
 							"1::integer AS c_mu, 1::integer AS pl_extr, "+
 							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
 							"(select get_kodsp(ld.cuser))::integer AS spec, " +
@@ -738,36 +783,37 @@ public class GenReestr extends Server implements Iface {
 		return path;
 	}
 
-	@Override
+	@Override		//СТАЦИОНАР
 	public String getReestrInfoOtd(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df) throws KmiacServerException,
 			ReestrNotFoundException, TException {
-        String sqlwhere;
-        String sqlmed;
-        String sqlpasp;
-        String sqlr;
-        String path;
+        String path = null;
+        String sqlr = null;
+        String sqlmed = null;
+        String sqlpasp = null;
+        String sqlfrom = null;
+        String sqlwhere = null;
         boolean flag = false;
-        sqlwhere = "";
-        if (vidr == 1) sqlwhere = "AND v.dataz >= ? AND v.dataz <= ? AND v.kod_rez = 0";
-        if (vidr == 2) sqlwhere = "AND (v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11))";
-        if (vidr == 3) sqlwhere = "AND v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
 
-        sqlr = "SELECT v.id::integer AS sl_id, v.id::integer AS id_med, v.kod_rez::integer AS kod_rez, v.datap::date as d_pst, 2::integer AS kl_usl, v.pl_extr::integer AS pl_extr, " +
-				"v.uet::double precision AS kol_usl, v.diag::char(7) AS diag, v.stoim::double precision AS stoim, v.cpos::integer AS case, v.rezult::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-				"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end)::integer AS c_mu, "+
-				"(select get_prof(?, v.cdol))::integer AS prof_fn, " +
-				"(select get_kodsp(v.cdol))::integer AS spec, " +
-				"(select get_kodvr(v.cdol)::integer) AS prvd, " +
-				"(select get_vmu(v.cdol))::integer AS v_mu, " +
-				"(select get_vrach_snils(v.cod_sp))::char(14) AS ssd, " +
-				"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end)::integer AS place, " +
+        if (vidr == 1) sqlwhere = "WHERE g.pr_out<>0 AND g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0";
+        if (vidr == 2) sqlwhere = "WHERE g.pr_out<>0 AND (g.kod_rez = 0 AND g.dataz >= ? AND g.dataz <= ?) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11))";
+        if (vidr == 3) sqlwhere = "WHERE g.pr_out<>0 AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
+
+        sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
+				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
+				"1::integer AS c_mu, "+
+				"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
+				"(select get_kodsp(ld.cuser))::integer AS spec, " +
+				"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
+				"(select get_vmu(ld.cuser))::integer AS v_mu, " +
+				"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
 				"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-				"null::integer AS kod_otd, null::date AS d_end, null::integer AS pr_exp, null::integer AS etap, null::char(15) AS usl, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
-				" 2::integer AS vid_rstr, " +
+				"null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
+				
+				" 1::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
 				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
-				"v.kod_ter::integer AS ter_mu, v.cpol::integer AS kod_mu, ?::date AS df_per, " +
+				"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
 				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
@@ -786,14 +832,16 @@ public class GenReestr extends Server implements Iface {
 				"(select get_region(p.poms_strg))::integer AS region," +
 				"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 				"(select get_kov(p.npasp))::char(30) AS kob, " +
-				"v.pl_extr::integer AS vid_hosp, (select get_talon(v.id_obr))::char(11) AS talon, " +
+				"1::integer AS vid_hosp, null::char(11) AS talon, " +
 				"p.terp::integer AS ter_pol, p.cpol_pr::integer AS pol, p.npasp::integer AS id_lpu, " +
-				"(select get_namb(p.npasp,v.cpol))::char(20) AS n_mk, " +
-				"null::char(10) AS ist_bol, null::integer AS id_smo, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir "+
-			    "FROM p_vizit_amb v, patient p " + 
-				"WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? ";
+				"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
+				"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
+				"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
+
+        	sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
+        			"JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
         	sqlr += sqlwhere;
-        	sqlr += " ORDER BY v.npasp";
+        	sqlr += " ORDER BY p.npasp";
 		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df),vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
             ResultSet rs = acrs.getResultSet();
             

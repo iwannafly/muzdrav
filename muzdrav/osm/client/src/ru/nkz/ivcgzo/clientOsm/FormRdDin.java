@@ -345,13 +345,13 @@ public class FormRdDin extends JFrame {
 //		if (ves>=32) br = br+1;}
 		rddin.setBall(br); 
 			MainForm.tcl.UpdateRdDin(rddin);
-		} catch (KmiacServerException | TException e1) {
+		} catch (TException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 	}
 		try {
 			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
-		} catch (KmiacServerException | TException e1) {
+		} catch (TException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -422,7 +422,7 @@ try {
 	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
 	if (tablePos.getRowCount() > 0)
 		tablePos.setRowSelectionInterval(tablePos.getRowCount() - 1, tablePos.getRowCount() - 1);
-} catch (KmiacServerException | TException e1) {
+} catch (TException e1) {
 	// TODO Auto-generated catch block
 	e1.printStackTrace();
 }

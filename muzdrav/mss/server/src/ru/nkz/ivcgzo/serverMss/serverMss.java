@@ -349,9 +349,9 @@ public class serverMss extends Server implements Iface {
     	while ( counter < lens) {
     		if (!docInfo.substring(counter,counter+1).equals("#") ) {
     			per1 += docInfo.substring(counter, counter+1);
-    		}else { if (per1.length() == 0) per1 ="null";
+    		}else { if (per1.length() == 0) per1 =" ";
     		htmTemplate.replaceText(htmTemplate.getLabels().get(i), per1);
-    	//	System.out.println(String.valueOf(i)+";"+per1);
+    		System.out.println(String.valueOf(i)+";"+per1);
     		per1 = "";
     		i++;
     	}
