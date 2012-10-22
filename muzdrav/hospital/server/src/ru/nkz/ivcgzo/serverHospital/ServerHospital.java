@@ -59,7 +59,7 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
-        "npasp", "id_gosp", "fam", "im", "ot", "datar", "dataz", "cotd", "npal", "nist"
+        "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
     };
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
@@ -155,7 +155,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientForDoctor(final int doctorId, final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im, "
-                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd, c_otd.npal, c_otd.nist "
+                + "patient.ot, patient.datar, c_gosp.datap, c_otd.cotd, c_otd.npal, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.vrach = ? AND c_otd.cotd = ? ORDER BY fam, im, ot;";
@@ -178,7 +178,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientFromOtd(final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im,"
-                + "patient.ot, patient.datar, c_otd.dataz, c_otd.cotd, c_otd.nist "
+                + "patient.ot, patient.datar, c_gosp.datap, c_otd.cotd, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
@@ -197,7 +197,7 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final TPatient getPatientPersonalInfo(final int patientId)
+    public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
                 + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, patient.sgrp, "
@@ -206,14 +206,14 @@ public class ServerHospital extends Server implements Iface {
                 + "n_z43.name_s as mrab, c_otd.npal, "
                 + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
                 + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
-                + "FROM patient LEFT JOIN c_gosp ON c_gosp.npasp = patient.npasp "
-                + "LEFT JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
+                + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
                 + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
                 + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
-                + "WHERE patient.npasp= ?;";
+                + "WHERE patient.npasp= ? AND c_otd.id_gosp = ?;";
         ResultSet rs = null;
 
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId, idGosp)) {
             rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmPatient.map(rs);
@@ -550,10 +550,10 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void updateMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {2, 3, 4, 5, 6, 0};
+        final int[] indexes = {2, 3, 4, 5, 6, 8, 9, 0};
         final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
             + "morbi = ?, status_praesense = ?, "
-            + "status_localis = ?, fisical_obs = ? "
+            + "status_localis = ?, fisical_obs = ?, dataz = ?, timez = ? "
             + "WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);

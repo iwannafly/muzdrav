@@ -12,7 +12,6 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
@@ -30,7 +29,7 @@ public class AllPatientTableModel implements TableModel {
             patients = ClientHospital.tcl.getAllPatientForDoctor(pcod, cpodr);
         } catch (PatientNotFoundException e) {
             patients = Collections.<TSimplePatient>emptyList();
-        } catch (KmiacServerException | TException e) {
+        } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
         }
@@ -41,7 +40,7 @@ public class AllPatientTableModel implements TableModel {
             patients = ClientHospital.tcl.getAllPatientFromOtd(cpodr);
         } catch (PatientNotFoundException e) {
             patients = Collections.<TSimplePatient>emptyList();
-        } catch (KmiacServerException | TException e) {
+        } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
         }

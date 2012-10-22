@@ -93,7 +93,10 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 		} else {
 			items = itemsBcp;
 			setSelectedIndex(getIdx((int) value));
-			setText(getSelectedItem().name);
+			if (getSelectedItem() != null)
+				setText(getSelectedItem().name);
+			else
+				setText(null);
 		}
 		
 		return this;
