@@ -18,6 +18,7 @@ struct ZapVr{
 	9: optional i64 datar;
 	10: optional i64 datap;
 	11: optional i32 nuch;
+	12: optional bool hasPvizit;
 }
 
 struct Pvizit {
