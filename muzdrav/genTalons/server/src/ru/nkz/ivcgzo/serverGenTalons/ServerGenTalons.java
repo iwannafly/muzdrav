@@ -184,7 +184,8 @@ public class ServerGenTalons extends Server implements Iface {
                 false, new Date(datan), new Date(datak), cpodr, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -204,7 +205,8 @@ public class ServerGenTalons extends Server implements Iface {
                 endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -224,7 +226,8 @@ public class ServerGenTalons extends Server implements Iface {
                 startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -720,18 +723,18 @@ public class ServerGenTalons extends Server implements Iface {
         }
     }
 
-	@Override
-	public void deleteNorm(int cpodr, String cdol) throws KmiacServerException,
-			TException {
+    @Override
+    public final void deleteNorm(final int cpodr, final String cdol) throws KmiacServerException,
+            TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_norm WHERE cpol =? AND cdol = ?;",
-                    false, cpodr, cdol);
+                false, cpodr, cdol);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
-	}
+    }
 
     @Override
     public final void deleteNdv(final int id) throws KmiacServerException, TException {

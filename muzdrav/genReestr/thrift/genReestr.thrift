@@ -107,7 +107,7 @@ struct Err{
 service ThriftGenReestr extends kmiacServer.KmiacServer {
 
 	/**
-        * Создает реестр и возвращает протокол проверок реестра
+        * Создает реестр поликлиники и возвращает протокол проверок реестра
 	*/
 	string getReestrInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
 
@@ -115,6 +115,16 @@ service ThriftGenReestr extends kmiacServer.KmiacServer {
         * Записывает код результата проверки реестра и возвращает протокол ошибок
 	*/
 	string getProtokolErrPol(1:string pf) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
+        * Создает реестр параотделения и возвращает протокол проверок реестра
+	*/
+	string getReestrInfoLDS(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df, 9:i32 ter_mu, 10:i32 kod_mu) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
+
+	/**
+        * Создает реестр стационара и возвращает протокол проверок реестра
+	*/
+	string getReestrInfoOtd(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
 
 	/*Классификаторы*/
 
@@ -129,8 +139,22 @@ service ThriftGenReestr extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getPolForCurrentLpu(1:i32 polId) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
+	 * Классификатор параотделений для текущего ЛПУ (N_LDS (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAllLDSForCurrentLpu(1:i32 lpuId) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Классификатор параотделения для текущего ЛПУ (N_LDS (pcod))
+	 */
+	list<classifier.IntegerClassifier> getLDSForCurrentLpu(1:i32 polId) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
 	 * Классификатор отделений для текущего ЛПУ (N_O00 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getOtdForCurrentLpu(1:i32 lpuId) throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	 * Классификатор отделений для текущего ЛПУ (N_O00 (pcod))
+	 */
+	list<classifier.IntegerClassifier> getAllOtdForCurrentLpu(1:i32 lpuId) throws (1: kmiacServer.KmiacServerException kse);
 }

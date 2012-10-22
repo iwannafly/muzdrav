@@ -94,7 +94,7 @@ public class DopInfoForm extends JDialog {
 		tfOt.setText(dopInfo.ot.trim());
 		if (dopInfo.prizn == true) ckbPrizn.setSelected(true);
 		else ckbPrizn.setSelected(false);
-		} catch (MssdopNotFoundException | TException  e1){
+		} catch (TException  e1){
 			tfNomer_n.setText(null);
 			tfNomer_k.setText(null);
 			tfNomer_t.setText(null);

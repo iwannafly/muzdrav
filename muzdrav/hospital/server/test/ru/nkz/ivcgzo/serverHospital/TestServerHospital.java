@@ -72,8 +72,9 @@ public class TestServerHospital {
     public final void getPatientPersonalInfo_isInfoCorrect()
             throws KmiacServerException, TException, PatientNotFoundException {
         final int patientId = 450; //10001;
+        final int idGosp = 25;
         TPatient patient =
-                testServer.getPatientPersonalInfo(patientId);
+                testServer.getPatientPersonalInfo(patientId, idGosp);
         System.out.print(patient);
         final int cGosp = 4;
         final Date birthdate = new Date(104, 4, 1); // 2004-05-01

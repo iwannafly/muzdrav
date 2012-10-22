@@ -266,8 +266,8 @@ public class PatientInfoForm extends ModalForm {
 		 					addLineToDetailInfo("Обоснование для направления",pnapr.isSetText(),pnapr.getText());
 		 					addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
 		 				}
-		 				addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetIshod(), pvizit.getIshod()));
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetRezult(), pvizit.getRezult()));
+		 				addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
+						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
 						addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 			 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
 			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());

@@ -93,7 +93,10 @@ public class TableComboBoxStringEditor extends ThriftStringClassifierCombobox<St
 		} else {
 			items = itemsBcp;
 			setSelectedIndex(getIdx((String) value));
-			setText(getSelectedItem().name);
+			if (getSelectedItem() != null)
+				setText(getSelectedItem().name);
+			else
+				setText(null);
 		}
 		
 		return this;
