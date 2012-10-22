@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientVgr;
+﻿package ru.nkz.ivcgzo.clientVgr;
 
 import java.awt.EventQueue;
 
@@ -8,7 +8,6 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -16,11 +15,13 @@ import java.awt.Font;
 
 public class Period {
 
-    private JFrame frame;
-    private CustomDateEditor textField;
-    private CustomDateEditor textField_1;
 
-
+	private JFrame frame;
+	private CustomDateEditor textField;
+	private CustomDateEditor textField_1;
+	private CustomDateEditor tfDn;
+	private CustomDateEditor tfDk;
+	private VgrKov sfrm;
 	/**
 	 * Launch the application.
 	 */
@@ -41,26 +42,35 @@ public class Period {
 	 * Create the application.
 	 */
 	public Period() {
-		initialize();
+		initialize(tfDk, tfDn);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @param tfDk 
+	 * @param tfDn 
 	 */
-	private void initialize() {
+	private void initialize(CustomDateEditor tfDk, CustomDateEditor tfDn) {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+	//	frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		JButton btnNewButton = new JButton("Выполнить");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				sfrm = new ServerVgr();
+				sfrm.ServerVgr();
+			}
+		});
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 		JButton btnNewButton_1 = new JButton("Выход");
 		btnNewButton_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-			}
+		    public void actionPerformed(ActionEvent arg0) {
+			   setVisible(false);
+		    }
 		});
 
 		JLabel lblNewLabel = new JLabel("Задайте период");
@@ -77,6 +87,8 @@ public class Period {
 
 		textField_1 = new CustomDateEditor();
 		textField_1.setColumns(10);
+		tfDk = new CustomDateEditor();
+		tfDn = new CustomDateEditor();
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -122,10 +134,20 @@ public class Period {
 		frame.getContentPane().setLayout(groupLayout);
 	}
 
+	
+
 	public void setVisible(boolean value) {
 		frame.setVisible(value);
 
 	}
 
+	public void showPeriod(CustomDateEditor tfDn, CustomDateEditor tfDk) {
+	//	CustomDateEditor tfDn = null;
+		// TODO Auto-generated method stub
+	      if (tfDn.getDate() == null) tfDn.setDate(System.currentTimeMillis());
+	//        CustomDateEditor tfDk = null;
+			if (tfDk.getDate() == null) tfDk.setDate(System.currentTimeMillis());
+	  	
+	}
 
 }
