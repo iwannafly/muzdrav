@@ -1120,7 +1120,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final void updateLgota(final Lgota lgota) throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_kov SET npasp = ?, lgot =?, datal = ? "
+            sme.execPreparedT("UPDATE p_kov SET npasp = ?, lgot = ?, datal = ? "
                     + "WHERE id = ?", false,
                     lgota, LGOTA_TYPES, indexes);
             sme.setCommit();
@@ -1131,10 +1131,10 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final void updateKont(final Kontingent kont) throws TException, KmiacServerException {
+    public final void updateKont(final Kontingent kont) throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg =?, datal = ? "
+            sme.execPreparedT("UPDATE p_konti SET npasp = ?, kateg = ?, datal = ? "
                     + "WHERE id = ?", false,
                     kont, KONTINGENT_TYPES, indexes);
             sme.setCommit();
@@ -1564,12 +1564,78 @@ public class ServerRegPatient extends Server implements Iface {
         String sqlQuery = "UPDATE c_otd SET id_gosp = ?, nist = ?, cotd = ?, dataz = ? "
                 + "WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd, id,
-                new Date(System.currentTimeMillis()));
+            sme.execPrepared(sqlQuery, true, idGosp, nist, cotd,
+                new Date(System.currentTimeMillis()), id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final String printStacCart(final PatientFullInfo pat, final Gosp gosp,
+            final String otdName, final String naprName, final String vidTrans,
+            final String grBl, final String rezus) throws KmiacServerException {
+        final String path;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+            String gender;
+            if (pat.getPol() == 1) {
+                gender = "мужской";
+            } else if (pat.getPol() == 2) {
+                gender = "женский";
+            } else {
+                gender = "";
+            }
+            int let = (int) ((System.currentTimeMillis() - pat.getDatar()) / 31556952000L);
+            HtmTemplate htmTemplate = new HtmTemplate(
+                    new File(this.getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                    + "\\plugin\\reports\\MedCardStac.htm");
+            System.out.println(new File(this.getClass().getProtectionDomain().getCodeSource()
+                    .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                    + "\\plugin\\reports\\MedCardStac.htm");
+            htmTemplate.replaceLabels(true,
+                (pat.getPolis_oms().isSetSer()) ? pat.getPolis_oms().getSer() : "",
+                (pat.getPolis_oms().isSetNom()) ? pat.getPolis_oms().getNom() : "",
+                (pat.getPolis_oms().isSetStrg())
+                    ? String.valueOf(pat.getPolis_oms().getStrg())  : "",
+                (pat.getPolis_dms().isSetSer()) ? pat.getPolis_dms().getSer() : "",
+                (pat.getPolis_dms().isSetNom()) ? pat.getPolis_dms().getNom() : "",
+                (pat.getPolis_dms().isSetStrg())
+                    ? String.valueOf(pat.getPolis_dms().getStrg()) : "",
+                (gosp.isSetNal_p() && gosp.nal_p) ? "педикулез" : "",
+                (gosp.isSetNal_z() && gosp.nal_z) ? "часотка" : "",
+                (gosp.isSetToc()) ? gosp.getToc() : "",
+                (gosp.isSetAd()) ? gosp.getAd() : "",
+                (gosp.isSetNist()) ? String.valueOf(gosp.getNist()) : "",
+                (gosp.isSetDatap()) ? dateFormat.format(gosp.getDatap()) : "",
+                (gosp.isSetVremp()) ? timeFormat.format(gosp.getVremp()) : "",
+                "",
+                "",
+                otdName,
+                "",
+                vidTrans,
+                grBl,
+                rezus,
+                String.format("%s %s %s", pat.getFam(), pat.getIm(), pat.getOt()),
+                gender,
+                String.valueOf(let),
+                pat.getAdmAddress().getCity()
+                    + "," + pat.getAdmAddress().getStreet() + " "
+                    + pat.getAdmAddress().getHouse()
+                    + " - " + pat.getAdmAddress().getFlat(),
+                pat.getTel(),
+                "",
+                naprName
+            );
+            osw.write(htmTemplate.getTemplateText());
+            return path;
+        } catch (Exception e) {
+            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
         }
     }
 
