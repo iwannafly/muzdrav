@@ -109,7 +109,7 @@ public class Vvod extends JFrame {
 	private CustomDateEditor tbDiagDispDatVz;
 	private CustomDateEditor tbDiagDispDatIsh;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbNaprMesto;
-	private ThriftStringClassifierCombobox<StringClassifier> cmbNaprVidIssl;
+	private ThriftStringClassifierCombobox<StringClassifier> cmbOrgan;
 	private CustomTable<PokazMet, PokazMet._Fields> tblNaprPokazMet;
 	private CustomTextField tbNaprKab;
 	private JTextArea tbJal;
@@ -178,11 +178,11 @@ public class Vvod extends JFrame {
 	private CustomTextField tfNewDs;
 	private CustomDateEditor tfDataIzmNewDs;
 	private String diag_named;
-	
-	private PvizitAmb pvizitAmbCopy;
 	private Priem priemCopy;
 	private AnamZab anamZabCopy;
 	private Pvizit pvizitCopy;
+	private PvizitAmb pvizitAmbCopy;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbLpu;
 
 	
 	/**
@@ -1466,7 +1466,7 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (cmbNaprMesto.getSelectedItem() != null)
-						cmbNaprVidIssl.setData(MainForm.tcl.get_n_nz1(cmbNaprMesto.getSelectedItem().pcod));
+						cmbOrgan.setData(MainForm.tcl.get_n_nz1(cmbNaprMesto.getSelectedItem().pcod));
 				} catch (KmiacServerException e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
@@ -1477,12 +1477,12 @@ public class Vvod extends JFrame {
 		
 		JLabel lblNaprMesto = new JLabel("Лаборатория");
 		
-		cmbNaprVidIssl = new ThriftStringClassifierCombobox<>(true);
-		cmbNaprVidIssl.addActionListener(new ActionListener() {
+		cmbOrgan = new ThriftStringClassifierCombobox<>(true);
+		cmbOrgan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					if (cmbNaprVidIssl.getSelectedItem()!= null)
-						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet(cmbNaprVidIssl.getSelectedItem().pcod, cmbNaprMesto.getSelectedItem().pcod));
+					if (cmbOrgan.getSelectedItem()!= null)
+						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet(cmbOrgan.getSelectedItem().pcod, cmbNaprMesto.getSelectedItem().pcod));
 				} catch (KmiacServerException e) {
 					JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
@@ -1501,12 +1501,12 @@ public class Vvod extends JFrame {
 		btnNaprPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if ((cmbNaprVidIssl.getSelectedItem() != null) ) {
+					if ((cmbOrgan.getSelectedItem() != null) ) {
 						P_isl_ld pisl = new P_isl_ld();
 						Prez_d prezd = new Prez_d();
 						Prez_l prezl = new Prez_l();
 						pisl.setNpasp(Vvod.zapVr.getNpasp());
-						pisl.setPcisl(cmbNaprVidIssl.getSelectedPcod());
+						pisl.setPcisl(cmbOrgan.getSelectedPcod());
 						pisl.setNapravl(2);
 						pisl.setNaprotd(MainForm.authInfo.getCpodr());
 						pisl.setDatan(System.currentTimeMillis());
@@ -1545,6 +1545,7 @@ public class Vvod extends JFrame {
 							isslmet.setPokaz(selItems);
 							if (cmbNaprMesto.getSelectedItem() != null) isslmet.setMesto(cmbNaprMesto.getSelectedItem().getName());
 							isslmet.setKab(getTextOrNull(tbNaprKab.getText()));
+							isslmet.setClpu(cmbLpu.getSelectedPcod());
 							isslmet.setClpu_name(MainForm.authInfo.getClpu_name());
 							isslmet.setCpodr_name(MainForm.authInfo.getCpodr_name());
 							String servPath = MainForm.tcl.printIsslMetod(isslmet);
@@ -1554,6 +1555,7 @@ public class Vvod extends JFrame {
 						}
 					}
 				}
+				
 					catch (TException e1) {
 					e1.printStackTrace();
 					MainForm.conMan.reconnect(e1);
@@ -1567,6 +1569,25 @@ public class Vvod extends JFrame {
 		tbNaprKab.setColumns(10);
 		
 		JLabel lblNaprKab = new JLabel("Кабинет");
+		
+		JLabel lblLpu = new JLabel("ЛПУ");
+		
+		 cmbLpu =  new ThriftIntegerClassifierCombobox<>(true);
+		 cmbLpu.addActionListener(new ActionListener() {
+		 	public void actionPerformed(ActionEvent e) {
+				try {
+					if (cmbLpu.getSelectedItem() != null){
+						cmbNaprMesto.setData(MainForm.tcl.get_n_lds(cmbLpu.getSelectedPcod()));
+							cmbOrgan.setData(MainForm.tcl.get_n_nz1(0));
+							tblNaprPokazMet.setData(MainForm.tcl.getPokazMet("", 0));
+					}
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+				}
+		 	}
+		 });
 		GroupLayout gl_pnlIssl = new GroupLayout(pnlIssl);
 		gl_pnlIssl.setHorizontalGroup(
 			gl_pnlIssl.createParallelGroup(Alignment.TRAILING)
@@ -1587,20 +1608,28 @@ public class Vvod extends JFrame {
 						.addGroup(gl_pnlIssl.createSequentialGroup()
 							.addComponent(lblNaprVidIssl, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbNaprVidIssl, 0, 418, Short.MAX_VALUE)))
+							.addComponent(cmbOrgan, 0, 418, Short.MAX_VALUE))
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(lblLpu)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmbLpu, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_pnlIssl.setVerticalGroup(
-			gl_pnlIssl.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_pnlIssl.createSequentialGroup()
-					.addContainerGap(38, Short.MAX_VALUE)
+			gl_pnlIssl.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_pnlIssl.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblLpu)
+						.addComponent(cmbLpu, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNaprMesto)
 						.addComponent(cmbNaprMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNaprVidIssl)
-						.addComponent(cmbNaprVidIssl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cmbOrgan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblNaprPokazMet)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -2278,7 +2307,7 @@ public class Vvod extends JFrame {
 		try {
 			tblPos.setStringClassifierSelector(2, ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00));
 			cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
-			cmbNaprMesto.setData(MainForm.tcl.get_n_lds(MainForm.authInfo.clpu));
+			cmbLpu.setData(MainForm.tcl.get_m00());
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));
 		} catch (KmiacServerException e) {

@@ -428,6 +428,7 @@ struct IsslMet {
 	8: optional i32 pvizitId;
 	9: optional string cpodr_name;
 	10: optional string clpu_name;
+	11: optional i32 clpu;
 }
 
 struct IsslPokaz {

@@ -356,15 +356,20 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 		2:kmiacServer.KmiacServerException kse);
 	
 	/**
-	 * Печать медицинской карты приемного отделения
+	 * Печать амбулаторный карты
 	 */
 	string printMedCart(1: Nambk nambk, 2: PatientFullInfo pat, 3: kmiacServer.UserAuthInfo uai,
 		4: string docInfo, 5: string oms_org, 6: string lgot) throws (1:kmiacServer.KmiacServerException kse);
 	
 	/**
-	 * Печать амбулаторный карты
+	 * Печать медицинской карты приемного отделения
 	 */
 	string printAmbCart(1:PatientFullInfo pat) throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Печать медицинской карты приемного отделения
+	 */
+	string printStacCart(1: PatientFullInfo pat, 2:Gosp gosp, 3:string otdName, 4:string naprName,
+		5:string vidTrans, 6:string grBl, 7:string rezus) throws (1:kmiacServer.KmiacServerException kse);
 
     void deletePatient(1:i32 npasp) throws (1:kmiacServer.KmiacServerException kse);
     void deleteNambk(1:i32 npasp, 2:i32 cpol) throws (1:kmiacServer.KmiacServerException kse);

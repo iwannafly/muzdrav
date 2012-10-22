@@ -916,12 +916,18 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<tr valign=\"top\">");
 				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
 					sb.append("<h3>Информация для пациента:</h3>");
-					if (im.getMesto()!=null)sb.append(String.format("<b>Место: </b>%s<br />", im.getMesto()));
-					if (im.getKab()!=null)sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
+					acrs = sse.execPreparedQuery("select substr(adres,8), name_s from n_m00 where pcod = ? ", im.getClpu());
+					if (acrs.getResultSet().next()) {
+						sb.append(String.format("<b>ЛПУ: </b>%s<br />", acrs.getResultSet().getString(2)));
+						sb.append(String.format("<b>Адрес: </b> %s <br />", acrs.getResultSet().getString(1)));
+					}
+					if (im.getMesto()!=null) sb.append(String.format("<b>Лаборатория: </b>%s<br />", im.getMesto()));
+					if (im.getKab()!=null) sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
 					sb.append("<b>Дата:</b><br />");
 					sb.append("<b>Время:</b><br />");
 					sb.append("<b>Подготовка:</b><br />");
 				sb.append("</td>");
+				acrs.close();
 				acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", im.getUserId());
 				if (acrs.getResultSet().next()) {
 					sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
@@ -937,8 +943,9 @@ public class ServerOsm extends Server implements Iface {
 				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 				if (acrs.getResultSet().next()) {
 					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-					sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
+					if (acrs.getResultSet().getString(8)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
 					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					if (acrs.getResultSet().getString(5)!=null)
 					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
 				}
 				sb.append("<b>Диагноз:</b><br />");
@@ -948,7 +955,7 @@ public class ServerOsm extends Server implements Iface {
 					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
 				acrs.close();
 				sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
-				sb.append("<h3>Наименование показателей:</h3>");
+				sb.append("<h3>Наименование исследований:</h3>");
 				sb.append("<ol>");
 				for (String str : im.getPokaz()) {
 					acrs.close();
@@ -1129,11 +1136,12 @@ public class ServerOsm extends Server implements Iface {
 			 	acrs.close();
 				acrs = sse.execPreparedQuery("SELECT patient.fam, patient.im, patient.ot, patient.datar, patient.adm_ul, patient.adm_dom, patient.adm_kv, n_z43.name, patient.prof FROM patient join n_z43 on (patient.mrab=n_z43.pcod) where patient.npasp= ? ", na.getNpasp());
 				if (acrs.getResultSet().next()){
-			sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-			sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
-			sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
-			sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
-			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));}
+					sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					sb.append("5. Адрес: "); if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
+					sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
+			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));
+			}
 			sb.append("<br>7. Код диагноза по МКБ: ");
 			acrs.close();
 			acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", na.getPvizitId());
@@ -2664,7 +2672,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<IntegerClassifier> get_m00() throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name from n_m00 where pr=\"Л\" ")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name_s as name from n_m00 where pr='Л' ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
