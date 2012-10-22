@@ -1977,7 +1977,7 @@ public class Vvod extends JFrame {
 					e2.printStackTrace();
 				} catch (PvizitNotFoundException e2) {
 					try {
-						pvizit.setId(MainForm.tcl.AddPvizitId(pvizit));
+						MainForm.tcl.AddPvizit(pvizit);
 						zapVr.setId_pvizit(pvizit.id);
 						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
@@ -2188,6 +2188,10 @@ public class Vvod extends JFrame {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			if (!arg0.getValueIsAdjusting()){
+				pvizitAmb = new PvizitAmb();
+				priem = new Priem();
+				anamZab = new AnamZab();
+				pvizit = new Pvizit();
 				if (tblPos.getSelectedItem()!= null) {
 					pvizitAmb = tblPos.getSelectedItem();
 					try {
@@ -2205,11 +2209,6 @@ public class Vvod extends JFrame {
 					} catch (TException e) {
 						MainForm.conMan.reconnect(e);
 					}
-				} else {
-					pvizitAmb = new PvizitAmb();
-					priem = new Priem();
-					anamZab = new AnamZab();
-					pvizit = new Pvizit();
 				}
 				
 				if (pvizitAmb.isSetCpos())
