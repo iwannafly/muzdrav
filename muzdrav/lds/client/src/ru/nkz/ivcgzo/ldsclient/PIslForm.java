@@ -400,7 +400,7 @@ public class PIslForm {
 				tn_ldi.addItem(pisl_ld);
 				//System.out.print(tn_ldi.getSelectedItem().nisl);
 				
-			} catch (IslExistsException | TException e) {
+			} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -505,7 +505,7 @@ public class PIslForm {
 				tn_ldi.getSelectedItem();
 				tn_ldi.repaint();
 //UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ?, WHERE nisl = ?				
-			}catch (IslExistsException | TException e) {
+			}catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

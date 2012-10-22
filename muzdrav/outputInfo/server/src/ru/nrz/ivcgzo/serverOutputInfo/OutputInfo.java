@@ -282,7 +282,6 @@ public class OutputInfo extends Server implements Iface {
 						// Проверка на условие первичности посещения
 						if (spat.getResultSet().getInt("xzab")==1) perv=1;
 						else if (spat.getResultSet().getDate("dataz").after(kpo) && spat.getResultSet().getDate("dataz").before(kpg)) {
-							// Здесь также должен проверяться исход (<>0)
 							try (AutoCloseableResultSet arcs = sse.execPreparedQuery("select count(*) from p_vizit_amb where npasp= ? and id_diag_amb = ? and ishod<>0 and datap between ? and ?::date", xind, ndiag, kpo, datef))
 							{
 								while (arcs.getResultSet().next()) {
@@ -637,5 +636,17 @@ public class OutputInfo extends Server implements Iface {
 		
 		return svod;
 	}
+
+public String ZagShap(String d1, String d2, String npol, int uchas){
+	
+	String shap = null;
+	
+	
+	
+	return shap;
+	
+} 
+
+
 
 }
