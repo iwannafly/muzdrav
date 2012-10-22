@@ -194,7 +194,7 @@ public class ServerViewSelect extends Server implements Iface {
 	
 	private String getSearchPatientWhereClause(PatientSearchParams prms) {
 		String clause = "WHERE ";
-		String condStringFormat = ((prms.illegibleSearch) ? "(%s SIMILAR TO ?) " : "(%s = ?) ") + "AND ";
+		String condStringFormat = ((prms.illegibleSearch) ? "(%s SIMILAR TO ?) " : "(%s LIKE ?) ") + "AND ";
 		String condDateFormat = ((prms.illegibleSearch) ? "(%s BETWEEN ? AND ?) " : "(%s = ?) ") + "AND ";
 		final int andLen = 4;
 		
