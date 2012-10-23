@@ -17,6 +17,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftKartaRInv.Pinvk;
 import ru.nkz.ivcgzo.thriftKartaRInv.thriftKartaRInv;
 
+
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
 
@@ -49,7 +50,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MainForm extends Client<thriftKartaRInv.Client> {
-
+//	public static ThriftKartaRInv.Client tcl;
+	public static MainForm instance;
 	private JFrame frame;
 	private int mr1;
 	private int mr2;
@@ -206,18 +208,95 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		
+		JButton btnAdd = new JButton("Добавить");
+		btnAdd.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+				Pinvk invk = new Pinvk();
+				invk.setD_inv(t_d_inv.getDate().getTime());
+				invk.setD_invp(t_d_invp.getDate().getTime());
+				invk.setD_osv(t_d_osv.getDate().getTime());
+				invk.setD_otpr(t_d_otpr.getDate().getTime());
+				invk.setDatav(t_datav.getDate().getTime());
+				invk.setDataz(t_dataz.getDate().getTime());
+				invk.setD_srok(t_d_srok.getDate().getTime());
+				invk.setDiag(getTextOrNull(t_diag.getText()));
+				invk.setDiag_s1(getTextOrNull(t_diag_s1.getText()));
+				invk.setDiag_s2(getTextOrNull(t_diag_s2.getText()));
+				invk.setDiag_s3(getTextOrNull(t_diag_s3.getText()));
+				invk.setOslog(getTextOrNull(t_oslog.getText()));
+				invk.setVrach(getTextOrNull(t_vrach.getText()));
+				invk.setUchr(getTextOrNull(t_uchr.getText()));
+				invk.setNom_mse(getTextOrNull(t_nom_mse.getText()));
+				invk.setRuk_mse(getTextOrNull(t_ruk_mse.getText()));
+				invk.setZakl_name(getTextOrNull(t_zakl_name.getText()));
+				invk.setMr1d(getTextOrNull(t_mr1d.getText()));
+				invk.setMr2d(getTextOrNull(t_mr2d.getText()));
+				invk.setMr3d(getTextOrNull(t_mr3d.getText()));
+				invk.setMr4d(getTextOrNull(t_mr4d.getText()));
+				invk.setPr1d(getTextOrNull(t_mr4d.getText()));
+				
+			//	invk.setD_srok(cb_srok.getDate().getTime());
+			}
+
+		private String getTextOrNull(String text) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		});
+		JButton btnSave = new JButton("Сохранить");
+		
+		JButton btnDelete = new JButton("Удалить");
+		
+		JButton btn_expkart = new JButton("Экспорт карты в МСЭ");
+		btn_expkart.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
+		JButton btnSearch = new JButton("Поиск");
+		btnAdd.setToolTipText("Поиск и выбор пациента");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, true);
+				
+				if (res != null) {
+				//	btnZpr.setEnabled(true);
+					
+			//		searched = true;
+			//		searchedNpasp = res[0];
+			//		updateZapList();
+				}
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 704, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+					.addGap(38)
+					.addComponent(btnSearch)
+					.addPreferredGap(ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
+					.addComponent(btnAdd)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(btnSave)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(btnDelete)
+					.addGap(27)
+					.addComponent(btn_expkart)
+					.addGap(38))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 640, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(34, Short.MAX_VALUE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btn_expkart)
+						.addComponent(btnDelete)
+						.addComponent(btnSave)
+						.addComponent(btnAdd)
+						.addComponent(btnSearch))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 619, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		
 		cb_mesto1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0m);
@@ -318,48 +397,6 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		JPanel p_medsoc = new JPanel();
 		p_medsoc.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B \u043C\u0435\u0434\u0438\u043A\u043E-\u0441\u043E\u0446\u0438\u0430\u043B\u044C\u043D\u043E\u0439 \u044D\u043A\u0441\u043F\u0435\u0440\u0442\u0438\u0437\u044B", TitledBorder.CENTER, TitledBorder.TOP, null, null));
 		
-		JButton btn_expkart = new JButton("Экспорт карты в МСЭ");
-		btn_expkart.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		
-		JButton btnNewButton = new JButton("Добавить");
-		btnNewButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-				Pinvk invk = new Pinvk();
-				invk.setD_inv(t_d_inv.getDate().getTime());
-				invk.setD_invp(t_d_invp.getDate().getTime());
-				invk.setD_osv(t_d_osv.getDate().getTime());
-				invk.setD_otpr(t_d_otpr.getDate().getTime());
-				invk.setDatav(t_datav.getDate().getTime());
-				invk.setDataz(t_dataz.getDate().getTime());
-				invk.setD_srok(t_d_srok.getDate().getTime());
-				invk.setDiag(getTextOrNull(t_diag.getText()));
-				invk.setDiag_s1(getTextOrNull(t_diag_s1.getText()));
-				invk.setDiag_s2(getTextOrNull(t_diag_s2.getText()));
-				invk.setDiag_s3(getTextOrNull(t_diag_s3.getText()));
-				invk.setOslog(getTextOrNull(t_oslog.getText()));
-				invk.setVrach(getTextOrNull(t_vrach.getText()));
-				invk.setUchr(getTextOrNull(t_uchr.getText()));
-				invk.setNom_mse(getTextOrNull(t_nom_mse.getText()));
-				invk.setRuk_mse(getTextOrNull(t_ruk_mse.getText()));
-				invk.setZakl_name(getTextOrNull(t_zakl_name.getText()));
-				invk.setMr1d(getTextOrNull(t_mr1d.getText()));
-				invk.setMr2d(getTextOrNull(t_mr2d.getText()));
-				invk.setMr3d(getTextOrNull(t_mr3d.getText()));
-				invk.setMr4d(getTextOrNull(t_mr4d.getText()));
-				invk.setPr1d(getTextOrNull(t_mr4d.getText()));
-				
-			//	invk.setD_srok(cb_srok.getDate().getTime());
-			}
-
-		private String getTextOrNull(String text) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		});
-		JButton button = new JButton("Сохранить");
-		
-		JButton btnNewButton_1 = new JButton("Удалить");
-		
 		
 		GroupLayout gl_p_rez_exp = new GroupLayout(p_rez_exp);
 		gl_p_rez_exp.setHorizontalGroup(
@@ -400,17 +437,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 							.addComponent(label))
 						.addGroup(gl_p_rez_exp.createSequentialGroup()
 							.addGap(19)
-							.addGroup(gl_p_rez_exp.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_p_rez_exp.createSequentialGroup()
-									.addGap(10)
-									.addComponent(btnNewButton)
-									.addGap(18)
-									.addComponent(button)
-									.addGap(18)
-									.addComponent(btnNewButton_1)
-									.addGap(48)
-									.addComponent(btn_expkart))
-								.addComponent(p_medsoc, GroupLayout.PREFERRED_SIZE, 634, GroupLayout.PREFERRED_SIZE))))
+							.addComponent(p_medsoc, GroupLayout.PREFERRED_SIZE, 634, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap(22, Short.MAX_VALUE))
 		);
 		gl_p_rez_exp.setVerticalGroup(
@@ -438,13 +465,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 						.addComponent(t_uchr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(p_medsoc, GroupLayout.PREFERRED_SIZE, 435, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_p_rez_exp.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnNewButton)
-						.addComponent(button)
-						.addComponent(btn_expkart)
-						.addComponent(btnNewButton_1))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(34, Short.MAX_VALUE))
 		);
 		
 		JLabel label_1 = new JLabel("Акт МСЭ №");
@@ -502,12 +523,12 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 						.addGroup(gl_p_medsoc.createSequentialGroup()
 							.addContainerGap()
 							.addGroup(gl_p_medsoc.createParallelGroup(Alignment.LEADING)
-								.addComponent(label_1)
 								.addComponent(lblNewLabel)
 								.addComponent(label_2)
 								.addComponent(lblNewLabel_1)
-								.addComponent(label_3))
-							.addGap(29)
+								.addComponent(label_3)
+								.addComponent(label_1))
+							.addGap(105)
 							.addGroup(gl_p_medsoc.createParallelGroup(Alignment.LEADING)
 								.addComponent(t_d_otpr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(t_d_osv, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -541,7 +562,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 					.addGroup(gl_p_medsoc.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_1)
 						.addComponent(t_nom_mse, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(9)
 					.addGroup(gl_p_medsoc.createParallelGroup(Alignment.BASELINE)
 						.addComponent(t_d_osv, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel))
@@ -571,7 +592,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 					.addGroup(gl_p_medsoc.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_6)
 						.addComponent(t_d_srok, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(70, Short.MAX_VALUE))
+					.addContainerGap(139, Short.MAX_VALUE))
 		);
 		p_medsoc.setLayout(gl_p_medsoc);
 		p_rez_exp.setLayout(gl_p_rez_exp);

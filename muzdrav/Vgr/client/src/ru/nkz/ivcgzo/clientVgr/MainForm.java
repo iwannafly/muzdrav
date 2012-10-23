@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
 import javax.swing.JMenuBar;
@@ -99,9 +100,18 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		
 		JMenuItem menuItem = new JMenuItem("Диспансеризация КОВ");
 		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e, CustomDateEditor tfdn, CustomDateEditor tfdk) {
+				per = new Period();
+				per.showPeriod(tfdn, tfdk);
+				
+				//sfrm = new SettingsForm();
+			//	sfrm.showSettingsForm();
+			}
+
+			@Override
 			public void actionPerformed(ActionEvent e) {
-//				per = new Period();
-//				per.setVisible(true);
+				// TODO Auto-generated method stub
+				
 			}
 		});
 		mnNewMenu.add(menuItem);
@@ -130,12 +140,21 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		JMenu menu = new JMenu("Выход");
 		menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			//	frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);	
+		//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
+				setVisible(false);
 			}
 		});
 		menuBar.add(menu);
 		
 //		JMenuBar menuBar_1 = new JMenuBar();
 //		menuBar.add(menuBar_1);
+
+	}
+
+	
+	public void setVisible(boolean value) {
+		frame.setVisible(value);		
 	}
 
 	@Override

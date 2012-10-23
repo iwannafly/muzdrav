@@ -800,16 +800,13 @@ public class GenReestr extends Server implements Iface {
         if (vidr == 3) sqlwhere = "WHERE g.pr_out<>0 AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
 
         sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
-				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-				"1::integer AS c_mu, "+
-				"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
-				"(select get_kodsp(ld.cuser))::integer AS spec, " +
-				"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
-				"(select get_vmu(ld.cuser))::integer AS v_mu, " +
-				"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
-				"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-				"null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
-				
+				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, g.diag_p::char(7) AS diag, null::char(7) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, "+
+				"(select get_prof(?, g.cuser))::integer AS prof_fn, " +
+				"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
+				"(select get_kodsp(g.cuser))::integer AS spec, " +
+				"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, " +
+				"(select get_vrach_snils(g.cuser))::char(14) AS ssd, " +
+				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, null::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt, "+
 				" 1::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
 				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
@@ -827,19 +824,17 @@ public class GenReestr extends Server implements Iface {
 				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
+				"(select get_region(p.poms_strg))::integer AS region, " +
+				"p.ter_liv::integer AS ter_liv, (select get_status(p.sgrp))::integer AS status, "+
+				"(select get_kov(p.npasp))::char(30) AS kob, null::char(10) AS ist_bol, null::integer AS vid_hosp, "+
+				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
+				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
 				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
 				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
-				"(select get_region(p.poms_strg))::integer AS region," +
-				"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
-				"(select get_kov(p.npasp))::char(30) AS kob, " +
-				"1::integer AS vid_hosp, null::char(11) AS talon, " +
-				"p.terp::integer AS ter_pol, p.cpol_pr::integer AS pol, p.npasp::integer AS id_lpu, " +
-				"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
-				"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
-				"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
+				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir";
 
-        	sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
-        			"JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
+        			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
         	sqlr += sqlwhere;
         	sqlr += " ORDER BY p.npasp";
 		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df),vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
