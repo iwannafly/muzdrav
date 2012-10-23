@@ -25,6 +25,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftLab.Gosp;
+import ru.nkz.ivcgzo.thriftLab.Isl;
 import ru.nkz.ivcgzo.thriftLab.Metod;
 import ru.nkz.ivcgzo.thriftLab.Napr;
 import ru.nkz.ivcgzo.thriftLab.Pisl;
@@ -405,5 +406,12 @@ public class ServerLab extends Server implements Iface {
             ((SQLException) e.getCause()).printStackTrace();
             throw new KmiacServerException();
         }
+    }
+
+    @Override
+    public List<Isl> getIslList(int gospId) throws KmiacServerException,
+            TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

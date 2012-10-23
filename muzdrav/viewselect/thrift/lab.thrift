@@ -91,6 +91,16 @@ struct Gosp {
 	12: optional string vrach_fio;
 }
 
+struct Isl{
+	1: optional i32 nisl;
+	2: optional i32 cisl;
+	3: optional string name_cisl;
+	4: optional string pokaz;
+	5: optional string pokaz_name;
+	6: optional string rez;
+	7: optional i64 datav;
+}
+
 service ThriftLab extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getVidIssled() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getLabs(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
@@ -107,4 +117,5 @@ service ThriftLab extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getLpu() throws (1: kmiacServer.KmiacServerException kse);
 	i32 addNapr(1: Napr napr) throws (1: kmiacServer.KmiacServerException kse);
 	list<Gosp> getGospList(1:i32 npasp, 2:i64 dateStart, 3: i64 dateEnd) throws (1: kmiacServer.KmiacServerException kse);
+	list<Isl> getIslList(1: i32 gospId) throws (1: kmiacServer.KmiacServerException kse);
 }

@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftLab.Gosp;
 import ru.nkz.ivcgzo.thriftLab.Napr;
 import ru.nkz.ivcgzo.thriftLab.Patient;
 import ru.nkz.ivcgzo.thriftLab.Pisl;
@@ -418,7 +419,7 @@ public class MainFrame extends JFrame {
         });
     }
 
-//    class GospTreeNode extends DefaultMutableTreeNode {
+    class GospTreeNode extends DefaultMutableTreeNode {
 //        private static final long serialVersionUID = 4212592425962984738L;
 //        private Gosp gosp;
 //        
@@ -430,9 +431,9 @@ public class MainFrame extends JFrame {
 //        
 //        @Override
 //        public String toString() {
-//            return DateFormat.getDateInstance().format(new Date(gosp.getDatao()));
+//            return DateFormat.getDateInstance().format(new Date(gosp.getDatap()));
 //        }
-//    }
+    }
     
 //    class IssledNode extends DefaultMutableTreeNode{
 //        private static final long serialVersionUID = -5215124870459111226L;
