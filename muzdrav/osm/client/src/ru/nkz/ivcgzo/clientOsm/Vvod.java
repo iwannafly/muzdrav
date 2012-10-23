@@ -2128,6 +2128,11 @@ public class Vvod extends JFrame {
 						MainForm.tcl.UpdatePvizit(pvizit);
 						MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 						btnRecPriem.setEnabled(!pvizit.isSetIshod());
+						
+						pvizitAmbCopy = new PvizitAmb(pvizitAmb);
+						priemCopy = new Priem(priem);
+						anamZabCopy = new AnamZab(anamZab);
+						pvizitCopy = new Pvizit(pvizit);
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {
