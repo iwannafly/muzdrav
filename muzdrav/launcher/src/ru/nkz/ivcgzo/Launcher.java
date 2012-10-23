@@ -23,6 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Launcher {
+	private static final String clientAuthType = "unspecified";
 	private static final String libDir = "lib";
 	private final String rootPath;
 	private class LibraryInfo {
@@ -38,7 +39,7 @@ public class Launcher {
 			lnc = new Launcher();
 			lnc.checkAndUpdate();
 			
-			Runtime.getRuntime().exec("java -jar auth.jar");
+			Runtime.getRuntime().exec("java -jar auth.jar " + clientAuthType);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -49,7 +50,7 @@ public class Launcher {
 	}
 	
 	public void checkAndUpdate() {
-		try (Socket servSct = new Socket("localhost", 55201)) {
+		try (Socket servSct = new Socket("10.0.0.243", 55201)) {
 			handShake(servSct);
 			Document domLibList = getLibrariesList(servSct);
 			List<LibraryInfo> updList = getUpdateList(domLibList);
