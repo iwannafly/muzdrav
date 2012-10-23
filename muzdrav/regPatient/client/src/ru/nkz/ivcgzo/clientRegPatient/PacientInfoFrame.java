@@ -41,6 +41,7 @@ import org.apache.thrift.TException;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomNumberEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
@@ -111,11 +112,11 @@ public class PacientInfoFrame extends JFrame {
     private CustomTextField tf_dms_ser;
     private CustomTextField tf_oms_nom;
     private CustomTextField tf_dms_nom;
-    private CustomTextField tfMr;
+    private CustomNumberEditor tfMr;
     private CustomTextField tfMrname;
     private CustomTextField tfDolj;
     private CustomTextField tfTel;
-    private CustomTextField tf_Cpol;
+    private CustomNumberEditor tf_Cpol;
     private CustomTextField tf_Nuch;
     private CustomTextField tf_Nambk;
     private CustomTextField tf_serdoc;
@@ -861,15 +862,20 @@ public class PacientInfoFrame extends JFrame {
         panel_7.setLayout(gl_panel_7);
         panel_7.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{tf_serdoc, tf_nomdoc, cmb_tdoc, tf_Odoc, tf_datadoc, tf_Snils}));
 
-        tf_Cpol = new CustomTextField();
+        tf_Cpol = new CustomNumberEditor();
         tf_Cpol.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    int[] res = MainForm.conMan.showPolpTreeForm("прикрепление", 0, 0, 0);
+                	int[] res = null;
+                	if (tf_Cpol.getNumber() != null )
+                		if (PersonalInfo.getTerp() == 10) res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", PersonalInfo.getTerp(), Integer.valueOf(Integer.toString(PersonalInfo.getCpol_pr()).substring(0,2)), PersonalInfo.getCpol_pr());
+                		else res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
+                	else
+                		res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
                     if (res != null) {
-                           tf_Cpol.setText(Integer.toString(res[2]));
-                           Terp = res[0];
+                    	tf_Cpol.setText(Integer.toString(res[2]));
+                    	Terp = res[0];
                     }
                 }
             }
@@ -953,19 +959,21 @@ public class PacientInfoFrame extends JFrame {
         tfMrname = new CustomTextField();
         tfMrname.setColumns(10);
 
-        tfMr = new CustomTextField();
+        tfMr = new CustomNumberEditor();
         tfMr.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    IntegerClassifier res = MainForm.conMan.showMrabTreeForm("место работы", Integer.valueOf(tfMr.getText()));
-
-                    if (res != null) {
-                           tfMr.setText(Integer.toString(res.pcod));
-                           //PersonalInfo.setMrab(res.pcod);
-                           tfMrname.setText(res.name);
-
-                    }
+                	IntegerClassifier res = null;
+                	if(tfMr.getNumber() != null){
+                    	res = MainForm.conMan.showMrabTreeForm("место работы", Integer.valueOf(tfMr.getText()));
+                	} else {
+                		res = MainForm.conMan.showMrabTreeForm("место работы", 0);
+					} 
+					if (res != null) {
+                        tfMr.setText(Integer.toString(res.pcod));
+                        tfMrname.setText(res.name);
+                      }
                 }
             }
         });
