@@ -59,7 +59,7 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
-        "npasp", "id_gosp", "fam", "im", "ot", "datar", "datagos", "cotd", "npal", "nist"
+        "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
     };
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
@@ -155,7 +155,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientForDoctor(final int doctorId, final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im, "
-                + "patient.ot, patient.datar, c_gosp.datagos, c_otd.cotd, c_otd.npal, c_otd.nist "
+                + "patient.ot, patient.datar, c_gosp.datap, c_otd.cotd, c_otd.npal, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.vrach = ? AND c_otd.cotd = ? ORDER BY fam, im, ot;";
@@ -178,7 +178,7 @@ public class ServerHospital extends Server implements Iface {
     public final List<TSimplePatient> getAllPatientFromOtd(final int otdNum)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.fam, patient.im,"
-                + "patient.ot, patient.datar, c_gosp.datagos, c_otd.cotd, c_otd.nist "
+                + "patient.ot, patient.datar, c_gosp.datap, c_otd.cotd, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
@@ -550,10 +550,10 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void updateMedicalHistory(final TMedicalHistory medHist)
             throws KmiacServerException {
-        final int[] indexes = {2, 3, 4, 5, 6, 0};
+        final int[] indexes = {2, 3, 4, 5, 6, 8, 9, 0};
         final String sqlQuery = "UPDATE c_osmotr SET jalob = ?, "
             + "morbi = ?, status_praesense = ?, "
-            + "status_localis = ?, fisical_obs = ? "
+            + "status_localis = ?, fisical_obs = ?, dataz = ?, timez = ? "
             + "WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, medHist, MEDICAL_HISTORY_TYPES, indexes);

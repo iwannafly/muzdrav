@@ -1,9 +1,13 @@
 package ru.nkz.ivcgzo.clientLab;
 
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -31,15 +35,26 @@ import ru.nkz.ivcgzo.thriftLab.Pisl;
 import ru.nkz.ivcgzo.thriftLab.PokazMet;
 import ru.nkz.ivcgzo.thriftLab.PrezD;
 import ru.nkz.ivcgzo.thriftLab.PrezL;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitAmbInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitInfo;
 
 import javax.swing.JButton;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.apache.thrift.TException;
 import javax.swing.JComboBox;
 import javax.swing.JTextArea;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+
+import java.awt.FlowLayout;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
+import javax.swing.JEditorPane;
 
 public class MainFrame extends JFrame {
 
@@ -68,6 +83,16 @@ public class MainFrame extends JFrame {
     private JTextArea taObosn;
     private Patient patient;
     private List<IntegerClassifier> vidIssled;
+    private JPanel pResult;
+    private JPanel pResultDateSelector;
+    private CustomDateEditor cdeResultDateFrom;
+    private JLabel lblPeriod;
+    private JLabel lblResultDash;
+    private CustomDateEditor cdeResultDateTo;
+    private JButton btnDatePeriodSelect;
+    private JSplitPane splitPane;
+    private JTree trResult;
+    private JEditorPane epResultText;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
@@ -82,6 +107,7 @@ public class MainFrame extends JFrame {
         addMainTabbedPane();
         addIssledTab();
         addNapravTab();
+        addResultTab();
     }
 
     private void addMainTabbedPane() {
@@ -228,6 +254,7 @@ public class MainFrame extends JFrame {
         pisl.setDatan(System.currentTimeMillis());
         pisl.setVrach(doctorAuthInfo.getPcod());
         pisl.setDataz(System.currentTimeMillis());
+        pisl.setIdGosp(patient.idGosp);
 //        pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
         pisl.setNisl(ClientLab.tcl.addPisl(pisl));
     }
@@ -251,7 +278,7 @@ public class MainFrame extends JFrame {
     private void addNapravTab() {
         pNaprav = new JPanel();
         tabbedPane.addTab("Направление", null, pNaprav, null);
-
+        
         setNapravTextArea();
         setNapravOrganizationFromComboBoxes();
         setNapravOrganizationToComboBoxes();
@@ -329,6 +356,101 @@ public class MainFrame extends JFrame {
                 }
             }
         });
+    }
+
+    private void addResultTab() {
+        pResult = new JPanel();
+        pResult.setLayout(new BoxLayout(pResult, BoxLayout.Y_AXIS));
+        tabbedPane.addTab("Результаты исследований", null, pResult, null);
+
+        addDateSelectPanel();
+        addResultTreePanel();
+    }
+
+    private void addDateSelectPanel() {
+        pResultDateSelector = new JPanel();
+        pResultDateSelector.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        pResultDateSelector.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pResult.add(pResultDateSelector);
+        
+        lblPeriod = new JLabel("Период ");
+        pResultDateSelector.add(lblPeriod);
+        
+        cdeResultDateFrom = new CustomDateEditor();
+        cdeResultDateFrom.setDate("01.01.2012");
+        cdeResultDateFrom.setColumns(10);
+        pResultDateSelector.add(cdeResultDateFrom);
+        
+        lblResultDash = new JLabel("-");
+        pResultDateSelector.add(lblResultDash);
+        
+        cdeResultDateTo = new CustomDateEditor();
+        cdeResultDateTo.setDate("31.12.2012");
+        cdeResultDateTo.setColumns(10);
+        pResultDateSelector.add(cdeResultDateTo);
+        
+        btnDatePeriodSelect = new JButton("OK");
+        pResultDateSelector.add(btnDatePeriodSelect);
+
+    }
+
+    private void addResultTreePanel() {
+        splitPane = new JSplitPane();
+        splitPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pResult.add(splitPane);
+        
+        addResultTree();
+        addResultText();
+    }
+
+    private void addResultTree() {
+        trResult = new JTree();
+        trResult.setFont(new Font("Arial", Font.PLAIN, 12));
+        splitPane.setLeftComponent(trResult);
+
+        trResult.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                if (e.getNewLeadSelectionPath() == null) {
+                    epResultText.setText("");
+                    return;
+                }
+            }
+        });
+    }
+
+//    class GospTreeNode extends DefaultMutableTreeNode {
+//        private static final long serialVersionUID = 4212592425962984738L;
+//        private Gosp gosp;
+//        
+//        public GospTreeNode(Gosp gosp) {
+//            this.gosp = gosp;
+//            this.add(new GospTreeNode(new PatientVizitAmbInfo()));
+//            
+//        }
+//        
+//        @Override
+//        public String toString() {
+//            return DateFormat.getDateInstance().format(new Date(gosp.getDatao()));
+//        }
+//    }
+    
+//    class IssledNode extends DefaultMutableTreeNode{
+//        private static final long serialVersionUID = -5215124870459111226L;
+//        private PatientVizitAmbInfo pam;
+//        
+//        public IssledAmbNode(PatientVizitAmbInfo pam) {
+//            this.pam = pam;
+//        }
+//        
+//        @Override
+//        public String toString() {
+//            return DateFormat.getDateInstance().format(new Date(pam.getDatap()));
+//        }
+//    }
+
+    private void addResultText() {
+        epResultText = new JEditorPane();
+        splitPane.setRightComponent(epResultText);
     }
 
     public final void onConnect() {

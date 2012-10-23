@@ -11,7 +11,6 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Talon;
 import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 

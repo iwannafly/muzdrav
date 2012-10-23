@@ -56,6 +56,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
  */
 public class ConnectionManager {
 	public static ConnectionManager instance;
+	private final String appServerIp;
 	private Map<Integer, TTransport> transports;
 	private Map<Integer, KmiacServer.Client> connections;
 	private Map<Integer, TTransport> commonTransports;
@@ -81,8 +82,9 @@ public class ConnectionManager {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
+	public <T extends FileTransfer.Client> ConnectionManager(String appServerIp, JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
 		instance = this;
+		this.appServerIp = appServerIp;
 		
 		transports = new HashMap<>();
 		connections = new HashMap<>();
@@ -159,7 +161,7 @@ public class ConnectionManager {
 		T connection;
 		
 		Constructor<T> constructor = cls.getConstructor(TProtocol.class);
-		TTransport transport = new TFramedTransport(new TSocket("localhost", port));
+		TTransport transport = new TFramedTransport(new TSocket(appServerIp, port));
 		connection = constructor.newInstance(new TBinaryProtocol(transport));
 		transports.put(port, transport);
 		connections.put(port, connection);
@@ -394,7 +396,7 @@ public class ConnectionManager {
 	public void transferFileToServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, OpenFileException, TException {
 		int port = openWriteServerSocket(dstPath);
 		try (FileInputStream fis = new FileInputStream(srcPath);
-				Socket socket = new Socket("localhost", port);) {
+				Socket socket = new Socket(appServerIp, port);) {
 			byte[] buf = new byte[fileTransferConstants.bufSize];
 			int read = fileTransferConstants.bufSize;
 			while (read == fileTransferConstants.bufSize) {
@@ -410,7 +412,7 @@ public class ConnectionManager {
 	public void transferFileFromServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, FileNotFoundException, OpenFileException, TException {
 		int port = openReadServerSocket(srcPath);
 		try (FileOutputStream fos = new FileOutputStream(dstPath);
-				Socket socket = new Socket("localhost", port);) {
+				Socket socket = new Socket(appServerIp, port);) {
 			byte[] buf = new byte[fileTransferConstants.bufSize];
 			int read = socket.getInputStream().read(buf);
 			while (read > -1) {
