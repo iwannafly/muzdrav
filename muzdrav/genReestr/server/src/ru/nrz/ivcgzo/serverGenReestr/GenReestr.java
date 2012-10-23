@@ -801,14 +801,14 @@ public class GenReestr extends Server implements Iface {
 
         sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
 				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-				"1::integer AS c_mu, "+
+				"2::integer AS c_mu, g.diag_p::char(6) AS diag, null::char(7) AS ds_s, null::char(6) AS pa_diag, "+
 				"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
 				"(select get_kodsp(ld.cuser))::integer AS spec, " +
 				"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
 				"(select get_vmu(ld.cuser))::integer AS v_mu, " +
 				"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
 				"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-				"null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
+				"null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
 				
 				" 1::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
