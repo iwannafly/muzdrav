@@ -4,7 +4,7 @@ include "../../../common/thrift/kmiacServer.thrift"
 include "../../../common/thrift/classifier.thrift"
 
 /**
-	 * Ошибка формирования KOB
+	 * РћС€РёР±РєР° С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ KOB
 	 */
 	exception KovNotFoundException {
 	}
@@ -77,18 +77,18 @@ struct Lgot{
 
 service ThriftVgr extends kmiacServer.KmiacServer {
 	/**
-        * Создает KOB
+        * РЎРѕР·РґР°РµС‚ KOB
 	*/
 	void getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk,  4:i32 clpu) throws (1:kmiacServer.KmiacServerException kse, 2:KovNotFoundException rnfe);
 
 
 /**
-	 * Классификатор поликлиник для текущего ЛПУ (N_N00 (pcod))
+	 * РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ РїРѕР»РёРєР»РёРЅРёРє РґР»СЏ С‚РµРєСѓС‰РµРіРѕ Р›РџРЈ (N_N00 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getAllPolForCurrentLpu(1:i32 lpuId) throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
-	 * Классификатор поликлиники для текущего ЛПУ (N_N00 (pcod))
+	 * РљР»Р°СЃСЃРёС„РёРєР°С‚РѕСЂ РїРѕР»РёРєР»РёРЅРёРєРё РґР»СЏ С‚РµРєСѓС‰РµРіРѕ Р›РџРЈ (N_N00 (pcod))
 	 */
 	list<classifier.IntegerClassifier> getPolForCurrentLpu(1:i32 polId) throws (1: kmiacServer.KmiacServerException kse);
 }

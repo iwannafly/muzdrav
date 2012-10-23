@@ -2,11 +2,14 @@ package ru.nkz.ivcgzo.serverVgr;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.zip.ZipEntry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -18,6 +21,7 @@ import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
+import ru.nkz.ivcgzo.serverManager.common.DbfMapper;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
@@ -136,18 +140,24 @@ throw new TException(e);
 		String sqlos;
 		String sqlpa;
 		String sqllgot;
-		
+		int bufRead;
+		byte[] buffer = new byte[8192];
 		sqllgot = "SELECT p.npasp::integer AS bn, l.lgot::integer AS kgl "+
 		           "FROM p_kov l, patient p, n_lkn k  "+
                    "WHERE l.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" ;		
-		try 		(AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllgot, lgot) {
-		    ResultSet rs = acrs.getResultSet();
-		//}
-   		//	try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
-   		//		StringBuilder sb = new StringBuilder(0x10000);
-    				
-				while (rs.next()){
-    	           	String str = RsTest(rs);}		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllgot, clpu, clpu,  cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+//			zos.putNextEntry(new ZipEntry("lgot.dbf"));
+//			while ((bufRead = dbfStr.read(buffer)) > 0)
+//				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
 				
 	
 	sqlpa = "SELECT p.npasp::integer AS bn, p.fam::char(20) AS fam,p.im:char(15) AS im,p.ot::char(20) AS otch,  "+
@@ -191,5 +201,6 @@ throw new TException(e);
 		
 
 	}
+}
 
-
+	

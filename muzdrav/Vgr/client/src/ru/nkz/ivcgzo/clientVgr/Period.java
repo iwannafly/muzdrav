@@ -59,8 +59,8 @@ public class Period {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				sfrm = new ServerVgr();
-				sfrm.ServerVgr();
+		//		sfrm = new ServerVgr();
+		//		sfrm.ServerVgr();
 			}
 		});
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
