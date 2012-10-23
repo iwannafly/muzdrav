@@ -761,6 +761,7 @@ public class Vvod extends JFrame {
 			  		diagamb.setDiag(tblDiag.getSelectedItem().getDiag());
 			  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
 			  		diagamb.setDatad(tblDiag.getSelectedItem().getDatad());
+			  		diagamb.setDatap(pvizitAmb.getDatap());
 			  		if (rbtDiagOsn.isSelected()) diagamb.setDiag_stat(1);
 			  		if (rbtDiagSop.isSelected())diagamb.setDiag_stat(3);
 			  		if (rbtDiagOsl.isSelected()) diagamb.setDiag_stat(2);
