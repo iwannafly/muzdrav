@@ -81,14 +81,12 @@ struct Gosp {
 	2: optional i32 npasp;
 	3: optional i32 cotd;
 	4: optional string cotd_name;
-	5: optional i32 clpu;
-	6: optional string clpu_name;
-	7: optional i64 datap;
-	8: optional i64 datav;
-	9: optional string ishod;
-	10: optional string result;
-	11: optional i32 vrach;
-	12: optional string vrach_fio;
+	5: optional i64 datap;
+	6: optional i64 datav;
+	7: optional string ishod;
+	8: optional string result;
+	9: optional i32 vrach;
+	10: optional string vrach_fio;
 }
 
 struct Isl{
@@ -99,6 +97,8 @@ struct Isl{
 	5: optional string pokaz_name;
 	6: optional string rez;
 	7: optional i64 datav;
+	8: optional string op_name;
+	9: optional string rez_name;
 }
 
 service ThriftLab extends kmiacServer.KmiacServer {

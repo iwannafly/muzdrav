@@ -779,7 +779,7 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
-        tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
+        tabbedPane.addTab("Дневник", null, pMedicalHistory, null);
         setMedicalHistoryTabs();
         setMedicalHistoryTablePanel();
         setMedicalHistoryTableButtons();
@@ -1469,8 +1469,8 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 try {
                     if ((patient != null)
-                            || (cbxIshod.getSelectedItem() != null)
-                            || (cbxResult.getSelectedItem() != null)) {
+                            && (cbxIshod.getSelectedItem() != null)
+                            && (cbxResult.getSelectedItem() != null)) {
                         Zakl tmpZakl = new Zakl();
                         tmpZakl.setRecom(taRecomend.getText());
                         tmpZakl.setSostv(taZakluch.getText());

@@ -30,22 +30,25 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftLab.Gosp;
+import ru.nkz.ivcgzo.thriftLab.Isl;
 import ru.nkz.ivcgzo.thriftLab.Napr;
 import ru.nkz.ivcgzo.thriftLab.Patient;
 import ru.nkz.ivcgzo.thriftLab.Pisl;
 import ru.nkz.ivcgzo.thriftLab.PokazMet;
 import ru.nkz.ivcgzo.thriftLab.PrezD;
 import ru.nkz.ivcgzo.thriftLab.PrezL;
-import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitAmbInfo;
-import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitInfo;
 
 import javax.swing.JButton;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
 import javax.swing.JComboBox;
@@ -55,11 +58,11 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import java.awt.FlowLayout;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
-import javax.swing.JEditorPane;
 
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 4157141004019237277L;
+    private static final String LINE_SEP = System.lineSeparator();
     private UserAuthInfo doctorAuthInfo;
     private JPanel pLabAndDiagIssled;
     private JScrollPane spIssled;
@@ -93,7 +96,8 @@ public class MainFrame extends JFrame {
     private JButton btnDatePeriodSelect;
     private JSplitPane splitPane;
     private JTree trResult;
-    private JEditorPane epResultText;
+    private JTextArea taResultText;
+    private StringBuilder sbResulText;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
@@ -124,6 +128,7 @@ public class MainFrame extends JFrame {
         patient.setName(name);
         patient.setMiddlename(middlename);
         patient.setIdGosp(idGosp);
+        updateTree(patient.getId());
     }
 
     private void addIssledTab() {
@@ -391,13 +396,49 @@ public class MainFrame extends JFrame {
         pResultDateSelector.add(cdeResultDateTo);
         
         btnDatePeriodSelect = new JButton("OK");
+        btnDatePeriodSelect.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateTree(patient.getId());
+            }
+        });
         pResultDateSelector.add(btnDatePeriodSelect);
 
+    }
+
+    public void updateTree(int npasp) {
+//        try {
+//            List<Gosp> gosp = ClientLab.tcl.getGospList(patient.getId(), new Date().getTime(), new Date().getTime());
+            trResult.setModel(new DefaultTreeModel(createNodes()));
+//        } catch (KmiacServerException e) {
+//            e.printStackTrace();
+//        } catch (TException e) {
+//            MainForm.conMan.reconnect(e);
+//        }
+    }
+
+    private DefaultMutableTreeNode createNodes() {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Корень");
+        DefaultMutableTreeNode gospInfo = new DefaultMutableTreeNode("Случаи госпитализации");
+        root.add(gospInfo);
+        
+        try {
+            for (Gosp gosp : ClientLab.tcl.getGospList(patient.getId(), new Date().getTime(),
+                    new Date().getTime())) {
+                gospInfo.add(new GospTreeNode(gosp));
+            }
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            ClientLab.conMan.reconnect(e);
+        } 
+
+        return root;
     }
 
     private void addResultTreePanel() {
         splitPane = new JSplitPane();
         splitPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        splitPane.setDividerLocation(1.0);
         pResult.add(splitPane);
         
         addResultTree();
@@ -405,53 +446,126 @@ public class MainFrame extends JFrame {
     }
 
     private void addResultTree() {
+        final JScrollPane sptree = new JScrollPane();
         trResult = new JTree();
         trResult.setFont(new Font("Arial", Font.PLAIN, 12));
-        splitPane.setLeftComponent(trResult);
+        sptree.setViewportView(trResult);
+        splitPane.setLeftComponent(sptree);
 
         trResult.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
-                    epResultText.setText("");
+                    taResultText.setText("");
                     return;
+                }
+                sbResulText = new StringBuilder();
+                Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
+                if (lastPath instanceof GospTreeNode) {
+                }
+                if (lastPath instanceof IssledNode) {
+                    Isl tmpIsl = ((IssledNode)lastPath).getIsl();
+                    if (tmpIsl.isSetNisl()) {
+                        addLineToDetailInfo("Показатель исследования",tmpIsl.isSetPokaz_name(),
+                                tmpIsl.getPokaz_name());
+                        addLineToDetailInfo("Результат исследования",tmpIsl.isSetRez(),
+                                tmpIsl.getRez());
+                        addLineToDetailInfo("Описание",tmpIsl.isSetOp_name(),
+                                tmpIsl.getOp_name());
+                        addLineToDetailInfo("Заключение",tmpIsl.isSetRez_name(),
+                                tmpIsl.getRez_name());
+                        addLineToDetailInfo("Дата проведения исследования",tmpIsl.isSetDatav(),
+                                DateFormat.getDateInstance().format(new Date(tmpIsl.getDatav())));
+                    }
+                    taResultText.setText(sbResulText.toString());
                 }
             }
         });
+
+        trResult.addTreeExpansionListener(new TreeExpansionListener() {
+            public void treeCollapsed(TreeExpansionEvent event) {
+            }
+            
+            public void treeExpanded(TreeExpansionEvent event) {
+                Object lastPath = event.getPath().getLastPathComponent();
+                if (lastPath instanceof GospTreeNode) {
+                    try {
+                        GospTreeNode gospNode = (GospTreeNode) lastPath;
+                        gospNode.removeAllChildren();
+                        for (Isl isl : ClientLab.tcl.getIslList(gospNode.gosp.getIdGosp())) {
+                            gospNode.add(new IssledNode(isl));
+                        }
+                        ((DefaultTreeModel) trResult.getModel()).reload(gospNode);
+                    } catch (KmiacServerException e) {
+                        e.printStackTrace();
+                    } catch (TException e) {
+                        ClientLab.conMan.reconnect(e);
+                    }
+                }
+            }
+         });
+        trResult.setShowsRootHandles(true);
+        trResult.setRootVisible(false);
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) trResult.getCellRenderer();
+        renderer.setLeafIcon(null);
+        renderer.setClosedIcon(null);
+        renderer.setOpenIcon(null);
+    }
+
+    private void addLineToDetailInfo(String name, boolean isSet, Object value) {
+        if (isSet)
+            if ((name != null) && (value != null))
+                if ((name.length() > 0) && (value.toString().length() > 0))
+                    sbResulText.append(String.format("%s: %s%s", name, value, LINE_SEP));
     }
 
     class GospTreeNode extends DefaultMutableTreeNode {
-//        private static final long serialVersionUID = 4212592425962984738L;
-//        private Gosp gosp;
-//        
-//        public GospTreeNode(Gosp gosp) {
-//            this.gosp = gosp;
-//            this.add(new GospTreeNode(new PatientVizitAmbInfo()));
-//            
-//        }
-//        
-//        @Override
-//        public String toString() {
-//            return DateFormat.getDateInstance().format(new Date(gosp.getDatap()));
-//        }
+        private static final long serialVersionUID = 4212592425962984738L;
+        private Gosp gosp;
+        
+        public GospTreeNode(Gosp inGosp) {
+            this.gosp = inGosp;
+            this.add(new IssledNode(new Isl()));
+//            try {
+//                for (Isl isl : ClientLab.tcl.getIslList(gosp.getIdGosp())) {
+//                    this.add(new IssledNode(isl));
+//                }
+//            } catch (KmiacServerException e) {
+//                e.printStackTrace();
+//            } catch (TException e) {
+//                MainForm.conMan.reconnect(e);
+//            } 
+        }
+        
+        @Override
+        public String toString() {
+            return DateFormat.getDateInstance().format(new Date(gosp.getDatap()));
+        }
     }
     
-//    class IssledNode extends DefaultMutableTreeNode{
-//        private static final long serialVersionUID = -5215124870459111226L;
-//        private PatientVizitAmbInfo pam;
-//        
-//        public IssledAmbNode(PatientVizitAmbInfo pam) {
-//            this.pam = pam;
-//        }
-//        
-//        @Override
-//        public String toString() {
-//            return DateFormat.getDateInstance().format(new Date(pam.getDatap()));
-//        }
-//    }
+    class IssledNode extends DefaultMutableTreeNode{
+        private static final long serialVersionUID = -5215124870459111226L;
+        private Isl isl;
+        
+        public IssledNode(Isl inIsl) {
+            this.isl = inIsl;
+        }
+        public Isl getIsl() {
+            return isl;
+        }
+        
+        @Override
+        public String toString() {
+            return isl.getPokaz();
+        }
+    }
 
     private void addResultText() {
-        epResultText = new JEditorPane();
-        splitPane.setRightComponent(epResultText);
+        final JScrollPane sptree = new JScrollPane();
+        taResultText = new JTextArea();
+        taResultText.setEditable(false);
+        taResultText.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        sptree.setViewportView(taResultText);
+        splitPane.setRightComponent(sptree);
     }
 
     public final void onConnect() {

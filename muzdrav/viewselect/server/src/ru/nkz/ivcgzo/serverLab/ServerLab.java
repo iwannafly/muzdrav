@@ -53,6 +53,7 @@ public class ServerLab extends Server implements Iface {
     @SuppressWarnings("unused")
     private TResultSetMapper<Napr, Napr._Fields> rsmNapr;
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
+    private TResultSetMapper<Isl, Isl._Fields> rsmIsl;
 
     private static final String[] METOD_FIELD_NAMES = {
         "obst", "name_obst", "c_p0e1", "pcod"
@@ -83,8 +84,12 @@ public class ServerLab extends Server implements Iface {
         "id", "id_pvizit", "vid_doc", "text", "preds", "zaved", "id_gosp"
     };
     private static final String[] GOSP_FIELD_NAMES = {
-        "id_gosp", "npasp", "cotd", "cotd_name", "clpu", "clpu_name", "datap",
+        "id_gosp", "npasp", "cotd", "cotd_name", "datap",
         "datav", "ishod", "result", "vrach", "vrach_fio"
+    };
+    private static final String[] ISL_FIELD_NAMES = {
+        "nisl",  "cp0e1", "np0e1", "pcod", "name_n", "zpok", "datav",
+        "op_name", "rez_name"
     };
 
     @SuppressWarnings("unused")
@@ -136,13 +141,21 @@ public class ServerLab extends Server implements Iface {
     //  preds          zaved          id_gosp
         Integer.class, Integer.class, Integer.class
     };
+    @SuppressWarnings("unused")
     private static final Class<?>[] GOSP_TYPES = {
-    //  id_gosp        npasp          cotd           cotd_name     clpu
-        Integer.class, Integer.class, Integer.class, String.class, Integer.class,
-    //  clpu_name     datap       datav       ishod         result
-        String.class, Date.class, Date.class, String.class, String.class,
+    //  id_gosp        npasp          cotd           cotd_name
+        Integer.class, Integer.class, Integer.class, String.class,
+    //  datap       datav       ishod         result
+        Date.class, Date.class, String.class, String.class,
     //  vrach          vrach_fio 
         Integer.class, String.class
+    };
+    @SuppressWarnings("unused")
+    private static final Class<?> [] ISL_TYPES = {
+    //  nisl            cp0e1          np0e1         cldi          nldi
+        Integer.class,  Integer.class, String.class, String.class, String.class,
+    //  zpok          datav
+        String.class, Date.class
     };
 
     public ServerLab(final ISqlSelectExecutor sse, final ITransactedSqlExecutor tse) {
@@ -163,6 +176,7 @@ public class ServerLab extends Server implements Iface {
         rsmStrClass = new TResultSetMapper<>(StringClassifier.class, STR_CLASS_FIELD_NAMES);
         rsmNapr = new TResultSetMapper<>(Napr.class, NAPR_FIELD_NAMES);
         rsmGosp = new TResultSetMapper<>(Gosp.class, GOSP_FIELD_NAMES);
+        rsmIsl = new TResultSetMapper<>(Isl.class, ISL_FIELD_NAMES);
     }
 
     @Override
@@ -397,9 +411,15 @@ public class ServerLab extends Server implements Iface {
     @Override
     public List<Gosp> getGospList(int npasp, long dateStart, long dateEnd)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT id_gosp, npasp, cotd, cotd_name, clpu, clpu_name, datap "
-                + "datav, ishod, result, vrach, vrach_fio FROM n_lds;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
+        final String sqlQuery = "SELECT c_gosp.id as id_gosp, c_gosp.npasp, c_gosp.cotd, n_o00.name_u as cotd_name, "
+                + "c_gosp.datap, c_otd.datav, c_otd.ishod, "
+                + "c_otd.result, c_otd.vrach, s_vrach.fam as vrach_fio "
+                + "FROM c_gosp "
+                + "LEFT JOIN c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN n_o00 ON c_gosp.cotd = n_o00.pcod "
+                + "LEFT JOIN s_vrach ON c_otd.vrach = s_vrach.pcod "
+                + "WHERE c_gosp.npasp = ? ORDER BY datap";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             return rsmGosp.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -409,9 +429,23 @@ public class ServerLab extends Server implements Iface {
     }
 
     @Override
-    public List<Isl> getIslList(int gospId) throws KmiacServerException,
-            TException {
-        // TODO Auto-generated method stub
-        return null;
+    public List<Isl> getIslList(int gospId) throws KmiacServerException {
+        final String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, p_rez_l.zpok, "
+        		+ "p_isl_ld.datav, '' as op_name, '' as rez_name  "
+                + "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) "
+        		+ "JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) "
+                + "WHERE p_isl_ld.id_gosp = ? "
+                + "UNION "
+                + "SELECT p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, "
+                + "p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name "
+                + "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) "
+                + "JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) "
+                + "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) "
+                + "WHERE p_isl_ld.id_gosp = ?;";
+       try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, gospId, gospId)) {
+           return rsmIsl.mapToList(acrs.getResultSet());
+       } catch (SQLException e) {
+           throw new KmiacServerException(e.getMessage());
+       }
     }
 }
