@@ -7,14 +7,21 @@
 	<property name="src_thrift.dir" location="../thrift/gen-java" />
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="lib.only.dir" value="lib" />
-	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
+	<property name="client_manager.dir" location="../../../common/managers/clientManager" />
+	<property name="bin_client_manager.dir" location="${client_manager.dir}/bin" />
 	<property name="com_resources.dir" location="../../../common/resources" />
 	<property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientAuth/resources" />
 	<property name="build.dir" location="bin" />
-	<property name="export.file" location="../../auth/client/auth.jar" />
+	<property name="client_auth.dir" location="../../auth/client" />
+	<property name="export.file" location="${client_auth.dir}/auth.jar" />
 	<property name="main.class" value="ru.nkz.ivcgzo.clientAuth.MainForm" />
 	<property name="muzdrav.dir" location="../../../muzdrav" />
 	<property name="manager.dir" location="../../manager" />
+	<property name="launcher.dir" location="../../../muzdrav/launcher" />
+	<property name="launcher_main.class" value="ru.nkz.ivcgzo.Launcher" />
+	<property name="test_app_server.ip" value="10.0.0.248" />
+	<property name="internal_app_server.ip" value="10.0.0.243" />
+	<property name="external_app_server.ip" value="10.1.1.8" />
 	
 	<path id="build.classpath" >
 	  <fileset dir="${lib.dir}">
@@ -28,19 +35,25 @@
 	<!-- Очистка директорий -->	
 	<target name="clean" description = "Очистка директорий">
 	        <delete dir="${build.dir}"/>
+	        <delete dir="${launcher.dir}/bin"/>
 	</target>
 	
 	<!-- Создание директорий -->
 	<target name="makedir" description="Создание директорий">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${bin_resources.dir}" />
+		<mkdir dir="${launcher.dir}/bin" />
 	</target>
 
 	<!-- Компилирование  исходного кода -->
 	<target name="compile" depends="clean, makedir" unless="debug.set" description="Компиляция">
+		<javac includeantruntime="false" srcdir="${client_manager.dir}/src" destdir="${client_manager.dir}/bin" encoding="utf-8" debug="${debug.build}">
+			<classpath refid="build.classpath"/>
+		</javac>
 		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
+		<javac includeantruntime="false" srcdir="${launcher.dir}/src" destdir="${launcher.dir}/bin" encoding="utf-8" debug="${debug.build}" />
 		<copy file="${com_resources.dir}/icon_1_16x16.png" todir="${bin_resources.dir}" />
 		<copy file="${com_resources.dir}/icon_2_32x32.png" todir="${bin_resources.dir}" />
 		<copy file="${com_resources.dir}/icon_3_64x64.png" todir="${bin_resources.dir}" />
@@ -64,25 +77,106 @@
 		</pathconvert>
 		
 		<jar destfile="${export.file}" basedir="${build.dir}" >
-			<fileset dir="${bin_client_manager.dir}"/>
+			<fileset dir="${bin_client_manager.dir}" excludes="**/thriftCommon/" />
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}" />
 				<attribute name="Class-Path" value=". ${jar.classpath}"/>
 			</manifest>
 		</jar>
 		<copy file="${export.file}" todir="${manager.dir}" overwrite="true" force="true" />
+		
+		<condition property="launcher.postfix" value="">
+			<equals arg1="${build.type}" arg2="dev" />
+		</condition>
+		<condition property="launcher.postfix" value="_t">
+			<equals arg1="${build.type}" arg2="tst" />
+		</condition>
+		<condition property="launcher.postfix" value="_e">
+			<equals arg1="${build.type}" arg2="ext" />
+		</condition>
+		<condition property="launcher.postfix" value="_i">
+			<equals arg1="${build.type}" arg2="int" />
+		</condition>
+		
+		<jar destfile="${launcher.dir}/launcher${launcher.postfix}.jar" basedir="${launcher.dir}/bin" >
+			<manifest>
+				<attribute name="Main-Class" value="${launcher_main.class}" />
+				<attribute name="Class-Path" value=". "/>
+			</manifest>
+		</jar>
+		<copy file="${launcher.dir}/launcher${launcher.postfix}.jar" todir="${manager.dir}" overwrite="true" force="true" />
 	</target>
-
-	<target name="main" depends="jar" description="Компиляция всех клиентских модулей">
+	
+	<target name="replaceStrings" description="">
+		<replace file="${client_auth.dir}/src/ru/nkz/ivcgzo/clientAuth/MainForm.java" failOnNoReplacements="true">
+			  <replacefilter token="//private ModulesUpdater modUpd;" value="private ModulesUpdater modUpd;" />
+			  <replacefilter token="//modUpd = new ModulesUpdater(conMan);" value="modUpd = new ModulesUpdater(conMan);" />
+			  <replacefilter token="//modUpd.checkAndUpdate(authInfo.pdost);" value="modUpd.checkAndUpdate(authInfo.pdost);" />
+		</replace>
+		
+		<replace file="${client_manager.dir}/src/ru/nkz/ivcgzo/clientManager/common/Client.java" token="//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" value="frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" failOnNoReplacements="true" />
+	</target>
+		
+	<target name="main_t" description="Компиляция всех клиентских модулей для тестового сервера приложений">
+		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" failOnNoReplacements="true">
+			  <replacefilter token="unspecified" value="tst" />
+			  <replacefilter token="localhost" value="${test_app_server.ip}" />
+		</replace>
+		
+		<antcall target="replaceStrings" />
+		<antcall target="jar">
+			<param name="build.type" value="tst"/>
+		</antcall>
+		
 		<subant>
 			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
 		</subant>
+		<subant target="main_t" buildpath="${manager.dir}"/>
 	</target>
 
-	<target name="main_d" description="Компиляция всех модулей с возможностью дебага">
-		<antcall target="main">
-			<param name="debug.build" value="true"/>
+	<target name="main_e" description="Компиляция всех клиентских модулей для внешнего рабочего сервера приложений">
+		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" failOnNoReplacements="true">
+			  <replacefilter token="unspecified" value="ext" />
+			  <replacefilter token="localhost" value="${external_app_server.ip}" />
+		</replace>
+		
+		<antcall target="replaceStrings" />
+		<antcall target="jar">
+			<param name="build.type" value="ext"/>
 		</antcall>
+		
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
+		</subant>
+		<subant target="main_ei" buildpath="${manager.dir}"/>
+	</target>
+
+	<target name="main_i" description="Компиляция всех клиентских модулей для внутреннего рабочего сервера приложений">
+		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" failOnNoReplacements="true">
+			  <replacefilter token="unspecified" value="int" />
+			  <replacefilter token="localhost" value="${internal_app_server.ip}" />
+		</replace>
+		
+		<antcall target="replaceStrings" />
+		<antcall target="jar">
+			<param name="build.type" value="int"/>
+		</antcall>
+		
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
+		</subant>
+		<subant target="main_ei" buildpath="${manager.dir}"/>
+	</target>
+
+	<target name="main_d" description="Компиляция всех модулей с возможностью дебага для девелоперского сервера приложений">
+		<antcall target="jar">
+			<param name="debug.build" value="true"/>
+			<param name="build.type" value="dev"/>
+		</antcall>
+		
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
+		</subant>
 	</target>
 
 </project>
