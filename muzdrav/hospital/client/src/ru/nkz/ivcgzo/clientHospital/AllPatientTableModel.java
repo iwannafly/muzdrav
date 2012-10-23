@@ -19,7 +19,7 @@ import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 public class AllPatientTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSimplePatient> patients;
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
     private static final String[] COLUMN_HEADERS = {
         "№ истории болезни", "Фамилия", "Имя", "Отчество", "Дата рождения", "Дата прибытия",
         "Номер палаты"

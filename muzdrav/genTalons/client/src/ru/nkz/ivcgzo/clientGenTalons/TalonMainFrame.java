@@ -14,6 +14,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.TitledBorder;
+import javax.swing.ComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -21,6 +22,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
 import javax.swing.UIManager;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -67,14 +69,13 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import org.apache.thrift.TException;
+import javax.swing.DefaultComboBoxModel;
 
 public class TalonMainFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTree treevrach;
-//	private JTabbedPane tbMain;
-//	private JTabbedPane tbRasp;
 	private String curSpec = null;
 	private int curVrach = 0;
 	private int ind = 0;
@@ -375,6 +376,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_rasp =new CustomTable<>(true, true, Nrasp.class, 1,"День недели" , 2,"Вид приема",3,"С",4,"По");
 //		tbl_rasp.setIntegerClassifierSelector(0, MainForm.tcl.get_intClass());
 		tbl_rasp.setPreferredWidths(130,100,60,60);
+		tbl_rasp.setEditableFields(false, 0,1);
 		tbl_rasp.setTimeField(2);
 		tbl_rasp.setTimeField(3);
 		tbl_rasp.setFillsViewportHeight(true);
@@ -688,8 +690,8 @@ public class TalonMainFrame extends JFrame {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<Ndv> event) {
 		        try {
-					//if (tbl_ndv.getSelectedItem() != null)
-						//MainForm.tcl.updateNdv(tbl_ndv.getData());
+					if (tbl_ndv.getSelectedItem() != null)
+						MainForm.tcl.updateNdv(tbl_ndv.getData());
 				} catch (Exception e) {
 					e.printStackTrace();
 					return false;
@@ -869,6 +871,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_norm =new CustomTable<>(true, true, Norm.class, 1,"Вид приема",2,"Длительность");
 		tbl_norm.setFillsViewportHeight(true);
 		tbl_norm.setPreferredWidths(90,90);
+		tbl_norm.setEditableFields(false, 0);
 		sp_norm.setViewportView(tbl_norm);
 		tbNorm.setLayout(gl_tbNorm);
 		
@@ -933,7 +936,8 @@ public class TalonMainFrame extends JFrame {
            		"Декабрь"
             };
 
-        cmb_month = new JComboBox(items);
+        cmb_month = new JComboBox<String>();
+        cmb_month.setModel(new DefaultComboBoxModel<>(items));
         cmb_month.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent arg0) {
 			    System.out.println(nday+ ",   "+ nmonth+ ",   "+ nyear);
@@ -1027,6 +1031,7 @@ public class TalonMainFrame extends JFrame {
 		tbl_talon =new CustomTable<>(true, true, Talon.class, 11,"Время", 6,"Вид приема");
 		tbl_talon.setPreferredWidths(70,90);
 		tbl_talon.setTimeField(0);
+		tbl_talon.setEditableFields(false, 0,1);
 		tbl_talon.setFillsViewportHeight(true);
 		scrollPane_1.setViewportView(tbl_talon);
 		panel_10.setLayout(gl_panel_10);
@@ -1051,6 +1056,12 @@ public class TalonMainFrame extends JFrame {
 						RaspisanieUnit.CreateTalons(pBar, MainForm.authInfo.cpodr, curVrach, curSpec, tf_datn.getDate().getTime(), tf_datk.getDate().getTime(), ind);
 						setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						JOptionPane.showMessageDialog(null, "Формирование талонов завершено.", null, JOptionPane.INFORMATION_MESSAGE); 
+				        nday = Integer.valueOf(sp_day.getValue().toString());
+		                nmonth = cmb_month.getSelectedIndex()+1;
+		                nyear = Integer.valueOf(sp_god.getValue().toString());
+ 					    if (nmonth != 0 && nday != 0 && nyear != 0){
+			                ChangeDatap();
+						}
 					}else {
 					    if (curSpec == null  && ind == 2) System.out.println("Выберите врачебную специальность.");
 					    if (curVrach == 0  && ind == 3) System.out.println("Выберите врача.");
@@ -1169,7 +1180,8 @@ public class TalonMainFrame extends JFrame {
        		"7. Количество использованных талонов"
         };
 
-		cmb_sv = new JComboBox(items1);
+		cmb_sv = new JComboBox<String>();
+		cmb_sv.setModel(new DefaultComboBoxModel<>(items1));
 		cmb_sv.addActionListener(new ActionListener() {
 			@SuppressWarnings({ "rawtypes", "unused" })
 			public void actionPerformed(ActionEvent e) {
@@ -1410,7 +1422,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_rasp.setData(new ArrayList<Nrasp>());
 			NraspInfo = MainForm.tcl.getNrasp(MainForm.authInfo.cpodr, curVrach, curSpec, cxm);
-            if (NraspInfo.size() > 0) {
+            if (!NraspInfo.isEmpty()) {
     			tbl_rasp.setData(NraspInfo);
     			ShowOtmetka();
     			ShowTimePause();
@@ -1426,7 +1438,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_norm.setData(new ArrayList<Norm>());
 			NormInfo = MainForm.tcl.getNorm(MainForm.authInfo.cpodr, curSpec);
-            if (NormInfo.size() > 0)tbl_norm.setData(NormInfo);
+            tbl_norm.setData(NormInfo);
 		} catch (NormNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1436,7 +1448,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_ndv.setData(new ArrayList<Ndv>());
 			NdvInfo = MainForm.tcl.getNdv(MainForm.authInfo.cpodr, curVrach, curSpec);
-			if (NdvInfo.size() > 0)tbl_ndv.setData(NdvInfo);
+			tbl_ndv.setData(NdvInfo);
 		} catch (NdvNotFoundException nnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1446,7 +1458,7 @@ public class TalonMainFrame extends JFrame {
 		try {
 			tbl_talon.setData(new ArrayList<Talon>());
 			TalonInfo = MainForm.tcl.getTalon(MainForm.authInfo.cpodr, curVrach, curSpec, getDatep);
-			if (TalonInfo.size() > 0)tbl_talon.setData(TalonInfo);
+			tbl_talon.setData(TalonInfo);
 		} catch (TalonNotFoundException tnfe) {
 		} catch (Exception e) {
 			e.printStackTrace();

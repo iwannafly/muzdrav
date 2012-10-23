@@ -29,5 +29,9 @@
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>
+	<logger name="ru.nkz.ivcgzo.serverLab.ServerLab">
+        <level value="INFO"/>
+        <appender-ref ref="muzdrav"/>
+    </logger>
 
 </log4j:configuration>

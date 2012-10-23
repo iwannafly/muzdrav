@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ import ru.nkz.ivcgzo.thriftMss.MssdopNotFoundException;
 import ru.nkz.ivcgzo.thriftMss.ThriftMss;
 import ru.nkz.ivcgzo.thriftMss.UserFio;
 import ru.nkz.ivcgzo.thriftMss.UserNotFoundException;
+
 import javax.swing.JCheckBox;
 import javax.swing.BoxLayout;
 import javax.swing.SwingConstants;
@@ -686,7 +689,21 @@ public class MainForm extends Client<ThriftMss.Client> {
 			}
 		});
 		
+		JButton btnPrintMss = new JButton("Печать");
+		btnPrintMss.setToolTipText("Печать медицинского свидетельства о смерти ");
+		panel.add(btnPrintMss);
+		btnPrintMss.addActionListener(new ActionListener () {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		JButton btnNomer = new JButton("Номера");
+		btnNomer.setToolTipText("Дополнительная информация, необходимая для печати мед. свидетельства о смерти");
 		btnNomer.setVerticalAlignment(SwingConstants.TOP);
 		panel.add(btnNomer);
 		btnNomer.addActionListener(new ActionListener() {
@@ -1978,4 +1995,32 @@ public class MainForm extends Client<ThriftMss.Client> {
 						return aBool;		
 		
 	}
+		
+	    public void printMedSS() {
+	    	String medsv = "м_свид_"+tfNomer.getText().trim();
+	    	System.out.println(medsv);
+       }
+	    
+	    private boolean isWindows() {
+	        String os = System.getProperty("os.name").toLowerCase();
+	        //windows
+	        return (os.indexOf("win") >= 0);
+	    }
+
+	    private boolean isUnix() {
+	        String os = System.getProperty("os.name").toLowerCase();
+	        //linux or unix
+	        return ((os.indexOf("nix") >= 0) || (os.indexOf("nux") >= 0));
+	    }
+	    private String setReportPath() {
+	        if (isWindows()) {
+	            System.out.println("Нашли винду");
+	            return "C:\\Temp\\MedCardAmbPriem_t.htm";
+	        } else if (isUnix()) {
+	            return System.getProperty("user.home")
+	                    + "/Work/muzdrav_reports/temp/MedCardAmbPriem_t.htm";
+	        } else {
+	            return "MedCardAmbPriem_t.htm";
+	        }
+	    }
 }

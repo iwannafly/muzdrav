@@ -1,28 +1,33 @@
 package ru.nkz.ivcgzo.clientGenReestr;
 
-import javax.swing.JDialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.border.TitledBorder;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.TitledBorder;
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import org.apache.thrift.TException;
-import java.awt.Dialog.ModalityType;
 
 
 public class SettingsForm extends JDialog {
@@ -167,19 +172,49 @@ public class SettingsForm extends JDialog {
 		JButton btnRun = new JButton("Выполнить");
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+				String servPath = null;
+				String cliPath = null;
 				if (rbtn1.isSelected()) vidrstr = 1;
 				if (rbtn2.isSelected()) vidrstr = 2;
 				if (rbtn3.isSelected()) vidrstr = 3;
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
-						MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), System.currentTimeMillis());
+				        if (MainForm.authInfo.getCslu() == 1)
+				        	servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        if (MainForm.authInfo.getCslu() == 2)
+				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        if (MainForm.authInfo.getCslu() == 3)
+				        	servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+						if (servPath.endsWith("zip")){
+							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+							JOptionPane.showMessageDialog(null, "Файл : "+cliPath, null, JOptionPane.INFORMATION_MESSAGE); 
+						}
+						else{
+							cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
+	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	   						MainForm.conMan.openFileInEditor(cliPath, false);
+						}
 						dispose();
 					}else
 						JOptionPane.showMessageDialog(null, "Укажите все параметры формирования реестра.", null, JOptionPane.INFORMATION_MESSAGE); 
 				} catch (ReestrNotFoundException | TException e) {
 					e.printStackTrace();
 				} catch (KmiacServerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OpenFileException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -220,17 +255,25 @@ public class SettingsForm extends JDialog {
         if (tfDn.getDate() == null) tfDn.setDate(System.currentTimeMillis());
         if (tfDk.getDate() == null) tfDk.setDate(System.currentTimeMillis());
         if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected()) rbtn1.setSelected(true);
-        if (MainForm.authInfo.getCslu() == 2){
 			try{
-				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-				if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-				cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+		        if (MainForm.authInfo.getCslu() == 1){
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 4) cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+				}
+		        if (MainForm.authInfo.getCslu() == 2){
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+				}
+		        if (MainForm.authInfo.getCslu() == 3){
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+				}
+	        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 			} catch (TException e) {
 				e.printStackTrace();
 				MainForm.conMan.reconnect(e);
 			} catch (KmiacServerException e) {
 				e.printStackTrace();
-			}
 		}
 		setVisible(true);
 	}

@@ -42,6 +42,8 @@ import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Pvizit;
 import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.RdDinStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
+import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 
 public class FormRdDin extends JFrame {
 	private static final long serialVersionUID = 553969304358351170L;
@@ -49,19 +51,21 @@ public class FormRdDin extends JFrame {
 	private RdDinStruct rddin;
 	public static PvizitAmb pvizitAmb;
 	public static Pvizit pvizit;
+	public static RdInfStruct RdInfStruct;
+	public static RdSlStruct rdSlStruct;
 	private CustomTable<RdDinStruct, RdDinStruct._Fields> tablePos;
-    private String oslname;
+//    private String oslname;
     private String oslcode;
     private int iw1;
     private int iw2;
     private int iw3;
     private int iw4;
-    private int iw5;
-    private String otname;
-    private String polplname;
-    private String predname;
-    private String cerdname;
-    private String cerdname1;
+//    private int iw5;
+    private int otname;
+    private int polplname;
+    private int predname;
+    private int cerdname;
+    private int cerdname1;
     CustomDateEditor SDataPos;
     CustomDateEditor SDataSl;
 	private ThriftStringClassifierCombobox<StringClassifier> CBDiag;
@@ -77,6 +81,11 @@ public class FormRdDin extends JFrame {
 	private int br;
 	private int rost;
 	private double ves;
+	private int chcc;
+	private int hdm;
+	private int oj;
+	private int spl;
+	private int srok;
     JSpinner SSrok ;
 	JSpinner SVes;
 	JSpinner SOkrj;
@@ -175,28 +184,6 @@ public class FormRdDin extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
-//		rddin = new RdDinStruct();
-//		patient = new PatientCommonInfo();
-//		if (rddin.isSetPredpl())
-//			CBPredPl.setSelectedPcod(rddin.getPredpl());
-//		else
-//			CBPredPl.setSelectedItem(null);
-//		if (rddin.isSetPolpl())
-//			CBPolPl.setSelectedPcod(rddin.getPolpl());
-//		else
-//			CBPolPl.setSelectedItem(null);
-//		if (rddin.isSetSerd())
-//			CBCerd.setSelectedPcod(rddin.getSerd());
-//		else
-//			CBCerd.setSelectedItem(null);
-//		if (rddin.isSetSerd1())
-//			CBSerd1.setSelectedPcod(rddin.getSerd1());
-//		else
-//			CBSerd1.setSelectedItem(null);
-//		if (rddin.isSetOteki())
-//			CBOteki.setSelectedPcod(rddin.getOteki());
-//		else
-//			CBOteki.setSelectedItem(null);
 		JPanel panel = new JPanel();
 		contentPane.add(panel, BorderLayout.SOUTH);
 		
@@ -312,6 +299,17 @@ public class FormRdDin extends JFrame {
 			if (mes == 1) br = br+1;
 			if (mes == 2) br = br+1;
 			if (mes == 12) br = br+1;
+			rddin.setArt1((int) SPdad.getModel().getValue());
+			rddin.setArt2((int) SPsad.getModel().getValue());
+			rddin.setArt3((int) SLdad.getModel().getValue());
+			rddin.setArt4((int) SLsad.getModel().getValue());
+			rddin.setChcc((int) SChcc.getModel().getValue());
+			rddin.setHdm((int) SVdm.getModel().getValue());
+			rddin.setOj((int) SOkrj.getModel().getValue());
+			rddin.setSpl((int) STolP.getModel().getValue());
+			rddin.setSrok((int) SSrok.getModel().getValue());
+			rddin.setVes((double) SVes.getModel().getValue());
+			ves = (double) SVes.getModel().getValue();
 			rddin.setGrr(0);
 		if (CBPredPl.getSelectedPcod() != null)
 			rddin.setPredpl(CBPredPl.getSelectedPcod());
@@ -328,42 +326,35 @@ public class FormRdDin extends JFrame {
 		if (CBOteki.getSelectedPcod() != null)
 			rddin.setOteki(CBOteki.getSelectedPcod());
 			else rddin.unsetOteki();
+		System.out.println("риск");		
 		if (CBDiag.getSelectedPcod() != null)
 		{	rddin.setDspos(CBDiag.getSelectedPcod());
-		rddin.setGrr(1);
-		System.out.println("риск");		
-}
+		rddin.setGrr(1);}
 		    else rddin.unsetDspos();
-		rddin.setArt1((int) SPdad.getModel().getValue());
-		rddin.setArt2((int) SPsad.getModel().getValue());
-		rddin.setArt3((int) SLdad.getModel().getValue());
-		rddin.setArt4((int) SLsad.getModel().getValue());
-		rddin.setChcc((int) SChcc.getModel().getValue());
-		rddin.setHdm((int) SVdm.getModel().getValue());
-		rddin.setOj((int) SOkrj.getModel().getValue());
-		rddin.setSpl((int) STolP.getModel().getValue());
-		rddin.setSrok((int) SSrok.getModel().getValue());
-		rddin.setVes((double) SVes.getModel().getValue());
-		ves = (double) SVes.getModel().getValue();
-		rost = FormPostBer.rdSlStruct.getRost();	
-		if (rost<=154) br = br+1;
-		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
-		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
-		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
-		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
-		if (rost != 0) 
-		{ves = ves/rost/rost*10000;
-		if (ves<17) br = br+1;
-		if (ves>=32) br = br+1;}
+//		rost = FormPostBer.rdSlStruct.getRost();	
+//		System.out.println(rost);
+//		if (rost<=154) br = br+1;
+//		if (FormRdInf.RdInfStruct.getObr() == 3)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getObr() == 5)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getSem() == 3)  br = br+1; 
+//		if (FormRdInf.RdInfStruct.getOsoco() >=1) br = br+1;
+//		if (rost != 0) 
+//		{ves = ves/rost/rost*10000;
+//		if (ves<17) br = br+1;
+//		if (ves>=32) br = br+1;}
 		rddin.setBall(br); 
-		System.out.println(rost);
 			MainForm.tcl.UpdateRdDin(rddin);
 		} catch (KmiacServerException | TException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			System.out.println(rddin);		
 	}
-//		rddin.setDspos((string) CBDspos.getSelectedKod_Mkb.)//диагноз заменить на kod_mkb (вместо PCOD)
+		try {
+			tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+		} catch (KmiacServerException | TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 			}
 		});
 		
@@ -374,7 +365,7 @@ public class FormRdDin extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 				RdDinStruct rddin = new RdDinStruct();
-	//			setDefaultValues();
+				setDefaultValues();
 				rddin.setNpasp(Vvod.pvizitAmb.npasp);
 				rddin.setId_pos(Vvod.pvizitAmb.id);
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
@@ -417,7 +408,13 @@ public class FormRdDin extends JFrame {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				}
+try {
+	tablePos.setData(MainForm.tcl.getRdDinInfo(Vvod.pvizitAmb.id_obr, Vvod.pvizitAmb.npasp));
+} catch (KmiacServerException | TException e1) {
+	// TODO Auto-generated catch block
+	e1.printStackTrace();
+}
+			}
 
 			private void showMessage(RdDinStruct rddin) {
 				// TODO Auto-generated method stub
@@ -602,7 +599,13 @@ public class FormRdDin extends JFrame {
 				if (!arg0.getValueIsAdjusting()) {
 					rddin = tablePos.getSelectedItem();
 					//вставить выбор даты из таблицы посещений 
-					SDataPos.setDate(Vvod.pvizitAmb.getDatap());
+//					try {
+//						SDataPos.setDate(MainForm.tcl.getdatap(rddin.id_pos));
+//					} catch (TException e3) {
+//						e3.printStackTrace();
+//					}
+////					SDataPos.setDate(MainForm.tcl.getDatap(rddin.id_pos,date));
+					SDataPos.setDate(rddin.getDatap());
 					SSrok.setValue(rddin.getSrok());
 					SVes.setValue(rddin.getVes());
 					SOkrj.setValue(rddin.getOj());
@@ -645,17 +648,35 @@ public class FormRdDin extends JFrame {
 		// TODO Auto-generated method stub
 //	rddin.setId_pvizit(Vvod.zapVr.getId_pvizit());
 //	rddin.setNpasp(Vvod.zapVr.getNpasp());
-	rddin.setArt1(120);
-	rddin.setArt2(80);
-	rddin.setArt3(120);
-	rddin.setArt4(80);
-	rddin.setChcc(70);
-	rddin.setHdm(0);
+	ves = 60; chcc = 110; hdm = 20;oj = 90; spl = 2;srok = 8;iw1 = 120; iw2 = 80; iw3 = 120; iw4 = 80;
+	ves = rddin.getVes();
+	chcc = rddin.getChcc();
+	hdm = rddin.getHdm();
+	oj = rddin.getOj();
+	spl = rddin.getSpl();
+	srok = rddin.getSrok();
+	polplname = rddin.getPolpl();
+	predname = rddin.getPredpl();
+	cerdname = rddin.getSerd();
+	cerdname1 = rddin.getSerd1();
+	otname = rddin.getOteki();
+	
+	rddin.setArt1(iw1);
+	rddin.setArt2(iw2);
+	rddin.setArt3(iw3);
+	rddin.setArt4(iw4);
+	rddin.setChcc(chcc);
+	rddin.setHdm(hdm);
 //	rddin.setDspos(Vvod.zapVr.)//диагноз при постановке
 //	rddin.setId_rd_sl(FormRdSl.rdsl.id);
-	rddin.setOj(60);
-	rddin.setSpl(0);
-//	rddin.setSrok(srok);
+	rddin.setOj(oj);
+	rddin.setSpl(spl);
+	rddin.setSrok(srok);
+	rddin.setPolpl(polplname);
+	rddin.setPredpl(predname);
+	rddin.setSerd(cerdname);
+	rddin.setSerd1(cerdname1);
+	rddin.setOteki(otname);
 	System.out.println("присвоение");		
 	System.out.println(rddin);		
 	}

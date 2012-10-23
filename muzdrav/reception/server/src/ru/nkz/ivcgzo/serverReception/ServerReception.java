@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Patient;
+import ru.nkz.ivcgzo.thriftReception.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftReception.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
@@ -75,10 +77,10 @@ public class ServerReception extends Server implements Iface {
         "pcod", "name", "vcolor"
     };
     private static final String[] TALON_FIELD_NAMES = {
-        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv"
+        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv", "pcod_sp"
     };
     private static final String[] RESERVED_TALON_FIELD_NAMES = {
-        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv",
+        "id", "ntalon", "vidp", "timep", "datap", "npasp", "dataz", "prv", "pcod_sp",
         "spec", "fio"
     };
 
@@ -166,7 +168,9 @@ public class ServerReception extends Server implements Iface {
     @Override
     public final List<IntegerClassifier> getPoliclinic() throws KmiacServerException,
             PoliclinicNotFoundException, TException {
-        final String sqlQuery = "SELECT DISTINCT n_n00.pcod, n_n00.name FROM n_n00 "
+        final String sqlQuery = "SELECT DISTINCT n_n00.pcod, "
+                + "(n_m00.name_s || ', ' || n_n00.name) as name "
+                + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu "
                 + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             List<IntegerClassifier> tmpList = rsmPoliclinic.mapToList(acrs.getResultSet());
@@ -252,11 +256,13 @@ public class ServerReception extends Server implements Iface {
         // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
-        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv "
-                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? AND datap >= ? "
-                + "AND prv = ? ORDER BY datap, timep;";
+        final String sqlQuery = "SELECT id, ntalon, vidp, timep, datap, npasp, dataz, prv, pcod_sp "
+                + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? "
+                + "AND ((datap > ?) OR (datap = ? AND timep >= ?)) AND prv = ? "
+                + "ORDER BY datap, timep;";
         try (AutoCloseableResultSet acrs =
-                sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec), prv)) {
+                sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec),
+                        new Date(todayMillisec), new Time(System.currentTimeMillis()), prv)) {
             List<Talon> tmpList = rsmTalon.mapToList(acrs.getResultSet());
             if (tmpList.size() > 0) {
                 return tmpList;
@@ -297,10 +303,11 @@ public class ServerReception extends Server implements Iface {
     }
 
     //TODO Добавить проверку на занятость талона прямо перед записью
+    //TODO Рефакторить
     @Override
     public final void reserveTalon(final Patient pat, final Talon talon)
             throws KmiacServerException, ReserveTalonOperationFailedException,
-            TException {
+            PatientHasSomeReservedTalonsOnThisDay {
         final int prv = 2;
         // java.sql.Date не имеет нулевого конструктора, а preparedUpdate() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
@@ -308,26 +315,41 @@ public class ServerReception extends Server implements Iface {
         final String sqlQuery = "UPDATE e_talon SET npasp = ?, dataz = ?, prv = ?, id_pvizit = ? "
                 + "WHERE  id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            int numUpdated = 0;
-            if (pat.getIdPvizit() != 0) {
-                numUpdated = sme.execPreparedUpdate(
-                    sqlQuery, false, pat.getId(), new Date(todayMillisec), prv, pat.getIdPvizit(),
-                    talon.getId());
+            if (!isPatientAlreadyReserveTalonOnThisDay(pat, talon)) {
+                int numUpdated = 0;
+                if (pat.getIdPvizit() != 0) {
+                    numUpdated = sme.execPreparedUpdate(
+                        sqlQuery, false, pat.getId(), new Date(todayMillisec), prv,
+                        pat.getIdPvizit(), talon.getId());
+                } else {
+                    numUpdated = sme.execPreparedUpdate("UPDATE e_talon SET npasp = ?, dataz = ?, "
+                            + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
+                            + "WHERE  id = ?;",
+                            false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+                }
+                if (numUpdated == 1) {
+                    sme.setCommit();
+                } else {
+                    sme.rollbackTransaction();
+                    throw new ReserveTalonOperationFailedException();
+                }
             } else {
-                numUpdated = sme.execPreparedUpdate("UPDATE e_talon SET npasp = ?, dataz = ?, "
-                        + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
-                        + "WHERE  id = ?;",
-                        false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+                throw new PatientHasSomeReservedTalonsOnThisDay();
             }
-            if (numUpdated == 1) {
-                sme.setCommit();
-            } else {
-                sme.rollbackTransaction();
-                throw new ReserveTalonOperationFailedException();
-            }
-        } catch (SqlExecutorException | InterruptedException e) {
+        } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
             throw new KmiacServerException();
+        }
+    }
+
+    private boolean isPatientAlreadyReserveTalonOnThisDay(final Patient patient,
+            final Talon talon) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT id FROM e_talon WHERE npasp = ? AND pcod_sp = ? AND datap = ?",
+                patient.getId(), talon.getPcodSp(), new Date(talon.getDatap()))) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
         }
     }
 

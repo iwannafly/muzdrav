@@ -29,8 +29,9 @@ struct Talon {
 	6:optional i32 npasp;
     7:optional i64 dataz;
     8:optional i32 prv;
-    9:optional string doctorSpec;
-    10:optional string doctorFio;
+	9:optional i32 pcodSp;
+    10:optional string doctorSpec;
+    11:optional string doctorFio;
 }
 
 /**
@@ -79,6 +80,12 @@ exception ReserveTalonOperationFailedException {
  * Ошибка во время отмены талона
  */
 exception ReleaseTalonOperationFailedException {
+}
+
+/**
+ * У пациента уже есть запись к этому врачу на этот день
+ */
+exception PatientHasSomeReservedTalonsOnThisDay {
 }
 
 service ThriftReception extends kmiacServer.KmiacServer {
@@ -131,7 +138,7 @@ service ThriftReception extends kmiacServer.KmiacServer {
      * Запись пациента на приём (изменение выбранного талона)
      */
     void reserveTalon(1: Patient pat, 2:Talon talon) throws (1: kmiacServer.KmiacServerException kse,
-            2: ReserveTalonOperationFailedException rtofe); 
+            2: ReserveTalonOperationFailedException rtofe, 3: PatientHasSomeReservedTalonsOnThisDay phsrtotd); 
     
     /*
      * Отменяет выбор талона (освобождает талон)
