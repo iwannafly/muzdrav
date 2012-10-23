@@ -235,17 +235,29 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			if (cmp instanceof JLabel) {
 				JLabel lbl = (JLabel) cmp;
 				
-				if (searched && MainForm.this.table.getData().get(row).id_pvizit > 0) {
-					if (isSelected) {
-						lbl.setBackground(selCol.darker());
+				if (searched) {
+					if (MainForm.this.table.getData().get(row).id_pvizit > 0) {
+						if (isSelected)
+							lbl.setBackground(selCol.darker());
+						else
+							lbl.setBackground(Color.gray.brighter());
 					} else {
-						lbl.setBackground(Color.gray.brighter());
+						if (isSelected)
+							lbl.setBackground(selCol);
+						else
+							lbl.setBackground(defCol);
 					}
 				} else {
-					if (isSelected) {
-						lbl.setBackground(selCol);
+					if (MainForm.this.table.getData().get(row).hasPvizit) {
+						if (isSelected)
+							lbl.setBackground(selCol.darker());
+						else
+							lbl.setBackground(Color.green.brighter());
 					} else {
-						lbl.setBackground(defCol);
+						if (isSelected)
+							lbl.setBackground(selCol);
+						else
+							lbl.setBackground(defCol);
 					}
 				}
 				

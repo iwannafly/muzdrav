@@ -9,7 +9,6 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 
 public final class TalonTableModel implements TableModel {

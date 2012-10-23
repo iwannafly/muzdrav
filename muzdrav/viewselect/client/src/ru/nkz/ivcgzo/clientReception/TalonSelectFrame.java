@@ -32,16 +32,10 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftReception.Patient;
 import ru.nkz.ivcgzo.thriftReception.PatientHasSomeReservedTalonsOnThisDay;
-import ru.nkz.ivcgzo.thriftReception.PoliclinicNotFoundException;
-import ru.nkz.ivcgzo.thriftReception.ReleaseTalonOperationFailedException;
-import ru.nkz.ivcgzo.thriftReception.ReserveTalonOperationFailedException;
-import ru.nkz.ivcgzo.thriftReception.SpecNotFoundException;
 import ru.nkz.ivcgzo.thriftReception.Talon;
-import ru.nkz.ivcgzo.thriftReception.VrachNotFoundException;
 
 /**
  * @author as
@@ -105,7 +99,7 @@ public class TalonSelectFrame extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(980, 600));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-
+        setTitle("Запись на приём к специалисту");
         splitPane = new JSplitPane();
         splitPane.setResizeWeight(0);
         fillSplitPane();
