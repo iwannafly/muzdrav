@@ -2,6 +2,8 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -37,6 +39,12 @@ public class TableDateEditor extends DefaultCellEditor {
 				} else {
 					super.keyPressed(e);
 				}
+			}
+		});
+		txt.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				stopCellEditing();
 			}
 		});
 		renderer = new TableDateRenderer();

@@ -1,5 +1,6 @@
 namespace java ru.nkz.ivcgzo.thriftServerAuth
 
+include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
 include "../../../common/thrift/fileTransfer.thrift"
 include "../../../common/thrift/libraryUpdater.thrift"
