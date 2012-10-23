@@ -761,6 +761,7 @@ public class Vvod extends JFrame {
 			  		diagamb.setDiag(tblDiag.getSelectedItem().getDiag());
 			  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
 			  		diagamb.setDatad(tblDiag.getSelectedItem().getDatad());
+			  		diagamb.setDatap(pvizitAmb.getDatap());
 			  		if (rbtDiagOsn.isSelected()) diagamb.setDiag_stat(1);
 			  		if (rbtDiagSop.isSelected())diagamb.setDiag_stat(3);
 			  		if (rbtDiagOsl.isSelected()) diagamb.setDiag_stat(2);
@@ -2127,6 +2128,11 @@ public class Vvod extends JFrame {
 						MainForm.tcl.UpdatePvizit(pvizit);
 						MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 						btnRecPriem.setEnabled(!pvizit.isSetIshod());
+						
+						pvizitAmbCopy = new PvizitAmb(pvizitAmb);
+						priemCopy = new Priem(priem);
+						anamZabCopy = new AnamZab(anamZab);
+						pvizitCopy = new Pvizit(pvizit);
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
 					} catch (TException e1) {

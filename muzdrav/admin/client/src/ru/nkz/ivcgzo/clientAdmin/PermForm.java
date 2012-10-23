@@ -143,10 +143,10 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbVrachinfo = new TaggedJCheckBox("Администрирование", 1, CsluPdost.CsluAll);
 		pnlPermChb.add(chbVrachinfo);
 		
-		TaggedJCheckBox chbStationar = new TaggedJCheckBox("Стационар", 2, CsluPdost.CsluStat);
+		TaggedJCheckBox chbStationar = new TaggedJCheckBox("Стационар", 2, CsluPdost.CsluAll);
 		pnlPermChb.add(chbStationar);
 				
-		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3, CsluPdost.CsluPol);
+		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3, CsluPdost.CsluAll);
 		pnlPermChb.add(chbOsm);
 				
 		TaggedJCheckBox chbLds = new TaggedJCheckBox("Параотделение", 4, CsluPdost.CsluAll);
@@ -155,13 +155,13 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Регистрация пациентов больницы", 5, CsluPdost.CsluAll);
 		pnlPermChb.add(chbRegPat);
 
-		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluStat | CsluPdost.CsluPol);
+		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluAll);
 		pnlPermChb.add(chbMss);
 
 		TaggedJCheckBox chbClasVIew = new TaggedJCheckBox("Просмотр и выбор из классификатора", 7, CsluPdost.CsluAll);
 		pnlPermChb.add(chbClasVIew);
 
-		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8, CsluPdost.CsluPol);
+		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8, CsluPdost.CsluAll);
 		pnlPermChb.add(chbGenTal);
 
 		TaggedJCheckBox chbOutInf = new TaggedJCheckBox("Выходная информация системы", 9, CsluPdost.CsluAll);
