@@ -287,7 +287,7 @@ public class ServerReception extends Server implements Iface {
                 + "INNER JOIN n_s00 ON n_s00.pcod = e_talon.cdol "
                 + "INNER JOIN s_vrach ON s_vrach.pcod = e_talon.pcod_sp "
                 + "WHERE cpol = ? AND datap >= ? "
-                + "AND npasp = ? ORDER BY datap, timep;";
+                + "AND npasp = ? AND npasp <> 0 ORDER BY datap, timep;";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpol, new Date(todayMillisec), patientId)) {
             List<Talon> tmpList = rsmReservedTalon.mapToList(acrs.getResultSet());

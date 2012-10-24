@@ -181,7 +181,8 @@ public class ServerHospital extends Server implements Iface {
                 + "patient.ot, patient.datar, c_gosp.datap, c_otd.cotd, c_otd.nist "
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
-                + "WHERE c_otd.cotd = ? AND c_otd.vrach is null ORDER BY fam, im, ot;";
+                + "WHERE c_otd.cotd = ? AND c_otd.vrach is null AND c_otd.result is null "
+                + "ORDER BY fam, im, ot;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, otdNum)) {
             List<TSimplePatient> patientList = rsmSimplePatient.mapToList(acrs.getResultSet());
             if (patientList.size() > 0) {
@@ -439,7 +440,7 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final List<TMedicalHistory> getMedicalHistory(final int idGosp)
             throws KmiacServerException, MedicalHistoryNotFoundException {
-        final String sqlQuery = "SELECT * FROM c_osmotr WHERE id_gosp = ?;";
+        final String sqlQuery = "SELECT * FROM c_osmotr WHERE id_gosp = ? ORDER BY dataz, timez;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             List<TMedicalHistory> tmpMedHistories =
                 rsmMedicalHistory.mapToList(acrs.getResultSet());

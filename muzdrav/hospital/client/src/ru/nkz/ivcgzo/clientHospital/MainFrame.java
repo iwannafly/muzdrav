@@ -710,6 +710,7 @@ public class MainFrame extends JFrame {
                         JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
                             + "изменении истории жизни. Информация не будет сохранена!",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        ClientHospital.conMan.reconnect(e1);
                     }
                 } else {
                     JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
@@ -779,7 +780,7 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
-        tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
+        tabbedPane.addTab("Дневник", null, pMedicalHistory, null);
         setMedicalHistoryTabs();
         setMedicalHistoryTablePanel();
         setMedicalHistoryTableButtons();
@@ -1469,8 +1470,8 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 try {
                     if ((patient != null)
-                            || (cbxIshod.getSelectedItem() != null)
-                            || (cbxResult.getSelectedItem() != null)) {
+                            && (cbxIshod.getSelectedItem() != null)
+                            && (cbxResult.getSelectedItem() != null)) {
                         Zakl tmpZakl = new Zakl();
                         tmpZakl.setRecom(taRecomend.getText());
                         tmpZakl.setSostv(taZakluch.getText());

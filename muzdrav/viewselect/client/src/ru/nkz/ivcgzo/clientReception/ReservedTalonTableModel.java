@@ -30,7 +30,7 @@ public class ReservedTalonTableModel implements TableModel {
         } catch (TalonNotFoundException e) {
             reservedTalons = Collections.emptyList();
         } catch (TException e) {
-            e.printStackTrace();
+            MainForm.conMan.reconnect(e);
         }
     }
 

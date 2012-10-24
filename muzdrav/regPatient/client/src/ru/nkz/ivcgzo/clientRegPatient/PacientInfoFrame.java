@@ -375,6 +375,7 @@ public class PacientInfoFrame extends JFrame {
                         e.printStackTrace();
                     } catch (TException e) {
                         e.printStackTrace();
+                        MainForm.conMan.reconnect(e);
                     }
                 }
             });
@@ -659,6 +660,7 @@ public class PacientInfoFrame extends JFrame {
 								e.printStackTrace();
                               } catch (TException e) {
                                   e.printStackTrace();
+                                  MainForm.conMan.reconnect(e);
 							}
                             }
                         });
@@ -669,7 +671,14 @@ public class PacientInfoFrame extends JFrame {
                         btnShowTalonSelectModule.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent arg0) {
-                            	MainForm.conMan.showReceptionRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), 0);
+                                if (curPatientId != 0) {
+                                    MainForm.conMan.showReceptionRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), 0);
+                                } else {
+                                    JOptionPane.showMessageDialog(
+                                        PacientInfoFrame.this.getContentPane(), "Пациент не выбран!",
+                                        "Ошибка!", JOptionPane.ERROR_MESSAGE
+                                    );
+                                }
                             }
                         });
 
@@ -1391,6 +1400,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1419,6 +1429,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1435,6 +1446,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1575,6 +1587,7 @@ public class PacientInfoFrame extends JFrame {
                     MainForm.tcl.deleteKont(curId);
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1602,6 +1615,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1615,6 +1629,7 @@ public class PacientInfoFrame extends JFrame {
                     MainForm.tcl.updateKont(event.getItem());
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -2995,6 +3010,7 @@ public class PacientInfoFrame extends JFrame {
             	System.out.println(curId);
                 MainForm.tcl.deleteGosp(curId);
             } catch (TException e) {
+                MainForm.conMan.reconnect(e);
                 e.printStackTrace();
                 return false;
             }

@@ -17,6 +17,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -163,7 +164,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 						} else {
 							while (selCol < getColumnCount()) {
 								if (isCellEditable(selRow, selCol)) {
-									changeSelection(selRow - 1, selCol, false, false);
+									changeSelection(selRow, selCol, false, false);
 									editCellAt(selRow, selCol, null);
 									return;
 								}
@@ -877,7 +878,13 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			ctf.addFocusListener(new FocusAdapter() {
 				@Override
 				public void focusLost(FocusEvent e) {
-					stopCellEditing();
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							if (!CustomTable.this.hasFocus())
+								stopCellEditing();
+						}
+					});
 				}
 			});
 		}
