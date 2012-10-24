@@ -1,16 +1,19 @@
-package ru.nrz.ivcgzo.serverOutputInfo;
+package ru.nkz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -22,6 +25,7 @@ import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -31,9 +35,23 @@ import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
+import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
+import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
+
 
 public class OutputInfo extends Server implements Iface {
+	
+	private static Logger log = Logger.getLogger(OutputInfo.class.getName());
+
+	private TResultSetMapper<VrachInfo, VrachInfo._Fields> tableVrachInfo;
+	private static Class<?>[] VrachInfoTypes;
+	private TResultSetMapper<VrachTabel, VrachTabel._Fields> tableVrachTabel;
+	private static Class<?>[] VrachTabelTypes;
+	
 	private TServer thrServ;
 	//public Input_info inputInfo;
 	public int kolz1, kolz2, kolz3, kolz4, kolz5, kolz6, kolz7, kolz8, xind, perv;
@@ -49,7 +67,17 @@ public class OutputInfo extends Server implements Iface {
 	public OutputInfo(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		// TODO Auto-generated constructor stub
+		
+		//Таблица VrachInfo
+		tableVrachInfo = new TResultSetMapper<>(VrachInfo.class, "pcod","fam","im","ot","cdol");
+		VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
+		
+		//Таблица VrachTabel
+		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","nuch1","nuch2","nuch3","id");
+		VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, String.class, String.class,String.class,Integer.class};
 	}
+	
+
 
 	/**
 	@SuppressWarnings("deprecation")
@@ -604,7 +632,48 @@ public class OutputInfo extends Server implements Iface {
 		return svod;
 	}
 
-private String ZagShap(String d1, String d2, String npol, int uchas){
+	@Override
+	public List<VrachInfo> getVrachTableInfo(int cpodr) throws VINotFoundException,
+			KmiacServerException, TException {
+
+		String sqlQuery = "SELECT a.pcod, a.fam, a.im, a.ot, b.cdol " 
+						+ "FROM s_vrach a, s_mrab b WHERE cpodr=?";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
+			ResultSet rs = acrs.getResultSet();
+			List<VrachInfo> VrachInfo = tableVrachInfo.mapToList(rs);
+			if (VrachInfo.size() > 0) {
+				return VrachInfo;				
+			} else {
+				throw new VINotFoundException();
+			}
+		} catch (SQLException e) {
+			log.log(Level.ERROR, "SQL Exception: ", e);
+			throw new KmiacServerException();
+		}
+	}
+	
+	@Override
+	public List<VrachTabel> getVrachTabel(int pcod) throws VTDuplException,
+			KmiacServerException, TException {
+		
+		String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
+						+ "timepr, nuch1, nuch2, nuch3, id FROM s_tabel WHERE pcod=?;";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+			ResultSet rs = acrs.getResultSet();
+			List<VrachTabel> VrachTabel = tableVrachTabel.mapToList(rs);
+			if (VrachTabel.size() > 0) {
+				return VrachTabel;				
+			} else {
+				throw new VTDuplException();
+			}
+		} catch (SQLException e) {
+			log.log(Level.ERROR, "SQL Exception: ", e);
+			throw new KmiacServerException();
+		}
+	}
+
+	
+	private String ZagShap(String d1, String d2, String npol, int uchas){
 	
 	String shap = null;
 	
@@ -668,11 +737,55 @@ private String ZagShap(String d1, String d2, String npol, int uchas){
 	sb.append(String.format("		</TD>"));
 	sb.append(String.format("	</TR>"));
 	
-	shap = sb.toString();
-	
-	
-	return shap;
-	
+	return shap = sb.toString();
+	}
+
+//Удалить
+public void deleteVT(VrachTabel vt) throws TException {
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPrepared("DELETE FROM s_tabel WHERE pcod = ?;", false, vt);
+		sme.setCommit();
+    } catch (SqlExecutorException | InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
+
+
+//Добавить
+public int addVT(VrachTabel vt) throws VTException, VTDuplException,
+		KmiacServerException, TException {
+	int id = vt.getId();
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		//нужно-ли в конце конструкции использовать CloseStatement?
+		sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
+		int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
+        				+ "timeprf, timepr, nuch1, nuch2, nuch3) " 
+        				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+        				true, vt, VrachTabelTypes, indexes);
+		id = sme.getGeneratedKeys().getInt(id);
+		sme.setCommit();
+		return id;			
+	} catch (SQLException | InterruptedException e) {
+		e.printStackTrace();
+		throw new KmiacServerException("Ошибка сервера");
+	}
+}
+
+
+
+//Изменить
+public void updateVT(VrachTabel vt) throws KmiacServerException, TException {
+	int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
+        				+ "timeda = ?, timeprf = ?, timepr = ?, nuch1 = ?, nuch2 = ?, " 
+        				+ "nuch3 = ? WHERE pcod = ?;", true, vt, VrachTabelTypes, indexes);
+		sme.setCommit();
+	} catch (SqlExecutorException | InterruptedException e) {
+		e.printStackTrace();
+	}
 }
 
 @Override
@@ -681,6 +794,8 @@ public String printNoVipPlanDisp(InputPlanDisp ipd)
 	// TODO Auto-generated method stub
 	return null;
 }
+
+
 
 @Override
 public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
@@ -692,3 +807,4 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 
 
 }
+
