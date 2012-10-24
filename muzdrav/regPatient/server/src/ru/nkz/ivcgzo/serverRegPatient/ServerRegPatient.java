@@ -1049,6 +1049,7 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final void deleteGosp(final int id) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
+        	System.out.println(id);
             sme.execPrepared("DELETE FROM c_gosp WHERE id = ?;",
                     false, id);
             sme.setCommit();
