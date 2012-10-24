@@ -142,7 +142,7 @@ public class FormPostBer extends JFrame {
 	 */
 	public FormPostBer() {
 		setExtendedState(Frame.MAXIMIZED_BOTH);
-		setTitle("Постановка на учет по беременности");
+		setTitle("Данные о случае беременности");
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
@@ -183,7 +183,7 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-		setTitle("Постановка на учет по беременности");
+		setTitle("Данные о случае беременности");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1032, 853);
 		contentPane = new JPanel();
