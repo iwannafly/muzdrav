@@ -516,7 +516,7 @@ public class TalonSelectFrame extends JFrame {
                         } else if (curPatient == null) {
                             JOptionPane.showMessageDialog(
                                     TalonSelectFrame.this.getContentPane(), "Пациент не выбран",
-                                    "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
+                                    "Ошибка!", JOptionPane.ERROR_MESSAGE);
                         }
                     } catch (TException e1) {
                         MainForm.conMan.reconnect(e1);
@@ -535,6 +535,7 @@ public class TalonSelectFrame extends JFrame {
         lblMiddlename.setText(patientMiddlename);
         curPatient = new Patient(patientId, patientSurname, patientName, patientMiddlename,
                 idPvizit);
+        tbpTalonOperations.setSelectedIndex(0);
     }
 
     public final void onConnect() {

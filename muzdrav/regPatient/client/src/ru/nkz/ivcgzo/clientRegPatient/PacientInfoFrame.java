@@ -662,7 +662,14 @@ public class PacientInfoFrame extends JFrame {
                         btnShowTalonSelectModule.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent arg0) {
-                            	MainForm.conMan.showReceptionRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), 0);
+                                if (curPatientId != 0) {
+                                    MainForm.conMan.showReceptionRecordForm(curPatientId, tfFam.getText(), tfIm.getText(), tfOt.getText(), 0);
+                                } else {
+                                    JOptionPane.showMessageDialog(
+                                        PacientInfoFrame.this.getContentPane(), "Пациент не выбран!",
+                                        "Ошибка!", JOptionPane.ERROR_MESSAGE
+                                    );
+                                }
                             }
                         });
 
