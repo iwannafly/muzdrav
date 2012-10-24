@@ -30,7 +30,7 @@ public final class TalonTableModel implements TableModel {
         } catch (TalonNotFoundException e) {
             talonList = new TalonList();
         } catch (TException e) {
-            e.printStackTrace();
+            MainForm.conMan.reconnect(e);
         }
     }
 
