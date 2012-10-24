@@ -433,7 +433,7 @@ public class Vvod extends JFrame {
 		JButton btnShabSrc = new JButton("...");
 		btnShabSrc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				shablonform.showShablonForm(tbShabSrc.getText());
+				shablonform.showShablonForm(tbShabSrc.getText(), lbShabSrc.getSelectedValue());
 				syncShablonList(shablonform.getSearchString(), shablonform.getShablon());
 				pasteShablon(shablonform.getShablon());
 			}
@@ -1990,6 +1990,12 @@ public class Vvod extends JFrame {
 		 btnPosAdd.setToolTipText("Добавление новой записи");
 		btnPosAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				for (PvizitAmb pviz : tblPos.getData())
+					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
+						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
+						return;
+					}
+				
 				pvizit = new Pvizit();
 				if (zapVr.getId_pvizit()!=0){
 				pvizit.setId(zapVr.getId_pvizit());
@@ -2010,12 +2016,6 @@ public class Vvod extends JFrame {
 				pvizitAmb.setCdol(MainForm.authInfo.getCdol());
 				pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
 				pvizitAmb.setKod_ter(MainForm.authInfo.getKdate());
-				
-				for (PvizitAmb pviz : tblPos.getData())
-					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
-						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
-						return;
-					}
 				
 				try {
 					Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
@@ -2041,12 +2041,6 @@ public class Vvod extends JFrame {
 				}
 				}
 				else {
-					for (PvizitAmb pviz : tblPos.getData())
-						if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
-							JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
-							return;
-						}
-					
 					try {
 						pvizit.setNpasp(zapVr.getNpasp());
 						pvizit.setCpol(MainForm.authInfo.getCpodr());
@@ -2073,6 +2067,10 @@ public class Vvod extends JFrame {
 						MainForm.conMan.reconnect(e1);
 					}	
 				}
+				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
+				priemCopy = new Priem(priem);
+				anamZabCopy = new AnamZab(anamZab);
+				pvizitCopy = new Pvizit(pvizit);
 			}
 		});
 		btnPosAdd.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
@@ -2284,10 +2282,8 @@ public class Vvod extends JFrame {
 	}
 	
 	private void syncShablonList(String searchString, Shablon shablon) {
-		
-		shablonSearchListener.updateNow(searchString);
-		
 		if (shablon != null) {
+			shablonSearchListener.updateNow(searchString);
 			for (int i = 0; i < lbShabSrc.getData().size(); i++)
 				if (lbShabSrc.getData().get(i).pcod == shablon.id)
 				{
@@ -2585,15 +2581,18 @@ public class Vvod extends JFrame {
 			pvizitAmb.unsetMobs();
 		if (cmbVidOpl.getSelectedPcod() != null) {
 			pvizitAmb.setOpl(cmbVidOpl.getSelectedPcod());
-			if (cmbVidOpl.getSelectedPcod() == 2)
+			if (cmbVidOpl.getSelectedPcod() == 2) {
 				try {
 					pvizitAmb.setStoim(MainForm.tcl.getStoim(MainForm.authInfo.getKateg(), MainForm.authInfo.getC_nom(), MainForm.authInfo.getCdol()));
+					pvizitAmbCopy.setStoim(pvizitAmb.stoim);
 				} catch (TException e3) {
 					e3.printStackTrace();
 					MainForm.conMan.reconnect(e3);
 				}
-			else
+			} else {
 				pvizitAmb.unsetStoim();
+				pvizitAmbCopy.unsetStoim();
+			}
 		}
 		else
 			pvizitAmb.unsetOpl();
