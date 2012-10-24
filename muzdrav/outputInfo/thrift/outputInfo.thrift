@@ -47,22 +47,6 @@ struct InputPlanDisp {
     5: optional string uchas;
 }
 
-struct OutputPlanDisp {
-	1: string dateb;
-	2: string datef;
-	3: optional string namepol;
-	4: optional string uchas;
-   	5: optional string nambk;
-	6: optional string fio;
-	7: optional i64 datar;
-	8: optional string adres;
-	9: optional string kab;
-	10: optional string diag;
-	11: optional string name;
-	12: optional i64 pdat;
-	13: optional i32 nuch1;
-	14: optional i32 d_grup;
-}
 
 /**
  * Информация отстутствует
@@ -116,7 +100,11 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
      */
 	void deleteVT(1:VrachTabel vt) throws (1:kmiacServer.KmiacServerException kse);
 
-    string printPlanDisp(1:InputPlanDisp ipd 2:OutputPlanDisp opd ) throws (1: kmiacServer.KmiacServerException kse);
+    string printPlanDisp(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
+
+    string printNoVipPlanDisp(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
+
+    string printSvedDispObs(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
 
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 

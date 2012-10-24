@@ -148,8 +148,8 @@ public class ServerOsm extends Server implements Iface {
 	public ServerOsm(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
-		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "fam",        "im",         "ot",         "poms_ser",   "poms_nom",   "id_pvizit",  "pol",          "datar",    "datap",   "nuch");
-		zapVrTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Date.class, Date.class,Integer.class};
+		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "fam",        "im",         "ot",         "poms_ser",   "poms_nom",   "id_pvizit",  "pol",          "datar",    "datap",    "nuch",        "has_pvizit");
+		zapVrTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Boolean.class};
 		
 		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "recomend",   "lech",       "cobr");
 		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class, String.class, Integer.class};
@@ -330,7 +330,11 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<ZapVr> getZapVr(int idvr, String cdol, long datap) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, tal.datap, p_nambk.nuch FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) JOIN p_nambk ON (pat.npasp=p_nambk.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL", idvr, cdol, new Date(datap))) {
+		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, tal.datap, p_nambk.nuch, FALSE AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) LEFT JOIN p_nambk ON (pat.npasp=p_nambk.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL " +
+					 "UNION " +
+					 "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, tal.datap, p_nambk.nuch, TRUE AS has_pvizit  FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id AND pa.datap = tal.datap) LEFT JOIN p_nambk ON (pat.npasp=p_nambk.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NOT NULL " +
+					 "ORDER BY has_pvizit, fam, im, ot ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, idvr, cdol, new Date(datap), idvr, cdol, new Date(datap))) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -340,10 +344,10 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<ZapVr> getZapVrSrc(int npasp, int codsp, String cdol) throws KmiacServerException, TException {
-		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, CURRENT_DATE AS datap, 0 AS id_pvizit     FROM patient pat WHERE pat.npasp = ? " +
+		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, CURRENT_DATE AS datap, 0 AS id_pvizit,     FALSE AS has_pvizit FROM patient pat WHERE pat.npasp = ? " +
 					 "UNION " +
-					 "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.datap,              pv.id AS id_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id)WHERE (pat.npasp = ?) AND (pv.cod_sp = ?) AND (pv.cdol = ?) AND ((pv.ishod IS NULL) OR (pv.ishod < 1)) " +
-					 "ORDER BY id_pvizit, datap DESC ";	
+					 "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.datap,              pv.id AS id_pvizit, TRUE AS has_pvizit  FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id)WHERE (pat.npasp = ?) AND (pv.cod_sp = ?) AND (pv.cdol = ?) AND ((pv.ishod IS NULL) OR (pv.ishod < 1)) " +
+					 "ORDER BY has_pvizit, id_pvizit, fam, im, ot ";	
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp, npasp, codsp, cdol)) {
 			List<ZapVr> zapVrList = rsmZapVr.mapToList(acrs.getResultSet());
 			int prevIdObr = -1;
@@ -644,7 +648,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<RdDinStruct> getRdDinInfo(int id_pvizit, int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? ", id_pvizit, npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select d.*,v.datap from p_rd_din d JOIN p_vizit_amb v on (d.id_pos = v.id) where d.id_pvizit = ? and d.npasp = ? order by v.datap", id_pvizit, npasp)) {
 			return rsmRdDin.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -726,20 +730,6 @@ public class ServerOsm extends Server implements Iface {
 		
 	}
 
-	@Override
-	public void DeleteRdDin(int id_pos, int iD) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pos = ? and iD = ?", false, id_pos,iD);
-			sme.setCommit();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-			throw new KmiacServerException();
-		}
-		
-	}
 	
 //	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 //		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -926,12 +916,18 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<tr valign=\"top\">");
 				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
 					sb.append("<h3>Информация для пациента:</h3>");
-					if (im.getMesto()!=null)sb.append(String.format("<b>Место: </b>%s<br />", im.getMesto()));
-					if (im.getKab()!=null)sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
+					acrs = sse.execPreparedQuery("select substr(adres,8), name_s from n_m00 where pcod = ? ", im.getClpu());
+					if (acrs.getResultSet().next()) {
+						sb.append(String.format("<b>ЛПУ: </b>%s<br />", acrs.getResultSet().getString(2)));
+						sb.append(String.format("<b>Адрес: </b> %s <br />", acrs.getResultSet().getString(1)));
+					}
+					if (im.getMesto()!=null) sb.append(String.format("<b>Лаборатория: </b>%s<br />", im.getMesto()));
+					if (im.getKab()!=null) sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
 					sb.append("<b>Дата:</b><br />");
 					sb.append("<b>Время:</b><br />");
 					sb.append("<b>Подготовка:</b><br />");
 				sb.append("</td>");
+				acrs.close();
 				acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", im.getUserId());
 				if (acrs.getResultSet().next()) {
 					sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
@@ -944,10 +940,12 @@ public class ServerOsm extends Server implements Iface {
 				if (acrs.getResultSet().next())
 					sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
 				acrs.close();
-				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ? ", im.getNpasp());
+				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 				if (acrs.getResultSet().next()) {
 					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					if (acrs.getResultSet().getString(8)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
 					sb.append(String.format("<b>Дата рождения:</b> %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					if (acrs.getResultSet().getString(5)!=null)
 					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
 				}
 				sb.append("<b>Диагноз:</b><br />");
@@ -957,7 +955,7 @@ public class ServerOsm extends Server implements Iface {
 					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
 				acrs.close();
 				sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
-				sb.append("<h3>Наименование показателей:</h3>");
+				sb.append("<h3>Наименование исследований:</h3>");
 				sb.append("<ol>");
 				for (String str : im.getPokaz()) {
 					acrs.close();
@@ -1114,7 +1112,7 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
+				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения <br> Российской Федерации<br>");
 				sb.append("<br>");
 				sb.append(String.format("%s, %s", na.getCpodr_name(), na.getClpu_name()));
 				sb.append("</div>"); 
@@ -1138,11 +1136,12 @@ public class ServerOsm extends Server implements Iface {
 			 	acrs.close();
 				acrs = sse.execPreparedQuery("SELECT patient.fam, patient.im, patient.ot, patient.datar, patient.adm_ul, patient.adm_dom, patient.adm_kv, n_z43.name, patient.prof FROM patient join n_z43 on (patient.mrab=n_z43.pcod) where patient.npasp= ? ", na.getNpasp());
 				if (acrs.getResultSet().next()){
-			sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-			sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
-			sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
-			sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
-			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));}
+					sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					sb.append("5. Адрес: "); if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
+					sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
+			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));
+			}
 			sb.append("<br>7. Код диагноза по МКБ: ");
 			acrs.close();
 			acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", na.getPvizitId());
@@ -1191,7 +1190,7 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
+				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения <br> Российской Федерации<br>");
 				sb.append("<br>");
 				sb.append(String.format("%s, %s", nk.getCpodr_name(), nk.getClpu_name()));
 				sb.append("</div>"); 
@@ -1267,7 +1266,7 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения и социального<br> развития Российской Федерации<br>");
+				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения <br>Российской Федерации<br>");
 				sb.append("<br>");
 				sb.append(String.format("%s, %s", vp.getClpu_name(), vp.getCpodr_name()));
 				sb.append("</div>"); 
@@ -1579,7 +1578,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				}				
 				acrs.close();
 				
-				acrs = sse.execPreparedQuery("select n_abs.name,n_opl.name,n_ap0.name,p_priem.t_jalob,p_priem.t_temp,p_priem.t_ad,p_priem.t_rost,p_priem.t_ves,p_priem.t_chss,p_priem.t_status_praesense,p_priem.t_fiz_obsl,p_priem.t_st_localis,p_priem.t_ocenka,p_vizit_amb.datap from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) left join n_opl on(p_vizit_amb.opl=n_opl.pcod) left join n_ap0 on(p_vizit_amb.rezult=n_ap0.pcod) where p_vizit_amb.id_obr=? order by id ", pk.getPvizit_id());
+				acrs = sse.execPreparedQuery("select n_abs.name,n_opl.name,n_aq0.name,p_priem.t_jalob,p_priem.t_temp,p_priem.t_ad,p_priem.t_rost,p_priem.t_ves,p_priem.t_chss,p_priem.t_status_praesense,p_priem.t_fiz_obsl,p_priem.t_st_localis,p_priem.t_ocenka,p_vizit_amb.datap from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) left join n_opl on(p_vizit_amb.opl=n_opl.pcod) left join n_aq0 on(p_vizit_amb.rezult=n_aq0.pcod) where p_vizit_amb.id_obr=? order by id ", pk.getPvizit_id());
 				if (acrs.getResultSet().next()) {
 					sb.append("<br><b>Осмотр: </b><br>");
 					do {
@@ -1650,7 +1649,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					}
 					acrs.close();
 					
-					acrs = sse.execPreparedQuery("select p_vizit.recomend,p_vizit.zakl,n_aq0.name from p_vizit left join n_aq0 on (p_vizit.ishod=n_aq0.pcod) where id=?", pk.getPvizit_id()); 
+					acrs = sse.execPreparedQuery("select p_vizit.recomend,p_vizit.zakl,n_ap0.name from p_vizit left join n_ap0 on (p_vizit.ishod=n_ap0.pcod) where id=?", pk.getPvizit_id()); 
 					if (acrs.getResultSet().next()) {
 						if (acrs.getResultSet().getString(1) != null)
 							sb.append(String.format("<br><b> Лечебные и трудовые рекомендации</b> %s", acrs.getResultSet().getString(1)));
@@ -1746,9 +1745,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("</head>");
 				sb.append("<body>");
 				sb.append("<p align=\"center\" >Министерство здравоохранения");
-				sb.append("и социального развития");
 				sb.append("<br>Российской Федерации");
-				sb.append("<br>_________________________________________________________________________________________");
+				sb.append("<br>_____________________________________________________________________________________");
 				sb.append("<br>(наименование и адрес организации, оказывающей лечебно-профилактическую помощь)");
 				sb.append("<br>");
 				sb.append("<br>НАПРАВЛЕНИЕ НА МЕДИКО-СОЦИАЛЬНУЮ ЭКСПЕРТИЗУ ОРГАНИЗАЦИЕЙ, <br>ОКАЗЫВАЮЩЕЙ ЛЕЧЕБНО-ПРОФИЛАКТИЧЕСКУЮ ПОМОЩЬ");
@@ -1763,19 +1761,19 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					sb.append(String.format("<br>2. Дата рождения: </b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(4)));
 					sb.append(String.format("<br>3. Пол:  %s", acrs.getResultSet().getString(5)));}
 				sb.append("<br>");
-				sb.append("4. Фамилия, имя, отчество законного представителя гражданина (заполняется при наличии законного представителя): ________________");
+				sb.append("4. Фамилия, имя, отчество законного представителя гражданина (заполняется при наличии законного представителя): ______________________________________________________________________________");
 				sb.append("<br>");
 				sb.append("5. Адрес места жительства гражданина (при отсутствии места жительства указывается адрес пребывания, фактического проживания на территории Российской Федерации): ___________________________________________________________________________");
 				sb.append("<br>");
 				sb.append("6. Инвалидом не является, инвалид первой, второй, третьей группы, категория 'ребенок-инвалид' (нужное подчеркнуть)");
 				sb.append("<br>");
-				sb.append("7. Степень ограничения к трудовой деятельности (заполняется при повторном направлении): _____________________________________________________________");
+				sb.append("7. Исключен: ___________________________________________________________________");
 				sb.append("<br>");
 				sb.append("8. Степень утраты профессиональной трудоспособности в процентах (заполняется при повторном направлении) _____________________________________________");
 				sb.append("<br>");
 				sb.append("9. Направляется первично, повторно (нужное подчеркнуть)");
 				sb.append("<br>");
-				sb.append("10. Кем работает на момент направления на медикл-социальную эксперизу (указать должность, профессию, специальность, квалификацию и стаж работы по указанной должности, профессии, специальности, квалификации; в отношении неработающих граждан сделать запись 'не работает')__________________________________________________");
+				sb.append("10. Кем работает на момент направления на медико-социальную эксперизу (указать должность, профессию, специальность, квалификацию и стаж работы по указанной должности, профессии, специальности, квалификации; в отношении неработающих граждан сделать запись 'не работает')__________________________________________________");
 				sb.append("<br>");
 				sb.append("11. Наименование и адрес организации, в которой работает гражданин: ________________________________________________________");
 				sb.append("<br>");
@@ -1794,19 +1792,99 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("18. Наблюдается в организациях, оказывающих лечебно-профилактическую помощь, с ____ года.");
 				sb.append("<br>");
 				sb.append("19. История заболевания (начало, развитие, течение, частота и длительность обострений, проведенные лечебно-оздоровительные и реабилитационные мероприятия и их эффективность):");
-				sb.append("_________________________________________________________________________________________________________________");
+				sb.append("____________________________________________________________________________________________________________________________________________________");
 				sb.append("<dd>(подробно описывается при первичном направлении, при повторном направлении отражается динамика  за период между освидетельствованиями, детально описываются выявленные за этот период нвоые случаи заболеваний, приведшим к стойким нарушениям функций организма)</dd>");
+				sb.append("<br>");
 				sb.append("<br>");
 				sb.append("20. Анамнез жизни (пречисляются перенесенные в прошлом заболевания, травмы, отравления, операции, заболевания, по которым отягощена наследственность"); 
 				sb.append(", дополнительно в отношении ребенка указывается, как протекали беременность и роды у матери, сроки формирования психомоторынх навыков, самообслуживания, показательно-игровой деятельности, навыков опрятности и ухода за собой, как протекало раннее развитие (по возрасту, с отставанием, с опережением)): ________________________________________________________________________________________________________________________________________________________________________________________");
 				sb.append("<br>");
+				sb.append("<br>");
 				sb.append("21. Частота и длительность временной нетрудоспособности (сведения за последние 12 месяцев)");
 				sb.append("<table width=\"100%\" border=\"1\" cellspacing=\"1\" bgcolor=\"#000000\"> ");
-				sb.append("<tr bgcolor=\"#F5E8FF\"><th style=\"font: 16px times new roman;\">№</th>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">№</th>");
 				sb.append("<th style=\"font: 16px times new roman;\">Дата (число, месяц, год) начала временной нетрудоспособности</th>");
 				sb.append("<th style=\"font: 16px times new roman;\">Дата (число, месяц, год) окончания временной нетрудоспособности</th>");
 				sb.append("<th style=\"font: 16px times new roman;\">Число дней (месяцев и дней) временной нетрудоспособности</th>");
 				sb.append("<th style=\"font: 16px times new roman;\">Диагноз</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("</tr>");
+				sb.append("<tr bgcolor=\"white\"><th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
+				sb.append("<th style=\"font: 16px times new roman;\">&nbsp;</th>");
 				sb.append("</tr>");
 				sb.append("</table>");
 				sb.append("<br>");
@@ -1852,9 +1930,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("<br>");
 				sb.append("Члены врачебной комисии _________________ (подпись) ________________(расшифровка)");
 				sb.append("<br>");
-				sb.append("_________________ (подпись) ________________(расшифровка)");
+				sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_________________ (подпись) ________________(расшифровка)");
 				sb.append("<br>");
-				sb.append("_________________ (подпись) ________________(расшифровка)");
+				sb.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_________________ (подпись) ________________(расшифровка)");
 				sb.append("</body>");
 				osw.write(sb.toString());
 				return path;
@@ -2177,7 +2255,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, diag, pmer, pdat, fdat, cod_sp, dataz, prichina, rez, cdol, dnl, dkl, lpu, ter, cpol) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz) values (?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 15, 7);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2312,12 +2390,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public String formfilecsv(KartaBer kb) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		Date p1; Date p2; Date p3; Date p4; Date p5; Date p6; Date p7;
-		Date p8;
+		Date p8; Date p9; Date p10;
 		Integer ball1;Integer ball2;Integer ball3;
 		Integer ball4;Integer ball5;Integer grk;
 		Integer kod2; Integer kod3; Integer kod4;Integer kod5;
 		Integer kod6; Integer kod7; Integer kod8; Integer kod9;
-		Integer j = 0;
+		Integer j = 0;Integer hr; Integer disp1;
 		Integer risk ;Integer kontr;Integer rod;
 		Integer grot; Integer hsm; Integer hal; Integer hdr;
 		Integer pr; Integer ek; Integer ru;Integer otec; Integer iw2;
@@ -2359,6 +2437,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
         //  Con_sob
 		StringBuilder sb5 = new StringBuilder(0x10000);
 		sb5.append("nsob;uid;obr;sem;height;weight;priv;prof;proj;osl;ak;eks;gen;sost;point1;point2;point3;point4;point5;sob_date");
+		
+		StringBuilder sb6 = new StringBuilder(0x10000);
+		sb6.append("numd;uid;uid_pol;ddiag;spz;diag;dpdiag;un;vp");
 //		for (int j = 0; j < rdPatient.size(); j++) {
 //			RdPatient rdp = rdPatient.get(j);
 //			
@@ -2421,8 +2502,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
  		
 		//Con_diagn.csv
-			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.diag,c.dex from p_diag d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
+			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("select d.diag,c.dex,d.d_vz,d.xzab,d.disp,s.name,da.datad from p_diag d,n_c00 c,n_s00 s, p_diag_amb da  where d.diag = c.pcod and d.cdol_ot = s.pcod  and da.id = d.id_diag_amb and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
+					p9 = new Date(acrs21.getResultSet().getLong(6));
+					p10 = new Date(acrs21.getResultSet().getLong(6));
+					if (acrs21.getResultSet().getInt(4) == 1) disp1 = 0; else disp1 = 0;
+					if (acrs21.getResultSet().getInt(3) == 1) hr = 1; else hr = 0;
+					sb6.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%s;%s;%7$td.%7$tm.%7$tY;%s;%d", j,rdp.npasp,rdp.npasp,p1,acrs21.getResultSet().getString(5),acrs21.getResultSet().getString(0),p2,acrs21.getResultSet().getString(5),disp1,hr));		
 	//				dex = dex + ' '+ acrs1.getResultSet().getString(0);	
 			if (acrs21.getResultSet().getString(1) == "dex1"){ dex1 =dex1 + ' '+ acrs21.getResultSet().getString(0);
 			k1 = k1+1; k2 = 1;}	
@@ -2666,11 +2752,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<IntegerClassifier> get_m00() throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name from n_m00 ")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name_s as name from n_m00 where pr='Л' ")) {
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
+			throw new KmiacServerException(); 
 		}
 	}
 
@@ -2733,19 +2819,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}
 	}
+
 	@Override
-	public long getdatap(int id) throws TException {   
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select datap from p_vizit_amb where id = ? ", id)) {
-			if (acrs.getResultSet().next())
-				return acrs.getResultSet().getLong(0);
-			else
-				return 0;
+	public void DeleteRdDin(int id_pos) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pos = ? ", false, id_pos);
+			sme.setCommit();
 		} catch (SQLException e) {
-			throw new TException(e);
-		}		
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
-
-
 
 
 	

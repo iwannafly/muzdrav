@@ -232,6 +232,7 @@ public class PatientSearchForm extends ModalForm {
 		btnClearFields.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				clearFields();
+				tbFam.requestFocusInWindow();
 			}
 		});
 		
@@ -487,6 +488,12 @@ public class PatientSearchForm extends ModalForm {
 		if (!tbFam.isEmpty()) params.setFam(tbFam.getText().trim());
 		if (!tbIm.isEmpty()) params.setIm(tbIm.getText().trim());
 		if (!tbOt.isEmpty()) params.setOt(tbOt.getText().trim());
+		if (!rbtIllegible.isSelected()) {
+			params.fam += '%';
+			params.im += '%';
+			if (params.isSetOt())
+				params.ot += '%';
+		}
 		if (!rbtIllegible.isSelected() && (tbBirDate.getDate() != null)) {
 			params.setDatar(tbBirDate.getDate().getTime());
 			params.unsetDatar2();
@@ -569,9 +576,8 @@ public class PatientSearchForm extends ModalForm {
 			boolean disabled = !legibleSearch;
 			
 			if (legibleSearch) {
-				disabled |= tbFam.isEmpty();
-				disabled |= tbIm.isEmpty();
-				disabled |= tbOt.isEmpty();
+				disabled |= tbFam.getText().length() < 2;
+				disabled |= tbIm.getText().length() < 2;
 			} else {
 				disabled &= tbFam.isEmpty();
 				disabled &= tbIm.isEmpty();

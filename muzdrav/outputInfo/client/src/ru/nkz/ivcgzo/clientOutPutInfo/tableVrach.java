@@ -16,6 +16,7 @@ import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPanel;
 import java.awt.GridLayout;
@@ -58,8 +59,7 @@ public tableVrach(){
 			try {
 			    vrach = MainForm.tcl.getVrachTableInfo(codPodr);
 			    tableVrachInfo.setData(vrach);
-			} catch (VINotFoundException | KmiacServerException
-					| TException e) {
+			} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 		    }
@@ -84,9 +84,15 @@ public void initialize() {
 		    	pcod = tableVrachInfo.getSelectedItem().pcod;
 		    	tabel = MainForm.tcl.getVrachTabel(pcod);
 		    	tableVrachTabel.setData(tabel);
-			} catch (VTDuplException | KmiacServerException | TException | VTException e) {
-				// TODO Auto-generated catch block
+		    } catch (VTDuplException e) {
+		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
+		    } catch (VTException e) {
+		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
+		    } catch (KmiacServerException e) {
+		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
+			} catch (TException e) {
 				e.printStackTrace();
+				MainForm.conMan.reconnect(e);
 			}
 		}
 	});
@@ -118,9 +124,6 @@ public void initialize() {
 			} catch (TException e) {
 				e.printStackTrace();
 				return false;
-			} catch (KmiacServerException e) {
-                e.printStackTrace();
-                return false;
 			}
 			return true;
 		}
@@ -157,9 +160,6 @@ public void initialize() {
             try {
             	MainForm.tcl.updateVT(event.getItem());
             } catch (TException e) {
-                e.printStackTrace();
-                return false;
-            } catch (KmiacServerException e) {
                 e.printStackTrace();
                 return false;
             }

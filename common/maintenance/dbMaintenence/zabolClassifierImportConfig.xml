@@ -59,10 +59,12 @@
 		<table srcName="NSILPU" dstName="n_nsilpu" />
 		<table srcName="NSIPOL" dstName="n_nsipol" />
 		<table srcName="NZ1" dstName="n_nz1" />
+		<table srcName="NZ2" dstName="n_nz2" />
 		<table srcName="OBST" dstName="n_obst" />
 		<table srcName="O00" dstName="n_o00" />
 		<table srcName="OPL" dstName="n_opl" />
 		<table srcName="OT9" dstName="n_ot9" />
+		<table srcName="OT63" dstName="n_ot63" />
 		<table srcName="P07" dstName="n_p07" />
 		<table srcName="P0C" dstName="n_p0c" />
 		<table srcName="P0E1" dstName="n_p0e1" />
@@ -72,6 +74,7 @@
 		<table srcName="R0Z" dstName="n_r0z" />
 		<table srcName="RZD" dstName="n_rzd" />
 		<table srcName="S00" dstName="n_s00" />
+		<table srcName="S0M" dstName="n_s0m" />
 		<table srcName="SMORF" dstName="n_smorf" />
 		<table srcName="SPEC" dstName="n_spec" />
 		<table srcName="STOIM" dstName="n_stoim" />

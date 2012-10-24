@@ -41,6 +41,7 @@ import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Client;
 import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 
 public class MainForm {
+	public static String appServerIp;
 	private JFrame frame;
 	private JPanel pnlLogin;
 	private CustomTextField tbLogin;
@@ -58,12 +59,29 @@ public class MainForm {
 	private static ThriftServerAuth.Client client; 
 	private UserAuthInfo authInfo;
 	private IClient plug;
-//	private ModulesUpdater modUpd;
+	//private ModulesUpdater modUpd;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		if (args.length == 0) {
+			System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
+			appServerIp = "localhost";
+		} else if (args[0].equals("tst")) {
+			System.out.println("Using test application server.");
+			appServerIp = "10.0.0.248";
+		} else if (args[0].equals("int")) {
+			System.out.println("Using internal application server.");
+			appServerIp = "10.0.0.243";
+		} else if (args[0].equals("ext")) {
+			System.out.println("Using external application server.");
+			appServerIp = "10.1.1.8";
+		} else {
+			System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
+			appServerIp = "localhost";
+		}
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -73,7 +91,7 @@ public class MainForm {
 					window.frame.getInputContext().selectInputMethod(new Locale("ru", "RU"));
 					window.frame.setVisible(true);
 					
-					conMan = new ConnectionManager(window.frame, ThriftServerAuth.Client.class, configuration.thrPort);
+					conMan = new ConnectionManager(appServerIp, window.frame, ThriftServerAuth.Client.class, configuration.thrPort);
 					client = (Client) conMan.get(configuration.thrPort);
 					conMan.connect();
 				} catch (Exception e) {
@@ -322,12 +340,12 @@ public class MainForm {
 	}
 	
 	private void showPluginList() {
-//			modUpd = new ModulesUpdater(conMan);
+			//modUpd = new ModulesUpdater(conMan);
 			while (true) {
 				try {
 					
 //					TODO На этапе разработки апдейтер будет только мешать
-//					modUpd.checkAndUpdate(authInfo.pdost);
+					//modUpd.checkAndUpdate(authInfo.pdost);
 					conMan.getPluginLoader().loadPluginList(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					conMan.loadViewClient();
 					break;

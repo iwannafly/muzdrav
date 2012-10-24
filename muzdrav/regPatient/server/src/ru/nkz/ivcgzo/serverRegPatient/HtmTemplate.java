@@ -201,9 +201,9 @@ public class HtmTemplate {
     public final void replaceLabel(final int labelIndex, final String value) throws Exception {
         if (labelIndex <= labels.size()) {
             if ((value != null) && (value != "null")) {
-                template = template.replace(labels.get(labelIndex), value);
+                template = template.replaceFirst(labels.get(labelIndex), value);
             } else {
-                template = template.replace(labels.get(labelIndex), "");
+                template = template.replaceFirst(labels.get(labelIndex), "");
             }
         } else {
             throw new Exception("В документе нет метки с таким индексом");
@@ -220,9 +220,9 @@ public class HtmTemplate {
     public final void replaceLabel(final String labelName, final String value) throws Exception {
         if (labels.contains(labelName)) {
             if ((value != null) && (value != "null")) {
-                template = template.replace(labelName, value);
+                template = template.replaceFirst(labelName, value);
             } else {
-                template = template.replace(labelName, "");
+                template = template.replaceFirst(labelName, "");
             }
         } else {
             throw new Exception("В документе нет метки с таким именем");
@@ -236,7 +236,7 @@ public class HtmTemplate {
      * @param value - текст, заменяющий метку в шаблоне
      */
     public final void replaceText(final String textForReplace, final String value) {
-        template = template.replace(textForReplace, value);
+        template = template.replaceFirst(textForReplace, value);
     }
 
     /**

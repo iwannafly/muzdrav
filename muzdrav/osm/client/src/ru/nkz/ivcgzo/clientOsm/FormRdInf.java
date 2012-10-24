@@ -105,7 +105,7 @@ public class FormRdInf extends JFrame {
 				fam.setText(Vvod.zapVr.getFam());
 				im.setText(Vvod.zapVr.getIm());
 				ot.setText(Vvod.zapVr.getOth());
-} catch (KmiacServerException | TException e) {
+} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -139,7 +139,7 @@ public class FormRdInf extends JFrame {
 	
 		JButton btnNewButton = new JButton("");
 		btnNewButton.setToolTipText("Новая запись");
-		btnNewButton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
+/*		btnNewButton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -157,7 +157,7 @@ public class FormRdInf extends JFrame {
 				}
 			}
 
-		});
+		});*/
 		
 		fam = new JTextField();
 		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
@@ -461,7 +461,7 @@ if (CBGrOtec.getSelectedPcod() != null)
 	else rdinf.unsetGrotec();
 System.out.println(rdinf);		
 	MainForm.tcl.UpdateRdInf(rdinf);
-} catch (KmiacServerException | TException e) {
+} catch (TException e) {
 	// TODO Auto-generated catch block
 	e.printStackTrace();
 }

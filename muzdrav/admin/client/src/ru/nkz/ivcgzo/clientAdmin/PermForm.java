@@ -17,15 +17,16 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.apache.thrift.TException;
-import org.apache.thrift.transport.TTransportException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRab;
@@ -38,15 +39,17 @@ public class PermForm extends JDialog {
 	private static final String frameTitle = "Установка прав пользователя";
 	private VrachInfo vInf;
 	private MestoRab mRab;
-	private JTextField tbLog;
-	private JTextField tbPass;
+	private CustomTextField tbLog;
+	private CustomTextField tbPass;
 	private JPanel gbPerm;
 	private JPanel pnlPermChb;
 	private JPanel pnlPermBtn;
 	private JButton btnPassDel;
+	private JButton btnPassReq;
 	private boolean opened;
 	private boolean ownRecord;
 	private CsluPdost csluPdost;
+	private boolean hasLog;
 
 	/**
 	 * Create the dialog.
@@ -113,11 +116,9 @@ public class PermForm extends JDialog {
 				try {
 					MainForm.tcl.setPermissions(mRab.pcod, mRab.clpu, mRab.cpodr, getPermissions());
 					dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
-				} catch (TTransportException e1) {
-					MainForm.conMan.reconnect(e1);
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
 				}
 			}
 		});
@@ -142,33 +143,29 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbVrachinfo = new TaggedJCheckBox("Администрирование", 1, CsluPdost.CsluAll);
 		pnlPermChb.add(chbVrachinfo);
 		
-		TaggedJCheckBox chbStationar = new TaggedJCheckBox("Стационар", 2, CsluPdost.CsluStat);
+		TaggedJCheckBox chbStationar = new TaggedJCheckBox("Стационар", 2, CsluPdost.CsluAll);
 		pnlPermChb.add(chbStationar);
 				
-		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3, CsluPdost.CsluPol);
+		TaggedJCheckBox chbOsm = new TaggedJCheckBox("Врач амбулаторного приема", 3, CsluPdost.CsluAll);
 		pnlPermChb.add(chbOsm);
 				
 		TaggedJCheckBox chbLds = new TaggedJCheckBox("Параотделение", 4, CsluPdost.CsluAll);
 		pnlPermChb.add(chbLds);
 
 		TaggedJCheckBox chbRegPat = new TaggedJCheckBox("Регистрация пациентов больницы", 5, CsluPdost.CsluAll);
-		chbRegPat.setText("Регистрация пациентов больницы");
 		pnlPermChb.add(chbRegPat);
 
-		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluStat | CsluPdost.CsluPol);
+		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluAll);
 		pnlPermChb.add(chbMss);
 
 		TaggedJCheckBox chbClasVIew = new TaggedJCheckBox("Просмотр и выбор из классификатора", 7, CsluPdost.CsluAll);
 		pnlPermChb.add(chbClasVIew);
 
-		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8, CsluPdost.CsluPol);
+		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8, CsluPdost.CsluAll);
 		pnlPermChb.add(chbGenTal);
 
 		TaggedJCheckBox chbOutInf = new TaggedJCheckBox("Выходная информация системы", 9, CsluPdost.CsluAll);
 		pnlPermChb.add(chbOutInf);
-
-		TaggedJCheckBox chbRecep = new TaggedJCheckBox("Запись на приём к врачу поликлиники", 10, CsluPdost.CsluAll);
-		pnlPermChb.add(chbRecep);
 
 		TaggedJCheckBox chbRebInv = new TaggedJCheckBox("Карта ребенка-инвалида", 11, CsluPdost.CsluAll);
 		pnlPermChb.add(chbRebInv);
@@ -179,25 +176,49 @@ public class PermForm extends JDialog {
 		gbPerm.setLayout(gl_gbPerm);
 		
 		tbLog = new CustomTextField(true, true, false);
+		tbLog.getDocument().addDocumentListener(new DocumentListener() {
+			
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				check();
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				check();
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				check();
+			}
+			
+			private void check() {
+				btnPassReq.setEnabled(!tbLog.isEmpty());
+			}
+		});
 		tbLog.setColumns(10);
 		
 		JLabel lblLog = new JLabel("Логин");
 		
-		JButton btnPassReq = new JButton("Запросить пароль");
+		btnPassReq = new JButton("Запросить пароль");
 		btnPassReq.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (hasLog)
+						if (JOptionPane.showConfirmDialog(PermForm.this, "На учетную запись уже заведен пароль. Изменить его?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
+							return;
+					
 					UserIdPassword idPass = MainForm.tcl.setPassword(mRab.pcod, mRab.clpu, mRab.cpodr, tbLog.getText()); 
 					tbPass.setText(idPass.getPassword());
 					mRab.setUser_id(idPass.getUser_id());
 					setDelPassPermEnabled(true);
-				} catch (TTransportException e1) {
-					MainForm.conMan.reconnect(e1);
+					hasLog = false;
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
 				}
 			}
 		});
@@ -214,13 +235,13 @@ public class PermForm extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					MainForm.tcl.remPassword(mRab.pcod, mRab.clpu, mRab.cpodr);
-					dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
-				} catch (TTransportException e1) {
-					MainForm.conMan.reconnect(e1);
+					if (JOptionPane.showConfirmDialog(PermForm.this, "Снятие пароля приведет к удалению учетной записи. Продолжить?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+						MainForm.tcl.remPassword(mRab.pcod, mRab.clpu, mRab.cpodr);
+						dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
+					}
 				} catch (TException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
 				}
 			}
 		});
@@ -286,13 +307,12 @@ public class PermForm extends JDialog {
 						tbPass.setText("");
 						setTitle(String.format("%s %s %s %s, код подразделения %d", frameTitle, vInf.fam, vInf.im, vInf.ot, mRab.cpodr));
 						tbLog.setText(MainForm.tcl.getLogin(mRab.pcod, mRab.clpu, mRab.cpodr));
+						hasLog = !tbLog.isEmpty();
 						setPermissions(MainForm.tcl.getPermissions(mRab.pcod, mRab.clpu, mRab.cpodr));
 						setDelPassPermEnabled((tbLog.getText().length() == 0) ? false : true);
-					} catch (TTransportException e1) {
-						MainForm.conMan.reconnect(e1);
 					} catch (TException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
 					}
 				}
 			}
@@ -342,7 +362,7 @@ public class PermForm extends JDialog {
 		if (ownRecord)
 			perm[1] = '2';
 		
-		return new String(perm).replace('\0', ' ').trim();
+		return new String(perm).replace('\0', ' ').trim().replace(' ', '0');
 	}
 	
 	/**

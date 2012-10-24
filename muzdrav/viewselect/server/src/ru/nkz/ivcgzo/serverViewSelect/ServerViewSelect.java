@@ -12,11 +12,13 @@ import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverLab.ServerLab;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.serverReception.ServerReception;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -45,6 +47,8 @@ import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
 
 public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
+	private Server labServ;
+	private Server recServ;
 	private final ClassifierManager ccm;
 	private final TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	private final TResultSetMapper<PatientCommonInfo, PatientCommonInfo._Fields> rsmPatComInfo;
@@ -90,6 +94,32 @@ public class ServerViewSelect extends Server implements Iface {
 
     @Override
     public void start() throws Exception {
+    	new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					labServ = new ServerLab(sse, tse);
+					labServ.start();
+				} catch (Exception e) {
+					System.err.println("Error starting lab server.");
+					e.printStackTrace();
+				}
+			}
+		}).start();
+    	
+    	new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					recServ = new ServerReception(sse, tse);
+					recServ.start();
+				} catch (Exception e) {
+					System.err.println("Error starting reception server.");
+					e.printStackTrace();
+				}
+			}
+		}).start();
+    	
         ThriftViewSelect.Processor<Iface> proc = new ThriftViewSelect.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
         thrServ.serve();
@@ -99,6 +129,10 @@ public class ServerViewSelect extends Server implements Iface {
     public void stop() {
         if (thrServ != null)
             thrServ.stop();
+        if (labServ != null)
+        	labServ.stop();
+        if (recServ != null)
+        	recServ.stop();
     }
 
 	@Override
@@ -160,7 +194,7 @@ public class ServerViewSelect extends Server implements Iface {
 	
 	private String getSearchPatientWhereClause(PatientSearchParams prms) {
 		String clause = "WHERE ";
-		String condStringFormat = ((prms.illegibleSearch) ? "(%s SIMILAR TO ?) " : "(%s = ?) ") + "AND ";
+		String condStringFormat = ((prms.illegibleSearch) ? "(%s SIMILAR TO ?) " : "(%s LIKE ?) ") + "AND ";
 		String condDateFormat = ((prms.illegibleSearch) ? "(%s BETWEEN ? AND ?) " : "(%s = ?) ") + "AND ";
 		final int andLen = 4;
 		

@@ -70,10 +70,12 @@ public class MainFrame extends JFrame {
     }
 
     private void addAppointmentButton() {
-        btnAppointment = new JButton("Р—Р°РїРёСЃСЊ РЅР° РїСЂРёС‘Рј");
+        btnAppointment = new JButton("Запись на приём");
         btnAppointment.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                frmDoctorSelect = new DoctorSelectFrame();
+                if (frmDoctorSelect == null) {
+                    frmDoctorSelect = new DoctorSelectFrame();
+                }
                 frmDoctorSelect.setVisible(true);
             }
         });
@@ -92,7 +94,7 @@ public class MainFrame extends JFrame {
     }
 
     private void addPersonalInfoButton() {
-        btnPersonalInfo = new JButton("Р›РёС‡РЅС‹Р№ РєР°Р±РёРЅРµС‚");
+        btnPersonalInfo = new JButton("Личный кабинет");
         btnPersonalInfo.setHorizontalTextPosition(SwingConstants.CENTER);
         btnPersonalInfo.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnPersonalInfo.setFont(new Font("Courier New", Font.PLAIN, 25));
@@ -107,7 +109,7 @@ public class MainFrame extends JFrame {
     }
 
     private void addScheduleButton() {
-        btnSchedule = new JButton("Р Р°СЃРїРёСЃР°РЅРёРµ");
+        btnSchedule = new JButton("Расписание");
         btnSchedule.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnSchedule.setFont(new Font("Courier New", Font.PLAIN, 25));
         btnSchedule.setHorizontalTextPosition(SwingConstants.CENTER);

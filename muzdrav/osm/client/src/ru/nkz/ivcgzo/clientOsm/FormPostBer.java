@@ -1088,11 +1088,11 @@ public class FormPostBer extends JFrame {
 		rdSlStruct.setOsp(0);
 		rdSlStruct.setDataM(System.currentTimeMillis());
 		rdSlStruct.setDatay(System.currentTimeMillis());
-		rdSlStruct.setDataosl(System.currentTimeMillis());
+//		rdSlStruct.setDataosl(System.currentTimeMillis());
 //		rdSlStruct.setDatasn(System.currentTimeMillis());
 		rdSlStruct.setDataz(System.currentTimeMillis());
         rdSlStruct.setDataZs(System.currentTimeMillis()+217728*100000);
-		Calendar cal1 = Calendar.getInstance();
+//		Calendar cal1 = Calendar.getInstance();
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -1136,6 +1136,8 @@ public class FormPostBer extends JFrame {
 			SParRod.setValue(rdSlStruct.getKolrod());
 			SKolBer.setValue(rdSlStruct.getShet());
 			SDataOsl.setDate(rdSlStruct.getDataosl());
+			if (rdSlStruct.getDataosl() == 0)
+			SDataOsl.setText(null);	
 			SYavka.setValue(rdSlStruct.getYavka1());
 			SRost.setValue(rdSlStruct.getRost());
 			SDataM.setDate(rdSlStruct.getDataM());

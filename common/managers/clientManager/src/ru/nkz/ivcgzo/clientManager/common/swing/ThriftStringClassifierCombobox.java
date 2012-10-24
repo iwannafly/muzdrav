@@ -40,6 +40,7 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	private Searcher searcher;
 	protected StringComboBoxModel model;
 	private boolean strict = true;
+	private boolean illegible = true;
 	
 	/**
 	 * Конструктор комбобокса с неотсортированным классификатором.
@@ -96,11 +97,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		items = new ArrayList<>(list.size());
 		itemsBcp = new ArrayList<>(list.size());
 		itemsLow = new ArrayList<>(list.size());
-		for (StringClassifier item : list) {
-			items.add(new StringClassifierItem(item));
-			itemsBcp.add(new StringClassifierItem(item));
-			itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
-		}
+		for (StringClassifier item : list)
+			if (item.isSetName())
+			{
+				items.add(new StringClassifierItem(item));
+				itemsBcp.add(new StringClassifierItem(item));
+				itemsLow.add(new StringClassifierItem(new StringClassifier(item.pcod, item.name.toLowerCase())));
+			}
 		setSelectedItem(null);
 		model.fireContentsChanged();
 	}
@@ -227,6 +230,13 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	}
 	
 	/**
+	 * Устанавливает нечеткий поиск.
+	 */
+	public void setIllegibleSearch(boolean value) {
+		illegible = value;
+	}
+	
+	/**
 	 * Получает текст из поля ввода.
 	 */
 	public String getText() {
@@ -242,15 +252,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 	 * Устанавливает текст в поле ввода.
 	 */
 	public void setText(String text) {
-		if (isEditable()) {
+		if (isEditable())
 			((JTextComponent) getEditor().getEditorComponent()).setText(text);
-			SwingUtilities.invokeLater(new Runnable() {
-				@Override
-				public void run() {
-					hidePopup();
-				}
-			});
-		}
 	}
 	
 	class StringComboBoxModel extends DefaultComboBoxModel<StringClassifier> {
@@ -353,6 +356,8 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 			if (srcStrLow.length() == 0) {
 				items = itemsBcp;
 				setSelectedItem(null);
+				model.fireContentsChanged();
+				return;
 			} else {
 				int i;
 				for (i = 0; i < itemsBcp.size(); i++)
@@ -363,9 +368,15 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 				
 				if (i == itemsBcp.size()) {
 					items = new ArrayList<>();
-					for (i = 0; i < itemsBcp.size(); i++)
-						if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
-							items.add(itemsBcp.get(i));
+					if (illegible) {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) > -1)
+								items.add(itemsBcp.get(i));
+					} else {
+						for (i = 0; i < itemsBcp.size(); i++)
+							if (itemsLow.get(i).name.indexOf(srcStrLow) == 0)
+								items.add(itemsBcp.get(i));
+					}
 				}
 			}
 			SwingUtilities.invokeLater(new Runnable() {
@@ -380,15 +391,22 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 							setSelectedItem(null);
 						}
 						model.fireContentsChanged();
+						if (items.size() == 1)
+							setSelectedIndex(0);
+						else if (selItem != null)
+							setSelectedItem(selItem);
 						editor.setText(srcStrLow);
-						editor.setCaretPosition(pos);
+						if (pos == 0)
+							pos = editor.getText().length();
+						if (pos <= editor.getText().length())
+							editor.setCaretPosition(pos);
 						if (getSelectedItem() != null)
 							if (getSelectedItem().name.toLowerCase().equals(srcStrLow))
 								editor.selectAll();
 					} finally {
 						searcher.setSearchEnabled(true);
 					}
-					if ((selItem == null) || (prevSelItem != selItem))
+					if (((selItem == null) || (prevSelItem != selItem)) && editor.hasFocus())
 						cmb.showPopup();
 					prevSelItem = selItem;
 				}
@@ -414,8 +432,15 @@ public class ThriftStringClassifierCombobox<T extends StringClassifier> extends 
 		public Object getItem() {
 			StringClassifier selItem = ThriftStringClassifierCombobox.this.getSelectedItem();
 			
-			if (selItem == null && strict)
-				setText(null);
+			try {
+				searcher.setSearchEnabled(false);
+				if (selItem != null)
+					setText(selItem.name);
+				else if (strict)
+					setText(null);
+			} finally {
+				searcher.setSearchEnabled(true);
+			}
 			
 			return selItem;
 		}
