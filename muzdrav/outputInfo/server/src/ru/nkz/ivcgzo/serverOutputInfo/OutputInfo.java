@@ -1,15 +1,14 @@
 package ru.nkz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -28,19 +27,18 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
-import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
+import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
-import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
-import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
 
 
 public class OutputInfo extends Server implements Iface {
@@ -211,9 +209,9 @@ public class OutputInfo extends Server implements Iface {
 		// Текущий год
 		String yaetr = null;
 		// Конец закрытия предыдущего отчетного периода
-		Date kpo = null;
+		java.util.Date kpo = null;
 		// Конец года по периоду
-		Date kpg = null;
+		java.util.Date kpg = null;
 		int kolz = 0;
 		
 		//Запросы
@@ -764,7 +762,7 @@ public int addVT(VrachTabel vt) throws VTException, VTDuplException,
         				+ "timeprf, timepr, nuch1, nuch2, nuch3) " 
         				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
         				true, vt, VrachTabelTypes, indexes);
-		id = sme.getGeneratedKeys().getInt(id);
+		id = sme.getGeneratedKeys().getInt("id");
 		sme.setCommit();
 		return id;			
 	} catch (SQLException | InterruptedException e) {
@@ -777,7 +775,7 @@ public int addVT(VrachTabel vt) throws VTException, VTDuplException,
 
 //Изменить
 public void updateVT(VrachTabel vt) throws KmiacServerException, TException {
-	int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
 	try (SqlModifyExecutor sme = tse.startTransaction()) {
 		sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
         				+ "timeda = ?, timeprf = ?, timepr = ?, nuch1 = ?, nuch2 = ?, " 

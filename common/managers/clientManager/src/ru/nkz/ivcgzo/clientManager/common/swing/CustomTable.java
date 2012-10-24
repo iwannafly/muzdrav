@@ -164,7 +164,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 						} else {
 							while (selCol < getColumnCount()) {
 								if (isCellEditable(selRow, selCol)) {
-									changeSelection(selRow - 1, selCol, false, false);
+									changeSelection(selRow, selCol, false, false);
 									editCellAt(selRow, selCol, null);
 									return;
 								}

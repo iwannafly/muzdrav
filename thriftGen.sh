@@ -24,3 +24,4 @@ generateJavaSource muzdrav/genReestr/thrift
 generateJavaSource muzdrav/hospital/thrift
 generateJavaSource muzdrav/Vgr/thrift
 generateJavaSource muzdrav/kartaRInv/thrift
+generateJavaSource muzdrav/disp/thrift

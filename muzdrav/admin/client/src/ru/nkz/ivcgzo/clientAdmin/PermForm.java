@@ -173,6 +173,12 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbGenReestr = new TaggedJCheckBox("Формирование реестров", 12, CsluPdost.CsluAll);
 		pnlPermChb.add(chbGenReestr);
 
+		TaggedJCheckBox chbVgr = new TaggedJCheckBox("Выгрузки информации", 14, CsluPdost.CsluAll);
+		pnlPermChb.add(chbVgr);
+
+		TaggedJCheckBox chbDisp = new TaggedJCheckBox("Диспансеризация", 16, CsluPdost.CsluAll);
+		pnlPermChb.add(chbDisp);
+
 		gbPerm.setLayout(gl_gbPerm);
 		
 		tbLog = new CustomTextField(true, true, false);
