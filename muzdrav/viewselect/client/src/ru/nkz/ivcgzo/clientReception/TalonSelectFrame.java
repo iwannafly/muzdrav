@@ -245,7 +245,7 @@ public class TalonSelectFrame extends JFrame {
                         cbxSpeciality.setSelectedPcod(curDoctorInfo.getCdol());
                     }
                 } catch (TException e1) {
-                    e1.printStackTrace();
+                    MainForm.conMan.reconnect(e1);
                 } catch (RuntimeException re) {
                     cbxSpeciality.setSelectedIndex(0);
                 }
@@ -269,7 +269,7 @@ public class TalonSelectFrame extends JFrame {
                         cbxDoctor.setSelectedPcod(curDoctorInfo.getPcod());
                     }
                 } catch (TException e1) {
-                    e1.printStackTrace();
+                    MainForm.conMan.reconnect(e1);
                 } catch (RuntimeException re) {
                     cbxDoctor.setSelectedIndex(0);
                 }
@@ -463,7 +463,7 @@ public class TalonSelectFrame extends JFrame {
                                 "Пациент уже записан на выбранную дату к выбранному врачу",
                                 "Ошибка!", JOptionPane.ERROR_MESSAGE);
                     } catch (TException e1) {
-                        e1.printStackTrace();
+                        MainForm.conMan.reconnect(e1);
                     }
                 }
             }
@@ -519,7 +519,7 @@ public class TalonSelectFrame extends JFrame {
                                     "Ошибка!", JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (TException e1) {
-                        e1.printStackTrace();
+                        MainForm.conMan.reconnect(e1);
                     }
                 }
             }
@@ -546,7 +546,7 @@ public class TalonSelectFrame extends JFrame {
             cbxPoliclinic.setData(MainForm.tcl.getPoliclinic());
             cbxPoliclinic.setSelectedPcod(curDoctorInfo.getCpodr());
         } catch (TException e) {
-            e.printStackTrace();
+            MainForm.conMan.reconnect(e);
         } catch (RuntimeException e) {
             cbxPoliclinic.setSelectedIndex(0);
         }
