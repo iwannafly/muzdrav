@@ -64,6 +64,7 @@ struct Pfiz{
 }
 
 
+//русские буквы
 service ThriftDisp extends kmiacServer.KmiacServer {
 	void SetPfiz(1: Pfiz fiz) throws (1: kmiacServer.KmiacServerException kse);
 }

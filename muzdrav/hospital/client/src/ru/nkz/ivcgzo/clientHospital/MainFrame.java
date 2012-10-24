@@ -710,6 +710,7 @@ public class MainFrame extends JFrame {
                         JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
                             + "изменении истории жизни. Информация не будет сохранена!",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        ClientHospital.conMan.reconnect(e1);
                     }
                 } else {
                     JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "

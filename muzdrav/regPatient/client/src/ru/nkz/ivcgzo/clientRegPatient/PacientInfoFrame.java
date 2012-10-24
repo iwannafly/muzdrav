@@ -370,6 +370,7 @@ public class PacientInfoFrame extends JFrame {
                         e.printStackTrace();
                     } catch (TException e) {
                         e.printStackTrace();
+                        MainForm.conMan.reconnect(e);
                     }
                 }
             });
@@ -652,6 +653,7 @@ public class PacientInfoFrame extends JFrame {
 								e.printStackTrace();
                               } catch (TException e) {
                                   e.printStackTrace();
+                                  MainForm.conMan.reconnect(e);
 							}
                             }
                         });
@@ -1385,6 +1387,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1413,6 +1416,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1429,6 +1433,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1569,6 +1574,7 @@ public class PacientInfoFrame extends JFrame {
                     MainForm.tcl.deleteKont(curId);
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1596,6 +1602,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1609,6 +1616,7 @@ public class PacientInfoFrame extends JFrame {
                     MainForm.tcl.updateKont(event.getItem());
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -2983,6 +2991,7 @@ public class PacientInfoFrame extends JFrame {
             try {
                 MainForm.tcl.deleteGosp(curId);
             } catch (TException e) {
+                MainForm.conMan.reconnect(e);
                 e.printStackTrace();
                 return false;
             }

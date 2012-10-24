@@ -1,6 +1,5 @@
 package ru.nkz.ivcgzo.clientDisp;
 
-import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
