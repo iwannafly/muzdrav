@@ -368,7 +368,7 @@ public class FormPostBer extends JFrame {
 					kartaber.setId_rd_sl(0);
 					String servPath = MainForm.tcl.printKartaBer(kartaber);
 					String cliPath;
-					oslname = "kart1"+String.valueOf(rdSlStruct.getId());
+					oslname = "kartl"+String.valueOf(rdSlStruct.getId());
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 
