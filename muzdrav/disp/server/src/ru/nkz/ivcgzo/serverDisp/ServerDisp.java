@@ -10,6 +10,8 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftDisp.Pfiz;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp.Iface;
 
@@ -18,18 +20,15 @@ public class ServerDisp extends Server implements Iface {
 
 	public ServerDisp(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void testConnection() throws TException {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void saveUserConfig(int id, String config) throws TException {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -46,8 +45,11 @@ public class ServerDisp extends Server implements Iface {
 	public void stop() {
 		if (thrServ != null)
 			thrServ.stop();
+	}
 
-
+	@Override
+	public void setPfiz(Pfiz fiz) throws KmiacServerException, TException {
+		
 	}
 
 }
