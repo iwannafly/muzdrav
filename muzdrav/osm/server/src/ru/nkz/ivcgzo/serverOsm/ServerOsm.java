@@ -2008,15 +2008,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					
 					sb.append(String.format("12. Первое шевеление плода: %1$td %1$tb %1$tY<br>", acrs.getResultSet().getDate(7)));
 					
-					sb.append("13. Возможные особенности течения беременности: ");
-					System.out.println("перед select");		
+					sb.append("13. Возможные особенности течения беременности: ");					System.out.println("перед select");		
 					acrs2 = sse.execPreparedQuery("SELECT diag,named FROM p_diag_amb WHERE id_obr = ?  ", kb.getId_pvizit());
-					System.out.println("select");		
 					if (acrs2.getResultSet().next()) {
 						do {
 							String str = "";
 						
-							System.out.println("В цикле");		
 							if (acrs2.getResultSet().getString(1) != null)
 								str += String.format("диагноз: %s - %s ", acrs2.getResultSet().getString(1), acrs2.getResultSet().getString(2));
 							if (str.length() > 0)
@@ -2128,16 +2125,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 //					sb.append("нет<br>");
 				acrs2.close();
 				
-//				sb.append("<TD>111</TD>");
-//				sb.append("<TD>222</TD>");
-//				sb.append("<TD>333</TD>");
-//				sb.append("<TD>444</TD>");
-//				sb.append("<TD>333</TD>");
-//				sb.append("<TD>444</TD>");
-//				sb.append("<TD>555</TD>");
-//				sb.append("<TD>444</TD>");
-//				sb.append("<TD>555</TD>");
-//				sb.append("</TR>");
 				sb.append("</TABLE>");
 				sb.append("<br>Проведенные исследования:");
 //				System.out.println("Проведенные исследования");		
@@ -2475,29 +2462,78 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
         String dak = null;
         String dsost = null;
         String dosl = null;
-		AutoCloseableResultSet acrs = null, acrs2 = null, arcs3 = null,
-				arcs4 = null, arsc5 = null, arsc6 = null;
+		AutoCloseableResultSet acrs = null, acrs2 = null;
 		//таблица паспортной информации Patient.csv
 		StringBuilder sb = new StringBuilder(0x10000);
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\patient.htm"), "utf-8")) {
+		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb.append("<head>");
+			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb.append("<title>Паспортные данные</title>");
+		sb.append("</head>");
+		sb.append("<body>");
 		sb.append("uid;fam;im;ot;dr;pasp;terpr;oblpr;tawn;street;house;flat;polis;dog;stat;lpup;ter;obl;terp;ftown;fstreet;fhouse;fflat;adr;grk;rez");
 		//Vizit.csv
 		StringBuilder sb1 = new StringBuilder(0x10000);
+		sb1.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb1.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb1.append("<head>");
+			sb1.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb1.append("<title>Посещения</title>");
+		sb1.append("</head>");
+		sb1.append("<body>");
 		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
 		// Con_vizit.scv
 		StringBuilder sb2 = new StringBuilder(0x10000);
+		sb2.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb2.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb2.append("<head>");
+			sb2.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb2.append("<title>Динамическое наблюдение</title>");
+		sb2.append("</head>");
+		sb2.append("<body>");
 		sb2.append("uicv;uiv;uid;ves;ned;dno;plac;lcad;ldad;rcad;rdad;ball1;ball2;ball3;ball4;ball5;nexdate;cirkumference;css;polojpl;predpl;cerdpl;cerdpl2;oteki;otekiras");
 		List<RdPatient> rdPatient = getRdPatient();
 		//Con_diagn.csv
 		StringBuilder sb3 = new StringBuilder(0x10000);
+		sb3.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb3.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb3.append("<head>");
+			sb3.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb3.append("<title>Соматические диагнозы</title>");
+		sb3.append("</head>");
+		sb3.append("<body>");
 		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl");
 		// Con_main.csv
 		StringBuilder sb4 = new StringBuilder(0x10000);
+		sb4.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb4.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb4.append("<head>");
+			sb4.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb4.append("<title>Особенности течения</title>");
+		sb4.append("</head>");
+		sb4.append("<body>");
 		sb4.append("num;uid;jdet;dvzdu;srokvzu1;grisk;dgrisk;drodr;fiovr;dred;telm;dsndu;nber;nrod;job;vp;vn;circl;hfio;hmrab;htel;hgrk;hrez;hsm;hal;hdr;hhealth;hage;mrab;dolj;dlm;kontr;dsp;dcr;dtroch;cext;solov;cs;allerg;nasl;gemotr;prich;dprich;predp;cdiag;cvera;eko;dvpl;rub");
         //  Con_sob
 		StringBuilder sb5 = new StringBuilder(0x10000);
+		sb5.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb5.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb5.append("<head>");
+			sb5.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb5.append("<title>Социально-гигиенические факторы</title>");
+		sb5.append("</head>");
+		sb5.append("<body>");
 		sb5.append("nsob;uid;obr;sem;height;weight;priv;prof;proj;osl;ak;eks;gen;sost;point1;point2;point3;point4;point5;sob_date");
 		
 		StringBuilder sb6 = new StringBuilder(0x10000);
+		sb6.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb6.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb6.append("<head>");
+			sb6.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb6.append("<title>Диагнозы</title>");
+		sb6.append("</head>");
+		sb6.append("<body>");
 		sb6.append("numd;uid;uid_pol;ddiag;spz;diag;dpdiag;un;vp");
 //		for (int j = 0; j < rdPatient.size(); j++) {
 //			RdPatient rdp = rdPatient.get(j);
@@ -2713,7 +2749,21 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			if (rcv.oteki == 0 ) ot = 1;
 			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;%d;%d", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
 		}
-		return null;
+		osw.write(sb.toString());
+		return "c:\\patient.html";
+	} /*catch (SQLException e) {
+		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}*/ catch (IOException e) {
+		e.printStackTrace();
+		throw new KmiacServerException();
+	} finally {
+		if (acrs != null)
+			acrs.close();
+		if (acrs2 != null)
+			acrs2.close();
+	}
+//		return null;
 	}
 
 	@Override
