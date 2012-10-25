@@ -98,7 +98,7 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 	/**
      * Удаляет информацию о враче
      */
-	void deleteVT(1:VrachTabel vt) throws (1:kmiacServer.KmiacServerException kse);
+	void deleteVT(1:i32 vt);
 
     string printPlanDisp(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
 

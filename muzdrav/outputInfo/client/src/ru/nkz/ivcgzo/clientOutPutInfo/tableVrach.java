@@ -38,6 +38,7 @@ public class tableVrach extends JPanel {
 	private int codPodr = 0;
 	private int pcod = 0;
 	private int vt = 0;
+	private int id = 0;
 
 /**public static void main(String[] args) {
 	EventQueue.invokeLater(new Runnable() {
@@ -87,9 +88,9 @@ public void initialize() {
 		    } catch (VTDuplException e) {
 		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
 		    } catch (VTException e) {
-		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
+		    	JOptionPane.showMessageDialog(tableVrach.this, "tableVrach error", "error", JOptionPane.ERROR_MESSAGE);
 		    } catch (KmiacServerException e) {
-		    	JOptionPane.showMessageDialog(tableVrach.this, "Clone", "error", JOptionPane.ERROR_MESSAGE);
+		    	JOptionPane.showMessageDialog(tableVrach.this, "Server error", "error", JOptionPane.ERROR_MESSAGE);
 			} catch (TException e) {
 				e.printStackTrace();
 				MainForm.conMan.reconnect(e);
@@ -119,8 +120,8 @@ public void initialize() {
 	tableVrachTabel.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<VrachTabel>() {
 		public boolean doAction(CustomTableItemChangeEvent<VrachTabel> event) {
 			try {
-				pcod = tableVrachTabel.getSelectedItem().pcod;
-				MainForm.tcl.deleteVT(event.getItem());
+				id = tableVrachTabel.getSelectedItem().id;
+				MainForm.tcl.deleteVT(id);
 			} catch (TException e) {
 				e.printStackTrace();
 				return false;
