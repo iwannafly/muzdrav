@@ -1985,15 +1985,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs2.getResultSet().next()) {
 						if (acrs2.getResultSet().getString(1) != null)
 							sb.append(String.format("%s;<br>", acrs2.getResultSet().getString(1)));
+						sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s<br>", acrs.getResultSet().getString(17)));
+						sb.append(String.format("6. Данная беременность %d (по счету), роды %d (по счету)<br>", acrs.getResultSet().getInt(1), acrs.getResultSet().getInt(2)));
+						sb.append(String.format("7. Количество абортов %d (всего). Последний в %tY году на сроке %d недель<br>", acrs.getResultSet().getInt(3), acrs.getResultSet().getDate(19), acrs.getResultSet().getInt(20)));
 						if (acrs2.getResultSet().getString(2) != null)
 							sb.append(String.format("осложнения после аборта: %s;<br>", acrs2.getResultSet().getString(2)));
 					} else
 						sb.append("нет<br>");
 					acrs2.close();
 					
-					sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s; %d<br>", acrs.getResultSet().getString(17), acrs.getResultSet().getInt(18)));
-					sb.append(String.format("6. Данная беременность %d (по счету), роды %d (по счету)<br>", acrs.getResultSet().getInt(1), acrs.getResultSet().getInt(2)));
-					sb.append(String.format("7. Количество абортов %d (всего). Последний в %tY году на сроке %d недель<br>", acrs.getResultSet().getInt(3), acrs.getResultSet().getDate(19), acrs.getResultSet().getInt(20)));
+//					sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s<br>", acrs.getResultSet().getString(17)));
+//					sb.append(String.format("6. Данная беременность %d (по счету), роды %d (по счету)<br>", acrs.getResultSet().getInt(1), acrs.getResultSet().getInt(2)));
+//					sb.append(String.format("7. Количество абортов %d (всего). Последний в %tY году на сроке %d недель<br>", acrs.getResultSet().getInt(3), acrs.getResultSet().getDate(19), acrs.getResultSet().getInt(20)));
 					sb.append("8. Были ли преждевременные роды: ДА _____ / НЕТ _____ . Если ДА, то в каком году _____________<br>");
 					sb.append(String.format("9. Дата последней менструации: %1$td %1$tb %1$tY<br>", acrs.getResultSet().getDate(4)));
 					sb.append(String.format("10. Срок текущей беременности составляет %d недель при первом посещении женской консультации %2$td %2$tb %2$tY года<br>", acrs.getResultSet().getInt(5), acrs.getResultSet().getDate(6)));
@@ -2006,22 +2009,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					sb.append(String.format("12. Первое шевеление плода: %1$td %1$tb %1$tY<br>", acrs.getResultSet().getDate(7)));
 					
 					sb.append("13. Возможные особенности течения беременности: ");
-					acrs2 = sse.execPreparedQuery("SELECT db6.name, db5.name FROM p_rd_din din LEFT OUTER JOIN n_db6 db6 ON (db6.pcod = din.dspos) LEFT OUTER JOIN n_db5 db5 ON (db5.pcod = din.oteki) WHERE id_pvizit = ? AND (db6.name IS NOT NULL OR db5.name IS NOT NULL) ", kb.getId_pvizit());
-					String ds ="" ; String oteki = "";
+					System.out.println("перед select");		
+					acrs2 = sse.execPreparedQuery("SELECT diag,named FROM p_diag_amb WHERE id_obr = ?  ", kb.getId_pvizit());
+					System.out.println("select");		
 					if (acrs2.getResultSet().next()) {
 						do {
 							String str = "";
 						
+							System.out.println("В цикле");		
 							if (acrs2.getResultSet().getString(1) != null)
-							if (ds != acrs2.getResultSet().getString(1))
-								str += String.format("диагноз: %s; ", acrs2.getResultSet().getString(1));
-							if (acrs2.getResultSet().getString(2) != null)
-							if (oteki != acrs2.getResultSet().getString(2))
-								str += String.format("отеки: %s; ", acrs2.getResultSet().getString(2));
+								str += String.format("диагноз: %s - %s ", acrs2.getResultSet().getString(1), acrs2.getResultSet().getString(2));
 							if (str.length() > 0)
 								sb.append(str + "<br>");
-							ds = acrs2.getResultSet().getString(1);
-							oteki = acrs2.getResultSet().getString(2);
 
 						} while (acrs2.getResultSet().next());
 					} else
@@ -2029,9 +2028,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					acrs2.close();
 					
 					sb.append("14. Размеры таза (при первом посещении)<br>");
-					sb.append(String.format("D.Sp %d D.Cr %d D.troch %d<br>", acrs.getResultSet().getInt(8), acrs.getResultSet().getInt(9), acrs.getResultSet().getInt(10)));
-					sb.append(String.format("C.ext %d C.diag %d C.vera %d<br>", acrs.getResultSet().getInt(11), acrs.getResultSet().getInt(12), acrs.getResultSet().getInt(13)));
-					sb.append(String.format("Рост %d Вес %.2f<br>", acrs.getResultSet().getInt(14), acrs.getResultSet().getDouble(15)));
+					sb.append(String.format("D.Sp = %d; D.Cr = %d; D.troch = %d;<br>", acrs.getResultSet().getInt(8), acrs.getResultSet().getInt(9), acrs.getResultSet().getInt(10)));
+					sb.append(String.format("C.ext = %d; C.diag = %d; C.vera - %d;<br>", acrs.getResultSet().getInt(11), acrs.getResultSet().getInt(12), acrs.getResultSet().getInt(13)));
+					sb.append(String.format("Рост = %d; Вес = %.2f;<br>", acrs.getResultSet().getInt(14), acrs.getResultSet().getDouble(15)));
 					dataRod = acrs.getResultSet().getDate(16);
 				}
 				acrs.close();
@@ -2045,14 +2044,14 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				acrs.close();
 				
 				sb.append("16. Лабораторные и другие исследования<br>");
-				acrs2 = sse.execPreparedQuery("select l.datav,l.cisl,n.name,d.zpok from p_isl_ld l,p_rez_l d,n_ldi n where l.nisl=d.nisl and d.cpok=n.pcod and l.pvizit_id = ? ", kb.getId_pvizit());
+				acrs2 = sse.execPreparedQuery("select l.datav,l.cisl,n.name,d.zpok from p_isl_ld l,p_rez_l d,n_ldi n where l.nisl=d.nisl and d.cpok=n.pcod and l.datav is not null and l.pvizit_id = ? ", kb.getId_pvizit());
 						if (acrs2.getResultSet().next()) {
 					do {
 						dataRod1 = acrs2.getResultSet().getDate(0);
 					sb.append(String.format("Дата %1$td %1$tb %1$tY  %s  %d",dataRod1,acrs2.getResultSet().getString(2),acrs2.getResultSet().getInt(3))); 	
 
 					} while (acrs2.getResultSet().next());
-				} else
+				} else 
 					sb.append("нет<br>");
 //				sb.append("RW<sub>1</sub>: \"____\" _____________ 20______ года <br>HBS<sub>1</sub>: \"____\" ____________ 20______ года<br>");
 //				sb.append("RW<sub>2</sub>: \"____\" _____________ 20______ года <br>HBS<sub>2</sub>: \"____\" ____________ 20______ года<br>");
@@ -2115,15 +2114,15 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						sb.append(String.format("<TD> %d/%d</TD>",acrs2.getResultSet().getInt(9),acrs2.getResultSet().getInt(10)));
 						sb.append(String.format("<TD> %.2f</TD>",acrs2.getResultSet().getDouble(6)));
 						sb.append(String.format("<TD> %d</TD>",acrs2.getResultSet().getInt(4)));
-						System.out.println(acrs2.getResultSet().getInt(4));		
 						sb.append(String.format("<TD> %d</TD>",acrs2.getResultSet().getInt(5)));
-						System.out.println(acrs2.getResultSet().getInt(5));		
+						if (acrs2.getResultSet().getString(1) != null) 
 						sb.append(String.format("<TD> %s</TD>",acrs2.getResultSet().getString(1)));
-						System.out.println(acrs2.getResultSet().getString(1));		
+						else sb.append("<TD> </TD>");
+						if (acrs2.getResultSet().getString(2) != null) 
 						sb.append(String.format("<TD> %s</TD>",acrs2.getResultSet().getString(2)));
-						System.out.println(acrs2.getResultSet().getString(2));		
+						else sb.append("<TD> </TD>");
 						sb.append("</TR>");
-						System.out.println("готово");		
+//						System.out.println("таблица");		
 					} while (acrs2.getResultSet().next());
 				} //else
 //					sb.append("нет<br>");
@@ -2141,15 +2140,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 //				sb.append("</TR>");
 				sb.append("</TABLE>");
 				sb.append("<br>Проведенные исследования:");
-//				acrs2 = sse.execPreparedQuery("select l.datav,l.cisl,n.name,d.rez,d.op_name,d.rez_name from p_isl_ld l,p_rez_d d,n_ldi n where l.nisl=d.nisl and d.kodisl=n.pcod and l.nisl=d.nisl and d.kodisl=n.pcod and l.pvizit_id = ? ", kb.getId_pvizit());
-//				if (acrs2.getResultSet().next()) {
-//			do {
-//				dataRod1 = acrs2.getResultSet().getDate(0);
-//				sb.append(String.format("Дата %1$td %1$tb %1$tY  %s",dataRod1,acrs2.getResultSet().getString(2))); 	
-//                sb.append(String.format("Описание исследования: $s", acrs2.getResultSet().getString(5)));
-//			} while (acrs2.getResultSet().next());
-//		} else
-//			sb.append("нет<br>");
+//				System.out.println("Проведенные исследования");		
+				acrs2 = sse.execPreparedQuery("select l.datav,l.cisl,n.name,d.rez,d.op_name,d.rez_name from p_isl_ld l,p_rez_d d,n_ldi n where l.nisl=d.nisl and d.kodisl=n.pcod and l.nisl=d.nisl and d.kodisl=n.pcod and l.datav is not null and l.pvizit_id = ? ", kb.getId_pvizit());
+//				System.out.println("select");		
+				if (acrs2.getResultSet().next()) {
+			do {
+//				System.out.println("в цикле");		
+				dataRod1 = acrs2.getResultSet().getDate(0);
+				sb.append(String.format("Дата %1$td %1$tb %1$tY  %s",dataRod1,acrs2.getResultSet().getString(2))); 	
+                sb.append(String.format("Описание исследования: $s", acrs2.getResultSet().getString(5)));
+			} while (acrs2.getResultSet().next());
+		} else
+			sb.append("нет<br>");
 				sb.append("<br>Заключение: _____________________________________________________");
 				sb.append("<br>1. Заключение терапевта _________________________________________");
 				sb.append("<br>2. Закючение окулиста ___________________________________________");
@@ -2157,7 +2159,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("</html>");
 			
 			osw.write(sb.toString());
-			return "c:\\kart1.html";
+			return "c:\\kartl.html";
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -2236,7 +2238,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<IntegerClassifier> getShOsmPoiskName(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
-		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, sho.diag || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, sho.diag || ' ' || substring(din.name from 1 for 1) || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN n_din din ON (din.pcod = sho.cdin) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
 		
 		if (srcText != null)
 			sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";

@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,6 +38,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.MaskFormatter;
+import javax.swing.text.NumberFormatter;
 
 import org.apache.thrift.TException;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
@@ -122,7 +127,7 @@ public class PacientInfoFrame extends JFrame {
     private CustomTextField tf_serdoc;
     private CustomTextField tf_nomdoc;
     private CustomTextField tf_Odoc;
-    private CustomTextField tf_Snils;
+    private JFormattedTextField tf_Snils;
     private CustomTextField tf_Fam_pr;
     private CustomTextField tf_Im_pr;
     private CustomTextField tf_Ot_pr;
@@ -178,7 +183,7 @@ public class PacientInfoFrame extends JFrame {
     private CustomTimeEditor tf_timeosm;
     private CustomTimeEditor tf_timesmp;
     private CustomTimeEditor tf_timegosp;
-
+    private JButton btnShowTalonSelectModule;
     private JSpinner sp_sv_time;
     private JSpinner sp_sv_day;
     public List<PatientBrief> pat;
@@ -370,6 +375,7 @@ public class PacientInfoFrame extends JFrame {
                         e.printStackTrace();
                     } catch (TException e) {
                         e.printStackTrace();
+                        MainForm.conMan.reconnect(e);
                     }
                 }
             });
@@ -479,6 +485,7 @@ public class PacientInfoFrame extends JFrame {
                 try {
 //                    newPatBr = tbl_patient.addExternalItem();
                     curPatientId = 0;
+                    btnShowTalonSelectModule.setVisible(true);
                     NewPatient();
                     tfFam.requestFocus();
                 } catch (Exception e) {
@@ -496,6 +503,7 @@ public class PacientInfoFrame extends JFrame {
                 if (res != null) {
                     tbMain.setSelectedIndex(0);
                     curPatientId = res[0];
+                    btnShowTalonSelectModule.setVisible(true);
                     changePatientPersonalInfo(curPatientId);
                     changePatientLgotaInfo(curPatientId);
                     changePatientKategInfo(curPatientId);
@@ -652,11 +660,12 @@ public class PacientInfoFrame extends JFrame {
 								e.printStackTrace();
                               } catch (TException e) {
                                   e.printStackTrace();
+                                  MainForm.conMan.reconnect(e);
 							}
                             }
                         });
 
-                        JButton btnShowTalonSelectModule = new JButton("Запись на приём");
+                        btnShowTalonSelectModule = new JButton("Запись на приём");
                         btnShowTalonSelectModule.setToolTipText("Записать пациента на приём");
                         btnShowTalonSelectModule.setVisible(false);
                         btnShowTalonSelectModule.addActionListener(new ActionListener() {
@@ -799,7 +808,13 @@ public class PacientInfoFrame extends JFrame {
         tf_Odoc = new CustomTextField();
         tf_Odoc.setColumns(10);
 
-        tf_Snils = new CustomTextField();
+        try {
+			MaskFormatter mf = new MaskFormatter("###-###-### ##");
+	        tf_Snils = new JFormattedTextField(mf);
+		} catch (ParseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         tf_Snils.setColumns(10);
 
         tf_datadoc = new CustomDateEditor();
@@ -1385,6 +1400,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1413,6 +1429,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1429,6 +1446,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1569,6 +1587,7 @@ public class PacientInfoFrame extends JFrame {
                     MainForm.tcl.deleteKont(curId);
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1596,6 +1615,7 @@ public class PacientInfoFrame extends JFrame {
                     return false;
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -1609,6 +1629,7 @@ public class PacientInfoFrame extends JFrame {
                     MainForm.tcl.updateKont(event.getItem());
                 } catch (TException e) {
                     e.printStackTrace();
+                    MainForm.conMan.reconnect(e);
                     return false;
                 }
                 return true;
@@ -2888,6 +2909,7 @@ public class PacientInfoFrame extends JFrame {
                 if (curPatientId != 0){
                     curId = 0;
                     curNgosp = 0;
+                    curId_otd = 0;
                     newPriem = tbl_priem.addExternalItem();
                     rbtn_plan.requestFocus();
                     NewPriemInfo();
@@ -2899,7 +2921,10 @@ public class PacientInfoFrame extends JFrame {
         btnSave_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 if (curPatientId != 0)
-                	SavePriemInfo();
+                    if (tbl_priem.getSelectedItem() !=  null)
+                    	SavePriemInfo();
+                    else 
+                    	JOptionPane.showMessageDialog(tbl_priem, "Нажмите кнопку <Новое обращение>.");
             }
         });
 
@@ -2907,11 +2932,12 @@ public class PacientInfoFrame extends JFrame {
         btnDel_priem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
               try{
-                  if (curPatientId != 0){
+                  if (curPatientId != 0 && tbl_priem.getSelectedItem().id != 0){
                       curId = tbl_priem.getSelectedItem().id;
                       tbl_priem.requestFocus();
                       tbl_priem.deleteSelectedRow();
-                  }
+                  }else
+                    JOptionPane.showMessageDialog(tbl_priem, "Отсутствуют обращения пациента.");
               } catch (Exception e) {
                 e.printStackTrace();
               }
@@ -2981,8 +3007,10 @@ public class PacientInfoFrame extends JFrame {
         @Override
         public boolean doAction(CustomTableItemChangeEvent<AllGosp> event) {
             try {
+            	System.out.println(curId);
                 MainForm.tcl.deleteGosp(curId);
             } catch (TException e) {
+                MainForm.conMan.reconnect(e);
                 e.printStackTrace();
                 return false;
             }
@@ -3705,7 +3733,6 @@ public class PacientInfoFrame extends JFrame {
             CheckNotNullTableCgosp();
             if (curId == 0){
                 curId = MainForm.tcl.addGosp(Id_gosp);
-                curId_otd = 0;
                 newPriem.setId(curId);
                 newPriem.setNist(Id_gosp.getNist());
                 newPriem.setDatap(Id_gosp.getDatap());

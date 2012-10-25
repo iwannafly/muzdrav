@@ -31,6 +31,7 @@ public class CurationTableModel implements TableModel {
         } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
+            ClientHospital.conMan.reconnect(e);
         }
     }
 
@@ -42,6 +43,7 @@ public class CurationTableModel implements TableModel {
         } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
+            ClientHospital.conMan.reconnect(e);
         }
     }
 

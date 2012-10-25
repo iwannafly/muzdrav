@@ -5,7 +5,7 @@ public class configuration {
             "ru.nkz.ivcgzo.serverDisp.ServerDisp";
     public static final String clientClassName =
             "ru.nkz.ivcgzo.clientDisp.MainForm";
-    public static final int thrPort = 55015;
-    public static final int appId = 15;
-    public static final String appName = "Диспансеризация";
+    public static final int thrPort = 55016;
+    public static final int appId = 16;
+    public static final String appName = "Р”РёСЃРїР°РЅСЃРµСЂРёР·Р°С†РёСЏ";
 }
