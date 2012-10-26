@@ -1992,13 +1992,19 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs2.getResultSet().next()) {
 						if (acrs2.getResultSet().getString(1) != null)
 							sb.append(String.format("%s;<br>", acrs2.getResultSet().getString(1)));
+						if (acrs.getResultSet().getString(17) != null)
 						sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s<br>", acrs.getResultSet().getString(17)));
+						else
+						sb.append("5. Особенности течения прежних беременностей, родов, послеродового периода: <br>");
 						sb.append(String.format("6. Данная беременность %d (по счету), роды %d (по счету)<br>", acrs.getResultSet().getInt(1), acrs.getResultSet().getInt(2)));
+						if (acrs.getResultSet().getInt(3) != 0)
 						sb.append(String.format("7. Количество абортов %d (всего). Последний в %tY году на сроке %d недель<br>", acrs.getResultSet().getInt(3), acrs.getResultSet().getDate(19), acrs.getResultSet().getInt(20)));
+						else
+						sb.append(String.format("7. Количество абортов %d (всего)<br>", acrs.getResultSet().getInt(3)));
 						if (acrs2.getResultSet().getString(2) != null)
 							sb.append(String.format("осложнения после аборта: %s;<br>", acrs2.getResultSet().getString(2)));
 					} else
-						sb.append("нет<br>");
+						sb.append("осложнения после аборта: нет<br>");
 					acrs2.close();
 					
 //					sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s<br>", acrs.getResultSet().getString(17)));
@@ -2125,6 +2131,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						if (acrs2.getResultSet().getString(2) != null) 
 						sb.append(String.format("<TD> %s</TD>",acrs2.getResultSet().getString(2)));
 						else sb.append("<TD> </TD>");
+						sb.append("<TD> </TD>");
 						sb.append("</TR>");
 //						System.out.println("таблица");		
 					} while (acrs2.getResultSet().next());
@@ -2133,7 +2140,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				acrs2.close();
 				
 				sb.append("</TABLE>");
-				sb.append("<br>Проведенные исследования:");
+				sb.append("<br>Проведенные исследования: ");
 //				System.out.println("Проведенные исследования");		
 				acrs2 = sse.execPreparedQuery("select l.datav,l.cisl,n.name,d.rez,d.op_name,d.rez_name from p_isl_ld l,p_rez_d d,n_ldi n where l.nisl=d.nisl and d.kodisl=n.pcod and l.nisl=d.nisl and d.kodisl=n.pcod and l.datav is not null and l.pvizit_id = ? ", kb.getId_pvizit());
 //				System.out.println("select");		
@@ -2148,7 +2155,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("нет<br>");
 				sb.append("<br>Заключение: _____________________________________________________");
 				sb.append("<br>1. Заключение терапевта _________________________________________");
-				sb.append("<br>2. Закючение окулиста ___________________________________________");
+				sb.append("<br>2. Заключение окулиста ___________________________________________");
 			sb.append("</body>"); 
 			sb.append("</html>");
 			

@@ -740,14 +740,19 @@ public class MainForm extends Client<ThriftMss.Client> {
 						if (cmbVid.getSelectedPcod() == 4) 
 							strVid = "(окончательного, предварительного, взамен предварительного, <u>взамен окончательного</u>)"; 
 						stroka_1 +=strVid+"#";
+						if (tfVz_ser.getText().trim().length() > 0)
 						stroka_1 += tfVz_ser.getText().trim()+"#";
+						else stroka_1 += "&nbsp&nbsp#";
+						if (tfVz_nomer.getText().length() > 0)
 						stroka_1 += tfVz_nomer.getText().trim()+"#";
+						else stroka_1 += "&nbsp&nbsp&nbsp&nbsp#";
 						if (tfVz_datav.getDate() != null) {
 							stroka_1 += sdfDay.format(tfVz_datav.getDate()).trim()+"#";
-							stroka_1 += sdfMonth.format(tfVz_datav.getDate()).trim()+"#";
+							nomMonth = sdfMonth.format(tfVz_datav.getDate()).trim();
+							stroka_1 += monthName()+"#";
 							stroka_1 += sdfYear.format(tfVz_datav.getDate()).trim()+"#";
 						} else {
-							stroka_1 += "###";
+							stroka_1 += "&nbsp&nbsp#&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp#&nbsp&nbsp#";
 						}
 						stroka_1 += tfFam.getText().trim()+" "+tfIm.getText().trim()+" "+tfOt.getText().trim()+"#";
 						if (tfPol.getText().equals("МУЖСКОЙ")) { 
@@ -768,7 +773,6 @@ public class MainForm extends Client<ThriftMss.Client> {
 							stroka_1 +="#"+tfAdm_gorod.getText().trim()+"#";
 						}
 						stroka_1 += tfAdm_ul.getText().trim()+"#"+tfAdm_dom.getText().trim()+"#"+tfAdm_kv.getText().trim()+"#";
-//						System.out.println(stroka_1);
 						docInfo += stroka_1;
 						if (cmbNastupila.getSelectedPcod() == 1) 
 						strNast = "на месте происшествия&nbsp<span> 1 </span>, в машине скорой помощи&nbsp<span> 2 </span>, <b><u>в стационаре</u></b>&nbsp<span> 3 </span>, дома&nbsp<span> 4 </span>, в другом месте&nbsp<span> 5&nbsp </span>";
@@ -797,43 +801,62 @@ public class MainForm extends Client<ThriftMss.Client> {
 						if (tfPsm_a.getText().trim().length() > 4)
 							stroka_2 += tfPsm_a.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += "&nbsp#";
 						stroka_2 += tfPsm_bn.getText().trim()+"#"+tfPsm_bk.getText().trim()+" "+cmbPsm_bd.getText().trim()+"#";
+						if (tfPsm_b.getText().trim().length() > 0) {
 						stroka_2 += tfPsm_b.getText().trim().substring(0,1)+"#"+tfPsm_b.getText().trim().substring(1,2)+"#"+tfPsm_b.getText().trim().substring(2,3)+"#";
 						if (tfPsm_b.getText().trim().length() > 4)
 							stroka_2 += tfPsm_b.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += "&nbsp#";
+						} else
+							stroka_2 +="&nbsp&nbsp#&nbsp#&nbsp#&nbsp#"; 
 						stroka_2 += tfPsm_vn.getText().trim()+"#"+tfPsm_vk.getText().trim()+" "+cmbPsm_vd.getText().trim()+"#";
+						if (tfPsm_v.getText().trim().length() > 0) {
 						stroka_2 += tfPsm_v.getText().trim().substring(0,1)+"#"+tfPsm_v.getText().trim().substring(1,2)+"#"+tfPsm_v.getText().trim().substring(2,3)+"#";
 						if (tfPsm_v.getText().trim().length() > 4)
 							stroka_2 += tfPsm_v.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += "&nbsp#";
+						} else
+							stroka_2 +="&nbsp&nbsp#&nbsp#&nbsp#&nbsp#"; 
+				
 						stroka_2 += tfPsm_gn.getText().trim()+"#"+tfPsm_gk.getText().trim()+" "+cmbPsm_ag.getText().trim()+"#";
+						if (tfPsm_g.getText().trim().length() > 0) {
 						stroka_2 += tfPsm_g.getText().trim().substring(0,1)+"#"+tfPsm_g.getText().trim().substring(1,2)+"#"+tfPsm_g.getText().trim().substring(2,3)+"#";
 						if (tfPsm_g.getText().trim().length() > 4)
 							stroka_2 += tfPsm_g.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += "&nbsp#";
+						} else
+							stroka_2 +="&nbsp&nbsp#&nbsp#&nbsp#&nbsp#"; 
 						stroka_2 += tfPsm_pn.getText().trim()+"#"+tfPsm_pk.getText().trim()+" "+cmbPsm_pd.getText().trim()+"#";
+						if (tfPsm_p.getText().trim().length() > 0) {
 						stroka_2 += tfPsm_p.getText().trim().substring(0,1)+"#"+tfPsm_p.getText().trim().substring(1,2)+"#"+tfPsm_p.getText().trim().substring(2,3)+"#";
 						if (tfPsm_p.getText().trim().length() > 4)
 							stroka_2 += tfPsm_p.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += "&nbsp#";
+						} else
+							stroka_2 +="&nbsp&nbsp#&nbsp#&nbsp#&nbsp#"; 
 						stroka_2 += tfPsm_p1n.getText().trim()+"#"+tfPsm_p1k.getText().trim()+" "+cmbPsm_p1d.getText().trim()+"#";
+						if (tfPsm_p1.getText().trim().length() > 0) {
 						stroka_2 += tfPsm_p1.getText().trim().substring(0,1)+"#"+tfPsm_p1.getText().trim().substring(1,2)+"#"+tfPsm_p1.getText().trim().substring(2,3)+"#";
 						if (tfPsm_p1.getText().trim().length() > 4)
 							stroka_2 += tfPsm_p1.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += "&nbsp#";
+						} else
+							stroka_2 +="&nbsp&nbsp#&nbsp#&nbsp#&nbsp#"; 
 						stroka_2 += tfPsm_p2n.getText().trim()+"#"+tfPsm_p2k.getText().trim()+" "+cmbPsm_p2d.getText().trim()+"#";
+						if (tfPsm_p2.getText().trim().length() > 0) {
 						stroka_2 += tfPsm_p2.getText().trim().substring(0,1)+"#"+tfPsm_p2.getText().trim().substring(1,2)+"#"+tfPsm_p2.getText().trim().substring(2,3)+"#";
 						if (tfPsm_p2.getText().trim().length() > 4)
 							stroka_2 += tfPsm_p2.getText().trim().substring(4)+"#";
 							else
-								stroka_2 += "#";
+								stroka_2 += " &nbsp#";
+						} else
+							stroka_2 +=" &nbsp # &nbsp# &nbsp# &nbsp#"; 
 						docInfo += stroka_2;
 						// конец причин смерти
 						if (!chckbxDtp30.isSelected() && !chckbxDtp7.isSelected()) 
@@ -845,15 +868,15 @@ public class MainForm extends Client<ThriftMss.Client> {
 						docInfo += strDtp + "#";
 						if (cmbUmerla.getSelectedItem() != null) {
 						if (cmbUmerla.getSelectedPcod() == 1) 
-							strUm = " <b><u>беременной (независимо от срока и локализации)</u></b>&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, в течение 42 дней после окон-#чания беременности, родов (аборта)&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
+							strUm = " <b><u>беременной (независимо от срока и локализации)</u></b>&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, в течение 42 дней после #окончания беременности, родов (аборта)&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
 						if (cmbNastupila.getSelectedPcod() == 2) 
-							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, <b><u>в процессе родов (аборта)</u></b>&nbsp<span> 2 </span>, в течение 42 дней после окон-#чания беременности, родов (аборта)&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
+							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, <b><u>в процессе родов (аборта)</u></b>&nbsp<span> 2 </span>, в течение 42 дней после #окончания беременности, родов (аборта)&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
 						if (cmbNastupila.getSelectedPcod() == 3) 
-							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, <b><u>в течение 42 дней после окон-</u></b>#<b><u>чания беременности, родов (аборта)</u></b>&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
+							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, <b><u>в течение 42 дней после</u></b>#<b><u>окончания беременности, родов (аборта)</u></b>&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
 						if (cmbNastupila.getSelectedPcod() == 4) 
-							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, в течение 42 дней после окон-#чания беременности, родов (аборта)&nbsp<span> 3 </span>, <b><u>в течение 43-365 дней после окончания беременности, родов</u></b>&nbsp<span> 4 </span>";
+							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, в течение 42 дней после #окончания беременности, родов (аборта)&nbsp<span> 3 </span>, <b><u>в течение 43-365 дней после окончания беременности, родов</u></b>&nbsp<span> 4 </span>";
 						} else 
-							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, в течение 42 дней после окон-#чания беременности, родов (аборта)&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
+							strUm = " беременной, независимо от срока и локализации)&nbsp<span> 1 </span>, в процессе родов (аборта)&nbsp<span> 2 </span>, в течение 42 дней после #окончания беременности, родов (аборта)&nbsp<span> 3 </span>, в течение 43-365 дней после окончания беременности, родов&nbsp<span> 4 </span>";
 						docInfo += strUm+"#";
 						
 						docInfo += tfZapolnil.getText().trim()+"#"+tfFam_pol.getText().trim()+"#";
@@ -920,31 +943,31 @@ public class MainForm extends Client<ThriftMss.Client> {
 								docInfo += strVid+"#";
 								if (cmb_obraz.getSelectedPcod() == 1)
 									strVid = "<b><u>высшее</u></b>&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 2)
 									strVid = "высшее&nbsp<span> 1 </span>, <b><u>неполное высшее</u></b>,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 3)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, <b><u>среднее</u></b>&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 4)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, <b><u>начальное</u></b>&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 5)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "<b><u>среднее (полное)</u></b>&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "<b><u>среднее (полное)</u></b>&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 6)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# <b><u>основное</u></b>&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, <b><u>основное</u></b>&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 7)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, <b><u>начальное</u></b>&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, <b><u>начальное</u></b>&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 8)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; <b><u>не имеет начального образования</u></b>&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; <b><u>не имеет начального образования</u></b>&nbsp<span> 8 </span>; неизвестно&nbsp<span> 9 </span>.";
 								if (cmb_obraz.getSelectedPcod() == 9)
 									strVid = "высшее&nbsp<span> 1 </span>, неполное высшее,&nbsp<span> 2 </span>, среднее&nbsp<span> 3 </span>, начальное&nbsp<span> 4 </span>#"
-											+ "среднее (полное)&nbsp<span> 5 </span>,# основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; <b><u>неизвестно</u></b>&nbsp<span> 9 </span>.";
+											+ "среднее (полное)&nbsp<span> 5 </span>, основное&nbsp<span> 6 </span>, начальное&nbsp<span> 7 </span>; не имеет начального образования&nbsp<span> 8 </span>; <b><u>неизвестно</u></b>&nbsp<span> 9 </span>.";
 								docInfo += strVid+"#";
 								if (cmb_zan.getSelectedPcod() == 1)
 									strVid = "<b><u>руководители и специалисты высшего уровня квалификации</u></b>&nbsp<span> 1 </span>, прочие#"
@@ -1037,13 +1060,19 @@ public class MainForm extends Client<ThriftMss.Client> {
 								}
 								docInfo += strVid + "#";
 								if (dtr == 1) {
-									docInfo += sdfDay.format(tfDatatr.getDate()).trim()+"#";
-									docInfo += sdfMonth.format(tfDatatr.getDate()).trim()+"#";
-									docInfo += sdfYear.format(tfDatatr.getDate()).trim()+"#";
-									docInfo += sdfTime.format(tfDatatr.getDate()).trim()+"#";
-									docInfo += tfObst.getText().trim()+"#";
+									docInfo += "<u> &nbsp&nbsp "+sdfDay.format(tfDatatr.getDate()).trim()+" &nbsp&nbsp</u>#";
+									docInfo += "<u> &nbsp&nbsp "+sdfMonth.format(tfDatatr.getDate()).trim()+" &nbsp&nbsp</u>#";
+									docInfo += "<u> &nbsp&nbsp "+sdfYear.format(tfDatatr.getDate()).trim()+" &nbsp&nbsp</u>#";
+									docInfo += "<u> &nbsp&nbsp "+sdfTime.format(tfDatatr.getDate()).trim()+" &nbsp&nbsp</u>#";
+									if (tfObst.getText().trim().length() > 0) {
+										if (tfObst.getText().trim().length() < 71)
+											docInfo += tfObst.getText().trim()+"##";
+										if (tfObst.getText().trim().length() > 70)
+											docInfo += tfObst.getText().trim().substring(0,70)+"#"+tfObst.getText().trim().substring(70)+"#" ;
+																			
+									} else docInfo += "##";
 								} else
-									docInfo += "#####";
+									docInfo += " ____# _____# ______# ______###";
 								if (cmbUstan.getSelectedPcod() == 1) 
 									strVid = " <b><u>врачом, только установившим смерть</u></b>&nbsp<span> 1 </span>, лечащим врачом&nbsp<span> 2 </span>, фельдшером (акушеркой)&nbsp<span> 3 </span>,#"
 									+ " патологоанатомом&nbsp<span> 4 </span>, судебно-медицинским экспертом&nbsp<span> 5 </span>.";
@@ -1065,13 +1094,13 @@ public class MainForm extends Client<ThriftMss.Client> {
 								if (cmbOsn.getSelectedPcod() == 1)
 									strVid = " <b><u>осмотра трупа<b><u>&nbsp<span> 1 </span>, записей в медицинской документации&nbsp<span> 2 </span>, предшествующего наблюдения# за больным(ой)&nbsp<span> 3 </span>,"
 									+ " вскрытия&nbsp<span> 4 </span> ";
-								if (cmbOsn.getSelectedPcod() == 1)
+								if (cmbOsn.getSelectedPcod() == 2)
 									strVid = " осмотра трупа&nbsp<span> 1 </span>, <b><u>записей в медицинской документации</u></b>&nbsp<span> 2 </span>, предшествующего наблюдения# за больным(ой)&nbsp<span> 3 </span>,"
 									+ " вскрытия&nbsp<span> 4 </span> ";
-								if (cmbOsn.getSelectedPcod() == 1)
+								if (cmbOsn.getSelectedPcod() == 3)
 									strVid = " осмотра трупа&nbsp<span> 1 </span>, записей в медицинской документации&nbsp<span> 2 </span>, <b><u>предшествующего наблюдения</u></b># <b><u>за больным(ой)</u></b>&nbsp<span> 3 </span>,"
 									+ " вскрытия&nbsp<span> 4 </span> ";
-								if (cmbOsn.getSelectedPcod() == 1)
+								if (cmbOsn.getSelectedPcod() == 4)
 									strVid = " осмотра трупа&nbsp<span> 1 </span>, записей в медицинской документации&nbsp<span> 2 </span>, предшествующего наблюдения# за больным(ой)&nbsp<span> 3 </span>,"
 									+ " <b><u>вскрытия&nbsp</u></b><span> 4 </span> ";
 								docInfo += strVid + "#";
@@ -1080,15 +1109,14 @@ public class MainForm extends Client<ThriftMss.Client> {
 								docInfo += strDtp+"#";
 								docInfo += strUm+"#";
 								docInfo += tfZapolnil.getText().trim()+"#"+tfFam_pol.getText().trim()+"#";
-								docInfo += cmbVdok.getText().trim()+" "+tfSdok.getText().trim()+" "+tfNomer.getText().trim()+" "+tfKvdok.getText().trim()+"#";
-								docInfo += sdfDay.format(new Date()).trim()+"#";
-								nomMonth = sdfMonth.format(new Date()).trim()+"#";
-								docInfo += monthName()+"#";
-								docInfo += sdfYear.format(new Date()).trim()+"#";
-						mssPath = MainForm.tcl.printMedSS(docInfo);
-						System.out.println(docInfo);
-	                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-						System.out.println(cliPath);
+					//			docInfo += cmbVdok.getText().trim()+" "+tfSdok.getText().trim()+" "+tfNomer.getText().trim()+" "+tfKvdok.getText().trim()+"#";
+					//			docInfo += sdfDay.format(new Date()).trim()+"#";
+					//			nomMonth = sdfMonth.format(new Date()).trim()+"#";
+					//			docInfo += monthName()+"#";
+					//			docInfo += sdfYear.format(new Date()).trim()+"#";
+						mssPath = MainForm.tcl.printMedSS(docInfo,tfNomer.getText().trim());
+//						String cliPath = "C:\\work\\МСС\\м_свид_"+tfNomer.getText().trim()+ ".htm";
+						String cliPath = File.createTempFile("mss_"+tfNomer.getText().trim(), ".htm").getAbsolutePath();
 	                    MainForm.conMan.transferFileFromServer(mssPath, cliPath);
 	                    MainForm.conMan.openFileInEditor(cliPath, false);
 
@@ -1841,6 +1869,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				tfPsm_a.setColumns(10);
 				
 				tfPsm_an = new JTextArea();
+				tfPsm_an.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_an.setLineWrap(true);
 				
 				tfPsm_ak = new CustomTextField();
@@ -1867,6 +1896,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				tfPsm_b.setColumns(10);
 				
 				tfPsm_bn = new JTextArea();
+				tfPsm_bn.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_bn.setLineWrap(true);
 				
 				tfPsm_bk = new CustomTextField();
@@ -1893,6 +1923,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				tfPsm_v.setColumns(10);
 				
 				tfPsm_vn = new JTextArea();
+				tfPsm_vn.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_vn.setLineWrap(true);
 				
 				tfPsm_vk = new CustomTextField();
@@ -1919,6 +1950,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				tfPsm_g.setColumns(10);
 				
 				tfPsm_gn = new JTextArea();
+				tfPsm_gn.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_gn.setLineWrap(true);
 				
 				tfPsm_gk = new CustomTextField();
@@ -1945,6 +1977,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				tfPsm_p.setColumns(10);
 				
 				tfPsm_pn = new JTextArea();
+				tfPsm_pn.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_pn.setLineWrap(true);
 				
 				tfPsm_pk = new CustomTextField();
@@ -1984,6 +2017,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				tfPsm_p2.setColumns(10);
 				
 				tfPsm_p1n = new JTextArea();
+				tfPsm_p1n.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_p1n.setLineWrap(true);
 				
 				tfPsm_p1k = new CustomTextField();
@@ -1991,6 +2025,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				
 				
 				tfPsm_p2n = new JTextArea();
+				tfPsm_p2n.setFont(new Font("Tahoma", Font.PLAIN, 11));
 				tfPsm_p2n.setLineWrap(true);
 				
 				tfPsm_p2k = new CustomTextField();
@@ -2486,6 +2521,126 @@ public class MainForm extends Client<ThriftMss.Client> {
 			}
 			if (tfDatas.getDate() == null) {
 				s_pro += "дата смерти не заполнена" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (tfVrems.getTime() == null) {
+				s_pro += "время смерти не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (tfAds_obl.getSelectedPcod() == null) {
+				s_pro += "место смерти - область - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (tfAds_gorod.getSelectedPcod() == null) {
+				s_pro += "место смерти - город (населенный пункт) - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (rdbtnMs_gor.isSelected()) {
+			if (tfAds_ul.getText().trim().length() == 0) {
+				s_pro += "место смерти - улица - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (tfAds_dom.getText().trim().length() == 0) {
+				s_pro += "место смерти - дом - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			}
+			if (cmbNastupila.getSelectedPcod() == null) {
+				s_pro += "где наступала смерть? - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (aBool) {
+				if (tfves.getText().trim().length() == 0) {
+					s_pro += "вес ребенка не заполнен" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfNreb.getText().trim().length() == 0) {
+					s_pro += "каким по счету был ребенок у матери? - не заполнено" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfNreb.getText().trim().length() == 0) {
+					s_pro += "дата рождения матери не заполнена" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfNreb.getText().trim().length() == 0) {
+					s_pro += "фамилия матери не заполнена" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfNreb.getText().trim().length() == 0) {
+					s_pro += "имя матери не заполнено" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+		
+			}
+			if (cmb_semp.getSelectedPcod() == null) {
+				s_pro += "семейное положение не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+
+			if (cmb_obraz.getSelectedPcod() == null) {
+				s_pro += "образование не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (cmb_zan.getSelectedPcod() == null) {
+				s_pro += "занятость не заполнена" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (cmbProiz.getSelectedPcod() == null) {
+				s_pro += "от чего произошла смерть? - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			} else {
+				if (cmbProiz.getSelectedPcod() > 2) {
+					if (tfDatatr.getDate() == null) {
+						s_pro += "дата травмы не заполнена" + System.lineSeparator();
+						mistake = mistake+1;
+					}
+					if (tfVrem_tr.getTime() == null) {
+						s_pro += "время травмы не заполнено" + System.lineSeparator();
+						mistake = mistake+1;
+					}
+				}
+			}
+			if (cmbUstan.getSelectedPcod() == null) {
+				s_pro += "кем установлены причины смерти? - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (tfCvrach.getSelectedPcod() == null) {
+				s_pro += "кто установил причины смерти? - не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (cmbCdol.getSelectedPcod() == null) {
+				s_pro += "должность установившего причины смерти не заполнена" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+// причины смерти
+			if (tfPsm_a.getText().trim().length() == 0) {
+				s_pro += "пункт а) - диагноз не заполнен" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if (tfPsm_an.getText().trim().length() == 0) {
+				s_pro += "пункт а) - медицинское описание причины смерти не заполнено" + System.lineSeparator();
+				mistake = mistake+1;
+			}
+			if ((tfPsm_v.getText().trim().length() > 0) || (tfPsm_vn.getText().trim().length() == 0)) {
+				if (tfPsm_vn.getText().trim().length() == 0) {
+					s_pro += "пункт в) - медицинское описание причины смерти не заполнено" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfPsm_v.getText().trim().length() == 0) {
+					s_pro += "пункт в) - диагноз не заполнен" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfPsm_b.getText().trim().length() == 0) {
+					s_pro += "пункт б) - диагноз не заполнен" + System.lineSeparator();
+					mistake = mistake+1;
+				}
+				if (tfPsm_bn.getText().trim().length() == 0) {
+					s_pro += "пункт б) - медицинское описание причины смерти не заполнено" + System.lineSeparator();	
+				mistake = mistake+1;
+			}
+			}
+			if ((cmbUmerla.getText().trim().length() > 0) && (tfPol.getText().trim().equals("МУЖСКОЙ"))) {
+				s_pro += "заполнена информация о случае смерти беременной" + System.lineSeparator();
 				mistake = mistake+1;
 			}
 			if (mistake >0) {
