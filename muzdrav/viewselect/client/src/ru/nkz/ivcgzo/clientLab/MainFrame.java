@@ -152,11 +152,11 @@ public class MainFrame extends JFrame {
                 try {
                     if (cbxLabs.getSelectedItem() != null) {
                         cbxOrgAndSystem.setData(
-                                ClientLab.tcl.getOrgAndSys(cbxLabs.getSelectedItem().pcod));
+                            ClientLab.tcl.getOrgAndSys(cbxLabs.getSelectedItem().pcod));
                     }
                 } catch (KmiacServerException e1) {
                     JOptionPane.showMessageDialog(MainFrame.this,
-                            "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 } catch (TException e1) {
                     ClientLab.conMan.reconnect(e1);
                 }
@@ -170,9 +170,9 @@ public class MainFrame extends JFrame {
                 try {
                     if (cbxOrgAndSystem.getSelectedItem() != null) {
                         tbIssled.setData(
-                                ClientLab.tcl.getPokazMet(
-                                        cbxOrgAndSystem.getSelectedItem().getPcod(),
-                                        cbxLabs.getSelectedItem().getPcod())
+                            ClientLab.tcl.getPokazMet(
+                                cbxOrgAndSystem.getSelectedItem().getPcod(),
+                                cbxLabs.getSelectedItem().getPcod())
                         );
                     }
                 } catch (KmiacServerException e) {
@@ -229,8 +229,8 @@ public class MainFrame extends JFrame {
                             }
                         }
                         JOptionPane.showMessageDialog(MainFrame.this,
-                                "Исследования успешно сохранены!",
-                                "Запись исследования", JOptionPane.INFORMATION_MESSAGE);
+                            "Исследования успешно сохранены!",
+                            "Запись исследования", JOptionPane.INFORMATION_MESSAGE);
                     } catch (KmiacServerException e1) {
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "Ошибка записи исследования! Информация может быть не сохранена!",
@@ -253,8 +253,6 @@ public class MainFrame extends JFrame {
         pisl.setNpasp(patient.getId());
         pisl.setPcisl(cbxOrgAndSystem.getSelectedPcod());
         pisl.setKodotd(cbxLabs.getSelectedPcod());
-        System.out.println(pisl.getKodotd());
-        System.out.println(cbxLabs.getSelectedPcod());
         pisl.setNapravl(2);
         pisl.setNaprotd(doctorAuthInfo.getCpodr());
         pisl.setDatan(System.currentTimeMillis());
@@ -562,6 +560,8 @@ public class MainFrame extends JFrame {
     private void addResultText() {
         final JScrollPane sptree = new JScrollPane();
         taResultText = new JTextArea();
+        taResultText.setWrapStyleWord(true);
+        taResultText.setLineWrap(true);
         taResultText.setEditable(false);
         taResultText.setFont(new Font("Tahoma", Font.PLAIN, 11));
         sptree.setViewportView(taResultText);
