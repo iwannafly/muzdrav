@@ -1,14 +1,18 @@
-package ru.nrz.ivcgzo.serverOutputInfo;
+package ru.nkz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -20,19 +24,32 @@ import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
-import ru.nkz.ivcgzo.thriftOutputInfo.OutputPlanDisp;
-import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
+import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
 
+
 public class OutputInfo extends Server implements Iface {
+	
+	private static Logger log = Logger.getLogger(OutputInfo.class.getName());
+
+	private TResultSetMapper<VrachInfo, VrachInfo._Fields> tableVrachInfo;
+	private static Class<?>[] VrachInfoTypes;
+	private TResultSetMapper<VrachTabel, VrachTabel._Fields> tableVrachTabel;
+	private static Class<?>[] VrachTabelTypes;
+	
 	private TServer thrServ;
 	//public Input_info inputInfo;
 	public int kolz1, kolz2, kolz3, kolz4, kolz5, kolz6, kolz7, kolz8, xind, perv;
@@ -48,7 +65,17 @@ public class OutputInfo extends Server implements Iface {
 	public OutputInfo(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		// TODO Auto-generated constructor stub
+		
+		//Таблица VrachInfo
+		tableVrachInfo = new TResultSetMapper<>(VrachInfo.class, "pcod","fam","im","ot","cdol");
+		VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
+		
+		//Таблица VrachTabel
+		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","nuch1","nuch2","nuch3","id");
+		VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, String.class, String.class,String.class,Integer.class};
 	}
+	
+
 
 	/**
 	@SuppressWarnings("deprecation")
@@ -182,9 +209,9 @@ public class OutputInfo extends Server implements Iface {
 		// Текущий год
 		String yaetr = null;
 		// Конец закрытия предыдущего отчетного периода
-		Date kpo = null;
+		java.util.Date kpo = null;
 		// Конец года по периоду
-		Date kpg = null;
+		java.util.Date kpg = null;
 		int kolz = 0;
 		
 		//Запросы
@@ -472,7 +499,7 @@ public class OutputInfo extends Server implements Iface {
 	}
 
 	@Override
-	public String printPlanDisp(InputPlanDisp ipd, OutputPlanDisp opd)
+	public String printPlanDisp(InputPlanDisp ipd)
 			throws KmiacServerException, TException {
 		
 		String svod = null;
@@ -501,7 +528,8 @@ public class OutputInfo extends Server implements Iface {
 		
 		try (AutoCloseableResultSet spat = sse.execPreparedQuery(sqlQueryPlanDis)) {
 			
-			
+		
+			try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(svod = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
 			
 			
 			StringBuilder sb = new StringBuilder(0x10000);
@@ -528,99 +556,55 @@ public class OutputInfo extends Server implements Iface {
 		
 			spat.getResultSet().first();
 			int spuch = Integer.parseInt(spat.getResultSet().getString("cod_sp")+"0"+ spat.getResultSet().getString("d_uch"));
+			int spuch1 = Integer.parseInt(spat.getResultSet().getString("cod_sp")+"0"+ spat.getResultSet().getString("d_uch"));
+			
+			sb.append(String.format(ZagShap(dn,dk,namepol,spuch)));
+			String adres = null; 
+			
+			while (spat.getResultSet().next()){
+				
+				spuch1 = Integer.parseInt(spat.getResultSet().getString("cod_sp")+"0"+ spat.getResultSet().getString("d_uch"));
+				adres = spat.getResultSet().getString("adm_ul")+" "+spat.getResultSet().getString("adm_dom")+" "+spat.getResultSet().getString("adm_korp")+" "+spat.getResultSet().getString("adm_kv");
+				if(spuch != spuch1){
+					spuch = spuch1;
+					sb.append(String.format("</TABLE>"));
+					sb.append(String.format("<p></p><p></p><p></p><p></p><p></p>"));
+					sb.append(String.format(ZagShap(dn,dk,namepol,spuch)));
 					
+				}
+				
+				// Данные в таблице
+				sb.append(String.format("	<TR VALIGN=TOP>"));
+				sb.append(String.format("		<TD WIDTH=52 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",spat.getResultSet().getString("nambk")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",spat.getResultSet().getString("fio")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",spat.getResultSet().getString("datar")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>", adres));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>", spat.getResultSet().getString("diag")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=174 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",spat.getResultSet().getString("name")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>", spat.getResultSet().getString("pdat")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=62 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",spat.getResultSet().getString("nuch")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("		<TD WIDTH=105 STYLE=\"border: 1px solid #000000; padding: 0cm 0.19cm\">"));
+				sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",spat.getResultSet().getString("d_grup")));
+				sb.append(String.format("		</TD>"));
+				sb.append(String.format("	</TR>"));
+			}
 			
-			sb.append(String.format("<P ALIGN=CENTER>План диспансерного обслуживания</P>"));
-			sb.append(String.format("<P ALIGN=CENTER>за период с %s по %s </FONT></P>",dn,dk));
-			sb.append(String.format("<P ALIGN=CENTER>%s</P>", namepol));
-			sb.append(String.format("<P ALIGN=CENTER>Участок № %s</P>",spuch));
-			sb.append(String.format("<P ALIGN=CENTER><BR>"));
-			sb.append(String.format("</P>"));
-		
-			
-		
-			// шапка таблицы
-			sb.append(String.format("<TABLE WIDTH=953 CELLPADDING=7 CELLSPACING=0>"));
-			sb.append(String.format("	<COL WIDTH=52>"));
-			sb.append(String.format("	<COL WIDTH=105>"));
-			sb.append(String.format("	<COL WIDTH=59>"));
-			sb.append(String.format("	<COL WIDTH=105>"));
-			sb.append(String.format("	<COL WIDTH=59>"));
-			sb.append(String.format("	<COL WIDTH=174>"));
-			sb.append(String.format("	<COL WIDTH=105>"));
-			sb.append(String.format("	<COL WIDTH=62>"));
-			sb.append(String.format("	<COL WIDTH=105>"));
-			sb.append(String.format("	<TR VALIGN=TOP>"));
-			sb.append(String.format("		<TD WIDTH=52 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">N"));
-			sb.append(String.format("			амб.карты</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Ф.И.О."));
-			sb.append(String.format("			</FONT>"));
-			sb.append(String.format("			</P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Дата"));
-			sb.append(String.format("			рождения</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Адрес</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Повод"));
-			sb.append(String.format("			дисп-ции</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=174 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Планируемые"));
-			sb.append(String.format("			мероприятия</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Дата"));
-			sb.append(String.format("			мероприятия</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=62 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Тер.участок</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border: 1px solid #000000; padding: 0cm 0.19cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Группа"));
-			sb.append(String.format("			учета</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("	</TR>"));
-		
-			// Данные в таблице
-			sb.append(String.format("	<TR VALIGN=TOP>"));
-			sb.append(String.format("		<TD WIDTH=52 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">278643</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">ПОЗДЕЕВА"));
-			sb.append(String.format("			КРИСТИНА СЕРГЕЕВНА</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">28.07.1990</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">ОЛЕКО"));
-			sb.append(String.format("			ДУНДИЧА д.16   кв.1</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">E05.0</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=174 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">ЯВКА,ПРОТИВОРЕЦИДИВНОЕ"));
-			sb.append(String.format("			ЛЕЧЕНИЕ</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">25.09.2012</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=62 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">200</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=105 STYLE=\"border: 1px solid #000000; padding: 0cm 0.19cm\">"));
-			sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">3</FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("	</TR>"));
 			sb.append(String.format("</TABLE>"));
 			sb.append(String.format("<P CLASS=\"western\" ALIGN=CENTER STYLE=\"margin-bottom: 0cm\"><BR>"));
 			sb.append(String.format("</P>"));
@@ -628,7 +612,16 @@ public class OutputInfo extends Server implements Iface {
 			sb.append(String.format("</P>"));
 			sb.append(String.format("</BODY>"));
 			sb.append(String.format("</HTML>"));
-
+			
+			osw.write(sb.toString());
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+			
+		}	
+			
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -637,16 +630,179 @@ public class OutputInfo extends Server implements Iface {
 		return svod;
 	}
 
-public String ZagShap(String d1, String d2, String npol, int uchas){
+	@Override
+	public List<VrachInfo> getVrachTableInfo(int cpodr) throws VINotFoundException,
+			KmiacServerException, TException {
+
+		String sqlQuery = "SELECT a.pcod, a.fam, a.im, a.ot, b.cdol " 
+						+ "FROM s_vrach a, s_mrab b WHERE cpodr=?";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
+			ResultSet rs = acrs.getResultSet();
+			List<VrachInfo> VrachInfo = tableVrachInfo.mapToList(rs);
+			if (VrachInfo.size() > 0) {
+				return VrachInfo;				
+			} else {
+				throw new VINotFoundException();
+			}
+		} catch (SQLException e) {
+			log.log(Level.ERROR, "SQL Exception: ", e);
+			throw new KmiacServerException();
+		}
+	}
+	
+	@Override
+	public List<VrachTabel> getVrachTabel(int pcod) throws VTDuplException,
+			KmiacServerException, TException {
+		
+		String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
+						+ "timepr, nuch1, nuch2, nuch3, id FROM s_tabel WHERE pcod=?;";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+			ResultSet rs = acrs.getResultSet();
+			List<VrachTabel> VrachTabel = tableVrachTabel.mapToList(rs);
+			if (VrachTabel.size() > 0) {
+				return VrachTabel;				
+			} else {
+				throw new VTDuplException();
+			}
+		} catch (SQLException e) {
+			log.log(Level.ERROR, "SQL Exception: ", e);
+			throw new KmiacServerException();
+		}
+	}
+
+	
+	private String ZagShap(String d1, String d2, String npol, int uchas){
 	
 	String shap = null;
 	
+	StringBuilder sb = new StringBuilder(0x10000);
 	
+	sb.append(String.format("<P ALIGN=CENTER>План диспансерного обслуживания</P>"));
+	sb.append(String.format("<P ALIGN=CENTER>за период с %s по %s </FONT></P>",d1,d2));
+	sb.append(String.format("<P ALIGN=CENTER>%s</P>", npol));
+	sb.append(String.format("<P ALIGN=CENTER>Участок № %s</P>",uchas));
+	sb.append(String.format("<P ALIGN=CENTER><BR>"));
+	sb.append(String.format("</P>"));
+
 	
-	return shap;
+
+	// шапка таблицы
+	sb.append(String.format("<TABLE WIDTH=953 CELLPADDING=7 CELLSPACING=0>"));
+	sb.append(String.format("	<COL WIDTH=52>"));
+	sb.append(String.format("	<COL WIDTH=105>"));
+	sb.append(String.format("	<COL WIDTH=59>"));
+	sb.append(String.format("	<COL WIDTH=105>"));
+	sb.append(String.format("	<COL WIDTH=59>"));
+	sb.append(String.format("	<COL WIDTH=174>"));
+	sb.append(String.format("	<COL WIDTH=105>"));
+	sb.append(String.format("	<COL WIDTH=62>"));
+	sb.append(String.format("	<COL WIDTH=105>"));
+	sb.append(String.format("	<TR VALIGN=TOP>"));
+	sb.append(String.format("		<TD WIDTH=52 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">N"));
+	sb.append(String.format("			амб.карты</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Ф.И.О."));
+	sb.append(String.format("			</FONT>"));
+	sb.append(String.format("			</P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Дата"));
+	sb.append(String.format("			рождения</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Адрес</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=59 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Повод"));
+	sb.append(String.format("			дисп-ции</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=174 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Планируемые"));
+	sb.append(String.format("			мероприятия</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=105 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Дата"));
+	sb.append(String.format("			мероприятия</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=62 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Тер.участок</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("		<TD WIDTH=105 STYLE=\"border: 1px solid #000000; padding: 0cm 0.19cm\">"));
+	sb.append(String.format("			<P CLASS=\"western\" ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">Группа"));
+	sb.append(String.format("			учета</FONT></P>"));
+	sb.append(String.format("		</TD>"));
+	sb.append(String.format("	</TR>"));
 	
+	return shap = sb.toString();
+	}
+
+//Удалить
+public void deleteVT(int vt) throws TException {
+	System.out.println(vt);
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPrepared("DELETE FROM s_tabel WHERE id = ?;", false, vt);
+		sme.setCommit();
+    } catch (SqlExecutorException | InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
+
+
+//Добавить
+public int addVT(VrachTabel vt) throws VTException, VTDuplException,
+		KmiacServerException, TException {
+	int id = vt.getId();
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
+		int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
+        				+ "timeprf, timepr, nuch1, nuch2, nuch3) " 
+        				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+        				true, vt, VrachTabelTypes, indexes);
+		id = sme.getGeneratedKeys().getInt("id");
+		sme.setCommit();
+		return id;			
+	} catch (SQLException | InterruptedException e) {
+		e.printStackTrace();
+		throw new KmiacServerException("Ошибка сервера");
+	}
+}
+
+
+
+//Изменить
+public void updateVT(VrachTabel vt) throws KmiacServerException, TException {
+	int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
+        				+ "timeda = ?, timeprf = ?, timepr = ?, nuch1 = ?, nuch2 = ?, " 
+        				+ "nuch3 = ? WHERE pcod = ?;", true, vt, VrachTabelTypes, indexes);
+		sme.setCommit();
+	} catch (SqlExecutorException | InterruptedException e) {
+		e.printStackTrace();
+	}
+}
+
+@Override
+public String printNoVipPlanDisp(InputPlanDisp ipd)
+		throws KmiacServerException, TException {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+
+@Override
+public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
+		TException {
+	// TODO Auto-generated method stub
+	return null;
 } 
 
 
 
 }
+

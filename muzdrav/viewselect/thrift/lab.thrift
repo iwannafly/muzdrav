@@ -11,7 +11,7 @@ struct Patient {
 	5: optional i32 idGosp;
 }
 
-/*Список показателей исследований по выбранному методу*/
+/*РЎРїРёСЃРѕРє РїРѕРєР°Р·Р°С‚РµР»РµР№ РёСЃСЃР»РµРґРѕРІР°РЅРёР№ РїРѕ РІС‹Р±СЂР°РЅРЅРѕРјСѓ РјРµС‚РѕРґСѓ*/
 struct PokazMet {
 	1: optional string pcod;
 	2: optional string nameN;
@@ -28,7 +28,7 @@ struct Napr {
 	7: optional i32 idGosp;
 }
 
-/*метод по виду исследования*/
+/*РјРµС‚РѕРґ РїРѕ РІРёРґСѓ РёСЃСЃР»РµРґРѕРІР°РЅРёСЏ*/
 struct Metod {
 	1: optional string obst;
 	2: optional string nameObst;
@@ -36,7 +36,7 @@ struct Metod {
 	//4: string pcod;
 }
 
-/*Список показателей исследований по выбранной системе*/
+/*РЎРїРёСЃРѕРє РїРѕРєР°Р·Р°С‚РµР»РµР№ РёСЃСЃР»РµРґРѕРІР°РЅРёР№ РїРѕ РІС‹Р±СЂР°РЅРЅРѕР№ СЃРёСЃС‚РµРјРµ*/
 struct Pokaz {
 	1: optional string pcod;
 	2: optional string nameN;
@@ -59,6 +59,7 @@ struct Pisl {
 	10: optional i64 dataz;
 	11: optional i32 kodotd;
 	12: optional i32 pvizitId;
+	13: optional i32 idGosp;
 }
 
 struct PrezD {
@@ -75,11 +76,36 @@ struct PrezL {
 	4: optional string cpok;
 }
 
+struct Gosp {
+	1: optional i32 idGosp;
+	2: optional i32 npasp;
+	3: optional i32 cotd;
+	4: optional string cotd_name;
+	5: optional i64 datap;
+	6: optional i64 datav;
+	7: optional string ishod;
+	8: optional string result;
+	9: optional i32 vrach;
+	10: optional string vrach_fio;
+}
+
+struct Isl{
+	1: optional i32 nisl;
+	2: optional i32 cisl;
+	3: optional string name_cisl;
+	4: optional string pokaz;
+	5: optional string pokaz_name;
+	6: optional string rez;
+	7: optional i64 datav;
+	8: optional string op_name;
+	9: optional string rez_name;
+}
+
 service ThriftLab extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getVidIssled() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getLabs(1: i32 clpu) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getOrgAndSys(1: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
-	/*Исследования*/
+	/*РСЃСЃР»РµРґРѕРІР°РЅРёСЏ*/
 	list<Metod> getMetod(1: i32 kodissl) throws (1: kmiacServer.KmiacServerException kse);
 	list<PokazMet> getPokazMet(1: string cNnz1, 2: i32 cotd) throws (1: kmiacServer.KmiacServerException kse);
 	list<Pokaz> getPokaz(1: i32 kodissl, 2: string kodsyst) throws (1: kmiacServer.KmiacServerException kse);
@@ -90,4 +116,6 @@ service ThriftLab extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> getStacionarTypes() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getLpu() throws (1: kmiacServer.KmiacServerException kse);
 	i32 addNapr(1: Napr napr) throws (1: kmiacServer.KmiacServerException kse);
+	list<Gosp> getGospList(1:i32 npasp, 2:i64 dateStart, 3: i64 dateEnd) throws (1: kmiacServer.KmiacServerException kse);
+	list<Isl> getIslList(1: i32 gospId) throws (1: kmiacServer.KmiacServerException kse);
 }

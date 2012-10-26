@@ -12,7 +12,6 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TSimplePatient;
 
@@ -32,6 +31,7 @@ public class CurationTableModel implements TableModel {
         } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
+            ClientHospital.conMan.reconnect(e);
         }
     }
 
@@ -43,6 +43,7 @@ public class CurationTableModel implements TableModel {
         } catch (TException e) {
             patients = Collections.<TSimplePatient>emptyList();
             e.printStackTrace();
+            ClientHospital.conMan.reconnect(e);
         }
     }
 

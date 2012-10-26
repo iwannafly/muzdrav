@@ -3,6 +3,8 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
@@ -11,6 +13,7 @@ import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
@@ -23,6 +26,7 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 	private TableComboBoxIntegerRender rnd;
 	private AbstractCellEditor dce;
 	private CustomTable<?, ?> ctb;
+	private CustomTextField txt;
 
 	public TableComboBoxIntegerEditor(IntegerClassifiers classifierName, boolean searcheable, List<IntegerClassifier> list) {
 		super(classifierName, searcheable, list);
@@ -40,10 +44,23 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 			}
 		};
 		
-		((CustomTextField) getEditor().getEditorComponent()).addActionListener(new ActionListener() {
+		txt = (CustomTextField) getEditor().getEditorComponent();
+		txt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ctb.dispatchEvent(new KeyEvent(ctb, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
+			}
+		});
+		txt.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (!ctb.hasFocus())
+							stopCellEditing();
+					}
+				});
 			}
 		});
 	}

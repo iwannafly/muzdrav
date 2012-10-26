@@ -11,7 +11,6 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftReception.Talon;
 import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 
@@ -31,7 +30,7 @@ public class ReservedTalonTableModel implements TableModel {
         } catch (TalonNotFoundException e) {
             reservedTalons = Collections.emptyList();
         } catch (TException e) {
-            e.printStackTrace();
+            MainForm.conMan.reconnect(e);
         }
     }
 

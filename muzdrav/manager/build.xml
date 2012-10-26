@@ -14,6 +14,8 @@
 	<condition property="muzdrav.public.dir" value="\\ivcgzo-fileserv\PUBLIC\TMP\thin\soft\muzdrav" else="unix path here">
 		<os family="windows" />
 	</condition>
+	<property name="manager.dir" location="${muzdrav.dir}/manager" />
+	<property name="db_server.ip" value="10.0.0.242" />
 	
 	<path id="build.classpath" >
 	  <fileset dir="${lib.dir}">
@@ -77,19 +79,41 @@
 		<copy file="${basedir}/auth.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
 		<copy file="${basedir}/managerAuth.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
 		<copy file="${basedir}/log4j.xml" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
+		<copy file="${basedir}/launcher_t.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false"/>
+		<copy file="${basedir}/launcher_e.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false" />
+		<copy file="${basedir}/launcher_i.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false" />
 	</target>
-	
-	<target name="main" depends="jar" description="Компиляция всех серверных модулей">
+
+	<target name="main_ei" description="Компиляция всех серверных модулей для рабочего сервера">
+		<replace file="${manager.dir}/src/ru/nkz/ivcgzo/managerAuth/ManagerAuth.java" token="10.0.0.248" value="${db_server.ip}" failOnNoReplacements="true" />
+		
+		<antcall target="jar" />
+		
 		<subant>
 			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
 		</subant>
+		
 		<antcall target="copyJarsToSharedPath" />
 	</target>
 
-	<target name="main_d" description="Компиляция всех модулей с возможностью дебага">
-		<antcall target="main">
+	<target name="main_t" description="Компиляция всех серверных модулей для тестового сервера">
+		<antcall target="jar" />
+		
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
+		</subant>
+		
+		<antcall target="copyJarsToSharedPath" />
+	</target>
+
+	<target name="main_d" description="Компиляция всех модулей с возможностью дебага для тестового сервера">
+		<antcall target="jar">
 			<param name="debug.build" value="true"/>
 		</antcall>
+		
+		<subant>
+			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
+		</subant>
 	</target>
 
 </project>
