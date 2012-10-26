@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
 import ru.nkz.ivcgzo.thriftOsm.Cotd;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
@@ -114,6 +115,7 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<AnamZab, AnamZab._Fields> rsmAnamZab;
 	private final Class<?>[] anamZabTypes; 
 	@SuppressWarnings("unused")
+	private final TResultSetMapper<IsslInfo, IsslInfo._Fields> rsmIsslInfo;
 	private final Class<?>[] isslInfoTypes;
 	private final TResultSetMapper<Pdisp, Pdisp._Fields> rsmPdisp;
 	private final Class<?>[] pdispTypes;
@@ -197,7 +199,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmAnamZab = new TResultSetMapper<>(AnamZab.class, "id_pvizit",   "npasp",       "t_ist_zab");
 		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class};
 		
-		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class};
+		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cisl",        "name_cisl",  "pokaz",      "pokaz_name", "rez",        "datav",    "datan",    "id");
+		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class, Date.class, Integer.class};
 																																
 		rsmPdisp = new TResultSetMapper<>(Pdisp.class, "id_diag",     "npasp",       "id",          "diag",       "pcod",        "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "d_uch",       "diag_n");
 		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Integer.class, String.class};
@@ -2891,6 +2894,38 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
+	}
+
+	@Override
+	public List<IsslInfo> getIsslInfoDate(int id_pvizit, long datan, long datak)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_isl_ld where pvizit_id = ? " +
+				"and datan between ? and ?", id_pvizit, new Date(datan), new Date(datak))) 
+		{
+			return rsmIsslInfo.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+	}
+	}
+
+	@Override
+	public List<IsslInfo> getIsslInfoPokaz(int nisl)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, p_rez_l.zpok as rez, p_isl_ld.datav " +
+				"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) left join n_ldi  on (n_ldi.pcod = p_rez_l.cpok) " +
+				"where p_isl_ld.nisl = ? " +
+				"union		" +
+				"select p_isl_ld.nisl,n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, n_arez.name as rez, p_isl_ld.datav	" +
+				"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl)  join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)	" +
+				"where p_isl_ld.nisl = ?", nisl, nisl))
+				{
+					return rsmIsslInfo.mapToList(acrs.getResultSet());
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+			}
+
 	}
 
 
