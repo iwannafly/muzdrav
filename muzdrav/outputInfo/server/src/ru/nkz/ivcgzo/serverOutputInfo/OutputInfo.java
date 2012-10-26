@@ -739,9 +739,10 @@ public class OutputInfo extends Server implements Iface {
 	}
 
 //Удалить
-public void deleteVT(VrachTabel vt) throws TException {
+public void deleteVT(int vt) throws TException {
+	System.out.println(vt);
 	try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPrepared("DELETE FROM s_tabel WHERE pcod = ?;", false, vt);
+		sme.execPrepared("DELETE FROM s_tabel WHERE id = ?;", false, vt);
 		sme.setCommit();
     } catch (SqlExecutorException | InterruptedException e) {
 		// TODO Auto-generated catch block
@@ -755,7 +756,6 @@ public int addVT(VrachTabel vt) throws VTException, VTDuplException,
 		KmiacServerException, TException {
 	int id = vt.getId();
 	try (SqlModifyExecutor sme = tse.startTransaction()) {
-		//нужно-ли в конце конструкции использовать CloseStatement?
 		sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
 		int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
