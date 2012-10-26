@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultButtonModel;
 import javax.swing.DefaultComboBoxModel;
@@ -97,6 +98,11 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -198,7 +204,9 @@ public class Vvod extends JFrame {
 	private CustomDateEditor tfDatak;
 	private DefaultMutableTreeNode issinfo;
 	private JTree treeRezIssl;
-
+	private StringBuilder sb;
+	private JEditorPane epTxtRezIssl;
+	private static final String lineSep = System.lineSeparator();
 
 	
 	/**
@@ -305,7 +313,7 @@ public class Vvod extends JFrame {
        						String servPath = MainForm.tcl.printProtokol(protokol);
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-       						MainForm.conMan.openFileInEditor(cliPath, true);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 	       				}
 	       				catch (TException e1) {
 	       					e1.printStackTrace();
@@ -332,7 +340,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printVypis(vp);
 							String cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);
-       						MainForm.conMan.openFileInEditor(cliPath, true);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
@@ -351,7 +359,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printKek(Vvod.zapVr.getNpasp(), tblPos.getSelectedItem().id_obr);
 								String cliPath = File.createTempFile("kek", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, true);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -371,7 +379,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
 								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, true);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -1928,6 +1936,48 @@ public class Vvod extends JFrame {
 		);
 		
 		 treeRezIssl = new JTree();
+		 treeRezIssl.addTreeSelectionListener(new TreeSelectionListener() {
+		 	public void valueChanged(TreeSelectionEvent e) {
+		 		if (e.getNewLeadSelectionPath() == null) {
+		 			epTxtRezIssl.setText("");
+		 			return;
+		 		}
+		 		sb = new StringBuilder();	
+		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
+
+		 		if (lastPath instanceof IsslPokazNode) {
+		 			IsslPokazNode isslPokazNode = (IsslPokazNode) lastPath;
+	 				IsslInfo iinfo = isslPokazNode.isslpokaz;
+						addLineToDetailInfo("id: ", iinfo.isSetId(), iinfo.getId());
+						addLineToDetailInfo("Наименование",iinfo.isSetPokaz_name(), iinfo.getPokaz_name());
+						addLineToDetailInfo("Результат",iinfo.isSetRez(), iinfo.getRez());
+						epTxtRezIssl.setText(sb.toString());
+					
+		 		}
+		 	}
+		 });
+		 treeRezIssl.addTreeExpansionListener(new TreeExpansionListener() {
+		 	public void treeCollapsed(TreeExpansionEvent event) {
+		 	}
+		 	public void treeExpanded(TreeExpansionEvent event) {
+		 		Object lastPath = event.getPath().getLastPathComponent();
+		 		if (lastPath instanceof IsslInfoTreeNode) {
+		 			try {
+						IsslInfoTreeNode isslnode = (IsslInfoTreeNode) lastPath;
+						isslnode.removeAllChildren();
+						for (IsslInfo isslChild : MainForm.tcl.getIsslInfoPokaz(isslnode.issl.getNisl())) {
+							isslnode.add(new IsslPokazNode(isslChild));
+						}
+						((DefaultTreeModel) treeRezIssl.getModel()).reload(isslnode);
+					} catch (KmiacServerException e) {
+						e.printStackTrace();
+					} catch (TException e) {
+						MainForm.conMan.reconnect(e);
+					}
+		 		}
+
+		 		}
+		 });
 		spRezIssl.setViewportView(treeRezIssl);
 		treeRezIssl.setShowsRootHandles(true);
 		treeRezIssl.setRootVisible(false);
@@ -1957,7 +2007,7 @@ public class Vvod extends JFrame {
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		
-		JEditorPane epTxtRezIssl = new JEditorPane();
+		 epTxtRezIssl = new JEditorPane();
 		spTxtRezIssl.setViewportView(epTxtRezIssl);
 		pnlRezIsslR.setLayout(gl_pnlRezIsslR);
 		pnlRezIssl.setLayout(gl_pnlRezIssl);
@@ -2379,8 +2429,10 @@ public class Vvod extends JFrame {
 		
 		try {
 			if (pvizit.getId()!=0)
-			{	for (IsslInfo issl : MainForm.tcl.getIsslInfoDate(815, tfDatan.getDate().getTime(), tfDatak.getDate().getTime()))
-					issinfo.add(new IsslInfoTreeNode(issl));}
+			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(815, tfDatan.getDate().getTime(), tfDatak.getDate().getTime()))
+					issinfo.add(new IsslInfoTreeNode(issl));
+			}
+			
 
 
 		} catch (KmiacServerException e) {
@@ -2394,9 +2446,9 @@ public class Vvod extends JFrame {
 	
 	class IsslInfoTreeNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = 3986622548094236905L;
-		private IsslInfo issl;
+		private P_isl_ld issl;
 		
-		public IsslInfoTreeNode(IsslInfo issl) {
+		public IsslInfoTreeNode(P_isl_ld issl) {
 			this.issl = issl;
 			this.add(new IsslPokazNode(new IsslInfo()));
 		}
@@ -2420,6 +2472,17 @@ public class Vvod extends JFrame {
 		}
 	}
 
+	private void addLineToDetailInfo(String name, boolean isSet, Object value) {
+		if (isSet)
+			if ((name != null) && (value != null))
+				if ((name.length() > 0) && (value.toString().length() > 0))
+					sb.append(String.format("%s: %s%s", name, value, lineSep));
+	}
+	
+	private void addLineToDetailInfo(String name, Object value) {
+		addLineToDetailInfo(name, true, value);
+	}
+	
 	private class ShablonSearchListener implements DocumentListener {
 		Timer timer = new Timer(500, new ActionListener() {
 			

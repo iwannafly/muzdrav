@@ -178,14 +178,14 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class};
 		
-		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl");
-		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class};
+		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl",     "rez");
+		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
 		
-		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "id",          "npasp",       "nisl",        "cpok");
-		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class};
+		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "id",          "npasp",       "nisl",        "cpok",       "rez");
+		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
 		
 		rsmMetod = new TResultSetMapper<>(Metod.class, "obst",       "name_obst",  "c_p0e1",      "pcod");
 		metodTypes = new Class<?>[] {                  String.class, String.class, Integer.class, String.class};
@@ -2951,12 +2951,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<IsslInfo> getIsslInfoDate(int id_pvizit, long datan, long datak)
+	public List<P_isl_ld> getIsslInfoDate(int id_pvizit, long datan, long datak)
 			throws KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_isl_ld where pvizit_id = ? " +
 				"and datan between ? and ?", id_pvizit, new Date(datan), new Date(datak))) 
 		{
-			return rsmIsslInfo.mapToList(acrs.getResultSet());
+			return rsmPislld.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -2980,6 +2980,27 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					throw new KmiacServerException();
 			}
 
+	}
+
+	@Override
+	public IsslInfo getIsslInfoPokazId(int id_issl)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, p_rez_l.zpok as rez, p_isl_ld.datav " +
+				"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) left join n_ldi  on (n_ldi.pcod = p_rez_l.cpok) " +
+				"where p_rez_l.id = ? " +
+				"union		" +
+				"select p_isl_ld.nisl,n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, n_arez.name as rez, p_isl_ld.datav	" +
+				"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl)  join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)	" +
+				"where p_rez_d.id = ? ", id_issl, id_issl ))
+				{
+			if (acrs.getResultSet().next())
+				return rsmIsslInfo.map(acrs.getResultSet());
+			else return null;
+			} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+		
 	}
 
 
