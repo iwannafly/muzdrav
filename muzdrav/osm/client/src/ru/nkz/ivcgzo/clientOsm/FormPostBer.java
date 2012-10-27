@@ -371,6 +371,7 @@ public class FormPostBer extends JFrame {
 					oslname = "kartl"+String.valueOf(rdSlStruct.getId());
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
 
 			}
 			catch (TException e1) {

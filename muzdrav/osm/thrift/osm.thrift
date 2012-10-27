@@ -401,6 +401,7 @@ struct P_isl_ld {
 	11: optional i32 pvizit_id;
 	12: optional i32 prichina;
 	13: optional i32 kodotd;
+	14: optional i64 datav;
 }
 
 struct Prez_d {
@@ -408,6 +409,7 @@ struct Prez_d {
 	2: optional i32 npasp;
 	3: optional i32 nisl;
 	4: optional string kodisl;
+	5: optional string rez;
 }
 
 struct Prez_l {
@@ -415,6 +417,7 @@ struct Prez_l {
 	2: optional i32 npasp;
 	3: optional i32 nisl;
 	4: optional string cpok;
+	5: optional string rez;
 }
 
 
@@ -475,6 +478,8 @@ struct IsslInfo{
 	5: optional string pokaz_name;
 	6: optional string rez;
 	7: optional i64 datav;
+	8: optional i64 datan;
+	9: optional i32 id;
 }
 
 
@@ -691,6 +696,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+	list<P_isl_ld> getIsslInfoDate(1: i32 id_pvizit, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
+	list<IsslInfo> getIsslInfoPokaz(1: i32 nisl) throws (1: kmiacServer.KmiacServerException kse);
+	IsslInfo getIsslInfoPokazId(1: i32 id_issl) throws (1: kmiacServer.KmiacServerException kse);
 
 	
 	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);

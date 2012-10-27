@@ -10,12 +10,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultButtonModel;
 import javax.swing.DefaultComboBoxModel;
@@ -25,6 +29,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -33,8 +38,10 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -46,6 +53,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
 
@@ -64,6 +74,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
 import ru.nkz.ivcgzo.thriftOsm.Cotd;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
@@ -87,6 +98,11 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -183,6 +199,14 @@ public class Vvod extends JFrame {
 	private Pvizit pvizitCopy;
 	private PvizitAmb pvizitAmbCopy;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbLpu;
+	private DefaultMutableTreeNode root;
+	private CustomDateEditor tfDatan;
+	private CustomDateEditor tfDatak;
+	private DefaultMutableTreeNode issinfo;
+	private JTree treeRezIssl;
+	private StringBuilder sb;
+	private JEditorPane epTxtRezIssl;
+	private static final String lineSep = System.lineSeparator();
 
 	
 	/**
@@ -289,7 +313,7 @@ public class Vvod extends JFrame {
        						String servPath = MainForm.tcl.printProtokol(protokol);
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-       						MainForm.conMan.openFileInEditor(cliPath, true);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 	       				}
 	       				catch (TException e1) {
 	       					e1.printStackTrace();
@@ -316,7 +340,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printVypis(vp);
 							String cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);
-       						MainForm.conMan.openFileInEditor(cliPath, true);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
@@ -335,7 +359,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printKek(Vvod.zapVr.getNpasp(), tblPos.getSelectedItem().id_obr);
 								String cliPath = File.createTempFile("kek", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, true);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -355,7 +379,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
 								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, true);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -536,8 +560,8 @@ public class Vvod extends JFrame {
 		pnlJal.setLayout(gl_pnlJal);
 		
 		JPanel pnlAnam = new JPanel();
-		tabbedPane.addTab("<html><br>История настоящего<br>заболевания<br></html>", null, pnlAnam, null);
-		tabbedPane.setTabComponentAt(1, new JLabel("<html><br>История настоящего<br>заболевания<br></html>"));
+		tabbedPane.addTab("<html><br>История заболевания<br> (anamnesis morbi)<br></html>", null, pnlAnam, null);
+		tabbedPane.setTabComponentAt(1, new JLabel("<html><br>История заболевания<br>(anamnesis morbi)<br></html>"));
 		
 		JScrollPane spAnam = new JScrollPane();
 		GroupLayout gl_pnlAnam = new GroupLayout(pnlAnam);
@@ -564,8 +588,8 @@ public class Vvod extends JFrame {
 		pnlAnam.setLayout(gl_pnlAnam);
 		
 		JPanel pnlStat = new JPanel();
-		tabbedPane.addTab("<html><br>Status praesense<br><br></html>", null, pnlStat, null);
-		tabbedPane.setTabComponentAt(2, new JLabel("<html><br>Status praesense<br><br></html>"));
+		tabbedPane.addTab("<html><br>Объективный статус <br>(status praesense)<br></html>", null, pnlStat, null);
+		tabbedPane.setTabComponentAt(2, new JLabel("<html><br>Объективный статус <br>(status praesense)<br></html>"));
 		
 		tbStatTemp = new CustomTextField();
 		tbStatTemp.setColumns(10);
@@ -689,8 +713,8 @@ public class Vvod extends JFrame {
 		pnlFiz.setLayout(gl_pnlFiz);
 		
 		JPanel pnlLoc = new JPanel();
-		tabbedPane.addTab("<html><br>Localis status<br><br></html>", null, pnlLoc, null);
-		tabbedPane.setTabComponentAt(4, new JLabel("<html><br>Localis status<br><br></html>"));
+		tabbedPane.addTab("<html><br>Локальный статус<br> (localis status)<br></html>", null, pnlLoc, null);
+		tabbedPane.setTabComponentAt(4, new JLabel("<html><br>Локальный статус<br> (localis status)<br></html>"));
 		
 		JScrollPane spLoc = new JScrollPane();
 		GroupLayout gl_pnlLoc = new GroupLayout(pnlLoc);
@@ -1411,8 +1435,8 @@ public class Vvod extends JFrame {
 		pnlDiag.setLayout(gl_pnlDiag);
 		
 		JPanel pnlLech = new JPanel();
-		tabbedPane.addTab("<html><br>Назначенное лечение<br><br></html>", null, pnlLech, null);
-		tabbedPane.setTabComponentAt(6, new JLabel("<html><br>Назначенное лечение<br><br></html>"));
+		tabbedPane.addTab("<html><br>Лечение<br><br></html>", null, pnlLech, null);
+		tabbedPane.setTabComponentAt(6, new JLabel("<html><br>Лечение<br><br></html>"));
 		
 		JScrollPane spLech = new JScrollPane();
 		GroupLayout gl_pnlLech = new GroupLayout(pnlLech);
@@ -1834,6 +1858,159 @@ public class Vvod extends JFrame {
 		tbKonsObosnov.setWrapStyleWord(true);
 		spKonsObosnov.setViewportView(tbKonsObosnov);
 		pnlKons.setLayout(gl_pnlKons);
+		
+		JPanel pnlRezIssl = new JPanel();
+		tabbedPane_1.addTab("Результаты исследований", null, pnlRezIssl, null);
+		
+		JSplitPane splRezIssl = new JSplitPane();
+		
+		JLabel label = new JLabel("Период ");
+		
+		 tfDatan = new CustomDateEditor();
+		 tfDatan.setColumns(10);
+		 Calendar calendar = GregorianCalendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			tfDatan.setDate("01.01."+calendar.get(Calendar.YEAR));
+		
+		JLabel label_1 = new JLabel("-");
+		
+		 tfDatak = new CustomDateEditor();
+		 tfDatak.setColumns(10);
+		 tfDatak.setDate("31.12."+calendar.get(Calendar.YEAR));
+	
+		
+		JButton button = new JButton("OK");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
+
+			}
+		});
+		GroupLayout gl_pnlRezIssl = new GroupLayout(pnlRezIssl);
+		gl_pnlRezIssl.setHorizontalGroup(
+			gl_pnlRezIssl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRezIssl.createSequentialGroup()
+					.addGroup(gl_pnlRezIssl.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlRezIssl.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(label, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tfDatan, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 4, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(tfDatak, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE))
+						.addComponent(splRezIssl))
+					.addContainerGap())
+		);
+		gl_pnlRezIssl.setVerticalGroup(
+			gl_pnlRezIssl.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_pnlRezIssl.createSequentialGroup()
+					.addContainerGap(12, Short.MAX_VALUE)
+					.addGroup(gl_pnlRezIssl.createParallelGroup(Alignment.BASELINE)
+						.addComponent(label)
+						.addComponent(tfDatan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_1)
+						.addComponent(tfDatak, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(button))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(splRezIssl, GroupLayout.PREFERRED_SIZE, 380, GroupLayout.PREFERRED_SIZE))
+		);
+		
+		JPanel pnlRezIsslL = new JPanel();
+		splRezIssl.setLeftComponent(pnlRezIsslL);
+		
+		JScrollPane spRezIssl = new JScrollPane();
+		GroupLayout gl_pnlRezIsslL = new GroupLayout(pnlRezIsslL);
+		gl_pnlRezIsslL.setHorizontalGroup(
+			gl_pnlRezIsslL.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, gl_pnlRezIsslL.createSequentialGroup()
+					.addComponent(spRezIssl, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		gl_pnlRezIsslL.setVerticalGroup(
+			gl_pnlRezIsslL.createParallelGroup(Alignment.LEADING)
+				.addComponent(spRezIssl, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
+		);
+		
+		 treeRezIssl = new JTree();
+		 treeRezIssl.addTreeSelectionListener(new TreeSelectionListener() {
+		 	public void valueChanged(TreeSelectionEvent e) {
+		 		if (e.getNewLeadSelectionPath() == null) {
+		 			epTxtRezIssl.setText("");
+		 			return;
+		 		}
+		 		sb = new StringBuilder();	
+		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
+
+		 		if (lastPath instanceof IsslPokazNode) {
+		 			IsslPokazNode isslPokazNode = (IsslPokazNode) lastPath;
+	 				IsslInfo iinfo = isslPokazNode.isslpokaz;
+						addLineToDetailInfo("id: ", iinfo.isSetId(), iinfo.getId());
+						addLineToDetailInfo("Наименование",iinfo.isSetPokaz_name(), iinfo.getPokaz_name());
+						addLineToDetailInfo("Результат",iinfo.isSetRez(), iinfo.getRez());
+						epTxtRezIssl.setText(sb.toString());
+					
+		 		}
+		 	}
+		 });
+		 treeRezIssl.addTreeExpansionListener(new TreeExpansionListener() {
+		 	public void treeCollapsed(TreeExpansionEvent event) {
+		 	}
+		 	public void treeExpanded(TreeExpansionEvent event) {
+		 		Object lastPath = event.getPath().getLastPathComponent();
+		 		if (lastPath instanceof IsslInfoTreeNode) {
+		 			try {
+						IsslInfoTreeNode isslnode = (IsslInfoTreeNode) lastPath;
+						isslnode.removeAllChildren();
+						for (IsslInfo isslChild : MainForm.tcl.getIsslInfoPokaz(isslnode.issl.getNisl())) {
+							isslnode.add(new IsslPokazNode(isslChild));
+						}
+						((DefaultTreeModel) treeRezIssl.getModel()).reload(isslnode);
+					} catch (KmiacServerException e) {
+						e.printStackTrace();
+					} catch (TException e) {
+						MainForm.conMan.reconnect(e);
+					}
+		 		}
+
+		 		}
+		 });
+		spRezIssl.setViewportView(treeRezIssl);
+		treeRezIssl.setShowsRootHandles(true);
+		treeRezIssl.setRootVisible(false);
+		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeRezIssl.getCellRenderer();
+		renderer.setLeafIcon(null);
+		renderer.setClosedIcon(null);
+		renderer.setOpenIcon(null);
+		pnlRezIsslL.setLayout(gl_pnlRezIsslL);
+		
+		JPanel pnlRezIsslR = new JPanel();
+		splRezIssl.setRightComponent(pnlRezIsslR);
+		
+		JScrollPane spTxtRezIssl = new JScrollPane();
+		GroupLayout gl_pnlRezIsslR = new GroupLayout(pnlRezIsslR);
+		gl_pnlRezIsslR.setHorizontalGroup(
+			gl_pnlRezIsslR.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRezIsslR.createSequentialGroup()
+					.addGap(4)
+					.addComponent(spTxtRezIssl, GroupLayout.PREFERRED_SIZE, 372, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		gl_pnlRezIsslR.setVerticalGroup(
+			gl_pnlRezIsslR.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRezIsslR.createSequentialGroup()
+					.addGap(4)
+					.addComponent(spTxtRezIssl, GroupLayout.PREFERRED_SIZE, 401, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		
+		 epTxtRezIssl = new JEditorPane();
+		spTxtRezIssl.setViewportView(epTxtRezIssl);
+		pnlRezIsslR.setLayout(gl_pnlRezIsslR);
+		pnlRezIssl.setLayout(gl_pnlRezIssl);
 		pnlNapr.setLayout(gl_pnlNapr);
 		
 		JPanel pnlOcen = new JPanel();
@@ -2247,6 +2424,67 @@ public class Vvod extends JFrame {
 		panel.setLayout(gl_panel);
 		getContentPane().setLayout(groupLayout);
 
+	}
+	
+	private DefaultMutableTreeNode createNodes(){
+		root = new DefaultMutableTreeNode("Корень");
+		issinfo = new DefaultMutableTreeNode("Даты назначенных исследований");
+		root.add(issinfo);
+		
+		try {
+			if (pvizit.getId()!=0)
+			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(815, tfDatan.getDate().getTime(), tfDatak.getDate().getTime()))
+					issinfo.add(new IsslInfoTreeNode(issl));
+			}
+			
+
+
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			MainForm.conMan.reconnect(e);
+		} 
+
+		return root;
+	}
+	
+	class IsslInfoTreeNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = 3986622548094236905L;
+		private P_isl_ld issl;
+		
+		public IsslInfoTreeNode(P_isl_ld issl) {
+			this.issl = issl;
+			this.add(new IsslPokazNode(new IsslInfo()));
+		}
+		
+		@Override
+		public String toString() {
+			return DateFormat.getDateInstance().format(new Date(issl.getDatan()));
+		}
+	}
+	
+	class IsslPokazNode extends DefaultMutableTreeNode{
+		private IsslInfo isslpokaz;
+		
+		public IsslPokazNode(IsslInfo isslpokaz) {
+			this.isslpokaz = isslpokaz;
+		}
+		
+		@Override
+		public String toString() {
+			return isslpokaz.getPokaz();
+		}
+	}
+
+	private void addLineToDetailInfo(String name, boolean isSet, Object value) {
+		if (isSet)
+			if ((name != null) && (value != null))
+				if ((name.length() > 0) && (value.toString().length() > 0))
+					sb.append(String.format("%s: %s%s", name, value, lineSep));
+	}
+	
+	private void addLineToDetailInfo(String name, Object value) {
+		addLineToDetailInfo(name, true, value);
 	}
 	
 	private class ShablonSearchListener implements DocumentListener {

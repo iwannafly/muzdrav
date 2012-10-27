@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
 import ru.nkz.ivcgzo.thriftOsm.Cotd;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.IsslPokaz;
 import ru.nkz.ivcgzo.thriftOsm.KartaBer;
@@ -114,6 +115,7 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<AnamZab, AnamZab._Fields> rsmAnamZab;
 	private final Class<?>[] anamZabTypes; 
 	@SuppressWarnings("unused")
+	private final TResultSetMapper<IsslInfo, IsslInfo._Fields> rsmIsslInfo;
 	private final Class<?>[] isslInfoTypes;
 	private final TResultSetMapper<Pdisp, Pdisp._Fields> rsmPdisp;
 	private final Class<?>[] pdispTypes;
@@ -176,14 +178,14 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class};
 		
-		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl");
-		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class};
+		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl",     "rez");
+		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
 		
-		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "id",          "npasp",       "nisl",        "cpok");
-		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class};
+		rsmPrezl = new TResultSetMapper<>(Prez_l.class, "id",          "npasp",       "nisl",        "cpok",       "rez");
+		prezlTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
 		
 		rsmMetod = new TResultSetMapper<>(Metod.class, "obst",       "name_obst",  "c_p0e1",      "pcod");
 		metodTypes = new Class<?>[] {                  String.class, String.class, Integer.class, String.class};
@@ -197,7 +199,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmAnamZab = new TResultSetMapper<>(AnamZab.class, "id_pvizit",   "npasp",       "t_ist_zab");
 		anamZabTypes = new Class<?>[] {                    Integer.class, Integer.class, String.class};
 		
-		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class};
+		rsmIsslInfo = new TResultSetMapper<>(IsslInfo.class, "nisl",        "cisl",        "name_cisl",  "pokaz",      "pokaz_name", "rez",        "datav",    "datan",    "id");
+		isslInfoTypes = new Class<?>[] {                     Integer.class, Integer.class, String.class, String.class, String.class, String.class, Date.class, Date.class, Integer.class};
 																																
 		rsmPdisp = new TResultSetMapper<>(Pdisp.class, "id_diag",     "npasp",       "id",          "diag",       "pcod",        "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "d_uch",       "diag_n");
 		pdispTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Integer.class, String.class};
@@ -1954,7 +1957,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		Date dataRod = null;
 		Date dataRod1 = null;
 		
-		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kart1", ".htm").getAbsolutePath()), "utf-8")) {
+
+//		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\kartl.htm"), "utf-8")) {
 			StringBuilder sb = new StringBuilder(0x10000);
 			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -1988,13 +1995,19 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs2.getResultSet().next()) {
 						if (acrs2.getResultSet().getString(1) != null)
 							sb.append(String.format("%s;<br>", acrs2.getResultSet().getString(1)));
+						if (acrs.getResultSet().getString(17) != null)
 						sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s<br>", acrs.getResultSet().getString(17)));
+						else
+						sb.append("5. Особенности течения прежних беременностей, родов, послеродового периода: <br>");
 						sb.append(String.format("6. Данная беременность %d (по счету), роды %d (по счету)<br>", acrs.getResultSet().getInt(1), acrs.getResultSet().getInt(2)));
+						if (acrs.getResultSet().getInt(3) != 0)
 						sb.append(String.format("7. Количество абортов %d (всего). Последний в %tY году на сроке %d недель<br>", acrs.getResultSet().getInt(3), acrs.getResultSet().getDate(19), acrs.getResultSet().getInt(20)));
+						else
+						sb.append(String.format("7. Количество абортов %d (всего)<br>", acrs.getResultSet().getInt(3)));
 						if (acrs2.getResultSet().getString(2) != null)
 							sb.append(String.format("осложнения после аборта: %s;<br>", acrs2.getResultSet().getString(2)));
 					} else
-						sb.append("нет<br>");
+						sb.append("осложнения после аборта: нет<br>");
 					acrs2.close();
 					
 //					sb.append(String.format("5. Особенности течения прежних беременностей, родов, послеродового периода: %s<br>", acrs.getResultSet().getString(17)));
@@ -2121,6 +2134,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						if (acrs2.getResultSet().getString(2) != null) 
 						sb.append(String.format("<TD> %s</TD>",acrs2.getResultSet().getString(2)));
 						else sb.append("<TD> </TD>");
+						sb.append("<TD> </TD>");
 						sb.append("</TR>");
 //						System.out.println("таблица");		
 					} while (acrs2.getResultSet().next());
@@ -2129,7 +2143,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				acrs2.close();
 				
 				sb.append("</TABLE>");
-				sb.append("<br>Проведенные исследования:");
+				sb.append("<br>Проведенные исследования: ");
 //				System.out.println("Проведенные исследования");		
 				acrs2 = sse.execPreparedQuery("select l.datav,l.cisl,n.name,d.rez,d.op_name,d.rez_name from p_isl_ld l,p_rez_d d,n_ldi n where l.nisl=d.nisl and d.kodisl=n.pcod and l.nisl=d.nisl and d.kodisl=n.pcod and l.datav is not null and l.pvizit_id = ? ", kb.getId_pvizit());
 //				System.out.println("select");		
@@ -2144,12 +2158,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("нет<br>");
 				sb.append("<br>Заключение: _____________________________________________________");
 				sb.append("<br>1. Заключение терапевта _________________________________________");
-				sb.append("<br>2. Закючение окулиста ___________________________________________");
+				sb.append("<br>2. Заключение окулиста ___________________________________________");
 			sb.append("</body>"); 
 			sb.append("</html>");
 			
 			osw.write(sb.toString());
-			return "c:\\kartl.html";
+			return path;
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -2944,6 +2958,59 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
+	}
+
+	@Override
+	public List<P_isl_ld> getIsslInfoDate(int id_pvizit, long datan, long datak)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_isl_ld where pvizit_id = ? " +
+				"and datan between ? and ?", id_pvizit, new Date(datan), new Date(datak))) 
+		{
+			return rsmPislld.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+	}
+	}
+
+	@Override
+	public List<IsslInfo> getIsslInfoPokaz(int nisl)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, p_rez_l.zpok as rez, p_isl_ld.datav " +
+				"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) left join n_ldi  on (n_ldi.pcod = p_rez_l.cpok) " +
+				"where p_isl_ld.nisl = ? " +
+				"union		" +
+				"select p_isl_ld.nisl,n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, n_arez.name as rez, p_isl_ld.datav	" +
+				"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl)  join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)	" +
+				"where p_isl_ld.nisl = ?", nisl, nisl))
+				{
+					return rsmIsslInfo.mapToList(acrs.getResultSet());
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					throw new KmiacServerException();
+			}
+
+	}
+
+	@Override
+	public IsslInfo getIsslInfoPokazId(int id_issl)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, p_rez_l.zpok as rez, p_isl_ld.datav " +
+				"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) left join n_ldi  on (n_ldi.pcod = p_rez_l.cpok) " +
+				"where p_rez_l.id = ? " +
+				"union		" +
+				"select p_isl_ld.nisl,n_ldi.pcod as pokaz, n_ldi.name_n as pokaz_name, n_arez.name as rez, p_isl_ld.datav	" +
+				"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl)  join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)	" +
+				"where p_rez_d.id = ? ", id_issl, id_issl ))
+				{
+			if (acrs.getResultSet().next())
+				return rsmIsslInfo.map(acrs.getResultSet());
+			else return null;
+			} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+		
 	}
 
 

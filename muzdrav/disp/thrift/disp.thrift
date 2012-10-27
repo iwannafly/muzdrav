@@ -107,10 +107,13 @@ struct Pdisp_ds{
 	41: optional i32 prizn_po;
 }
 
+exception PfizNotFoundException {
+}
+
 
 //русские буквы
 service ThriftDisp extends kmiacServer.KmiacServer {
 	void setPfiz(1: Pfiz fiz) throws (1: kmiacServer.KmiacServerException kse);
-	
+	Pfiz getPfiz(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PfizNotFoundException pfnfe);
 	
 }
