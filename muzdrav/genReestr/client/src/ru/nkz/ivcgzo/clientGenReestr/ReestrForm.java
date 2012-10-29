@@ -55,7 +55,8 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrPolMenu = new JMenuItem ("Реестры поликлиники");
 		ReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm();
+				sfrm = new SettingsForm(2);
+				sfrm.Cslu = 2;
 				sfrm.showSettingsForm();
 			}
 		});
@@ -63,35 +64,36 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
 		ReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm();
+				sfrm = new SettingsForm(0);
+				sfrm.Cslu = 3;
 				sfrm.showSettingsForm();
 			}
 		});
 
 		JMenuItem ReestrStMenu = new JMenuItem ("Реестры стационара");
+		ReestrStMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				sfrm = new SettingsForm(1);
+				sfrm.Cslu = 1;
+				sfrm.showSettingsForm();
+			}
+		});
 		
 		JMenuItem LoadReestrPolMenu = new JMenuItem ("Реестры поликлиники");
 		LoadReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 		        OpenWindowFileChooser();
 				try {
+					MainForm.conMan.transferFileToServer(pathfile, pathfile = new File(pathfile).getName());
 					String servPath = MainForm.tcl.getProtokolErrPol(pathfile);
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
 				} catch (TException e) {
 					e.printStackTrace();
-				} catch (KmiacServerException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (OpenFileException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -103,10 +105,10 @@ public class ReestrForm extends JFrame {
 		JMenuItem LoadReestrStMenu = new JMenuItem ("Реестры стационара");
 		menu2.add (ReestrPolMenu);
 		menu2.add (ReestrLDSMenu);
-		//menu2.add (ReestrStMenu);
+		menu2.add (ReestrStMenu);
 		menu3.add (LoadReestrPolMenu);
 		menu3.add (LoadReestrLDSMenu);
-		//menu3.add (LoadReestrStMenu);
+		menu3.add (LoadReestrStMenu);
 //		RunMenu.addSeparator(); 
 
 		JPanel panel1 = new JPanel();
@@ -156,7 +158,7 @@ public class ReestrForm extends JFrame {
 		// TODO Auto-generated method stub
 		fc = new JFileChooser();
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				".rar files", "rar");
+				".rar", "rar");
 		fc.setFileFilter(filter);
         int returnVal = fc.showOpenDialog(null);
 

@@ -89,6 +89,13 @@ exception KmiacServerException {
 	1:  string message;
 }
 
+/**
+ * Исключение для проброса в случае нарушения целостности внешнего ключа.
+ */
+exception ForeignKeyException {
+	1:  string message;
+}
+
 service KmiacServer {
 	/**
 	 * Проверка соединения клиента с сервером.

@@ -145,7 +145,7 @@ public class PIslForm {
 		JButton btnNewButton = new JButton("Поиск");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int[] npasp = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, false);
+				int[] npasp = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);
 				
 				if (npasp != null){
 					try {
@@ -400,7 +400,7 @@ public class PIslForm {
 				tn_ldi.addItem(pisl_ld);
 				//System.out.print(tn_ldi.getSelectedItem().nisl);
 				
-			} catch (IslExistsException | TException e) {
+			} catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -505,7 +505,7 @@ public class PIslForm {
 				tn_ldi.getSelectedItem();
 				tn_ldi.repaint();
 //UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ?, WHERE nisl = ?				
-			}catch (IslExistsException | TException e) {
+			}catch (TException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -687,12 +687,20 @@ public class PIslForm {
 				tFdatav.setText(dp.format(tn_ldi.getSelectedItem().datav));
 				
 				tFnprob.setText(String.valueOf(tn_ldi.getSelectedItem().nprob));
+				
+								
 				if(tn_ldi.getSelectedItem().prichina != 0){
 					cBprichina.setSelectedPcod(tn_ldi.getSelectedItem().prichina);
 				}else{
 					cBprichina.setSelectedItem(null);
 				}
-				//cbpopl
+				
+				if (tn_ldi.getSelectedItem().popl !=0){
+					cBpopl.setSelectedPcod(tn_ldi.getSelectedItem().popl);
+				}else{
+					cBpopl.setSelectedItem(null);
+				}
+				
 				cBnapravl.setSelectedPcod(tn_ldi.getSelectedItem().napravl);
 				
 				//if (tn_ldi.getSelectedItem().naprotd != 0)
@@ -728,7 +736,11 @@ public class PIslForm {
 				cBSvrach.setSelectedPcod(tn_ldi.getSelectedItem().kodvr);
 				} else {cBSvrach.setSelectedItem(null);}
 				
-				tFdiag.setText(tn_ldi.getSelectedItem().diag);
+				if (tn_ldi.getSelectedItem().diag != null){
+					tFdiag.setText(tn_ldi.getSelectedItem().diag);
+				}else{
+					tFdiag.setText(null);
+				}
 				
 				
 				
@@ -741,12 +753,12 @@ public class PIslForm {
 						
 						if (String.valueOf(spDisl.getNpasp()) != null) {
 							
-							tFkodisl.setText(spDisl.getKodisl());
-							
 							if(spDisl.kodisl != null){ 
 								cBkodisl.setSelectedPcod(spDisl.kodisl);
+								tFkodisl.setText(spDisl.getKodisl());
 							}else{
 								cBkodisl.setSelectedItem(null);
+								tFkodisl.setText(null);
 								}
 							
 							spkol.setValue(spDisl.kol);
@@ -1020,7 +1032,7 @@ public class PIslForm {
 				public void mouseClicked(MouseEvent arg0) {
 					
 					if (arg0.getClickCount() == 2) {
-						StringClassifier res = MainForm.conMan.showStringClassifierSelector(StringClassifiers.n_c00);
+						StringClassifier res = MainForm.conMan.showMkbTreeForm("Диагнозы", null);//(StringClassifiers.n_c00);
 						
 						if (res != null)
 							tFdiag.setText(String.valueOf(res.pcod));
@@ -1228,7 +1240,9 @@ public class PIslForm {
 		cBkodisl = new ThriftStringClassifierCombobox<>(true);
 		cBkodisl.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+
 				tFkodisl.setText(cBkodisl.getSelectedPcod());
+
 				try {
 					if ((cBpcisl.getSelectedItem() != null) && (cBkodisl.getSelectedItem() != null)){
 						cBpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), cBkodisl.getSelectedPcod()));

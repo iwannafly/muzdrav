@@ -40,7 +40,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.fileTransferConstants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileTransfer;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
@@ -56,6 +56,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
  */
 public class ConnectionManager {
 	public static ConnectionManager instance;
+	private final String appServerIp;
 	private Map<Integer, TTransport> transports;
 	private Map<Integer, KmiacServer.Client> connections;
 	private Map<Integer, TTransport> commonTransports;
@@ -81,8 +82,9 @@ public class ConnectionManager {
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	public <T extends FileTransfer.Client> ConnectionManager(JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
+	public <T extends FileTransfer.Client> ConnectionManager(String appServerIp, JFrame mainForm, Class<T> filTransCls, int filTransPort) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, MalformedURLException, ClassNotFoundException, IOException {
 		instance = this;
+		this.appServerIp = appServerIp;
 		
 		transports = new HashMap<>();
 		connections = new HashMap<>();
@@ -159,7 +161,7 @@ public class ConnectionManager {
 		T connection;
 		
 		Constructor<T> constructor = cls.getConstructor(TProtocol.class);
-		TTransport transport = new TFramedTransport(new TSocket("localhost", port));
+		TTransport transport = new TFramedTransport(new TSocket(appServerIp, port));
 		connection = constructor.newInstance(new TBinaryProtocol(transport));
 		transports.put(port, transport);
 		connections.put(port, connection);
@@ -211,11 +213,11 @@ public class ConnectionManager {
 			TTransport transport = transports.get(port);
 			KmiacServer.Client connection = connections.get(port);
 			
-			if (!transport.isOpen()) {
-				transport.open();
-				if (client != null)
-					client.onConnect(connection);
-			}
+			if (transport.isOpen())
+				transport.close();
+			transport.open();
+			if (client != null)
+				client.onConnect(connection);
 		} catch (TTransportException e) {
 			throw new ConnectionException(e);
 		}
@@ -394,10 +396,10 @@ public class ConnectionManager {
 	public void transferFileToServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, OpenFileException, TException {
 		int port = openWriteServerSocket(dstPath);
 		try (FileInputStream fis = new FileInputStream(srcPath);
-				Socket socket = new Socket("localhost", port);) {
-			byte[] buf = new byte[Constants.bufSize];
-			int read = Constants.bufSize;
-			while (read == Constants.bufSize) {
+				Socket socket = new Socket(appServerIp, port);) {
+			byte[] buf = new byte[fileTransferConstants.bufSize];
+			int read = fileTransferConstants.bufSize;
+			while (read == fileTransferConstants.bufSize) {
 				read = fis.read(buf);
 				socket.getOutputStream().write(buf, 0, read);
 			}
@@ -410,8 +412,8 @@ public class ConnectionManager {
 	public void transferFileFromServer(String srcPath, String dstPath) throws java.io.FileNotFoundException, IOException, FileNotFoundException, OpenFileException, TException {
 		int port = openReadServerSocket(srcPath);
 		try (FileOutputStream fos = new FileOutputStream(dstPath);
-				Socket socket = new Socket("localhost", port);) {
-			byte[] buf = new byte[Constants.bufSize];
+				Socket socket = new Socket(appServerIp, port);) {
+			byte[] buf = new byte[fileTransferConstants.bufSize];
 			int read = socket.getInputStream().read(buf);
 			while (read > -1) {
 				fos.write(buf, 0, read);
@@ -680,6 +682,30 @@ public class ConnectionManager {
 	 */
 	public void showPatientInfoForm(String title, int npasp) {
 		viewClient.showModal(client, 17, title, npasp);
+	}
+	
+	/**
+	 * Вызов формы записи пациента на исследование.
+	 * @param npasp - уникальный номер пациента
+	 * @param fam - фамилия
+	 * @param im - имя
+	 * @param ot - отчество
+	 * @param idGosp - идентификатор госпитализации
+	 */
+	public void showLabRecordForm(int npasp, String fam, String im, String ot, int idGosp) {
+		viewClient.showModal(client, 18, npasp, fam, im, ot, idGosp);
+	}
+	
+	/**
+	 * Вызов формы записи пациента на прием к врачу.
+	 * @param npasp - уникальный номер пациента.
+	 * @param fam - фамилия
+	 * @param im - имя
+	 * @param ot - отчество
+	 * @param idPvizit - идентификатор случая заболевания
+	 */
+	public void showReceptionRecordForm(int npasp, String fam, String im, String ot, int idPvizit) {
+		viewClient.showModal(client, 19, npasp, fam, im, ot, idPvizit);
 	}
 	
 	/**

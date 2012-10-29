@@ -139,7 +139,7 @@ exception UserNotFoundException {
 }
 
 /**
- * пациент не зарегистрирован в базе
+ * пациет не зарегистрирован в базе
  */
 exception PatientNotFoundException {
 }
@@ -179,7 +179,7 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	void delPsmert(1: i32 npasp);
 
 /**
- * возвращает сведения о пациенте для печати мед.свидетельства
+ * возвращает сведения о пациенте для печати мед. свидетельства
  */
 	PatientCommonInfo getPatientCommonInfo(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse,2:PatientNotFoundException pnf);
 
@@ -194,7 +194,7 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	PatientMestn getL00(1:i32 c_ffoms, 2: string name) throws (1: MestnNotFoundException mstn);	
 
 /**
- * добавляет дополнительную информацию для формирования МСС в базу
+ * добавляет или корректирует запись таблицы дополнительной информации
  */
 	i32 setPsmertdop(1: Psmertdop cpodr);
 	
@@ -207,4 +207,9 @@ service ThriftMss extends kmiacServer.KmiacServer {
 	list<classifier.IntegerClassifier> get_n_z00() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> gets_vrach(1:i32 clpu, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> gets_dolj(1:i32 clpu, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+
+/**
+ * печать корешка медицинского свидетельства и медицинского свидетельства о смерти
+ */
+	string printMedSS(1: string docInfo, 2: string nomMss) throws (1: kmiacServer.KmiacServerException kse);
 }

@@ -2,12 +2,15 @@ package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -36,6 +39,18 @@ public class TableTimeEditor extends DefaultCellEditor {
 				} else {
 					super.keyPressed(e);
 				}
+			}
+		});
+		txt.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (!ctb.hasFocus())
+							stopCellEditing();
+					}
+				});
 			}
 		});
 		renderer = new TableTimeRenderer();

@@ -7,8 +7,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,7 +15,6 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
@@ -257,7 +254,7 @@ public class MainFrame extends JFrame {
         clearPriemInfoText();
         lifeHistory = null;
         clearLifeHistoryText();
-        clearMedicalHistoryText();
+        clearMedicalHistory();
         clearDiagnosisText();
         clearZaklText();
     }
@@ -489,18 +486,9 @@ public class MainFrame extends JFrame {
         btnIssled.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
-                    IClient client;
-                    try {
-                        client = ClientHospital.conMan.getPluginLoader().loadPluginByAppId(15);
-                        client.showModal(ClientHospital.instance, patient.getPatientId(),
-                                patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                                patient.getGospitalCod());
-                    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException
-                            | InstantiationException | IllegalAccessException
-                            | IllegalArgumentException | InvocationTargetException
-                            | IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
+                            patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                            patient.getGospitalCod());
                 }
             }
         });
@@ -718,10 +706,11 @@ public class MainFrame extends JFrame {
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "История жизни сохранена", "Операция успешно завершена",
                             JOptionPane.INFORMATION_MESSAGE);
-                    } catch (KmiacServerException | TException e1) {
+                    } catch (TException e1) {
                         JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
                             + "изменении истории жизни. Информация не будет сохранена!",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        ClientHospital.conMan.reconnect(e1);
                     }
                 } else {
                     JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
@@ -791,7 +780,7 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
-        tabbedPane.addTab("Медицинская история", null, pMedicalHistory, null);
+        tabbedPane.addTab("Дневник", null, pMedicalHistory, null);
         setMedicalHistoryTabs();
         setMedicalHistoryTablePanel();
         setMedicalHistoryTableButtons();
@@ -874,14 +863,14 @@ public class MainFrame extends JFrame {
                     tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
                             tbMedHist.getRowCount() - 1);
                 }
-                clearMedicalHistoryText();
+                clearMedicalHistoryTextAreas();
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (MedicalHistoryNotFoundException e1) {
             tbMedHist.setData(new ArrayList<TMedicalHistory>());
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
 
     }
@@ -923,10 +912,10 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (MedicalHistoryNotFoundException e) {
             tbMedHist.setData(new ArrayList<TMedicalHistory>());
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
     }
 
@@ -1063,7 +1052,7 @@ public class MainFrame extends JFrame {
 //        pnZakl.add(taZakl);
 //    }
 
-    private void clearMedicalHistoryText() {
+    private void clearMedicalHistory() {
         tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
         taJalob.setText("");
         taDesiaseHistory.setText("");
@@ -1074,12 +1063,20 @@ public class MainFrame extends JFrame {
 //        taZakl.setText("");
     }
 
+    private void clearMedicalHistoryTextAreas() {
+        taJalob.setText("");
+        taDesiaseHistory.setText("");
+        taFisicalObs.setText("");
+        taStatusLocalis.setText("");
+        taStatusPraence.setText("");
+    }
+
     private void pasteSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
         }
 
-        clearMedicalHistoryText();
+        clearMedicalHistoryTextAreas();
 
         for (ShablonText shText : shablon.textList) {
             switch (shText.grupId) {
@@ -1248,11 +1245,11 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (DiagnosisNotFoundException e1) {
             tbDiag.setData(new ArrayList<TDiagnosis>());
             //e1.printStackTrace();
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
     }
 
@@ -1300,10 +1297,10 @@ public class MainFrame extends JFrame {
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
         } catch (DiagnosisNotFoundException e) {
             tbDiag.setData(new ArrayList<TDiagnosis>());
+        } catch (TException e1) {
+            ClientHospital.conMan.reconnect(e1);
         }
     }
 
@@ -1473,8 +1470,8 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 try {
                     if ((patient != null)
-                            || (cbxIshod.getSelectedItem() != null)
-                            || (cbxResult.getSelectedItem() != null)) {
+                            && (cbxIshod.getSelectedItem() != null)
+                            && (cbxResult.getSelectedItem() != null)) {
                         Zakl tmpZakl = new Zakl();
                         tmpZakl.setRecom(taRecomend.getText());
                         tmpZakl.setSostv(taZakluch.getText());

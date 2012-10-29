@@ -20,9 +20,8 @@ generateJavaSource muzdrav/admin/thrift
 generateJavaSource muzdrav/viewselect/thrift
 generateJavaSource muzdrav/genTalons/thrift
 generateJavaSource muzdrav/outputInfo/thrift
-generateJavaSource muzdrav/reception/thrift
 generateJavaSource muzdrav/genReestr/thrift
 generateJavaSource muzdrav/hospital/thrift
 generateJavaSource muzdrav/Vgr/thrift
-generateJavaSource muzdrav/lab/thrift
 generateJavaSource muzdrav/kartaRInv/thrift
+generateJavaSource muzdrav/disp/thrift

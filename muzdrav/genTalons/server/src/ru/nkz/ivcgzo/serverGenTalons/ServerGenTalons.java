@@ -175,7 +175,7 @@ public class ServerGenTalons extends Server implements Iface {
      * талона на 4 (отмененный талон), в случае если признак равен 2 или 3.
      */
     private void updateTalonPrvCpodr(final long datan, final long datak, final int cpodr)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         final int startPrvToUpdate = 2;
         final int endPrvToUpdate = 3;
         try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -184,7 +184,8 @@ public class ServerGenTalons extends Server implements Iface {
                 false, new Date(datan), new Date(datak), cpodr, startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -193,7 +194,7 @@ public class ServerGenTalons extends Server implements Iface {
      * талона на 4 (отмененный талон), в случае если признак равен 2 или 3.
      */
     private void updateTalonPrvCdol(final long datan, final long datak, final int cpodr,
-            final String cdol) throws KmiacServerException, TException {
+            final String cdol) throws KmiacServerException {
         final int startPrvToUpdate = 2;
         final int endPrvToUpdate = 3;
         try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -204,7 +205,8 @@ public class ServerGenTalons extends Server implements Iface {
                 endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -213,7 +215,7 @@ public class ServerGenTalons extends Server implements Iface {
      * талона на 4 (отмененный талон), в случае если признак равен 2 или 3.
      */
     private void updateTalonPrvVrach(final long datan, final long datak, final int cpodr,
-            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+            final int pcodvrach, final String cdol) throws KmiacServerException {
         final int startPrvToUpdate = 2;
         final int endPrvToUpdate = 3;
         try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -224,7 +226,8 @@ public class ServerGenTalons extends Server implements Iface {
                 startPrvToUpdate, endPrvToUpdate);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -268,7 +271,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Spec> getAllSpecForPolikliniki(final int cpodr)
-            throws KmiacServerException, SpecNotFoundException, TException {
+            throws KmiacServerException, SpecNotFoundException {
         final String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
             + "INNER JOIN s_mrab ON n_s00.pcod = s_mrab.cdol "
             + "WHERE s_mrab.cpodr = ? ORDER BY n_s00.name";
@@ -287,7 +290,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Vrach> getVrachForCurrentSpec(final int cpodr, final String cdol)
-            throws KmiacServerException, VrachNotFoundException, TException {
+            throws KmiacServerException, VrachNotFoundException {
         final String  sqlQuery = "SELECT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot, "
             + "s_mrab.cdol FROM s_vrach INNER JOIN s_mrab ON s_vrach.pcod=s_mrab.pcod "
             + "WHERE s_mrab.cpodr=? AND s_mrab.cdol=? AND s_mrab.datau is null "
@@ -307,7 +310,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final Calend getCalendar(final long datacal) throws KmiacServerException,
-            CalendNotFoundException, TException {
+            CalendNotFoundException {
         final String  sqlQuery = "SELECT datacal, dweek, nweek, cday, cmonth, cyear, "
             + "pr_rab, d_rab FROM e_calendar WHERE datacal=? ORDER BY datacal";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, new Date(datacal))) {
@@ -325,7 +328,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Norm> getNorm(final int cpodr, final String cdol)
-            throws KmiacServerException, TException, NormNotFoundException {
+            throws KmiacServerException, NormNotFoundException {
         final String  sqlQuery = "SELECT cdol, vidp, dlit, cpol, id "
             + "FROM e_norm WHERE cpol=? AND cdol =? ORDER BY vidp";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, cdol)) {
@@ -343,7 +346,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Ndv> getNdv(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException, NdvNotFoundException {
+            throws KmiacServerException, NdvNotFoundException {
         final String  sqlQuery = "SELECT pcod, datan, datak, cdol, cpol, id "
             + "FROM e_ndv WHERE cpol=? AND pcod =? AND cdol =? ORDER BY datan, datak";
         try (AutoCloseableResultSet acrs =
@@ -362,7 +365,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Nrasp> getNrasp(final int cpodr, final int pcodvrach, final String cdol,
-            final int cxema) throws KmiacServerException, TException, NraspNotFoundException {
+            final int cxema) throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
             + "cxema, cdol, cpol, id, pfd, timep_n, timep_k "
             + "FROM e_nrasp WHERE cpol=? AND pcod =? AND cdol =? "
@@ -383,7 +386,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Rasp> getRasp(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException, RaspNotFoundException {
+            throws KmiacServerException, RaspNotFoundException {
         final String  sqlQuery = "SELECT nrasp, pcod, nned, denn, datap, time_n, time_k, "
             + "vidp, cdol, cpol, id, pfd FROM e_rasp WHERE cpol=? AND pcod =? AND cdol =? "
             + "ORDER BY datap, vidp, time_n";
@@ -423,7 +426,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final List<IntegerClassifier> getVidp() throws KmiacServerException, TException,
+    public final List<IntegerClassifier> getVidp() throws KmiacServerException,
             VidpNotFoundException {
         final String  sqlQuery = "SELECT pcod, name FROM e_vidp "
                 + "ORDER BY pcod";
@@ -442,7 +445,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Nrasp> getNraspCpodr(final int cpodr) throws KmiacServerException,
-            TException, NraspNotFoundException {
+            NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
             + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
             + "WHERE cpol =? "
@@ -462,7 +465,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Nrasp> getNraspCdol(final int cpodr, final String cdol)
-            throws KmiacServerException, TException, NraspNotFoundException {
+            throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
             + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
             + "WHERE cpol =? AND cdol =? "
@@ -482,7 +485,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<Nrasp> getNraspVrach(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException, NraspNotFoundException {
+            throws KmiacServerException, NraspNotFoundException {
         final String  sqlQuery = "SELECT pcod, denn, vidp, time_n, time_k, "
                 + "cxema, cdol, cpol, id, pfd, timep_n, timep_k FROM e_nrasp "
                 + "WHERE cpol =? AND pcod = ? AND cdol =? "
@@ -503,7 +506,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final int getTalonCountCpodr(final long datan, final long datak, final int cpodr)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         final String  sqlQuery = "SELECT count(*) FROM e_talon "
                 + "WHERE datap >= ? AND datap <= ?  AND cpol = ? ";
         try (AutoCloseableResultSet acrs =
@@ -518,7 +521,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final int getTalonCountCdol(final long datan, final long datak,
-            final int cpodr, final String cdol) throws KmiacServerException, TException {
+            final int cpodr, final String cdol) throws KmiacServerException {
         final String  sqlQuery = "SELECT count(*) FROM e_talon "
                 + "WHERE datap >= ? AND datap <= ?  AND cpol = ? AND cdol = ?";
         try (AutoCloseableResultSet acrs =
@@ -533,7 +536,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final int getTalonCountVrach(final long datan, final long datak, final int cpodr,
-            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+            final int pcodvrach, final String cdol) throws KmiacServerException {
         final String  sqlQuery = "SELECT count(*) FROM e_talon "
                 + "WHERE datap >= ? AND datap <= ?  AND cpol = ? AND cdol = ? AND pcod_sp = ?";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
@@ -548,7 +551,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getAzt() throws KmiacServerException,
-            AztNotFoundException, TException {
+            AztNotFoundException {
         final String sqlQuery = "SELECT pcod, name FROM n_azt";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAzt =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
@@ -556,15 +559,14 @@ public class ServerGenTalons extends Server implements Iface {
             return rsmAzt.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new TException(e);
+            throw new KmiacServerException(e.getMessage());
         }
     }
 
 //////////////////////// Add Methods ////////////////////////////////////
 
     @Override
-    public final void addRasp(final List<Rasp> rasp) throws KmiacServerException,
-            TException {
+    public final void addRasp(final List<Rasp> rasp) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Rasp elemRasp : rasp) {
@@ -582,8 +584,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void addNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
-            TException {
+    public final void addNrasp(final List<Nrasp> nrasp) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Nrasp elemNrasp : nrasp) {
@@ -600,7 +601,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void addNdv(final Ndv ndv) throws KmiacServerException, TException {
+    public final void addNdv(final Ndv ndv) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3, 4};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT("INSERT INTO e_ndv (pcod, datan, datak, cdol, cpol) "
@@ -614,8 +615,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void addNorm(final List<Norm> norm) throws KmiacServerException,
-            TException {
+    public final void addNorm(final List<Norm> norm) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Norm elemNorm : norm) {
@@ -631,8 +631,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void addTalons(final List<Talon> talon) throws KmiacServerException,
-            TException {
+    public final void addTalons(final List<Talon> talon) throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Talon elemTalon : talon) {
@@ -651,8 +650,7 @@ public class ServerGenTalons extends Server implements Iface {
 //////////////////////// Update Methods ////////////////////////////////////
 
     @Override
-    public final void updateNrasp(final List<Nrasp> nrasp) throws KmiacServerException,
-            TException {
+    public final void updateNrasp(final List<Nrasp> nrasp) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 8};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Nrasp elemNrasp : nrasp) {
@@ -670,8 +668,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void updateNorm(final List<Norm> norm) throws KmiacServerException,
-            TException {
+    public final void updateNorm(final List<Norm> norm) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3, 4};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Norm elemNorm : norm) {
@@ -688,8 +685,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void updateNdv(final List<Ndv> ndv) throws KmiacServerException,
-            TException {
+    public final void updateNdv(final List<Ndv> ndv) throws KmiacServerException {
         final int[] indexes = {0, 1, 2, 3, 4, 5};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Ndv elemNdv : ndv) {
@@ -709,7 +705,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteNrasp(final int cpodr, final int pcodvrach, final String cdol)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_nrasp WHERE cpol =? AND pcod = ? AND cdol = ?;",
                     false, cpodr, pcodvrach, cdol);
@@ -721,8 +717,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void deleteNorm(final int cpodr, final String cdol) throws KmiacServerException,
-            TException {
+    public final void deleteNorm(final int cpodr, final String cdol) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_norm WHERE cpol =? AND cdol = ?;",
                 false, cpodr, cdol);
@@ -734,7 +729,7 @@ public class ServerGenTalons extends Server implements Iface {
     }
 
     @Override
-    public final void deleteNdv(final int id) throws KmiacServerException, TException {
+    public final void deleteNdv(final int id) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_ndv WHERE id =?;",
                     false, id);
@@ -747,7 +742,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteRaspCpodr(final long datan, final long datak, final int cpodr)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_rasp WHERE datap >=? AND datap <= ? AND cpol = ?;",
                     false, new Date(datan), new Date(datak), cpodr);
@@ -761,7 +756,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteRaspCdol(final long datan, final long datak,
-            final int cpodr, final String cdol) throws KmiacServerException, TException {
+            final int cpodr, final String cdol) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_rasp WHERE datap >=? AND datap <= ? AND cpol = ? "
                     + "AND cdol = ?;",
@@ -776,7 +771,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteRaspVrach(final long datan, final long datak, final int cpodr,
-            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+            final int pcodvrach, final String cdol) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_rasp WHERE datap >=? AND datap <= ? AND cpol = ? "
                     + "AND pcod = ? AND cdol = ?;",
@@ -790,7 +785,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteTalonCpodr(final long datan, final long datak, final int cpodr)
-            throws KmiacServerException, TException {
+            throws KmiacServerException {
         updateTalonPrvCpodr(datan, datak, cpodr);
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ?;",
@@ -804,7 +799,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteTalonCdol(final long datan, final long datak, final int cpodr,
-            final String cdol) throws KmiacServerException, TException {
+            final String cdol) throws KmiacServerException {
         updateTalonPrvCdol(datan, datak, cpodr, cdol);
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ? "
@@ -819,7 +814,7 @@ public class ServerGenTalons extends Server implements Iface {
 
     @Override
     public final void deleteTalonVrach(final long datan, final long datak, final int cpodr,
-            final int pcodvrach, final String cdol) throws KmiacServerException, TException {
+            final int pcodvrach, final String cdol) throws KmiacServerException {
         updateTalonPrvVrach(datan, datak, cpodr, pcodvrach, cdol);
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM e_talon WHERE datap >=? AND datap <= ? AND cpol = ? "

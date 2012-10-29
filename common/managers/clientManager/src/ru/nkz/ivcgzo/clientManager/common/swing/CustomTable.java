@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -161,6 +164,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 						} else {
 							while (selCol < getColumnCount()) {
 								if (isCellEditable(selRow, selCol)) {
+									changeSelection(selRow, selCol, false, false);
 									editCellAt(selRow, selCol, null);
 									return;
 								}
@@ -178,8 +182,14 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 							if (selRow == getRowCount())
 								addItem();
 							else {
-								changeSelection(selRow - 1, 0, false, false);
+								selCol = 0;
+								while (selCol < getColumnCount()) {
+									if (isCellEditable(selRow, selCol))
+										break;
+									selCol++;
+								}
 								updateSelectedItem();
+								changeSelection(selRow - 1, selCol, false, false);
 							}
 						} else {
 							changeSelection(selRow, selCol, false, false);
@@ -505,10 +515,10 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	
 	private boolean dispatching;
 	@Override
-	protected boolean processKeyBinding(KeyStroke ks, final KeyEvent e, int condition, boolean pressed) {
+	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
 		Component cmp = getEditorComponent();
 		
-			if (e.getKeyCode() == KeyEvent.VK_ENTER)
+			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 				if (!dispatching) {
 					if (super.processKeyBinding(ks, e, condition, pressed)) {
 						cmp = getEditorComponent();
@@ -530,7 +540,14 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				} else {
 					return false;
 				}
-			else if (cmp == null)
+			} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
+				if (CustomTable.this.isEditing() && pressed) {
+					CustomTable.this.dispatchEvent(new KeyEvent(this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
+					return false;
+				} else {
+					return super.processKeyBinding(ks, e, condition, pressed);
+				}
+			} else if (cmp == null) {
 				switch (e.getKeyCode()) {
 				case KeyEvent.VK_ESCAPE:
 				case KeyEvent.VK_F2:
@@ -548,6 +565,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				default:
 					return false;
 				}
+			}
 			return super.processKeyBinding(ks, e, condition, pressed);
 	}
 	
@@ -833,16 +851,18 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	
 	private class CustomTableDefaultEditor extends DefaultCellEditor {
 		private static final long serialVersionUID = 8972780790646236150L;
+		private CustomTextField ctf;
 
 		public CustomTableDefaultEditor() {
 			super(new CustomTextField());
 			
+			ctf = (CustomTextField) getComponent();
+			
 			setActionPerformed();
+			setFocusListener();
 		}
 		
 		private void setActionPerformed() {
-			CustomTextField ctf = (CustomTextField) getComponent();
-			
 			ctf.setBorder(new LineBorder(Color.black));
 			ctf.removeActionListener(delegate);
 			ctf.addActionListener(new ActionListener() {
@@ -852,6 +872,21 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				}
 			});
 			
+		}
+		
+		private void setFocusListener() {
+			ctf.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							if (!CustomTable.this.hasFocus())
+								stopCellEditing();
+						}
+					});
+				}
+			});
 		}
 	}
 }

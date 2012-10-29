@@ -18,7 +18,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.Constants;
+import ru.nkz.ivcgzo.thriftCommon.fileTransfer.fileTransferConstants;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.FileNotFoundException;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -41,7 +41,7 @@ public class ServerAuth extends Server implements Iface {
 		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config", "cdol", "cdol_name", "name_short", "cpodr_name", "clpu_name", "cslu", "cslu_name", "cspec", "cspec_name", "c_nom", "kdate", "kateg");
 		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size");
 		
-		scMan = new SocketManager(5, Constants.bufSize);
+		scMan = new SocketManager(5, fileTransferConstants.bufSize);
 		
 		remInst = new RemoteInstaller(sse);
 	}

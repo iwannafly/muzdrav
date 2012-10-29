@@ -18,6 +18,8 @@ struct ZapVr{
 	9: optional i64 datar;
 	10: optional i64 datap;
 	11: optional i32 nuch;
+	12: optional bool hasPvizit;
+	13: optional i32 id_pvizit_amb;
 }
 
 struct Pvizit {
@@ -399,6 +401,7 @@ struct P_isl_ld {
 	11: optional i32 pvizit_id;
 	12: optional i32 prichina;
 	13: optional i32 kodotd;
+	14: optional i64 datav;
 }
 
 struct Prez_d {
@@ -406,6 +409,7 @@ struct Prez_d {
 	2: optional i32 npasp;
 	3: optional i32 nisl;
 	4: optional string kodisl;
+	5: optional string rez;
 }
 
 struct Prez_l {
@@ -413,6 +417,7 @@ struct Prez_l {
 	2: optional i32 npasp;
 	3: optional i32 nisl;
 	4: optional string cpok;
+	5: optional string rez;
 }
 
 
@@ -427,6 +432,7 @@ struct IsslMet {
 	8: optional i32 pvizitId;
 	9: optional string cpodr_name;
 	10: optional string clpu_name;
+	11: optional i32 clpu;
 }
 
 struct IsslPokaz {
@@ -472,6 +478,8 @@ struct IsslInfo{
 	5: optional string pokaz_name;
 	6: optional string rez;
 	7: optional i64 datav;
+	8: optional i64 datan;
+	9: optional i32 id;
 }
 
 
@@ -545,64 +553,64 @@ struct Shablon {
 }
 
 struct Pmer{
-	1: i32 id;
-	2: i32 npasp;
-	3: string diag;
-	4: i32 pmer;
-	5: i64 pdat;
-	6: i64 fdat;
-	7: i32 cod_sp;
-	8: i64 dataz;
-	9: i32 prichina;
-	10: i32 rez;
-	11: string cdol;
-	12: i64 dnl;
-	13: i64 dkl;
-	14: i32 lpu;
-	15: i32 ter;
-	16: i32 cpol;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional string diag;
+	4: optional i32 pmer;
+	5: optional i64 pdat;
+	6: optional i64 fdat;
+	7: optional i32 cod_sp;
+	8: optional i64 dataz;
+	9: optional i32 prichina;
+	10: optional i32 rez;
+	11: optional string cdol;
+	12: optional i64 dnl;
+	13: optional i64 dkl;
+	14: optional i32 lpu;
+	15: optional i32 ter;
+	16: optional i32 cpol;
 }
 
 struct Pobost{
-	1: i32 id;
-	2: i32 npasp;
-	3: i32 id_pdiag;
-	4: string diag;
-	5: i32 sl_obostr;
-	6: i32 sl_hron;
-	7: i32 cod_sp;
-	8: string cdol;
-	9: i64 dataz;
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional i32 id_pdiag;
+	4: optional string diag;
+	5: optional i32 sl_obostr;
+	6: optional i32 sl_hron;
+	7: optional i32 cod_sp;
+	8: optional string cdol;
+	9: optional i64 dataz;
 }
 
 struct Cgosp{
-	1: i32 id;
-	2: i32 ngosp;
-	3: i32 npasp;
-	4: i32 nist;
-	5: string naprav;
-	6: string diag_n;
-	7: string named_n;
-	8: i64 dataz;
-	9: i32 vid_st;
-	10: i32 n_org;
-	11: i32 pl_extr;
-	12: i64 datap;
-	13: i64 vremp;
-	14: i32 cotd;
-	15: string diag_p;
-	16: string named_p;
-	17: i32 cotd_p;
-	18: i64 dataosm;
-	19: i64 vremosm;
+	1: optional i32 id;
+	2: optional i32 ngosp;
+	3: optional i32 npasp;
+	4: optional i32 nist;
+	5: optional string naprav;
+	6: optional string diag_n;
+	7: optional string named_n;
+	8: optional i64 dataz;
+	9: optional i32 vid_st;
+	10: optional i32 n_org;
+	11: optional i32 pl_extr;
+	12: optional i64 datap;
+	13: optional i64 vremp;
+	14: optional i32 cotd;
+	15: optional string diag_p;
+	16: optional string named_p;
+	17: optional i32 cotd_p;
+	18: optional i64 dataosm;
+	19: optional i64 vremosm;
 }
 
 struct Cotd{
-	1: i32 id;
-	2: i32 id_gosp;
-	3: i32 nist;
-	4: i32 cotd;
-	5: i64 dataz;
+	1: optional i32 id;
+	2: optional i32 id_gosp;
+	3: optional i32 nist;
+	4: optional i32 cotd;
+	5: optional i64 dataz;
 }
 
 exception PvizitNotFoundException {
@@ -688,6 +696,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+	list<P_isl_ld> getIsslInfoDate(1: i32 id_pvizit, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
+	list<IsslInfo> getIsslInfoPokaz(1: i32 nisl) throws (1: kmiacServer.KmiacServerException kse);
+	IsslInfo getIsslInfoPokazId(1: i32 id_issl) throws (1: kmiacServer.KmiacServerException kse);
 
 	
 	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
@@ -719,7 +730,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	void AddRdDin(1:RdDinStruct RdDin) throws (1: kmiacServer.KmiacServerException kse);
  
 	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void DeleteRdDin(1:i32 id_pos,2:i32 iD) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteRdDin(1:i32 id_pos) throws (1: kmiacServer.KmiacServerException kse);
 
 	void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
@@ -760,7 +771,5 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*Stoim_p*/
 	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
-/*Datap*/
-        i64 getdatap(1: i32 id);
 
 }
