@@ -3729,8 +3729,8 @@ public class PacientInfoFrame extends JFrame {
             if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
             if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
 
-            if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(1);
-            if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(2);
+            if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(2);
+            if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(1);
 
             Id_gosp.setMessr(cbx_messr.isSelected());
             Id_gosp.setNal_z(cbx_nalz.isSelected());

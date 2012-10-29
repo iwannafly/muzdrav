@@ -50,6 +50,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -62,6 +63,8 @@ import org.apache.thrift.TException;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -201,6 +204,8 @@ public class MainFrame extends JFrame {
     private JLabel lblZaklDate;
     private JLabel lblZaklTime;
     private JButton btnIssled;
+    private Color defCol = UIManager.getColor("TabbedPane.foreground");
+    private Color selCol = Color.red;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -225,6 +230,7 @@ public class MainFrame extends JFrame {
         setMedicalHistoryPanel();
         setDiagnosisPanel();
         setZaklPanel();
+        UIManager.put("TabbedPane.selected", Color.red);
     }
 
     public final void onConnect() {
@@ -792,6 +798,21 @@ public class MainFrame extends JFrame {
     private void setMedicalHistoryTabs() {
         tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
         tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tbpMedicalHistory.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                for (int i = 0; i < tbpMedicalHistory.getTabCount(); i++) {
+                    JLabel lbl = (JLabel) tbpMedicalHistory.getTabComponentAt(i);
+                    if (lbl != null) {
+                        if (i == tbpMedicalHistory.getSelectedIndex()) {
+                            lbl.setForeground(selCol);
+                        } else {
+                            lbl.setForeground(defCol);
+                        }
+                    }
+                }
+            }
+        });
         addJalonPanel();
         addDesiaseHistoryPanel();
         addStatusPraencePanel();
@@ -965,6 +986,8 @@ public class MainFrame extends JFrame {
         pnJalob = new JPanel();
         pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("Жалобы", null, pnJalob, null);
+        tbpMedicalHistory.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
+        ((JLabel) tbpMedicalHistory.getTabComponentAt(0)).setForeground(selCol);
         pnJalob.setLayout(new BoxLayout(pnJalob, BoxLayout.Y_AXIS));
 
         taJalob = new JTextArea();
@@ -978,6 +1001,8 @@ public class MainFrame extends JFrame {
         pnDesiaseHistory = new JPanel();
         pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("История болезни", null, pnDesiaseHistory, null);
+        tbpMedicalHistory.setTabComponentAt(
+                1, new JLabel("<html><br>История болезни<br><br></html>"));
         pnDesiaseHistory.setLayout(new BoxLayout(pnDesiaseHistory, BoxLayout.X_AXIS));
 
         taDesiaseHistory = new JTextArea();
@@ -990,7 +1015,10 @@ public class MainFrame extends JFrame {
     private void addStatusPraencePanel() {
         pnStatusPraence = new JPanel();
         pnStatusPraence.setBorder(new LineBorder(new Color(0, 0, 0)));
-        tbpMedicalHistory.addTab("Status praense", null, pnStatusPraence, null);
+        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
+            null, pnStatusPraence, null);
+        tbpMedicalHistory.setTabComponentAt(
+                2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
         pnStatusPraence.setLayout(new BoxLayout(pnStatusPraence, BoxLayout.X_AXIS));
 
         taStatusPraence = new JTextArea();
@@ -1004,6 +1032,8 @@ public class MainFrame extends JFrame {
         pnFisicalObs = new JPanel();
         pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("Физикальное обследование", null, pnFisicalObs, null);
+        tbpMedicalHistory.setTabComponentAt(
+                3, new JLabel("<html><br>Физикальное обследование<br><br></html>"));
         pnFisicalObs.setLayout(new BoxLayout(pnFisicalObs, BoxLayout.X_AXIS));
 
         taFisicalObs = new JTextArea();
@@ -1016,7 +1046,10 @@ public class MainFrame extends JFrame {
     private void addStausLocalisPanel() {
         pnStatusLocalis = new JPanel();
         pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
-        tbpMedicalHistory.addTab("Status localis", null, pnStatusLocalis, null);
+        tbpMedicalHistory.addTab("Локальный статус (Status localis)",
+                null, pnStatusLocalis, null);
+        tbpMedicalHistory.setTabComponentAt(
+                4, new JLabel("<html><br>Локальный статус (Status localis)<br><br></html>"));
         pnStatusLocalis.setLayout(new BoxLayout(pnStatusLocalis, BoxLayout.X_AXIS));
 
         taStatusLocalis = new JTextArea();
