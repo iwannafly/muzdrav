@@ -290,6 +290,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Вес",priem.isSetT_ves(), priem.getT_ves());
 						addLineToDetailInfo("Status praesense",priem.isSetT_status_praesense(), priem.getT_status_praesense());
 						addLineToDetailInfo("Физикальное обследование",priem.isSetT_fiz_obsl(), priem.getT_fiz_obsl());
+						addLineToDetailInfo("Рекомендации",priem.isSetT_recom(), priem.getT_recom());
 						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
 						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
