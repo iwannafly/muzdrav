@@ -77,7 +77,7 @@ public class SvodVed extends JPanel {
 					String servPath = MainForm.tcl.printSvodVed(iaf,isv);
 					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, true);
+					MainForm.conMan.openFileInEditor(cliPath, false);
 					//catch (TException e1) {
 					//	MainForm.conMan.reconnect(e1);
 				} catch (Exception e1) {
