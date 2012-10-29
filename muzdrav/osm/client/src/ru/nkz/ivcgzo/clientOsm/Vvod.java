@@ -2370,14 +2370,18 @@ public class Vvod extends JFrame {
 					}
 				}
 				
-				if (pvizitAmb.isSetCpos())
+				if (pvizitAmb.isSetCpos()) {
 					cmbCelObr.setSelectedPcod(pvizitAmb.getCpos());
-				else
+					pvizit.setCobr(pvizitAmb.cpos);
+				} else {
 					cmbCelObr.setSelectedItem(null);
-				if (pvizitAmb.isSetRezult())
+				}
+				if (pvizitAmb.isSetRezult()) {
 					cmbRez.setSelectedPcod(pvizitAmb.getRezult());
-				else
+					pvizit.setRezult(pvizitAmb.rezult);
+				} else {
 					cmbRez.setSelectedItem(null);
+				}
 				if (pvizit.isSetIshod())
 					cmbZaklIsh.setSelectedPcod(pvizit.getIshod());
 				else
@@ -2798,13 +2802,14 @@ public class Vvod extends JFrame {
 			pvizitAmb.setCpos(cmbCelObr.getSelectedPcod());
 			pvizit.setCobr(pvizitAmb.getCpos());
 		} else {
-			pvizitAmb.unsetCpos();pvizit.unsetCobr();
+			pvizitAmb.unsetCpos();
+			pvizit.unsetCobr();
 		}
 		if (cmbRez.getSelectedPcod() != null) {
 			pvizitAmb.setRezult(cmbRez.getSelectedPcod());
 			pvizit.setRezult(pvizitAmb.getRezult());
 		} else {
-			pvizitAmb.unsetRezult();pvizit.unsetRezult();
+			pvizitAmb.unsetRezult();
 			pvizit.unsetRezult();
 		}
 		if (cmbZaklIsh.getSelectedPcod() != null)
@@ -2835,6 +2840,7 @@ public class Vvod extends JFrame {
 		for (PdiagAmb pd : tblDiag.getData())
 			if (pd.diag_stat == 1) {
 				pvizitAmb.setDiag(pd.getDiag());
+				pvizitAmbCopy.setDiag(pvizitAmb.diag);
 			}
 		
 		return true;

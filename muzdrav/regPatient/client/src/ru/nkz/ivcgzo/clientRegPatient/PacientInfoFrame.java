@@ -3067,46 +3067,50 @@ public class PacientInfoFrame extends JFrame {
         btnPrint_istb.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 String servPath;
-                try {
-//                    String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
-//                    String omsOrg = cmb_oms_smo.getText();
-//                    String lgot = "";
-//                    Gosp = new Gosp()
-                    String cotdName = "";
-                    if (cmb_cotd.getSelectedItem() != null) {
-                        cotdName = cmb_cotd.getSelectedItem().getName();
-                    }
-                    String naprName = "";
-                    if (cmb_naprav.getSelectedItem() != null) {
-                        naprName = cmb_naprav.getSelectedItem().getName();
-                    }
-                    if (cmb_org.getSelectedItem() != null) {
-                        naprName += ", " +cmb_org.getSelectedItem().getName();
-                    }
-                    String vidTrans = "";
-                    if (cmb_trans.getSelectedItem() != null) {
-                        vidTrans += cmb_trans.getSelectedItem().getName();
-                    }
-                    String grBl = "";
-                    String rezus = "";
-                    if (SignInfo != null) {
-                        if (SignInfo.isSetGrup()) {
-                            grBl = SignInfo.getGrup();
+                if ((Id_gosp != null) && (PersonalInfo != null)) {
+                    try {
+    //                    String docInfo = cmb_tdoc.getText() + " " + tf_serdoc.getText() + " " + tf_nomdoc.getText();
+    //                    String omsOrg = cmb_oms_smo.getText();
+    //                    String lgot = "";
+    //                    Gosp = new Gosp()
+                        String cotdName = "";
+                        if (cmb_cotd.getSelectedItem() != null) {
+                            cotdName = cmb_cotd.getSelectedItem().getName();
                         }
-                        if (SignInfo.isSetPh()) {
-                            rezus = SignInfo.getPh();
+                        String naprName = "";
+                        if (cmb_naprav.getSelectedItem() != null) {
+                            naprName = cmb_naprav.getSelectedItem().getName();
                         }
+                        if (cmb_org.getSelectedItem() != null) {
+                            naprName += ", " +cmb_org.getSelectedItem().getName();
+                        }
+                        String vidTrans = "";
+                        if (cmb_trans.getSelectedItem() != null) {
+                            vidTrans += cmb_trans.getSelectedItem().getName();
+                        }
+                        String grBl = "";
+                        String rezus = "";
+                        if (SignInfo != null) {
+                            if (SignInfo.isSetGrup()) {
+                                grBl = SignInfo.getGrup();
+                            }
+                            if (SignInfo.isSetPh()) {
+                                rezus = SignInfo.getPh();
+                            }
+                        }
+                        servPath = MainForm.tcl.printStacCart(PersonalInfo, Id_gosp, cotdName, naprName,
+                                vidTrans, grBl, rezus);
+                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                        MainForm.conMan.transferFileFromServer(servPath, cliPath);
+                        MainForm.conMan.openFileInEditor(cliPath, false);
+                    } catch (TException e) {
+                        MainForm.conMan.reconnect((TException) e);
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                    servPath = MainForm.tcl.printStacCart(PersonalInfo, Id_gosp, cotdName, naprName,
-                            vidTrans, grBl, rezus);
-                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
-                    MainForm.conMan.openFileInEditor(cliPath, false);
-                } catch (TException e) {
-                    MainForm.conMan.reconnect((TException) e);
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } else {
+                    JOptionPane.showMessageDialog(PacientInfoFrame.this, "Пациент не выбран, либо у выбранного пациента нет записей госпитализации.");
                 }
             }
         });
