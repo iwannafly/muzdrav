@@ -50,7 +50,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -58,6 +57,7 @@ import javax.swing.JTextField;
 import javax.swing.BoxLayout;
 import javax.swing.JTextPane;
 import javax.swing.JButton;
+import javax.swing.UIManager;
 
 import org.apache.thrift.TException;
 import javax.swing.JTextArea;
@@ -230,7 +230,6 @@ public class MainFrame extends JFrame {
         setMedicalHistoryPanel();
         setDiagnosisPanel();
         setZaklPanel();
-        UIManager.put("TabbedPane.selected", Color.red);
     }
 
     public final void onConnect() {
