@@ -220,7 +220,7 @@ public class PatientInfoForm extends ModalForm {
 			 			PatientDiagZInfo pdiag = pdiagNode.pdiag;
 						addLineToDetailInfo("Поликлиника",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
 						addLineToDetailInfo("Медицинское описание", pdiag.isSetNamed(),pdiag.getNamed());
-						addLineToDetailInfo("Дата регистрации", pdiag.isSetDatad(),pdiag.getDatad());
+						addLineToDetailInfo("Дата регистрации", pdiag.isSetDatad(),DateFormat.getDateInstance().format(new Date(pdiag.getDatad())));
 						addLineToDetailInfo("Обстоятельства регистрации", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abv),pdiag.isSetNmvd(),pdiag.getNmvd()));
 						addLineToDetailInfo("Характер заболевания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abx),pdiag.isSetXzab(),pdiag.getXzab()));
 						addLineToDetailInfo("Стадия заболевания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aby),pdiag.isSetStady(),pdiag.getStady()));
