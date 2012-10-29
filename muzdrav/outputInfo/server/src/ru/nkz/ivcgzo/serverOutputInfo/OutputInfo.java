@@ -14,6 +14,12 @@ import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.thrift.TException;
+import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.TThreadedSelectorServer;
+import org.apache.thrift.server.TThreadedSelectorServer.Args;
+import org.apache.thrift.transport.TNonblockingServerSocket;
+
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
@@ -141,30 +147,6 @@ public class OutputInfo extends Server implements Iface {
 	}	*/
 	
 
-	@SuppressWarnings("deprecation")
-	public void PlanovDisp() throws TException, ParseException {
-		// Дата от ...
-		String d1 = InputPlanDisp._Fields.DATEB.toString();
-		// Дата до ...
-		String d2 = InputPlanDisp._Fields.DATEF.toString();
-		// Код полеклиники
-		int kodpol = Integer.parseInt(InputPlanDisp._Fields.KPOLIK.toString());
-		// Наименование полеклиники
-		String namepol = InputPlanDisp._Fields.NAMEPOL.toString();
-		// № участка
-		String uc = InputPlanDisp._Fields.UCHAS.toString(); 
-		
-		final String sqlQueryPlanDis = "select pn.nambk, (p.fam||' '||p.im||' '||p.ot) as fio, p.datar, p.adm_ul,p.adm_dom,p.adm_korp," +
-				"p.adm_kv,	pm.diag, na.name, pm.pdat, pn.nuch, pd.d_grup, pm.pdat, pd.d_uch, pm.cod_sp, pm.cpol,pm.fdat, pd.ishod " +
-				"from patient p join p_nambk pn on(p.npasp = pn.npasp) join p_mer pm on(p.npasp =pm.npasp) " +
-				"join p_disp pd on(p.npasp = pd.npasp) join n_abd na on(pm.pmer = na.pcod) " +
-				"where (pm.pdata between "+ d1+" and "+ d2+")and(pd.diag = pm.diag)and(pm.fdat is null)and(pd.ishod is null) and(pn.dataot is null)";
-		
-	}	
-	
-
-	
-	
 	@Override
 	public void testConnection() throws TException {
 		// TODO Auto-generated method stub
@@ -214,7 +196,7 @@ public class OutputInfo extends Server implements Iface {
 		// Конец закрытия предыдущего отчетного периода
 		java.util.Date kpo = null;
 		// Конец года по периоду
-		Date kpg = null;
+		//Date kpg = null;
 		// Текущая дата
 		Date curDate = new java.sql.Date(System.currentTimeMillis());
 		// Выходные графы
