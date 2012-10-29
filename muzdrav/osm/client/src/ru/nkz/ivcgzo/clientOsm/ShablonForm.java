@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -166,9 +167,10 @@ public class ShablonForm  extends JDialog {
 		getContentPane().setLayout(groupLayout);
 	}
 	
-	public void showShablonForm(String srcTxt) {
+	public void showShablonForm(String srcTxt, IntegerClassifier shOsm) {
 		tbSearch.setText(srcTxt);
 		trSearch.updateNow(tbSearch.getText());
+		trSearch.select(shOsm);
 		
 		setVisible(true);
 	}
@@ -325,6 +327,37 @@ public class ShablonForm  extends JDialog {
 				JOptionPane.showMessageDialog(ShablonForm.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			} catch (TException e) {
 				MainForm.conMan.reconnect(e);
+			}
+		}
+		
+		public void select(IntegerClassifier shOsm) {
+			if ((shOsm != null) && (shOsm.isSetName()) && (shOsm.name.indexOf(' ') > -1)) {
+				String diag = shOsm.name.substring(0, shOsm.name.indexOf(' '));
+				DefaultMutableTreeNode root = (DefaultMutableTreeNode) getModel().getRoot();
+				int childCount = root.getChildCount();
+				
+				for (int i = 0; i < childCount; i++) {
+					StrClassTreeNode diagGroupNode = (StrClassTreeNode) root.getChildAt(i);
+					
+					if (diagGroupNode.toString().indexOf(diag) == 0) {
+						int shOsmChildCount;
+						TreePath path = new TreePath(new Object[] {root, diagGroupNode});
+						Rectangle bounds = getPathBounds(path);
+						
+						expandPath(path);
+						shOsmChildCount = diagGroupNode.getChildCount();
+						for (int j = 0; j < shOsmChildCount; j++) {
+							if (((IntClassTreeNode) diagGroupNode.getChildAt(j)).getCode() == shOsm.pcod) {
+								setSelectionPath(new TreePath(new Object[] {root, diagGroupNode, diagGroupNode.getChildAt(j)}));
+								bounds.x = 0;
+								scrollRectToVisible(bounds);
+								return;
+							}
+						}
+						collapsePath(path);
+						return;
+					}
+				}
 			}
 		}
 

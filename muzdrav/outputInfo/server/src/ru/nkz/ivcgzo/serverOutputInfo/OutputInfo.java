@@ -1,16 +1,19 @@
-package ru.nrz.ivcgzo.serverOutputInfo;
+package ru.nkz.ivcgzo.serverOutputInfo;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -22,18 +25,35 @@ import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputPlanDisp;
 import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
-import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo;
 import ru.nkz.ivcgzo.thriftOutputInfo.ThriftOutputInfo.Iface;
+import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.VrachTabel;
 //import ru.nkz.ivcgzo.thriftOutputInfo.Input_info;
 
+
 public class OutputInfo extends Server implements Iface {
+	
+	private static Logger log = Logger.getLogger(OutputInfo.class.getName());
+
+	private TResultSetMapper<VrachInfo, VrachInfo._Fields> tableVrachInfo;
+	private static Class<?>[] VrachInfoTypes;
+	private TResultSetMapper<VrachTabel, VrachTabel._Fields> tableVrachTabel;
+	private static Class<?>[] VrachTabelTypes;
+	
 	private TServer thrServ;
 	//public Input_info inputInfo;
 	public int kolz1, kolz2, kolz3, kolz4, kolz5, kolz6, kolz7, kolz8, xind, perv;
@@ -49,7 +69,17 @@ public class OutputInfo extends Server implements Iface {
 	public OutputInfo(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		// TODO Auto-generated constructor stub
+		
+		//Таблица VrachInfo
+		tableVrachInfo = new TResultSetMapper<>(VrachInfo.class, "pcod","fam","im","ot","cdol");
+		VrachInfoTypes = new Class<?>[]{Integer.class,String.class,String.class,String.class,String.class};
+		
+		//Таблица VrachTabel
+		tableVrachTabel = new TResultSetMapper<>(VrachTabel.class, "pcod","cdol","datav","timep","timed","timeda","timeprf","timepr","nuch1","nuch2","nuch3","id");
+		VrachTabelTypes = new Class<?>[]{Integer.class,String.class,Date.class,Double.class,Double.class,Double.class, Double.class, Double.class, String.class, String.class,String.class,Integer.class};
 	}
+	
+
 
 	/**
 	@SuppressWarnings("deprecation")
@@ -117,30 +147,6 @@ public class OutputInfo extends Server implements Iface {
 	}	*/
 	
 
-/*	@SuppressWarnings("deprecation")
-	public void PlanovDisp() throws TException, ParseException {
-		// Дата от ...
-		String d1 = InputPlanDisp._Fields.DATEB.toString();
-		// Дата до ...
-		String d2 = InputPlanDisp._Fields.DATEF.toString();
-		// Код полеклиники
-		int kodpol = Integer.parseInt(InputPlanDisp._Fields.KPOLIK.toString());
-		// Наименование полеклиники
-		String namepol = InputPlanDisp._Fields.NAMEPOL.toString();
-		// № участка
-		String uc = InputPlanDisp._Fields.UCHAS.toString(); 
-		
-		final String sqlQueryPlanDis = "select pn.nambk, (p.fam||' '||p.im||' '||p.ot) as fio, p.datar, p.adm_ul,p.adm_dom,p.adm_korp," +
-				"p.adm_kv,	pm.diag, na.name, pm.pdat, pn.nuch, pd.d_grup, pm.pdat, pd.d_uch, pm.cod_sp, pm.cpol,pm.fdat, pd.ishod " +
-				"from patient p join p_nambk pn on(p.npasp = pn.npasp) join p_mer pm on(p.npasp =pm.npasp) " +
-				"join p_disp pd on(p.npasp = pd.npasp) join n_abd na on(pm.pmer = na.pcod) " +
-				"where (pm.pdata between "+ d1+" and "+ d2+")and(pd.diag = pm.diag)and(pm.fdat is null)and(pd.ishod is null) and(pn.dataot is null)";
-		
-	}	*/
-	
-
-	
-	
 	@Override
 	public void testConnection() throws TException {
 		// TODO Auto-generated method stub
@@ -167,6 +173,8 @@ public class OutputInfo extends Server implements Iface {
 			thrServ.stop();
 	}
 
+	
+	
 	public String printSvodVed(InputAuthInfo iaf, InputSvodVed isv) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
 		String path = null;
@@ -175,6 +183,9 @@ public class OutputInfo extends Server implements Iface {
 		String dateb = isv.getDateb();
 		String datef = isv.getDatef();
 		int vozcat = isv.getVozcat();
+		AutoCloseableResultSet bok = null;
+		//AutoCloseableResultSet spat = null;
+		List<IntegerClassifier> patList = new ArrayList<IntegerClassifier>();
 		
 		// Первичность
 		int perv = 0;
@@ -183,25 +194,46 @@ public class OutputInfo extends Server implements Iface {
 		// Текущий год
 		String yaetr = null;
 		// Конец закрытия предыдущего отчетного периода
-		Date kpo = null;
+		java.util.Date kpo = null;
 		// Конец года по периоду
-		Date kpg = null;
+		//Date kpg = null;
+		// Текущая дата
+		Date curDate = new java.sql.Date(System.currentTimeMillis());
+		// Выходные графы
+		
+		String graph1 = null,graph2 = null;
+		int graph3 = 0,graph4 = 0,graph5 = 0,graph6 = 0,graph7 = 0;
+		
+
+		java.util.Date kpg = null;
+
 		int kolz = 0;
 		
-		//Запросы
-		final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz,d.datad,d.ishod from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between ?::date and ?::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
+		//Запросы\
+		final String sqlQuerySpat = "select a.id,a.npasp,a.dataz,a.ishod,a.cpol,b.datar,c.id_obr,c.diag,c.datad,d.xzab,d.disp " +
+				"from p_vizit a, patient b, p_diag_amb c, p_diag d " +
+				"where a.npasp=b.npasp and a.id=c.id_obr and c.id=d.id_diag_amb and c.predv!=true " +
+				"and a.dataz between ?::date and ?::date order by a.npasp,c.diag,a.dataz";
+		/**final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot," +
+				"k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog," +
+				"k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz,d.datad,d.ishod from p_vizit_amb f," +
+				"patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and " +
+				"f.dataz between ?::date and ?::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and" +
+				" substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and " +
+				"substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
+		*/
 		//final String sqlQuerySpat = "select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between'",datab,"'::date and '2012-12-31'::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc";
 		//final String sqlQuerySkat = "select lgot from p_kov";
-		final String sqlQueryBok = "select * from n_bz5";
+		final String sqlQueryBok = "select name,diagsrpt from n_bz5";
+		
+		
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("test", ".htm").getAbsolutePath()), "utf-8")) {
-			AutoCloseableResultSet acrs;
-			AutoCloseableResultSet bok;
+			//AutoCloseableResultSet acrs;
+			//AutoCloseableResultSet bok;
 			
 			
 						
 			//spat = sse.execPreparedQuery("select f.npasp,f.diag,f.datap,d.id_diag_amb,k.fam,k.im,k.ot,k.pol,k.jitel,k.cpol_pr,d.disp,f.cdol,k.adp_ul,k.adp_dom,k.adp_kv,k.mrab,k.poms_ndog,k.sgrp,f.opl,d.datad,d.xzab,f.cpos,f.dataz from p_vizit_amb f,patient k,p_diag d where f.npasp = k.npasp and f.diag = d.diag and f.dataz between ? ::date and ? ::date and substr(f.cdol,1,2)<>'33' and substr(f.cdol,1,2)<>'34' and substr(f.cdol,1,3)<>'142' and substr(f.cdol,1,3)<>'143' and substr(f.cdol,1,3)<>'172' and substr(f.cdol,1,3)<>'212' order by f.npasp,f.diag,f.datap desc,d.disp desc", dateb, datef);
-			
-			
 			
 			// Код формы, н-р, BIPG14J - для взрослых
 			String kodForm = null;
@@ -211,6 +243,16 @@ public class OutputInfo extends Server implements Iface {
 			String sdfoDateB = null, sdfoDateF = null;
 			
 			
+
+			try {
+				bok = sse.execPreparedQuery(sqlQueryBok);
+				//spat = sse.execPreparedQuery(sqlQuerySpat ,dateb, datef);
+			} catch (SqlExecutorException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		
 			
 			// Преобразование переменных
 			
@@ -231,8 +273,6 @@ public class OutputInfo extends Server implements Iface {
 				//	// TODO Auto-generated catch block
 					e.printStackTrace();
 				}				
-				
-			
 			
 			switch ( vozcat ) 
 			{ 
@@ -251,68 +291,6 @@ public class OutputInfo extends Server implements Iface {
 			//default: 
 			}
 			
-			// Расчет значений
-			try (AutoCloseableResultSet spat = sse.execPreparedQuery(sqlQuerySpat ,dateb, datef))
-			{
-				
-				while (spat.getResultSet().next()) {
-					if (spat.getResultSet().getString("diag").trim().charAt(0)!='Z' && spat.getResultSet().getInt("ishod")!=0) {
-					//if (spat.getResultSet().getString("diag").trim().charAt(0)!='Z') {
-						
-						xind = spat.getResultSet().getInt("npasp");
-						cdiag = spat.getResultSet().getString("diag");
-						int ndiag = spat.getResultSet().getInt("id_diag_amb");
-						//System.out.println(cdiag);
-						// Здесь должна быть проверка, связанная с таблицей PBOL
-						// Здесь должна быть проверка, связанная со льготами
-						bok = sse.execPreparedQuery(sqlQueryBok);
-						bok.getResultSet().next();
-						
-						bokl = bok.getResultSet().getString("name");
-						/**
-						try (AutoCloseableResultSet skat = sse.execPreparedQuery(sqlQuerySkat))
-						{
-							while (skat.getResultSet().next()) {
-								kat = skat.getResultSet().getString("lgot");
-							}
-							
-						} 	catch (SQLException e) {
-							((SQLException) e.getCause()).printStackTrace();
-							throw new KmiacServerException();
-						}*/
-						// Проверка на условие первичности посещения
-						if (spat.getResultSet().getInt("xzab")==1) perv=1;
-						else if (spat.getResultSet().getDate("dataz").after(kpo) && spat.getResultSet().getDate("dataz").before(kpg)) {
-							try (AutoCloseableResultSet arcs = sse.execPreparedQuery("select count(*) from p_vizit_amb where npasp= ? and id_diag_amb = ? and ishod<>0 and datap between ? and ?::date", xind, ndiag, kpo, datef))
-							{
-								while (arcs.getResultSet().next()) {
-									if (arcs.getResultSet().getInt(0)==1) {
-										if (spat.getResultSet().getDate("datad").after(kpo) && spat.getResultSet().getDate("datad").before(kpg)) perv=1; else perv=2;
-									} else {
-										try (AutoCloseableResultSet arcss = sse.execPreparedQuery("select datep from p_vizit_amb where npasp= ? and id_diag_amb = ? and ishod<>0 and datap between ? and ?::date order by datap", xind, ndiag, kpo, datef))
-										{
-											while (arcss.getResultSet().next()) {
-												if (spat.getResultSet().getString("datad").equals(arcss.getResultSet().getString(0))) {
-													if (spat.getResultSet().getDate("datad").after(kpo) && spat.getResultSet().getDate("datad").before(kpg)) perv=1; else perv=2;
-												} else perv=3;
-											}
-										}
-										
-																			
-									}
-								}
-							}
-						} else perv=3;
-					} else perv=3; 
-					System.out.println(String.valueOf(perv));	
-					//sb.append(String.format("<P><BR>%s<BR>", kolz));
-				}
-			} 	catch (SQLException e) {
-				((SQLException) e.getCause()).printStackTrace();
-				throw new KmiacServerException();
-			}
-
-		
 			StringBuilder sb = new StringBuilder(0x10000);
 			// Шапка сводки
 			sb.append(String.format("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">"));
@@ -418,30 +396,212 @@ public class OutputInfo extends Server implements Iface {
 			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">7</FONT></FONT></P>"));
 			sb.append(String.format("		</TD>"));
 			sb.append(String.format("	</TR>"));
-			// Подстановка значений в таблицу
-			sb.append(String.format("	<TR VALIGN=TOP>"));
-			sb.append(String.format("		<TD WIDTH=165 HEIGHT=17 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"1\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", bokl ));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=64 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"2\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=59 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"3\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=75 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"4\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=69 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"5\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=68 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"6\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("		<TD WIDTH=94 STYLE=\"border: 1px solid #000000; padding: 0.05cm\" SDVAL=\"7\" SDNUM=\"1049;\">"));
-			sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">0</FONT></FONT></P>"));
-			sb.append(String.format("		</TD>"));
-			sb.append(String.format("	</TR>"));
+			
+						// Расчет значений
+			while (bok.getResultSet().next()) {
+				String namebok = bok.getResultSet().getString("name");
+				String diagDiap = bok.getResultSet().getString("diagsrpt");
+				graph3=0;
+				graph4=0;
+				graph5=0;
+				graph6=0;
+				graph7=0;
+				graph1=namebok;
+				graph2=diagDiap;
+							
+				try {
+					AutoCloseableResultSet spat = sse.execPreparedQuery(sqlQuerySpat ,dateb, datef);
+				
+					while (spat.getResultSet().next()) {
+						String xdiag = spat.getResultSet().getString("diag");
+						//String xdatar = spat.getResultSet().getString("datar");
+						int xpasp = spat.getResultSet().getInt("npasp");
+						int xishod = spat.getResultSet().getInt("ishod");
+						int xxzab = spat.getResultSet().getInt("xzab");
+						int xdisp = spat.getResultSet().getInt("disp");
+						Date xdatad = spat.getResultSet().getDate("datad");
+						Date xdatar = spat.getResultSet().getDate("datar");
+						if (xdiag.trim().charAt(0)!='Z' && xishod!=0) {
+							// Проверка на первичность
+							if (xxzab==1) perv=1;
+							else if (xdatad.after(kpo) && xdatad.before(kpg)) perv=1;
+							else perv=2;
+							
+							if (isIncludesDiag(xdiag,diagDiap)) {
+								if (perv==1) {
+									//Зарегестрировано всего
+									graph3++;
+									//В том числе с диагнозами, установленными впервые в жизни
+									graph5++;
+									// В том числе детей до 1 года
+									if (getYearDiff(xdatad, xdatar)<1) { graph4++; graph6++;}
+									// Состоит под диспансерным наблюдением
+									if (xdisp==1) graph7++;
+								}   // Если первичность равна 2, то больной учитывается с одним заболеванием только один раз
+									else if (!patList.contains(new IntegerClassifier(xpasp,xdiag))) {
+										patList.add(new IntegerClassifier(xpasp,xdiag));
+										// Зарегестрировано всего
+										graph3++;
+										// В том числе детей до 1 года, всего
+										if (getYearDiff(curDate, xdatar)<1) graph4++;
+										
+										
+								}
+							}
+							
+							}
+					}
+				} catch (SqlExecutorException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//perv++;
+				System.out.println(namebok+" "+diagDiap+" "+graph3);
+				//spat.getResultSet().beforeFirst();
+				
+						// Считаем значения
+					
+						//try (AutoCloseableResultSet bok = sse.execPreparedQuery(sqlQueryBok))
+						//{
+						
+							
+						
+						/**while (bok.getResultSet().next()) {
+							String namebok = bok.getResultSet().getString("name");
+							String diagDiap = bok.getResultSet().getString("diagsrpt");
+							if (isIncludesDiag(xdiag,diagDiap)) {
+								if (getYearDiff(curDate, xdatar)<15) {
+									graph1=namebok;
+									graph2=diagDiap;
+									if (perv==1) {
+										
+										graph3++;
+										graph5++;
+										if (xdisp==1) graph7++;
+									} else if (!patList.contains(new IntegerClassifier(xpasp,xdiag))) {
+										patList.add(new IntegerClassifier(xpasp,xdiag));
+										graph3++;
+										if (xdisp==1) graph7++;
+										}
+								} else if (getYearDiff(curDate, xdatar)<1) {
+									graph1=namebok;
+									graph2=diagDiap;
+									if (perv==1) {
+										
+										graph4++;
+										graph6++;
+									} else if (!patList.contains(new IntegerClassifier(xpasp,xdiag))) {
+										patList.add(new IntegerClassifier(xpasp,xdiag));
+										graph4++;
+									}
+								}
+							} */
+							if (graph3!=0 || graph4!=0 || graph5!=0 || graph6!=0 || graph7 !=0)
+							{
+								sb.append(String.format("	<TR VALIGN=TOP>"));
+								sb.append(String.format("		<TD WIDTH=165 HEIGHT=17 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph1 ));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("		<TD WIDTH=64 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph2));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("		<TD WIDTH=59 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph3));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("		<TD WIDTH=75 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph4));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("		<TD WIDTH=69 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph5));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("		<TD WIDTH=68 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph6));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("		<TD WIDTH=94 STYLE=\"border: 1px solid #000000; padding: 0.05cm\">"));
+								sb.append(String.format("			<P ALIGN=CENTER><FONT FACE=\"Times New Roman\"><FONT SIZE=2 STYLE=\"font-size: 11pt\">%s</FONT></FONT></P>", graph7));
+								sb.append(String.format("		</TD>"));
+								sb.append(String.format("	</TR>"));
+							}
+						} // Подстановка значений в таблицу
+
+					//}
+				
+				//}
+				
+				/** Попытка порта старого кода
+				while (spat.getResultSet().next()) {
+					if (spat.getResultSet().getString("diag").trim().charAt(0)!='Z' && spat.getResultSet().getInt("ishod")!=0) {
+					//if (spat.getResultSet().getString("diag").trim().charAt(0)!='Z') {
+						
+						xind = spat.getResultSet().getInt("npasp");
+						cdiag = spat.getResultSet().getString("diag");
+						int ndiag = spat.getResultSet().getInt("id_diag_amb");
+						//System.out.println(cdiag);
+						// Здесь должна быть проверка, связанная с таблицей PBOL
+						// Здесь должна быть проверка, связанная со льготами
+						bok = sse.execPreparedQuery(sqlQueryBok);
+						bok.getResultSet().next();
+						
+						bokl = bok.getResultSet().getString("name");
+						
+						try (AutoCloseableResultSet skat = sse.execPreparedQuery(sqlQuerySkat))
+						{
+							while (skat.getResultSet().next()) {
+								kat = skat.getResultSet().getString("lgot");
+							}
+							
+						} 	catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						}
+						// Проверка на условие первичности посещения
+						if (spat.getResultSet().getInt("xzab")==1) perv=1;
+						else if (spat.getResultSet().getDate("dataz").after(kpo) && spat.getResultSet().getDate("dataz").before(kpg)) {perv=4;
+						// Добавить проверку на ishod<>0 и ndiag
+						try (AutoCloseableResultSet arcs = sse.execPreparedQuery("select count(*) from p_vizit_amb f,p_diag_amb d, p_diag b where " +
+								"f.id_obr=d.id_obr and b.id_diag_amb=d.id and f.npasp=? and b.id_diag_amb=? and " +
+								"f.datap between '2012-01-01'::date and '2012-12-31'::date", xind, ndiag))
+							{ 
+								while (arcs.getResultSet().next()) {
+									if (arcs.getResultSet().getInt(0)==1) { perv=5;
+										//if (spat.getResultSet().getDate("datad").after(kpo) && spat.getResultSet().getDate("datad").before(kpg)) perv=1; else perv=2;
+									} else {
+											try (AutoCloseableResultSet arcss = sse.execPreparedQuery("select datep from p_vizit_amb where npasp= ? and datap between '2012-01-01'::date and '2012-12-31'::date order by datap", xind, ndiag, kpo, datef))
+										{
+											while (arcss.getResu ltSet().next()) {
+												if (spat.getResultSet().getString("datad").equals(arcss.getResultSet().getString(0))) {
+													if (spat.getResultSet().getDate("datad").after(kpo) && spat.getResultSet().getDate("datad").before(kpg)) perv=1; else perv=2;
+												} else perv=3;
+											}
+										} catch (SQLException e) {
+											((SQLException) e.getCause()).printStackTrace();
+											throw new KmiacServerException();
+										}
+										
+																			
+									
+								}
+							} catch (SQLException e) {
+								((SQLException) e.getCause()).printStackTrace();
+								throw new KmiacServerException();
+							}
+						} else perv=3;
+					} else perv=3; 
+					System.out.println(spat.getResultSet().getString("npasp"));
+					System.out.println(String.valueOf(perv));	
+					//sb.append(String.format("<P><BR>%s<BR>", kolz));
+				}*/
+
+			//System.out.println(graph1);
+			//System.out.println(graph2);
+			//System.out.println(String.valueOf(graph3));
+			//System.out.println(String.valueOf(graph4));
+			//System.out.println(String.valueOf(graph5));
+			//System.out.println(String.valueOf(graph6));
+			//System.out.println(String.valueOf(graph7));
+					
+			
+
 			
 			// Подвал документа
 			sb.append(String.format("</TABLE>"));
@@ -468,6 +628,9 @@ public class OutputInfo extends Server implements Iface {
 		//} catch (ParseException e) {
 			// TODO Auto-generated catch block
 		//	e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return path;
 	}
@@ -643,7 +806,48 @@ public class OutputInfo extends Server implements Iface {
 		return svod;
 	}
 
-private String ZagShap(String d1, String d2, String npol, int uchas){
+	@Override
+	public List<VrachInfo> getVrachTableInfo(int cpodr) throws VINotFoundException,
+			KmiacServerException, TException {
+
+		String sqlQuery = "SELECT a.pcod, a.fam, a.im, a.ot, b.cdol " 
+						+ "FROM s_vrach a, s_mrab b WHERE cpodr=?";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr)) {
+			ResultSet rs = acrs.getResultSet();
+			List<VrachInfo> VrachInfo = tableVrachInfo.mapToList(rs);
+			if (VrachInfo.size() > 0) {
+				return VrachInfo;				
+			} else {
+				throw new VINotFoundException();
+			}
+		} catch (SQLException e) {
+			log.log(Level.ERROR, "SQL Exception: ", e);
+			throw new KmiacServerException();
+		}
+	}
+	
+	@Override
+	public List<VrachTabel> getVrachTabel(int pcod) throws VTDuplException,
+			KmiacServerException, TException {
+		
+		String sqlQuery = "SELECT pcod, cdol, datav, timep, timed, timeda, timeprf, " 
+						+ "timepr, nuch1, nuch2, nuch3, id FROM s_tabel WHERE pcod=?;";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
+			ResultSet rs = acrs.getResultSet();
+			List<VrachTabel> VrachTabel = tableVrachTabel.mapToList(rs);
+			if (VrachTabel.size() > 0) {
+				return VrachTabel;				
+			} else {
+				throw new VTDuplException();
+			}
+		} catch (SQLException e) {
+			log.log(Level.ERROR, "SQL Exception: ", e);
+			throw new KmiacServerException();
+		}
+	}
+
+	
+	private String ZagShap(String d1, String d2, String npol, int uchas){
 	
 	String shap = null;
 	
@@ -707,11 +911,55 @@ private String ZagShap(String d1, String d2, String npol, int uchas){
 	sb.append(String.format("		</TD>"));
 	sb.append(String.format("	</TR>"));
 	
-	shap = sb.toString();
-	
-	
-	return shap;
-	
+	return shap = sb.toString();
+	}
+
+//Удалить
+public void deleteVT(int vt) throws TException {
+	System.out.println(vt);
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPrepared("DELETE FROM s_tabel WHERE id = ?;", false, vt);
+		sme.setCommit();
+    } catch (SqlExecutorException | InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
+
+
+//Добавить
+public int addVT(VrachTabel vt) throws VTException, VTDuplException,
+		KmiacServerException, TException {
+	int id = vt.getId();
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPreparedQuery("SELECT id FROM s_tabel WHERE id=?", id).getResultSet().next(); 
+		int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+		sme.execPreparedT("INSERT INTO s_tabel (pcod, cdol, datav, timep, timed, timeda, " 
+        				+ "timeprf, timepr, nuch1, nuch2, nuch3) " 
+        				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+        				true, vt, VrachTabelTypes, indexes);
+		id = sme.getGeneratedKeys().getInt("id");
+		sme.setCommit();
+		return id;			
+	} catch (SQLException | InterruptedException e) {
+		e.printStackTrace();
+		throw new KmiacServerException("Ошибка сервера");
+	}
+}
+
+
+
+//Изменить
+public void updateVT(VrachTabel vt) throws KmiacServerException, TException {
+	int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
+	try (SqlModifyExecutor sme = tse.startTransaction()) {
+		sme.execPreparedT("UPDATE s_tabel SET cdol = ?, datav = ?, timep = ?, timed = ?, "
+        				+ "timeda = ?, timeprf = ?, timepr = ?, nuch1 = ?, nuch2 = ?, " 
+        				+ "nuch3 = ? WHERE pcod = ?;", true, vt, VrachTabelTypes, indexes);
+		sme.setCommit();
+	} catch (SqlExecutorException | InterruptedException e) {
+		e.printStackTrace();
+	}
 }
 
 @Override
@@ -720,6 +968,8 @@ public String printNoVipPlanDisp(InputPlanDisp ipd)
 	// TODO Auto-generated method stub
 	return null;
 }
+
+
 
 @Override
 public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
@@ -893,6 +1143,45 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 	return null;
 } 
 
+/**
+ * Метод, возвращающий количество полных лет
+ */
+public int getYearDiff(Date a, Date b) {
+	//int yearDiff = (a.getTime() - b.getTime())/(24*60*60*1000*365);
+	int yearDiff = (int) ((a.getTime() - b.getTime()) / 31556952000L);
+	return yearDiff;
+	
+	
+}
 
+
+/**
+ * Метод, возвращающий true при совпадении диагноза с диапазоном
+ */
+public static boolean isIncludesDiag(String diag, String diagsrpt) {
+	
+ 	String[] vals,vals2;
+	 
+		vals=diagsrpt.split(",");
+
+		boolean result = false;
+		int i = 0;
+		while (vals!=null && i<vals.length) {
+			// Диапазон вида A00-B00 или A00.0-B00.0
+			if (vals[i].length()>=7) {
+				vals2 = vals[i].split("-");
+				if (vals2[0].compareTo(diag)<=0 & vals2[1].compareTo(diag)>=0) result = true; 
+			}
+			
+			// Диапазон вида A00 или A00.0
+			else if (vals[i].compareTo(diag)<=0 & (vals[i]+".99").compareTo(diag)>=0) result = true;
+			
+			i++;
+			
+		}
+		return result;
+	}
+    
 
 }
+

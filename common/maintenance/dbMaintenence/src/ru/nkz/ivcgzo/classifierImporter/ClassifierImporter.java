@@ -72,7 +72,7 @@ public class ClassifierImporter {
 		script.add("BEGIN;");
 		if (!tableExists(tableParams.dstName)) {
 			script.add(tabScrGen.generateScript(tableParams));
-			script.add(String.format("COPY %s FROM '%s' BINARY;", tableParams.dstName, binFileName));
+			script.add(String.format("\\COPY %s FROM '%s' BINARY;", tableParams.dstName, binFileName));
 		} else {
 			String[][] foreignDep = getTableForeignDependees(tableParams.dstName);
 			
@@ -84,7 +84,7 @@ public class ClassifierImporter {
 			script.add(findCreationString(String.format("COMMENT ON TABLE %s", tableParams.dstName)));
 			script.add(findCreationString(String.format("ALTER TABLE ONLY %s ADD CONSTRAINT", tableParams.dstName)));
 			script.addAll(findCreationStringList(String.format("COMMENT ON COLUMN %s.", tableParams.dstName)));
-			script.add(String.format("COPY %s FROM '%s' BINARY;", tableParams.dstName, binFileName));
+			script.add(String.format("\\COPY %s FROM '%s' BINARY;", tableParams.dstName, binFileName));
 			
 			if (foreignDep.length > 0) {
 				for (int i = 0; i < foreignDep.length; i++) {

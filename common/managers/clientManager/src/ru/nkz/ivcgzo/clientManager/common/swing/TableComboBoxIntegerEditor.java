@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
@@ -53,7 +54,13 @@ public class TableComboBoxIntegerEditor extends ThriftIntegerClassifierCombobox<
 		txt.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				stopCellEditing();
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (!ctb.hasFocus())
+							stopCellEditing();
+					}
+				});
 			}
 		});
 	}

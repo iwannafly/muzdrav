@@ -1,4 +1,4 @@
-﻿package ru.nkz.ivcgzo.clientVgr;
+package ru.nkz.ivcgzo.clientVgr;
 
 import java.awt.EventQueue;
 

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
-	<title>Медицинское свидетельство о смерти</title>
+	<title>Медицинское свидетельство о смерти </title>
 </head>
 <style type="text/css">
 	body {font-family:"Times New Roman"; font-size:12px}
@@ -54,11 +54,14 @@
 		width:82em;
 		text-wrap:normal;
 		}
+	p.more {
+		page-break-after: always;
+		}
 
 @media print
-{
-h6 {page-break-before:always}
-}
+	p.more {
+		page-break-after: always;
+		}
 </style>
 <body>
 	<h3 align=center>
@@ -80,34 +83,34 @@ h6 {page-break-before:always}
 		</h3>
 		<table>
 			<tr>
-			<td width="40%"><b>1.</b>Фамилия, имя, отчество умершего(ей)</td>
-			<td class=leftcol width = "59%"> ~fioum </td>
+			<td width="35%"><b>1.</b>Фамилия, имя, отчество умершего(ей)</td>
+			<td class=leftcol width = "64%"> ~fioum </td>
 			</tr></table>
 		<b>2.</b>Пол: ~pol &nbsp&nbsp
 		<br><b>3.</b>Дата рождения: число <u>&nbsp&nbsp ~dnr &nbsp&nbsp</u>, месяц <u>&nbsp&nbsp ~msr  &nbsp&nbsp</u>,&nbspгод<u>&nbsp&nbsp ~gdr  &nbsp&nbsp</u>
 		<br><b>4.</b>Дата смерти: &nbsp&nbsp&nbsp&nbsp число <u>&nbsp&nbsp ~dns &nbsp&nbsp</u>, месяц <u>&nbsp&nbsp ~mss &nbsp&nbsp</u>,&nbspгод<u>&nbsp&nbsp ~gds  &nbsp&nbsp</u>,&nbspвремя<u>&nbsp&nbsp ~vremsm &nbsp&nbsp</u>
 		<table> 
 			<tr>
-			<td width="73%"><br><b>5.</b>Место постоянного жительства (регистрации) умершего(ей): республика, край область</td>
-			<td class=leftcol width = "27%"> ~kadm_obl</td>
+			<td width="68%"><br><b>5.</b>Место постоянного жительства (регистрации) умершего(ей): республика, край область</td>
+			<td class=leftcol width = "31%"> ~kadm_obl</td>
 			</tr></table>
 		 <table>
 			<tr>
-			<td width="8%"> &nbsp район</td>
-			<td class=leftcol width="20%"> ~kadm_raion </td>
-			<td width="8%"> &nbsp город</td>
-			<td class=leftcol width = "20%"> ~kadm_gorod </td>
-			<td width="16%"> &nbsp населенный пункт</td>
-			<td class=leftcol width = "20%"> ~kadm_np </td>
+			<td width="6%"> &nbsp район</td>
+			<td class=leftcol width="25%"> ~kadm_raion </td>
+			<td width="6%" align = center> &nbsp город</td>
+			<td class=leftcol width = "25%"> ~kadm_gorod </td>
+			<td width="15%" aligh = center> &nbsp населенный пункт</td>
+			<td class=leftcol width = "24%"> ~kadm_np </td>
 			</tr></table>
 		 <table>
 			<tr>
-			<td width="8%"> &nbsp улица</td>
-			<td class=leftcol width="20%"> ~kadm_ul </td>
-			<td width="8%"> &nbsp дом</td>
-			<td class=leftcol width = "20%"> ~kadm_dom </td>
-			<td width="16%"> &nbsp кв.</td>
-			<td class=leftcol width = "20%"> ~kadm_kv </td>
+			<td width="6%"> &nbsp улица</td>
+			<td class=leftcol width="52%"> ~kadm_ul </td>
+			<td width="6%" align = center> &nbsp дом</td>
+			<td class=leftcol width = "15%"> ~kadm_dom </td>
+			<td width="6%" align = center> &nbsp кв.</td>
+			<td class=leftcol width = "15%"> ~kadm_kv </td>
 			</tr></table>
 
 		<br><b>6.</b>Смерть наступила:&nbsp~kmesto_prois  
@@ -116,25 +119,25 @@ h6 {page-break-before:always}
 			<tr>
 			<td width="20%"><b>7.</b>Дата рождения: число</td>
 			<td class=leftcol width="5%"> ~kden_rojd </td>
-			<td width="5%">, месяц</td>
-			<td class=leftcol width = "8%"> ~kmes_rojd </td>
-			<td width="5%">, год</td>
+			<td width="7%" align = center>, месяц</td>
+			<td class=leftcol width = "13%"> ~kmes_rojd </td>
+			<td width="5%" align = center>, год</td>
 			<td class=leftcol width = "8%"> ~kgod_rojd </td>
-			<td width="10%">, число месяцев</td>
-			<td class=leftcol width = "8%"> ~kkol_mes </td>
-			<td width="10%">, дней жизни</td>
+			<td width="15%" align = center>, число месяцев</td>
+			<td class=leftcol width = "7%"> ~kkol_mes </td>
+			<td width="10%" align = center>, дней жизни</td>
 			<td class=leftcol width = "8%"> ~kkol_den </td>
 
 			</tr></table>
 		<table>
 			<tr>
-			<td width="20%"><b>8.</b>Место рождения</td>
-			<td class=leftcol width = "59%"> ~km_rojd </td>
+			<td width="16%"><b>8.</b>Место рождения</td>
+			<td class=leftcol width = "83%"> ~km_rojd </td>
 			</tr></table>
 		<table>
 			<tr>
-			<td width="40%"><b>1.</b>Фамилия, имя, отчество матери</td>
-			<td class=leftcol width = "59%"> ~kfio_m </td>
+			<td width="30%"><b>9.</b>Фамилия, имя, отчество матери</td>
+			<td class=leftcol width = "70%"> ~kfio_m </td>
 			</tr></table>
 			
 
@@ -147,16 +150,18 @@ h6 {page-break-before:always}
 					<td class = centrlr width="15%" align = center>Код по МКБ-10</td>
 					</tr>
 					<tr>
-					<td class = leftcol><b>I.а)</b>~psma_name</td>
+					<td class = leftcol><b>I.а)</b> &nbsp<b>~psma_name</b></td>
 					<td class = centr>~psma_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~a</td>
-					<td class = box align = center>~c</td>
-					<td class = box  align = center>~d</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~e</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~a</td>
+					<td class = box align = center Width="18%">~c</td>
+					<td class = box  align = center Width="18%">~d</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~e</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -167,16 +172,18 @@ h6 {page-break-before:always}
 					<td class = centrlr></td>
 					</tr>
 					<tr>
-					<td class = leftcol><b> б)</b>~psmb_name</td>
+					<td class = leftcol><b> б)</b> &nbsp<b>~psmb_name</b></td>
 					<td class = centr>~psmb_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~b</td>
-					<td class = box align = center>~f</td>
-					<td class = box  align = center>~h</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~i</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~b</td>
+					<td class = box align = center Width="18%">~f</td>
+					<td class = box  align = center Width="18%">~h</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~i</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -187,16 +194,18 @@ h6 {page-break-before:always}
 					<td class = centrlr></td>
 					</tr>
 					<tr>
-					<td class = leftcol><b> в)</b>~psmv_name</td>
+					<td class = leftcol><b> в)</b>  &nbsp<b>~psmv_name</b></td>
 					<td class = centr>~psmv_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~v</td>
-					<td class = box align = center>~j</td>
-					<td class = box  align = center>~k</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~l</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~v</td>
+					<td class = box align = center Width="18%">~j</td>
+					<td class = box  align = center Width="18%">~k</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~l</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -208,16 +217,18 @@ h6 {page-break-before:always}
 					<td class = centrlr></td>
 					</tr>
 					<tr>
-					<td class = leftcol><b> г)</b>~psmg_name</td>
+					<td class = leftcol><b> г)</b>  &nbsp<b>~psmg_name</b></td>
 					<td class = centr>~psmg_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~g</td>
-					<td class = box align = center>~m</td>
-					<td class = box  align = center>~n</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~o</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~g</td>
+					<td class = box align = center Width="18%">~m</td>
+					<td class = box  align = center Width="18%">~n</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~o</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -236,46 +247,52 @@ h6 {page-break-before:always}
 					</tr>
 					
 					<tr>
-					<td class = leftcol>~psmp_name</td>
+					<td class = leftcol>&nbsp<b>~psmp_name</b></td>
 					<td class = centr>~psmp_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~p</td>
-					<td class = box align = center>~q</td>
-					<td class = box  align = center>~r</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~s</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~p</td>
+					<td class = box align = center Width="18%">~q</td>
+					<td class = box  align = center Width="18%">~r</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~s</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
 					</tr>
 					<tr>
-					<td class = leftcol>~psmp1_name</td>
+					<td class = leftcol> &nbsp<b>~psmp1_name</b></td>
 					<td class = centr>~psmp1_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~t</td>
-					<td class = box align = center>~u</td>
-					<td class = box  align = center>~w</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~x</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~t</td>
+					<td class = box align = center Width="18%">~u</td>
+					<td class = box  align = center Width="18%">~w</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~x</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
 					</tr>
 					<tr>
-					<td class = leftcol>~psmp2_name</td>
+					<td class = leftcol> &nbsp<b>~psmp2_name</b></td>
 					<td class = centr>~psmp2_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~y</td>
-					<td class = box align = center>~z</td>
-					<td class = box  align = center>~0</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~1</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~y</td>
+					<td class = box align = center Width="18%">~z</td>
+					<td class = box  align = center Width="18%">~0</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~1</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -300,10 +317,9 @@ h6 {page-break-before:always}
 <td class = leftcol width = "60%">~kfio_pol</td>
 </tr>
 </table> 
-<p> Документ, удостоверяющий личность получателя (серия, номер, кем выдан)</p>
-<p class=und>~kpasp_info</p>
-<u>~den_p</u>&nbsp<u>~mes_p</u>&nbsp<u>~god_p</u> г. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Подпись получателя________________
-<h6>pagebreak</h6>
+Документ, удостоверяющий личность получателя (серия, номер, кем выдан) <u>~kpasp_info</u>
+<br><u> &nbsp ~den_p &nbsp </u>&nbsp<u> &nbsp ~mes_p &nbsp </u>&nbsp<u> &nbsp ~god_p  г. &nbsp </u> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Подпись получателя________________
+<p class = more><br><br><br><br><br><br> </p>
 <table>
 <tr>
 <td class = box width = "45%">Министерство здравоохранения 
@@ -342,58 +358,63 @@ h6 {page-break-before:always}
 		серия <u>&nbsp&nbsp ~vzseria &nbsp&nbsp</u> №<u>&nbsp&nbsp ~vznomer &nbsp&nbsp</u>&nbsp&nbsp <u>&nbsp&nbsp ~vzden &nbsp&nbsp</u> <u>&nbsp&nbsp ~vzmes &nbsp&nbsp</u> ~vzgod г.
 		</h3>
 
-		1.Фамилия, имя, отчество умершего(ей) <u>~fio_um</u>
+		<table>
+			<tr>
+			<td width="35%"><b>1.</b>Фамилия, имя, отчество умершего(ей)</td>
+			<td class=leftcol width = "64%"> ~dfioum </td>
+			</tr></table>
+
 		<br><b>2.</b>Пол: ~dpol
 		<br><b>3.</b>Дата рождения: число <u>&nbsp&nbsp ~den_rojd &nbsp&nbsp</u>, месяц <u>&nbsp&nbsp ~mes_rojd  &nbsp&nbsp</u>,&nbspгод<u>&nbsp&nbsp ~god_rojd  &nbsp&nbsp</u>
 		<br><b>4.</b>Дата смерти: &nbsp&nbsp&nbsp&nbsp число <u>&nbsp&nbsp ~den_sm &nbsp&nbsp</u>, месяц <u>&nbsp&nbsp ~mes_sm &nbsp&nbsp</u>,&nbspгод<u>&nbsp&nbsp ~god_sm  &nbsp&nbsp</u>,&nbspвремя<u>&nbsp&nbsp ~vrem_sm &nbsp&nbsp</u>
 <!--место жительства-->		
 		<table> 
 			<tr>
-			<td width="73%"><br><b>5.</b>Место постоянного жительства (регистрации) умершего(ей): республика, край область</td>
-			<td class=leftcol width = "27%"> ~dadm_obl</td>
+			<td width="68%"><br><b>5.</b>Место постоянного жительства (регистрации) умершего(ей): республика, край область</td>
+			<td class=leftcol width = "31%"> ~dadm_obl</td>
 			</tr></table>
 		 <table>
 			<tr>
-			<td width="8%"> &nbsp район</td>
-			<td class=leftcol width="20%"> ~dadm_raion </td>
-			<td width="8%"> &nbsp город</td>
-			<td class=leftcol width = "20%"> ~dadm_gorod </td>
-			<td width="16%"> &nbsp населенный пункт</td>
-			<td class=leftcol width = "20%"> ~dadm_np </td>
+			<td width="6%"> &nbsp район</td>
+			<td class=leftcol width="25%"> ~dadm_raion </td>
+			<td width="6%" align = center> &nbsp город</td>
+			<td class=leftcol width = "25%"> ~dadm_gorod </td>
+			<td width="15%" align = center> &nbsp населенный пункт</td>
+			<td class=leftcol width = "24%"> ~dadm_np </td>
 			</tr></table>
 		 <table>
 			<tr>
-			<td width="8%"> &nbsp улица</td>
-			<td class=leftcol width="20%"> ~dadm_ul </td>
-			<td width="8%"> &nbsp дом</td>
-			<td class=leftcol width = "20%"> ~dadm_dom </td>
-			<td width="16%"> &nbsp кв.</td>
-			<td class=leftcol width = "20%"> ~dadm_kv </td>
+			<td width="6%"> &nbsp улица</td>
+			<td class=leftcol width="52%"> ~dadm_ul </td>
+			<td width="6%" align = center> &nbsp дом</td>
+			<td class=leftcol width = "15%"> ~dadm_dom </td>
+			<td width="6%" align = center> &nbsp кв.</td>
+			<td class=leftcol width = "15%"> ~dadm_kv </td>
 			</tr></table>
 		<br><b>6.</b>Местность ~dmjit
  <!--место смерти-->	
 		<table> 
 			<tr>
-			<td width="73%"><br><b>7.</b>Место смерти: республика, край область</td>
-			<td class=leftcol width = "27%"> ~dads_obl</td>
+			<td width="43%"><br><b>7.</b>Место смерти: республика, край область</td>
+			<td class=leftcol width = "57%"> ~dads_obl</td>
 			</tr></table>
 		 <table>
 			<tr>
-			<td width="8%"> &nbsp район</td>
-			<td class=leftcol width="20%"> ~dads_raion </td>
-			<td width="8%"> &nbsp город</td>
-			<td class=leftcol width = "20%"> ~dads_gorod </td>
-			<td width="16%"> &nbsp населенный пункт</td>
-			<td class=leftcol width = "20%"> ~dads_np </td>
+			<td width="6%"> &nbsp район</td>
+			<td class=leftcol width="25%"> ~dads_raion </td>
+			<td width="6%" align = center> &nbsp город</td>
+			<td class=leftcol width = "25%"> ~dads_gorod </td>
+			<td width="15%" align = center> &nbsp населенный пункт</td>
+			<td class=leftcol width = "24%"> ~dads_np </td>
 			</tr></table>
 		 <table>
 			<tr>
-			<td width="8%"> &nbsp улица</td>
-			<td class=leftcol width="20%"> ~dads_ul </td>
-			<td width="8%"> &nbsp дом</td>
-			<td class=leftcol width = "20%"> ~dads_dom </td>
-			<td width="16%"> &nbsp кв.</td>
-			<td class=leftcol width = "20%"> ~dads_kv </td>
+			<td width="6%"> &nbsp улица</td>
+			<td class=leftcol width="52%"> ~dads_ul </td>
+			<td width="6%" align = center> &nbsp дом</td>
+			<td class=leftcol width = "15%"> ~dads_dom </td>
+			<td width="6%" align = center> &nbsp кв.</td>
+			<td class=leftcol width = "15%"> ~dads_kv </td>
 			</tr></table>
 		<br><b>8.</b>Местность ~dmsm
 		<br><b>9.</b>Смерть наступила: ~snast
@@ -412,15 +433,36 @@ h6 {page-break-before:always}
                 <br>&nbsp ~dzan_1
 		<br>&nbsp <cite> не был(а) занят(а) в экономике:</cite>~dzan_2  
 		<br>&nbsp ~dzan_3  
-		<br><b>15.</b>Смерть произошла: ~dproizo
-		<br>&nbsp ~dproizo_1
+		<br><b>15.</b>Смерть произошла: ~dproizo <cite> несчастного случая: </cite> ~dproiz_1
+		<br>&nbsp ~dproiz_2 <cite> в ходе действий: </cite> ~dproiz_3
 		<br>______________________
 		<br font-size = "9px">*В случае смерти детей, возраст которых указан в пунктах 10-11, пункты 12-14 заполняются в отношении их матерей       
-<h6>pagebreak</h6>
+<p class = more><br><br><br><br><br><br> </p>
+		<br><b>16.</b>В случае смерти от несчастного случая, убийства, самоубийства, от военных и террористических действий, при неустановленном
+		<br> роде смерти - указать дату травмы (отравления): число ~trden , месяц ~trmes , год ~trgod , время ~trvrem , а также место и обстоя-
+	<table>
+			<tr>
+			<td width="40%">тельства, при которых произошла травма(отравление)</td>
+			<td class=leftcol width = "60%"> ~obst</td>
+			</tr></table>
+	<table>
+			<tr>
+			<td class=leftcol> ~obst1 </td>
+			</tr></table>
+
 		<br><b>17.</b>Причины смерти установлены: ~dustan,
 		<br>&nbsp ~dustan1
-		<br><b>18.</b>Я, врач (фельдшер, акушерка)<u> ~fio_vr </u>,
-		<br>должность <u>~doljnost </u>,
+	<table>
+			<tr>
+			<td width="35%"><b>18.</b>Я, врач (фельдшер, акушерка)</td>
+			<td class=leftcol width = "65%"> ~fio_vr,</td>
+			</tr></table>		
+	<table>
+			<tr>
+			<td width="10%">должность</td>
+			<td class=leftcol width = "90%"> ~doljnost,</td>
+			</tr></table>		
+
 		<br>удостоверяю, что на основании: ~osnov
                 <br>~osnov_1 мною определена последовательность патологических процессов (состояний), приведших к смерти,
 		<br>и установлены причины смерти.
@@ -432,16 +474,18 @@ h6 {page-break-before:always}
 					<td class = centrlr width="15%" align = center>Код по МКБ-10</td>
 					</tr>
 					<tr>
-					<td class = leftcol><b>I.а)</b>~psma_name</td>
+					<td class = leftcol><b>I.а)</b> &nbsp<b>~psma_name</b></td>
 					<td class = centr>~psma_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~a</td>
-					<td class = box align = center>~c</td>
-					<td class = box  align = center>~d</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~e</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~a</td>
+					<td class = box align = center Width="18%">~c</td>
+					<td class = box  align = center Width="18%">~d</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~e</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -452,16 +496,18 @@ h6 {page-break-before:always}
 					<td class = centrlr></td>
 					</tr>
 					<tr>
-					<td class = leftcol><b> б)</b>~psmb_name</td>
+					<td class = leftcol><b> б)</b> &nbsp<b>~psmb_name</b></td>
 					<td class = centr>~psmb_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~b</td>
-					<td class = box align = center>~f</td>
-					<td class = box  align = center>~h</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~i</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~b</td>
+					<td class = box align = center Width="18%">~f</td>
+					<td class = box  align = center Width="18%">~h</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~i</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -472,16 +518,18 @@ h6 {page-break-before:always}
 					<td class = centrlr></td>
 					</tr>
 					<tr>
-					<td class = leftcol><b> в)</b>~psmv_name</td>
+					<td class = leftcol><b> в)</b> &nbsp<b>~psmv_name</b></td>
 					<td class = centr>~psmv_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~v</td>
-					<td class = box align = center>~j</td>
-					<td class = box  align = center>~k</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~l</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~v</td>
+					<td class = box align = center Width="18%">~j</td>
+					<td class = box  align = center Width="18%">~k</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~l</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -493,16 +541,18 @@ h6 {page-break-before:always}
 					<td class = centrlr></td>
 					</tr>
 					<tr>
-					<td class = leftcol><b> г)</b>~psmg_name</td>
+					<td class = leftcol><b> г)</b> &nbsp<b>~psmg_name</b></td>
 					<td class = centr>~psmg_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~g</td>
-					<td class = box align = center>~m</td>
-					<td class = box  align = center>~n</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~o</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~g</td>
+					<td class = box align = center Width="18%">~m</td>
+					<td class = box  align = center Width="18%">~n</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~o</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -521,46 +571,52 @@ h6 {page-break-before:always}
 					</tr>
 					
 					<tr>
-					<td class = leftcol>~psmp_name</td>
+					<td class = leftcol> &nbsp<b>~psmp_name</b></td>
 					<td class = centr>~psmp_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~p</td>
-					<td class = box align = center>~q</td>
-					<td class = box  align = center>~r</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~s</td>
+					<td Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~p</td>
+					<td class = box align = center Width="18%">~q</td>
+					<td class = box  align = center Width="18%">~r</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~s</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
 					</tr>
 					<tr>
-					<td class = leftcol>~psmp1_name</td>
+					<td class = leftcol> &nbsp<b>~psmp1_name</b></td>
 					<td class = centr>~psmp1_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~t</td>
-					<td class = box align = center>~u</td>
-					<td class = box  align = center>~w</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~x</td>
+					<td  Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~t</td>
+					<td class = box align = center Width="18%">~u</td>
+					<td class = box  align = center Width="18%">~w</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~x</td>
+					<td Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
 					</tr>
 					<tr>
-					<td class = leftcol>~psmp2_name</td>
+					<td class = leftcol> &nbsp<b>~psmp2_name</b></td>
 					<td class = centr>~psmp2_per</td>
 					<td class = centrlr align = center>
 					<table>
 					<tr>
-					<td class = box align = center>~y</td>
-					<td class = box align = center>~z</td>
-					<td class = box  align = center>~0</td>
-					<td  align = center> . </td>
-					<td class = box  align = center>~1</td>
+					<td  Width="9%"> &nbsp </td>
+					<td class = box align = center Width="18%">~y</td>
+					<td class = box align = center Width="18%">~z</td>
+					<td class = box  align = center Width="18%">~0</td>
+					<td  align = center Width="10%"> . </td>
+					<td class = box  align = center Width="18%">~1</td>
+					<td  Width="9%"> &nbsp </td>
 					</tr> </table>
 
 </td>
@@ -569,10 +625,9 @@ h6 {page-break-before:always}
 </table>
 
 <br><b>20.</b>В случае смерти в результате ДТП: смерть наступила ~ddtp
-<br><b>21.</b>В случае смерти беременной ~dberem
+<br><b>21.</b>В случае смерти ~dberem
 <br> ~dberem_1
 <br><b>22.</b>Фамилия, имя, отчество врача (фельдшера, акушерки), заполнившего свидетельство осмерти</br>
-<br>
 <table>
 <tr>
 <td class = leftcol width = "70%"> ~fio_vr</td>
@@ -582,12 +637,21 @@ h6 {page-break-before:always}
 </table> 
 <table>
 <tr>
-<td width = "20%"> Руководитель медицинской организации
+<td width = "37%"> Руководитель медицинской организации,
 <br>частнопрактикующий врач (подчеркнуть)
 </td>
-<td class = leftcol width = "80%">~fio_pol</td>
+<td class = leftcol width = "15%"></td>
+<td width = "1%">
+<td class = leftcol width = "47%" align = center>~fio_pol</td>
 </td>
 </tr>
+<tr class = info>
+<td></td>
+<td align = center>(подпись)</td>
+<td></td>
+<td align = center>(фамилия, имя, отчество)</td>
+</tr>
+
 </table> 
 <br>
 <br>      Печать
@@ -595,7 +659,7 @@ h6 {page-break-before:always}
 <p class=und></p>
 <br><b>23.</b>Свидетельство проверено врачом, ответственным за правильность заполнения медицинских свидетельств.
 <br>___ _______________ 20___ г.       _________________  __________________________________________________________
-<br>                                     (подпись)                 (фамилия, имя, отчество врача)
+<br> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp  (подпись) &nbsp&nbsp &nbsp&nbsp &nbsp&nbsp&nbsp &nbsp &nbsp&nbsp &nbsp&nbsp &nbsp&nbsp &nbsp&nbsp &nbsp&nbsp &nbsp&nbsp &nbsp&nbsp &nbsp  (фамилия, имя, отчество врача)
 
 </body>
 </html>

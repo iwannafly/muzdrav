@@ -1045,10 +1045,17 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-    //TODO исправить - скорее всего удалять не по npasp+ngosp, а по id_gosp
     @Override
     public final void deleteGosp(final int id) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM c_osmotr WHERE id_gosp = ?;",
+                    false, id);
+            sme.execPrepared("DELETE FROM c_otd WHERE id_gosp = ?;",
+                    false, id);
+            sme.execPrepared("DELETE FROM c_izmer WHERE id_gosp = ?;",
+                    false, id);
+            sme.execPrepared("DELETE FROM c_diag WHERE id_gosp = ?;",
+                    false, id);
             sme.execPrepared("DELETE FROM c_gosp WHERE id = ?;",
                     false, id);
             sme.setCommit();

@@ -302,6 +302,7 @@ struct PatientPriemInfo {
 	16: optional string t_jalob;
 	17: optional string t_status_praesense;
 	18: optional string t_fiz_obsl;
+	19: optional string t_recom;
 }
 
 service ThriftViewSelect extends kmiacServer.KmiacServer {

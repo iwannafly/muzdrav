@@ -142,7 +142,7 @@ public class FormPostBer extends JFrame {
 	 */
 	public FormPostBer() {
 		setExtendedState(Frame.MAXIMIZED_BOTH);
-		setTitle("Постановка на учет по беременности");
+		setTitle("Данные о случае беременности");
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
@@ -183,7 +183,7 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-		setTitle("Постановка на учет по беременности");
+		setTitle("Данные о случае беременности");
 //		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1032, 853);
 		contentPane = new JPanel();
@@ -368,9 +368,10 @@ public class FormPostBer extends JFrame {
 					kartaber.setId_rd_sl(0);
 					String servPath = MainForm.tcl.printKartaBer(kartaber);
 					String cliPath;
-					oslname = "kart1"+String.valueOf(rdSlStruct.getId());
+					oslname = "kartl"+String.valueOf(rdSlStruct.getId());
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
 
 			}
 			catch (TException e1) {
@@ -542,10 +543,10 @@ public class FormPostBer extends JFrame {
 		CBAkush = new JCheckBox("Акушерские щипцы");
 //		CBAkush.setSelected(or6 ==1);
 		
-		CBIiiiv = new JCheckBox("Разрав промежности III-IV степени");
+		CBIiiiv = new JCheckBox("Разрыв промежности III-IV степени");
 //		CBIiiiv.setSelected(or7 ==1);
 		
-		CBRazrProm = new JCheckBox("Разрав шейки матки III степени");
+		CBRazrProm = new JCheckBox("Разрыв шейки матки III степени");
 //		CBRazrProm.setSelected(or8 ==1);
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
@@ -705,7 +706,7 @@ public class FormPostBer extends JFrame {
 		
 		CHosp9 = new JCheckBox("Средняя оценка КТГ по Fisher 6 и менее баллов");
 		
-		CHosp10 = new JCheckBox("Ареактивный нестрассовый тест");
+		CHosp10 = new JCheckBox("Ареактивный нестрессовый тест");
 		
 //		JLabel LDataSn = new JLabel("New label");
 	

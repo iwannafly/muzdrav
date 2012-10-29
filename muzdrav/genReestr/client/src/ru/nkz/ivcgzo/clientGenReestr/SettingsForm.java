@@ -111,7 +111,7 @@ public class SettingsForm extends JDialog {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    int[] res = MainForm.conMan.showPolpTreeForm("Классификатор родразделений ЛПУ", 0, 0, 0);
+                    int[] res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
                     if (res != null) {
                            tf_Cpol.setText(Integer.toString(res[2]));
                            Terp = res[0];
