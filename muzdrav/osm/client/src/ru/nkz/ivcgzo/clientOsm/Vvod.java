@@ -1699,14 +1699,12 @@ public class Vvod extends JFrame {
 		JScrollPane spRezIssl = new JScrollPane();
 		GroupLayout gl_pnlRezIsslL = new GroupLayout(pnlRezIsslL);
 		gl_pnlRezIsslL.setHorizontalGroup(
-			gl_pnlRezIsslL.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_pnlRezIsslL.createSequentialGroup()
-					.addComponent(spRezIssl, GroupLayout.PREFERRED_SIZE, 165, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+			gl_pnlRezIsslL.createParallelGroup(Alignment.LEADING)
+				.addComponent(spRezIssl, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
 		);
 		gl_pnlRezIsslL.setVerticalGroup(
 			gl_pnlRezIsslL.createParallelGroup(Alignment.LEADING)
-				.addComponent(spRezIssl, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
+				.addComponent(spRezIssl, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
 		);
 		
 		 treeRezIssl = new JTree();
@@ -1770,8 +1768,7 @@ public class Vvod extends JFrame {
 			gl_pnlRezIsslR.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlRezIsslR.createSequentialGroup()
 					.addGap(4)
-					.addComponent(spTxtRezIssl, GroupLayout.PREFERRED_SIZE, 372, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addComponent(spTxtRezIssl, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
 		);
 		gl_pnlRezIsslR.setVerticalGroup(
 			gl_pnlRezIsslR.createParallelGroup(Alignment.LEADING)
