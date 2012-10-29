@@ -578,7 +578,7 @@ public class MainFrame extends JFrame {
         
         @Override
         public String toString() {
-            return isl.getPokaz();
+            return isl.getPokaz_name();//isl.getPokaz();
         }
     }
 
