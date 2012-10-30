@@ -117,6 +117,17 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenu menu_6 = new JMenu("Сводки по диспансеризации");
 		menu_2.add(menu_6);
 		
+		JMenuItem menuItem_3 = new JMenuItem("Плановая диспансеризация");
+		menuItem_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pPlanDisp = new PlanDisp();
+				panel.removeAll();
+				panel.add(pPlanDisp);
+				panel.revalidate();
+			}
+		});
+		menu_6.add(menuItem_3);
+		
 		JMenu menu_7 = new JMenu("Отчет по прививкам");
 		menu_2.add(menu_7);
 		
