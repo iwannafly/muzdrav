@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.serverVgr;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -140,16 +142,21 @@ throw new TException(e);
 		String sqlos;
 		String sqlpa;
 		String sqllgot;
+		String path;
 		int bufRead;
 		byte[] buffer = new byte[8192];
+		
+		try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoPol", ".zip").getAbsolutePath());
+	 		ZipOutputStream zos = new ZipOutputStream(fos)) {
+	
 		sqllgot = "SELECT p.npasp::integer AS bn, l.lgot::integer AS kgl "+
 		           "FROM p_kov l, patient p, n_lkn k  "+
                    "WHERE l.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" ;		
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllgot, clpu, clpu,  cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk)) ;
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllgot,cpodr ) ;
 				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-//			zos.putNextEntry(new ZipEntry("lgot.dbf"));
-//			while ((bufRead = dbfStr.read(buffer)) > 0)
-//				zos.write(buffer, 0, bufRead);
+			zos.putNextEntry(new ZipEntry("lgot.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
 		} catch (SQLException e) {
 	        log.log(Level.ERROR, "SQl Exception: ", e);
 			throw new KmiacServerException();
@@ -170,6 +177,18 @@ throw new TException(e);
 			"p.dataot AS datot,p.ter_liv::integer AS nas "+			
 	        "FROM p_kov l, patient p, n_lkn k  "+
             "WHERE l.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" ;		
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlpa,  cpodr) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontipa.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
 
 	sqldi = "SELECT p.npasp::integer AS bn, d.diag::char(6) AS isd,  "+
             "(case when d.ppi=1 then '+' else when d.ppi=2 then '-' end)::char(1) AS pp, " +
@@ -178,6 +197,18 @@ throw new TException(e);
 			"FROM p_kov l, patient p, n_lkn k, pdiag d  "+
             "WHERE l.npasp=p.npasp AND d.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
 	        "d.xzab=2 AND pd_pu=1 AND substr(diag,1,1)<>'Z' "   ;		
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqldi, cpodr) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontidi.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
 
 	sqlis = "SELECT p.npasp::integer AS bn, a.usl_kov::char(15) AS kissl,  "+
            "m.vdat AS dvi"+
@@ -185,22 +216,65 @@ throw new TException(e);
             "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
 	        "m.pmer=n.pcod AND (m.dnl>? AND m.dnl<?) or ( m.vdat>? AND m.vdat<?); "   ;
 	
-	
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlis,  cpodr) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontiis.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
 	sqllo = "SELECT p.npasp::integer AS bn, a.cod_kov::char(20) AS klo,  "+
 	           "m.dnl AS dn, m.dkl AS dk, m.ter::integer AS ter,m.lpu::integer AS lpu"+
 				"FROM p_kov l, patient p, n_lkn k, p_mer m, n_abd a  "+
 	            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
 		        "AND m.pmer=n.pcod AND (m.dnl>? AND m.dnl<?) or ( m.vdat>? AND m.vdat<?) "   ;
-	
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllo,  cpodr) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontilo.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
 	
 	sqlos = "SELECT p.npasp::integer AS bn, select get_kodsp(v.cdol))::integer AS kspec,  "+
 	           "m.datap AS dvo"+
 				"FROM p_kov l, patient p, n_lkn k, p_vizit_amb m,n_s00 s  "+
 	            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
 		        "AND m.datap>? AND m.datap<? AND m.cdol=s.pcod  AND s.cod_kov<>0"   ;
-		
-
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlos,   cpodr, new Date(dn), new Date(dk)) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontios.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
 	}
-}
 
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+//	return path;
+	
+}}
 	
