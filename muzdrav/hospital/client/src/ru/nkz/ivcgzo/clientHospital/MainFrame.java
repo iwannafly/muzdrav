@@ -307,13 +307,13 @@ public class MainFrame extends JFrame {
             final ThriftIntegerClassifierList inTicl) {
         try {
             List<IntegerClassifier> intClassif = ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),
-                    (inCtf.getText().length() < 3)
-                    ? null : '%' + inCtf.getText() + '%');
+                doctorAuth.getCspec(), doctorAuth.getCslu(),
+                (inCtf.getText().length() < 3)
+                ? null : '%' + inCtf.getText() + '%');
             inTicl.setData(intClassif);
         } catch (KmiacServerException e1) {
             JOptionPane.showMessageDialog(MainFrame.this,
-                    "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
         } catch (TException e1) {
             ClientHospital.conMan.reconnect(e1);
         }
