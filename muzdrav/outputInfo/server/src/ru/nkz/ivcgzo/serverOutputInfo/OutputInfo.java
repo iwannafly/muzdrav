@@ -981,8 +981,8 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 	// Дата до ...
 	Date dk;
 	try {
-		dn = sdfo.parse(ipd.getDaten());
-		dk = sdfo.parse(ipd.getDatek());
+		dn = (Date) sdfo.parse(ipd.getDaten());
+		dk = (Date) sdfo.parse(ipd.getDatek());
 
 		// Код полеклиники
 		int kodpol = ipd.getKpolik();
@@ -1023,7 +1023,7 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 			float [] sum = new float [26];
 			//spat.getResultSet().first();
 				
-			new Date().after(dn); 
+ 
 		
 			while (spat.getResultSet().next()){
 				//Обследование
