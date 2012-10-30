@@ -455,13 +455,13 @@ public class MainFrame extends JFrame {
             ClientLab.conMan.reconnect(e);
         } 
 
+        splitPane.setDividerLocation(0.5);
         return root;
     }
 
     private void addResultTreePanel() {
         splitPane = new JSplitPane();
         splitPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        splitPane.setDividerLocation(1.0);
         pResult.add(splitPane);
         
         addResultTree();
@@ -474,7 +474,6 @@ public class MainFrame extends JFrame {
         trResult.setFont(new Font("Arial", Font.PLAIN, 12));
         sptree.setViewportView(trResult);
         splitPane.setLeftComponent(sptree);
-
         trResult.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
@@ -484,12 +483,26 @@ public class MainFrame extends JFrame {
                 sbResulText = new StringBuilder();
                 Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
                 if (lastPath instanceof GospTreeNode) {
+                    Gosp tmpGosp = ((GospTreeNode)lastPath).getGosp();
+                    if (tmpGosp.isSetIdGosp()) {
+                        addLineToDetailInfo("Отделение стационара", tmpGosp.isSetCotd_name(),
+                                tmpGosp.getCotd_name());
+                        addLineToDetailInfo("Лечащий врач", tmpGosp.isSetVrach_fio(),
+                                tmpGosp.getVrach_fio());
+                        addLineToDetailInfo("Дата поступления в стационар", tmpGosp.isSetDatap(),
+                                DateFormat.getDateInstance().format(new Date(tmpGosp.getDatap())));
+                        addLineToDetailInfo("Дата выписки из стационара ", tmpGosp.isSetDatav(),
+                                DateFormat.getDateInstance().format(new Date(tmpGosp.getDatav())));
+                    }
+                    taResultText.setText(sbResulText.toString());
                 }
                 if (lastPath instanceof IssledNode) {
                     Isl tmpIsl = ((IssledNode)lastPath).getIsl();
                     if (tmpIsl.isSetNisl()) {
                         addLineToDetailInfo("Показатель исследования",tmpIsl.isSetPokaz_name(),
                                 tmpIsl.getPokaz_name());
+                        addLineToDetailInfo("Код показателя",tmpIsl.isSetPokaz(),
+                                tmpIsl.getPokaz());
                         addLineToDetailInfo("Результат исследования",tmpIsl.isSetRez(),
                                 tmpIsl.getRez());
                         addLineToDetailInfo("Описание",tmpIsl.isSetOp_name(),
@@ -558,7 +571,11 @@ public class MainFrame extends JFrame {
 //                MainForm.conMan.reconnect(e);
 //            } 
         }
-        
+
+        public Gosp getGosp() {
+            return gosp;
+        }
+
         @Override
         public String toString() {
             return DateFormat.getDateInstance().format(new Date(gosp.getDatap()));
