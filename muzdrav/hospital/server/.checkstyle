@@ -6,6 +6,7 @@
   </fileset>
   <filter name="FilesFromPackage" enabled="true">
     <filter-data value="gen-java"/>
+    <filter-data value="test"/>
     <filter-data value="config"/>
   </filter>
 </fileset-config>

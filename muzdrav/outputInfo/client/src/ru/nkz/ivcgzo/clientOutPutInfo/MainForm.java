@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientOutPutInfo;
 
 import java.awt.EventQueue;
+import java.awt.Panel;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
@@ -49,6 +50,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
+import javax.swing.JMenuItem;
+import javax.swing.JMenu;
 
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
@@ -76,72 +79,89 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		initialize();
 		setFrame(frame);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
-		JScrollPane scrollPane = new JScrollPane();
+		final JScrollPane scrollPane = new JScrollPane();
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		//scrollPane.add(pSvodVed);
 		
-		//inputInfo.setKpolik(authInfo.clpu);
-		//inputInfo.setNamepol(authInfo.clpu_name);
+		final JPanel panel = new JPanel();
+		
+		JMenuBar menuBar = new JMenuBar();
+		scrollPane.setColumnHeaderView(menuBar);
+		
+		JMenu mnNewMenu = new JMenu("Поликлиника");
+		menuBar.add(mnNewMenu);
+		
+		JMenu menu_2 = new JMenu("Регламентные сводки");
+		mnNewMenu.add(menu_2);
+		
+		JMenu menu_3 = new JMenu("Сводки по форме 025");
+		menu_2.add(menu_3);
+		
+		JMenuItem menuItem = new JMenuItem("Сводная ведомость учета зарегистрированных заболеваний");
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pSvodVed = new SvodVed();
+				panel.removeAll();
+				panel.add(pSvodVed);
+				panel.revalidate();
+			}
+		});
+		menu_3.add(menuItem);
+		
+		JMenuItem menuItem_1 = new JMenuItem("Факторы, влияющие на состояние здоровья");
+		menu_3.add(menuItem_1);
+		
+		JMenu menu_4 = new JMenu("Сводки по форме 039");
+		menu_2.add(menu_4);
+		
+		JMenu menu_6 = new JMenu("Сводки по диспансеризации");
+		menu_2.add(menu_6);
+		
+		JMenuItem menuItem_3 = new JMenuItem("Плановая диспансеризация");
+		menuItem_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pPlanDisp = new PlanDisp();
+				panel.removeAll();
+				panel.add(pPlanDisp);
+				panel.revalidate();
+			}
+		});
+		menu_6.add(menuItem_3);
+		
+		JMenu menu_7 = new JMenu("Отчет по прививкам");
+		menu_2.add(menu_7);
+		
+		JMenu menu_8 = new JMenu("КОВ");
+		menu_2.add(menu_8);
+		
+		JMenu menu_9 = new JMenu("Годовые отчеты");
+		menu_2.add(menu_9);
+		
+		JMenuItem menuItem_2 = new JMenuItem("Табель врача");
+		menuItem_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pTableVrach = new tableVrach();
+				panel.removeAll();
+				panel.add(pTableVrach);
+				panel.revalidate();
+			}
+		});
+		mnNewMenu.add(menuItem_2);
+		
+		JMenu menu = new JMenu("Стационар");
+		menuBar.add(menu);
+		
+		JMenu menu_1 = new JMenu("Параотделение");
+		menuBar.add(menu_1);
 		
 		
+		scrollPane.setViewportView(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		pSvodVed = new SvodVed();
+		panel.add(pSvodVed);
+		panel.revalidate();
 		
-		
-		/**
-		 * Создание панелей с табами (категорий)
-		 */
-		JTabbedPane tpMain = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpPol = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpStac = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpPar = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpReg = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpZap = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpRees = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpVrTabel = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tp039 = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tp025 = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpDisp = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tp615 = new JTabbedPane(JTabbedPane.TOP);
-		JTabbedPane tpVzaim = new JTabbedPane(JTabbedPane.TOP);
-		//JTabbedPane tpSvodVed = new JTabbedPane(JTabbedPane.TOP);
-		//JTabbedPane tpFacZd = new JTabbedPane(JTabbedPane.TOP);
-		
-		/**
-		 * Создание панелей (классов) во вкладках
-		 */
-		tableVrach pTableVrach = new tableVrach();
-		
-		scrollPane.setViewportView(tpMain);
-
-		/**
-		 * Создание и привязка вкладок
-		 */
-		tpMain.addTab("Поликлиника", tpPol);
-		tpMain.addTab("Стационар", tpStac);
-		tpMain.addTab("Параотделение", tpPar);
-		
-		tpPol.addTab("Регламентные сводки", tpReg);
-		tpPol.addTab("Запросы", tpZap);
-		tpPol.addTab("Реестры", tpRees);
-
-		//tp025.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		SvodVed pSvodVed = new SvodVed();
-		FacZd pFacZd = new FacZd();
-		PlanDisp pPlanDisp = new PlanDisp();
-		
-		tpReg.addTab("Отчеты по форме 025", tp025);
-		tpReg.addTab("Отчеты по форме 039", tp039);
-		tpReg.addTab("Сводки по диспансеризации", tpDisp);
-		tpReg.addTab("Сводки по пр.№615 и положению 16 ТС", tp615);
-		tpReg.addTab("Реестр на взаиморасчеты по параклинике", tpVzaim);
-		
-		/**
-		 * Создание и привязка панелей (классов)
-		 */
-		
-		tpPol.addTab("Табель врача", pTableVrach);
-		tp025.addTab("Сводная ведомость учета зарегистрированных заболеваний", pSvodVed);
-		tp025.addTab("Факторы, влияющие на состояние здоровья", pFacZd);
-		tpDisp.addTab("План диспансерного обслуживания", pPlanDisp);
+	
 		//tpReg.addTab("Паспорт участка", pFacZd);
 	}
 

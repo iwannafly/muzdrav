@@ -233,7 +233,7 @@ public class HtmShablon {
      * @param value - текст, заменяющий метку в шаблоне
      */
     public final void replaceText(final String textForReplace, final String value) {
-    	System.out.println(textForReplace+";"+value);
+ //   	System.out.println(textForReplace+";"+value);
 
     	template = template.replaceFirst(textForReplace, value);
     }

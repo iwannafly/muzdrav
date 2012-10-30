@@ -10,6 +10,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -44,7 +45,13 @@ public class TableDateEditor extends DefaultCellEditor {
 		txt.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				stopCellEditing();
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						if (!ctb.hasFocus())
+							stopCellEditing();
+					}
+				});
 			}
 		});
 		renderer = new TableDateRenderer();
