@@ -12,6 +12,6 @@ struct Patient {
 }
 
 service ThriftMedication extends kmiacServer.KmiacServer {
-
+	i32 getInt();
 }
 

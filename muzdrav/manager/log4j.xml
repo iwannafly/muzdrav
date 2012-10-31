@@ -33,7 +33,7 @@
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>
-		<logger name="ru.nkz.ivcgzo.serverMedication.ServerMedication">
+	<logger name="ru.nkz.ivcgzo.serverMedication.ServerMedication">
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>

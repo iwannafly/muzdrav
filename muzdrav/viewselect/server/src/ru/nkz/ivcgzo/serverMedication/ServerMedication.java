@@ -59,4 +59,10 @@ public class ServerMedication extends Server implements Iface {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public int getInt() throws TException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }

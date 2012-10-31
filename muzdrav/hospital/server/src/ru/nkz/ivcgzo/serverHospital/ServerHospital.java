@@ -400,6 +400,17 @@ public class ServerHospital extends Server implements Iface {
             sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?)"
                     + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
         }
+
+        // Запрос не работает, т.к. профиль и специализация это разные вещи
+//        String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
+//            + sho.diag || ' ' || sho.name AS name "
+//            + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
+//            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+//            + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
+//            + "JOIN n_t00 t00 ON t00.pcod = shp.cspec "
+//            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
+//            + "WHERE (n45.codotd = 2004) AND (sho.cslu & 2 = 2) ";
+
         sql += "ORDER BY sho.name ";
         try (AutoCloseableResultSet acrs = (srcText == null)
                 ? sse.execPreparedQuery(sql, 38, 2, 2)

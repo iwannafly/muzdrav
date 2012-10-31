@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 
 import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientLab.MainFrame;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;

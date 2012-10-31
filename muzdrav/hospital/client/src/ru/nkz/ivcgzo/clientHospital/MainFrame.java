@@ -206,6 +206,7 @@ public class MainFrame extends JFrame {
     private JButton btnIssled;
     private Color defCol = UIManager.getColor("TabbedPane.foreground");
     private Color selCol = Color.red;
+    private JButton btnMedication;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -236,13 +237,13 @@ public class MainFrame extends JFrame {
         createModalFrames();
         try {
             lShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lLifeHistoryShabloNames.setData(ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lDiagShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                    doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             cbxIshod.setData(ClientHospital.tcl.getAp0());
             cbxResult.setData(ClientHospital.tcl.getAq0());
         } catch (KmiacServerException e) {
@@ -483,6 +484,17 @@ public class MainFrame extends JFrame {
                 if (patient != null) {
                     ClientHospital.conMan.showPatientInfoForm("Информация о пациенте",
                             patient.getPatientId());
+                }
+            }
+        });
+
+        btnMedication = new JButton("Медицинские назначения");
+        btnMedication.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
+                            patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                            patient.getGospitalCod());
                 }
             }
         });
@@ -1541,6 +1553,7 @@ public class MainFrame extends JFrame {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void setPatientInfoPanelGroupLayout() {
+
         GroupLayout glPersonalInfo = new GroupLayout(pPersonalInfo);
         glPersonalInfo.setHorizontalGroup(
             glPersonalInfo.createParallelGroup(Alignment.LEADING)
@@ -1585,9 +1598,11 @@ public class MainFrame extends JFrame {
                                 .addGroup(glPersonalInfo.createSequentialGroup()
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE)
                                         .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
-                                            GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE))
                                     .addGap(43)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(lblMiddlename)
@@ -1599,15 +1614,20 @@ public class MainFrame extends JFrame {
                         .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addGap(18)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
-                        .addComponent(btnIssled, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnShowPatientInfo, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnUpdateChamber, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(tfMiddlename)
-                        .addComponent(tfDms))
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.TRAILING, false)
+                        .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE, 248,
+                                GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfDms, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
+                                248, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnIssled, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
+                                248, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnMedication, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
+                                248, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(Alignment.LEADING, glPersonalInfo.createSequentialGroup()
+                            .addComponent(btnUpdateChamber, GroupLayout.PREFERRED_SIZE, 87,
+                                    GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnShowPatientInfo)))
                     .addGap(5))
         );
         glPersonalInfo.setVerticalGroup(
@@ -1622,8 +1642,8 @@ public class MainFrame extends JFrame {
                         .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblName)
-                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblMiddlename)
                         .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -1652,13 +1672,14 @@ public class MainFrame extends JFrame {
                         .addComponent(lblWork)
                         .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnShowPatientInfo)
                         .addComponent(btnUpdateChamber))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRegistrationAddress)
                         .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
                                 GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnShowPatientInfo))
+                        .addComponent(btnMedication))
                     .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
                             Short.MAX_VALUE)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
