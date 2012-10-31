@@ -26,15 +26,15 @@ import java.awt.event.ActionEvent;
 
 public class MainForm extends Client<ThriftVgr.Client>  {
 
+//	protected static final JFrame Per = null;
 	private JFrame frame;
 	private Period per;
 	public static MainForm instance;
 	public static ThriftVgr.Client tcl;
-
 	/**
 	 * Launch the application.
 	 */
-	/*public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -78,6 +78,7 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGap(0, 10, Short.MAX_VALUE)
 		);
+		
 		panel.setLayout(gl_panel);
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -100,18 +101,11 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		
 		JMenuItem menuItem = new JMenuItem("Диспансеризация КОВ");
 		menuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e, CustomDateEditor tfdn, CustomDateEditor tfdk) {
-				per = new Period();
-				per.showPeriod(tfdn, tfdk);
-				
-				//sfrm = new SettingsForm();
-			//	sfrm.showSettingsForm();
-			}
-
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				
+				per = new Period();
+				per.Cslu = 1;
+				per.showPeriod();
 			}
 		});
 		mnNewMenu.add(menuItem);
@@ -137,15 +131,19 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		JMenuItem menuItem_7 = new JMenuItem("Экспорт данных о флюоороосмотрах");
 		mnNewMenu.add(menuItem_7);
 		
-		JMenu menu = new JMenu("Выход");
+		JMenu menu = new JMenu("Подгрузка данных");
 		menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			//	frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);	
-		//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
 				setVisible(false);
 			}
 		});
 		menuBar.add(menu);
+		
+		JMenuItem mntmNewMenuItem = new JMenuItem("Подгрузка информации из ПФ");
+		menu.add(mntmNewMenuItem);
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Подгрузка информации об областных льготниках");
+		menu.add(mntmNewMenuItem_1);
 		
 //		JMenuBar menuBar_1 = new JMenuBar();
 //		menuBar.add(menuBar_1);
