@@ -9,11 +9,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.JTable;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = -8573682902821548961L;
-    private UserAuthInfo doctorInfo;
+//    private UserAuthInfo doctorInfo;
     private Patient patient;
     private JTable tbMedication;
     private JScrollPane spMedicationTable;
@@ -21,9 +23,10 @@ public class MainFrame extends JFrame {
     private JButton btnAdd;
     private JButton btnUpdate;
     private JButton btnDelete;
+    private MedicationCatalogFrame frmMedicationCatalog;
 
     public MainFrame(final UserAuthInfo authInfo) {
-        doctorInfo = authInfo;
+//        doctorInfo = authInfo;
         initialization();
     }
 
@@ -32,7 +35,6 @@ public class MainFrame extends JFrame {
 
         addTableScrollPane();
         addButtonPanel();
-
     }
 
     private void addTableScrollPane() {
@@ -50,7 +52,6 @@ public class MainFrame extends JFrame {
     private void addButtonPanel() {
         pButtons = new JPanel();
         getContentPane().add(pButtons);
-        pButtons.setLayout(new BoxLayout(pButtons, BoxLayout.Y_AXIS));
 
         addAddButton();
         addUpdateButton();
@@ -58,7 +59,13 @@ public class MainFrame extends JFrame {
     }
 
     private void addAddButton() {
+        pButtons.setLayout(new BoxLayout(pButtons, BoxLayout.Y_AXIS));
         btnAdd = new JButton("Добавить");
+        btnAdd.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frmMedicationCatalog.setVisible(true);
+            }
+        });
         pButtons.add(btnAdd);
     }
 
@@ -82,6 +89,12 @@ public class MainFrame extends JFrame {
         patient.setIdGosp(idGosp);
     }
 
+    private void createModalFrames() {
+        frmMedicationCatalog = new MedicationCatalogFrame();
+        frmMedicationCatalog.pack();
+    }
+
     public final void onConnect() {
+        createModalFrames();
     }
 }

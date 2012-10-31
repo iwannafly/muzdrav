@@ -12,6 +12,11 @@ struct Patient {
 }
 
 service ThriftMedication extends kmiacServer.KmiacServer {
-	i32 getInt();
+	list<classifier.IntegerClassifier> getMedications()
+		throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getMedicationsUsingTemplate(1: string template)
+		throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getMedicationForms(1:i32 medId)
+		throws (1: kmiacServer.KmiacServerException kse);
 }
 

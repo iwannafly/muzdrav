@@ -122,8 +122,6 @@ public class MainFrame extends JFrame {
     private JTabbedPane tbpMedicalHistory;
     private CustomTextField tfShablonFilter;
     private JPanel pnStatusLocalis;
-//    private JPanel pnRecomendation;
-//    private JPanel pnZakl;
     private JPanel pnStatusPraence;
     private JPanel pnJalob;
     private JPanel pnDesiaseHistory;
@@ -133,8 +131,6 @@ public class MainFrame extends JFrame {
     private JTextArea taStatusPraence;
     private JTextArea taFisicalObs;
     private JTextArea taStatusLocalis;
-//    private JTextArea taRecomdation;
-//    private JTextArea taZakl;
     private JScrollPane spShablonNames;
     private ThriftIntegerClassifierList lShablonNames;
     private JPanel pLifeHistory;
@@ -192,7 +188,6 @@ public class MainFrame extends JFrame {
     private ShablonSearchListener zaklSearchListener;
     private CustomTable<TMedicalHistory, TMedicalHistory._Fields> tbMedHist;
     private JScrollPane spMedHist;
-//    private TMedicalHistory curMedicalHistory;
     private JButton btnMedHistUpd;
     private JButton btnMedHistDel;
     private JButton btnMedHistAdd;
@@ -483,7 +478,7 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
                     ClientHospital.conMan.showPatientInfoForm("Информация о пациенте",
-                            patient.getPatientId());
+                        patient.getPatientId());
                 }
             }
         });
@@ -493,8 +488,8 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
                     ClientHospital.conMan.showMedicationForm(patient.getPatientId(),
-                            patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                            patient.getGospitalCod());
+                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                        patient.getGospitalCod());
                 }
             }
         });
@@ -504,8 +499,8 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
                     ClientHospital.conMan.showLabRecordForm(patient.getPatientId(),
-                            patient.getSurname(), patient.getName(), patient.getMiddlename(),
-                            patient.getGospitalCod());
+                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                        patient.getGospitalCod());
                 }
             }
         });
@@ -534,13 +529,10 @@ public class MainFrame extends JFrame {
                 frmPatientSelect.getCurrentPatient().getPatientId(),
                 frmPatientSelect.getCurrentPatient().getIdGosp());
             setTitle(String.format("%s %s %s",
-                    patient.getSurname(), patient.getName(),
-                    patient.getMiddlename()));
+                patient.getSurname(), patient.getName(),
+                patient.getMiddlename()));
         } catch (PatientNotFoundException e) {
-            e.printStackTrace();
-//            JOptionPane.showMessageDialog(frmPatientSelect,
-//                "Персональная инфомация о данном пациенте не найдена.",
-//                "Внимание!", JOptionPane.WARNING_MESSAGE);
+            patient = null;
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -583,11 +575,7 @@ public class MainFrame extends JFrame {
             priemInfo = ClientHospital.tcl.getPriemInfo(
                     patient.getGospitalCod());
         } catch (PriemInfoNotFoundException e) {
-            e.printStackTrace();
-//            JOptionPane.showMessageDialog(frmPatientSelect,
-//                "Информация из приёмного отделения "
-//                    + "о данном пациенте не найдена.",
-//                    "Внимание!", JOptionPane.WARNING_MESSAGE);
+            priemInfo = null;
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -743,12 +731,9 @@ public class MainFrame extends JFrame {
             lifeHistory =
                     ClientHospital.tcl.getLifeHistory(patient.getPatientId());
         } catch (LifeHistoryNotFoundException e) {
-            e.printStackTrace();
-//            JOptionPane.showMessageDialog(frmPatientSelect,
-//                "История жизни данного пациента не найдена.",
-//                "Внимание!", JOptionPane.WARNING_MESSAGE);
+            lifeHistory = null;
         } catch (KmiacServerException e) {
-            e.printStackTrace();
+            lifeHistory = null;
         } catch (TException e) {
             ClientHospital.conMan.reconnect(e);
         }
@@ -829,8 +814,6 @@ public class MainFrame extends JFrame {
         addStatusPraencePanel();
         addFisicalObsPanel();
         addStausLocalisPanel();
-//        addRecomendationPanel();
-//        addZaklPanel();
     }
 
     private void setMedicalHistoryTablePanel() {
@@ -883,11 +866,11 @@ public class MainFrame extends JFrame {
         try {
             if (tbMedHist.getSelectedItem() != null) {
                 int opResult = JOptionPane.showConfirmDialog(
-                        btnMedHistDel, "Удалить запись?",
+                    btnMedHistDel, "Удалить запись?",
                     "Удаление записи", JOptionPane.YES_NO_OPTION);
                 if (opResult == JOptionPane.YES_OPTION) {
                     ClientHospital.tcl.deleteMedicalHistory(
-                            tbMedHist.getSelectedItem().getId());
+                        tbMedHist.getSelectedItem().getId());
                     tbMedHist.setData(
                         ClientHospital.tcl.getMedicalHistory((patient.getGospitalCod())));
                 }
@@ -1070,32 +1053,6 @@ public class MainFrame extends JFrame {
         pnStatusLocalis.add(taStatusLocalis);
     }
 
-//    private void addRecomendationPanel() {
-//        pnRecomendation = new JPanel();
-//        pnRecomendation.setBorder(new LineBorder(new Color(0, 0, 0)));
-//        tbpMedicalHistory.addTab("Рекомендации", null, pnRecomendation, null);
-//        pnRecomendation.setLayout(new BoxLayout(pnRecomendation, BoxLayout.X_AXIS));
-//
-//        taRecomdation = new JTextArea();
-//        taRecomdation.setLineWrap(true);
-//        taRecomdation.setWrapStyleWord(true);
-//        taRecomdation.setFont(new Font("Tahoma", Font.PLAIN, 11));
-//        pnRecomendation.add(taRecomdation);
-//    }
-//
-//    private void addZaklPanel() {
-//        pnZakl = new JPanel();
-//        pnZakl.setBorder(new LineBorder(new Color(0, 0, 0)));
-//        tbpMedicalHistory.addTab("Заключение", null, pnZakl, null);
-//        pnZakl.setLayout(new BoxLayout(pnZakl, BoxLayout.X_AXIS));
-//
-//        taZakl = new JTextArea();
-//        taZakl.setWrapStyleWord(true);
-//        taZakl.setLineWrap(true);
-//        taZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
-//        pnZakl.add(taZakl);
-//    }
-
     private void clearMedicalHistory() {
         tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
         taJalob.setText("");
@@ -1103,8 +1060,6 @@ public class MainFrame extends JFrame {
         taFisicalObs.setText("");
         taStatusLocalis.setText("");
         taStatusPraence.setText("");
-//        taRecomdation.setText("");
-//        taZakl.setText("");
     }
 
     private void clearMedicalHistoryTextAreas() {
@@ -1139,9 +1094,6 @@ public class MainFrame extends JFrame {
                 case 8:
                     taStatusLocalis.setText(shText.getText());
                     break;
-//                case 12:
-//                    taRecomdation.setText(shText.getText());
-//                    break;
                 default:
                     break;
             }
@@ -1154,10 +1106,7 @@ public class MainFrame extends JFrame {
                 tbMedHist.setData(
                         ClientHospital.tcl.getMedicalHistory((patient.getGospitalCod())));
             } catch (MedicalHistoryNotFoundException e) {
-                e.printStackTrace();
-//                JOptionPane.showMessageDialog(frmPatientSelect,
-//                        "Медицинская история пациента не найдена.",
-//                        "Внимание!", JOptionPane.WARNING_MESSAGE);
+                tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
@@ -1208,10 +1157,7 @@ public class MainFrame extends JFrame {
                         ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
                 setDiagPriznRdbtn();
             } catch (DiagnosisNotFoundException e) {
-                e.printStackTrace();
-//                JOptionPane.showMessageDialog(frmPatientSelect,
-//                        "Диагнозы данного пациента не найдены.",
-//                        "Внимание!", JOptionPane.WARNING_MESSAGE);
+                Collections.<TDiagnosis>emptyList();
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
@@ -1553,7 +1499,6 @@ public class MainFrame extends JFrame {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void setPatientInfoPanelGroupLayout() {
-
         GroupLayout glPersonalInfo = new GroupLayout(pPersonalInfo);
         glPersonalInfo.setHorizontalGroup(
             glPersonalInfo.createParallelGroup(Alignment.LEADING)
