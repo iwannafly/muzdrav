@@ -284,7 +284,11 @@ public class Vvod extends JFrame {
 		JButton btnProsm = new JButton("Просмотр");
 		btnProsm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", zapVr.fam, zapVr.im, zapVr.oth), zapVr.npasp);
+				try {
+					MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", zapVr.fam, zapVr.im, zapVr.oth), zapVr.npasp);
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(Vvod.this, String.format("Не удалось отобразить форму просмотра%s%s", System.lineSeparator(), e1.toString()), "Ошибка", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
