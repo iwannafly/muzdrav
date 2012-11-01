@@ -6,8 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.math.BigInteger;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -30,10 +30,6 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftVgr.RdPatient;
-import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
-import ru.nkz.ivcgzo.thriftVgr.RdVizit;
-import ru.nkz.ivcgzo.thriftVgr.KartaBer;
 import ru.nkz.ivcgzo.thriftVgr.Kontidi;
 import ru.nkz.ivcgzo.thriftVgr.Kontiis;
 import ru.nkz.ivcgzo.thriftVgr.Kontilo;
@@ -41,9 +37,11 @@ import ru.nkz.ivcgzo.thriftVgr.Kontios;
 import ru.nkz.ivcgzo.thriftVgr.Kontipa;
 import ru.nkz.ivcgzo.thriftVgr.KovNotFoundException;
 import ru.nkz.ivcgzo.thriftVgr.Lgot;
+import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
+import ru.nkz.ivcgzo.thriftVgr.RdPatient;
+import ru.nkz.ivcgzo.thriftVgr.RdVizit;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr.Iface;
-
 
 public class ServerVgr extends Server implements Iface {
 	private TServer thrServ;
@@ -327,7 +325,7 @@ throw new TException(e);
 
 
 	@Override
-	public String formfilecsv(KartaBer kb) throws KmiacServerException,
+	public String formfilecsv() throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
 		Date p1; Date p2; Date p3; Date p4; Date p5; Date p6; Date p7;
@@ -357,9 +355,13 @@ throw new TException(e);
         String dak = null;
         String dsost = null;
         String dosl = null;
+        BigInteger fam = null;
+        BigInteger im = null;
+        BigInteger otsh = null;
 		AutoCloseableResultSet acrs = null, acrs2 = null;
 		//таблица паспортной информации Patient.csv
 		StringBuilder sb = new StringBuilder(0x10000);
+//		Base64.BASE64DEFAULTLENGTH.
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream("c:\\patient.htm"), "utf-8")) {
 		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -489,6 +491,7 @@ throw new TException(e);
 
 		Date dgrisk = null;
 		sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s %s %s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%30$td.%30$tm.%30$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%42$td.%42$tm.%42$tY;%d;%d;%d;%d;%47$td.%47$tm.%47$tY;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,dgrisk,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));		
+//		Encoded.Base64(rdp.fam,35,fam);
 		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
  		
 		//Con_diagn.csv
