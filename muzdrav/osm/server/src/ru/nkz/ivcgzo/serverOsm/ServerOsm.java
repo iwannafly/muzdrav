@@ -335,7 +335,7 @@ public class ServerOsm extends Server implements Iface {
 	public List<ZapVr> getZapVr(int idvr, String cdol, long datap) throws KmiacServerException, TException {
 		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, NULL AS datap, pn.nuch, FALSE AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL " +
 					 "UNION " +
-					 "(SELECT DISTINCT ON (fam, im, ot) pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.id_obr, pa.datap, pn.nuch, pa.datap = ? AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp) WHERE pv.id IN (SELECT id_pvizit FROM e_talon ital WHERE (ital.pcod_sp = ?) AND (ital.cdol = ?) AND (ital.datap = ?) AND (ital.id_pvizit IS NOT NULL)) " +
+					 "(SELECT DISTINCT ON (fam, im, ot) pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.id_obr, pa.datap, pn.nuch, pa.datap = ? AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp) WHERE pv.id IN (SELECT id_pvizit FROM e_talon ital WHERE (ital.pcod_sp = ?) AND (ital.cdol = ?) AND (ital.datap = ?) AND (ital.id_pvizit IS NOT NULL)) AND (pa.id_obr IS NOT NULL) " +
 					 "ORDER BY fam, im, ot, datap DESC) " +
 					 "ORDER BY has_pvizit, fam, im, ot, datap DESC ";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, idvr, cdol, new Date(datap), new Date(datap), idvr, cdol, new Date(datap))) {
@@ -347,31 +347,16 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<ZapVr> getZapVrSrc(int npasp, int codsp, String cdol) throws KmiacServerException, TException {
-		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, NULL AS datap, 0 AS id_pvizit,     FALSE AS has_pvizit, 0 AS id_pvizit_amb    FROM patient pat WHERE pat.npasp = ? " +
-					 "UNION " +
-					 "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.datap,      pv.id AS id_pvizit, TRUE AS has_pvizit, pa.id AS id_pvizit_amb FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
-					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND ((ipv.ishod IS NULL) OR (ipv.ishod < 1)) " +
-					 ") " +
-					 "ORDER BY has_pvizit, id_pvizit, datap DESC ";	
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp, npasp, codsp, cdol)) {
-			List<ZapVr> zapVrList = rsmZapVr.mapToList(acrs.getResultSet());
-			int prevIdObr = -1;
-			
-			for (int i = 0; i < zapVrList.size(); i++) {
-				if (zapVrList.get(i).id_pvizit != prevIdObr)
-					prevIdObr = zapVrList.get(i).id_pvizit;
-				else
-					zapVrList.remove(i--);
-			}
-			
-			return zapVrList;
+	public ZapVr getZapVrSrc(int npasp) throws KmiacServerException, TException {
+		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pn.nuch FROM patient pat LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp) WHERE pat.npasp = ? ";
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp)) {
+			acrs.getResultSet().next();
+			return rsmZapVr.map(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}
 	}
-
 	@Override
 	public void AddPvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -379,6 +364,8 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPrepared("INSERT INTO p_anam_zab (id_pvizit, npasp) VALUES (?, ?) ", false, obr.getId(), obr.getNpasp());
 			sme.setCommit();
 		} catch (SQLException e) {
+			if (((SQLException) e.getCause()).getSQLState().equals("23505"))
+				return;
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		} catch (InterruptedException e1) {
@@ -401,6 +388,29 @@ public class ServerOsm extends Server implements Iface {
 	}
 	
 	@Override
+	public List<Pvizit> getPvizitList(int npasp, int codsp, String cdol) throws KmiacServerException, TException {
+		String sql = "SELECT pv.id, pv.datao, TRUE AS has_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
+					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND ((ipv.ishod IS NULL) OR (ipv.ishod < 1))) " +
+					 "ORDER BY has_pvizit, id DESC, datao DESC ";	
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp, codsp, cdol)) {
+		List<Pvizit> pvizitList = rsmPvizit.mapToList(acrs.getResultSet());
+		int prevIdObr = -1;
+		
+		for (int i = 0; i < pvizitList.size(); i++) {
+			if (pvizitList.get(i).id != prevIdObr)
+				prevIdObr = pvizitList.get(i).id;
+			else
+				pvizitList.remove(i--);
+		}
+		
+		return pvizitList;
+	} catch (SQLException e) {
+		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}
+	}
+	
+	@Override
 	public int AddPvizitId(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_vizit (npasp, cpol, datao, cod_sp, cdol, cuser, dataz) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, obr, pvizitTypes, 1, 2, 3, 7, 8, 9, 11);
@@ -420,7 +430,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ?, cobr = ?, lech = ? WHERE id = ?", false, obr, pvizitTypes, 4, 5, 6, 10, 12, 11, 14, 13, 0);
+			sme.execPreparedT("UPDATE p_vizit SET datao = ?, ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ?, cobr = ?, lech = ? WHERE id = ?", false, obr, pvizitTypes, 3, 4, 5, 6, 10, 12, 11, 14, 13, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -500,7 +510,24 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-
+	
+	@Override
+	public void DeletePvizitAmbObr(int obrId) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pvizit = ? ", false, obrId);
+			sme.execPrepared("DELETE FROM p_priem WHERE id_obr = ? ", false, obrId);
+			sme.execPrepared("DELETE FROM p_vizit_amb WHERE id_obr = ? ", false, obrId);
+			sme.execPrepared("DELETE FROM e_talon WHERE (id_pvizit = ?) AND (datap > CURRENT_DATE) ", false, obrId);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+	
 	@Override
 	public int AddPdiagAmb(PdiagAmb diag) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -3180,6 +3207,4 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 //			return null;
 	}
-
-	
 }
