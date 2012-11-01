@@ -110,6 +110,7 @@ public class PacientInfoFrame extends JFrame {
     private final ButtonGroup btnGroup_rf = new ButtonGroup();
     private final ButtonGroup btnGroup_pol_pr = new ButtonGroup();
     private final ButtonGroup btnGroup_plextr = new ButtonGroup();
+    private final ButtonGroup btnGroup_pp = new ButtonGroup();
     private CustomTextField tfFam;
     private CustomTextField tfIm;
     private CustomTextField tfOt;
@@ -198,7 +199,8 @@ public class PacientInfoFrame extends JFrame {
     private PatientFullInfo PersonalInfo;
     private Nambk NambInfo;
     private Agent AgentInfo;
-    private Lgota Id_lgota;
+	private Lgota Info_lgota;
+    private AllLgota Id_lgota;
     private List<AllLgota> LgotaInfo;
     private List<Kontingent> KontingentInfo;
     private Sign SignInfo;
@@ -536,7 +538,7 @@ public class PacientInfoFrame extends JFrame {
                     curPatientId = res[0];
                     changePatientPersonalInfo(curPatientId);
                     changePatientLgotaInfo(curPatientId);
-                    InfoForLgotaPatient(curPatientId);
+                    InfoForLgotaPatient();
                     changePatientKategInfo(curPatientId);
                     changePatientAgentInfo(curPatientId);
                     changePatientSignInfo(curPatientId);
@@ -1511,15 +1513,16 @@ public class PacientInfoFrame extends JFrame {
         scrollPane_1.setViewportView(tbl_lgota);
         panel_10.setLayout(gl_panel_10);
 
-//		tbl_lgota.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//        	if (tbl_lgota.getSelectedItem() !=  null)
-//				if (!e.getValueIsAdjusting()) {
-//					  changePatientLgotaInfo(curPatientId);
-//				}
-//			}
-//		});
+		tbl_lgota.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+        	if (tbl_lgota.getSelectedItem() !=  null)
+				if (!e.getValueIsAdjusting()) {
+					InfoForLgotaPatient();  
+					//changePatientLgotaInfo(curPatientId);
+				}
+			}
+		});
 
         //удалить
         tbl_lgota.registerDeleteSelectedRowListener(new CustomTableItemChangeEventListener<AllLgota>() {
@@ -1527,7 +1530,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public boolean doAction(CustomTableItemChangeEvent<AllLgota> event) {
                 try {
-                    curId = tbl_lgota.getSelectedItem().id;
+                    if (tbl_lgota.getSelectedItem().getId() != 0)curId = tbl_lgota.getSelectedItem().id;
                     MainForm.tcl.deleteLgota(curId);
                     NewLgotaInfo();
                 } catch (KmiacServerException e) {
@@ -1552,14 +1555,13 @@ public class PacientInfoFrame extends JFrame {
                     item.setLgota(tbl_lgota.getSelectedItem().lgota);
                     item.setDatau(tbl_lgota.getSelectedItem().datau);
 					if (tfgr.getText().length() > 0) item.setGri(Integer.valueOf(tfgr.getText())); 
-                    //else item.setGri( null);
-                    if (cmb_srok.getSelectedItem() != null) item.setSin(cmb_srok.getSelectedPcod());
+                    if (tfspr.getText().length() > 0) item.setNdoc(tfspr.getText());
                     if (rbtn_vperv.isSelected())item.setPp(1);
                     if (rbtn_povt.isSelected()) item.setPp(2);
                     if (tfdust.getDate() != null) item.setDrg(tfdust.getDate().getTime());
                     if (tfdotm.getDate() != null) item.setDot(tfdotm.getDate().getTime());
                     if (cmb_obst.getSelectedItem() != null) item.setObo(cmb_obst.getSelectedPcod());
-                    if (tfspr.getText() != null) item.setNdoc(tfspr.getText());
+                    if (cmb_srok.getSelectedItem() != null) item.setSin(cmb_srok.getSelectedPcod());
                     Info pInfo = MainForm.tcl.addLgota(event.getItem());
                     tbl_lgota.getSelectedItem().setName(pInfo.getName());
                     curId = pInfo.getId();
@@ -1582,6 +1584,20 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public boolean doAction(CustomTableItemChangeEvent<AllLgota> event) {
                 try {
+                    AllLgota item = event.getItem();
+                    item.setNpasp(curPatientId);
+                    if (tbl_lgota.getSelectedItem().getId() != 0)curId = tbl_lgota.getSelectedItem().id;
+                    item.setId(curId);
+                    item.setLgota(tbl_lgota.getSelectedItem().lgota);
+                    item.setDatau(tbl_lgota.getSelectedItem().datau);
+					if (tfgr.getText().length() > 0) item.setGri(Integer.valueOf(tfgr.getText())); 
+                    if (tfspr.getText().length() > 0) item.setNdoc(tfspr.getText());
+                    if (rbtn_vperv.isSelected())item.setPp(1);
+                    if (rbtn_povt.isSelected()) item.setPp(2);
+                    if (tfdust.getDate() != null) item.setDrg(tfdust.getDate().getTime());
+                    if (tfdotm.getDate() != null) item.setDot(tfdotm.getDate().getTime());
+                    if (cmb_obst.getSelectedItem() != null) item.setObo(cmb_obst.getSelectedPcod());
+                    if (cmb_srok.getSelectedItem() != null) item.setSin(cmb_srok.getSelectedPcod());
                 	MainForm.tcl.updateLgota(event.getItem());
                 } catch (KmiacServerException e) {
                     e.printStackTrace();
@@ -1627,7 +1643,8 @@ public class PacientInfoFrame extends JFrame {
         btnSave_lgt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 try{
-                    tbl_lgota.updateSelectedItem();
+                	tbl_lgota.updateSelectedItem();
+                	SaveForLgotaPatient();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -3385,7 +3402,6 @@ public class PacientInfoFrame extends JFrame {
                 }
           }
     };
-    private final ButtonGroup btnGroup_pp = new ButtonGroup();
 
     //TODO просмотр  информации о пациенте
     private void changePatientPersonalInfo(int PatId){
@@ -3515,25 +3531,52 @@ public class PacientInfoFrame extends JFrame {
         }
     }
 
+    // сохранение информации о льготе
+    private void SaveForLgotaPatient(){
+        try {
+            if (tbl_lgota.getSelectedItem() == null){
+                return;
+            }
+			Id_lgota = new AllLgota();
+			Id_lgota.setNpasp(curPatientId);
+            if (tbl_lgota.getSelectedItem().getId() != 0)curId = tbl_lgota.getSelectedItem().id;
+            Id_lgota.setId(curId);
+            Id_lgota.setLgota(tbl_lgota.getSelectedItem().lgota);
+            Id_lgota.setDatau(tbl_lgota.getSelectedItem().datau);
+			if (tfgr.getText().length() > 0) Id_lgota.setGri(Integer.valueOf(tfgr.getText())); 
+            if (tfspr.getText().length() > 0) Id_lgota.setNdoc(tfspr.getText());
+            if (rbtn_vperv.isSelected())Id_lgota.setPp(1);
+            if (rbtn_povt.isSelected()) Id_lgota.setPp(2);
+            if (tfdust.getDate() != null) Id_lgota.setDrg(tfdust.getDate().getTime());
+            if (tfdotm.getDate() != null) Id_lgota.setDot(tfdotm.getDate().getTime());
+            if (cmb_obst.getSelectedItem() != null) Id_lgota.setObo(cmb_obst.getSelectedPcod());
+            if (cmb_srok.getSelectedItem() != null) Id_lgota.setSin(cmb_srok.getSelectedPcod());
+        	MainForm.tcl.updateLgota(Id_lgota);
+        } catch (LgotaNotFoundException lnfe) {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // обновление информации о льготе
-    private void InfoForLgotaPatient(int PatId){
+    private void InfoForLgotaPatient(){
         try {
             NewLgotaInfo();
             if (tbl_lgota.getSelectedItem() == null){
                 return;
             }
-            curId = tbl_lgota.getSelectedItem().id;
-            Id_lgota = MainForm.tcl.getLgota(curId);
-            if (Id_lgota.getGri() != 0) tfgr.setText(Integer.toString(Id_lgota.getGri()));
-            if (Id_lgota.getNdoc() != null) tfspr.setText(Id_lgota.getNdoc());
-            if (Id_lgota.getDrg() != 0) tfdust.setDate(Id_lgota.getDrg());
-            if (Id_lgota.getDot() != 0) tfdotm.setDate(Id_lgota.getDot());
-            if (Id_lgota.isSetPp()){
-                rbtn_vperv.setSelected(Id_lgota.getPp() == 1);
-                rbtn_povt.setSelected(Id_lgota.getPp() == 2);
+            if (tbl_lgota.getSelectedItem().getId() != 0)curId = tbl_lgota.getSelectedItem().id;
+            Info_lgota = MainForm.tcl.getLgota(curId);
+            if (Info_lgota.getGri() != 0) tfgr.setText(Integer.toString(Info_lgota.getGri()));
+            if (Info_lgota.getNdoc() != null) tfspr.setText(Info_lgota.getNdoc());
+            if (Info_lgota.getDrg() != 0) tfdust.setDate(Info_lgota.getDrg());
+            if (Info_lgota.getDot() != 0) tfdotm.setDate(Info_lgota.getDot());
+            if (Info_lgota.isSetPp()){
+                rbtn_vperv.setSelected(Info_lgota.getPp() == 1);
+                rbtn_povt.setSelected(Info_lgota.getPp() == 2);
             }
-            if (Id_lgota.getSin() != 0) cmb_srok.setSelectedPcod(Id_lgota.getSin());
-            if (Id_lgota.getObo() != 0) cmb_obst.setSelectedPcod(Id_lgota.getObo());
+            if (Info_lgota.getSin() != 0) cmb_srok.setSelectedPcod(Info_lgota.getSin());
+            if (Info_lgota.getObo() != 0) cmb_obst.setSelectedPcod(Info_lgota.getObo());
         } catch (LgotaNotFoundException lnfe) {
         } catch (Exception e) {
             e.printStackTrace();

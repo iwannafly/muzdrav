@@ -30,6 +30,7 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
+import ru.nkz.ivcgzo.serverManager.common.DbfReader.DbfResultSet;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -400,8 +401,7 @@ public class GenReestr extends Server implements Iface {
 	        sqlr = "SELECT p.sl_id, p.id_lpu, p.fam, p.im, p.otch, p.dr, m.id_med, m.kod_rez, m.d_pst, m.diag, , e.kod_err, e.prim " +
 	 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med)" + 
 	 			   "ORDER BY p.id_lpu";
-			try (AutoCloseableResultSet	acrs = sse.execPreparedQuery(sqlr)) {
-				ResultSet rs = acrs.getResultSet();
+			try (DbfResultSet drs = new DbfResultSet("c:\\err.dbf")) {
 				AutoCloseableResultSet acr;
             
    			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("pr_err", ".htm").getAbsolutePath()), "utf-8")) {
@@ -419,12 +419,12 @@ public class GenReestr extends Server implements Iface {
 				sb.append("Имя архивного файла: <br>"+pf);
 				sb.append("Информация об ошибках: <br>");
 
-				while (rs.next()){
-					int kr = rs.getInt("kod_rez");
-					if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
+				while (drs.next()){
+					int kr = drs.getInt("kod_rez");
+					if (drs.getInt("kod_err")==14 || drs.getInt("kod_err")==81 || drs.getInt("kod_err")==82 ||drs.getInt("kod_err")==103 ||drs.getInt("kod_err")==231)
 						kr = 81;
 					try (SqlModifyExecutor sme = tse.startTransaction()) {
-						sme.execPrepared("UPDATE p_vizit_amb SET kod_rez=?, datak=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),rs.getInt("id"));
+						sme.execPrepared("UPDATE p_vizit_amb SET kod_rez=?, datak=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),drs.getInt("id"));
 						sme.setCommit();
 					} catch (SQLException e) {
 						((SQLException) e.getCause()).printStackTrace();
@@ -433,18 +433,22 @@ public class GenReestr extends Server implements Iface {
 						e1.printStackTrace();
 						throw new KmiacServerException();
 					}
-					if (rs.getInt("kod_rez") != 3 && rs.getInt("kod_rez") != 10){
-	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
-						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
-						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-						if (rs.getString("diag") == null) sb.append("</b><br>   Диагноз :  ОТСУТСТВУЕТ");
-						else sb.append(String.format("<br>   Диагноз :  %s", rs.getString("diag")));
-						sb.append(String.format("<br> %s ", rs.getString("kod_err")));
-						acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", rs.getInt("kod_err"));
-						if (acr.getResultSet().next()) 
-							sb.append(String.format("<br> %s ", acr.getResultSet().getString("name_err")));
-						sb.append(String.format("<br> %s ", rs.getString("prim")));
-						
+					if (drs.getInt("kod_rez") != 3 && drs.getInt("kod_rez") != 10){
+	    				sb.append(String.format("%s %s %s", drs.getString("fam").trim(), drs.getString("im").trim(), drs.getString("otch").trim()));
+						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", drs.getDate("dr").getTime()));
+						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", drs.getDate("d_pst").getTime()));
+						if (drs.getString("diag") == null) sb.append("</b><br>   Диагноз :  ОТСУТСТВУЕТ");
+						else sb.append(String.format("<br>   Диагноз :  %s", drs.getString("diag")));
+						sb.append(String.format("<br> %s ", drs.getString("kod_err")));
+						try {
+							acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", drs.getInt("kod_err"));
+							if (acr.getResultSet().next()) 
+								sb.append(String.format("<br> %s ", acr.getResultSet().getString("name_err")));
+							sb.append(String.format("<br> %s ", drs.getString("prim")));
+							acr.close();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
     	                	
    	            }
@@ -459,7 +463,11 @@ public class GenReestr extends Server implements Iface {
    			log.log(Level.ERROR, "SQl Exception: ", e);
     		((SQLException) e.getCause()).printStackTrace();
     		throw new KmiacServerException();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
 		}
+			return null;
 	}
 
 //////////////////////////Classifiers ////////////////////////////////////

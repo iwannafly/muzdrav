@@ -662,12 +662,6 @@ public class ServerRegPatient extends Server implements Iface {
             } else {
                 throw new LgotaNotFoundException();
             }
-//            List<Lgota> lgotaList = rsmLgota.mapToList(rs);
-//            if (lgotaList.size() > 0) {
-//                return lgotaList;
-//            } else {
-//                throw new LgotaNotFoundException();
-//            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -852,7 +846,7 @@ public class ServerRegPatient extends Server implements Iface {
           if (!isLgotaExist(lgota)) {
               sme.execPreparedT(
                       "INSERT INTO p_kov (npasp, lgot, datal, gri, sin, pp, drg, dot, obo, ndoc) "
-                      + "VALUES (?, ?, ?);", true, lgota,
+                      + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", true, lgota,
                       LGOTA_TYPES, indexes);
               Info tmpInfo = new Info();
               tmpInfo.setId(sme.getGeneratedKeys().getInt("id"));
@@ -1705,7 +1699,7 @@ public class ServerRegPatient extends Server implements Iface {
 			TException {
         final int[] indexes = {1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_kov SET npasp = ?, lgot = ?, datal = ?, gri, sin, pp, drg, dot, obo, ndoc "
+            sme.execPreparedT("UPDATE p_kov SET npasp = ?, lgot = ?, datal = ?, gri = ?, sin = ?, pp = ?, drg = ?, dot = ?, obo = ?, ndoc = ? "
                     + "WHERE id = ?", false,
                     lgota, LGOTA_TYPES, indexes);
             sme.setCommit();

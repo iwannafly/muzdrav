@@ -1,4 +1,4 @@
-﻿namespace java ru.nkz.ivcgzo.thriftRegPatient
+namespace java ru.nkz.ivcgzo.thriftRegPatient
 
 include "../../../common/thrift/classifier.thrift"
 include "../../../common/thrift/kmiacServer.thrift"
