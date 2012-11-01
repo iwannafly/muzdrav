@@ -9,5 +9,6 @@
 	<classpathentry kind="var" path="EXTERNAL_LIB/log4j-1.2.17.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.7.2.jar"/>
+	<classpathentry kind="lib" path="forms-1.3.0.jar" sourcepath="forms-1.3.0-src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
