@@ -159,8 +159,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz",    "cpos",        "cpol",        "kod_ter");
 		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
 		
-		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr");
-		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class};
+		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr",     "id_pos");
+		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class};
 		
 		rsmPdiagZ = new TResultSetMapper<>(PdiagZ.class, "id",          "id_diag_amb", "npasp",       "diag",       "cpodr",       "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "diag_s",     "d_grup_s",    "cod_sp",      "cdol_ot",    "nmvd",        "xzab",        "stady",       "disp",        "pat",         "prizb",       "prizi",       "named",      "ppi",         "uch",         "nameC00");
 		pdiagZTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, String.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
@@ -1536,7 +1536,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	public int setPdisp(Pdisp disp) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
-				getPdisp(disp.npasp, disp.diag);
+				getPdisp(disp.npasp, disp.diag, disp.pcod);
 				sme.execPreparedT("UPDATE p_disp SET diag = ?, pcod = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, d_uch = ?, diag_n = ? WHERE id_diag = ? ", false, disp, pdispTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
 				sme.setCommit();
 				return disp.getId();
@@ -1566,80 +1566,81 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 			sb.append("<head>");
 				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-				sb.append("<title>Случай заболевания</title>");
+				sb.append("<title>Вкладыш в амб.карту</title>");
 			sb.append("</head>");
 			sb.append("<body>");
-				acrs = sse.execPreparedQuery("SELECT datao,cobr,n_p0c.name FROM p_vizit join n_p0c on(p_vizit.cobr=n_p0c.pcod) where id=?", pk.getPvizit_id());
+				acrs = sse.execPreparedQuery("select datap,cpos,n_p0c.name FROM p_vizit_amb join n_p0c on(p_vizit_amb.cpos=n_p0c.pcod) where id=?", pk.getPvizit_ambId());
 				if (acrs.getResultSet().next()) {
-					sb.append(String.format("<b>Дата перв.обращения</b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(1)));
+					sb.append(String.format("<b>Дата</b> %1$td.%1$tm.%1$tY", acrs.getResultSet().getDate(1)));
 					sb.append(String.format("<br><b>Цель обращения </b>%s", acrs.getResultSet().getString(3)));
 				}
 				acrs.close();
 				
-				acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", pk.getPvizit_id()); 
-				if (acrs.getResultSet().next()) {
-					sb.append("<br><b>	Анамнез заболевания</b><br>");
-					if (acrs.getResultSet().getString(1)!=null)
-						sb.append(String.format(" %s.", acrs.getResultSet().getString(1)));
-				}				
-				acrs.close();
+//				acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", pk.getPvizit_id()); 
+//				if (acrs.getResultSet().next()) {
+//					sb.append("<br><b>	Анамнез заболевания</b><br>");
+//					if (acrs.getResultSet().getString(1)!=null)
+//						sb.append(String.format(" %s.", acrs.getResultSet().getString(1)));
+//				}				
+//				acrs.close();
 				
-				acrs = sse.execPreparedQuery("select n_abs.name,n_opl.name,n_aq0.name,p_priem.t_jalob,p_priem.t_temp,p_priem.t_ad,p_priem.t_rost,p_priem.t_ves,p_priem.t_chss,p_priem.t_status_praesense,p_priem.t_fiz_obsl,p_priem.t_st_localis,p_priem.t_ocenka,p_vizit_amb.datap,p_priem.t_recom from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) left join n_abs on(p_vizit_amb.mobs=n_abs.pcod) left join n_opl on(p_vizit_amb.opl=n_opl.pcod) left join n_aq0 on(p_vizit_amb.rezult=n_aq0.pcod) where p_vizit_amb.id_obr=? order by id ", pk.getPvizit_id());
+				acrs = sse.execPreparedQuery("select p_priem.t_jalob,p_priem.t_temp,p_priem.t_ad,p_priem.t_rost,p_priem.t_ves,p_priem.t_chss,p_priem.t_status_praesense,p_priem.t_fiz_obsl,p_priem.t_st_localis,p_priem.t_ocenka,p_priem.t_recom,n_aq0.name,p_diag_amb.diag,n_vdi.name,p_diag_amb.named  from p_vizit_amb join p_priem on (p_priem.id_pos=p_vizit_amb.id) left join n_aq0 on(p_vizit_amb.rezult=n_aq0.pcod) join p_diag_amb on (p_diag_amb.id_pos=p_vizit_amb.id) join n_vdi on(p_diag_amb.diag_stat=n_vdi.pcod) where p_vizit_amb.id=? order by id ", pk.getPvizit_ambId());
 				if (acrs.getResultSet().next()) {
 					sb.append("<br><b>Осмотр: </b><br>");
 					do {
-						sb.append(String.format("Дата посещения %1$td.%1$tm.%1$tY <br>", acrs.getResultSet().getDate(14)));
-						if (acrs.getResultSet().getString(1)!=null) sb.append(String.format("<i>Место обслуживания </i> %s <br>", acrs.getResultSet().getString(1)));
-						if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Способ оплаты </i> %s <br>", acrs.getResultSet().getString(2)));
-						if (acrs.getResultSet().getString(4)!=null) sb.append(String.format("<i>Жалобы: </i> %s <br>", acrs.getResultSet().getString(4)));
-						if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(5)));
-						if (acrs.getResultSet().getString(6)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(6)));
-						if (acrs.getResultSet().getString(7)!=null) sb.append(String.format("<i>Рост </i> %s <br>", acrs.getResultSet().getString(7)));
-						if (acrs.getResultSet().getString(8)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(8)));
-						if (acrs.getResultSet().getString(9)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(9)));
-						if (acrs.getResultSet().getString(10)!=null) sb.append(String.format("<i>Status praesense </i> %s <br>", acrs.getResultSet().getString(10)));
-						if (acrs.getResultSet().getString(11)!=null) sb.append(String.format("<i>Физикальное обследование </i> %s <br>", acrs.getResultSet().getString(11)));
-						if (acrs.getResultSet().getString(12)!=null) sb.append(String.format("<i>Localis status </i> %s <br>", acrs.getResultSet().getString(12)));
-						if (acrs.getResultSet().getString(12)!=null) sb.append(String.format("<i>Рекомендации </i> %s <br>", acrs.getResultSet().getString(15)));
-						if (acrs.getResultSet().getString(13)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(13)));
-						if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>Результат </i> %s <br>", acrs.getResultSet().getString(3)));
+						if (acrs.getResultSet().getString(1)!=null) sb.append(String.format("<i>Жалобы: </i> %s <br>", acrs.getResultSet().getString(1)));
+						if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Температура </i> %s <br>", acrs.getResultSet().getString(2)));
+						if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>АД </i> %s <br>", acrs.getResultSet().getString(3)));
+						if (acrs.getResultSet().getString(4)!=null) sb.append(String.format("<i>Рост </i> %s <br>", acrs.getResultSet().getString(4)));
+						if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("<i>Вес </i> %s <br>", acrs.getResultSet().getString(5)));
+						if (acrs.getResultSet().getString(6)!=null) sb.append(String.format("<i>ЧСС </i> %s <br>", acrs.getResultSet().getString(6)));
+						if (acrs.getResultSet().getString(7)!=null) sb.append(String.format("<i>Status praesense </i> %s <br>", acrs.getResultSet().getString(7)));
+						if (acrs.getResultSet().getString(8)!=null) sb.append(String.format("<i>Физикальное обследование </i> %s <br>", acrs.getResultSet().getString(8)));
+						if (acrs.getResultSet().getString(9)!=null) sb.append(String.format("<i>Localis status </i> %s <br>", acrs.getResultSet().getString(9)));
+						if (acrs.getResultSet().getString(11)!=null) sb.append(String.format("<i>Рекомендации </i> %s <br>", acrs.getResultSet().getString(11)));
+						if (acrs.getResultSet().getString(10)!=null) sb.append(String.format("<i>Оценка данных анамнеза и объективного исследования </i> %s <br>", acrs.getResultSet().getString(10)));
+						if (acrs.getResultSet().getString(13)!=null) sb.append(String.format("<i>Код диагноза МКБ </i> %s <br>", acrs.getResultSet().getString(13)));
+						if (acrs.getResultSet().getString(14)!=null) sb.append(String.format("<i>Статус диагноза</i> %s <br>", acrs.getResultSet().getString(14)));
+						if (acrs.getResultSet().getString(15)!=null) sb.append(String.format("<i>Медицинское описание диагноза </i> %s <br>", acrs.getResultSet().getString(15)));
+
+						if (acrs.getResultSet().getString(12)!=null) sb.append(String.format("<i>Результат </i> %s <br>", acrs.getResultSet().getString(12)));
 					} while (acrs.getResultSet().next());
 				}
 				acrs.close();
 					
-				sb.append("<br><b>Поставленные диагнозы: </b><br>");
-				acrs = sse.execPreparedQuery("select p_diag_amb. diag, n_c00.name  from p_diag_amb join n_c00 on (p_diag_amb.diag=n_c00.pcod) where p_diag_amb.diag_stat=1 and p_diag_amb.predv=false and id_obr=?", pk.getPvizit_id());
-				if (acrs.getResultSet().next()) {
-					sb.append("основное заболевание <br>");
-					acrs.close();
-					acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", pk.getPvizit_id());
-					while (acrs.getResultSet().next()) {
-						if (acrs.getResultSet().getString(1) != null)
-							sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
-					}
-					acrs.close();
-					
-					acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=2 and predv=false order by datap", pk.getPvizit_id());
-					if (acrs.getResultSet().isBeforeFirst())
-						sb.append("<br>осложнение основного заболевания <br>");
-					while (acrs.getResultSet().next()) {
-						if (acrs.getResultSet().getString(1) != null)
-							sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
-						else
-							sb.append(" -<br>");
-						}				
-					acrs.close();
-					
-					acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=3 and predv=false order by datap", pk.getPvizit_id());
-					if (acrs.getResultSet().isBeforeFirst())
-						sb.append("<br>сопутствующее заболевание <br>");
-					while (acrs.getResultSet().next()) {
-						if (acrs.getResultSet().getString(1) != null)
-							sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
-						else
-							sb.append(" -<br>");
-						}
-					acrs.close();
+//				sb.append("<br><b>Поставленные диагнозы: </b><br>");
+//				acrs = sse.execPreparedQuery("select p_diag_amb. diag, n_c00.name  from p_diag_amb join n_c00 on (p_diag_amb.diag=n_c00.pcod) where p_diag_amb.diag_stat=1 and p_diag_amb.predv=false and id_obr=?", pk.getPvizit_id());
+//				if (acrs.getResultSet().next()) {
+//					sb.append("основное заболевание <br>");
+//					acrs.close();
+//					acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", pk.getPvizit_id());
+//					while (acrs.getResultSet().next()) {
+//						if (acrs.getResultSet().getString(1) != null)
+//							sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
+//					}
+//					acrs.close();
+//					
+//					acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=2 and predv=false order by datap", pk.getPvizit_id());
+//					if (acrs.getResultSet().isBeforeFirst())
+//						sb.append("<br>осложнение основного заболевания <br>");
+//					while (acrs.getResultSet().next()) {
+//						if (acrs.getResultSet().getString(1) != null)
+//							sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
+//						else
+//							sb.append(" -<br>");
+//						}				
+//					acrs.close();
+//					
+//					acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=3 and predv=false order by datap", pk.getPvizit_id());
+//					if (acrs.getResultSet().isBeforeFirst())
+//						sb.append("<br>сопутствующее заболевание <br>");
+//					while (acrs.getResultSet().next()) {
+//						if (acrs.getResultSet().getString(1) != null)
+//							sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
+//						else
+//							sb.append(" -<br>");
+//						}
+//					acrs.close();
 					
 					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_p0e1.pcod , n_p0e1.name , n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav " +
 						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok) join n_p0e1  on (n_p0e1.pcod = p_isl_ld.cisl) " +
@@ -1666,7 +1667,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(3)));
 					}
 					sb.append("<br>");
-				}
 				acrs.close();
 	
 				sb.append(String.format("<p align=\"left\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
@@ -2933,19 +2933,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 
-	@Override
-	public Pdisp getPdisp(int npasp, String diag) throws KmiacServerException,
-			PdispNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_disp where npasp = ? and diag = ?", npasp, diag)) {
-			if (acrs.getResultSet().next())
-				return rsmPdisp.map(acrs.getResultSet());
-			else
-				throw new PdispNotFoundException();
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
-			throw new KmiacServerException();
-		}
-	}
+
 
 	@Override
 	public void DeleteRdDin(int id_pos) throws KmiacServerException, TException {
@@ -3203,6 +3191,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				acrs2.close();
 		}
 //			return null;
+	}
+
+	@Override
+	public Pdisp getPdisp(int npasp, String diag, int cpol)
+			throws KmiacServerException, PdispNotFoundException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_disp where npasp = ? and diag = ? and pcod = ?", npasp, diag, cpol)) {
+			if (acrs.getResultSet().next())
+				return rsmPdisp.map(acrs.getResultSet());
+			else
+				throw new PdispNotFoundException();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
 	}
 
 	
