@@ -110,11 +110,15 @@ public abstract class Client <T extends KmiacServer.Client> implements IClient {
 			if (!(getFrame() instanceof ModalForm) || (((ModalForm) getFrame()).getModalLocationRelativeToParent()))
 					dialog.setLocationRelativeTo(parent.getFrame());
 			conMan.setClient(this);
+			conMan.add(thrClass, getPort());
 			conMan.connect();
 		} catch (TException e) {
 			e.printStackTrace();
 			conMan.setClient(parent);
 			conMan.reconnect(e);
+		} catch (Exception e) {
+			e.printStackTrace();
+			conMan.setClient(parent);
 		}
 		
 		return dialog;

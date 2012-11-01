@@ -87,6 +87,7 @@ struct PdiagAmb {
 	15: optional i32 codsp_ot;
 	16: optional string cdol_ot;
 	17: optional i32 vid_tr;
+	18: optional i32 id_pos;
 }
 
 struct Psign{
@@ -118,6 +119,7 @@ struct Priem{
 	16: optional string t_jalob;
 	17: optional string t_status_praesense;
 	18: optional string t_fiz_obsl;
+	19: optional string t_recom;
 }
 
 struct AnamZab{
@@ -401,6 +403,7 @@ struct P_isl_ld {
 	11: optional i32 pvizit_id;
 	12: optional i32 prichina;
 	13: optional i32 kodotd;
+	14: optional i64 datav;
 }
 
 struct Prez_d {
@@ -408,6 +411,7 @@ struct Prez_d {
 	2: optional i32 npasp;
 	3: optional i32 nisl;
 	4: optional string kodisl;
+	5: optional string rez;
 }
 
 struct Prez_l {
@@ -415,6 +419,7 @@ struct Prez_l {
 	2: optional i32 npasp;
 	3: optional i32 nisl;
 	4: optional string cpok;
+	5: optional string rez;
 }
 
 
@@ -475,6 +480,8 @@ struct IsslInfo{
 	5: optional string pokaz_name;
 	6: optional string rez;
 	7: optional i64 datav;
+	8: optional i64 datan;
+	9: optional i32 id;
 }
 
 
@@ -639,11 +646,12 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 * Получение списка записанных на прием на заданную дату.
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
-	list<ZapVr> getZapVrSrc(1: i32 npasp, 2: i32 codsp, 3: string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	ZapVr getZapVrSrc(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
+	list<Pvizit> getPvizitList(1: i32 npasp, 2: i32 codsp, 3: string cdol) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteEtalon (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
@@ -652,6 +660,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<PvizitAmb> getPvizitAmb(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePvizitAmb(1: PvizitAmb pos) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizitAmb(1: i32 posId) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePvizitAmbObr(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 AddPdiagAmb(1: PdiagAmb diag) throws (1: kmiacServer.KmiacServerException kse);
 	list<PdiagAmb> getPdiagAmb(1: i32 idObr) throws (1: kmiacServer.KmiacServerException kse);
@@ -675,7 +684,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PdiagZ getPdiagZ(1: i32 id_diag_amb) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
-	Pdisp getPdisp(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
+	Pdisp getPdisp(1: i32 npasp, 2: string diag, 3: i32 cpol) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
 
 	i32 AddPnapr(1: PNapr pn) throws (1: kmiacServer.KmiacServerException kse);
 
@@ -691,6 +700,9 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	i32 AddPisl(1: P_isl_ld npisl) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezd(1: Prez_d di) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPrezl(1: Prez_l li) throws (1: kmiacServer.KmiacServerException kse);
+	list<P_isl_ld> getIsslInfoDate(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	list<IsslInfo> getIsslInfoPokaz(1: i32 nisl) throws (1: kmiacServer.KmiacServerException kse);
+	IsslInfo getIsslInfoPokazId(1: i32 id_issl) throws (1: kmiacServer.KmiacServerException kse);
 
 	
 	string printIsslMetod(1: IsslMet im) throws (1: kmiacServer.KmiacServerException kse);
@@ -734,6 +746,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
+	string printDnevVr(1: i32 vrach) throws (1: kmiacServer.KmiacServerException kse);
 
 /*Выгрузка для Кемерово по диспансеризации беременных*/
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);

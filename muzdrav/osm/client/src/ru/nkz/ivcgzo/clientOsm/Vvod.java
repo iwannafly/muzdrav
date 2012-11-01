@@ -10,10 +10,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
@@ -25,6 +28,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
@@ -33,9 +37,12 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
+import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
@@ -46,6 +53,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
 
@@ -64,6 +78,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.AnamZab;
 import ru.nkz.ivcgzo.thriftOsm.Cgosp;
 import ru.nkz.ivcgzo.thriftOsm.Cotd;
+import ru.nkz.ivcgzo.thriftOsm.IsslInfo;
 import ru.nkz.ivcgzo.thriftOsm.IsslMet;
 import ru.nkz.ivcgzo.thriftOsm.Napr;
 import ru.nkz.ivcgzo.thriftOsm.NaprKons;
@@ -139,9 +154,6 @@ public class Vvod extends JFrame {
 	private JCheckBox chbDiagBoe;
 	private JCheckBox chbDiagInv;
 	private JCheckBox chbDiagBer;
-	private JComboBox<String> cmbKonsVidNapr;
-	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbKonsMesto;
-	private JTextArea tbKonsObosnov;
 	private JTextArea tbLech;
 	private JButton btnRecPriem;
 	private JButton btnBer;
@@ -171,8 +183,6 @@ public class Vvod extends JFrame {
 	private FormPostBer postber;
 	private ShablonForm shablonform;
 	private DispHron disphron;
-	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbVidStacionar;
-	private JLabel lblVidStacionar;
 	private Color defCol = UIManager.getColor("TabbedPane.foreground");
 	private Color selCol = Color.red;
 	private CustomTextField tfNewDs;
@@ -183,7 +193,23 @@ public class Vvod extends JFrame {
 	private Pvizit pvizitCopy;
 	private PvizitAmb pvizitAmbCopy;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbLpu;
-
+	private DefaultMutableTreeNode root;
+	private DefaultMutableTreeNode issinfo;
+	private JTree treeRezIssl;
+	private StringBuilder sb;
+	private JEditorPane epTxtRezIssl;
+	private JTextArea tbRecom;
+	private static final String lineSep = System.lineSeparator();
+	private JComboBox<String> cmbConsVidNapr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbVidStacionar;
+	private JTextArea tbKonsObosnov;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbKonsMesto;
+	private JLabel lblVidStacionar;
+	private JLabel lblKonsMesto;
+	private CustomTable<Pvizit, Pvizit._Fields> tblObr;
+	private JButton btnObrDel;
+	private JButton btnObrSave;
+	private JButton btnObrAdd;
 	
 	/**
 	 * Create the dialog.
@@ -260,7 +286,11 @@ public class Vvod extends JFrame {
 		JButton btnProsm = new JButton("Просмотр");
 		btnProsm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", zapVr.fam, zapVr.im, zapVr.oth), zapVr.npasp);
+				try {
+					MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", zapVr.fam, zapVr.im, zapVr.oth), zapVr.npasp);
+				} catch (Exception e1) {
+					JOptionPane.showMessageDialog(Vvod.this, String.format("Не удалось отобразить форму просмотра%s%s", System.lineSeparator(), e1.toString()), "Ошибка", JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 		
@@ -289,7 +319,7 @@ public class Vvod extends JFrame {
        						String servPath = MainForm.tcl.printProtokol(protokol);
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
-       						MainForm.conMan.openFileInEditor(cliPath, true);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 	       				}
 	       				catch (TException e1) {
 	       					e1.printStackTrace();
@@ -316,7 +346,7 @@ public class Vvod extends JFrame {
 							String servPath = MainForm.tcl.printVypis(vp);
 							String cliPath = File.createTempFile("vypis", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);
-       						MainForm.conMan.openFileInEditor(cliPath, true);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
@@ -335,7 +365,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printKek(Vvod.zapVr.getNpasp(), tblPos.getSelectedItem().id_obr);
 								String cliPath = File.createTempFile("kek", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, true);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -355,7 +385,7 @@ public class Vvod extends JFrame {
 								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
 								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
 								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, true);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
 						}
 						catch (TException e1) {
 							e1.printStackTrace();
@@ -507,8 +537,8 @@ public class Vvod extends JFrame {
 		spShabSrc.setViewportView(lbShabSrc);
 		
 		JPanel pnlJal = new JPanel();
-		tabbedPane.addTab("<html><br>Жалобы<br><br></html>", null, pnlJal, null);
-		tabbedPane.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
+		tabbedPane.addTab("<html><br>Жалобы</html>", null, pnlJal, null);
+		tabbedPane.setTabComponentAt(0, new JLabel("<html><br>Жалобы</html>"));
 		((JLabel) tabbedPane.getTabComponentAt(0)).setForeground(selCol);
 		
 		JScrollPane spJal = new JScrollPane();
@@ -536,8 +566,8 @@ public class Vvod extends JFrame {
 		pnlJal.setLayout(gl_pnlJal);
 		
 		JPanel pnlAnam = new JPanel();
-		tabbedPane.addTab("<html><br>История настоящего<br>заболевания<br></html>", null, pnlAnam, null);
-		tabbedPane.setTabComponentAt(1, new JLabel("<html><br>История настоящего<br>заболевания<br></html>"));
+		tabbedPane.addTab("<html>История заболевания<br> (anamnesis morbi)</html>", null, pnlAnam, null);
+		tabbedPane.setTabComponentAt(1, new JLabel("<html>История заболевания<br> (anamnesis morbi)</html></html>"));
 		
 		JScrollPane spAnam = new JScrollPane();
 		GroupLayout gl_pnlAnam = new GroupLayout(pnlAnam);
@@ -564,8 +594,8 @@ public class Vvod extends JFrame {
 		pnlAnam.setLayout(gl_pnlAnam);
 		
 		JPanel pnlStat = new JPanel();
-		tabbedPane.addTab("<html><br>Status praesense<br><br></html>", null, pnlStat, null);
-		tabbedPane.setTabComponentAt(2, new JLabel("<html><br>Status praesense<br><br></html>"));
+		tabbedPane.addTab("<html>Объективный статус <br>(status praesense)</html>", null, pnlStat, null);
+		tabbedPane.setTabComponentAt(2, new JLabel("<html>Объективный статус <br>(status praesense)</html>"));
 		
 		tbStatTemp = new CustomTextField();
 		tbStatTemp.setColumns(10);
@@ -660,8 +690,8 @@ public class Vvod extends JFrame {
 		pnlStat.setLayout(gl_pnlStat);
 		
 		JPanel pnlFiz = new JPanel();
-		tabbedPane.addTab("<html><br>Физикальное обследование<br><br></html>", null, pnlFiz, null);
-		tabbedPane.setTabComponentAt(3, new JLabel("<html><br>Физикальное обследование<br><br></html>"));
+		tabbedPane.addTab("<html><br>Физикальное обследование</html>", null, pnlFiz, null);
+		tabbedPane.setTabComponentAt(3, new JLabel("<html><br>Физикальное обследование</html>"));
 		
 		JScrollPane spFiz = new JScrollPane();
 		
@@ -689,8 +719,8 @@ public class Vvod extends JFrame {
 		pnlFiz.setLayout(gl_pnlFiz);
 		
 		JPanel pnlLoc = new JPanel();
-		tabbedPane.addTab("<html><br>Localis status<br><br></html>", null, pnlLoc, null);
-		tabbedPane.setTabComponentAt(4, new JLabel("<html><br>Localis status<br><br></html>"));
+		tabbedPane.addTab("<html>Локальный статус<br> (localis status)<br></html>", null, pnlLoc, null);
+		tabbedPane.setTabComponentAt(4, new JLabel("<html>Локальный статус<br> (localis status)<br></html>"));
 		
 		JScrollPane spLoc = new JScrollPane();
 		GroupLayout gl_pnlLoc = new GroupLayout(pnlLoc);
@@ -717,8 +747,8 @@ public class Vvod extends JFrame {
 		pnlLoc.setLayout(gl_pnlLoc);
 		
 		JPanel pnlDiag = new JPanel();
-		tabbedPane.addTab("<html><br>Диагноз<br><br></html>", null, pnlDiag, null);
-		tabbedPane.setTabComponentAt(5, new JLabel("<html><br>Диагноз<br><br></html>"));
+		tabbedPane.addTab("<html><br>Диагноз</html>", null, pnlDiag, null);
+		tabbedPane.setTabComponentAt(5, new JLabel("<html><br>Диагноз</html>"));
 		
 		JPanel PnlDiag = new JPanel();
 		
@@ -841,8 +871,9 @@ public class Vvod extends JFrame {
 		  				tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
 		  			}
 		  			/*pdiag*/
+		  			if (tbDiagDispDatVz.getDate() != null)
 		  				pdiag.setD_vz(pdisp.getD_vz());
-		  				pdiag.setDataish(pdisp.getDataish());
+		  			if (tbDiagDispDatIsh.getDate() != null)	pdiag.setDataish(pdisp.getDataish());
 			  		pdiag.setIshod(pdisp.getIshod());
 			  		pdiag.setD_grup(pdisp.getD_grup());
 			  		MainForm.tcl.setPdiag(pdiag);	
@@ -1155,6 +1186,7 @@ public class Vvod extends JFrame {
 				.addGroup(gl_pnlDiag.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING)
+						.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 582, GroupLayout.PREFERRED_SIZE)
 						.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDiag.createSequentialGroup()
 							.addComponent(lblDiagVidTr, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
@@ -1169,19 +1201,18 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(chbDiagBoe)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(chbDiagBer, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addComponent(chbDiagBer, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))
 						.addComponent(PnlDiag, 0, 0, Short.MAX_VALUE)
 						.addGroup(gl_pnlDiag.createSequentialGroup()
 							.addComponent(lblDiagOpis, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(spDiagOpis, GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE))
-						.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 582, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlDiag.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(spDiagOpis, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE))
+						.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING, false)
 							.addGroup(gl_pnlDiag.createSequentialGroup()
 								.addComponent(pnlDiagStadZab, GroupLayout.PREFERRED_SIZE, 292, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.UNRELATED)
 								.addComponent(pnlDiagHarZab, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-							.addGroup(Alignment.LEADING, gl_pnlDiag.createSequentialGroup()
+							.addGroup(gl_pnlDiag.createSequentialGroup()
 								.addComponent(pnlDiagStat, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(pnlDiagPredv, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE))))
@@ -1210,9 +1241,9 @@ public class Vvod extends JFrame {
 						.addComponent(lblDiagVidTr, GroupLayout.PREFERRED_SIZE, 12, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblDiagObstReg)
 						.addComponent(cmbDiagObstReg, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
-					.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.BASELINE)
 						.addComponent(chbDiagInv)
 						.addComponent(chbDiagBoe)
@@ -1240,7 +1271,8 @@ public class Vvod extends JFrame {
 		
 		JLabel lblDiagDispIsh = new JLabel("Исход ДУ");
 		
-		btnDispHron = new JButton("...");
+		btnDispHron = new JButton("<html>Дисп.<br>набл.</html>");
+		btnDispHron.setHorizontalTextPosition(SwingConstants.LEADING);
 		btnDispHron.setToolTipText("Диспансерные мероприятия");
 		btnDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -1299,7 +1331,7 @@ public class Vvod extends JFrame {
 									.addComponent(lblDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 									.addComponent(lblNuch)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addGap(10)
 									.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addGap(18)
 									.addComponent(lblNewDs)
@@ -1309,13 +1341,11 @@ public class Vvod extends JFrame {
 									.addComponent(lblDataIzmNewDs)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(tfDataIzmNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
-									.addGap(10)
-									.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
-								.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE))))
-					.addGap(2))
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.TRAILING)
+								.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE))))
+					.addContainerGap())
 		);
 		gl_pnlDiagDisp.setVerticalGroup(
 			gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING)
@@ -1332,15 +1362,14 @@ public class Vvod extends JFrame {
 						.addComponent(lblDiagDispDatIsh)
 						.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.TRAILING)
-						.addComponent(lblNuch)
-						.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.BASELINE)
-							.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblNewDs)
-							.addComponent(tfNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(lblDataIzmNewDs)
-							.addComponent(tfDataIzmNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+					.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tfNuch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnDispHron, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewDs)
+						.addComponent(tfNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblDataIzmNewDs)
+						.addComponent(tfDataIzmNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNuch))
 					.addGap(11))
 		);
 		pnlDiagDisp.setLayout(gl_pnlDiagDisp);
@@ -1411,8 +1440,8 @@ public class Vvod extends JFrame {
 		pnlDiag.setLayout(gl_pnlDiag);
 		
 		JPanel pnlLech = new JPanel();
-		tabbedPane.addTab("<html><br>Назначенное лечение<br><br></html>", null, pnlLech, null);
-		tabbedPane.setTabComponentAt(6, new JLabel("<html><br>Назначенное лечение<br><br></html>"));
+		tabbedPane.addTab("<html><br>Лечение</html>", null, pnlLech, null);
+		tabbedPane.setTabComponentAt(6, new JLabel("<html><br>Лечение</html>"));
 		
 		JScrollPane spLech = new JScrollPane();
 		GroupLayout gl_pnlLech = new GroupLayout(pnlLech);
@@ -1438,24 +1467,24 @@ public class Vvod extends JFrame {
 		spLech.setViewportView(tbLech);
 		pnlLech.setLayout(gl_pnlLech);
 		
-		JPanel pnlNapr = new JPanel();
-		tabbedPane.addTab("<html><br>Направления<br><br></html>", null, pnlNapr, null);
-		tabbedPane.setTabComponentAt(7, new JLabel("<html><br>Направления<br><br></html>"));
+		JPanel pnlLabIssl = new JPanel();
+		tabbedPane.addTab("<html>Лабораторно-<br>диагностические <br>исследования</html>", null, pnlLabIssl, null);
+		tabbedPane.setTabComponentAt(7, new JLabel("<html>Лабораторно-<br>диагностические <br>исследования</html>"));
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
-		GroupLayout gl_pnlNapr = new GroupLayout(pnlNapr);
-		gl_pnlNapr.setHorizontalGroup(
-			gl_pnlNapr.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlNapr.createSequentialGroup()
+		GroupLayout gl_pnlLabIssl = new GroupLayout(pnlLabIssl);
+		gl_pnlLabIssl.setHorizontalGroup(
+			gl_pnlLabIssl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlLabIssl.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(tabbedPane_1, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+					.addComponent(tabbedPane_1)
 					.addContainerGap())
 		);
-		gl_pnlNapr.setVerticalGroup(
-			gl_pnlNapr.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlNapr.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(tabbedPane_1, GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+		gl_pnlLabIssl.setVerticalGroup(
+			gl_pnlLabIssl.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_pnlLabIssl.createSequentialGroup()
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(tabbedPane_1, GroupLayout.PREFERRED_SIZE, 445, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		
@@ -1595,35 +1624,35 @@ public class Vvod extends JFrame {
 				.addGroup(gl_pnlIssl.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.LEADING)
-						.addComponent(spNaprPokazMet, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(lblLpu)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmbLpu, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(lblNaprMesto, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmbNaprMesto, 0, 458, Short.MAX_VALUE))
+						.addGroup(gl_pnlIssl.createSequentialGroup()
+							.addComponent(lblNaprVidIssl, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cmbOrgan, 0, 419, Short.MAX_VALUE))
+						.addComponent(spNaprPokazMet, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
 						.addComponent(btnNaprPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlIssl.createSequentialGroup()
 							.addComponent(lblNaprKab, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblNaprPokazMet, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
-						.addGroup(gl_pnlIssl.createSequentialGroup()
-							.addComponent(lblNaprMesto, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbNaprMesto, 0, 457, Short.MAX_VALUE))
-						.addGroup(gl_pnlIssl.createSequentialGroup()
-							.addComponent(lblNaprVidIssl, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbOrgan, 0, 418, Short.MAX_VALUE))
-						.addGroup(gl_pnlIssl.createSequentialGroup()
-							.addComponent(lblLpu)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbLpu, GroupLayout.PREFERRED_SIZE, 298, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(lblNaprPokazMet, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_pnlIssl.setVerticalGroup(
 			gl_pnlIssl.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_pnlIssl.createSequentialGroup()
+				.addGroup(Alignment.LEADING, gl_pnlIssl.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblLpu)
 						.addComponent(cmbLpu, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlIssl.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNaprMesto)
 						.addComponent(cmbNaprMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -1641,7 +1670,7 @@ public class Vvod extends JFrame {
 						.addComponent(tbNaprKab, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnNaprPrint)
-					.addContainerGap())
+					.addContainerGap(17, Short.MAX_VALUE))
 		);
 		
 		tblNaprPokazMet = new CustomTable<>(false, true, PokazMet.class, 0, "Код", 1, "Наименование", 2, "Выбор");
@@ -1650,38 +1679,178 @@ public class Vvod extends JFrame {
 		spNaprPokazMet.setViewportView(tblNaprPokazMet);
 		pnlIssl.setLayout(gl_pnlIssl);
 		
-		JPanel pnlKons = new JPanel();
-		tabbedPane_1.addTab("Направление", null, pnlKons, null);
+		JPanel pnlRezIssl = new JPanel();
+		tabbedPane_1.addTab("Результаты исследований", null, pnlRezIssl, null);
 		
-		cmbKonsVidNapr = new JComboBox<>();
-		cmbKonsVidNapr.addActionListener(new ActionListener() {
+		JSplitPane splRezIssl = new JSplitPane();
+		 Calendar calendar = GregorianCalendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+		GroupLayout gl_pnlRezIssl = new GroupLayout(pnlRezIssl);
+		gl_pnlRezIssl.setHorizontalGroup(
+			gl_pnlRezIssl.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRezIssl.createSequentialGroup()
+					.addComponent(splRezIssl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
+		gl_pnlRezIssl.setVerticalGroup(
+			gl_pnlRezIssl.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_pnlRezIssl.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(splRezIssl, GroupLayout.PREFERRED_SIZE, 400, Short.MAX_VALUE))
+		);
+		
+		JPanel pnlRezIsslL = new JPanel();
+		splRezIssl.setLeftComponent(pnlRezIsslL);
+		
+		JScrollPane spRezIssl = new JScrollPane();
+		GroupLayout gl_pnlRezIsslL = new GroupLayout(pnlRezIsslL);
+		gl_pnlRezIsslL.setHorizontalGroup(
+			gl_pnlRezIsslL.createParallelGroup(Alignment.LEADING)
+				.addComponent(spRezIssl, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+		);
+		gl_pnlRezIsslL.setVerticalGroup(
+			gl_pnlRezIsslL.createParallelGroup(Alignment.LEADING)
+				.addComponent(spRezIssl, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+		);
+		
+		 treeRezIssl = new JTree();
+		 treeRezIssl.addTreeSelectionListener(new TreeSelectionListener() {
+		 	public void valueChanged(TreeSelectionEvent e) {
+		 		if (e.getNewLeadSelectionPath() == null) {
+		 			epTxtRezIssl.setText("");
+		 			return;
+		 		}
+		 		sb = new StringBuilder();	
+		 		Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
+
+		 		if (lastPath instanceof IsslPokazNode) {
+		 			IsslPokazNode isslPokazNode = (IsslPokazNode) lastPath;
+	 				IsslInfo iinfo = isslPokazNode.isslpokaz;
+						addLineToDetailInfo("id: ", iinfo.isSetId(), iinfo.getId());
+						addLineToDetailInfo("Наименование",iinfo.isSetPokaz_name(), iinfo.getPokaz_name());
+						addLineToDetailInfo("Результат",iinfo.isSetRez(), iinfo.getRez());
+						epTxtRezIssl.setText(sb.toString());
+					
+		 		}
+		 	}
+		 });
+		 treeRezIssl.addTreeExpansionListener(new TreeExpansionListener() {
+		 	public void treeCollapsed(TreeExpansionEvent event) {
+		 	}
+		 	public void treeExpanded(TreeExpansionEvent event) {
+		 		Object lastPath = event.getPath().getLastPathComponent();
+		 		if (lastPath instanceof IsslInfoTreeNode) {
+		 			try {
+						IsslInfoTreeNode isslnode = (IsslInfoTreeNode) lastPath;
+						isslnode.removeAllChildren();
+						for (IsslInfo isslChild : MainForm.tcl.getIsslInfoPokaz(isslnode.issl.getNisl())) {
+							isslnode.add(new IsslPokazNode(isslChild));
+						}
+						((DefaultTreeModel) treeRezIssl.getModel()).reload(isslnode);
+					} catch (KmiacServerException e) {
+						e.printStackTrace();
+					} catch (TException e) {
+						MainForm.conMan.reconnect(e);
+					}
+		 		}
+
+		 		}
+		 });
+		spRezIssl.setViewportView(treeRezIssl);
+		treeRezIssl.setShowsRootHandles(true);
+		treeRezIssl.setRootVisible(false);
+		DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeRezIssl.getCellRenderer();
+		renderer.setLeafIcon(null);
+		renderer.setClosedIcon(null);
+		renderer.setOpenIcon(null);
+		pnlRezIsslL.setLayout(gl_pnlRezIsslL);
+		
+		JPanel pnlRezIsslR = new JPanel();
+		splRezIssl.setRightComponent(pnlRezIsslR);
+		
+		JScrollPane spTxtRezIssl = new JScrollPane();
+		GroupLayout gl_pnlRezIsslR = new GroupLayout(pnlRezIsslR);
+		gl_pnlRezIsslR.setHorizontalGroup(
+			gl_pnlRezIsslR.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRezIsslR.createSequentialGroup()
+					.addGap(4)
+					.addComponent(spTxtRezIssl, GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+		);
+		gl_pnlRezIsslR.setVerticalGroup(
+			gl_pnlRezIsslR.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRezIsslR.createSequentialGroup()
+					.addGap(4)
+					.addComponent(spTxtRezIssl, GroupLayout.PREFERRED_SIZE, 401, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		
+		 epTxtRezIssl = new JEditorPane();
+		spTxtRezIssl.setViewportView(epTxtRezIssl);
+		pnlRezIsslR.setLayout(gl_pnlRezIsslR);
+		pnlRezIssl.setLayout(gl_pnlRezIssl);
+		pnlLabIssl.setLayout(gl_pnlLabIssl);
+		
+		JPanel pnlNapr = new JPanel();
+		tabbedPane.addTab("<html><br>Направления</html>", null, pnlNapr, null);
+		tabbedPane.setTabComponentAt(8, new JLabel("<html><br>Направления</html>"));
+
+		
+		JLabel lblKonsVidNapr = new JLabel("на");
+		
+		  cmbConsVidNapr = new JComboBox<String>();
+		cmbConsVidNapr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (cmbKonsVidNapr.getSelectedIndex() != 0){cmbVidStacionar.setVisible(false);lblVidStacionar.setVisible(false);}
+				if (cmbConsVidNapr.getSelectedIndex() != 0){cmbVidStacionar.setVisible(false);lblVidStacionar.setVisible(false);lblKonsMesto.setVisible(true); cmbKonsMesto.setVisible(true);}
 				else {try {
 					cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
 					e1.printStackTrace();
-				}cmbVidStacionar.setVisible(true);}
+				}cmbVidStacionar.setVisible(true);lblVidStacionar.setVisible(true);
+				}
 			}
 		});
-		cmbKonsVidNapr.setModel(new DefaultComboBoxModel<>(new String[] {"госпитализацию", "консультацию"}));
+		cmbConsVidNapr.setModel(new DefaultComboBoxModel<String>(new String[] {"госпитализацию", "консультацию"}));
 		
-		JLabel lblKonsVidNapr = new JLabel("на");
+		 lblVidStacionar = new JLabel("Вид стационара");
 		
-		cmbKonsMesto = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_n00);
+		cmbVidStacionar = new ThriftIntegerClassifierCombobox<>(true);
+		cmbVidStacionar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (cmbVidStacionar.getSelectedItem() != null){
+					if ((cmbVidStacionar.getSelectedPcod()==1)||(cmbVidStacionar.getSelectedPcod()==2)){lblKonsMesto.setVisible(true); cmbKonsMesto.setVisible(true); 
+					try {
+					cmbKonsMesto.setData(MainForm.tcl.get_m00());
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+				}
+				}
+				if ((cmbVidStacionar.getSelectedPcod()==3)||(cmbVidStacionar.getSelectedPcod()==4)){lblKonsMesto.setVisible(false); cmbKonsMesto.setVisible(false); }
+				}
+			}
+		});
 		
-		final JLabel lblKonsMesto = new JLabel("Куда");
+		lblKonsMesto = new JLabel("Куда");
+		
+		cmbKonsMesto = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_n00);
 		
 		JLabel lblKonsObosnov = new JLabel("Обоснование для направления");
+		
+		tbKonsObosnov = new JTextArea();
+		tbKonsObosnov.setBorder(UIManager.getBorder("ScrollPane.border"));
+		tbKonsObosnov.setWrapStyleWord(true);
+		tbKonsObosnov.setLineWrap(true);
+		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JButton btnKonsPrint = new JButton("Печать");
 		btnKonsPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
 					PNapr pnapr = new PNapr();
-					if (cmbKonsVidNapr.getSelectedIndex() != 0){
+					if (cmbConsVidNapr.getSelectedIndex() != 0){
 						pnapr.setIdpvizit(tblPos.getSelectedItem().getId_obr());
 						pnapr.setVid_doc(3);
 						pnapr.setText(tbKonsObosnov.getText());					
@@ -1691,7 +1860,7 @@ public class Vvod extends JFrame {
 						naprkons.setNpasp(Vvod.zapVr.getNpasp());
 						naprkons.setObosnov(tbKonsObosnov.getText());
 						if (cmbKonsMesto.getSelectedItem()!= null) naprkons.setCpol(cmbKonsMesto.getSelectedItem().getName());
-						naprkons.setNazv(cmbKonsVidNapr.getSelectedItem().toString());
+						naprkons.setNazv(cmbKonsMesto.getSelectedItem().toString());
 						naprkons.setCdol(MainForm.authInfo.getCdol());
 						naprkons.setPvizitId(tblPos.getSelectedItem().getId_obr());
 						naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
@@ -1760,85 +1929,65 @@ public class Vvod extends JFrame {
 				}
 			}
 		});
-		
-		JScrollPane spKonsObosnov = new JScrollPane();
-		
-		lblVidStacionar = new JLabel("Вид стационара");
-		
-		cmbVidStacionar = new ThriftIntegerClassifierCombobox<>(true);
-		cmbVidStacionar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (cmbVidStacionar.getSelectedItem() != null){
-				if ((cmbVidStacionar.getSelectedPcod()==1)||(cmbVidStacionar.getSelectedPcod()==2)){lblKonsMesto.setVisible(true); cmbKonsMesto.setVisible(true); try {
-				cmbKonsMesto.setData(MainForm.tcl.get_m00());
-			} catch (KmiacServerException e1) {
-				e1.printStackTrace();
-			} catch (TException e1) {
-				e1.printStackTrace();
-			}
-			}
-			if ((cmbVidStacionar.getSelectedPcod()==3)||(cmbVidStacionar.getSelectedPcod()==4)){lblKonsMesto.setVisible(false); cmbKonsMesto.setVisible(false); }
-			}
-			}
-		});
-		GroupLayout gl_pnlKons = new GroupLayout(pnlKons);
-		gl_pnlKons.setHorizontalGroup(
-			gl_pnlKons.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_pnlKons.createSequentialGroup()
+		GroupLayout gl_pnlNapr = new GroupLayout(pnlNapr);
+		gl_pnlNapr.setHorizontalGroup(
+			gl_pnlNapr.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlNapr.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlKons.createParallelGroup(Alignment.LEADING)
-						.addComponent(spKonsObosnov)
-						.addGroup(gl_pnlKons.createSequentialGroup()
-							.addComponent(lblKonsVidNapr, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbKonsVidNapr, 0, 519, Short.MAX_VALUE))
-						.addComponent(btnKonsPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlKons.createSequentialGroup()
-							.addComponent(lblVidStacionar)
+					.addGroup(gl_pnlNapr.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlNapr.createSequentialGroup()
+							.addComponent(lblVidStacionar, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
 							.addComponent(cmbVidStacionar, GroupLayout.PREFERRED_SIZE, 458, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblKonsObosnov, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
-						.addGroup(Alignment.TRAILING, gl_pnlKons.createSequentialGroup()
+						.addGroup(gl_pnlNapr.createSequentialGroup()
 							.addComponent(lblKonsMesto, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbKonsMesto, 0, 493, Short.MAX_VALUE)))
-					.addContainerGap())
+							.addGap(4)
+							.addComponent(cmbKonsMesto, GroupLayout.PREFERRED_SIZE, 496, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblKonsObosnov, GroupLayout.PREFERRED_SIZE, 558, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pnlNapr.createSequentialGroup()
+							.addGap(1)
+							.addComponent(tbKonsObosnov, GroupLayout.PREFERRED_SIZE, 556, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnKonsPrint, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pnlNapr.createSequentialGroup()
+							.addComponent(lblKonsVidNapr, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+							.addGap(4)
+							.addComponent(cmbConsVidNapr, GroupLayout.PREFERRED_SIZE, 522, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(32, Short.MAX_VALUE))
 		);
-		gl_pnlKons.setVerticalGroup(
-			gl_pnlKons.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlKons.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_pnlKons.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblKonsVidNapr)
-						.addComponent(cmbKonsVidNapr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_pnlKons.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblVidStacionar)
+		gl_pnlNapr.setVerticalGroup(
+			gl_pnlNapr.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlNapr.createSequentialGroup()
+					.addGap(6)
+					.addGroup(gl_pnlNapr.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlNapr.createSequentialGroup()
+							.addGap(3)
+							.addComponent(lblKonsVidNapr))
+						.addComponent(cmbConsVidNapr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_pnlNapr.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlNapr.createSequentialGroup()
+							.addGap(3)
+							.addComponent(lblVidStacionar))
 						.addComponent(cmbVidStacionar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-					.addGroup(gl_pnlKons.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblKonsMesto)
+					.addGap(10)
+					.addGroup(gl_pnlNapr.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlNapr.createSequentialGroup()
+							.addGap(3)
+							.addComponent(lblKonsMesto))
 						.addComponent(cmbKonsMesto, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGap(11)
 					.addComponent(lblKonsObosnov)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spKonsObosnov, GroupLayout.PREFERRED_SIZE, 248, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(7)
+					.addComponent(tbKonsObosnov, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addGap(7)
 					.addComponent(btnKonsPrint)
-					.addContainerGap())
+					.addContainerGap(71, Short.MAX_VALUE))
 		);
-		
-		tbKonsObosnov = new JTextArea();
-		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		tbKonsObosnov.setLineWrap(true);
-		tbKonsObosnov.setWrapStyleWord(true);
-		spKonsObosnov.setViewportView(tbKonsObosnov);
-		pnlKons.setLayout(gl_pnlKons);
 		pnlNapr.setLayout(gl_pnlNapr);
 		
 		JPanel pnlOcen = new JPanel();
-		tabbedPane.addTab("<html><br>Оценка данных анамнеза<br><br></html>", null, pnlOcen, null);
-		tabbedPane.setTabComponentAt(8, new JLabel("<html><br>Оценка данных анамнеза<br><br></html>"));
+		tabbedPane.addTab("<html><br>Оценка данных анамнеза</html>", null, pnlOcen, null);
+		tabbedPane.setTabComponentAt(9, new JLabel("<html><br>Оценка данных анамнеза</html></html>"));
 		
 		JScrollPane spOcen = new JScrollPane();
 		GroupLayout gl_pnlOcen = new GroupLayout(pnlOcen);
@@ -1864,9 +2013,37 @@ public class Vvod extends JFrame {
 		spOcen.setViewportView(tbOcen);
 		pnlOcen.setLayout(gl_pnlOcen);
 		
+		JPanel pnlRecom = new JPanel();
+		tabbedPane.addTab("<html><br>Рекомендации</html>", null, pnlRecom, null);
+		tabbedPane.setTabComponentAt(10, new JLabel("<html><br>Рекомендации</html>"));
+		
+		JScrollPane spRecom = new JScrollPane();
+		GroupLayout gl_pnlRecom = new GroupLayout(pnlRecom);
+		gl_pnlRecom.setHorizontalGroup(
+			gl_pnlRecom.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRecom.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spRecom, GroupLayout.PREFERRED_SIZE, 580, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		gl_pnlRecom.setVerticalGroup(
+			gl_pnlRecom.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_pnlRecom.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(spRecom, GroupLayout.PREFERRED_SIZE, 439, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		
+		tbRecom = new JTextArea();
+		spRecom.setViewportView(tbRecom);
+		tbRecom.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tbRecom.setLineWrap(true);
+		tbRecom.setWrapStyleWord(true);
+		pnlRecom.setLayout(gl_pnlRecom);
+		
 		JPanel pnlZakl = new JPanel();
-		tabbedPane.addTab("<html><br>Заключение<br><br></html>", null, pnlZakl, null);
-		tabbedPane.setTabComponentAt(9, new JLabel("<html><br>Заключение<br><br></html>"));
+		tabbedPane.addTab("<html><br>Заключение</html>", null, pnlZakl, null);
+		tabbedPane.setTabComponentAt(11, new JLabel("<html><br>Заключение</html>"));
 		
 		JLabel lblZakl = new JLabel("Заключение специалиста");
 		
@@ -1924,7 +2101,9 @@ public class Vvod extends JFrame {
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
-		pnlZakl.setLayout(gl_pnlZakl);;
+		pnlZakl.setLayout(gl_pnlZakl);
+		/*tabbedPane.addTab("<html><br>Оценка данных анамнеза</html>", null, pnlOcen, null);
+		tabbedPane.setTabComponentAt(8, new JLabel("<html><br>Оценка данных анамнеза<br><br></html>"));*/
 		
 		panel_2.setLayout(gl_panel_2);
 		
@@ -1983,10 +2162,10 @@ public class Vvod extends JFrame {
 		);
 		pnlTalon.setLayout(gl_pnlTalon);
 		
-		JScrollPane scrollPane = new JScrollPane();
+		JScrollPane spPos = new JScrollPane();
 		
 		 btnPosAdd = new JButton("");
-		 btnPosAdd.setToolTipText("Добавление новой записи");
+		 btnPosAdd.setToolTipText("Добавление посещения");
 		btnPosAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for (PvizitAmb pviz : tblPos.getData())
@@ -1995,19 +2174,8 @@ public class Vvod extends JFrame {
 						return;
 					}
 				
-				pvizit = new Pvizit();
-				if (zapVr.getId_pvizit()!=0){
-				pvizit.setId(zapVr.getId_pvizit());
-				pvizit.setNpasp(zapVr.getNpasp());
-				pvizit.setCpol(MainForm.authInfo.getCpodr());
-				pvizit.setDatao(System.currentTimeMillis());
-				pvizit.setCod_sp(MainForm.authInfo.getPcod());
-				pvizit.setCdol(MainForm.authInfo.getCdol());
-				pvizit.setCuser(MainForm.authInfo.getUser_id());
-				pvizit.setDataz(System.currentTimeMillis());
-				
 				pvizitAmb = new PvizitAmb();
-				pvizitAmb.setId_obr(pvizit.getId());
+				pvizitAmb.setId_obr(zapVr.id_pvizit);
 				pvizitAmb.setNpasp(zapVr.getNpasp());
 				pvizitAmb.setDatap(System.currentTimeMillis());
 				pvizitAmb.setDataz(System.currentTimeMillis());
@@ -2017,65 +2185,23 @@ public class Vvod extends JFrame {
 				pvizitAmb.setKod_ter(MainForm.authInfo.getKdate());
 				
 				try {
-					Vvod.pvizit = MainForm.tcl.getPvizit(pvizit.getId());
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
-					tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
+					tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.id_pvizit));
 				} catch (KmiacServerException e2) {
 					e2.printStackTrace();
-				} catch (PvizitNotFoundException e2) {
-					try {
-						MainForm.tcl.AddPvizit(pvizit);
-						zapVr.setId_pvizit(pvizit.id);
-						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
-						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-					} catch (KmiacServerException e1) {
-						e1.printStackTrace();
-					} catch (TException e1) {
-						MainForm.conMan.reconnect(e1);
-						e1.printStackTrace();
-					}
 				} catch (TException e2) {
 					MainForm.conMan.reconnect(e2);
 					e2.printStackTrace();
 				}
-				}
-				else {
-					try {
-						pvizit.setNpasp(zapVr.getNpasp());
-						pvizit.setCpol(MainForm.authInfo.getCpodr());
-						pvizit.setDatao(System.currentTimeMillis());
-						pvizit.setCod_sp(MainForm.authInfo.getPcod());
-						pvizit.setCdol(MainForm.authInfo.getCdol());
-						pvizit.setCuser(MainForm.authInfo.getUser_id());
-						pvizit.setDataz(System.currentTimeMillis());
-						pvizit.setId(MainForm.tcl.AddPvizitId(pvizit));
-						zapVr.setId_pvizit(pvizit.id);
-						pvizitAmb = new PvizitAmb();
-						pvizitAmb.setId_obr(pvizit.getId());
-						pvizitAmb.setNpasp(zapVr.getNpasp());
-						pvizitAmb.setDatap(System.currentTimeMillis());
-						pvizitAmb.setCod_sp(MainForm.authInfo.getPcod());
-						pvizitAmb.setCdol(MainForm.authInfo.getCdol());
-						pvizitAmb.setCpol(MainForm.authInfo.getCpodr());
-						pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
-						pvizitAmb.setKod_ter(MainForm.authInfo.getKdate());
-						tblPos.setData(MainForm.tcl.getPvizitAmb(pvizit.getId()));
-					} catch (KmiacServerException e1) {
-						e1.printStackTrace();
-					} catch (TException e1) {
-						MainForm.conMan.reconnect(e1);
-					}	
-				}
 				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 				priemCopy = new Priem(priem);
 				anamZabCopy = new AnamZab(anamZab);
-				pvizitCopy = new Pvizit(pvizit);
 			}
 		});
 		btnPosAdd.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		
 		final JButton btnPosDel = new JButton("");
-		btnPosDel.setToolTipText("Удаление записи");
+		btnPosDel.setToolTipText("Удаление посещения");
 		btnPosDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -2094,12 +2220,8 @@ public class Vvod extends JFrame {
 									tblPos.setRowSelectionInterval(prevIdx, prevIdx);
 								else
 									tblPos.setRowSelectionInterval(tblPos.getRowCount() - 1, tblPos.getRowCount() - 1);
-							if (tblPos.getSelectedItem() == null) {
-								MainForm.tcl.DeleteAnamZab(zapVr.getId_pvizit());
-								MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());
-								MainForm.tcl.DeletePdiagAmbVizit(zapVr.getId_pvizit());
-								Vvod.this.dispatchEvent(new WindowEvent(Vvod.this, WindowEvent.WINDOW_CLOSING));
-							}
+							if (tblPos.getSelectedItem() == null)
+								btnObrDel.doClick();
 						}
 					}
 				} catch (KmiacServerException e1) {
@@ -2122,6 +2244,7 @@ public class Vvod extends JFrame {
 						
 						MainForm.tcl.setPriem(priem);
 						MainForm.tcl.setAnamZab(anamZab);
+						pvizit.setDatao(tblObr.getSelectedItem().datao);
 						MainForm.tcl.UpdatePvizit(pvizit);
 						MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 						btnRecPriem.setEnabled(!pvizit.isSetIshod());
@@ -2139,11 +2262,78 @@ public class Vvod extends JFrame {
 			}
 		});
 		btnPosSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
+		
+		JScrollPane spObr = new JScrollPane();
+		
+		btnObrAdd = new JButton("");
+		btnObrAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (Pvizit pviz : tblObr.getData())
+					if (pviz.getDatao() == getDateMills(System.currentTimeMillis())) {
+						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два обращения за одну дату");
+						return;
+					}
+				
+				addPvizit(0);
+			}
+		});
+		btnObrAdd.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
+		btnObrAdd.setToolTipText("Добавление обращения");
+		
+		btnObrDel = new JButton("");
+		btnObrDel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (tblObr.getSelectedItem() !=  null) {
+					if ((tblPos.getRowCount() == 0) || (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
+						try {
+							MainForm.tcl.DeletePvizitAmbObr(zapVr.getId_pvizit());
+							MainForm.tcl.DeleteAnamZab(zapVr.getId_pvizit());
+							MainForm.tcl.DeletePvizit(zapVr.getId_pvizit());
+							MainForm.tcl.DeletePdiagAmbVizit(zapVr.getId_pvizit());
+							
+							int prevIdx = tblObr.getSelectedRow();
+							tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp, MainForm.authInfo.pcod, MainForm.authInfo.cdol));
+							if (tblObr.getRowCount() > 0)
+								if (prevIdx < tblObr.getRowCount() - 1)
+									tblObr.setRowSelectionInterval(prevIdx, prevIdx);
+								else
+									tblObr.setRowSelectionInterval(tblObr.getRowCount() - 1, tblObr.getRowCount() - 1);
+							if (tblObr.getSelectedItem() == null) {
+								Vvod.this.dispatchEvent(new WindowEvent(Vvod.this, WindowEvent.WINDOW_CLOSING));
+							}
+						} catch (KmiacServerException e1) {
+							e1.printStackTrace();
+						} catch (TException e1) {
+							e1.printStackTrace();
+							MainForm.conMan.reconnect(e1);
+						}
+					}
+				}
+			}
+		});
+		btnObrDel.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789259_Delete.png")));
+		btnObrDel.setToolTipText("Удаление обращения");
+		
+		btnObrSave = new JButton("");
+		btnObrSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnPosSave.doClick();
+			}
+		});
+		btnObrSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
+		btnObrSave.setToolTipText("Сохранение изменений");
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+					.addComponent(spObr, GroupLayout.PREFERRED_SIZE, 299, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnObrAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnObrDel, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnObrSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
+					.addGap(42)
+					.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 815, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
 						.addComponent(btnPosAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
@@ -2151,20 +2341,53 @@ public class Vvod extends JFrame {
 						.addComponent(btnPosSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)))
 		);
 		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+			gl_panel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel.createSequentialGroup()
 					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+						.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+							.addComponent(btnObrAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+							.addGap(6)
+							.addComponent(btnObrDel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(btnObrSave, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
+						.addComponent(spObr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
+						.addComponent(spPos, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(btnPosAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnPosDel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnPosSave, GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)))
+							.addComponent(btnPosSave, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)))
 					.addGap(0))
 		);
 		
-		tblPos = new CustomTable<>(true, false, PvizitAmb.class, 3, "Дата", 19, "ФИО врача", 5, "Должность");
+		tblObr = new CustomTable<>(true, false, Pvizit.class, 3, "Дата обращения");
+		tblObr.setDateField(0);
+		tblObr.setFillsViewportHeight(true);
+		tblObr.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				try {
+					if (tblObr.getSelectedItem() != null) {
+						zapVr.setId_pvizit(tblObr.getSelectedItem().id);
+						tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
+						if (tblDiag.getRowCount() > 0)
+							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+						tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
+						treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
+						checkZapVrNext();
+					}
+				} catch (KmiacServerException e1) {
+					JOptionPane.showMessageDialog(Vvod.this, "Не удалось загрузить список посещений.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				}
+			}
+		});
+		spObr.setViewportView(tblObr);
+		
+		tblPos = new CustomTable<>(true, false, PvizitAmb.class, 3, "Дата посещения", 19, "ФИО врача", 5, "Должность");
 		tblPos.setDateField(0);
 		tblPos.setEditableFields(false, 1, 2);
 		tblPos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -2194,14 +2417,18 @@ public class Vvod extends JFrame {
 					}
 				}
 				
-				if (pvizitAmb.isSetCpos())
+				if (pvizitAmb.isSetCpos()) {
 					cmbCelObr.setSelectedPcod(pvizitAmb.getCpos());
-				else
+					pvizit.setCobr(pvizitAmb.cpos);
+				} else {
 					cmbCelObr.setSelectedItem(null);
-				if (pvizitAmb.isSetRezult())
+				}
+				if (pvizitAmb.isSetRezult()) {
 					cmbRez.setSelectedPcod(pvizitAmb.getRezult());
-				else
+					pvizit.setRezult(pvizitAmb.rezult);
+				} else {
 					cmbRez.setSelectedItem(null);
+				}
 				if (pvizit.isSetIshod())
 					cmbZaklIsh.setSelectedPcod(pvizit.getIshod());
 				else
@@ -2239,10 +2466,71 @@ public class Vvod extends JFrame {
 		}
 	});
 		tblPos.setFillsViewportHeight(true);
-		scrollPane.setViewportView(tblPos);
+		spPos.setViewportView(tblPos);
 		panel.setLayout(gl_panel);
 		getContentPane().setLayout(groupLayout);
 
+	}
+	
+	private DefaultMutableTreeNode createNodes(){
+		root = new DefaultMutableTreeNode("Корень");
+		issinfo = new DefaultMutableTreeNode("Даты назначенных исследований");
+		root.add(issinfo);
+		
+		try {
+			{	for (P_isl_ld issl : MainForm.tcl.getIsslInfoDate(Vvod.zapVr.id_pvizit))
+					issinfo.add(new IsslInfoTreeNode(issl));
+			}
+			
+
+
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			MainForm.conMan.reconnect(e);
+		} 
+
+		return root;
+	}
+	
+	class IsslInfoTreeNode extends DefaultMutableTreeNode {
+		private static final long serialVersionUID = 3986622548094236905L;
+		private P_isl_ld issl;
+		
+		public IsslInfoTreeNode(P_isl_ld issl) {
+			this.issl = issl;
+			this.add(new IsslPokazNode(new IsslInfo()));
+		}
+		
+		@Override
+		public String toString() {
+			return DateFormat.getDateInstance().format(new Date(issl.getDatan()));
+		}
+	}
+	
+	class IsslPokazNode extends DefaultMutableTreeNode{
+		private static final long serialVersionUID = 5707201011289452058L;
+		private IsslInfo isslpokaz;
+		
+		public IsslPokazNode(IsslInfo isslpokaz) {
+			this.isslpokaz = isslpokaz;
+		}
+		
+		@Override
+		public String toString() {
+			return isslpokaz.getPokaz();
+		}
+	}
+
+	private void addLineToDetailInfo(String name, boolean isSet, Object value) {
+		if (isSet)
+			if ((name != null) && (value != null))
+				if ((name.length() > 0) && (value.toString().length() > 0))
+					sb.append(String.format("%s: %s%s", name, value, lineSep));
+	}
+	
+	private void addLineToDetailInfo(String name, Object value) {
+		addLineToDetailInfo(name, true, value);
 	}
 	
 	private class ShablonSearchListener implements DocumentListener {
@@ -2320,7 +2608,9 @@ public class Vvod extends JFrame {
 	
 	public void showVvod(ZapVr zapVr) {
 		Vvod.zapVr = zapVr;
-				
+		int idPvizit = zapVr.id_pvizit;
+		int selIdx;
+		
 		try {
 			setTitle(String.format("Врачебный осмотр - пациент: %s %s %s, номер и серия полиса: %s %s", zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getNompolis(), zapVr.getSerpolis()));
 			int age = (int) ((System.currentTimeMillis() - zapVr.datar) / 31556952000L);
@@ -2328,18 +2618,19 @@ public class Vvod extends JFrame {
 			chbDiagBer.setEnabled(btnBer.isEnabled());
 			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
 			
-			tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
-			if (tblPos.getRowCount() > 0) {
-				if (pvizitAmb.datap < getDateMills(System.currentTimeMillis()))
-					btnPosAdd.doClick();
-			} else {
-				btnPosAdd.doClick();
+			tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp, MainForm.authInfo.pcod, MainForm.authInfo.cdol));
+			if ((idPvizit > 0) && (tblObr.getRowCount() > 0)) {
+				for (selIdx = 0; selIdx < tblObr.getRowCount(); selIdx++) {
+					if (tblObr.getData().get(selIdx).id == idPvizit) {
+						if (selIdx > 0)
+							tblObr.setRowSelectionInterval(selIdx, selIdx);
+						break;
+					}
+				}
+				if (selIdx == tblObr.getRowCount()) {
+					addPvizit(idPvizit);
+				}
 			}
-			tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
-			if (tblDiag.getRowCount() > 0)
-				tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
-			
-			checkZapVrNext();
 			
 			setVisible(true);
 			MainForm.instance.setVisible(false);
@@ -2369,7 +2660,7 @@ public class Vvod extends JFrame {
 		tbLech.setText("");
 		tbOcen.setText("");
 		tbZakl.setText("");
-		tbZaklRek.setText("");
+		tbRecom.setText("");
 
 		for (ShablonText st : sh.textList) {
 			switch (st.grupId) {
@@ -2395,7 +2686,7 @@ public class Vvod extends JFrame {
 				tbZakl.setText(st.text);
 				break;
 			case 12:
-				tbZaklRek.setText(st.text);
+				tbRecom.setText(st.text);
 				break;
 			default:
 				break;
@@ -2561,13 +2852,14 @@ public class Vvod extends JFrame {
 			pvizitAmb.setCpos(cmbCelObr.getSelectedPcod());
 			pvizit.setCobr(pvizitAmb.getCpos());
 		} else {
-			pvizitAmb.unsetCpos();pvizit.unsetCobr();
+			pvizitAmb.unsetCpos();
+			pvizit.unsetCobr();
 		}
 		if (cmbRez.getSelectedPcod() != null) {
 			pvizitAmb.setRezult(cmbRez.getSelectedPcod());
 			pvizit.setRezult(pvizitAmb.getRezult());
 		} else {
-			pvizitAmb.unsetRezult();pvizit.unsetRezult();
+			pvizitAmb.unsetRezult();
 			pvizit.unsetRezult();
 		}
 		if (cmbZaklIsh.getSelectedPcod() != null)
@@ -2598,6 +2890,7 @@ public class Vvod extends JFrame {
 		for (PdiagAmb pd : tblDiag.getData())
 			if (pd.diag_stat == 1) {
 				pvizitAmb.setDiag(pd.getDiag());
+				pvizitAmbCopy.setDiag(pvizitAmb.diag);
 			}
 		
 		return true;
@@ -2617,5 +2910,30 @@ public class Vvod extends JFrame {
 			return true;
 		
 		return false;
+	}
+
+	private void addPvizit(int idPvizit) {
+		pvizit = new Pvizit();
+		try {
+			pvizit.setNpasp(zapVr.getNpasp());
+			pvizit.setCpol(MainForm.authInfo.getCpodr());
+			pvizit.setDatao(System.currentTimeMillis());
+			pvizit.setCod_sp(MainForm.authInfo.getPcod());
+			pvizit.setCdol(MainForm.authInfo.getCdol());
+			pvizit.setCuser(MainForm.authInfo.getUser_id());
+			pvizit.setDataz(System.currentTimeMillis());
+			pvizit.setId(idPvizit);
+			if (idPvizit == 0)
+				pvizit.setId(MainForm.tcl.AddPvizitId(pvizit));
+			else
+				MainForm.tcl.AddPvizit(pvizit);
+			tblObr.addItem(0, pvizit);
+			tblObr.updateSelectedItem();
+		} catch (KmiacServerException e1) {
+			e1.printStackTrace();
+		} catch (TException e1) {
+			MainForm.conMan.reconnect(e1);
+		}	
+		pvizitCopy = new Pvizit(pvizit);
 	}
 }

@@ -45,6 +45,7 @@ struct InputPlanDisp {
     3: string daten;
     4: string datek;
     5: optional string uchas;
+    6: i32 clpu;
 }
 
 

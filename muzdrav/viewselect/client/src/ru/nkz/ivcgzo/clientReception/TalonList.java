@@ -85,12 +85,16 @@ public class TalonList {
 
     public final void setPrevWeek() {
         dateChecker.prevWeek();
-        partitionWeekTalonList(allTalonList);
+        if (allTalonList != null) {
+            partitionWeekTalonList(allTalonList);
+        }
     }
 
     public final void setNextWeek() {
         dateChecker.nextWeek();
-        partitionWeekTalonList(allTalonList);
+        if (allTalonList != null) {
+            partitionWeekTalonList(allTalonList);
+        }
     }
 
     private void partitionWeekTalonList(final List<Talon> weekTalonList) {

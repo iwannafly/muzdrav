@@ -211,5 +211,5 @@ service ThriftMss extends kmiacServer.KmiacServer {
 /**
  * печать корешка медицинского свидетельства и медицинского свидетельства о смерти
  */
-	string printMedSS(1: string docInfo) throws (1: kmiacServer.KmiacServerException kse);
+	string printMedSS(1: string docInfo, 2: string nomMss) throws (1: kmiacServer.KmiacServerException kse);
 }
