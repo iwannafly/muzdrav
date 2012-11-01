@@ -359,7 +359,7 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public List<PatientDiagAmbInfo> getPatientDiagAmbInfoList(int pvizitId) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_obr = ? ", pvizitId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_pos = ? ", pvizitId)) {
 			return rsmPdiagAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException(e.getMessage());

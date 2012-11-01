@@ -305,7 +305,7 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 	            JPopupMenu menu = new JPopupMenu();
 	            
-	       		JMenuItem mi1 = new JMenuItem("Случай заболевания");
+	       		JMenuItem mi1 = new JMenuItem("Вкладыш в карту");
 	       		mi1.addActionListener(new ActionListener() {
 	       			@Override
 	       			public void actionPerformed(ActionEvent arg0) {
@@ -792,6 +792,7 @@ public class Vvod extends JFrame {
 			  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
 			  		diagamb.setDatad(tblDiag.getSelectedItem().getDatad());
 			  		diagamb.setDatap(pvizitAmb.getDatap());
+			  		diagamb.setId_pos(pvizitAmb.getId());
 			  		if (rbtDiagOsn.isSelected()) diagamb.setDiag_stat(1);
 			  		if (rbtDiagSop.isSelected())diagamb.setDiag_stat(3);
 			  		if (rbtDiagOsl.isSelected()) diagamb.setDiag_stat(2);
@@ -938,7 +939,7 @@ public class Vvod extends JFrame {
 						diagamb = tblDiag.getSelectedItem();
 							
 						try {
-							pdiag = MainForm.tcl.getPdiagZ(diagamb.getId());
+							pdiag = MainForm.tcl.getPdiagZ(zapVr.npasp, diagamb.diag);
 						} catch (KmiacServerException e1) {
 							e1.printStackTrace();
 						} catch (PdiagNotFoundException e1) {
@@ -949,7 +950,7 @@ public class Vvod extends JFrame {
 						}
 						
 						try {
-							pdisp = MainForm.tcl.getPdisp(zapVr.getNpasp(),tblDiag.getSelectedItem().diag);
+							pdisp = MainForm.tcl.getPdisp(zapVr.getNpasp(),tblDiag.getSelectedItem().diag,MainForm.authInfo.getCpodr());
 						} catch (KmiacServerException e1) {
 							e1.printStackTrace();
 						} catch (PdispNotFoundException e1) {
@@ -2746,6 +2747,7 @@ public class Vvod extends JFrame {
   			if (mkb != null) {
 		  		diagamb = new PdiagAmb();
 		  		diagamb.setId_obr(zapVr.getId_pvizit());
+		  		diagamb.setId_pos(tblPos.getSelectedItem().id);
 		  		diagamb.setNpasp(zapVr.getNpasp());
 		  		diagamb.setDatap(System.currentTimeMillis());
 		  		diagamb.setDatad(System.currentTimeMillis());
