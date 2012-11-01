@@ -131,6 +131,9 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		JMenuItem menuItem_7 = new JMenuItem("Экспорт данных о флюоороосмотрах");
 		mnNewMenu.add(menuItem_7);
 		
+		JMenuItem menuItem_8 = new JMenuItem("Экспорт данных по диспансеризации беременных");
+		mnNewMenu.add(menuItem_8);
+		
 		JMenu menu = new JMenu("Подгрузка данных");
 		menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
