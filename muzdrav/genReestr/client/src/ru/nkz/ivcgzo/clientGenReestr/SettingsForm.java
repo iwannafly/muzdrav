@@ -48,7 +48,7 @@ public class SettingsForm extends JDialog {
 	private JPanel panel_4;
     public int Cslu;
 
-	public SettingsForm(final int Cslu) {
+	public SettingsForm() {
 //		setModalityType(ModalityType.TOOLKIT_MODAL);
 		setBounds(100, 100, 344, 411); //ширина, высота
 		setTitle("Реестры пациентов");
@@ -157,6 +157,7 @@ public class SettingsForm extends JDialog {
 		rbtn2 = new JRadioButton("новые посещения + ошибки контроля");
 		rbtn3 = new JRadioButton("ошибки контроля");
 		rbtn4 = new JRadioButton("все случаи лечения");
+		rbtn4.setVisible(false);
 		bgrp.add(rbtn1);
 		bgrp.add(rbtn2);
 		bgrp.add(rbtn3);
@@ -305,15 +306,15 @@ public class SettingsForm extends JDialog {
         if (tfDk.getDate() == null) tfDk.setDate(System.currentTimeMillis());
         if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected()) rbtn1.setSelected(true);
 			try{
-		        if (Cslu == 1){
+		        if (Cslu == 1){//стационар
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 4) cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
 				}
-		        if (Cslu == 2){
+		        if (Cslu == 2){//поликлиника
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
 				}
-		        if (Cslu == 3){
+		        if (Cslu == 3){//лдс
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
 		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
 		            tf_Cpol.setVisible(true);

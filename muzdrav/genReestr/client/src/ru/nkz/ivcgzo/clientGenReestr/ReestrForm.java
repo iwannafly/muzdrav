@@ -55,7 +55,7 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrPolMenu = new JMenuItem ("Реестры поликлиники");
 		ReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm(2);
+				sfrm = new SettingsForm();
 				sfrm.Cslu = 2;
 				sfrm.showSettingsForm();
 			}
@@ -64,7 +64,7 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
 		ReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm(0);
+				sfrm = new SettingsForm();
 				sfrm.Cslu = 3;
 				sfrm.showSettingsForm();
 			}
@@ -73,7 +73,7 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrStMenu = new JMenuItem ("Реестры стационара");
 		ReestrStMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm(1);
+				sfrm = new SettingsForm();
 				sfrm.Cslu = 1;
 				sfrm.showSettingsForm();
 			}
