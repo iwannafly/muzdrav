@@ -746,7 +746,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	
 	string printKartaBer(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
-	string printDnevVr(1: i32 vrach) throws (1: kmiacServer.KmiacServerException kse);
+	string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
 
 /*Выгрузка для Кемерово по диспансеризации беременных*/
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
