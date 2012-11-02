@@ -224,6 +224,6 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
-	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
+	string formfilecsv() throws (1: kmiacServer.KmiacServerException kse);
 }
 

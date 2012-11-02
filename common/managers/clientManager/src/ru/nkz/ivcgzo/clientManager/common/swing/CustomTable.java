@@ -717,6 +717,13 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	 * Добавление новой строки.
 	 */
 	public void addItem(T item) {
+		addItem(lst.size(), item);
+	}
+	
+	/**
+	 * Добавление новой строки.
+	 */
+	public void addItem(int idx, T item) {
 		if (itemAdd && !itemUpd)
 			deleteSelectedRow();
 		else if (itemAdd)
@@ -724,10 +731,10 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		
 		try {
 			if (item == null)
-				lst.add(cls.newInstance());
+				lst.add(idx, cls.newInstance());
 			else
-				lst.add(item);
-			updateSelectedIndex(lst.size(), getSelectedColumn(), lst.size(), 1);
+				lst.add(idx, item);
+			updateSelectedIndex(idx, getSelectedColumn(), idx, 1);
 			itemUpd = false;
 			itemAdd = true;
 		} catch (Exception e) {
