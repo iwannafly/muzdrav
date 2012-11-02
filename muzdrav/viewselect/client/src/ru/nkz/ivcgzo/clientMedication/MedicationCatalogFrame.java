@@ -50,6 +50,7 @@ public class MedicationCatalogFrame extends JDialog{
     private ThriftIntegerClassifierList lMedicationForms;
     private JLabel lblMedicationSearchHeader;
     private ShablonSearchListener medicationSearchListener;
+    private MedicationOptionsFrame frmMedicationOptions;
     
 
     public MedicationCatalogFrame() {
@@ -65,7 +66,13 @@ public class MedicationCatalogFrame extends JDialog{
         setFrameSize();
         setUndecorated(true);
 
+        createModalFrames();
         addMainPanel();
+    }
+
+    private void createModalFrames() {
+        frmMedicationOptions = new MedicationOptionsFrame();
+        frmMedicationOptions.pack();
     }
 
     private void setFrameSize() {
@@ -188,6 +195,23 @@ public class MedicationCatalogFrame extends JDialog{
 
     private void addAddButton() {
         btnAddMedication = new JButton("Выбрать медикамент");
+        btnAddMedication.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MedicationCatalogFrame.this.dispatchEvent(new WindowEvent(
+                    MedicationCatalogFrame.this, WindowEvent.WINDOW_CLOSING));
+                if (lMedications.getSelectedValue() != null) {
+                    if (lMedicationForms.getData().size() > 0) {
+                        frmMedicationOptions.setHeader(lMedications.getSelectedValue(),
+                            lMedicationForms.getSelectedValue());
+                    } else {
+                        frmMedicationOptions.setHeader(lMedications.getSelectedValue(),
+                            new IntegerClassifier(-1, "форма выпуска неизвестна"));
+                    }
+                }
+                frmMedicationOptions.setVisible(true);
+            }
+        });
         pMedicationButtons.add(btnAddMedication);
     }
 
