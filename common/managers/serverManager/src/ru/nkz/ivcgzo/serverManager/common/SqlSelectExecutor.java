@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
@@ -41,6 +42,26 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 		this.connString = connString;
 		this.user = user;
 		this.pass = pass;
+		
+		_connected = true;
+		_closed = false;
+	}
+	
+	/**
+	 * Устанавливает подключение к базе данных и настраивает его свойства.
+	 * @param connString - строка подключеня к базе, в которой
+	 * указываются драйвер подключения, хост, порт, путь к базе
+	 * или имя схемы и дополнительные параметры.
+	 * @param prop - свойства.
+	 * @throws SQLException
+	 */
+	public SqlSelectExecutor(String connString, Properties prop) throws SQLException {
+		conn = DriverManager.getConnection(connString, prop);
+		conn.setReadOnly(true);
+		
+		this.connString = connString;
+		this.user = prop.getProperty("user");
+		this.pass = prop.getProperty("password");;
 		
 		_connected = true;
 		_closed = false;
