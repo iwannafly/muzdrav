@@ -69,9 +69,9 @@ public class Period {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (Cslu == 1){
-					sfrm = new ServerVgr();
+//					sfrm = new ServerVgr();
 				//	sfrm.Cslu = 2;
-					sfrm.ServerVgr();
+//					sfrm.ServerVgr();
 					try {
 						MainForm.tcl.getKovInfoPol(MainForm.authInfo.cpodr, tfDn.getDate().getTime(), tfDk.getDate().getTime(), MainForm.authInfo.clpu);
 					} catch (KmiacServerException e1) {

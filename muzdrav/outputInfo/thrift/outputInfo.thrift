@@ -109,5 +109,7 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 
+/*Сводки по форме 39*/
+    string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
 }
 

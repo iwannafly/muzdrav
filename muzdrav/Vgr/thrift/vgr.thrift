@@ -201,6 +201,11 @@ struct KartaBer {
 	3: optional i32 id_pos;
 	4: optional i32 id_rd_sl;
 }
+struct ServerVgr{
+        1: optional i32 cpol;
+        2: optional i64 datan;
+        3: optional i64 datak;  
+}
 
 service ThriftVgr extends kmiacServer.KmiacServer {
 	/**

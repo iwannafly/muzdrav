@@ -3032,7 +3032,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public String printDnevVr(int vrach) throws KmiacServerException,
+	public String printDnevVr() throws KmiacServerException,
 			TException {
 		AutoCloseableResultSet acrs = null, acrs2 = null;
 		Date data = null;

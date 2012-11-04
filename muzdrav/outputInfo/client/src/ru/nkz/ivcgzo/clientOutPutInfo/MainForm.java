@@ -28,6 +28,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Font;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JSeparator;
@@ -52,6 +53,8 @@ import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+
+import org.apache.thrift.TException;
 
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
@@ -113,6 +116,29 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		
 		JMenu menu_4 = new JMenu("Сводки по форме 039");
 		menu_2.add(menu_4);
+		menu_3.add(menuItem);
+		
+		JMenuItem menuItem_4 = new JMenuItem("Посещения врачей поликлиники");
+		menuItem_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					String servPath = MainForm.tcl.printDnevVr();
+					String cliPath;
+					String oslname = "kartl";
+					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
+
+			}
+			catch (TException e1) {
+				e1.printStackTrace();
+				MainForm.conMan.reconnect(e1);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+			}
+		});
+		menu_4.add(menuItem_4);
 		
 		JMenu menu_6 = new JMenu("Сводки по диспансеризации");
 		menu_2.add(menu_6);
