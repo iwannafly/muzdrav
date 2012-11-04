@@ -65,7 +65,7 @@ public class SettingsForm extends JDialog {
 		panel_3.setBorder(new TitledBorder(null, "Подразделение ЛПУ :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "Поликлиника обслуживания", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_4.setBorder(new TitledBorder(null, "Выберите поликлинику обслуживания", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_4.setVisible(false);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
@@ -230,8 +230,10 @@ public class SettingsForm extends JDialog {
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
-						if (Cslu == 1)
+						if (Cslu == 1){
 				        	servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+						}
 				        if (Cslu == 2){
 				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
 							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
@@ -320,7 +322,7 @@ public class SettingsForm extends JDialog {
 		            tf_Cpol.setVisible(true);
 		            panel_4.setVisible(true);
 		        }
-	        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+	        	if (cmb_podr.getSelectedItem() != null)cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 			} catch (KmiacServerException e) {
 				e.printStackTrace();
 			} catch (TException e) {
