@@ -10,6 +10,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -29,6 +30,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.DbfReader.DbfResultSet;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
@@ -49,6 +51,7 @@ public class GenReestr extends Server implements Iface {
 	private static Logger log = Logger.getLogger(GenReestr.class.getName());
 
 	private TServer thrServ;
+	private Properties prop;
 	private final TResultSetMapper<Err, Err._Fields> rsmErr;
 	private final Class<?>[] ErrTypes;
 	private final TResultSetMapper<Med, Med._Fields> rsmMed;
@@ -58,6 +61,15 @@ public class GenReestr extends Server implements Iface {
 
 	@Override
 	public void start() throws Exception {
+		try {
+			prop = new Properties();
+			prop.put("charSet", "Cp866");
+			
+			Class.forName("com.hxtt.sql.dbf.DBFDriver");
+		} catch (ClassNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
 		ThriftGenReestr.Processor<Iface> proc = new ThriftGenReestr.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
@@ -392,84 +404,6 @@ public class GenReestr extends Server implements Iface {
 		return str;
 	}
 
-	@Override
-	public String getProtokolErrPol(String pf) throws KmiacServerException,
-			TException {
-        String sqlr;
-        String path;
-
-	        sqlr = "SELECT p.sl_id, p.id_lpu, p.fam, p.im, p.otch, p.dr, m.id_med, m.kod_rez, m.d_pst, m.diag, , e.kod_err, e.prim " +
-	 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med)" + 
-	 			   "ORDER BY p.id_lpu";
-			try (DbfResultSet drs = new DbfResultSet("c:\\err.dbf")) {
-				AutoCloseableResultSet acr;
-            
-   			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("pr_err", ".htm").getAbsolutePath()), "utf-8")) {
-    				
-   				StringBuilder sb = new StringBuilder(0x10000);
-   				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-   				sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-   				sb.append("<head>");
-     			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-   				sb.append("<title>Файл контроля реестров</title>");
-   				sb.append("</head>");
-   				sb.append("<body>");
-				sb.append("Протокол контроля реестров за оказанную мед. помощь");
-				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-				sb.append("Имя архивного файла: <br>"+pf);
-				sb.append("Информация об ошибках: <br>");
-
-				while (drs.next()){
-					int kr = drs.getInt("kod_rez");
-					if (drs.getInt("kod_err")==14 || drs.getInt("kod_err")==81 || drs.getInt("kod_err")==82 ||drs.getInt("kod_err")==103 ||drs.getInt("kod_err")==231)
-						kr = 81;
-					try (SqlModifyExecutor sme = tse.startTransaction()) {
-						sme.execPrepared("UPDATE p_vizit_amb SET kod_rez=?, datak=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),drs.getInt("id"));
-						sme.setCommit();
-					} catch (SQLException e) {
-						((SQLException) e.getCause()).printStackTrace();
-						throw new KmiacServerException();
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-						throw new KmiacServerException();
-					}
-					if (drs.getInt("kod_rez") != 3 && drs.getInt("kod_rez") != 10){
-	    				sb.append(String.format("%s %s %s", drs.getString("fam").trim(), drs.getString("im").trim(), drs.getString("otch").trim()));
-						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", drs.getDate("dr").getTime()));
-						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", drs.getDate("d_pst").getTime()));
-						if (drs.getString("diag") == null) sb.append("</b><br>   Диагноз :  ОТСУТСТВУЕТ");
-						else sb.append(String.format("<br>   Диагноз :  %s", drs.getString("diag")));
-						sb.append(String.format("<br> %s ", drs.getString("kod_err")));
-						try {
-							acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", drs.getInt("kod_err"));
-							if (acr.getResultSet().next()) 
-								sb.append(String.format("<br> %s ", acr.getResultSet().getString("name_err")));
-							sb.append(String.format("<br> %s ", drs.getString("prim")));
-							acr.close();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-					}
-    	                	
-   	            }
-   					osw.write(sb.toString());
-   					return path;
-            	
-   			} catch (IOException e) {
-   				e.printStackTrace();
-   				throw new KmiacServerException();
-   			}
-   		} catch (SQLException e) {
-   			log.log(Level.ERROR, "SQl Exception: ", e);
-    		((SQLException) e.getCause()).printStackTrace();
-    		throw new KmiacServerException();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-			return null;
-	}
-
 //////////////////////////Classifiers ////////////////////////////////////
 
 	@Override
@@ -498,19 +432,6 @@ public class GenReestr extends Server implements Iface {
 		}
 	}
 
-	@Override
-    public final List<IntegerClassifier> getOtdForCurrentLpu(final int lpuId) throws TException {
-        final String sqlQuery = "SELECT pcod, name_u FROM n_o00 WHERE pcod = ?";
-        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
-                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
-            return rsmO00.mapToList(acrs.getResultSet());
-        } catch (SQLException e) {
-            log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new TException(e);
-        }
-    }
-	
 	@Override
 	public List<IntegerClassifier> getAllLDSForCurrentLpu(int lpuId)
 			throws KmiacServerException, TException {
@@ -542,7 +463,7 @@ public class GenReestr extends Server implements Iface {
 	@Override
 	public List<IntegerClassifier> getAllOtdForCurrentLpu(int lpuId)
 			throws KmiacServerException, TException {
-		final String sqlQuery = "SELECT pcod, name_u FROM n_o00 WHERE clpu = ?";
+		final String sqlQuery = "SELECT pcod, name FROM n_o00 WHERE clpu = ?";
     	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
     			new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
@@ -553,6 +474,19 @@ public class GenReestr extends Server implements Iface {
 		}
 	}
 
+	@Override
+    public final List<IntegerClassifier> getOtdForCurrentLpu(final int lpuId) throws TException {
+        final String sqlQuery = "SELECT pcod, name FROM n_o00 WHERE pcod = ?";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmO00 =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
+            return rsmO00.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new TException(e);
+        }
+    }
+	
 	@Override		//ЛДС
 	public String getReestrInfoLDS(int cpodr, long dn, long dk, int vidr,
 			int vopl, int clpu, int terp, long df, int ter_mu, int kod_mu)
@@ -1061,6 +995,257 @@ public class GenReestr extends Server implements Iface {
 		}
 
 		return path;
+	}
+
+	@Override
+	public String getProtokolErrPol(String pf) throws KmiacServerException,
+			TException {
+        String sqlr;
+        String path;
+
+	        sqlr = "SELECT p.sl_id, p.id_lpu, p.fam, p.im, p.otch, p.dr, m.id_med, m.kod_rez, m.d_pst, m.diag, e.kod_err, e.prim " +
+	 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med) " + 
+	 			   "ORDER BY p.id_lpu";
+	        try {
+	        	SqlSelectExecutor dbfSse = new SqlSelectExecutor(String.format("jdbc:dbf:/%s", pf), prop);
+	        	
+	        	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("pr_err", ".htm").getAbsolutePath()), "utf-8");
+	        			AutoCloseableResultSet acrs = dbfSse.execQuery(sqlr)) {
+	   				StringBuilder sb = new StringBuilder(0x10000);
+	   				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	   				sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	   				sb.append("<head>");
+	     			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	   				sb.append("<title>Файл контроля реестров</title>");
+	   				sb.append("</head>");
+	   				sb.append("<body>");
+					sb.append("Протокол контроля реестров за оказанную мед. помощь");
+					sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+					sb.append("Имя архивного файла:  "+pf);
+					sb.append("<br>Информация об ошибках: <br><br>");
+					
+					ResultSet rs = acrs.getResultSet();
+					while (rs.next()){
+						int kr = rs.getInt("kod_rez");
+						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
+							kr = 81;
+						try (SqlModifyExecutor sme = tse.startTransaction()) {
+							sme.execPrepared("UPDATE p_vizit_amb SET kod_rez=?, datak=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),rs.getInt("sl_id"));
+							sme.setCommit();
+						} catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+							throw new KmiacServerException();
+						}
+						if (rs.getInt("kod_rez") != 3 && rs.getInt("kod_rez") != 10){
+		    				sb.append(String.format("<br>%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
+							sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
+							sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
+							if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
+							else sb.append(String.format("%s   Диагноз :  %s", "      ",rs.getString("diag")));
+							sb.append(String.format("<br> %s ", rs.getString("kod_err")));
+							try (AutoCloseableResultSet acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", rs.getInt("kod_err"))) {
+								if (acr.getResultSet().next()) 
+									sb.append(String.format(" %s ", acr.getResultSet().getString("name_err")));
+								sb.append(String.format("<br> %s <br>", rs.getString("prim")));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+	    	                	
+	   	            }
+	   					osw.write(sb.toString());
+	   					return path;
+		   		} catch (SQLException e) {
+		    		((SQLException) e.getCause()).printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+	        	
+	        	dbfSse.closeConnection();
+	   		} catch (SQLException e) {
+	   			log.log(Level.ERROR, "SQl Exception: ", e);
+	    		((SQLException) e.getCause()).printStackTrace();
+	    		throw new KmiacServerException();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        
+	        return null;
+	}
+
+	@Override
+	public String getProtokolErrLDS(String pf) throws KmiacServerException,
+			TException {
+        String sqlr;
+        String path;
+
+	        sqlr = "SELECT p.sl_id, p.id_lpu, p.fam, p.im, p.otch, p.dr, m.id_med, m.kod_rez, m.d_pst, m.diag, m.ssd, e.kod_err, e.prim " +
+	 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med) " + 
+	 			   "ORDER BY p.id_lpu";
+	        try {
+	        	SqlSelectExecutor dbfSse = new SqlSelectExecutor(String.format("jdbc:dbf:/%s", pf), prop);
+	        	
+	        	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("pr_err", ".htm").getAbsolutePath()), "utf-8");
+	        			AutoCloseableResultSet acrs = dbfSse.execQuery(sqlr)) {
+	   				StringBuilder sb = new StringBuilder(0x10000);
+	   				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	   				sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	   				sb.append("<head>");
+	     			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	   				sb.append("<title>Файл контроля реестров</title>");
+	   				sb.append("</head>");
+	   				sb.append("<body>");
+					sb.append("Протокол контроля реестров за оказанную мед. помощь");
+					sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+					sb.append("Имя архивного файла:  "+pf);
+					sb.append("<br>Информация об ошибках: <br><br>");
+					
+					ResultSet rs = acrs.getResultSet();
+					while (rs.next()){
+						int kr = rs.getInt("kod_rez");
+						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
+							kr = 81;
+						try (AutoCloseableResultSet acr = sse.execPreparedQuery("select l.tip from n_lds l, s_vrach v, s_users u where l.pcod = u.cpodr and v.pcod=u.pcod and v.snils=?", rs.getString("ssd"))) {
+							if (acr.getResultSet().next()){
+								if (acr.getResultSet().getString("tip").equals("Л"))
+									try (SqlModifyExecutor sme = tse.startTransaction()) {
+										sme.execPrepared("UPDATE p_rez_l SET kod_rez=?, d_rez=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),rs.getInt("sl_id"));
+										sme.setCommit();
+									} catch (SQLException e) {
+										((SQLException) e.getCause()).printStackTrace();
+										throw new KmiacServerException();
+									}
+								if (acr.getResultSet().getString("tip").equals("Д") || acr.getResultSet().getString("tip").equals("Т"))
+									try (SqlModifyExecutor sme = tse.startTransaction()) {
+										sme.execPrepared("UPDATE p_rez_d SET kod_rez=?, d_rez=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),rs.getInt("sl_id"));
+										sme.setCommit();
+									} catch (SQLException e) {
+										((SQLException) e.getCause()).printStackTrace();
+										throw new KmiacServerException();
+									}
+							}
+						} catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+							throw new KmiacServerException();
+						}
+						if (rs.getInt("kod_rez") != 3 && rs.getInt("kod_rez") != 10){
+		    				sb.append(String.format("<br>%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
+							sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
+							sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
+							if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
+							else sb.append(String.format("%s   Диагноз :  %s", "      ",rs.getString("diag")));
+							sb.append(String.format("<br> %s ", rs.getString("kod_err")));
+							try (AutoCloseableResultSet acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", rs.getInt("kod_err"))) {
+								if (acr.getResultSet().next()) 
+									sb.append(String.format(" %s ", acr.getResultSet().getString("name_err")));
+								sb.append(String.format("<br> %s <br>", rs.getString("prim")));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+	    	                	
+					}
+	   					osw.write(sb.toString());
+	   					return path;
+		   		} catch (SQLException e) {
+		    		((SQLException) e.getCause()).printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+	        	
+	        	dbfSse.closeConnection();
+	   		} catch (SQLException e) {
+	   			log.log(Level.ERROR, "SQl Exception: ", e);
+	    		((SQLException) e.getCause()).printStackTrace();
+	    		throw new KmiacServerException();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		return null;
+	}
+
+	@Override
+	public String getProtokolErrGosp(String pf) throws KmiacServerException,
+			TException {
+        String sqlr;
+        String path;
+
+	        sqlr = "SELECT p.sl_id, p.id_lpu, p.fam, p.im, p.otch, p.dr, m.id_med, m.kod_rez, m.d_pst, m.diag, e.kod_err, e.prim " +
+	 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med) " + 
+	 			   "ORDER BY p.id_lpu";
+	        try {
+	        	SqlSelectExecutor dbfSse = new SqlSelectExecutor(String.format("jdbc:dbf:/%s", pf), prop);
+	        	
+	        	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("pr_err", ".htm").getAbsolutePath()), "utf-8");
+	        			AutoCloseableResultSet acrs = dbfSse.execQuery(sqlr)) {
+	   				StringBuilder sb = new StringBuilder(0x10000);
+	   				sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	   				sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	   				sb.append("<head>");
+	     			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	   				sb.append("<title>Файл контроля реестров</title>");
+	   				sb.append("</head>");
+	   				sb.append("<body>");
+					sb.append("Протокол контроля реестров за оказанную мед. помощь");
+					sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+					sb.append("Имя архивного файла:  "+pf);
+					sb.append("<br>Информация об ошибках: <br><br>");
+					
+					ResultSet rs = acrs.getResultSet();
+					while (rs.next()){
+						int kr = rs.getInt("kod_rez");
+						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
+							kr = 81;
+						try (SqlModifyExecutor sme = tse.startTransaction()) {
+							sme.execPrepared("UPDATE c_gosp SET kod_rez=?, d_rez=?  WHERE id = ? ", false, kr, new Date(System.currentTimeMillis()),rs.getInt("sl_id"));
+							sme.setCommit();
+						} catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							throw new KmiacServerException();
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+							throw new KmiacServerException();
+						}
+						if (rs.getInt("kod_rez") != 3 && rs.getInt("kod_rez") != 10){
+		    				sb.append(String.format("<br>%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
+							sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
+							sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
+							if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
+							else sb.append(String.format("%s   Диагноз :  %s", "      ",rs.getString("diag")));
+							sb.append(String.format("<br> %s ", rs.getString("kod_err")));
+							try (AutoCloseableResultSet acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", rs.getInt("kod_err"))) {
+								if (acr.getResultSet().next()) 
+									sb.append(String.format(" %s ", acr.getResultSet().getString("name_err")));
+								sb.append(String.format("<br> %s <br>", rs.getString("prim")));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+	    	                	
+	   	            }
+	   					osw.write(sb.toString());
+	   					return path;
+		   		} catch (SQLException e) {
+		    		((SQLException) e.getCause()).printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+	        	
+	        	dbfSse.closeConnection();
+	   		} catch (SQLException e) {
+	   			log.log(Level.ERROR, "SQl Exception: ", e);
+	    		((SQLException) e.getCause()).printStackTrace();
+	    		throw new KmiacServerException();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		return null;
 	}
 
 
