@@ -157,14 +157,19 @@ public class ConnectionManager {
 	 * @return
 	 * экземпляр клиентской части
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends KmiacServer.Client> T add(Class<T> cls, int port) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		T connection;
 		
-		Constructor<T> constructor = cls.getConstructor(TProtocol.class);
-		TTransport transport = new TFramedTransport(new TSocket(appServerIp, port));
-		connection = constructor.newInstance(new TBinaryProtocol(transport));
-		transports.put(port, transport);
-		connections.put(port, connection);
+		if (!connections.containsKey(port)) {
+			Constructor<T> constructor = cls.getConstructor(TProtocol.class);
+			TTransport transport = new TFramedTransport(new TSocket(appServerIp, port));
+			connection = constructor.newInstance(new TBinaryProtocol(transport));
+			transports.put(port, transport);
+			connections.put(port, connection);
+		} else {
+			connection = (T) connections.get(port);
+		}
 		
 		return connection;
 	}

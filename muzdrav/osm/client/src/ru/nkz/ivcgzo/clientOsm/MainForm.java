@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -17,6 +19,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -46,8 +49,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private Vvod vvod;
 	private Timer timer;
 	private ZapVr prevZapvr;
-	private boolean searched;
-	private int searchedNpasp;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -57,7 +58,6 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		setFrame(frame);
 		
 		instance = this;
-		searched = false;
 	}
 
 	/**
@@ -67,6 +67,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 721, 508);
+		
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				timer.stop();
+			}
+		});
 		
 		JScrollPane scrollPane = new JScrollPane();
 		
@@ -78,28 +85,23 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					vvod.showVvod(table.getSelectedItem());
 			}
 		});
-		
-		final JButton btnZpr = new JButton("Вернуться к записанным на прием");
-		btnZpr.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				btnZpr.setEnabled(false);
-				
-				searched = false;
-				updateZapList();
-			}
-		});
-		btnZpr.setEnabled(false);
 		JButton btnSearch = new JButton("Поиск");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, true);
-				
-				if (res != null) {
-					btnZpr.setEnabled(true);
+				try {
+					int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, true);
 					
-					searched = true;
-					searchedNpasp = res[0];
-					updateZapList();
+					if (res != null) {
+						vvod.showVvod(MainForm.tcl.getZapVrSrc(res[0]));
+					}
+				} catch (KmiacServerException e1) {
+					JOptionPane.showMessageDialog(frame, "Не удалось загрузить информацию на пациента.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e1) {
+					e1.printStackTrace();
+					MainForm.conMan.reconnect(e1);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(frame, "Не удалось отобразить форму поиска.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -133,9 +135,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnSelect)
 							.addGap(18)
-							.addComponent(btnView)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnZpr)))
+							.addComponent(btnView)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -145,8 +145,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSearch)
 						.addComponent(btnSelect)
-						.addComponent(btnView)
-						.addComponent(btnZpr))
+						.addComponent(btnView))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(18))
@@ -189,20 +188,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	}
 	
 	public void updateZapList() {
-		if (!searched) {
-			Calendar calendar = GregorianCalendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis());
-			frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
-		} else {
-			frame.setTitle("Найденные пациенты");
-		}
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
 		
 		try {
 			prevZapvr = table.getSelectedItem();
-			if (!searched)
-				table.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis()));
-			else
-				table.setData(tcl.getZapVrSrc(searchedNpasp, authInfo.pcod, authInfo.cdol));
+			table.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis()));
 			if (prevZapvr != null)
 				for (int i = 0; i < table.getData().size(); i++)
 					if (table.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {
@@ -219,6 +211,11 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	}
 	
 	public void setVisible(boolean value) {
+		if (value)
+			timer.restart();
+		else
+			timer.stop();
+		
 		frame.setVisible(value);
 	}
 	
@@ -235,30 +232,16 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			if (cmp instanceof JLabel) {
 				JLabel lbl = (JLabel) cmp;
 				
-				if (searched) {
-					if (MainForm.this.table.getData().get(row).id_pvizit > 0) {
-						if (isSelected)
-							lbl.setBackground(selCol.darker());
-						else
-							lbl.setBackground(Color.gray.brighter());
-					} else {
-						if (isSelected)
-							lbl.setBackground(selCol);
-						else
-							lbl.setBackground(defCol);
-					}
+				if (MainForm.this.table.getData().get(row).hasPvizit) {
+					if (isSelected)
+						lbl.setBackground(selCol.darker());
+					else
+						lbl.setBackground(Color.green.brighter());
 				} else {
-					if (MainForm.this.table.getData().get(row).hasPvizit) {
-						if (isSelected)
-							lbl.setBackground(selCol.darker());
-						else
-							lbl.setBackground(Color.green.brighter());
-					} else {
-						if (isSelected)
-							lbl.setBackground(selCol);
-						else
-							lbl.setBackground(defCol);
-					}
+					if (isSelected)
+						lbl.setBackground(selCol);
+					else
+						lbl.setBackground(defCol);
 				}
 				
 				if (value instanceof Date)

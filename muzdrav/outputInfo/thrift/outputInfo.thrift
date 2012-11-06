@@ -52,6 +52,7 @@ struct InputPlanDisp {
     3: string daten;
     4: string datek;
     5: optional string uchas;
+    6: i32 clpu;
 }
 
 
@@ -117,5 +118,9 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string printFacZd(1: InputAuthInfo iaf 2: InputFacZd ifz) throws (1: kmiacServer.KmiacServerException kse);
 
+   /**
+    * Сводки по форме 39
+    */
+    string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
 }
 
