@@ -97,18 +97,28 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenu menu_3 = new JMenu("Сводки по форме 025");
 		menu_2.add(menu_3);
 		
-		JMenuItem menuItem = new JMenuItem("Сводная ведомость учета зарегистрированных заболеваний");
+		final JMenuItem menuItem = new JMenuItem("Сводная ведомость учета зарегистрированных заболеваний");
 		menuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pSvodVed = new SvodVed();
 				panel.removeAll();
 				panel.add(pSvodVed);
 				panel.revalidate();
+				frame.setTitle("Статистическая отчетность: "+menuItem.getText());
 			}
 		});
 		menu_3.add(menuItem);
 		
-		JMenuItem menuItem_1 = new JMenuItem("Факторы, влияющие на состояние здоровья");
+		final JMenuItem menuItem_1 = new JMenuItem("Факторы, влияющие на состояние здоровья");
+		menuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pFacZd = new FacZd();
+				panel.removeAll();
+				panel.add(pFacZd);
+				panel.revalidate();
+				frame.setTitle("Статистическая отчетность: "+menuItem_1.getText());
+			}
+		});
 		menu_3.add(menuItem_1);
 		
 		JMenu menu_4 = new JMenu("Сводки по форме 039");
