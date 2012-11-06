@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -33,6 +34,7 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
+import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
@@ -57,6 +59,7 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<TMedicalHistory, TMedicalHistory._Fields> rsmMedicalHistory;
     private TResultSetMapper<TDiagnosis, TDiagnosis._Fields> rsmDiagnosis;
     private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+    private TResultSetMapper<TStage, TStage._Fields> rsmStage;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
@@ -83,6 +86,9 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] INT_CLAS_FIELD_NAMES = {
         "pcod", "name"
     };
+    private static final String[] STAGE_FIELD_NAMES = {
+        "id", "id_gosp", "stl", "mes", "date_start", "date_end"
+    };
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
     //  id             id_gosp         cod           med_op        date_ustan
@@ -99,6 +105,12 @@ public class ServerHospital extends Server implements Iface {
     private static final Class<?>[] LIFE_HISTORY_TYPES = {
     //  npasp          allerg        farmkol       vitae
         Integer.class, String.class, String.class, String.class
+    };
+    private static final Class<?>[] STAGE_TYPES = {
+    //  id             id_gosp        stl            mes
+        Integer.class, Integer.class, Integer.class, String.class,
+    //  date_start  date_end
+        Date.class, Date.class
     };
 
     /**
@@ -122,6 +134,7 @@ public class ServerHospital extends Server implements Iface {
             MEDICAL_HISTORY_FIELD_NAMES);
         rsmDiagnosis = new TResultSetMapper<>(TDiagnosis.class, DIAGNOSIS_FIELD_NAMES);
         rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, INT_CLAS_FIELD_NAMES);
+        rsmStage = new TResultSetMapper<>(TStage.class, STAGE_FIELD_NAMES);
     }
 
     @Override
@@ -270,11 +283,11 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void addPatientToDoctor(final int gospId, final int doctorId)
-            throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET vrach = ? WHERE id_gosp = ?;";
+    public final void addPatientToDoctor(final int gospId, final int doctorId,
+            final int stationType) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET vrach = ?, stat_type = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, doctorId, gospId);
+            sme.execPrepared(sqlQuery, false, doctorId, stationType, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -533,7 +546,6 @@ public class ServerHospital extends Server implements Iface {
             log.log(Level.ERROR, "SqlException", e);
             throw new KmiacServerException();
         }
-
     }
 
     private boolean isLifeHistoryExist(final int patientId) throws KmiacServerException {
@@ -587,6 +599,80 @@ public class ServerHospital extends Server implements Iface {
                     new Date(zakl.getDatav()), new Time(zakl.getVremv()),
                     zakl.getSostv(), zakl.getRecom(),
                     null, zakl.getIdGosp());
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getStationTypes()
+            throws KmiacServerException {
+        final String sqlQuery = "SELECT pcod, name FROM n_tip";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmStaionTypes =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmStaionTypes.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final List<TStage> getStage(final int idGosp) throws KmiacServerException {
+        String sqlQuery = "SELECT * FROM c_etap WHERE id_gosp = ? ORDER BY date_start;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            List<TStage> stageList = rsmStage.mapToList(acrs.getResultSet());
+            if (stageList.size() > 0) {
+                return stageList;
+            } else {
+                log.log(Level.INFO, "StagesNotFoundException, idGosp = " + idGosp);
+                return Collections.<TStage>emptyList();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final int addStage(final TStage stage) throws KmiacServerException {
+        final int[] indexes = {1, 4};
+        final String sqlQuery = "INSERT INTO c_etap (id_gosp, date_start) "
+                + "VALUES (?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, true, stage,
+                    STAGE_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateStage(final TStage stage) throws KmiacServerException {
+        final int[] indexes = {4, 5, 2, 3};
+        String sqlQuery = "UPDATE c_etap SET date_start = ?, date_end = ?, stl = ?, mes = ? "
+            + "WHERE id_gosp = ?";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, stage, STAGE_TYPES, indexes);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void deleteStage(final int idStage) throws KmiacServerException {
+        final String sqlQuery = "DELETE FROM c_etap WHERE id = ?";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, idStage);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
