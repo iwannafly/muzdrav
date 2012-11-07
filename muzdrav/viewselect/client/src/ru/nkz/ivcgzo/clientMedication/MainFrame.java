@@ -2,28 +2,39 @@ package ru.nkz.ivcgzo.clientMedication;
 
 import javax.swing.JFrame;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftMedication.LekPriem;
 import ru.nkz.ivcgzo.thriftMedication.Patient;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.JTable;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.thrift.TException;
 
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = -8573682902821548961L;
 //    private UserAuthInfo doctorInfo;
     private Patient patient;
-    private JTable tbMedication;
+    private CustomTable<LekPriem, LekPriem._Fields> tbMedication;
     private JScrollPane spMedicationTable;
     private JPanel pButtons;
     private JButton btnAdd;
     private JButton btnUpdate;
     private JButton btnDelete;
     private MedicationCatalogFrame frmMedicationCatalog;
+    private ThriftIntegerClassifierList lMedication;
+    private JScrollPane spMedicationList;
 
     public MainFrame(final UserAuthInfo authInfo) {
 //        doctorInfo = authInfo;
@@ -33,8 +44,16 @@ public class MainFrame extends JFrame {
     private void initialization() {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
+        addListScrollPane();
         addTableScrollPane();
         addButtonPanel();
+    }
+
+    private void addListScrollPane() {
+        spMedicationList = new JScrollPane();
+        getContentPane().add(spMedicationList);
+        lMedication = new ThriftIntegerClassifierList();
+        spMedicationList.setViewportView(lMedication);
     }
 
     private void addTableScrollPane() {
@@ -45,7 +64,9 @@ public class MainFrame extends JFrame {
     }
 
     private void addMedicationTable() {
-        tbMedication = new JTable();
+        tbMedication = new CustomTable<LekPriem, LekPriem._Fields>(
+            false, false, LekPriem.class, 2, "Дата приёма", 4, "Статус приёма");
+        tbMedication.setEditableFields(true, 0);
         spMedicationTable.setViewportView(tbMedication);
     }
 
@@ -89,12 +110,28 @@ public class MainFrame extends JFrame {
         patient.setIdGosp(idGosp);
     }
 
-    private void createModalFrames() {
-        frmMedicationCatalog = new MedicationCatalogFrame();
+    private void createModalFrames(Patient patient) {
+        frmMedicationCatalog = new MedicationCatalogFrame(patient);
         frmMedicationCatalog.pack();
     }
 
     public final void onConnect() {
-        createModalFrames();
+        createModalFrames(patient);
+        if (patient != null) {
+            try {
+                List<IntegerClassifier> tmpLekShortList =
+                    ClientMedication.tcl.getLekShortList(patient.getIdGosp());
+                if (tmpLekShortList.size() == 0){
+                    lMedication.setData(Collections.<IntegerClassifier>emptyList());
+                } else {
+                    lMedication.setData(tmpLekShortList);
+                }
+            } catch (KmiacServerException e) {
+                e.printStackTrace();
+            } catch (TException e) {
+                e.printStackTrace();
+                ClientMedication.conMan.reconnect(e);
+            }
+        }
     }
 }

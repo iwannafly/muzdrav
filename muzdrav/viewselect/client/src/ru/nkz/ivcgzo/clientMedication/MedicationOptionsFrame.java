@@ -8,8 +8,6 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
 import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
@@ -18,16 +16,16 @@ import javax.swing.JTextArea;
 import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.Font;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftMedication.Lek;
+import ru.nkz.ivcgzo.thriftMedication.Patient;
 
 public class MedicationOptionsFrame extends JDialog {
 
@@ -72,8 +70,10 @@ public class MedicationOptionsFrame extends JDialog {
     private Component hsFifth;
     private IntegerClassifier curMedication;
     private IntegerClassifier curMedicationForm;
+    private Patient patient;
 
-    public MedicationOptionsFrame() {
+    public MedicationOptionsFrame(Patient inPatient) {
+        patient = inPatient;
         initialization();
     }
 
@@ -298,6 +298,14 @@ public class MedicationOptionsFrame extends JDialog {
     private void addButtonAdd() {
         pButtons.setLayout(new BoxLayout(pButtons, BoxLayout.X_AXIS));
         btnAdd = new JButton("Выбрать");
+        btnAdd.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Lek tmpLek = new Lek();
+                tmpLek.setIdGosp()
+                MedicationOptionsFrame.this.dispatchEvent(new WindowEvent(
+                    MedicationOptionsFrame.this, WindowEvent.WINDOW_CLOSING));
+            }
+        });
         btnAdd.setMinimumSize(new Dimension(200, 23));
         btnAdd.setMaximumSize(new Dimension(200, 23));
         btnAdd.setAlignmentX(0.5f);
