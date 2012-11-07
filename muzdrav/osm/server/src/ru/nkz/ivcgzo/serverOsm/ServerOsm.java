@@ -2147,7 +2147,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("<TD>Расположение отеков</TD>");
 				sb.append("</TR>");
 				sb.append("<TR>");
-				acrs2 = sse.execPreparedQuery("SELECT db6.name, db5.name,srok,oj,hdm,ves,art1,art2,art3,art4,datap,id_pvizit FROM  p_rd_din din LEFT OUTER JOIN n_db6 db6 ON (db6.pcod = din.dspos) LEFT OUTER JOIN n_db5 db5 ON (db5.pcod = din.oteki) join p_vizit_amb on (id= id_pos) WHERE id_pvizit = ? order by datap ", kb.getId_pvizit());
+				acrs2 = sse.execPreparedQuery("SELECT db6.name, oteki,srok,oj,hdm,ves,art1,art2,art3,art4,datap,id_pvizit FROM  p_rd_din din LEFT OUTER JOIN n_db6 db6 ON (db6.pcod = din.dspos) join p_vizit_amb on (id= id_pos) WHERE id_pvizit = ? order by datap ", kb.getId_pvizit());
 				if (acrs2.getResultSet().next()) {
 					do {
 							dataRod1 = acrs2.getResultSet().getDate(11);
@@ -2161,8 +2161,19 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 						if (acrs2.getResultSet().getString(1) != null) 
 						sb.append(String.format("<TD> %s</TD>",acrs2.getResultSet().getString(1)));
 						else sb.append("<TD> </TD>");
-						if (acrs2.getResultSet().getString(2) != null) 
-						sb.append(String.format("<TD> %s</TD>",acrs2.getResultSet().getString(2)));
+						String oteki = "";
+						if (acrs2.getResultSet().getInt(2) != 0) {
+							Integer iw1=0;
+							if ((acrs2.getResultSet().getInt(2)-8)>=0)
+							{oteki=" Генерализованные";   iw1=acrs2.getResultSet().getInt(2)-8;}	
+							else {iw1=acrs2.getResultSet().getInt(2);}
+							if ((iw1-4)>=0)
+							{oteki=oteki+" Верхняя брюшная стенка";		iw1=iw1-4;}	
+							else {iw1=iw1;}
+							if ((iw1-2)>=0)
+							{oteki=oteki+" Верхние конечности";		iw1=iw1-2;}	
+							if (iw1 ==1 ) oteki=oteki+" Нижние конечности";
+						sb.append(String.format("<TD> %s</TD>",oteki));}
 						else sb.append("<TD> </TD>");
 						sb.append("<TD> </TD>");
 						sb.append("</TR>");

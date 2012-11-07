@@ -1005,7 +1005,7 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 		
 		
 		
-		// Наименование полеклиники
+		// Наименование поликлиники
 		String namepol = ipd.getNamepol();
 		// № участка
 		String uc = ipd.getUchas(); 
@@ -1190,7 +1190,7 @@ public String printDnevVr() throws KmiacServerException, TException {
 	Date data = null;
 	Date data1 = null;
 	
-	String path;
+	String path = null;
 	
 	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kart1", ".htm").getAbsolutePath()), "utf-8")) {
 
@@ -1358,7 +1358,7 @@ public String printDnevVr() throws KmiacServerException, TException {
 		sb.append("</html>");
 		
 		osw.write(sb.toString());
-		return path;
+		return path = sb.toString();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
 		throw new KmiacServerException();
