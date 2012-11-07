@@ -1712,5 +1712,4 @@ public class ServerRegPatient extends Server implements Iface {
             throw new KmiacServerException();
         }
     }
-
 }
