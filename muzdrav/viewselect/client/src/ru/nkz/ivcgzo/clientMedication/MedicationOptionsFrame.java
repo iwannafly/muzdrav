@@ -23,7 +23,12 @@ import java.awt.event.WindowEvent;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
+import org.apache.thrift.TException;
+
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftMedication.Lek;
 import ru.nkz.ivcgzo.thriftMedication.Patient;
 
@@ -43,14 +48,17 @@ public class MedicationOptionsFrame extends JDialog {
     private JLabel lblDateTo;
     private JPanel pOptions;
     private JLabel lblPeriod;
+    @SuppressWarnings("rawtypes")
     private JComboBox cmbPeriod;
     private JLabel lblOsobNazn;
+    @SuppressWarnings("rawtypes")
     private JComboBox cbxOsobNazn;
     private JLabel lblInputMethod;
-    private JComboBox cbxInputMethod;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxInputMethod;
     private Component vsSecondInterval;
     private JPanel pDailyRules;
     private JLabel lblDose;
+    @SuppressWarnings("rawtypes")
     private JComboBox cbxDose;
     private JLabel lblIntakePerDay;
     private JLabel lblChargeOff;
@@ -72,8 +80,7 @@ public class MedicationOptionsFrame extends JDialog {
     private IntegerClassifier curMedicationForm;
     private Patient patient;
 
-    public MedicationOptionsFrame(Patient inPatient) {
-        patient = inPatient;
+    public MedicationOptionsFrame() {
         initialization();
     }
 
@@ -192,6 +199,7 @@ public class MedicationOptionsFrame extends JDialog {
         addInputMethod();
     }
 
+    @SuppressWarnings("rawtypes")
     private void addPeriod() {
         lblPeriod = new JLabel("Периодичность приёма:");
         pOptions.add(lblPeriod);
@@ -201,6 +209,7 @@ public class MedicationOptionsFrame extends JDialog {
         pOptions.add(cmbPeriod);
     }
 
+    @SuppressWarnings("rawtypes")
     private void addOsobNazn() {
         lblOsobNazn = new JLabel("Особые назначения:");
         pOptions.add(lblOsobNazn);
@@ -214,7 +223,7 @@ public class MedicationOptionsFrame extends JDialog {
         lblInputMethod = new JLabel("Способ ввода:");
         pOptions.add(lblInputMethod);
 
-        cbxInputMethod = new JComboBox();
+        cbxInputMethod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxInputMethod.setMaximumSize(new Dimension(32767, 20));
         pOptions.add(cbxInputMethod);
 
@@ -235,6 +244,7 @@ public class MedicationOptionsFrame extends JDialog {
         addReestr();
     }
 
+    @SuppressWarnings("rawtypes")
     private void addDose() {
         lblDose = new JLabel("Количество на приём:");
         pDailyRules.add(lblDose);
@@ -301,7 +311,19 @@ public class MedicationOptionsFrame extends JDialog {
         btnAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Lek tmpLek = new Lek();
-                tmpLek.setIdGosp()
+                tmpLek.setIdGosp(patient.getIdGosp());
+                tmpLek.setVrach(ClientMedication.authInfo.getPcod());
+                tmpLek.setKlek(curMedication.getPcod());
+                tmpLek.setDatan(System.currentTimeMillis());
+                tmpLek.setDataz(System.currentTimeMillis());
+                try {
+                    ClientMedication.tcl.addLek(tmpLek);
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    e1.printStackTrace();
+                    ClientMedication.conMan.reconnect(e1);
+                }
                 MedicationOptionsFrame.this.dispatchEvent(new WindowEvent(
                     MedicationOptionsFrame.this, WindowEvent.WINDOW_CLOSING));
             }
@@ -327,7 +349,13 @@ public class MedicationOptionsFrame extends JDialog {
         pButtons.add(btnCancel);
     }
 
-    public void setHeader(IntegerClassifier medication,
+    public void prepareForm(IntegerClassifier medication,
+            IntegerClassifier medicationForm, Patient inPatient) {
+        setHeader(medication, medicationForm);
+        patient = inPatient;
+    }
+
+    private void setHeader(IntegerClassifier medication,
             IntegerClassifier medicationForm) {
         if (medication != null) {
             curMedication = medication;

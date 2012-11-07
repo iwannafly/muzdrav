@@ -20,6 +20,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.thrift.TException;
+import java.awt.GridLayout;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import java.awt.Dimension;
 
 public class MainFrame extends JFrame {
 
@@ -35,6 +39,18 @@ public class MainFrame extends JFrame {
     private MedicationCatalogFrame frmMedicationCatalog;
     private ThriftIntegerClassifierList lMedication;
     private JScrollPane spMedicationList;
+    private JPanel pMedicationInfo;
+    private JPanel pInfo;
+    private JLabel lblNewLabel;
+    private JLabel lblNewLabel_1;
+    private JLabel lblNewLabel_2;
+    private JLabel lblNewLabel_3;
+    private JLabel lblNewLabel_4;
+    private JTextField textField;
+    private JTextField textField_1;
+    private JTextField textField_2;
+    private JTextField textField_3;
+    private JTextField textField_4;
 
     public MainFrame(final UserAuthInfo authInfo) {
 //        doctorInfo = authInfo;
@@ -44,14 +60,65 @@ public class MainFrame extends JFrame {
     private void initialization() {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
-        addListScrollPane();
+        addMedicationPanels();
         addTableScrollPane();
         addButtonPanel();
     }
 
-    private void addListScrollPane() {
+    private void addMedicationPanels() {
+        pMedicationInfo = new JPanel();
+        getContentPane().add(pMedicationInfo);
+        pMedicationInfo.setLayout(new BoxLayout(pMedicationInfo, BoxLayout.Y_AXIS));
+
+        addMedicationInfoPanel();
+        addMedicationListScrollPane();
+    }
+
+    private void addMedicationInfoPanel() {
+        pInfo = new JPanel();
+        pInfo.setMaximumSize(new Dimension(32767, 250));
+        pMedicationInfo.add(pInfo);
+        pInfo.setLayout(new GridLayout(5, 2, 0, 0));
+
+        lblNewLabel_1 = new JLabel("New label");
+        pInfo.add(lblNewLabel_1);
+
+        textField = new JTextField();
+        pInfo.add(textField);
+        textField.setColumns(10);
+
+        lblNewLabel_2 = new JLabel("New label");
+        pInfo.add(lblNewLabel_2);
+
+        textField_1 = new JTextField();
+        pInfo.add(textField_1);
+        textField_1.setColumns(10);
+
+        lblNewLabel_3 = new JLabel("New label");
+        pInfo.add(lblNewLabel_3);
+
+        textField_2 = new JTextField();
+        pInfo.add(textField_2);
+        textField_2.setColumns(10);
+
+        lblNewLabel_4 = new JLabel("New label");
+        pInfo.add(lblNewLabel_4);
+
+        textField_3 = new JTextField();
+        pInfo.add(textField_3);
+        textField_3.setColumns(10);
+
+        lblNewLabel = new JLabel("New label");
+        pInfo.add(lblNewLabel);
+
+        textField_4 = new JTextField();
+        pInfo.add(textField_4);
+        textField_4.setColumns(10);
+    }
+
+    private void addMedicationListScrollPane() {
         spMedicationList = new JScrollPane();
-        getContentPane().add(spMedicationList);
+        pMedicationInfo.add(spMedicationList);
         lMedication = new ThriftIntegerClassifierList();
         spMedicationList.setViewportView(lMedication);
     }
@@ -84,6 +151,7 @@ public class MainFrame extends JFrame {
         btnAdd = new JButton("Добавить");
         btnAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                frmMedicationCatalog.prepareForm(patient);
                 frmMedicationCatalog.setVisible(true);
             }
         });
@@ -111,7 +179,7 @@ public class MainFrame extends JFrame {
     }
 
     private void createModalFrames(Patient patient) {
-        frmMedicationCatalog = new MedicationCatalogFrame(patient);
+        frmMedicationCatalog = new MedicationCatalogFrame();
         frmMedicationCatalog.pack();
     }
 

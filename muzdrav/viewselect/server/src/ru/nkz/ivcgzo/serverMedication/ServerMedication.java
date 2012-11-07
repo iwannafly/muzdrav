@@ -3,7 +3,7 @@ package ru.nkz.ivcgzo.serverMedication;
 import java.io.File;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 import org.apache.log4j.Level;

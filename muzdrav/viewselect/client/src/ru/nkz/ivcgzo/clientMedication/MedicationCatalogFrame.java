@@ -25,6 +25,7 @@ import java.util.List;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftMedication.Patient;
 
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
@@ -51,6 +52,7 @@ public class MedicationCatalogFrame extends JDialog{
     private JLabel lblMedicationSearchHeader;
     private ShablonSearchListener medicationSearchListener;
     private MedicationOptionsFrame frmMedicationOptions;
+    private Patient patient;
     
 
     public MedicationCatalogFrame() {
@@ -202,11 +204,11 @@ public class MedicationCatalogFrame extends JDialog{
                     MedicationCatalogFrame.this, WindowEvent.WINDOW_CLOSING));
                 if (lMedications.getSelectedValue() != null) {
                     if (lMedicationForms.getData().size() > 0) {
-                        frmMedicationOptions.setHeader(lMedications.getSelectedValue(),
-                            lMedicationForms.getSelectedValue());
+                        frmMedicationOptions.prepareForm(lMedications.getSelectedValue(),
+                            lMedicationForms.getSelectedValue(), patient);
                     } else {
-                        frmMedicationOptions.setHeader(lMedications.getSelectedValue(),
-                            new IntegerClassifier(-1, "форма выпуска неизвестна"));
+                        frmMedicationOptions.prepareForm(lMedications.getSelectedValue(),
+                            new IntegerClassifier(-1, "форма выпуска неизвестна"), patient);
                     }
                 }
                 frmMedicationOptions.setVisible(true);
@@ -275,5 +277,9 @@ public class MedicationCatalogFrame extends JDialog{
         } catch (TException e) {
             ClientMedication.conMan.reconnect(e);
         }
+    }
+
+    public void prepareForm(Patient inPatient) {
+        patient = inPatient;
     }
 }
