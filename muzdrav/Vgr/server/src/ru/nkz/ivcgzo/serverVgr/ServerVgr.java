@@ -84,8 +84,9 @@ public class ServerVgr extends Server implements Iface {
 		rsmLgot = new TResultSetMapper<>(Lgot.class, "bn",     "klg" );
 		LgotTypes = new Class<?>[] {               Integer.class,Integer.class};
 		
-		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr",       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl", "osp");
+		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr"        ,       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl", "osp");
 		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class,Integer.class};
+
 		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
 		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
@@ -323,6 +324,30 @@ throw new TException(e);
 		}
 	}
 
+	@Override
+	public List<ru.nkz.ivcgzo.thriftVgr.RdPatient> getRdPatient()
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit,rd.npasp,p.fam, p.im, p.ot, p.datar,p.docser,p.docnum,p.adp_gorod,p.adp_ul, "+ 
+"p.adp_dom,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,a.stat,n.clpu,p.terp,p.adm_gorod, p.adm_ul, "+  
+"p.adm_dom, p.adm_kv,s.grup,s.ph, p.tel,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs, "+ 
+"vr.fam,vr.im,vr.ot,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.vozmen,rd.prmen,rd.datam,rd.kont, "+  
+"rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,s.vitae,s.allerg,rd.ishod,rd.prrod,rd.oslrod,i.sem, "+  
+"rd.rost,rd.vesd,i.osoco,i.uslpr,rd.dataz,rd.polj,z0.kod_tf, "+  
+"i.fiootec,i.mrotec,i.telotec,i.grotec,i.photec,i.vredotec,i.votec,p.name_mr,p.prof, "+  
+"rd.eko,rd.rub,rd.predp,p.ter_liv,p.region_liv,rd.cdiagt,rd.cvera,rd.dataosl,rd.osp "+  
+"FROM patient p,p_rd_sl rd,p_rd_inf i,p_sign s,p_vizit v,n_az9 a,n_n00 n,s_vrach vr,n_z00 z0 "+  
+"WHERE  p.cpol_pr=n.pcod and v.npasp=s.npasp and i.npasp=s.npasp and "+  
+"p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp and v.id=rd.id_pvizit "+  
+"and v.cod_sp=vr.pcod and z0.pcod_s=i.obr ")) {
+						if (acrs.getResultSet().next())
+							return rsmRdPat.mapToList(acrs.getResultSet());
+						else
+							throw new KmiacServerException("нет записи");
+					} catch (SQLException e) {
+						((SQLException) e.getCause()).printStackTrace();
+						throw new KmiacServerException();
+					}
+				}
 
 	@Override
 	public String formfilecsv() throws KmiacServerException,
@@ -370,7 +395,7 @@ throw new TException(e);
 			sb.append("<title>Паспортные данные</title>");
 		sb.append("</head>");
 		sb.append("<body>");
-		sb.append("uid;fam;im;ot;dr;pasp;terpr;oblpr;tawn;street;house;flat;polis;dog;stat;lpup;ter;obl;terp;ftown;fstreet;fhouse;fflat;adr;grk;rez");
+		sb.append("uid;fam;im;ot;dr;pasp;terpr;oblpr;tawn;street;house;flat;polis;dog;stat;lpup;ter;obl;terp;ftown;fstreet;fhouse;fflat;adr;grk;rez;");
 		//Vizit.csv
 		StringBuilder sb1 = new StringBuilder(0x10000);
 		sb1.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -380,7 +405,7 @@ throw new TException(e);
 			sb1.append("<title>Посещения</title>");
 		sb1.append("</head>");
 		sb1.append("<body>");
-		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr");
+		sb1.append("uiv;uid;dv;sp;wr;diap;mso;rzp;aim;npr;");
 		// Con_vizit.scv
 		StringBuilder sb2 = new StringBuilder(0x10000);
 		sb2.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -390,8 +415,7 @@ throw new TException(e);
 			sb2.append("<title>Динамическое наблюдение</title>");
 		sb2.append("</head>");
 		sb2.append("<body>");
-		sb2.append("uicv;uiv;uid;ves;ned;dno;plac;lcad;ldad;rcad;rdad;ball1;ball2;ball3;ball4;ball5;nexdate;cirkumference;css;polojpl;predpl;cerdpl;cerdpl2;oteki;otekiras");
-		List<RdPatient> rdPatient = getRdPatient();
+		sb2.append("uicv;uiv;uid;ves;ned;dno;plac;lcad;ldad;rcad;rdad;ball1;ball2;ball3;ball4;ball5;nexdate;cirkumference;css;polojpl;predpl;cerdpl;cerdpl2;oteki;otekiras;");
 		//Con_diagn.csv
 		StringBuilder sb3 = new StringBuilder(0x10000);
 		sb3.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -401,7 +425,7 @@ throw new TException(e);
 			sb3.append("<title>Соматические диагнозы</title>");
 		sb3.append("</head>");
 		sb3.append("<body>");
-		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl");
+		sb3.append("ndiag;uid;dex1;dex2;dex3;dex4dex5;dex6;dex7;dex9;dex10;dex;dak;dsost;dosl;");
 		// Con_main.csv
 		StringBuilder sb4 = new StringBuilder(0x10000);
 		sb4.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -411,7 +435,7 @@ throw new TException(e);
 			sb4.append("<title>Особенности течения</title>");
 		sb4.append("</head>");
 		sb4.append("<body>");
-		sb4.append("num;uid;jdet;dvzdu;srokvzu1;grisk;dgrisk;drodr;fiovr;dred;telm;dsndu;nber;nrod;job;vp;vn;circl;hfio;hmrab;htel;hgrk;hrez;hsm;hal;hdr;hhealth;hage;mrab;dolj;dlm;kontr;dsp;dcr;dtroch;cext;solov;cs;allerg;nasl;gemotr;prich;dprich;predp;cdiag;cvera;eko;dvpl;rub");
+		sb4.append("num;uid;jdet;dvzdu;srokvzu1;grisk;dgrisk;drodr;fiovr;dred;telm;dsndu;nber;nrod;job;vp;vn;circl;hfio;hmrab;htel;hgrk;hrez;hsm;hal;hdr;hhealth;hage;mrab;dolj;dlm;kontr;dsp;dcr;dtroch;cext;solov;cs;allerg;nasl;gemotr;prich;dprich;predp;cdiag;cvera;eko;dvpl;rub;");
         //  Con_sob
 		StringBuilder sb5 = new StringBuilder(0x10000);
 		sb5.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -421,7 +445,7 @@ throw new TException(e);
 			sb5.append("<title>Социально-гигиенические факторы</title>");
 		sb5.append("</head>");
 		sb5.append("<body>");
-		sb5.append("nsob;uid;obr;sem;height;weight;priv;prof;proj;osl;ak;eks;gen;sost;point1;point2;point3;point4;point5;sob_date");
+		sb5.append("nsob;uid;obr;sem;height;weight;priv;prof;proj;osl;ak;eks;gen;sost;point1;point2;point3;point4;point5;sob_date;");
 		
 		StringBuilder sb6 = new StringBuilder(0x10000);
 		sb6.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -431,11 +455,12 @@ throw new TException(e);
 			sb6.append("<title>Диагнозы</title>");
 		sb6.append("</head>");
 		sb6.append("<body>");
-		sb6.append("numd;uid;uid_pol;ddiag;spz;diag;dpdiag;un;vp");
+		sb6.append("numd;uid;uid_pol;ddiag;spz;diag;dpdiag;un;vp;");
 //		for (int j = 0; j < rdPatient.size(); j++) {
 //			RdPatient rdp = rdPatient.get(j);
 //			
 //		}
+		List<RdPatient> rdPatient = getRdPatient();//ошибка SQL
 		j = 0;
 		for (RdPatient rdp : rdPatient) {
 			j = j+1;
@@ -466,8 +491,8 @@ throw new TException(e);
 		if (rdp.prrod != "") rod =1;
 		if (rdp.kont) kontr = 1;
 		if (rdp.predp) pr = 1;
-		if (rdp.eko) ek = 0;
-		if (rdp.rub) ru = 0;
+		if (rdp.eko) ek = 1;
+		if (rdp.rub) ru = 1;
 		if (rdp.grotec == "I") grot = 1;
 		if (rdp.grotec == "II") grot = 2;
 		if (rdp.grotec == "III") grot = 3;
@@ -488,11 +513,17 @@ throw new TException(e);
 		if (rdp.vred.charAt(1) == '1') kod2= kod2+2;
 		if (rdp.vred.charAt(2) == '1') kod2= kod2+4;
 		if (rdp.vred.charAt(3) == '1') kod2= kod2+8;
+		System.out.println(p8);
+		System.out.println(rdp.oblpr);
 
-		Date dgrisk = null;
-		sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%7$td.%7$tm.%7$tY;%8$td.%8$tm.%8$tY;%s %s %s;%10$td.%10$tm.%10$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%30$td.%30$tm.%30$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%42$td.%42$tm.%42$tY;%d;%d;%d;%d;%47$td.%47$tm.%47$tY;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,dgrisk,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));		
+//		Date dgrisk = new Date(System.currentTimeMillis());//дата изменения группы риска - текущая
+//		sb4.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%d;%d;%$td.%7$tm.%7$tY;%$td.%8$tm.%8$tY;%s %s %s;%12$td.%12$tm.%12$tY;%s;%12$td.%12$tm.%12$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%30$td.%30$tm.%30$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%42$td.%42$tm.%42$tY;%d;%d;%d;%d;%47$td.%47$tm.%47$tY;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,dgrisk,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));		
+		sb4.append(String.format("%d;%d;%d;%td.%4$tm.%4$tY;%d;%d;%td.%7$tm.%7$tY;%td.%8$tm.%8$tY;%s %s %s;%td.%12$tm.%12$tY;%s;%td.%14$tm.%14$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%td.%30$tm.%30$tY;%d;%d;%d;%d;%d;%d;%s;%s;;;%d;%td.%42$tm.%42$tY;%d;%d;%d;%d;%td.%47$tm.%47$tY;%d", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,p8,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol,rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));	
+		System.out.println(sb4);
 //		Encoded.Base64(rdp.fam,35,fam);
-		sb.append(String.format("%d;%s;%s;%s;%5$td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
+		sb.append(String.format("%d;%s;%s;%s;%td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terp,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terp,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
+//		sb.append(String.format("%d;%s;%s;%s;%td.%5$tm.%5$tY;%s %s;%d;", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terp));		
+		System.out.println(sb);
  		
 		//Con_diagn.csv
 			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("select d.diag,c.dex,d.d_vz,d.xzab,d.disp,s.name,da.datad from p_diag d,n_c00 c,n_s00 s, p_diag_amb da  where d.diag = c.pcod and d.cdol_ot = s.pcod  and da.id = d.id_diag_amb and d.npasp=?",rdp.npasp)) {
@@ -628,7 +659,7 @@ throw new TException(e);
 			}
 			dex = dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10;
 			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,rdp.npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
-		    sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
+		    sb5.append(String.format("%d;%d;%d;%d;%d;%.2f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
 //			acrs21.close();
 		}
 		//Vizit.csv
@@ -645,7 +676,7 @@ throw new TException(e);
 			j = j+1;
 			Integer ot = 0;
 			if (rcv.oteki != 0 ) ot = 1;
-			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;%d;%d", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
+			sb2.append(String.format("%d;%d;%d;%.2f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;%d;%d", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
 		}
 		osw.write(sb.toString());
 		return "c:\\patient.html";
@@ -664,29 +695,5 @@ throw new TException(e);
 //		return null;
 	}
 
-	@Override
-	public List<ru.nkz.ivcgzo.thriftVgr.RdPatient> getRdPatient()
-			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit,rd.npasp,p.fam, p.im, p.ot, p.datar,p.docser,p.docnum,p.adp_gorod,p.adp_ul, " +
-			       "p.adp_dom,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,a.stat,n.clpu,p.terp,p.adm_gorod, p.adm_ul, "+
-			      "p.adm_dom, p.adm_kv,s.grup,s.ph, p.tel,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs, " +
-			      "vr.fam,vr.im,vr.ot,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.vozmen,rd.prmen,rd.datam,rd.kont, " +
-			      "rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,s.vitae,s.allerg,rd.ishod,rd.datasn,rd.prrod,rd.oslrod,i.sem, "+
-			      "rd.rost,rd.vesd,i.osoco,i.uslpr,rd.dataz,rd.polj,z0.cod_tf "+
-			      "i.fiootec,i.mrotec,i.telotec,i.grotec,i.photec,i.vredotec,i.votec,p.name_mr,p.prof, "+
-			      "rd.eko,rd.rub,rd.predp,p.ter_liv,p.region_liv,rd.cdiagt,rd.cvera,rd.dataosl,rd.osp "+
-			"FROM patient p,p_rd_sl rd,p_rd_inf i,p_sign s,p_vizit v,n_az9 a,n_n00 n,s_vrach vr,n_z00 z0 "+
-			"WHERE p.npasp = 16164 and p.cpol_pr=n.pcod and "+
-			"p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp "+
-			"and v.cod_sp=vr.pcod and z0.pcod_s=i.obr ")) {
-						if (acrs.getResultSet().next())
-							return rsmRdPat.mapToList(acrs.getResultSet());
-						else
-							throw new KmiacServerException("нет записи");
-					} catch (SQLException e) {
-						((SQLException) e.getCause()).printStackTrace();
-						throw new KmiacServerException();
-					}
-				}
 }
 	

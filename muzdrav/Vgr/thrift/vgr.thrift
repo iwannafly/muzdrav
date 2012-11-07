@@ -118,7 +118,7 @@ struct RdPatient{
         39: optional i32 prmen;
 	40: optional i64 datam;
         41: optional bool kont;
-        42: optional i32 dsp;
+        42: optional i32 dsp;  
         43: optional i32 dsr;
         44: optional i32 dtroch;
         45: optional i32 cext;
@@ -154,6 +154,7 @@ struct RdPatient{
         75: optional i32 cvera;
         76: optional i64 dataosl;
         77: optional i32 osp;
+
 }
 struct RdVizit{
          1: optional i32    uid;

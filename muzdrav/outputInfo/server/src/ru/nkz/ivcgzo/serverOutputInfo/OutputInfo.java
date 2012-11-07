@@ -1192,8 +1192,9 @@ public String printDnevVr() throws KmiacServerException, TException {
 	
 	String path = null;
 	
-	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kart1", ".htm").getAbsolutePath()), "utf-8")) {
-
+	try 
+//	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kart1", ".htm").getAbsolutePath()), "utf-8")) 
+			{
 		StringBuilder sb = new StringBuilder(0x10000);
 		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
 		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -1357,13 +1358,10 @@ public String printDnevVr() throws KmiacServerException, TException {
 		sb.append("</body>"); 
 		sb.append("</html>");
 		
-		osw.write(sb.toString());
+//		osw.write(sb.toString());
 		return path = sb.toString();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
-		throw new KmiacServerException();
-	} catch (IOException e) {
-		e.printStackTrace();
 		throw new KmiacServerException();
 	} finally {
 		if (acrs != null)
@@ -1371,7 +1369,7 @@ public String printDnevVr() throws KmiacServerException, TException {
 		if (acrs2 != null)
 			acrs2.close();
 	}
-//		return null;
+//	return path = sb.toString();
 }
     
 
