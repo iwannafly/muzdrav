@@ -31,7 +31,7 @@ public class Period {
 //	private CustomDateEditor textField_1;
 	private CustomDateEditor tfDn;
 	private CustomDateEditor tfDk;
-	private ServerVgr sfrm;
+//	private ServerVgr sfrm;
 	/**
 	 * Launch the application.
 	 */
@@ -69,9 +69,9 @@ public class Period {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (Cslu == 1){
-					sfrm = new ServerVgr();
-				//	sfrm.Cslu = 2;
-					sfrm.ServerVgr();
+//					sfrm = new ServerVgr();
+//				//	sfrm.Cslu = 2;
+//					sfrm.ServerVgr();
 					try {
 						MainForm.tcl.getKovInfoPol(MainForm.authInfo.cpodr, tfDn.getDate().getTime(), tfDk.getDate().getTime(), MainForm.authInfo.clpu);
 					} catch (KmiacServerException e1) {
