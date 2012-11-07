@@ -9,5 +9,6 @@
 	<classpathentry kind="var" path="EXTERNAL_LIB/postgresql-9.2-1000.jdbc4.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.7.2.jar"/>
+	<classpathentry kind="var" path="EXTERNAL_LIB/DBF_JDBC40.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

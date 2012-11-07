@@ -235,7 +235,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 				try {
 					nomerMss = MainForm.tcl.getPsmertdop(cuserPodr, cuserCslu, cuserClpu);
 					nextNomer = nomerMss.nomer_t+1;
-					
+					System.out.println(nextNomer);
 				} catch (TException e0) {
 					
 					e0.printStackTrace();
@@ -294,7 +294,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 							tfAds_kv.setText(PatientAdres.adm_kv.trim());
 						}
 						int region = PatientAdres.getRegion_liv();
-						//System.out.println(PatientAdres.adm_gorod);
+						if (region == 0) region = 42;
 						try {
 							PatMestn = MainForm.tcl.getL00(region, PatientAdres.adm_gorod.trim());
 							//System.out.println(PatMestn.vid_np);
@@ -2546,7 +2546,7 @@ public class MainForm extends Client<ThriftMss.Client> {
 			}
 			}
 			if (cmbNastupila.getSelectedPcod() == null) {
-				s_pro += "где наступала смерть? - не заполнено" + System.lineSeparator();
+				s_pro += "где наступила смерть? - не заполнено" + System.lineSeparator();
 				mistake = mistake+1;
 			}
 			if (aBool) {
