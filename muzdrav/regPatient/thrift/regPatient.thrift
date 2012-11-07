@@ -95,12 +95,35 @@ struct Agent{
 }
 
 /*pkov*/
+struct AllLgota{
+	1:i32 id,
+	2:i32 npasp,
+	3:i32 lgota,
+	4:optional i64 datau,
+	5:string name,
+	6:i32 gri,
+	7:i32 sin,
+	8:i32 pp,
+	9:optional i64 drg,
+	10:optional i64 dot,
+	11:i32 obo,
+	12:string ndoc
+}
+
+/*pkov*/
 struct Lgota{
 	1:i32 id,
 	2:i32 npasp,
 	3:i32 lgota,
 	4:optional i64 datau,
-	5:string name
+	5:string name,
+	6:i32 gri,
+	7:i32 sin,
+	8:i32 pp,
+	9:optional i64 drg,
+	10:optional i64 dot,
+	11:i32 obo,
+	12:string ndoc
 }
 
 /*pkonti*/
@@ -310,14 +333,21 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 		2:kmiacServer.KmiacServerException kse);
 	
     /**
+     * Возвращает сведения о льготе пациента с указанным идентификатором льготы
+     * @param id - идентификатор льготы
+     * @return thrift-объектов, содержащих информацию о льготах пациента
+     * @throws kmiacServer.KmiacServerException
+     */
+    Lgota getLgota(1:i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	
+    /**
      * Возвращает сведения о льготах пациента с указанным персональным номером
      * @param npasp - персональный номер пациента
      * @return список thrift-объектов, содержащих информацию о льготах пациента
      * @throws LgotaNotFoundException
      */
-    list<Lgota> getLgota(1:i32 npasp) throws (1: LgotaNotFoundException lnfe,
+    list<AllLgota> getAllLgota(1:i32 npasp) throws (1: LgotaNotFoundException lnfe,
 		2:kmiacServer.KmiacServerException kse);
-	
     /**
      * Возвращает сведения о категориях пациента с указанным персональным номером
      * @param npasp - персональный номер пациента
@@ -398,7 +428,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	 * </ul>
      * @throws LgotaAlreadyExistException
      */
-    Info addLgota(1:Lgota lgota) throws (1:LgotaAlreadyExistException laee,
+    Info addLgota(1:AllLgota lgota) throws (1:LgotaAlreadyExistException laee,
 		2:kmiacServer.KmiacServerException kse);
 	
     /**
@@ -446,7 +476,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 
     void updatePatient(1:PatientFullInfo patinfo) throws (1:kmiacServer.KmiacServerException kse);
     void updateNambk(1:Nambk nambk) throws (1:kmiacServer.KmiacServerException kse);
-    void updateLgota(1:Lgota lgota) throws (1:kmiacServer.KmiacServerException kse);
+    void updateLgota(1:AllLgota lgota) throws (1:kmiacServer.KmiacServerException kse);
     void updateKont(1:Kontingent kont) throws (1:kmiacServer.KmiacServerException kse);
     void updateGosp(1:Gosp gosp) throws (1:kmiacServer.KmiacServerException kse);
 
@@ -592,6 +622,7 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 
 	i32 addToOtd(1:i32 idGosp, 2:i32 nist, 3:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 	void updateOtd(1:i32 id, 2:i32 idGosp, 3:i32 nist, 4:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
+	void addOrUpdateOtd(1:i32 idGosp, 2:i32 nist, 3:i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 
 
 }

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
@@ -23,11 +24,15 @@ public class SqlModifyExecutor extends SqlSelectExecutor implements ISqlModifyEx
 
 	/**
 	 * Устанавливает подключение к базе данных и настраивает его свойства.
+	 * @param connString - строка подключеня к базе, в которой
+	 * указываются драйвер подключения, хост, порт, путь к базе
+	 * или имя схемы и дополнительные параметры.
+	 * @param user - логин.
+	 * @param pass - пароль.
 	 * @param man - экземпляр менеджера транзакций.
 	 * @throws SQLException
 	 */
-	public SqlModifyExecutor(String connString, String user, String pass, TransactedSqlManager man)
-			throws SQLException {
+	public SqlModifyExecutor(String connString, String user, String pass, TransactedSqlManager man) throws SQLException {
 		super(connString, user, pass);
 		
 		conn.setAutoCommit(false);
@@ -39,11 +44,52 @@ public class SqlModifyExecutor extends SqlSelectExecutor implements ISqlModifyEx
 		_inTransaction = false;
 	}
 
-	public SqlModifyExecutor(String connString, String user, String pass)
-			throws SQLException {
+	/**
+	 * Устанавливает подключение к базе данных и настраивает его свойства.
+	 * @param connString - строка подключеня к базе, в которой
+	 * указываются драйвер подключения, хост, порт, путь к базе
+	 * или имя схемы и дополнительные параметры.
+	 * @param user - логин.
+	 * @param pass - пароль.
+	 * @throws SQLException
+	 */
+	public SqlModifyExecutor(String connString, String user, String pass) throws SQLException {
 		this(connString, user, pass, null);
 	}
-
+	
+	/**
+	 * Устанавливает подключение к базе данных и настраивает его свойства.
+	 * @param connString - строка подключеня к базе, в которой
+	 * указываются драйвер подключения, хост, порт, путь к базе
+	 * или имя схемы и дополнительные параметры.
+	 * @param prop - свойства.
+	 * @param man - экземпляр менеджера транзакций.
+	 * @throws SQLException
+	 */
+	public SqlModifyExecutor(String connString, Properties prop, TransactedSqlManager man) throws SQLException {
+		super(connString, prop);
+		
+		conn.setAutoCommit(false);
+		conn.setReadOnly(false);
+		
+		this.man = man;
+		_manIsSet = man != null;
+		
+		_inTransaction = false;
+	}
+	
+	/**
+	 * Устанавливает подключение к базе данных и настраивает его свойства.
+	 * @param connString - строка подключеня к базе, в которой
+	 * указываются драйвер подключения, хост, порт, путь к базе
+	 * или имя схемы и дополнительные параметры.
+	 * @param prop - свойства.
+	 * @throws SQLException
+	 */
+	public SqlModifyExecutor(String connString, Properties prop) throws SQLException {
+		this(connString, prop, null);
+	}
+	
 	@Override
 	public SqlModifyExecutor startTransaction() throws InterruptedException {
 		if (isInTransaction())
