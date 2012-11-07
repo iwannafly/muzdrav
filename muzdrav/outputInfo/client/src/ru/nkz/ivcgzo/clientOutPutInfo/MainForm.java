@@ -63,6 +63,9 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public FacZd pFacZd;
 	public tableVrach pTableVrach;
 	public PlanDisp pPlanDisp;
+	public Ot039 pOt039;
+
+	private JMenuItem menuItemSvodSP;
 
 
 	/**
@@ -84,6 +87,9 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		//scrollPane.add(pSvodVed);
 		
 		final JPanel panel = new JPanel();
+		
+		panel.removeAll();
+		panel.revalidate();
 		
 		JMenuBar menuBar = new JMenuBar();
 		scrollPane.setColumnHeaderView(menuBar);
@@ -113,6 +119,17 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		
 		JMenu menu_4 = new JMenu("Сводки по форме 039");
 		menu_2.add(menu_4);
+		
+		JMenuItem menuItemSvedSP = new JMenuItem("Сведения о структуре посещений");
+		menuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pOt039 = new Ot039();
+				panel.removeAll();
+				panel.add(pOt039);
+				panel.revalidate();
+			}
+		});
+		menu_4.add(menuItemSvedSP);
 		
 		JMenu menu_6 = new JMenu("Сводки по диспансеризации");
 		menu_2.add(menu_6);
@@ -150,6 +167,13 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		panel.add(pSvodVed);
 		panel.revalidate();
 		
+		/**
+		scrollPane.setViewportView(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		pOt039 = new Ot039();
+		panel.add(pOt039);
+		panel.revalidate();
+		*/
 	
 		//tpReg.addTab("Паспорт участка", pFacZd);
 	}

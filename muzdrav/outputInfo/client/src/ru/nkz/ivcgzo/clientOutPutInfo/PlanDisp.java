@@ -47,7 +47,7 @@ public class PlanDisp extends JPanel {
 				ipd.setUchas(tfUch.getText());
 				ipd.setKpolik(MainForm.authInfo.getCpodr());
 				ipd.setNamepol(MainForm.authInfo.getCpodr_name());
-				ipd.setClpu(MainForm.authInfo.clpu);					
+				//ipd.setClpu(MainForm.authInfo.clpu);					
 					
 					//OutputTest ot = new OutputTest();
 					String servPath = MainForm.tcl.printPlanDisp(ipd);
