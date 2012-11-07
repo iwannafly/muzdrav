@@ -66,7 +66,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public FacZd pFacZd;
 	public tableVrach pTableVrach;
 	public PlanDisp pPlanDisp;
-
+	static int disp; 
 
 	/**
 	 * Launch the application.
@@ -156,6 +156,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenuItem menuItem_3 = new JMenuItem("Плановая диспансеризация");
 		menuItem_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				disp = 1;
 				pPlanDisp = new PlanDisp();
 				panel.removeAll();
 				panel.add(pPlanDisp);
@@ -163,6 +164,32 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 			}
 		});
 		menu_6.add(menuItem_3);
+		
+		JMenuItem mntmNewMenuItem = new JMenuItem("Не выполненые запланированные диспансерные мероприятия");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				disp = 2;
+				pPlanDisp = new PlanDisp();
+				panel.removeAll();
+				panel.add(pPlanDisp);
+				panel.revalidate();
+			}
+		});
+		
+		menu_6.add(mntmNewMenuItem);
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Сведения о диспансерном обслуживании");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				disp = 3;
+				pPlanDisp = new PlanDisp();
+				panel.removeAll();
+				panel.add(pPlanDisp);
+				panel.revalidate();
+			}
+		});
+		
+		menu_6.add(mntmNewMenuItem_1);
 		
 		JMenu menu_7 = new JMenu("Отчет по прививкам");
 		menu_2.add(menu_7);
