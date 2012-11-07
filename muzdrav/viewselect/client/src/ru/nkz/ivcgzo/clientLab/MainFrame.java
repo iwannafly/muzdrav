@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -129,6 +130,7 @@ public class MainFrame extends JFrame {
         patient.setMiddlename(middlename);
         patient.setIdGosp(idGosp);
         updateTree(patient.getId());
+        setDefaults();
     }
 
     private void addIssledTab() {
@@ -141,6 +143,15 @@ public class MainFrame extends JFrame {
         setIssledButtons();
 
         setIssledPanelGroupLayout();
+    }
+
+    private final void setDefaults() {
+        cbxLabs.setSelectedIndex(-1);
+        cbxOrgAndSystem.setSelectedIndex(-1);
+        cbxOrganizationFrom.setSelectedIndex(-1);
+        cbxOrganzationTo.setSelectedIndex(-1);
+        tbIssled.setData(Collections.<PokazMet>emptyList());
+        taObosn.setText("");
     }
 
     private void setIssledComboBoxes() {
@@ -206,7 +217,8 @@ public class MainFrame extends JFrame {
         btnPrintIssled = new JButton("Печать");
         btnPrintIssled.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if (cbxOrgAndSystem.getSelectedItem() != null) {
+                if ((cbxLabs.getSelectedItem() != null)
+                        && (cbxOrgAndSystem.getSelectedItem() != null)) {
                     try {
                         Pisl pisl = new Pisl();
                         fillPislFields(pisl);
@@ -240,10 +252,13 @@ public class MainFrame extends JFrame {
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "Ошибка записи исследования! Информация может быть не сохранена!",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        ClientLab.conMan.reconnect(e1);
                         e1.printStackTrace();
+                        ClientLab.conMan.reconnect(e1);
                     }
-
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Не выбрана лаборатория или система исследования!",
+                        "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -307,8 +322,8 @@ public class MainFrame extends JFrame {
                 } catch (KmiacServerException e1) {
                     e1.printStackTrace();
                 } catch (TException e1) {
-                    ClientLab.conMan.reconnect(e1);
                     e1.printStackTrace();
+                    ClientLab.conMan.reconnect(e1);
                 }
             }
         });
@@ -323,6 +338,9 @@ public class MainFrame extends JFrame {
         lblObosn = new JLabel("Обоснование для направления");
         spObosn = new JScrollPane();
         taObosn = new JTextArea();
+        taObosn.setWrapStyleWord(true);
+        taObosn.setLineWrap(true);
+        taObosn.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spObosn.setViewportView(taObosn);
     }
 
@@ -330,33 +348,40 @@ public class MainFrame extends JFrame {
         btnPrintNaprav = new JButton("Печать");
         btnPrintNaprav.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                try {
-                    Napr napr = new Napr();
-//                    pnapr.setIdpvizit(tblPos.getSelectedItem().getId_obr());
-                    napr.setVidDoc(3);
-                    napr.setText(taObosn.getText());
-                    napr.setId(ClientLab.tcl.addNapr(napr));
-                    napr.setIdGosp(patient.getIdGosp());
-//                    NaprKons naprkons = new NaprKons();
-//                    naprkons.setUserId(MainForm.authInfo.getUser_id());
-//                    naprkons.setNpasp(Vvod.zapVr.getNpasp());
-//                    naprkons.setObosnov(tbKonsObosnov.getText());
-//                    if (cmbKonsMesto.getSelectedItem() != null)
-//                        naprkons.setCpol(cmbKonsMesto.getSelectedItem().getName());
-//                    naprkons.setNazv(cmbKonsVidNapr.getSelectedItem().toString());
-//                    naprkons.setCdol(MainForm.authInfo.getCdol());
-//                    naprkons.setPvizitId(tblPos.getSelectedItem().getId_obr());
-//                    naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
-//                    naprkons.setClpu_name(MainForm.authInfo.getClpu_name());
-//                    String servPath = MainForm.tcl.printNaprKons(naprkons);
-//                    String cliPath = File.createTempFile("napk", ".htm").getAbsolutePath();
-//                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
-//                    MainForm.conMan.openFileInEditor(cliPath, false);
-                } catch (TException e1) {
-                    e1.printStackTrace();
-                    ClientLab.conMan.reconnect(e1);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                if ((cbxOrganizationFrom.getSelectedItem() != null)
+                        && (cbxOrganzationTo.getSelectedItem() != null)) {
+                    try {
+                        Napr napr = new Napr();
+    //                    pnapr.setIdpvizit(tblPos.getSelectedItem().getId_obr());
+                        napr.setVidDoc(3);
+                        napr.setText(taObosn.getText());
+                        napr.setId(ClientLab.tcl.addNapr(napr));
+                        napr.setIdGosp(patient.getIdGosp());
+    //                    NaprKons naprkons = new NaprKons();
+    //                    naprkons.setUserId(MainForm.authInfo.getUser_id());
+    //                    naprkons.setNpasp(Vvod.zapVr.getNpasp());
+    //                    naprkons.setObosnov(tbKonsObosnov.getText());
+    //                    if (cmbKonsMesto.getSelectedItem() != null)
+    //                        naprkons.setCpol(cmbKonsMesto.getSelectedItem().getName());
+    //                    naprkons.setNazv(cmbKonsVidNapr.getSelectedItem().toString());
+    //                    naprkons.setCdol(MainForm.authInfo.getCdol());
+    //                    naprkons.setPvizitId(tblPos.getSelectedItem().getId_obr());
+    //                    naprkons.setCpodr_name(MainForm.authInfo.getCpodr_name());
+    //                    naprkons.setClpu_name(MainForm.authInfo.getClpu_name());
+    //                    String servPath = MainForm.tcl.printNaprKons(naprkons);
+    //                    String cliPath = File.createTempFile("napk", ".htm").getAbsolutePath();
+    //                    MainForm.conMan.transferFileFromServer(servPath, cliPath);
+    //                    MainForm.conMan.openFileInEditor(cliPath, false);
+                    } catch (TException e1) {
+                        e1.printStackTrace();
+                        ClientLab.conMan.reconnect(e1);
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                            "Не выбрано место назначения или место направления!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -430,13 +455,13 @@ public class MainFrame extends JFrame {
             ClientLab.conMan.reconnect(e);
         } 
 
+        splitPane.setDividerLocation(0.5);
         return root;
     }
 
     private void addResultTreePanel() {
         splitPane = new JSplitPane();
         splitPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        splitPane.setDividerLocation(1.0);
         pResult.add(splitPane);
         
         addResultTree();
@@ -449,7 +474,6 @@ public class MainFrame extends JFrame {
         trResult.setFont(new Font("Arial", Font.PLAIN, 12));
         sptree.setViewportView(trResult);
         splitPane.setLeftComponent(sptree);
-
         trResult.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 if (e.getNewLeadSelectionPath() == null) {
@@ -459,12 +483,26 @@ public class MainFrame extends JFrame {
                 sbResulText = new StringBuilder();
                 Object lastPath = e.getNewLeadSelectionPath().getLastPathComponent();
                 if (lastPath instanceof GospTreeNode) {
+                    Gosp tmpGosp = ((GospTreeNode)lastPath).getGosp();
+                    if (tmpGosp.isSetIdGosp()) {
+                        addLineToDetailInfo("Отделение стационара", tmpGosp.isSetCotd_name(),
+                                tmpGosp.getCotd_name());
+                        addLineToDetailInfo("Лечащий врач", tmpGosp.isSetVrach_fio(),
+                                tmpGosp.getVrach_fio());
+                        addLineToDetailInfo("Дата поступления в стационар", tmpGosp.isSetDatap(),
+                                DateFormat.getDateInstance().format(new Date(tmpGosp.getDatap())));
+                        addLineToDetailInfo("Дата выписки из стационара ", tmpGosp.isSetDatav(),
+                                DateFormat.getDateInstance().format(new Date(tmpGosp.getDatav())));
+                    }
+                    taResultText.setText(sbResulText.toString());
                 }
                 if (lastPath instanceof IssledNode) {
                     Isl tmpIsl = ((IssledNode)lastPath).getIsl();
                     if (tmpIsl.isSetNisl()) {
                         addLineToDetailInfo("Показатель исследования",tmpIsl.isSetPokaz_name(),
                                 tmpIsl.getPokaz_name());
+                        addLineToDetailInfo("Код показателя",tmpIsl.isSetPokaz(),
+                                tmpIsl.getPokaz());
                         addLineToDetailInfo("Результат исследования",tmpIsl.isSetRez(),
                                 tmpIsl.getRez());
                         addLineToDetailInfo("Описание",tmpIsl.isSetOp_name(),
@@ -533,7 +571,11 @@ public class MainFrame extends JFrame {
 //                MainForm.conMan.reconnect(e);
 //            } 
         }
-        
+
+        public Gosp getGosp() {
+            return gosp;
+        }
+
         @Override
         public String toString() {
             return DateFormat.getDateInstance().format(new Date(gosp.getDatap()));
@@ -553,7 +595,7 @@ public class MainFrame extends JFrame {
         
         @Override
         public String toString() {
-            return isl.getPokaz();
+            return isl.getPokaz_name();//isl.getPokaz();
         }
     }
 

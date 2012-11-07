@@ -15,7 +15,6 @@
 		<os family="windows" />
 	</condition>
 	<property name="manager.dir" location="${muzdrav.dir}/manager" />
-	<property name="db_server.ip" value="10.0.0.242" />
 	
 	<path id="build.classpath" >
 	  <fileset dir="${lib.dir}">
@@ -84,19 +83,7 @@
 		<copy file="${basedir}/launcher_i.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false" />
 	</target>
 
-	<target name="main_ei" description="Компиляция всех серверных модулей для рабочего сервера">
-		<replace file="${manager.dir}/src/ru/nkz/ivcgzo/managerAuth/ManagerAuth.java" token="10.0.0.248" value="${db_server.ip}" failOnNoReplacements="true" />
-		
-		<antcall target="jar" />
-		
-		<subant>
-			<fileset dir="${muzdrav.dir}" includes="**/server/build.xml" />
-		</subant>
-		
-		<antcall target="copyJarsToSharedPath" />
-	</target>
-
-	<target name="main_t" description="Компиляция всех серверных модулей для тестового сервера">
+	<target name="main" description="Компиляция всех серверных модулей для тестового сервера">
 		<antcall target="jar" />
 		
 		<subant>

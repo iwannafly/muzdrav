@@ -394,6 +394,7 @@ public class PIslForm {
 				pisl_ld.setDataz(System.currentTimeMillis());				
 				pisl_ld.setCuser(MainForm.authInfo.pcod);
 				
+				
 				//System.out.print(pisl_ld);
 				
 				pisl_ld.setNisl(MainForm.ltc.AddIsl(pisl_ld));
@@ -424,6 +425,8 @@ public class PIslForm {
 				}
 				
 				upnisl.setPcisl(cBpcisl.getSelectedPcod());
+				
+				
 				upnisl.setDatap(tFdatap.getDate().getTime());
 				upnisl.setDatav(tFdatav.getDate().getTime());
 				
@@ -594,7 +597,7 @@ public class PIslForm {
 								//System.out.print(addLbIsl);
 								//addLbIsl.setNpasp(tn_ldi.getSelectedItem().npasp);
 								try {
-									
+			
 									MainForm.ltc.AddLIsl(addLbIsl);
 									
 								} catch (LIslExistsException e) {
@@ -683,8 +686,18 @@ public class PIslForm {
 				}
 				
 				SimpleDateFormat dp = new SimpleDateFormat("dd.MM.yyyy");
-				tFdatap.setText(dp.format(tn_ldi.getSelectedItem().datap));
-				tFdatav.setText(dp.format(tn_ldi.getSelectedItem().datav));
+				
+				if (tn_ldi.getSelectedItem().isSetDatap()){
+					tFdatap.setText(dp.format(tn_ldi.getSelectedItem().datap));
+				}else{
+					tFdatap.setDate(System.currentTimeMillis());
+				}
+				
+				if (tn_ldi.getSelectedItem().isSetDatav()){
+					tFdatav.setText(dp.format(tn_ldi.getSelectedItem().datav));
+				}else{
+					tFdatav.setDate(System.currentTimeMillis());
+				}
 				
 				tFnprob.setText(String.valueOf(tn_ldi.getSelectedItem().nprob));
 				

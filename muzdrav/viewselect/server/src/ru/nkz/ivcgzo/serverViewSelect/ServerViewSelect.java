@@ -73,7 +73,7 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmRdSl = new TResultSetMapper<>(RdSlInfo.class, "id", "npasp", "datay", "dataosl", "abort", "shet", "datam", "yavka1", "ishod", "datasn", "datazs", "kolrod", "deti", "kont", "vesd", "dsp", "dsr", "dtroch", "cext", "indsol", "prmen", "dataz", "datasert", "nsert", "ssert", "oslab", "plrod", "prrod", "vozmen", "oslrod", "polj", "dataab", "srokab", "cdiagt", "cvera", "id_pvizit", "rost");
 		rsmPdiagZ = new TResultSetMapper<>(PatientDiagZInfo.class, "id", "id_diag_amb", "npasp", "diag", "cpodr", "d_vz", "d_grup", "ishod", "dataish", "datag", "datad", "diag_s", "d_grup_s", "cod_sp", "cdol_ot", "nmvd", "xzab", "stady", "disp", "pat", "prizb", "prizi", "named", "fio_vr");
 		rsmPvizitAmb = new TResultSetMapper<>(PatientVizitAmbInfo.class, "id", "id_obr", "npasp", "datap", "cod_sp", "cdol", "diag", "mobs", "rezult", "opl", "stoim", "uet", "datak", "kod_rez", "k_lr", "n_sp", "pr_opl", "pl_extr", "vpom", "fio_vr", "dataz", "cpos");
-		rsmPriem = new TResultSetMapper<>(PatientPriemInfo.class, "id_obr","npasp", "id_pos", "sl_ob", "n_is", "n_kons", "n_proc", "n_lek", "t_chss", "t_temp", "t_ad", "t_rost", "t_ves", "t_st_localis", "t_ocenka", "t_jalob", "t_status_praesense", "t_fiz_obsl");
+		rsmPriem = new TResultSetMapper<>(PatientPriemInfo.class, "id_obr","npasp", "id_pos", "sl_ob", "n_is", "n_kons", "n_proc", "n_lek", "t_chss", "t_temp", "t_ad", "t_rost", "t_ves", "t_st_localis", "t_ocenka", "t_jalob", "t_status_praesense", "t_fiz_obsl", "t_recom");
 		rsmPnapr = new TResultSetMapper<>(PatientNaprInfo.class, "id", "idpvizit", "vid_doc", "text", "preds", "zaved", "name");
 		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "datap", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
 		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav");
@@ -359,7 +359,7 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public List<PatientDiagAmbInfo> getPatientDiagAmbInfoList(int pvizitId) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_obr = ? ", pvizitId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_pos = ? ", pvizitId)) {
 			return rsmPdiagAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException(e.getMessage());
