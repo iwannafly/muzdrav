@@ -699,6 +699,7 @@ public class MainFrame extends JFrame {
 
     private void setLifeHistoryScrollPane() {
         lblLifeHistory = new JLabel("История жизни");
+        lblLifeHistory.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblLifeHistory.setFont(new Font("Tahoma", Font.BOLD, 13));
         vbLifeHistoryTextFields.add(lblLifeHistory);
         spLifeHistory = new JScrollPane();
@@ -712,6 +713,7 @@ public class MainFrame extends JFrame {
 
     private void setAllergoScrollPane() {
         lblAllergo = new JLabel("Аллергоанамнез");
+        lblAllergo.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblAllergo.setFont(new Font("Tahoma", Font.BOLD, 13));
         vbLifeHistoryTextFields.add(lblAllergo);
         spAllergo = new JScrollPane();
@@ -725,6 +727,7 @@ public class MainFrame extends JFrame {
 
     private void setFarmoScrollPane() {
         lblFarmo = new JLabel("Фармоанамнез");
+        lblFarmo.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblFarmo.setFont(new Font("Tahoma", Font.BOLD, 13));
         vbLifeHistoryTextFields.add(lblFarmo);
         spFarmo = new JScrollPane();
@@ -738,7 +741,9 @@ public class MainFrame extends JFrame {
 
     private void setLifeHistoryButtons() {
         btnSaveLifeHistory = new JButton("Сохранить");
-        btnSaveLifeHistory.setAlignmentY(0.0f);
+        btnSaveLifeHistory.setMaximumSize(new Dimension(350, 40));
+        btnSaveLifeHistory.setPreferredSize(new Dimension(350, 40));
+        btnSaveLifeHistory.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSaveLifeHistory.setFont(new Font("Tahoma", Font.BOLD, 11));
         vbLifeHistoryTextFields.add(btnSaveLifeHistory);
         btnSaveLifeHistory.addActionListener(new ActionListener() {
@@ -773,7 +778,8 @@ public class MainFrame extends JFrame {
 
     private void setLifeHistoryVerticalShablonPanel() {
         vbLifeHistoryShablonComponents = Box.createVerticalBox();
-        vbLifeHistoryShablonComponents.setBorder(new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+        vbLifeHistoryShablonComponents.setBorder(
+            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
         vbLifeHistoryShablonComponents.setPreferredSize(new Dimension(200, 0));
         pLifeHistory.add(vbLifeHistoryShablonComponents);
 
@@ -784,6 +790,7 @@ public class MainFrame extends JFrame {
 
     private void setLifeHistoryShablonLabel() {
         lblLifeHistioryShablonHeader = new JLabel("Строка поиска шаблона");
+        lblLifeHistioryShablonHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblLifeHistioryShablonHeader.setFont(new Font("Tahoma", Font.BOLD, 13));
         vbLifeHistoryShablonComponents.add(lblLifeHistioryShablonHeader);
         lblLifeHistioryShablonHeader.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -792,11 +799,11 @@ public class MainFrame extends JFrame {
 
     private void setLifeHistoryShablonHorizontalBox() {
         horizontalBox = Box.createHorizontalBox();
+        horizontalBox.setAlignmentY(Component.CENTER_ALIGNMENT);
         vbLifeHistoryShablonComponents.add(horizontalBox);
 
         setLifeHistoryShablonTextField();
         setLifeHistoryShablonButton();
-        setLifeHistoryShablonList();
     }
 
     private void setLifeHistoryShablonTextField() {
@@ -806,7 +813,7 @@ public class MainFrame extends JFrame {
         tfLifeHShablonFilter.getDocument().addDocumentListener(lifeHiSearchListener);
         tfLifeHShablonFilter.setColumns(10);
         lifeHiSearchListener =
-                new ShablonSearchListener(tfLifeHShablonFilter, lLifeHistoryShabloNames);
+            new ShablonSearchListener(tfLifeHShablonFilter, lLifeHistoryShabloNames);
     }
 
     private void setLifeHistoryShablonButton() {
@@ -817,6 +824,8 @@ public class MainFrame extends JFrame {
     private void setLifeHistoryShablonScrollPane() {
         spLifeHShablonNames = new JScrollPane();
         vbLifeHistoryShablonComponents.add(spLifeHShablonNames);
+
+        setLifeHistoryShablonList();
     }
 
     private void setLifeHistoryShablonList() {
