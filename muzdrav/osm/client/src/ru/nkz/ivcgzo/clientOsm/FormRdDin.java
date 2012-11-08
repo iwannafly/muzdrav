@@ -407,7 +407,6 @@ public class FormRdDin extends JFrame {
 				rddin.setId_pvizit(Vvod.pvizitAmb.id_obr);
 				rddin.setGrr(0);
 				rddin.setBall(0);
-//				calcOteci();
 				rddin.setOteki(oslrod);
 				rddin.setArt1((int) SPdad.getModel().getValue());
 				if ( (int) SPdad.getModel().getValue() == 0) rddin.setArt1(120);
@@ -692,14 +691,10 @@ try {
 	protected void method2() {
 		if ((oslrod-8)>=0)
 		{ChBot4.setSelected(true);   iw1=oslrod-8;}	
-		else {iw1=oslrod; ChBot4.setSelected(false);}
 		if ((iw1-4)>=0)
 		{ChBot3.setSelected(true);		iw1=iw1-4;}	
-		else {iw1=iw1; ChBot3.setSelected(false);}
 		if ((iw1-2)>=0)
 		{ChBot2.setSelected(true);		iw1=iw1-2;}	
-		else ChBot2.setSelected(false);
-//		else iw1=iw1;
 		ChBot1.setSelected(iw1 ==1 );
 		
 	}

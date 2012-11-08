@@ -16,6 +16,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftVgr.KovNotFoundException;
+import ru.nkz.ivcgzo.thriftVgr.ServerVgr;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

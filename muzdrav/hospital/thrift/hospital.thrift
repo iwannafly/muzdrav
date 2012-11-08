@@ -107,6 +107,15 @@ struct Zakl {
 	7: optional i32 idGosp;
 }
 
+struct TStage {
+	1: optional i32 id;
+	2: optional i32 idGosp;
+	3: optional i32 stage;
+	4: optional string mes;
+	5: optional i64 dateStart;
+	6: optional i64 dateEnd;
+}
+
 /**
  * Пациент с такими данными не найден.
  */
@@ -162,7 +171,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void updateMedicalHistory(1:TMedicalHistory medHist) throws (1:kmiacServer.KmiacServerException kse);
 	void deleteMedicalHistory(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 	
-	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId) throws (1:PatientNotFoundException pnfe,
+	void addPatientToDoctor(1:i32 gospId, 2:i32 doctorId, 3:i32 stationType) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
 
     list<TDiagnosis> getDiagnosis(1:i32 gospId) throws (1:DiagnosisNotFoundException dnfe
@@ -173,19 +182,29 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 
 	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
+
+	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
+	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
+	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
+	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
 	
 /*Классификаторы*/
 	
 	/**
 	* Классификатор социального статуса (N_azj(pcod))
-	 */
+	*/
 	list<classifier.StringClassifier> getAzj() throws (1:kmiacServer.KmiacServerException kse);
 	/**
 	* Классификатор исхода заболевания (N_ap0(pcod))
-	 */
+	*/
 	list<classifier.IntegerClassifier> getAp0() throws (1:kmiacServer.KmiacServerException kse);
 	/**
 	* Классификатор результата лечения (N_aq0(pcod))
-	 */
+	*/
 	list<classifier.IntegerClassifier> getAq0() throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	* Классификатор типа стационара (N_tip0(pcod))
+	*/
+	list<classifier.IntegerClassifier> getStationTypes() throws (1:kmiacServer.KmiacServerException kse);
+	
 }
