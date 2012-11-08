@@ -85,19 +85,28 @@
 		</jar>
 		<copy file="${export.file}" todir="${manager.dir}" overwrite="true" force="true" />
 		
-		<condition property="launcher.postfix" value="">
-			<equals arg1="${build.type}" arg2="dev" />
-		</condition>
-		<condition property="launcher.postfix" value="_t">
-			<equals arg1="${build.type}" arg2="tst" />
-		</condition>
-		<condition property="launcher.postfix" value="_e">
-			<equals arg1="${build.type}" arg2="ext" />
-		</condition>
-		<condition property="launcher.postfix" value="_i">
-			<equals arg1="${build.type}" arg2="int" />
-		</condition>
-		
+		<antcall target="compileLauncher">
+			<param name="launcher.postfix" value=""/>
+			<param name="replaceDst.str" value="clientAuthType = &quot;dev&quot;"/>
+		</antcall>
+		<antcall target="compileLauncher">
+			<param name="launcher.postfix" value="_t"/>
+			<param name="replaceDst.str" value="clientAuthType = &quot;tst&quot;"/>
+		</antcall>
+		<antcall target="compileLauncher">
+			<param name="launcher.postfix" value="_i"/>
+			<param name="replaceDst.str" value="clientAuthType = &quot;int&quot;"/>
+		</antcall>
+		<antcall target="compileLauncher">
+			<param name="launcher.postfix" value="_e"/>
+			<param name="replaceDst.str" value="clientAuthType = &quot;ext&quot;"/>
+		</antcall>
+	</target>
+	
+	<target name="compileLauncher" unless="${debug.build}">
+		<property name="replaceSrc.str" value="clientAuthType = &quot;unspecified&quot;" />
+		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" token="${replaceSrc.str}" value="${replaceDst.str}" failOnNoReplacements="true" />
+		<javac includeantruntime="false" srcdir="${launcher.dir}/src" destdir="${launcher.dir}/bin" encoding="utf-8" debug="false" />
 		<jar destfile="${launcher.dir}/launcher${launcher.postfix}.jar" basedir="${launcher.dir}/bin" >
 			<manifest>
 				<attribute name="Main-Class" value="${launcher_main.class}" />
@@ -105,9 +114,10 @@
 			</manifest>
 		</jar>
 		<copy file="${launcher.dir}/launcher${launcher.postfix}.jar" todir="${manager.dir}" overwrite="true" force="true" />
+		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" token="${replaceDst.str}" value="${replaceSrc.str}" failOnNoReplacements="true" />
 	</target>
 	
-	<target name="replaceStrings" description="">
+	<target name="replaceStrings" unless="${debug.build}">
 		<replace file="${client_auth.dir}/src/ru/nkz/ivcgzo/clientAuth/MainForm.java" failOnNoReplacements="true">
 			  <replacefilter token="//private ModulesUpdater modUpd;" value="private ModulesUpdater modUpd;" />
 			  <replacefilter token="//modUpd = new ModulesUpdater(conMan);" value="modUpd = new ModulesUpdater(conMan);" />
@@ -116,56 +126,15 @@
 		
 		<replace file="${client_manager.dir}/src/ru/nkz/ivcgzo/clientManager/common/Client.java" token="//frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" value="frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);" failOnNoReplacements="true" />
 	</target>
-		
-	<target name="main_t" description="Компиляция всех клиентских модулей для тестового сервера приложений">
-		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" failOnNoReplacements="true">
-			  <replacefilter token="unspecified" value="tst" />
-			  <replacefilter token="localhost" value="${test_app_server.ip}" />
-		</replace>
-		
+	
+	<target name="main" description="Компиляция всех клиентских модулей">
 		<antcall target="replaceStrings" />
-		<antcall target="jar">
-			<param name="build.type" value="tst"/>
-		</antcall>
+		<antcall target="jar" />
 		
 		<subant>
 			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
 		</subant>
-		<subant target="main_t" buildpath="${manager.dir}"/>
-	</target>
-
-	<target name="main_e" description="Компиляция всех клиентских модулей для внешнего рабочего сервера приложений">
-		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" failOnNoReplacements="true">
-			  <replacefilter token="unspecified" value="ext" />
-			  <replacefilter token="localhost" value="${external_app_server.ip}" />
-		</replace>
-		
-		<antcall target="replaceStrings" />
-		<antcall target="jar">
-			<param name="build.type" value="ext"/>
-		</antcall>
-		
-		<subant>
-			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
-		</subant>
-		<subant target="main_ei" buildpath="${manager.dir}"/>
-	</target>
-
-	<target name="main_i" description="Компиляция всех клиентских модулей для внутреннего рабочего сервера приложений">
-		<replace file="${launcher.dir}/src/ru/nkz/ivcgzo/Launcher.java" failOnNoReplacements="true">
-			  <replacefilter token="unspecified" value="int" />
-			  <replacefilter token="localhost" value="${internal_app_server.ip}" />
-		</replace>
-		
-		<antcall target="replaceStrings" />
-		<antcall target="jar">
-			<param name="build.type" value="int"/>
-		</antcall>
-		
-		<subant>
-			<fileset dir="${muzdrav.dir}" includes="**/client/build.xml" excludes="auth/client/build.xml"/>
-		</subant>
-		<subant target="main_ei" buildpath="${manager.dir}"/>
+		<subant target="main" buildpath="${manager.dir}"/>
 	</target>
 
 	<target name="main_d" description="Компиляция всех модулей с возможностью дебага для девелоперского сервера приложений">

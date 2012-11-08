@@ -73,7 +73,6 @@ public class Period {
 				String servPath = null;
 				String cliPath = null;
 				if (Cslu == 1){
-			
 					try {
 					
 			        try {

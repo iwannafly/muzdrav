@@ -231,4 +231,3 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
 }
-
