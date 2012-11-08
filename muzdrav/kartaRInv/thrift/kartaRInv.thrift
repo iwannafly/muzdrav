@@ -213,20 +213,20 @@ service thriftKartaRInv extends kmiacServer.KmiacServer {
 
 
 //classifiers
-	list<classifier.IntegerClassifier> get_n_v0a() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0b() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0c() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0d() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0e() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0f() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0g() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0h() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0m() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0n() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0p() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0r() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0s() throws (1: kmiacServer.KmiacServerException kse);
-        list<classifier.IntegerClassifier> get_n_v0t() throws (1: kmiacServer.KmiacServerException kse);
+//	list<classifier.IntegerClassifier> get_n_v0a() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0b() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0c() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0d() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0e() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0f() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0g() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0h() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0m() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0n() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0p() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0r() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0s() throws (1: kmiacServer.KmiacServerException kse);
+//        list<classifier.IntegerClassifier> get_n_v0t() throws (1: kmiacServer.KmiacServerException kse);
         list<classifier.IntegerClassifier> get_n_c00() throws (1: kmiacServer.KmiacServerException kse);
 
 }

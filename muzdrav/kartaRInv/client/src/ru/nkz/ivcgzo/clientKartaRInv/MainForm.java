@@ -14,13 +14,13 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftKartaRInv.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftKartaRInv.Pinvk;
 import ru.nkz.ivcgzo.thriftKartaRInv.thriftKartaRInv;
 
-
 import javax.swing.JTabbedPane;
 import java.awt.BorderLayout;
-
+import java.text.SimpleDateFormat;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.border.TitledBorder;
+import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
@@ -49,10 +50,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MainForm extends Client<thriftKartaRInv.Client> {
-//	public static ThriftKartaRInv.Client tcl;
+public  class MainForm extends Client<thriftKartaRInv.Client> {
+	public static thriftKartaRInv.Client tcl;
 	public static MainForm instance;
 	private JFrame frame;
+	public static Pinvk pinvk;
+	public static PatientCommonInfo patInf;
 	private int mr1;
 	private int mr2;
 	private int mr3;
@@ -132,18 +135,26 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_rez_mse;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_srok_inv;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_factor;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_factor_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact1;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact1_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact2;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact2_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact3;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact3_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact4;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_fact4_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_prognoz;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_prognoz_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_potencial;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_potencial_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_med_reab;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_ps_reab;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_prof_reab;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_soc_reab;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_zakl;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_klin_prognoz;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_klin_prognoz_1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_mr1v;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_mr2v;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_mr3v;
@@ -183,8 +194,8 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_pr14v;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_pr15v;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_pr16v;
-	/*private CustomDateEditor t_datav;*/
-
+	private int searchedNpasp;
+	private String nameLpu;
 	/**
 	 * Launch the application.
 	 */
@@ -196,6 +207,8 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		super(conMan, authInfo, thriftKartaRInv.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 	
 		initialize();
+		
+		setFrame(frame);
 	}
 
 	/**
@@ -207,36 +220,40 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		frame.setBounds(100, 100, 717, 678);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
-		JButton btnAdd = new JButton("Добавить");
+		final JButton btnAdd = new JButton("Добавить");
 		btnAdd.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-				Pinvk invk = new Pinvk();
-				invk.setD_inv(t_d_inv.getDate().getTime());
-				invk.setD_invp(t_d_invp.getDate().getTime());
-				invk.setD_osv(t_d_osv.getDate().getTime());
-				invk.setD_otpr(t_d_otpr.getDate().getTime());
-				invk.setDatav(t_datav.getDate().getTime());
-				invk.setDataz(t_dataz.getDate().getTime());
-				invk.setD_srok(t_d_srok.getDate().getTime());
-				invk.setDiag(getTextOrNull(t_diag.getText()));
-				invk.setDiag_s1(getTextOrNull(t_diag_s1.getText()));
-				invk.setDiag_s2(getTextOrNull(t_diag_s2.getText()));
-				invk.setDiag_s3(getTextOrNull(t_diag_s3.getText()));
-				invk.setOslog(getTextOrNull(t_oslog.getText()));
-				invk.setVrach(getTextOrNull(t_vrach.getText()));
-				invk.setUchr(getTextOrNull(t_uchr.getText()));
-				invk.setNom_mse(getTextOrNull(t_nom_mse.getText()));
-				invk.setRuk_mse(getTextOrNull(t_ruk_mse.getText()));
-				invk.setZakl_name(getTextOrNull(t_zakl_name.getText()));
-				invk.setMr1d(getTextOrNull(t_mr1d.getText()));
-				invk.setMr2d(getTextOrNull(t_mr2d.getText()));
-				invk.setMr3d(getTextOrNull(t_mr3d.getText()));
-				invk.setMr4d(getTextOrNull(t_mr4d.getText()));
-				invk.setPr1d(getTextOrNull(t_mr4d.getText()));
+				pinvk  = new Pinvk();
+		
+			  pinvk.npasp = searchedNpasp;
+				//	  (PatientCommonInfo.getNpasp());
+				pinvk.setDatav(System.currentTimeMillis());
+				pinvk.setDataz(System.currentTimeMillis());
 				
-			//	invk.setD_srok(cb_srok.getDate().getTime());
+				pinvk.setD_inv(t_d_inv.getDate().getTime());
+				pinvk.setD_invp(t_d_invp.getDate().getTime());
+				pinvk.setD_osv(t_d_osv.getDate().getTime());
+				pinvk.setD_otpr(t_d_otpr.getDate().getTime());
+				pinvk.setD_srok(t_d_srok.getDate().getTime());
+				pinvk.setDiag(getTextOrNull(t_diag.getText()));
+				pinvk.setDiag_s1(getTextOrNull(t_diag_s1.getText()));
+				pinvk.setDiag_s2(getTextOrNull(t_diag_s2.getText()));
+				pinvk.setDiag_s3(getTextOrNull(t_diag_s3.getText()));
+				pinvk.setOslog(getTextOrNull(t_oslog.getText()));
+				pinvk.setVrach(getTextOrNull(t_vrach.getText()));
+				pinvk.setUchr(getTextOrNull(t_uchr.getText()));
+				pinvk.setNom_mse(getTextOrNull(t_nom_mse.getText()));
+				pinvk.setRuk_mse(getTextOrNull(t_ruk_mse.getText()));
+				pinvk.setZakl_name(getTextOrNull(t_zakl_name.getText()));
+				pinvk.setMr1d(getTextOrNull(t_mr1d.getText()));
+				pinvk.setMr2d(getTextOrNull(t_mr2d.getText()));
+				pinvk.setMr3d(getTextOrNull(t_mr3d.getText()));
+				pinvk.setMr4d(getTextOrNull(t_mr4d.getText()));
+				pinvk.setPr1d(getTextOrNull(t_pr1d.getText()));
+			
+			//	pinvk.setD_srok(cb_srok.getDate().getTime());
 			}
 
 		private String getTextOrNull(String text) {
@@ -244,25 +261,58 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 			return null;
 		}
 		});
-		JButton btnSave = new JButton("Сохранить");
-		
+		final JButton btnSave = new JButton("Сохранить");
+		btnSave.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientKartaRInv/resources/1341981970_Accept.png")));
+		btnSave.setToolTipText("Сохранить");
+		btnSave.addActionListener (new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+			}
+		});		
 		JButton btnDelete = new JButton("Удалить");
 		
 		JButton btn_expkart = new JButton("Экспорт карты в МСЭ");
 		btn_expkart.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JButton btnSearch = new JButton("Поиск");
-		btnAdd.setToolTipText("Поиск и выбор пациента");
+		btnSearch.setToolTipText("Поиск и выбор пациента");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, true);
 				
 				if (res != null) {
 				//	btnZpr.setEnabled(true);
-					
-			//		searched = true;
-			//		searchedNpasp = res[0];
-			//		updateZapList();
+				//	try {
+					searchedNpasp = res[0];	
+					nameLpu = MainForm.authInfo.getClpu_name();
+					//pinvk = MainForm.tcl.getPinvk(res[0]);
+					t_vrach.setText(String.valueOf(pinvk.vrach));
+					t_uchr.setText(String.valueOf(pinvk.uchr));
+					if (pinvk.isSetDatav()) t_datav.setDate(pinvk.datav);
+					if (pinvk.isSetDataz()) t_dataz.setDate(pinvk.dataz);
+					if (pinvk.isSetD_otpr()) t_d_otpr.setDate(pinvk.d_otpr);
+					if (pinvk.getMesto1() != 0) cb_mesto1.setSelectedPcod(pinvk.mesto1);
+					if (pinvk.getPreds() != 0) cb_preds.setSelectedPcod(pinvk.preds);
+					if (pinvk.getRez_mse() != 0) cb_rez_mse.setSelectedPcod(pinvk.rez_mse);
+					if (pinvk.getSrok_inv() != 0) cb_srok_inv.setSelectedPcod(pinvk.srok_inv);
+					if (pinvk.getFactor() != 0) cb_factor.setSelectedPcod(pinvk.factor);
+					if (pinvk.getFact1() != 0) cb_fact1.setSelectedPcod(pinvk.fact1);
+					if (pinvk.getFact2() != 0) cb_fact2.setSelectedPcod(pinvk.fact2);
+					if (pinvk.getFact3() != 0) cb_fact3.setSelectedPcod(pinvk.fact3);
+					if (pinvk.getFact4() != 0) cb_fact4.setSelectedPcod(pinvk.fact4);
+					if (pinvk.getPrognoz() != 0) cb_prognoz.setSelectedPcod(pinvk.prognoz);
+					if (pinvk.getPotencial() != 0) cb_potencial.setSelectedPcod(pinvk.potencial);
+					//if (Patientsmert.getVz_ser() != 0) tfVz_ser.setText(String.valueOf(Patientsmert.vz_ser));
+					//if (Patientsmert.getVz_nomer() != 0) tfVz_nomer.setText(String.valueOf(Patientsmert.vz_nomer));
+				//			PatientAdres = MainForm.tcl.getPatientCommonInfo(res[0]);
+				//			if (PatientAdres.getFam() != null) {					
+				//				tfFam.setText(PatientAdres.getFam().trim());
+				//			}
+				//			if (PatientAdres.getIm() != null) {
+				//				tfIm.setText(PatientAdres.im.trim());
+				//			}	
+								
+										
 				}
 			}
 		});
@@ -380,13 +430,13 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		l_mpreb.setForeground(Color.RED);
 		
 		//JComboBox cB_mesto1 = new JComboBox();
-		JComboBox cb_mesto1 = new ThriftStringClassifierCombobox<>(true);
+		cb_mesto1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0m);
 		
 		JLabel l_predst = new JLabel("Родители / представители ребенка");
 		l_predst.setForeground(Color.RED);
 		
 		//JComboBox cB_preds = new JComboBox();
-		JComboBox cb_preds = new ThriftStringClassifierCombobox<>(true);
+		cb_preds = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0p);
 		
 		JLabel label = new JLabel("ФИО / название учреждения");
 		label.setForeground(Color.RED);
@@ -498,7 +548,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		lblNewLabel_2.setForeground(Color.RED);
 		
 	//	JComboBox cb_rez_mse = new JComboBox();
-		JComboBox cb_rez_mse = new ThriftStringClassifierCombobox<>(true);
+		cb_rez_mse = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0r);
 	//	cb_rez_mse = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0r);
 		JLabel label_4 = new JLabel("Дата повтор. установления  инв-ти");
 		label_4.setForeground(Color.RED);
@@ -510,7 +560,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		label_5.setForeground(Color.RED);
 		
 //		JComboBox cb_srok = new JComboBox();
-		JComboBox cb_srok_inv = new ThriftStringClassifierCombobox<>(true);
+		cb_srok_inv = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0s);
 		
 		JLabel label_6 = new JLabel("До какой даты инвалидность");
 		t_d_srok = new CustomDateEditor();
@@ -620,25 +670,25 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		lblNewLabel_9.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		//JComboBox cb_factor = new JComboBox();
-		JComboBox cb_factor = new ThriftStringClassifierCombobox<>(true);
+		cb_factor_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0a);
 		
 		JLabel label_16 = new JLabel("Главное нарушение в состоянии здоровья");
 		label_16.setForeground(Color.RED);
 		
 		//JComboBox cb_fact1 = new JComboBox();
-		JComboBox cb_fact1 = new ThriftStringClassifierCombobox<>(true);
+		cb_fact1_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0b);
 		
 		//JComboBox cb_fact2 = new JComboBox();
-		JComboBox cb_fact2 = new ThriftStringClassifierCombobox<>(true);
+		cb_fact2_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0c);
 		
 		JLabel lblNewLabel_10 = new JLabel("Ведущее ограничение жизнедеятельности");
 		lblNewLabel_10.setForeground(Color.RED);
 		
 		//JComboBox cb_fact3 = new JComboBox();
-		JComboBox cb_fact3 = new ThriftStringClassifierCombobox<>(true);
+		cb_fact3_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0d);
 		
 		//JComboBox cB_fact4 = new JComboBox();
-		JComboBox cb_fact4 = new ThriftStringClassifierCombobox<>(true);
+		cb_fact4_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0e);
 		
 		JLabel label_17 = new JLabel("Реабилитационный прогноз");
 		label_17.setForeground(Color.RED);
@@ -648,13 +698,13 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		JLabel label_19 = new JLabel("Клинический прогноз");
 		
 		//JComboBox cb_prognoz = new JComboBox();
-		JComboBox cb_prognoz = new ThriftStringClassifierCombobox<>(true);
+		cb_prognoz_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0f);
 		
 		//JComboBox cb_potencial = new JComboBox();
-		JComboBox cb_potencial = new ThriftStringClassifierCombobox<>(true);
+		cb_potencial_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0g);
 		
 		//JComboBox cb_klin_prognoz = new JComboBox();
-		JComboBox cb_klin_prognoz = new ThriftStringClassifierCombobox<>(true);
+		cb_klin_prognoz_1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0f);
 		
 		t_diag = new JTextField();
 		t_diag.setColumns(10);
@@ -730,6 +780,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 					.addContainerGap()
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_p_nar.createSequentialGroup()
+							.addGap(0, 0, Short.MAX_VALUE)
 							.addGroup(gl_p_nar.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_p_nar.createParallelGroup(Alignment.LEADING, false)
 									.addGroup(gl_p_nar.createSequentialGroup()
@@ -755,19 +806,19 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 									.addGroup(gl_p_nar.createSequentialGroup()
 										.addComponent(lblNewLabel_9, GroupLayout.PREFERRED_SIZE, 198, GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(ComponentPlacement.RELATED)
-										.addComponent(cb_factor, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+										.addComponent(cb_factor_1, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 								.addGroup(gl_p_nar.createSequentialGroup()
 									.addGroup(gl_p_nar.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(cb_fact2, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(cb_fact1, Alignment.LEADING, 0, 280, Short.MAX_VALUE))
+										.addComponent(cb_fact2_1, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(cb_fact1_1, Alignment.LEADING, 0, 280, Short.MAX_VALUE))
 									.addGap(62)
 									.addGroup(gl_p_nar.createParallelGroup(Alignment.LEADING, false)
-										.addComponent(cb_fact4, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(cb_fact3, 0, 261, Short.MAX_VALUE))))
-							.addContainerGap(89, Short.MAX_VALUE))
+										.addComponent(cb_fact4_1, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(cb_fact3_1, 0, 261, Short.MAX_VALUE))))
+							.addGap(86))
 						.addGroup(gl_p_nar.createSequentialGroup()
 							.addComponent(label_16)
-							.addPreferredGap(ComponentPlacement.RELATED, 152, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
 							.addComponent(lblNewLabel_10)
 							.addGap(104))
 						.addGroup(gl_p_nar.createSequentialGroup()
@@ -777,10 +828,10 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 								.addComponent(label_19))
 							.addGap(33)
 							.addGroup(gl_p_nar.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(cb_klin_prognoz, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(cb_potencial, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(cb_prognoz, 0, 208, Short.MAX_VALUE))
-							.addContainerGap(296, Short.MAX_VALUE))))
+								.addComponent(cb_klin_prognoz_1, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(cb_potencial_1, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(cb_prognoz_1, 0, 208, Short.MAX_VALUE))
+							.addContainerGap(293, Short.MAX_VALUE))))
 		);
 		gl_p_nar.setVerticalGroup(
 			gl_p_nar.createParallelGroup(Alignment.LEADING)
@@ -803,32 +854,32 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 					.addGap(21)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.TRAILING)
 						.addComponent(lblNewLabel_9)
-						.addComponent(cb_factor, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cb_factor_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_16)
 						.addComponent(lblNewLabel_10))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cb_fact1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cb_fact3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cb_fact1_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cb_fact3_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cb_fact2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cb_fact4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cb_fact2_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(cb_fact4_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(35)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_17)
-						.addComponent(cb_prognoz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cb_prognoz_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_18)
-						.addComponent(cb_potencial, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cb_potencial_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_p_nar.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label_19)
-						.addComponent(cb_klin_prognoz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(69, Short.MAX_VALUE))
+						.addComponent(cb_klin_prognoz_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(180, Short.MAX_VALUE))
 		);
 		p_nar.setLayout(gl_p_nar);
 		
@@ -1655,34 +1706,34 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		JLabel label_28 = new JLabel("Медикаментозная терапия");
 		
 		//JComboBox cb_mr1v = new JComboBox();
-		JComboBox cb_mr1v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr1v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		t_mr1d = new JTextField();
 		t_mr1d.setColumns(10);
 		
 		//JComboBox cb_mr2v = new JComboBox();
-		JComboBox cb_mr2v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr2v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		t_mr2d = new JTextField();
 		t_mr2d.setColumns(10);
 		
 		JLabel label_31 = new JLabel("Физические методы");
 		
 		//JComboBox cb_mr3v = new JComboBox();
-		JComboBox cb_mr3v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr3v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr4v = new JComboBox();
-		JComboBox cb_mr4v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr4v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		t_mr3d = new JTextField();
 		t_mr3d.setColumns(10);
 		
 		JLabel label_37 = new JLabel("Механические методы");
 		
 		//JComboBox cb_mr5v = new JComboBox();
-		JComboBox cb_mr5v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr5v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr6v = new JComboBox();
-		JComboBox cb_mr6v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr6v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr7v = new JComboBox();
-		JComboBox cb_mr7v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr7v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr9v = new JComboBox();
-		JComboBox cb_mr9v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr9v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		JLabel label_40 = new JLabel("Назначение");
 		label_40.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
@@ -1690,32 +1741,32 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		label_41.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
 		//JComboBox cb_mr10v = new JComboBox();
-		JComboBox cb_mr10v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr10v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr11v = new JComboBox();
-		JComboBox cb_mr11v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr11v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr12v = new JComboBox();
-		JComboBox cb_mr12v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr12v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		JLabel label_44 = new JLabel("Водо- и бальнеотерапия");
 		
 		//JComboBox cb_mr13v = new JComboBox();
-		JComboBox cb_mr13v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr14v = new JComboBox();
-		JComboBox cb_mr14v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr15v = new JComboBox();
-		JComboBox cb_mr15v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr16v = new JComboBox();
-		JComboBox cb_mr16v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr17v = new JComboBox();
-		JComboBox cb_mr17v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr17v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		t_mr4d = new JTextField();
 		t_mr4d.setColumns(10);
 		
 		//JComboBox cb_mr21v = new JComboBox();
-		JComboBox cb_mr21v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr21v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr22v = new JComboBox();
-		JComboBox cb_mr22v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr22v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr23v = new JComboBox();
-		JComboBox cb_mr23v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr23v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		final JCheckBox ch_mr1n = new JCheckBox("медикаменты                ");
 		ch_mr1n.setHorizontalTextPosition(SwingConstants.LEFT);
 		ch_mr1n.setSelected(mr1 == 1);
@@ -1750,7 +1801,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_mr8n.setSelected(mr8 == 1);
 		
 		//JComboBox cb_mr8v = new JComboBox();
-		JComboBox cb_mr8v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr8v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		
 		final JCheckBox ch_mr9n = new JCheckBox("кинезотерапия               ");
 		ch_mr9n.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -1813,11 +1864,11 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_mr23n.setSelected(mr23 == 1);
 		
 		//JComboBox cb_mr18v = new JComboBox();
-		JComboBox cb_mr18v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr18v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr19v = new JComboBox();
-		JComboBox cb_mr19v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr19v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_mr20v = new JComboBox();
-		JComboBox cb_mr20v = new ThriftStringClassifierCombobox<>(true);
+		cb_mr20v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		
 		GroupLayout gl_p_ipr1 = new GroupLayout(p_ipr1);
 		gl_p_ipr1.setHorizontalGroup(
@@ -2129,15 +2180,15 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_pr5n.setSelected(pr5 == 1);
 		
 		//JComboBox cb_pr1v = new JComboBox();
-		JComboBox cb_pr1v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr1v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr2v = new JComboBox();
-		JComboBox cb_pr2v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr2v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr3v = new JComboBox();
-		JComboBox cb_pr3v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr3v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr4v = new JComboBox();
-		JComboBox cb_pr4v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr4v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr5v = new JComboBox();
-		JComboBox cb_pr5v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr5v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		JLabel label_34 = new JLabel("Социальная реабилитация");
 		label_34.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
@@ -2152,9 +2203,9 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_pr7n.setSelected(pr7 == 1);
 		
 		//JComboBox cb_pr6v = new JComboBox();
-		JComboBox cb_pr6v = new ThriftStringClassifierCombobox<>(true);
+		 cb_pr6v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr7v = new JComboBox();
-		JComboBox cb_pr7v = new ThriftStringClassifierCombobox<>(true);
+		 cb_pr7v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		JLabel label_38 = new JLabel("Поддержка медико-социальной реабилитации");
 		
 		JLabel label_39 = new JLabel("Протезно-ортопедическая помощь");
@@ -2168,9 +2219,9 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_pr9n.setSelected(pr9 == 1);
 		
 		//JComboBox cb_pr8v = new JComboBox();
-		JComboBox cb_pr8v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr8v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr9v = new JComboBox();
-		JComboBox cb_pr9v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr9v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		JLabel label_42 = new JLabel("Технические средства реабилитации");
 		label_42.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
@@ -2187,11 +2238,11 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_pr12n.setSelected(pr12 == 1);
 		
 		//JComboBox cb_pr10v = new JComboBox();
-		JComboBox cb_pr10v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr10v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr11v = new JComboBox();
-		JComboBox cb_pr11v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr11v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr12v = new JComboBox();
-		JComboBox cb_pr12v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr12v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		final JCheckBox ch_pr13n = new JCheckBox("Инвалидные коляски");
 		ch_pr13n.setHorizontalTextPosition(SwingConstants.LEFT);
 		ch_pr13n.setSelected(pr13 == 1);
@@ -2201,9 +2252,9 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_pr14n.setSelected(pr14 == 1);
 		
 		//JComboBox cb_pr13v = new JComboBox();
-		JComboBox cb_pr13v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr13v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr14v = new JComboBox();
-		JComboBox cb_pr14v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr14v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		final JCheckBox ch_pr15n = new JCheckBox("Очки, линзы               ");
 		ch_pr15n.setHorizontalTextPosition(SwingConstants.LEFT);
 		ch_pr15n.setSelected(pr15 == 1);
@@ -2213,9 +2264,9 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		ch_pr16n.setSelected(pr16 == 1);
 		
 		//JComboBox cb_pr15v = new JComboBox();
-		JComboBox cb_pr15v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr15v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		//JComboBox cb_pr16v = new JComboBox();
-		JComboBox cb_pr16v = new ThriftStringClassifierCombobox<>(true);
+		cb_pr16v = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0t);
 		t_pr1d = new JTextField();
 		t_pr1d.setColumns(10);
 		GroupLayout gl_p_ipr2 = new GroupLayout(p_ipr2);
@@ -2416,7 +2467,7 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		label_20.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
 		//JComboBox cb_med_reab = new JComboBox();
-		JComboBox cb_med_reab = new ThriftStringClassifierCombobox<>(true);
+		cb_med_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
 		
 		JLabel label_21 = new JLabel("Психологическая реабилитация");
 		label_21.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -2435,16 +2486,16 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 		JLabel label_25 = new JLabel("Причина смерти");
 		
 		//JComboBox cb_ps_reab = new JComboBox();
-		JComboBox cb_ps_reab = new ThriftStringClassifierCombobox<>(true);
+		cb_ps_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
 		
 		//JComboBox cb_prof_reab = new JComboBox();
-		JComboBox cb_prof_reab = new ThriftStringClassifierCombobox<>(true);
+		cb_prof_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
 		
 		//JComboBox cb_soc_reab = new JComboBox();
-		JComboBox cb_soc_reab = new ThriftStringClassifierCombobox<>(true);
+		cb_soc_reab = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0n);
 		
 		//JComboBox cb_zakl = new JComboBox();
-		JComboBox cb_zakl = new ThriftStringClassifierCombobox<>(true);
+		cb_zakl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_v0h);
 		
 		t_zakl_name = new JTextField();
 		t_zakl_name.setColumns(10);
@@ -2516,6 +2567,25 @@ public class MainForm extends Client<thriftKartaRInv.Client> {
 
 	@Override
 	public String getName() {
-		return configuration.appName;
+		// TODO Auto-generated method stub
+		return null;
 	}
-}
+
+//	@Override
+//	public String getName() {
+		// TODO Auto-generated method stub
+//		return null;
+//	}
+
+
+//	@Override
+//	public String getName() {
+		// TODO Auto-generated method stub
+	//	return null;
+//	}
+
+	//@Override
+	//public String getName() {
+		// TODO Auto-generated method stub
+	//	return null;
+	}
