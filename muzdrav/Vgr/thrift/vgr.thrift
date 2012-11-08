@@ -172,29 +172,25 @@ struct RdVizit{
 struct RdConVizit{
          1: optional i32    uiv;
          2: optional i32    uid;
-         3: optional double ves;
+         3: optional i32    npasp;
          4: optional i32    ned;
-         5: optional i32    lcad;
-         6: optional i32    ldad; 
-         7: optional i32    rcad;
-         8: optional i32    rdad;
-         9: optional i32    rost;
-        10: optional i64    datar;
-        11: optional i32    obr;
-        12: optional i32    sem;
-        13: optional i32    osoco;
-        14: optional string vrpr;
-        15: optional i32 npasp;
-        16: optional i32 hdm;
-        17: optional i32 spl; 
-        18: optional i32 oj;
-        19: optional i32 chcc;
-        20: optional i32 polpl;
-        21: optional i32 predpl;
-        22: optional i32 serd;
-        23: optional i32 serd1;
-        24: optional i32 oteki;
+         5: optional double ves;
+         6: optional i32    lcad;
+         7: optional i32    ldad; 
+         8: optional i32    rcad;
+         9: optional i32    rdad;
+        10: optional i32    ball;
+        11: optional i32 hdm;
+        12: optional i32 spl; 
+        13: optional i32 oj;
+        14: optional i32 chcc;
+        15: optional i32 polpl;
+        16: optional i32 predpl;
+        17: optional i32 serd;
+        18: optional i32 serd1;
+        19: optional i32 oteki;
 }
+
 struct KartaBer {
 	1: optional i32 npasp;
 	2: optional i32 id_pvizit;
