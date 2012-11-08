@@ -1700,7 +1700,6 @@ public String printFacZd(InputAuthInfo iaf, InputFacZd ifz)
 
 @Override
 public String printDnevVr() throws KmiacServerException, TException {
-<<<<<<< HEAD
 	AutoCloseableResultSet acrs = null, acrs2 = null;
 	Date data = null;
 	Date data1 = null;
@@ -1885,10 +1884,6 @@ public String printDnevVr() throws KmiacServerException, TException {
 			acrs2.close();
 	}
 //	return path = sb.toString();
-=======
-	// TODO Auto-generated method stub
-	return null;
->>>>>>> cc6930c1d4774dd71ff783370f56e6476327ff77
 }
     
 
