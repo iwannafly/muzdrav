@@ -513,7 +513,16 @@ public class PIslForm {
 				e.printStackTrace();
 			}
 				
+			if((cBSvrach.getSelectedPcod() == null)||(tFdiag.getText().equals(""))){	
+				String mess = "Поля для реестров:\n";
+				if (cBSvrach.getSelectedPcod() == null) mess=mess+"Код врача\n";
+				if (tFdiag.getText().equals("")) mess=mess+"Диагноз\n";
+			
+				mess= mess+"не заполнены";
 				
+				JOptionPane.showMessageDialog(frame, mess);
+			}
+			
 			if (!PostPer.tip.equals("Л")){			
 				//System.out.print(PostPer.tip);
 				DiagIsl spDIsl;
