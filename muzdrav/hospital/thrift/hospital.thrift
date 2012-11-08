@@ -146,6 +146,12 @@ exception DiagnosisNotFoundException {
 exception PriemInfoNotFoundException {
 }
 
+/*
+ * Код МЭС не сущесвтует
+ */
+exception MesNotFoundException {
+}
+
 service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TSimplePatient> getAllPatientForDoctor(1:i32 doctorId, 2:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -185,7 +191,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
-	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
+	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
+		2: MesNotFoundException mnfe);
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
 	
 /*Классификаторы*/
@@ -205,7 +212,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	/**
 	* Классификатор типа стационара (N_tip0(pcod))
 	*/
-	list<classifier.IntegerClassifier> getStationTypes() throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getStationTypes(1: i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 	/**
 	* Классификатор этапов лечения (N_tip0(pcod))
 	*/

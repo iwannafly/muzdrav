@@ -26,6 +26,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
@@ -213,7 +214,7 @@ public class ServerHospital extends Server implements Iface {
     public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
-                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_tip.name as sgrp, "
+                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.name_s as sgrp, "
                 + "(patient.poms_ser||patient.poms_nom) as poms, "
                 + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
@@ -221,7 +222,7 @@ public class ServerHospital extends Server implements Iface {
                 + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
                 + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
                 + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
-                + "LEFT JOIN n_tip ON n_tip.pcod = c_otd.stat_type "
+                + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
                 + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
                 + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
                 + "WHERE patient.npasp= ? AND c_otd.id_gosp = ?;";
@@ -285,7 +286,7 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void addPatientToDoctor(final int gospId, final int doctorId,
             final int stationType) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET vrach = ?, stat_type = ? WHERE id_gosp = ?;";
+        final String sqlQuery = "UPDATE c_otd SET vrach = ?, cprof = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared(sqlQuery, false, doctorId, stationType, gospId);
             sme.setCommit();
@@ -607,12 +608,15 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final List<IntegerClassifier> getStationTypes()
+    public final List<IntegerClassifier> getStationTypes(final int cotd)
             throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_tip";
+        final String sqlQuery = "SELECT n_n45.codprof as pcod, n_t00.name as name "
+                + "FROM n_n45 "
+                + "INNER JOIN n_t00 ON n_t00.pcod = n_n45.codprof "
+                + "WHERE n_n45.codotd = ?";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmStaionTypes =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
-        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cotd)) {
             return rsmStaionTypes.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -655,13 +659,18 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void updateStage(final TStage stage) throws KmiacServerException {
+    public final void updateStage(final TStage stage)
+            throws KmiacServerException, MesNotFoundException {
         final int[] indexes = {4, 5, 2, 3, 0};
         String sqlQuery = "UPDATE c_etap SET date_start = ?, date_end = ?, stl = ?, mes = ? "
             + "WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT(sqlQuery, false, stage, STAGE_TYPES, indexes);
-            sme.setCommit();
+            if (isCodMesValid(stage.getStage(), stage.getMes())) {
+                sme.execPreparedT(sqlQuery, false, stage, STAGE_TYPES, indexes);
+                sme.setCommit();
+            } else {
+                throw new MesNotFoundException();
+            }
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
             throw new KmiacServerException();
@@ -693,6 +702,17 @@ public class ServerHospital extends Server implements Iface {
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
+        }
+    }
+
+    private boolean isCodMesValid(final int stage, final String codMes) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT * FROM n_messtet WHERE pcod = ?;",
+                codMes)) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            return false;
         }
     }
 
