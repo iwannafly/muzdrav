@@ -204,14 +204,4 @@ String sql;
 		}
 		
 	}
-
-	@Override
-	public void setPinvk(Pinvk invk, TBase<?, TFieldIdEnum> npasp)
-			throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
 }
