@@ -201,17 +201,17 @@ struct KartaBer {
 	3: optional i32 id_pos;
 	4: optional i32 id_rd_sl;
 }
-struct ServerVgr{
-        1: optional i32 cpol;
-        2: optional i64 datan;
-        3: optional i64 datak;  
-}
 
 service ThriftVgr extends kmiacServer.KmiacServer {
 	/**
         * Создает KOB
 	*/
-	void getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk,  4:i32 clpu) throws (1:kmiacServer.KmiacServerException kse, 2:KovNotFoundException rnfe);
+	string getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+
+
+
+
+
 
 
 /**
@@ -231,4 +231,3 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv() throws (1: kmiacServer.KmiacServerException kse);
 }
-
