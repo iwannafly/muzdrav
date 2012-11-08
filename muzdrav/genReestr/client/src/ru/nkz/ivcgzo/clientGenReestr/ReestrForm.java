@@ -55,7 +55,7 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrPolMenu = new JMenuItem ("Реестры поликлиники");
 		ReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm(2);
+				sfrm = new SettingsForm();
 				sfrm.Cslu = 2;
 				sfrm.showSettingsForm();
 			}
@@ -64,7 +64,7 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
 		ReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm(0);
+				sfrm = new SettingsForm();
 				sfrm.Cslu = 3;
 				sfrm.showSettingsForm();
 			}
@@ -73,7 +73,7 @@ public class ReestrForm extends JFrame {
 		JMenuItem ReestrStMenu = new JMenuItem ("Реестры стационара");
 		ReestrStMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				sfrm = new SettingsForm(1);
+				sfrm = new SettingsForm();
 				sfrm.Cslu = 1;
 				sfrm.showSettingsForm();
 			}
@@ -84,7 +84,8 @@ public class ReestrForm extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 		        OpenWindowFileChooser();
 				try {
-					MainForm.conMan.transferFileToServer(pathfile, pathfile = new File(pathfile).getName());
+					pathfile = new File(pathfile).getParentFile().getAbsolutePath();
+//					MainForm.conMan.transferFileToServer(pathfile, pathfile = new File(pathfile).getParentFile().getAbsolutePath());
 					String servPath = MainForm.tcl.getProtokolErrPol(pathfile);
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -101,45 +102,54 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem LoadReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
+		LoadReestrLDSMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+		        OpenWindowFileChooser();
+				try {
+					pathfile = new File(pathfile).getParentFile().getAbsolutePath();
+//					MainForm.conMan.transferFileToServer(pathfile, pathfile = new File(pathfile).getParentFile().getAbsolutePath());
+					String servPath = MainForm.tcl.getProtokolErrLDS(pathfile);
+					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 
 		JMenuItem LoadReestrStMenu = new JMenuItem ("Реестры стационара");
+		LoadReestrStMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+		        OpenWindowFileChooser();
+				try {
+					pathfile = new File(pathfile).getParentFile().getAbsolutePath();
+//					MainForm.conMan.transferFileToServer(pathfile, pathfile = new File(pathfile).getParentFile().getAbsolutePath());
+					String servPath = MainForm.tcl.getProtokolErrGosp(pathfile);
+					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		menu2.add (ReestrPolMenu);
 		menu2.add (ReestrLDSMenu);
 		menu2.add (ReestrStMenu);
 		menu3.add (LoadReestrPolMenu);
 		menu3.add (LoadReestrLDSMenu);
 		menu3.add (LoadReestrStMenu);
-//		RunMenu.addSeparator(); 
-
-		JPanel panel1 = new JPanel();
-		JPanel panel2 = new JPanel();
-		JTabbedPane tbMain = new JTabbedPane();
-		tbMain.add("Реестры", panel1);
-		GroupLayout gl_panel1 = new GroupLayout(panel1);
-		gl_panel1.setHorizontalGroup(
-			gl_panel1.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 550, Short.MAX_VALUE)	//ширина
-		);
-		gl_panel1.setVerticalGroup(
-			gl_panel1.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 400, Short.MAX_VALUE)	//высота
-		);
-		panel1.setLayout(gl_panel1);
-		tbMain.add("Протокол проверки", panel2);
-		GroupLayout gl_panel2 = new GroupLayout(panel2);
-		gl_panel2.setHorizontalGroup(
-			gl_panel2.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 550, Short.MAX_VALUE)
-		);
-		gl_panel2.setVerticalGroup(
-			gl_panel2.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 400, Short.MAX_VALUE)
-		);
-		panel2.setLayout(gl_panel2);
-		getContentPane().add(tbMain);
 		
 		JPanel panel = new JPanel();
-		getContentPane().add(panel, BorderLayout.NORTH);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -151,19 +161,44 @@ public class ReestrForm extends JFrame {
 		);
 		panel.setLayout(gl_panel);
 		
+		JPanel panel_1 = new JPanel();
+		GroupLayout groupLayout = new GroupLayout(getContentPane());
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+				.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
+		);
+		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
+		gl_panel_1.setHorizontalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 424, Short.MAX_VALUE)
+		);
+		gl_panel_1.setVerticalGroup(
+			gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGap(0, 214, Short.MAX_VALUE)
+		);
+		panel_1.setLayout(gl_panel_1);
+		getContentPane().setLayout(groupLayout);
+		
         
 	}
 
 	private void OpenWindowFileChooser() {
-		// TODO Auto-generated method stub
 		fc = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-				".rar", "rar");
-		fc.setFileFilter(filter);
-        int returnVal = fc.showOpenDialog(null);
+//		FileNameExtensionFilter filter = new FileNameExtensionFilter(
+//				".rar", "rar");
+//		fc.setFileFilter(filter);
+		int returnVal = fc.showOpenDialog(null);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            pathfile = fc.getSelectedFile().getPath();
+			pathfile = fc.getSelectedFile().getAbsolutePath();
             System.out.println(pathfile);
         }
 	}

@@ -1192,40 +1192,56 @@ public class FormPostBer extends JFrame {
 	}
 	private void method2(){
 		if ((oslrod-128)>=0)
-		{CBRazrProm.setSelected(true);   iw1=oslrod-128;}	
+		{CBRazrProm.setSelected(true);   iw1=oslrod-128;}
+		else {CBRazrProm.setSelected(false);iw1=oslrod;}
 		if ((iw1-64)>=0)
-		{CBIiiiv.setSelected(true);		iw1=iw1-64;}	
+		{CBIiiiv.setSelected(true);		iw1=iw1-64;}
+		else {CBIiiiv.setSelected(false);iw1=iw1;}
 		if ((iw1-32)>=0)
 		{CBAkush.setSelected(true);		iw1=iw1-32;}	
+		else {CBAkush.setSelected(false);	iw1=iw1;}
 		if ((iw1-16)>=0)
 		{CDKesar.setSelected(true);		iw1=iw1-16;}	
+		else {CDKesar.setSelected(false);	iw1=iw1;}
 		if ((iw1-8)>=0)
 		{CBTromb.setSelected(true);		iw1=iw1-8;}	
+		else {CBTromb.setSelected(false);	iw1=iw1;}
 		if ((iw1-4)>=0) 
 		{CBGnoin.setSelected(true);		iw1=iw1-4;}	
+		else {CBGnoin.setSelected(false);	iw1=iw1;}
 		if ((iw1-2)>=0)
 		{CBEkl.setSelected(true);		iw1=iw1-2;}	
+		else CBEkl.setSelected(false);
 		CBKrov.setSelected(iw1 ==1 );
 		if ((osostp-512)>=0)
 		{CHosp10.setSelected(true);   iw1=osostp-512;}	
+		else {CHosp10.setSelected(false);iw1=osostp;}
 		if ((iw1-256)>=0)
 		{CHosp9.setSelected(true);   iw1=iw1-256;}	
+		else {CHosp9.setSelected(false);iw1=iw1;}
 		if ((iw1-128)>=0)
 		{CHosp8.setSelected(true);   iw1=iw1-128;}	
+		else {CHosp8.setSelected(false); iw1=iw1;}
 		if ((iw1-64)>=0)
 		{CHosp7.setSelected(true);   iw1=iw1-64;}	
+		else {CHosp7.setSelected(false);iw1=iw1;}
 		if ((iw1-32)>=0)
 		{CHosp6.setSelected(true);   iw1=iw1-32;}	
+		else {CHosp6.setSelected(false);iw1=iw1;}
 		if ((iw1-16)>=0)
 		{CHosp5.setSelected(true);   iw1=iw1-16;}	
+		else {CHosp5.setSelected(false);iw1=iw1;}
 		if ((iw1-8)>=0)
 		{CHosp4.setSelected(true);   iw1=iw1-8;}	
+		else {CHosp4.setSelected(false); iw1=iw1;}
 		if ((iw1-4)>=0)
 		{CHosp3.setSelected(true);   iw1=iw1-4;}	
+		else {CHosp3.setSelected(false);iw1=iw1;}
 //		System.out.println("расчет сост. плода");		
 //		System.out.println(iw1);		
 		if ((iw1-2)>=0)
 		{CHosp2.setSelected(true);   iw1=iw1-2;}
+		else CHosp2.setSelected(false);
 		if (iw1 == 1) CHosp1.setSelected(true);
 	}
 	

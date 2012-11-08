@@ -644,7 +644,7 @@ throw new TException(e);
 		for (RdConVizit rcv : rdConVizit) {
 			j = j+1;
 			Integer ot = 0;
-			if (rcv.oteki == 0 ) ot = 1;
+			if (rcv.oteki != 0 ) ot = 1;
 			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;%d;%d", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
 		}
 		osw.write(sb.toString());

@@ -739,10 +739,10 @@ public class PIslForm {
 				}
 				
 				
-				if (cBvopl.getSelectedItem() != null){
+				if ((cBvopl.getSelectedItem() != null)||(cBvopl.getSelectedIndex()!=0)){
 					cBvopl.setSelectedPcod(tn_ldi.getSelectedItem().vopl);
 				}else{
-					cBvopl.setSelectedItem(null);
+					cBvopl.setSelectedItem(2);
 				}
 				
 				if ((tn_ldi.getSelectedItem().kodvr !=0) && (String.valueOf(tn_ldi.getSelectedItem().kodvr) != null)){
@@ -2000,3 +2000,6 @@ public class PIslForm {
 		}
 	}	
 }
+
+
+

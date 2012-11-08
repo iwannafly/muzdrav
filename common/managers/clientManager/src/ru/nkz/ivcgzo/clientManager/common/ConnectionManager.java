@@ -700,6 +700,18 @@ public class ConnectionManager {
 	public void showLabRecordForm(int npasp, String fam, String im, String ot, int idGosp) {
 		viewClient.showModal(client, 18, npasp, fam, im, ot, idGosp);
 	}
+
+	/**
+     * Вызов формы медицинских назначений
+     * @param npasp - уникальный номер пациента
+     * @param fam - фамилия
+     * @param im - имя
+     * @param ot - отчество
+     * @param idGosp - идентификатор госпитализации
+     */
+    public void showMedicationForm(int npasp, String fam, String im, String ot, int idGosp) {
+        viewClient.showModal(client, 20, npasp, fam, im, ot, idGosp);
+    }
 	
 	/**
 	 * Вызов формы записи пациента на прием к врачу.

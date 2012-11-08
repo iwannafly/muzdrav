@@ -334,9 +334,9 @@ public class PacientInfoFrame extends JFrame {
                     } else {
                         cmb_adp_dom.setData(new ArrayList<StringClassifier>());
                     }
-                    if (cmb_adm_ul.getText().equals("")) 
-                		cmb_adm_ul.setText(cmb_adp_ul.getText());
-                		//cmb_adm_ul.setSelectedPcod(cmb_adp_ul.getSelectedPcod());
+//                    if (cmb_adm_ul.getText().equals("")) 
+//                		cmb_adm_ul.setText(cmb_adp_ul.getText());
+//                		//cmb_adm_ul.setSelectedPcod(cmb_adp_ul.getSelectedPcod());
                 }
             });
             cmb_adm_ul = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_u00);
@@ -375,9 +375,7 @@ public class PacientInfoFrame extends JFrame {
             cmb_org = new ThriftIntegerClassifierCombobox<>(true);
             cmb_ogrn = new ThriftStringClassifierCombobox<>(true);
             cmb_ishod = new ThriftIntegerClassifierCombobox<>(true);
-            cmb_ishod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abb);
-            //cmb_ishod.setData(null);
-            //cmb_ishod.setData(MainForm.tcl.getABB());
+            //cmb_ishod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abb);
             cmb_status = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_az9);
             cmb_status.setMaximumRowCount(27);
             cmb_tdoc = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_az0);
@@ -3321,6 +3319,7 @@ public class PacientInfoFrame extends JFrame {
             cmb_Tdoc_pr.setVisible(false);
             cmb_org.setSelectedItem(null);
             cmb_ogrn.setData(null);
+            cmb_ishod.setData(MainForm.tcl.getABB());
 //            cmb_adm_obl.setData(null);
             try {
                 tbl_lgota.setIntegerClassifierSelector(1, MainForm.tcl.getLKN());

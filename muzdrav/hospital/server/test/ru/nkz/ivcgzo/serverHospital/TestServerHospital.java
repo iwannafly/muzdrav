@@ -104,7 +104,8 @@ public class TestServerHospital {
     public final void addPatientToDoctor_isActuallyAdded() throws KmiacServerException {
         final int gospId = 8;
         final int doctorId = 45;
-        testServer.addPatientToDoctor(gospId, doctorId);
+        final int stationType = 1;
+        testServer.addPatientToDoctor(gospId, stationType, doctorId);
     }
 
 //    @SuppressWarnings("deprecation")
