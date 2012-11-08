@@ -15,6 +15,13 @@ struct InputSvodVed {
     3: i32 vozcat;
 }
 
+struct InputFacZd {
+    1: string dateb;
+    2: string datef;
+    3: i32 vozcat;
+    4: i32 kvar;
+}
+
 struct VrachInfo {
 	1: i32 pcod;
 	2: string fam;
@@ -45,6 +52,7 @@ struct InputPlanDisp {
     3: string daten;
     4: string datek;
     5: optional string uchas;
+    6: i32 clpu;
 }
 
 
@@ -108,5 +116,11 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 
+    string printFacZd(1: InputAuthInfo iaf 2: InputFacZd ifz) throws (1: kmiacServer.KmiacServerException kse);
+
+   /**
+    * Сводки по форме 39
+    */
+    string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
 }
 

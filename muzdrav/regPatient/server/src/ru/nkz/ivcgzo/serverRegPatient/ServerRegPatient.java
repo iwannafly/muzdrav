@@ -34,6 +34,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Address;
 import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
+import ru.nkz.ivcgzo.thriftRegPatient.AllLgota;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
 import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
@@ -86,6 +87,7 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<Polis, Polis._Fields> rsmPolisDms;
     private TResultSetMapper<Nambk, Nambk._Fields> rsmNambk;
     private TResultSetMapper<Agent, Agent._Fields> rsmAgent;
+    private TResultSetMapper<AllLgota, AllLgota._Fields> rsmAllLgota;
     private TResultSetMapper<Lgota, Lgota._Fields> rsmLgota;
     private TResultSetMapper<Kontingent, Kontingent._Fields> rsmKontingent;
     private TResultSetMapper<Sign, Sign._Fields> rsmSign;
@@ -175,8 +177,10 @@ public class ServerRegPatient extends Server implements Iface {
     private static final Class<?>[] LGOTA_TYPES = new Class<?>[] {
     //  id             npasp          lgot          datal
         Integer.class, Integer.class, Integer.class, Date.class,
-    //  name
-        String.class
+    //  name          gri            sin            pp             drg
+        String.class, Integer.class, Integer.class, Integer.class, Date.class,
+    //  dot         obo            ndoc
+        Date.class, Integer.class, String.class
     };
 
 //////////////////////////// Field Name Arrays ////////////////////////////
@@ -225,7 +229,7 @@ public class ServerRegPatient extends Server implements Iface {
         "dataosm", "vremosm", "dataz", "jalob", "vid_st"
     };
     private static final String[] LGOTA_FIELD_NAMES = {
-        "id", "npasp", "lgot", "datal", "name"
+        "id", "npasp", "lgot", "datal", "name", "gri", "sin", "pp", "drg", "dot", "obo", "ndoc"
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,6 +267,7 @@ public class ServerRegPatient extends Server implements Iface {
         rsmSign = new TResultSetMapper<>(Sign.class, SIGN_FIELD_NAMES);
         rsmAllGosp = new TResultSetMapper<>(AllGosp.class, ALL_GOSP_FIELD_NAMES);
         rsmGosp = new TResultSetMapper<>(Gosp.class, GOSP_FIELD_NAMES);
+        rsmAllLgota = new TResultSetMapper<>(AllLgota.class, LGOTA_FIELD_NAMES);
         rsmLgota = new TResultSetMapper<>(Lgota.class, LGOTA_FIELD_NAMES);
     }
 
@@ -306,6 +311,22 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     /**
+     * Проверяет, существует ли в БД запись госпитализации пациента с такими данными
+     * @param idGosp - thrift-объект с информацией  госпитализации
+     * @return true - если особая информация о пациенте с такими данными уже существует,
+     * false - если не существует
+     */
+    private boolean isOtdExist(final int idGosp) throws SQLException {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                "SELECT id_gosp FROM c_otd WHERE id_gosp = ?",
+                idGosp)) {
+            return acrs.getResultSet().next();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
      * Проверяет, существует ли в БД пациент с такими данными
      * @param patinfo - thrift-объект с информацией о пациенте
      * @return true - если пациент с такими данными уже существует,
@@ -329,7 +350,7 @@ public class ServerRegPatient extends Server implements Iface {
      * @return true - если льгота с такими данными уже существует,
      * false - если не существует
      */
-    private boolean isLgotaExist(final Lgota lgota) throws SQLException {
+    private boolean isLgotaExist(final AllLgota lgota) throws SQLException {
         final int[] indexes = {1, 2};
         try (AutoCloseableResultSet acrs = sse.execPreparedQueryT(
                 "SELECT id FROM p_kov WHERE (npasp = ?) AND (lgot = ?);",
@@ -611,25 +632,6 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final List<Lgota> getLgota(final int npasp)
-            throws LgotaNotFoundException, KmiacServerException {
-        String sqlQuery = "SELECT id, npasp, lgot, datal, name FROM p_kov "
-                + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE npasp = ?;";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
-            ResultSet rs = acrs.getResultSet();
-            List<Lgota> lgotaList = rsmLgota.mapToList(rs);
-            if (lgotaList.size() > 0) {
-                return lgotaList;
-            } else {
-                throw new LgotaNotFoundException();
-            }
-        } catch (SQLException e) {
-            log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    @Override
     public final List<Kontingent> getKontingent(final int npasp)
             throws KontingentNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT id , npasp, kateg, datal, name FROM p_konti "
@@ -641,6 +643,25 @@ public class ServerRegPatient extends Server implements Iface {
                 return kontingent;
             } else {
                 throw new KontingentNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final Lgota getLgota(final int id)
+            throws LgotaNotFoundException, KmiacServerException {
+        String sqlQuery = "SELECT id, npasp, lgot, datal, name, gri, sin, pp, drg, "
+                + "dot, obo, ndoc FROM p_kov "
+                + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE id = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rsmLgota.map(rs);
+            } else {
+                throw new LgotaNotFoundException();
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -819,15 +840,15 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final Info addLgota(final Lgota lgota)
-            throws LgotaAlreadyExistException, KmiacServerException {
-        final int[] indexes = {1, 2, 3};
+    public final Info addLgota(final AllLgota lgota) throws LgotaAlreadyExistException,
+            KmiacServerException {
+        final int[] indexes = {1, 2, 3, 5, 6, 7, 8, 9, 10, 11};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isLgotaExist(lgota)) {
                 sme.execPreparedT(
-                        "INSERT INTO p_kov (npasp, lgot, datal) "
-                        + "VALUES (?, ?, ?);", true, lgota,
-                        LGOTA_TYPES, indexes);
+                    "INSERT INTO p_kov (npasp, lgot, datal, gri, sin, pp, drg, dot, obo, ndoc) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", true, lgota,
+                    LGOTA_TYPES, indexes);
                 Info tmpInfo = new Info();
                 tmpInfo.setId(sme.getGeneratedKeys().getInt("id"));
                 sme.setCommit();
@@ -1124,20 +1145,6 @@ public class ServerRegPatient extends Server implements Iface {
     }
 
     @Override
-    public final void updateLgota(final Lgota lgota) throws KmiacServerException {
-        final int[] indexes = {1, 2, 3, 0};
-        try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT("UPDATE p_kov SET npasp = ?, lgot = ?, datal = ? "
-                    + "WHERE id = ?", false,
-                    lgota, LGOTA_TYPES, indexes);
-            sme.setCommit();
-        } catch (SQLException | InterruptedException e) {
-            log.log(Level.ERROR, "SQl Exception: ", e);
-            throw new KmiacServerException();
-        }
-    }
-
-    @Override
     public final void updateKont(final Kontingent kont) throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 0};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -1400,7 +1407,8 @@ public class ServerRegPatient extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getABB() throws KmiacServerException {
-        final String sqlQuery = "SELECT pcod, name FROM n_abb";
+        final String sqlQuery = "SELECT pcod, name FROM n_abb WHERE (pcod=2) "
+            + "OR (pcod=7) OR (pcod=10)";
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmVtr =
                 new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
@@ -1521,13 +1529,13 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<IntegerClassifier> getL00(final int pcod) throws KmiacServerException {
         String sqlQuery;
         if (pcod == 42) {
-            sqlQuery = "SELECT ter, (nam_kem || ' ' || n_l01.name) as nam_kem FROM n_l00 "
+            sqlQuery = "SELECT n_l00.pcod, (nam_kem || ' ' || n_l01.name) as nam_kem FROM n_l00 "
                 + "INNER JOIN n_l01 ON n_l00.ter=n_l01.pcod WHERE c_ffomc = ? ORDER BY nam_kem;";
         } else {
-            sqlQuery = "SELECT ter, nam_kem FROM n_l00 WHERE c_ffomc = ? ORDER BY nam_kem;";
+            sqlQuery = "SELECT n_l00.pcod, nam_kem FROM n_l00 WHERE c_ffomc = ? ORDER BY nam_kem;";
         }
         final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmL00 =
-                new TResultSetMapper<>(IntegerClassifier.class, "ter", "nam_kem");
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "nam_kem");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, pcod)) {
             return rsmL00.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -1544,6 +1552,30 @@ public class ServerRegPatient extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, name)) {
             return rsmU10.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void addOrUpdateOtd(final int idGosp, final int nist, final int cotd)
+            throws KmiacServerException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            if (!isOtdExist(idGosp)) {
+                String sqlQuery = "INSERT INTO c_otd (id_gosp, nist, cotd, dataz)"
+                    + "VALUES (?, ?, ?, ?);";
+                sme.execPrepared(sqlQuery, true, idGosp, nist, cotd,
+                    new Date(System.currentTimeMillis()));
+                sme.setCommit();
+                    //return id;
+            } else {
+                String sqlQuery = "UPDATE c_otd SET nist = ?, cotd = ?, dataz = ? "
+                        + "WHERE id_gosp = ?;";
+                sme.execPrepared(sqlQuery, true, nist, cotd,
+                    new Date(System.currentTimeMillis()), idGosp);
+                sme.setCommit();
+            }
+        } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
@@ -1646,4 +1678,38 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+    @Override
+    public final List<AllLgota> getAllLgota(final int npasp) throws LgotaNotFoundException,
+            KmiacServerException {
+        String sqlQuery = "SELECT id, npasp, lgot, datal, name, gri, sin, pp, drg, "
+                + "dot, obo, ndoc FROM p_kov "
+                + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE npasp = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
+            ResultSet rs = acrs.getResultSet();
+            List<AllLgota> lgotaList = rsmAllLgota.mapToList(rs);
+            if (lgotaList.size() > 0) {
+                return lgotaList;
+            } else {
+                throw new LgotaNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final void updateLgota(final AllLgota lgota) throws KmiacServerException {
+        final int[] indexes = {1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 0};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("UPDATE p_kov SET npasp = ?, lgot = ?, datal = ?, gri = ?, "
+                + "sin = ?, pp = ?, drg = ?, dot = ?, obo = ?, ndoc = ? "
+                + "WHERE id = ?", false,
+                lgota, LGOTA_TYPES, indexes);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
 }

@@ -77,7 +77,7 @@ public class SvodVed extends JPanel {
 					String servPath = MainForm.tcl.printSvodVed(iaf,isv);
 					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, true);
+					MainForm.conMan.openFileInEditor(cliPath, false);
 					//catch (TException e1) {
 					//	MainForm.conMan.reconnect(e1);
 				} catch (Exception e1) {
@@ -90,11 +90,13 @@ public class SvodVed extends JPanel {
 		
 		
 		JLabel lblNewLabel_1 = new JLabel("Возрастная категория");
+		
+		JLabel label_1 = new JLabel("Сводная ведомость зарегестрированных заболеваний");
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
+			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(20)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(label)
@@ -111,11 +113,17 @@ public class SvodVed extends JPanel {
 						.addComponent(rdbtnPod)
 						.addComponent(rdbtnDet))
 					.addGap(53))
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(57)
+					.addComponent(label_1)
+					.addContainerGap(83, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(52)
+					.addGap(25)
+					.addComponent(label_1)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(label)
 						.addComponent(tfDateB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)

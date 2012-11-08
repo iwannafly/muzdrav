@@ -33,35 +33,56 @@ public class PlanDisp extends JPanel {
 		JButton btnNewButton = new JButton("Вывод");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				try{
-
+				if (MainForm.disp ==1){
+					// план дисп
+					try{
+						InputPlanDisp ipd = new InputPlanDisp();	
+						/*	if (rdbtnDet.isSelected()) isv.setVozcat(1);
+						else if (rdbtnPod.isSelected()) isv.setVozcat(2);
+						else if (rdbtnVzr.isSelected()) isv.setVozcat(3);
+						 */				
+						ipd.setDaten(sdf.format(tfDateB.getDate()));
+						ipd.setDatek(sdf.format(tfDateF.getDate()));
+						ipd.setUchas(tfUch.getText());
+						ipd.setKpolik(MainForm.authInfo.getCpodr());
+						ipd.setNamepol(MainForm.authInfo.getCpodr_name());
+						//ipd.setClpu(MainForm.authInfo.clpu);					
 					
-				InputPlanDisp ipd = new InputPlanDisp();	
-/*				if (rdbtnDet.isSelected()) isv.setVozcat(1);
-				else if (rdbtnPod.isSelected()) isv.setVozcat(2);
-				else if (rdbtnVzr.isSelected()) isv.setVozcat(3);
-*/				
-				ipd.setDaten(sdf.format(tfDateB.getDate()));
-				ipd.setDatek(sdf.format(tfDateF.getDate()));
-				ipd.setUchas(tfUch.getText());
-				ipd.setKpolik(MainForm.authInfo.getCpodr());
-				ipd.setNamepol(MainForm.authInfo.getCpodr_name());
-									
+							//OutputTest ot = new OutputTest();
+						String servPath = MainForm.tcl.printPlanDisp(ipd);
+						String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+						MainForm.conMan.openFileInEditor(cliPath, true);
+							//catch (TException e1) {
+							//	MainForm.conMan.reconnect(e1);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
 					
-					//OutputTest ot = new OutputTest();
-					String servPath = MainForm.tcl.printPlanDisp(ipd);
-					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
-					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, true);
-					//catch (TException e1) {
-					//	MainForm.conMan.reconnect(e1);
-				} catch (Exception e1) {
-					e1.printStackTrace();
 				}
-			
-			}
-				
+				if(MainForm.disp ==2){
+				//не выполнененые планы дисп	
+				}
+				if(MainForm.disp ==3){
+					//Сведения о дисп обслуж
+					try{
+						InputPlanDisp ipd = new InputPlanDisp();	
+							
+						ipd.setDaten(sdf.format(tfDateB.getDate()));
+						ipd.setDatek(sdf.format(tfDateF.getDate()));
+						ipd.setUchas(tfUch.getText());
+						ipd.setKpolik(MainForm.authInfo.getCpodr());
+						ipd.setNamepol(MainForm.authInfo.getCpodr_name());
+						String servPath = MainForm.tcl.printSvedDispObs(ipd);
+						String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+						MainForm.conMan.openFileInEditor(cliPath, true);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					
+				}
+			}	
 				
 				
 		});
@@ -121,3 +142,4 @@ public class PlanDisp extends JPanel {
 		JScrollPane scrollPane = new JScrollPane();
 	}
 }
+

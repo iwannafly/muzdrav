@@ -50,7 +50,23 @@ public class Launcher {
 	}
 	
 	public void checkAndUpdate() {
-		try (Socket servSct = new Socket("10.0.0.243", 55201)) {
+		String ip;
+		
+		switch (clientAuthType) {
+		case "tst":
+			ip = "10.0.0.248";
+			break;
+		case "int":
+			ip = "10.0.0.243";
+			break;
+		case "ext":
+			ip = "10.1.1.8";
+			break;
+		default:
+			ip = "localhost";
+			break;
+		}
+		try (Socket servSct = new Socket(ip, 55201)) {
 			handShake(servSct);
 			Document domLibList = getLibrariesList(servSct);
 			List<LibraryInfo> updList = getUpdateList(domLibList);
