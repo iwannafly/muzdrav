@@ -152,151 +152,7 @@ throw new TException(e);
 		log.info("Stop serverVgr");
 	}
 
-	@Override
-	public void getKovInfoPol(int cpodr, long dn, long dk, int clpu)
-			throws KmiacServerException, KovNotFoundException, TException {
-		// TODO Auto-generated method stub
-		String sqldi;
-		String sqlis;
-		String sqllo;
-		String sqlos;
-		String sqlpa;
-		String sqllgot;
-		String path;
-		int bufRead;
-		byte[] buffer = new byte[8192];
-		
-		try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoPol", ".zip").getAbsolutePath());
-	 		ZipOutputStream zos = new ZipOutputStream(fos)) {
 	
-		sqllgot = "SELECT p.npasp::integer AS bn, l.lgot::integer AS kgl "+
-		           "FROM p_kov l, patient p, n_lkn k  "+
-                   "WHERE l.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" ;		
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllgot,cpodr ) ;
-				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-			zos.putNextEntry(new ZipEntry("lgot.dbf"));
-			while ((bufRead = dbfStr.read(buffer)) > 0)
-				zos.write(buffer, 0, bufRead);
-		} catch (SQLException e) {
-	        log.log(Level.ERROR, "SQl Exception: ", e);
-			throw new KmiacServerException();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-				
-	
-	sqlpa = "SELECT p.npasp::integer AS bn, p.fam::char(20) AS fam,p.im:char(15) AS im,p.ot::char(20) AS otch,  "+
-            "(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex,p.datar AS dr, " +
-			"(select get_status(p.sgrp))::integer AS stat,p.adp_ul::char(25) AS ul,p.adp_dom::char(5) AS nd,p.adp_kv::char(5) AS nk "+
-            "k.gr_kov:: char(1) AS kat, "+
-            "(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-			"(case when p.ishod=2 then 7 else 6)::integer AS pud, " +
-			"p.doms_ndog::char(11) AS sdog,p.datapr AS dpp,p.terp::integer AS ter,p.cpol_pr::integer AS lpu, "+
-			"p.dataot AS datot,p.ter_liv::integer AS nas "+			
-	        "FROM p_kov l, patient p, n_lkn k  "+
-            "WHERE l.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" ;		
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlpa,  cpodr) ;
-			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-		zos.putNextEntry(new ZipEntry("kontipa.dbf"));
-		while ((bufRead = dbfStr.read(buffer)) > 0)
-			zos.write(buffer, 0, bufRead);
-	} catch (SQLException e) {
-        log.log(Level.ERROR, "SQl Exception: ", e);
-		throw new KmiacServerException();
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
-
-	sqldi = "SELECT p.npasp::integer AS bn, d.diag::char(6) AS isd,  "+
-            "(case when d.ppi=1 then '+' else when d.ppi=2 then '-' end)::char(1) AS pp, " +
-            "(case when d.priz=1 then '1' else  ' ' end)::char(1) AS priz, " +
-            "(case when d.prizi=1 then '1' else ' ' end)::char(1) AS prizi " +
-			"FROM p_kov l, patient p, n_lkn k, pdiag d  "+
-            "WHERE l.npasp=p.npasp AND d.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
-	        "d.xzab=2 AND pd_pu=1 AND substr(diag,1,1)<>'Z' "   ;		
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqldi, cpodr) ;
-			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-		zos.putNextEntry(new ZipEntry("kontidi.dbf"));
-		while ((bufRead = dbfStr.read(buffer)) > 0)
-			zos.write(buffer, 0, bufRead);
-	} catch (SQLException e) {
-        log.log(Level.ERROR, "SQl Exception: ", e);
-		throw new KmiacServerException();
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
-
-	sqlis = "SELECT p.npasp::integer AS bn, a.usl_kov::char(15) AS kissl,  "+
-           "m.vdat AS dvi"+
-			"FROM p_kov l, patient p, n_lkn k, p_mer m, n_abd a  "+
-            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
-	        "m.pmer=n.pcod AND (m.dnl>? AND m.dnl<?) or ( m.vdat>? AND m.vdat<?); "   ;
-	
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlis,  cpodr) ;
-			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-		zos.putNextEntry(new ZipEntry("kontiis.dbf"));
-		while ((bufRead = dbfStr.read(buffer)) > 0)
-			zos.write(buffer, 0, bufRead);
-	} catch (SQLException e) {
-        log.log(Level.ERROR, "SQl Exception: ", e);
-		throw new KmiacServerException();
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
-
-	sqllo = "SELECT p.npasp::integer AS bn, a.cod_kov::char(20) AS klo,  "+
-	           "m.dnl AS dn, m.dkl AS dk, m.ter::integer AS ter,m.lpu::integer AS lpu"+
-				"FROM p_kov l, patient p, n_lkn k, p_mer m, n_abd a  "+
-	            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
-		        "AND m.pmer=n.pcod AND (m.dnl>? AND m.dnl<?) or ( m.vdat>? AND m.vdat<?) "   ;
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllo,  cpodr) ;
-			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-		zos.putNextEntry(new ZipEntry("kontilo.dbf"));
-		while ((bufRead = dbfStr.read(buffer)) > 0)
-			zos.write(buffer, 0, bufRead);
-	} catch (SQLException e) {
-        log.log(Level.ERROR, "SQl Exception: ", e);
-		throw new KmiacServerException();
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
-
-	
-	sqlos = "SELECT p.npasp::integer AS bn, select get_kodsp(v.cdol))::integer AS kspec,  "+
-	           "m.datap AS dvo"+
-				"FROM p_kov l, patient p, n_lkn k, p_vizit_amb m,n_s00 s  "+
-	            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.ckov>0  AND p.cpol_pr = ?" +
-		        "AND m.datap>? AND m.datap<? AND m.cdol=s.pcod  AND s.cod_kov<>0"   ;
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlos,   cpodr, new Date(dn), new Date(dk)) ;
-			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-		zos.putNextEntry(new ZipEntry("kontios.dbf"));
-		while ((bufRead = dbfStr.read(buffer)) > 0)
-			zos.write(buffer, 0, bufRead);
-	} catch (SQLException e) {
-        log.log(Level.ERROR, "SQl Exception: ", e);
-		throw new KmiacServerException();
-	} catch (IOException e1) {
-		// TODO Auto-generated catch block
-		e1.printStackTrace();
-	}
-
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-
-//	return path;
-	
-}
 	@Override
 	public List<RdVizit> getRdVizit() throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT v.datap,v.diag,v.mobs,v.rezult,v.n_sp,s.cod_sp,c.cod_tf,d.fam,d.im,d.ot,rd.npasp,v.id FROM p_rd_sl rd,p_vizit_amb v, n_s00 s,n_p0c c,s_vrach d where rd.npasp=v.npasp and v.cdol=s.pcod and v.cpos=c.pcod and v.n_sp=d.pcod")) {
@@ -685,5 +541,152 @@ throw new TException(e);
 						throw new KmiacServerException();
 					}
 				}
+
+	@Override
+	public String getKovInfoPol(int cpodr, long dn, long dk)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		String sqldi;
+		String sqlis;
+		String sqllo;
+		String sqlos;
+		String sqlpa;
+		String sqllgot;
+		String path = null;
+		int bufRead;
+		byte[] buffer = new byte[8192];
+		
+		try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("kovInfoPol", ".zip").getAbsolutePath());
+	 		ZipOutputStream zos = new ZipOutputStream(fos)) {
+	
+		sqllgot = "SELECT p.npasp::integer AS bn, l.lgot::integer AS kgl "+
+		           "FROM p_kov l, patient p, n_lkn k  "+
+                   "WHERE l.npasp=p.npasp AND l.lgot=k.pcod AND  k.c_kov>0  AND p.cpol_pr = ? " ;		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllgot,cpodr ) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("lgot.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+				
+	
+	sqlpa = "SELECT p.npasp::integer AS bn, p.fam::char(20) AS fam,p.im::char(15) AS im,p.ot::char(20) AS otch,  "+
+            "(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex,p.datar AS dr, " +
+			"(select get_status(p.sgrp))::integer AS stat,p.adp_ul::char(25) AS ul,p.adp_dom::char(5) AS nd,p.adp_kv::char(5) AS nk, "+
+            "k.gr_kov:: char(1) AS kat, "+
+            "(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
+			"(case when pa.ishod=2 then 7 else 6 end)::integer AS pud, " +
+			"p.poms_ndog::char(11) AS sdog,p.datapr AS dpp,p.terp::integer AS ter,p.cpol_pr::integer AS lpu, "+
+			"pa.dataot AS datot,p.ter_liv::integer AS nas "+			
+	        "FROM p_kov l, patient p, n_lkn k, p_nambk pa  "+
+            "WHERE l.npasp=p.npasp AND pa.npasp=p.npasp AND l.lgot=k.pcod AND  k.c_kov>0  AND p.cpol_pr = ?" ;		
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlpa,  cpodr) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontipa.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
+	sqldi = "SELECT p.npasp::integer AS bn, d.diag::char(6) AS isd,  "+
+            "(case when d.ppi=1 then '+'  end)::char(1) AS pp, " +
+            "(case when d.ppi=2 then '-' end)::char(1) AS pp, " +
+            "(case when d.prizb=1 then '1' else  ' ' end)::char(1) AS priz, " +
+            "(case when d.prizi=1 then '1' else ' ' end)::char(1) AS prizi " +
+			"FROM p_kov l, patient p, n_lkn k, p_diag d  "+
+            "WHERE l.npasp=p.npasp AND d.npasp=p.npasp AND l.lgot=k.pcod AND  k.c_kov>0  AND p.cpol_pr = ? AND " +
+	        "d.xzab=2 AND  substr(diag,1,1)<>'Z' "   ;		
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqldi, cpodr) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontidi.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
+	sqlis = "SELECT p.npasp::integer AS bn, a.usl_kov::char(15) AS kissl,  "+
+           "m.fdat AS dvi  FROM p_kov l, patient p, n_lkn k, p_mer m, n_abd a  "+
+            " WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.c_kov>0  AND p.cpol_pr = ? AND " +
+	        " m.pmer=a.pcod AND ((m.dnl>? AND m.dnl<?) or ( m.fdat>? AND m.fdat<?)) "   ;
+	
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlis,  cpodr,new Date(dn), new Date(dk), new Date(dn), new Date(dk)) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontiis.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
+	sqllo = "SELECT p.npasp::integer AS bn, a.cod_kov::char(20) AS klo,  "+
+	           "m.dnl AS dn, m.dkl AS dk, m.ter::integer AS ter,m.lpu::integer AS lpu   "+
+				"FROM p_kov l, patient p, n_lkn k, p_mer m, n_abd a  "+
+	            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  a.cod_kov>0  AND p.cpol_pr = ?" +
+		        "AND m.pmer=a.pcod AND ((m.dnl>? AND m.dnl<?) or ( m.fdat>? AND m.fdat<?)) "   ;
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqllo,  cpodr,new Date(dn), new Date(dk), new Date(dn), new Date(dk)) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontilo.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
+	sqlos = "SELECT p.npasp::integer AS bn, (select get_kodsp(m.cod_sp))::integer AS kspec,  "+
+	           "m.datap AS dvo "+
+				"FROM p_kov l, patient p, n_lkn k, p_vizit_amb m,n_s00 s  "+
+	            "WHERE l.npasp=p.npasp AND m.npasp=p.npasp AND l.lgot=k.pcod AND  k.c_kov>0  AND p.cpol_pr = ?" +
+		        "AND (m.datap>? AND m.datap<?) AND m.cdol=s.pcod  AND s.cod_kov<>0"   ;
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlos,   cpodr,new Date(dn), new Date(dk)) ;
+			InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+		zos.putNextEntry(new ZipEntry("kontios.dbf"));
+		while ((bufRead = dbfStr.read(buffer)) > 0)
+			zos.write(buffer, 0, bufRead);
+	} catch (SQLException e) {
+        log.log(Level.ERROR, "SQl Exception: ", e);
+		throw new KmiacServerException();
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+
+		} 
+		/*catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}*/
+		catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+
+	return path;
+	
+	}
 }
 	

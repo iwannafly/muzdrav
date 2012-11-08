@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
+
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
@@ -111,6 +112,14 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		mnNewMenu.add(menuItem);
 		
 		JMenuItem menuItem_1 = new JMenuItem("Диспансеризация подростков");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				per = new Period();
+				per.Cslu = 2;
+				per.showPeriod();
+			}
+		});
 		mnNewMenu.add(menuItem_1);
 		
 		JMenuItem menuItem_2 = new JMenuItem("Диспансеризация детей-сирот");

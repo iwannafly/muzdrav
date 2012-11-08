@@ -206,7 +206,12 @@ service ThriftVgr extends kmiacServer.KmiacServer {
 	/**
         * Создает KOB
 	*/
-	void getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk,  4:i32 clpu) throws (1:kmiacServer.KmiacServerException kse, 2:KovNotFoundException rnfe);
+	string getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+   
+
+
+
+
 
 
 /**
