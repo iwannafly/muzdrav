@@ -788,15 +788,15 @@ public class GenReestr extends Server implements Iface {
 				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
 				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
 				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
-				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir";
+				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
         	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
         			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
         	sqlr += sqlfrom; 
         	sqlr += "WHERE g.pr_out<>0 "+sqlwhere;
-        	sqlr += "UNION ";
-            sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, g.datap::date as d_pst, o.datav::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
-    				"d.etap::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
+        	sqlr += " UNION ";
+            sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
+    				"d.stl::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
     				"(select get_pr_out(o.ishod))::integer AS pr_out, (select get_res_l(o.result))::integer AS res_l, "+
     				"(select get_prof(?, o.vrach))::integer AS prof_fn, " +
     				"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
@@ -827,15 +827,15 @@ public class GenReestr extends Server implements Iface {
     				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
     				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
     				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
-    				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir";
+    				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.ngosp = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_dnev d ON (o.id_gosp = d.id_gosp) "+
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
             			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlr += sqlfrom; 
             	sqlr += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
-            	sqlr += " ORDER BY p.npasp ";
+//            	sqlr += " ORDER BY p.npasp ";
             	
-           try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk),  clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk),  clpu, clpu, new Date(df), new Date(dn), new Date(dk)))) {
+           try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk)))) {
         	   ResultSet rs = acrs.getResultSet();
             
             	try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
@@ -894,22 +894,22 @@ public class GenReestr extends Server implements Iface {
 	        			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
 	        	sqlmed += sqlfrom; 
 	        	sqlmed += "WHERE g.pr_out<>0 "+sqlwhere;
-	        	sqlmed += "UNION ";
-	            sqlmed = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, g.datap::date as d_pst, o.datav::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
-	    				"d.etap::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
+	        	sqlmed += " UNION ";
+	            sqlmed = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
+	    				"d.stl::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
 	    				"(select get_pr_out(o.ishod))::integer AS pr_out, (select get_res_l(o.result))::integer AS res_l, "+
 	    				"(select get_prof(?, o.vrach))::integer AS prof_fn, " +
 	    				"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
 	    				"(select get_kodsp(o.vrach))::integer AS spec, " +
 	    				"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
 	    				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.ngosp = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_dnev d ON (o.id_gosp = d.id_gosp) "+
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
             			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlmed += sqlfrom; 
             	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
             	sqlmed += " ORDER BY p.npasp "; //ругается
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk),  clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk),  clpu, new Date(dn), new Date(dk)));
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)));
 					InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 						zos.putNextEntry(new ZipEntry("med.dbf"));
 						while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -942,13 +942,13 @@ public class GenReestr extends Server implements Iface {
 						"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
 						"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
 						"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-						"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir";
+						"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
 	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
 	        			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
 	        	sqlpasp += sqlfrom; 
 	        	sqlpasp += "WHERE g.pr_out<>0 "+sqlwhere;
-	        	sqlpasp += "UNION ";
+	        	sqlpasp += " UNION ";
 	            sqlpasp = "SELECT g.id::integer AS sl_id, 1::integer AS vid_rstr, " +
 	    				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
 	    				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
@@ -972,15 +972,15 @@ public class GenReestr extends Server implements Iface {
 	    				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
 	    				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
 	    				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-	    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir";
+	    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.ngosp = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_dnev d ON (o.id_gosp = d.id_gosp) "+
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
             			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlpasp += sqlfrom; 
             	sqlpasp += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
 
-				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk),  clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk),  clpu, new Date(df), new Date(dn), new Date(dk)));
+				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
 					InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 						zos.putNextEntry(new ZipEntry("pasp.dbf"));
 						while ((bufRead = dbfStr.read(buffer)) > 0)
