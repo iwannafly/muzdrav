@@ -4062,3 +4062,4 @@ public class PacientInfoFrame extends JFrame {
         }
     }
 }
+

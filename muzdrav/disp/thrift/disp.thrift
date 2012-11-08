@@ -61,6 +61,9 @@ struct Pfiz{
 	55: optional i32 ef1;
 	56: optional i32 rf1;
 	57: optional i32 grzd_s;
+	58: optional string fam;
+	59: optional string im;
+	60: optional string ot;
 }
 
 struct Pdisp_ds{
