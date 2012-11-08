@@ -1,8 +1,30 @@
 package ru.nkz.ivcgzo.clientDisp;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
@@ -10,32 +32,12 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds;
+import ru.nkz.ivcgzo.thriftDisp.Pfiz;
+import ru.nkz.ivcgzo.thriftDisp.PfizNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.ButtonGroup;
-import javax.swing.JTabbedPane;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.border.BevelBorder;
-import java.awt.Color;
-import javax.swing.border.TitledBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.UIManager;
-import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-import javax.swing.SwingConstants;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 public class MainForm extends Client<ThriftDisp.Client>{
 	public static ThriftDisp.Client tcl;
@@ -177,6 +179,40 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private JRadioButton rbtVmp2_1;
 	private JRadioButton rbtVmp2_2;
 	private JRadioButton rbtAkds4;
+	private JLabel lblPatient;
+	protected Pfiz fiz;
+	private JCheckBox cbPrb;
+	private JCheckBox cbPrk;
+	private JCheckBox bcPrs;
+	private JCheckBox cbPriv_n;
+	private JCheckBox cbBcg;
+	private JCheckBox cbPolio;
+	private JCheckBox cbAkds;
+	private JCheckBox cbAdsm;
+	private JCheckBox cbKor;
+	private JCheckBox cbParotit;
+	private JCheckBox cbKrasn;
+	private JCheckBox cbGepatit;
+	private JCheckBox cbVrec1;
+	private JCheckBox cbVrec2;
+	private JCheckBox cbVrec3;
+	private JCheckBox cbVrec4;
+	private JCheckBox cbNrec10;
+	private JCheckBox cbNrec9;
+	private JCheckBox cbNrec8;
+	private JCheckBox cbNrec7;
+	private JCheckBox cbNrec6;
+	private JCheckBox cbNrec5;
+	private JCheckBox cbNrec4;
+	private JCheckBox cbNrec3;
+	private JCheckBox cbNrec2;
+	private JCheckBox cbNrec1;
+	private JCheckBox cbVrec10;
+	private JCheckBox cbVrec9;
+	private JCheckBox cbVrec8;
+	private JCheckBox cbVrec7;
+	private JCheckBox cbVrec6;
+	private JCheckBox cbVrec5;
 
 
 	public MainForm (ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -189,13 +225,61 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JButton btnSrc = new JButton("Поиск");
 		btnSrc.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
-//				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, true);
-//				
-//				if (res != null) {
-//				}
+				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);			
+				if (res != null) {
+					try {
+						fiz = new Pfiz();
+						fiz = MainForm.tcl.getPfiz(res[0]);
+						lblPatient.setText(fiz.fam+" "+fiz.im);
+						bgAkds.clearSelection();
+						rbtAkds1.setSelected(fiz.getAkds() == 1);
+						rbtAkds2.setSelected(fiz.getAkds() == 2);
+						rbtAkds3.setSelected(fiz.getAkds() == 3);
+						rbtAkds4.setSelected(fiz.getAkds() == 4);
+						bgGrzd.clearSelection();
+						rbtGrzd1.setSelected(fiz.getGrzd() == 1);
+						rbtGrzd2.setSelected(fiz.getGrzd() == 2);
+						rbtGrzd3.setSelected(fiz.getGrzd() == 3);
+						rbtGrzd4.setSelected(fiz.getGrzd() == 4);
+						bgPe.clearSelection();
+						rbtPe1.setSelected(fiz.getPe() == 1);
+						rbtPe2.setSelected(fiz.getPe() == 2);
+						bgPi.clearSelection();
+						rbtPi1.setSelected(fiz.getPi() == 1);
+						rbtPi2.setSelected(fiz.getPi() == 2);
+						bgPp.clearSelection();
+						rbtPp1.setSelected(fiz.getPp() == 1);
+						rbtPp2.setSelected(fiz.getPp() == 2);
+						bgVes.clearSelection();
+						rbtVes1.setSelected(fiz.getFv() == 1);
+						rbtVes2.setSelected(fiz.getFv() == 2);
+						rbtVes3.setSelected(fiz.getFv() == 3);
+						bgRost.clearSelection();
+						rbtRost1.setSelected(fiz.getFr() == 1);
+						rbtRost2.setSelected(fiz.getFr() == 2);
+						rbtRost3.setSelected(fiz.getFr() == 3);
+						if (cbPrb.isSelected()) fiz.setPrb(1);
+						if (fiz.isSetDat_p())
+							tbDataPostup.setDate(fiz.getDat_p());
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (PfizNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
+		
+		lblPatient = new JLabel("Пациент:");
+		
+		JButton button = new JButton("Сохранить");
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -203,16 +287,24 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 967, Short.MAX_VALUE)
-						.addComponent(btnSrc))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(btnSrc)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button))
+						.addComponent(lblPatient))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(btnSrc)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 650, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap()
+					.addComponent(lblPatient)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnSrc)
+						.addComponent(button))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 632, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		bgVedomPr = new ButtonGroup();
@@ -538,23 +630,23 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlPrNePrivit.setLayout(gl_pnlPrNePrivit);
 		pnlProfPriv.setLayout(gl_pnlProfPriv);
 		
-		JCheckBox cbPriv_n = new JCheckBox("нуждается  в проведении вакцинации/ревакцинации");
+		cbPriv_n = new JCheckBox("нуждается  в проведении вакцинации/ревакцинации");
 		
-		JCheckBox cbBcg = new JCheckBox("БЦЖ");
+		cbBcg = new JCheckBox("БЦЖ");
 		
-		JCheckBox cbPolio = new JCheckBox("Полиомиелит");
+		cbPolio = new JCheckBox("Полиомиелит");
 		
-		JCheckBox cbAkds = new JCheckBox("АКДС");
+		cbAkds = new JCheckBox("АКДС");
 		
-		JCheckBox cbAdsm = new JCheckBox("АДСМ");
+		cbAdsm = new JCheckBox("АДСМ");
 		
-		JCheckBox cbKor = new JCheckBox("Корь");
+		cbKor = new JCheckBox("Корь");
 		
-		JCheckBox cbParotit = new JCheckBox("Эпид.паротит");
+		cbParotit = new JCheckBox("Эпид.паротит");
 		
-		JCheckBox cbKrasn = new JCheckBox("Краснуха");
+		cbKrasn = new JCheckBox("Краснуха");
 		
-		JCheckBox cbGepatit = new JCheckBox("Гепатит В");
+		cbGepatit = new JCheckBox("Гепатит В");
 		
 		JPanel pnlBcg_vr = new JPanel();
 		pnlBcg_vr.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -830,11 +922,12 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		CustomDateEditor tbDateOsm = new CustomDateEditor();
 		tbDateOsm.setColumns(10);
 		
-		JCheckBox cbPrb = new JCheckBox("Относится к категории часто болеющих детей");
+		cbPrb = new JCheckBox("Относится к категории часто болеющих детей");
 		
-		JCheckBox cbPrk = new JCheckBox("Потребность в медико-педагогической коррекции");
+		cbPrk = new JCheckBox("Потребность в медико-педагогической коррекции");
 		
-		JCheckBox bcPrs = new JCheckBox("Потребность в медико-социальной коррекции");
+		bcPrs = new JCheckBox("Потребность в медико-социальной коррекции");
+		
 		GroupLayout gl_pnlSveden = new GroupLayout(pnlSveden);
 		gl_pnlSveden.setHorizontalGroup(
 			gl_pnlSveden.createParallelGroup(Alignment.LEADING)
@@ -850,25 +943,33 @@ public class MainForm extends Client<ThriftDisp.Client>{
 								.addGroup(gl_pnlSveden.createSequentialGroup()
 									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_pnlSveden.createSequentialGroup()
-											.addComponent(lblProfil)
-											.addGap(4)
-											.addComponent(cmbProfil, GroupLayout.PREFERRED_SIZE, 249, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_pnlSveden.createSequentialGroup()
-											.addComponent(lblVedomPr, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
-											.addGap(4)
-											.addComponent(pnlVedomPr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+											.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+												.addGroup(gl_pnlSveden.createSequentialGroup()
+													.addComponent(lblProfil)
+													.addGap(4)
+													.addComponent(cmbProfil, GroupLayout.PREFERRED_SIZE, 249, GroupLayout.PREFERRED_SIZE))
+												.addGroup(gl_pnlSveden.createSequentialGroup()
+													.addComponent(lblVedomPr, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+													.addGap(4)
+													.addComponent(pnlVedomPr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addGroup(gl_pnlSveden.createSequentialGroup()
+													.addPreferredGap(ComponentPlacement.RELATED)
+													.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+														.addGroup(gl_pnlSveden.createSequentialGroup()
+															.addComponent(lblVib2, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
+															.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+															.addComponent(pnlVib2, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE))
+														.addGroup(gl_pnlSveden.createSequentialGroup()
+															.addComponent(lblVib, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+															.addPreferredGap(ComponentPlacement.RELATED)
+															.addComponent(pnlVib, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE)))))
+											.addGap(32))
 										.addGroup(gl_pnlSveden.createSequentialGroup()
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addGroup(gl_pnlSveden.createParallelGroup(Alignment.TRAILING)
-												.addGroup(gl_pnlSveden.createSequentialGroup()
-													.addComponent(lblVib2, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
-													.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-													.addComponent(pnlVib2, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE))
-												.addGroup(Alignment.LEADING, gl_pnlSveden.createSequentialGroup()
-													.addComponent(lblVib, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-													.addPreferredGap(ComponentPlacement.RELATED)
-													.addComponent(pnlVib, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE)))))
-									.addGap(32)
+											.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+												.addComponent(cbPriv_n)
+												.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 420, GroupLayout.PREFERRED_SIZE))
+											.addGap(99)))
 									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
 										.addComponent(cbPrb)
 										.addGroup(gl_pnlSveden.createSequentialGroup()
@@ -883,11 +984,6 @@ public class MainForm extends Client<ThriftDisp.Client>{
 											.addComponent(tbDateOsm, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE))
 										.addComponent(cbPrk)
 										.addComponent(bcPrs)))))
-						.addGroup(gl_pnlSveden.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbPriv_n)
-								.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 420, GroupLayout.PREFERRED_SIZE)))
 						.addGroup(gl_pnlSveden.createSequentialGroup()
 							.addGap(44)
 							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
@@ -959,7 +1055,9 @@ public class MainForm extends Client<ThriftDisp.Client>{
 											.addComponent(pnlVib2, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
 										.addGroup(gl_pnlSveden.createSequentialGroup()
 											.addGap(24)
-											.addComponent(lblVib2))))
+											.addComponent(lblVib2)))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_pnlSveden.createSequentialGroup()
 									.addGap(14)
 									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.BASELINE)
@@ -968,22 +1066,18 @@ public class MainForm extends Client<ThriftDisp.Client>{
 									.addPreferredGap(ComponentPlacement.UNRELATED)
 									.addComponent(pnlGrzd, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(cbPrb)))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(cbPrb)
+									.addGap(29)
+									.addComponent(bcPrs)))
+							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+								.addGroup(Alignment.TRAILING, gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_pnlSveden.createSequentialGroup()
+										.addGap(3)
+										.addComponent(lblDateOsm))
+									.addComponent(tbDateOsm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_pnlSveden.createSequentialGroup()
-									.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-									.addGap(3)
-									.addComponent(cbPriv_n))
-								.addGroup(gl_pnlSveden.createSequentialGroup()
-									.addGap(18)
-									.addComponent(bcPrs)
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_pnlSveden.createSequentialGroup()
-											.addGap(3)
-											.addComponent(lblDateOsm))
-										.addComponent(tbDateOsm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(cbPriv_n)))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.TRAILING)
 								.addComponent(cbBcg)
@@ -2195,45 +2289,46 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblSan = new JLabel("в санатории");
 		
-		JCheckBox cbVrec1 = new JCheckBox("");
+		cbVrec1 = new JCheckBox("");
 		
-		JCheckBox cbVrec2 = new JCheckBox("");
+		cbVrec2 = new JCheckBox("");
 		
-		JCheckBox cbVrec3 = new JCheckBox("");
+		cbVrec3 = new JCheckBox("");
 		
-		JCheckBox cbVrec4 = new JCheckBox("");
+		cbVrec4 = new JCheckBox("");
 		
-		JCheckBox cbVrec5 = new JCheckBox("");
+		cbVrec5 = new JCheckBox("");
 		
-		JCheckBox cbVrec6 = new JCheckBox("");
+		cbVrec6 = new JCheckBox("");
 		
-		JCheckBox cbVrec7 = new JCheckBox("");
+		cbVrec7 = new JCheckBox("");
 		
-		JCheckBox cbVrec8 = new JCheckBox("");
+		cbVrec8 = new JCheckBox("");
 		
-		JCheckBox cbVrec9 = new JCheckBox("");
+		cbVrec9 = new JCheckBox("");
 		
-		JCheckBox cbVrec10 = new JCheckBox("");
+		cbVrec10 = new JCheckBox("");
 		
-		JCheckBox cbNrec1 = new JCheckBox("");
+		cbNrec1 = new JCheckBox("");
 		
-		JCheckBox cbNrec2 = new JCheckBox("");
+		cbNrec2 = new JCheckBox("");
 		
-		JCheckBox cbNrec3 = new JCheckBox("");
+		cbNrec3 = new JCheckBox("");
 		
-		JCheckBox cbNrec4 = new JCheckBox("");
+		cbNrec4 = new JCheckBox("");
 		
-		JCheckBox cbNrec5 = new JCheckBox("");
+		cbNrec5 = new JCheckBox("");
 		
-		JCheckBox cbNrec6 = new JCheckBox("");
+		cbNrec6 = new JCheckBox("");
 		
-		JCheckBox cbNrec7 = new JCheckBox("");
+		cbNrec7 = new JCheckBox("");
 		
-		JCheckBox cbNrec8 = new JCheckBox("");
+		cbNrec8 = new JCheckBox("");
 		
-		JCheckBox cbNrec9 = new JCheckBox("");
+		cbNrec9 = new JCheckBox("");
 		
-		JCheckBox cbNrec10 = new JCheckBox("");
+		cbNrec10 = new JCheckBox("");
+		
 		GroupLayout gl_pnlProvOzd = new GroupLayout(pnlProvOzd);
 		gl_pnlProvOzd.setHorizontalGroup(
 			gl_pnlProvOzd.createParallelGroup(Alignment.LEADING)
@@ -2375,5 +2470,13 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	@Override
 	public String getName() {
 		return configuration.appName;
+	}
+	
+	@Override
+	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
+		super.onConnect(conn);
+		if (conn instanceof ThriftDisp.Client) {
+			tcl = thrClient;
+		}
 	}
 }

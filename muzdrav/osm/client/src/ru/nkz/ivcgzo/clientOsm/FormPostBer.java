@@ -146,8 +146,8 @@ public class FormPostBer extends JFrame {
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
-				System.out.println("постановка по +");		
-				System.out.println(Vvod.zapVr.getNpasp());		
+//				System.out.println("постановка по +");		
+//				System.out.println(Vvod.zapVr.getNpasp());		
 				fam.setText(Vvod.zapVr.getFam());
 				im.setText(Vvod.zapVr.getIm());
 				ot.setText(Vvod.zapVr.getOth());
@@ -297,7 +297,7 @@ public class FormPostBer extends JFrame {
 			if (CBPrishSn.getSelectedPcod() != null)
 				rdSlStruct.setIshod(CBPrishSn.getSelectedPcod());
 				else rdSlStruct.unsetIshod();
-	System.out.println(rdSlStruct);		
+//	System.out.println(rdSlStruct);		
 		//		JOptionPane.showMessageDialog(FormPostBer.this, "Ошибка обновления");
 				MainForm.tcl.UpdateRdSl(rdSlStruct);
 			} catch (KmiacServerException e) {

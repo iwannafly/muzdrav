@@ -38,13 +38,13 @@ public class ServerDisp extends Server implements Iface {
 				"pfd6", "prs", "priv", "priv_pr", "priv_n", "bcg", "polio", "akds", "adsm", "adm", "kor", 
 				"parotit", "krasn", "gepatit", "bcg_vr", "polio_vr", "akds_vr", "kor_vr", "parotit_vr", "krasn_vr", 
 				"gepatit_vr", "dat_p", "profil", "vedom", "vib1", "vib2", "ipr", "dat_ipr", "menses", "menses1", 
-				"okr", "pf1", "mf1", "ef1", "rf1", "grzd_s");
+				"okr", "pf1", "mf1", "ef1", "rf1", "grzd_s", "fam", "im", "oth");
 		pfizTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
 				Double.class, Double.class, Date.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class, 
 				String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
 				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
 				Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class,Integer.class, Integer.class, 
-				String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
+				String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class};
 
 		rsmPdisp_ds = new TResultSetMapper<>(Pdisp_ds.class, "npasp", "id", "d_do","diag_do", "obs_n","obs_v", 
 				"lech_n", "lech_v", "d_po", "diag_po", "xzab", "pu", "disp", "vmp1", "vmp2", "vrec1", "vrec2",
@@ -108,7 +108,7 @@ public class ServerDisp extends Server implements Iface {
 	@Override
 	public Pfiz getPfiz(int npasp) throws KmiacServerException,
 			PfizNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_fiz where npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_fiz.*, patient.fam, patient.im, patient.ot from patient left join p_fiz on (p_fiz.npasp=patient.npasp) where patient.npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmPfiz.map(acrs.getResultSet());
 			else

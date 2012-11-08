@@ -18,6 +18,7 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.serverMedication.ServerMedication;
 import ru.nkz.ivcgzo.serverReception.ServerReception;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
@@ -49,6 +50,7 @@ public class ServerViewSelect extends Server implements Iface {
 	private TServer thrServ;
 	private Server labServ;
 	private Server recServ;
+	private Server medServ;
 	private final ClassifierManager ccm;
 	private final TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	private final TResultSetMapper<PatientCommonInfo, PatientCommonInfo._Fields> rsmPatComInfo;
@@ -119,6 +121,19 @@ public class ServerViewSelect extends Server implements Iface {
 				}
 			}
 		}).start();
+
+    	new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    medServ = new ServerMedication(sse, tse);
+                    medServ.start();
+                } catch (Exception e) {
+                    System.err.println("Error starting medication server.");
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     	
         ThriftViewSelect.Processor<Iface> proc = new ThriftViewSelect.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -320,7 +335,7 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public List<PatientDiagZInfo> getPatientDiagZInfoList(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT p_diag.*,s_vrach.fam||' '||s_vrach.im||' '||s_vrach.ot as fio_vr FROM p_diag JOIN s_vrach ON (p_diag.cod_sp=s_vrach.pcod) WHERE npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM p_diag WHERE npasp = ? ", npasp)) {
 			return rsmPdiagZ.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException(e.getMessage());
