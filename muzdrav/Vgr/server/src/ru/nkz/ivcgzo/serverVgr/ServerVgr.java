@@ -98,8 +98,8 @@ public class ServerVgr extends Server implements Iface {
 		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
 		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
-		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",        "uid",       "ves",       "ned",        "lcad",        "ldad",       "rcad",       "rdad",       "rost",       "datar",    "obr",        "sem",          "ososo",       "vrpr" ,      "npasp",        "hdm",         "spl",         "oj",          "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "oteki");
-		rdConVizitTypes = new Class<?>[]{                 Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
+		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",         "uid",      "npasp",        "ned",        "ves",      "lcad",       "ldad",       "rcad",       "rdad",       "ball",        "hdm",        "spl",         "oj",         "chcc",       "polpl",      "predpl",       "serd",        "serd1",       "oteki");
+		rdConVizitTypes = new Class<?>[]{          Integer.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
 
 		// TODO Auto-generated constructor stub
@@ -177,7 +177,7 @@ throw new TException(e);
 	@Override
 	public List<RdConVizit> getRdConVizit() throws KmiacServerException,
 			TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select d.id_pvizit,d.id_pos,d.npasp,d.srok,d.ves,d.art1,d.art2,d.art3,d.art4,d.ball,d.hdm,d.spl,d.chcc,d.polpl,d.predpl,d.serd,d.serd1,d.oteki from p_rd_din d,p_rd_sl rd where d.id_pvizit=rd.id_pvizit")) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select d.id_pvizit,d.id_pos,d.npasp,d.srok,d.ves,d.art1,d.art2,d.art3,d.art4,d.ball,d.hdm,d.spl,d.oj,d.chcc,d.polpl,d.predpl,d.serd,d.serd1,d.oteki from p_rd_din d,p_rd_sl rd where d.id_pvizit=rd.id_pvizit")) {
 			if (acrs.getResultSet().next())
 				return rsmRdCV.mapToList(acrs.getResultSet());
 			else
@@ -191,14 +191,14 @@ throw new TException(e);
 	@Override
 	public List<ru.nkz.ivcgzo.thriftVgr.RdPatient> getRdPatient()
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit,rd.npasp,p.fam, p.im, p.ot, p.datar,p.docser,p.docnum,p.adp_gorod,p.adp_ul,  "+
-"p.adp_dom,p.adp_kv,p.poms_ser,p.poms_nom,p.poms_ndog,a.stat,n.clpu,p.terp,p.adm_gorod, p.adm_ul, "+ 
-"p.adm_dom, p.adm_kv,s.grup,s.ph, p.tel,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs, "+
-"vr.fam,vr.im,vr.ot,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.vozmen,rd.prmen,rd.datam,rd.kont, "+ 
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit as uid,rd.npasp,p.fam as fam, p.im as im, p.ot as ot, p.datar,p.docser,p.docnum,p.adp_gorod as tavn,p.adp_ul as street,  "+
+"p.adp_dom as house,p.adp_kv as flat,p.poms_ser,p.poms_nom,p.poms_ndog as dog,a.stat,n.clpu as lpup,p.terp,p.adm_gorod as ftawn, p.adm_ul as fstreet, "+ 
+"p.adm_dom as fhouse, p.adm_kv as fflat,s.grup as grk,s.ph as rez, p.tel as telm,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs, "+
+"vr.fam as famv,vr.im as imv,vr.ot as otv,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.vozmen,rd.prmen,rd.datam,rd.kont, "+ 
 "rd.dsp,rd.dsr,rd.dtroch,rd.cext,rd.indsol,s.vitae,s.allerg,rd.ishod,rd.prrod,rd.oslrod,i.sem, "+ 
-"rd.rost,rd.vesd,i.osoco,i.uslpr,rd.dataz,rd.polj,z0.kod_tf, "+ 
-"i.fiootec,i.mrotec,i.telotec,i.grotec,i.photec,i.vredotec,i.votec,p.name_mr,p.prof, "+ 
-"rd.eko,rd.rub,rd.predp,p.ter_liv,p.region_liv,rd.cdiagt,rd.cvera,rd.dataosl,rd.osp "+ 
+"rd.rost,rd.vesd,i.osoco,i.uslpr,rd.dataz,rd.polj,z0.kod_tf as obr, "+ 
+"i.fiootec,i.mrotec as mrabotec,i.telotec,i.grotec,i.photec,i.vredotec,i.votec as vozotec,p.name_mr as mrab,p.prof, "+ 
+"rd.eko,rd.rub,rd.predp,p.ter_liv as terpr,p.region_liv as oblpr,rd.cdiagt as diag,rd.cvera,rd.dataosl,rd.osp "+ 
 "FROM patient p,p_rd_sl rd,p_rd_inf i,p_sign s,p_vizit v,n_az9 a,n_n00 n,s_vrach vr,n_z00 z0 "+ 
 "WHERE  p.cpol_pr=n.pcod and v.npasp=s.npasp and i.npasp=s.npasp and "+ 
 "p.npasp=s.npasp and p.sgrp=a.pcod and rd.npasp=p.npasp and v.id=rd.id_pvizit "+
@@ -281,7 +281,6 @@ throw new TException(e);
 		sb2.append("</head>");
 		sb2.append("<body>");
 		sb2.append("uicv;uiv;uid;ves;ned;dno;plac;lcad;ldad;rcad;rdad;ball1;ball2;ball3;ball4;ball5;nexdate;cirkumference;css;polojpl;predpl;cerdpl;cerdpl2;oteki;otekiras");
-		List<RdPatient> rdPatient = getRdPatient();
 		//Con_diagn.csv
 		StringBuilder sb3 = new StringBuilder(0x10000);
 		sb3.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -326,6 +325,7 @@ throw new TException(e);
 //			RdPatient rdp = rdPatient.get(j);
 //			
 //		}
+		List<RdPatient> rdPatient = getRdPatient();
 		j = 0;
 		for (RdPatient rdp : rdPatient) {
 			j = j+1;
@@ -338,6 +338,7 @@ throw new TException(e);
        dex1 = "";dex2 = ""; dex3 = ""; dex4 = ""; dex5 = "";
         dex6 = ""; dex7 = "";dex9 = ""; dex10 = "";
         dex = "";  dak = ""; dsost = ""; dosl = "";
+		System.out.println(rdp);		
 		p7 = new Date(rdp.datar);
 		if (rdp.grk == "I") grk = 1;
 		if (rdp.grk == "II") grk = 2;
@@ -374,6 +375,7 @@ throw new TException(e);
 		hsm=1; iw2=iw2-2;	
 		}
 		hsm=iw2;
+		System.out.println(rdp.vred);		
 		if (rdp.vred.charAt(0) == '1') kod2= kod2+1;
 		if (rdp.vred.charAt(1) == '1') kod2= kod2+2;
 		if (rdp.vred.charAt(2) == '1') kod2= kod2+4;
@@ -385,6 +387,7 @@ throw new TException(e);
 		sb4.append(String.format("%d;%d;%d;%td.%4$tm.%4$tY;%d;%d;%td.%7$tm.%7$tY;%td.%8$tm.%8$tY;%s %s %s;%td.%12$tm.%12$tY;%s;%td.%14$tm.%14$tY;%d;%d;%d;%d;%d;%d;%s;%s;%s;%d;%s;%d;%d;%d;;%d;%s;%s;%td.%32$tm.%32$tY;%d;%d;%d;%d;%d;%d;", j,rdp.npasp,rdp.deti,p1,rdp.yavka1,risk,p8,p3,rdp.fam,rdp.im,rdp.ot,p4,rdp.telm,rdp.datasn,rdp.shet,rdp.kolrod,rdp.abort,rdp.polj,rdp.vozmen,rdp.prmen,rdp.fiootec,rdp.mrabotec,rdp.telotec,grot,rdp.photec,hsm,hal,hdr,rdp.vozotec,rdp.mrab,rdp.prof,rdp.datam,kontr,rdp.dsp,rdp.dsr,rdp.dtroch,rdp.cext,rdp.indsol));		
         sb4.append(String.format("%s;%s;;;%d;%td.%4$tm.%4$tY;%d;%d;%d;%d;%td.%9$tm.%9$tY;%d", rdp.vitae,rdp.allerg,rdp.ishod,p5,pr,rdp.diag,rdp.cvera,ek,rdp.dataosl,ru));
 		System.out.println(sb4);		
+		System.out.println(rdp.fam);		
 		//		Encoded.Base64(rdp.fam,35,fam);
 		sb.append("<br>");
 		sb.append(String.format("%d;%s;%s;%s;%td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
@@ -525,7 +528,11 @@ throw new TException(e);
 			}
 			dex = dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10;
 			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,rdp.npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
-		    sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%18$td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
+//		    sb5.append(String.format("%d;%d;%d;%d;%d;%.2f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;%td.%18$tm.%18$tY",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost,rdp.vesd,kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4,p8));
+		    sb5.append(String.format("%d;%d;%d;%d;%d;",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost));
+		    sb5.append(String.format(".2f;", rdp.vesd));
+		    sb5.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;", kod2,rdp.osoco,rdp.uslpr,kod5,kod6,kod7,kod8,rdp.osp,ball1,ball2,ball3,ball4));
+		    sb5.append(String.format("%td.%1$tm.%1$tY;", p8));
 //			acrs21.close();
 		}
 		//Vizit.csv
@@ -542,7 +549,8 @@ throw new TException(e);
 			j = j+1;
 			Integer ot = 0;
 			if (rcv.oteki != 0 ) ot = 1;
-			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;%d;%d", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
+			sb2.append(String.format("%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
+//			sb2.append(String.format("%d;%d;", j, rcv.uiv));		
 		}
 		osw.write(sb.toString());
 		return "c:\\patient.html";
