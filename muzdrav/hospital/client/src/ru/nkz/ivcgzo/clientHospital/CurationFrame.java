@@ -87,7 +87,7 @@ public class CurationFrame extends JDialog {
                             .get(table.convertRowIndexToModel(table.getSelectedRow()));
                     try {
                         ClientHospital.tcl.addPatientToDoctor(currentPatient.getIdGosp(),
-                                cbxStationType.getSelectedPcod(), authInfo.getPcod());
+                            authInfo.getPcod(), cbxStationType.getSelectedPcod());
                         CurationTableModel tbModel =
                                 new CurationTableModel(authInfo.getCpodr());
                         table.setModel(tbModel);

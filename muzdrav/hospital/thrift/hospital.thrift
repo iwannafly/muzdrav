@@ -25,7 +25,7 @@ struct TPatient{
 	6:string middlename;
 	7:string gender;
 	8:i32 nist;
-	9:i32 status;
+	9:string status;
 	10:string oms;
 	11:string dms;
 	12:string job;
@@ -206,5 +206,10 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	* Классификатор типа стационара (N_tip0(pcod))
 	*/
 	list<classifier.IntegerClassifier> getStationTypes() throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	* Классификатор этапов лечения (N_tip0(pcod))
+	*/
+	list<classifier.IntegerClassifier> getStagesClassifier(1: i32 idGosp)
+		throws (1:kmiacServer.KmiacServerException kse);
 	
 }

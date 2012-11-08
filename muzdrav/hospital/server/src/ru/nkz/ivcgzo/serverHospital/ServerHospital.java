@@ -48,7 +48,6 @@ import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 
-
 public class ServerHospital extends Server implements Iface {
     private static Logger log = Logger.getLogger(ServerHospital.class.getName());
     private TServer tServer;
@@ -214,7 +213,7 @@ public class ServerHospital extends Server implements Iface {
     public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
-                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, patient.sgrp, "
+                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_tip.name as sgrp, "
                 + "(patient.poms_ser||patient.poms_nom) as poms, "
                 + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
@@ -222,6 +221,7 @@ public class ServerHospital extends Server implements Iface {
                 + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
                 + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
                 + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN n_tip ON n_tip.pcod = c_otd.stat_type "
                 + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
                 + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
                 + "WHERE patient.npasp= ? AND c_otd.id_gosp = ?;";
@@ -656,9 +656,9 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void updateStage(final TStage stage) throws KmiacServerException {
-        final int[] indexes = {4, 5, 2, 3};
+        final int[] indexes = {4, 5, 2, 3, 0};
         String sqlQuery = "UPDATE c_etap SET date_start = ?, date_end = ?, stl = ?, mes = ? "
-            + "WHERE id_gosp = ?";
+            + "WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, stage, STAGE_TYPES, indexes);
             sme.setCommit();
@@ -675,6 +675,22 @@ public class ServerHospital extends Server implements Iface {
             sme.execPrepared(sqlQuery, false, idStage);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getStagesClassifier(final int idGosp)
+            throws KmiacServerException {
+        final String sqlQuery = "SELECT n_etp.pcod, n_etp.name FROM n_etp "
+            + "INNER JOIN c_otd ON c_otd.stat_type = n_etp.tip "
+            + "WHERE id_gosp = ? ";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmStagesClassifier =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
+            return rsmStagesClassifier.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }

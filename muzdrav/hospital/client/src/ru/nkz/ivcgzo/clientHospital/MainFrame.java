@@ -21,6 +21,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -211,12 +212,12 @@ public class MainFrame extends JFrame {
     private JButton btnAddStage;
     private JButton btnUpdateStage;
     private JButton btnDeleteStage;
-    private JLabel lblNewLabel;
-    private JComboBox textField;
-    private JComboBox textField_1;
-    private JLabel lblNewLabel_2;
-    private JLabel lblNewLabel_1;
-    private JTextField textField_2;
+    private JLabel lblVidPom;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidPom;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxDefect;
+    private JLabel lblDefect;
+    private JLabel lblUkl;
+    private JTextField tfUkl;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -448,7 +449,7 @@ public class MainFrame extends JFrame {
         tfChamber = new JTextField();
         tfChamber.setColumns(15);
 
-        lblStatus = new JLabel("Статус");
+        lblStatus = new JLabel("Тип стационара");
         tfStatus = new JTextField();
         tfStatus.setEditable(false);
         tfStatus.setColumns(15);
@@ -501,6 +502,7 @@ public class MainFrame extends JFrame {
         });
 
         btnMedication = new JButton("Медицинские назначения");
+        btnMedication.setVisible(false);
         btnMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
@@ -566,7 +568,9 @@ public class MainFrame extends JFrame {
             tfOms.setText(patient.getOms());
             tfDms.setText(patient.getDms());
             tfChamber.setText(String.valueOf(patient.getChamber()));
-            tfStatus.setText(String.valueOf(patient.getStatus()));
+            if (patient.getStatus() != null) {
+                tfStatus.setText(patient.getStatus());
+            }
             tfWork.setText(patient.getJob());
             tfRegistrationAddress.setText(patient.getRegistrationAddress());
             tfRealAddress.setText(patient.getRealAddress());
@@ -1385,8 +1389,8 @@ public class MainFrame extends JFrame {
             "Этап", 3, "МЭС");
         tbStages.setDateField(0);
         tbStages.setDateField(1);
-        tbStages.setIntegerClassifierSelector(2, new ArrayList<IntegerClassifier>());
-        tbStages.setStringClassifierSelector(3, new ArrayList<StringClassifier>());
+        tbStages.setIntegerClassifierSelector(2, IntegerClassifiers.n_etp);
+//        tbStages.setStringClassifierSelector(3, new ArrayList<StringClassifier>());
         spStageTable.setViewportView(tbStages);
     }
 
@@ -1623,18 +1627,20 @@ public class MainFrame extends JFrame {
     }
 
     private void setZaklComboboxes() {
-        lblNewLabel = new JLabel("Вид помощи");
-        
-        textField = new JComboBox();
-        
-        textField_1 = new JComboBox();
-        
-        lblNewLabel_2 = new JLabel("Дефекты доп. этапа");
-        
-        lblNewLabel_1 = new JLabel("УКЛ");
-        
-        textField_2 = new JTextField();
-        textField_2.setColumns(10);
+        lblVidPom = new JLabel("Вид помощи");
+
+        cbxVidPom = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
+                IntegerClassifiers.n_vp1);
+
+        cbxDefect = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
+                IntegerClassifiers.n_def);
+
+        lblDefect = new JLabel("Дефекты доп. этапа");
+
+        lblUkl = new JLabel("УКЛ");
+
+        tfUkl = new JTextField();
+        tfUkl.setColumns(10);
         cbxIshod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxResult = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
     }
@@ -1645,13 +1651,17 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 try {
                     if ((patient != null)
-                            && (cbxIshod.getSelectedItem() != null)
-                            && (cbxResult.getSelectedItem() != null)) {
+                            && (((cbxIshod.getSelectedItem() != null)
+                                    && (cbxResult.getSelectedItem() != null))
+                                ||  ((cbxIshod.getSelectedPcod() == 2)
+                                    && (cbxResult.getSelectedItem() == null)))) {
                         Zakl tmpZakl = new Zakl();
                         tmpZakl.setRecom(taRecomend.getText());
                         tmpZakl.setSostv(taZakluch.getText());
                         tmpZakl.setIshod(cbxIshod.getSelectedPcod());
-                        tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        if (cbxResult.getSelectedItem() != null) {
+                            tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        }
                         tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                         tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                         tmpZakl.setIdGosp(patient.getGospitalCod());
@@ -2026,10 +2036,10 @@ public class MainFrame extends JFrame {
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblZakluch)
                         .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                        .addComponent(lblNewLabel)
-                        .addComponent(lblNewLabel_2)
-                        .addComponent(textField, 0, 701, Short.MAX_VALUE)
-                        .addComponent(textField_1, 0, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                        .addComponent(lblVidPom)
+                        .addComponent(lblDefect)
+                        .addComponent(cbxVidPom, 0, 701, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                         .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblResult)
                         .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
@@ -2042,8 +2052,8 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.UNRELATED)
                             .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                         .addComponent(lblIshod)
-                        .addComponent(lblNewLabel_1)
-                        .addComponent(textField_2))
+                        .addComponent(lblUkl)
+                        .addComponent(tfUkl))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
@@ -2073,17 +2083,17 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
                             .addGap(1)
-                            .addComponent(lblNewLabel)
+                            .addComponent(lblVidPom)
                             .addGap(1)
-                            .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbxVidPom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addGap(4)
-                            .addComponent(lblNewLabel_2)
+                            .addComponent(lblDefect)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbxDefect, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(lblNewLabel_1)
+                            .addComponent(lblUkl)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfUkl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)
