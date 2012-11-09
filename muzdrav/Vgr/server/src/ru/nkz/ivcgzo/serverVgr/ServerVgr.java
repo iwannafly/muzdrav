@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.serverManager.common.DbfMapper;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -94,7 +95,7 @@ public class ServerVgr extends Server implements Iface {
 		LgotTypes = new Class<?>[] {               Integer.class,Integer.class};
 		
 		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr",       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl", "osp");
-		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class,Integer.class};
+		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class,Integer.class};
 		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
 		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
@@ -191,7 +192,7 @@ throw new TException(e);
 	@Override
 	public List<ru.nkz.ivcgzo.thriftVgr.RdPatient> getRdPatient()
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit as uid,rd.npasp,p.fam as fam, p.im as im, p.ot as ot, p.datar,p.docser,p.docnum,p.adp_gorod as tavn,p.adp_ul as street,  "+
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT rd.id_pvizit as uid,rd.npasp,p.fam as fam, p.im as im, p.ot as ot, p.datar,p.docser,p.docnum,p.adp_gorod as tawn,p.adp_ul as street,  "+
 "p.adp_dom as house,p.adp_kv as flat,p.poms_ser,p.poms_nom,p.poms_ndog as dog,a.stat,n.clpu as lpup,p.terp,p.adm_gorod as ftawn, p.adm_ul as fstreet, "+ 
 "p.adm_dom as fhouse, p.adm_kv as fflat,s.grup as grk,s.ph as rez, p.tel as telm,s.vred,rd.deti,rd.datay,rd.yavka1,rd.datazs, "+
 "vr.fam as famv,vr.im as imv,vr.ot as otv,rd.datasn,rd.shet,rd.kolrod,rd.abort,rd.vozmen,rd.prmen,rd.datam,rd.kont, "+ 
@@ -221,7 +222,7 @@ throw new TException(e);
 		Date p1; Date p2; Date p3; Date p4; Date p5; Date p6; Date p7;
 		Date p8; Date p9; Date p10;
 		Integer ball1;Integer ball2;Integer ball3;
-		Integer ball4;Integer ball5;Integer grk;
+		Integer ball4;Integer ball5;Integer grk;Integer tawn=0;Integer ftawn=0;
 		Integer kod2; Integer kod3; Integer kod4;Integer kod5;
 		Integer kod6; Integer kod7; Integer kod8; Integer kod9;
 		Integer j = 0;Integer hr; Integer disp1;
@@ -351,6 +352,22 @@ throw new TException(e);
 		p5 = new Date(rdp.datasn);
 		p6 = new Date(rdp.datam);
 		p8 = new Date(System.currentTimeMillis());
+		try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("select kdnpt from n_l00  where nam_kem=?",rdp.tawn)) {
+			if (acrs21.getResultSet().next()){
+			tawn = acrs21.getResultSet().getInt(1);
+			}
+			} catch (SQLException e) {
+				((SQLException) e.getCause()).printStackTrace();
+				throw new KmiacServerException();
+			}
+		try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("select kdnpt from n_l00  where nam_kem=?",rdp.ftawn)) {
+			if (acrs21.getResultSet().next()){
+			ftawn = acrs21.getResultSet().getInt(1);
+			}
+			} catch (SQLException e) {
+				((SQLException) e.getCause()).printStackTrace();
+				throw new KmiacServerException();
+			}
 		risk = 0;kontr = 0;	rod = 0;
 		grot = 0; hsm = 0; hdr = 0; hal = 0;
 		pr = 0; ek = 0; ru = 0;
@@ -390,7 +407,8 @@ throw new TException(e);
 		System.out.println(rdp.fam);		
 		//		Encoded.Base64(rdp.fam,35,fam);
 		sb.append("<br>");
-		sb.append(String.format("%d;%s;%s;%s;%td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s %s %s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,rdp.tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,rdp.ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
+//		sb.append(String.format("%d;%s;%s;%s;%td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s;%s;%s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
+		sb.append(String.format("%d;%s;%s;%s;%td.%5$tm.%5$tY;%s %s;%d;%d;%d;%s;%s;%s;%s%s;%s;%d;%d;%d;%d;%d;%d;%s;%s;%s;%s;%s;%s;%d;%s", rdp.uid, rdp.fam, rdp.im, rdp.ot, p7,rdp.docser,rdp.docnum,rdp.terpr,rdp.oblpr,tawn,rdp.street,rdp.house,rdp.flat,rdp.poms_ser,rdp.poms_nom,rdp.dog,rdp.stat,rdp.lpup,rdp.terp,rdp.terpr,rdp.oblpr,ftawn,rdp.fstreet,rdp.fhouse,rdp.fflat,rdp.fstreet,rdp.fhouse,rdp.fflat,grk,rdp.rez));		
 		System.out.println(sb);		
  		
         ves = rdp.vesd;
@@ -470,12 +488,12 @@ throw new TException(e);
 				if (acrs21.getResultSet().getString(1).substring(0, 2) == "B20") kod8 =  kod8+2048;
 				if (acrs21.getResultSet().getString(1) == "M95.5") kod8 =  kod8+4098;
 				if (acrs21.getResultSet().getString(1).substring(0, 1) == "M3") kod8 =  kod8+8196;
-				}
 				if (k1 >=3) kod6 = kod6+1;
 				if ((k2+k3+k4+k5+k6+k7+k8+k9+k10)>=3) kod6 = kod6 + 2;
 				if (k3>0) kod6 = kod6 + 4;
 				if (k4>0) kod6 = kod6 + 8;
 				if (kod2 == 1) kod6 = kod6 + 512;
+				}
 				} catch (SQLException e) {
 				((SQLException) e.getCause()).printStackTrace();
 				throw new KmiacServerException();
