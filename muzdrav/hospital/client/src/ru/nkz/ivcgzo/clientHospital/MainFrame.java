@@ -1623,6 +1623,7 @@ public class MainFrame extends JFrame {
 
     private void addStageTablePanel() {
         spStageTable = new JScrollPane();
+        spStageTable.setBorder(new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
         pStage.add(spStageTable);
 
         tbStages = new CustomTable<TStage, TStage._Fields>(
@@ -1631,7 +1632,6 @@ public class MainFrame extends JFrame {
         tbStages.setDateField(0);
         tbStages.setDateField(1);
         tbStages.setIntegerClassifierSelector(2, IntegerClassifiers.n_etp);
-//        tbStages.setStringClassifierSelector(3, new ArrayList<StringClassifier>());
         spStageTable.setViewportView(tbStages);
     }
 
@@ -1755,8 +1755,7 @@ public class MainFrame extends JFrame {
                 List<TStage> tmpStages =
                     ClientHospital.tcl.getStage(patient.getGospitalCod());
                 if (tmpStages.size() > 0) {
-                    tbStages.setData(
-                        ClientHospital.tcl.getStage(patient.getGospitalCod()));
+                    tbStages.setData(tmpStages);
                 } else {
                     tbStages.setData(Collections.<TStage>emptyList());
                 }
