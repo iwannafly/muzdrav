@@ -1173,9 +1173,6 @@ public class MainFrame extends JFrame {
 
     private void addJalonPanel() {
         pnJalob = new JPanel();
-        tbpMedicalHistory.addTab("Жалобы", null, pnJalob, null);
-        tbpMedicalHistory.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
-        ((JLabel) tbpMedicalHistory.getTabComponentAt(0)).setForeground(selCol);
         pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnJalob.setLayout(new BoxLayout(pnJalob, BoxLayout.Y_AXIS));
 
@@ -1184,12 +1181,13 @@ public class MainFrame extends JFrame {
         taJalob.setLineWrap(true);
         taJalob.setWrapStyleWord(true);
         pnJalob.add(taJalob);
+
+        tbpMedicalHistory.addTab("Жалобы", null, pnJalob, null);
+        tbpMedicalHistory.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
+        ((JLabel) tbpMedicalHistory.getTabComponentAt(0)).setForeground(selCol);
     }
 
     private void addDesiaseHistoryPanel() {
-        tbpMedicalHistory.addTab("История болезни", null, pnDesiaseHistory, null);
-        tbpMedicalHistory.setTabComponentAt(
-            1, new JLabel("<html><br>История болезни<br><br></html>"));
         pnDesiaseHistory = new JPanel();
         pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnDesiaseHistory.setLayout(new BoxLayout(pnDesiaseHistory, BoxLayout.X_AXIS));
@@ -1200,13 +1198,13 @@ public class MainFrame extends JFrame {
         taDesiaseHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnDesiaseHistory.add(taDesiaseHistory);
 
+        tbpMedicalHistory.addTab("История болезни", null, pnDesiaseHistory, null);
+        tbpMedicalHistory.setTabComponentAt(
+            1, new JLabel("<html><br>История болезни<br><br></html>"));
+
     }
 
     private void addStatusPraencePanel() {
-        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
-                null, pnStatusPraence, null);
-        tbpMedicalHistory.setTabComponentAt(
-            2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
         pnStatusPraence = new JPanel();
         pnStatusPraence.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusPraence.setLayout(new BoxLayout(pnStatusPraence, BoxLayout.X_AXIS));
@@ -1216,12 +1214,14 @@ public class MainFrame extends JFrame {
         taStatusPraence.setWrapStyleWord(true);
         taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnStatusPraence.add(taStatusPraence);
+
+        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
+            null, pnStatusPraence, null);
+        tbpMedicalHistory.setTabComponentAt(
+            2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
     }
 
     private void addFisicalObsPanel() {
-        tbpMedicalHistory.addTab("Физикальное обследование", null, pnFisicalObs, null);
-        tbpMedicalHistory.setTabComponentAt(
-            3, new JLabel("<html><br>Физикальное обследование<br><br></html>"));
         pnFisicalObs = new JPanel();
         pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnFisicalObs.setLayout(new BoxLayout(pnFisicalObs, BoxLayout.X_AXIS));
@@ -1231,13 +1231,13 @@ public class MainFrame extends JFrame {
         taFisicalObs.setWrapStyleWord(true);
         taFisicalObs.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnFisicalObs.add(taFisicalObs);
+
+        tbpMedicalHistory.addTab("Физикальное обследование", null, pnFisicalObs, null);
+        tbpMedicalHistory.setTabComponentAt(
+            3, new JLabel("<html><br>Физикальное обследование<br><br></html>"));
     }
 
     private void addStausLocalisPanel() {
-        tbpMedicalHistory.addTab("Локальный статус (Status localis)",
-            null, pnStatusLocalis, null);
-        tbpMedicalHistory.setTabComponentAt(
-            4, new JLabel("<html><br>Локальный статус (Status localis)<br><br></html>"));
         pnStatusLocalis = new JPanel();
         pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusLocalis.setLayout(new BoxLayout(pnStatusLocalis, BoxLayout.X_AXIS));
@@ -1246,6 +1246,11 @@ public class MainFrame extends JFrame {
         taStatusLocalis.setWrapStyleWord(true);
         taStatusLocalis.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnStatusLocalis.add(taStatusLocalis);
+
+        tbpMedicalHistory.addTab("Локальный статус (Status localis)",
+            null, pnStatusLocalis, null);
+        tbpMedicalHistory.setTabComponentAt(
+            4, new JLabel("<html><br>Локальный статус (Status localis)<br><br></html>"));
     }
 
     private void clearMedicalHistory() {
