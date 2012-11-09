@@ -1025,11 +1025,12 @@ public class GenReestr extends Server implements Iface {
 					sb.append("<br>Информация об ошибках: <br><br>");
 					
 					ResultSet rs = acrs.getResultSet();
-					if (rs.getInt("vid_rstr") != 2 && rs.getInt("kl_usl") != 2){
-						sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
-		   				osw.write(sb.toString());
-						return path;
-					}
+					if (rs.next())
+						if (rs.getInt("vid_rstr") != 2 && rs.getInt("kl_usl") != 2){
+							sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
+			   				osw.write(sb.toString());
+							return path;
+						}
 					while (rs.next()){
 						int kr = rs.getInt("kod_rez");
 						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
@@ -1109,11 +1110,12 @@ public class GenReestr extends Server implements Iface {
 					sb.append("<br>Информация об ошибках: <br><br>");
 					
 					ResultSet rs = acrs.getResultSet();
-					if (rs.getInt("vid_rstr") != 2 && (rs.getInt("kl_usl") != 2 || rs.getInt("kl_usl") != 9)){
-						sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
-		   				osw.write(sb.toString());
-						return path;
-					}
+					if (rs.next())
+						if (rs.getInt("vid_rstr") != 2 && (rs.getInt("kl_usl") != 2 || rs.getInt("kl_usl") != 9)){
+							sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
+			   				osw.write(sb.toString());
+							return path;
+						}
 					while (rs.next()){
 						int kr = rs.getInt("kod_rez");
 						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
@@ -1209,11 +1211,11 @@ public class GenReestr extends Server implements Iface {
 					
 					ResultSet rs = acrs.getResultSet();
 					if (rs.next())
-					if (rs.getInt("vid_rstr") != 1 && (rs.getInt("kl_usl") != 1 || rs.getInt("kl_usl") != 3  || rs.getInt("kl_usl") != 8)){
-						sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
-		   				osw.write(sb.toString());
-						return path;
-					}
+						if (rs.getInt("vid_rstr") != 1 && (rs.getInt("kl_usl") != 1 || rs.getInt("kl_usl") != 3  || rs.getInt("kl_usl") != 8)){
+							sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
+							osw.write(sb.toString());
+							return path;
+						}
 					while (rs.next()){
 						int kr = rs.getInt("kod_rez");
 						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
