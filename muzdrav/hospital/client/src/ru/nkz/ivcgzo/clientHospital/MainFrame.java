@@ -21,12 +21,14 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
@@ -75,6 +77,10 @@ import java.awt.Component;
 import javax.swing.Box;
 import java.awt.Dimension;
 import javax.swing.JComboBox;
+import javax.swing.SwingConstants;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.JToolBar;
 
 public class MainFrame extends JFrame {
 
@@ -122,7 +128,7 @@ public class MainFrame extends JFrame {
     private TPriemInfo priemInfo;
     private JPanel pMedicalHistory;
     private JTabbedPane tbpMedicalHistory;
-    private CustomTextField tfShablonFilter;
+    private CustomTextField tfMedHShablonFilter;
     private JPanel pnStatusLocalis;
     private JPanel pnStatusPraence;
     private JPanel pnJalob;
@@ -133,8 +139,8 @@ public class MainFrame extends JFrame {
     private JTextArea taStatusPraence;
     private JTextArea taFisicalObs;
     private JTextArea taStatusLocalis;
-    private JScrollPane spShablonNames;
-    private ThriftIntegerClassifierList lShablonNames;
+    private JScrollPane spMedicalHistoryShablonNames;
+    private ThriftIntegerClassifierList lMedicalHistoryShablonNames;
     private JPanel pLifeHistory;
     private JLabel lblLifeHistory;
     private JScrollPane spLifeHistory;
@@ -211,12 +217,31 @@ public class MainFrame extends JFrame {
     private JButton btnAddStage;
     private JButton btnUpdateStage;
     private JButton btnDeleteStage;
-    private JLabel lblNewLabel;
-    private JComboBox textField;
-    private JComboBox textField_1;
-    private JLabel lblNewLabel_2;
-    private JLabel lblNewLabel_1;
-    private JTextField textField_2;
+    private JLabel lblVidPom;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidPom;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxDefect;
+    private JLabel lblDefect;
+    private JLabel lblUkl;
+    private JTextField tfUkl;
+    private JLabel lblLifeHistioryShablonHeader;
+    private Box vbLifeHistoryShablonComponents;
+    private Box vbLifeHistoryTextFields;
+    private Component hsLifeHistorySecond;
+    private Box hbLifeHistoryShablonFind;
+    private JButton btnLifeHistoryShablonFind;
+    private Component hsLifeHistoryThird;
+    private Component hsLifeHistoryFirst;
+    private Box vbMedicalHistoryTextFields;
+    private Box vbMedicalHistoryShablonComponents;
+    private JLabel lblMedicalHistioryShablonHeader;
+    private Box hbMedicalHistoryShablonFind;
+    private JButton btnMedicalHistoryShablonFind;
+    private Box hbMedicalHistoryTableControls;
+    private Box vbMedicalHistoryTableButtons;
+    private Component hsMedicalHistorySecond;
+    private Component hsMedicalHistoryFirst;
+    private Component hsMedicalHistoryThird;
+    private Component vsMedicalHistoryControlsDelim;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuth = authInfo;
@@ -233,7 +258,7 @@ public class MainFrame extends JFrame {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void setTabbedPane() {
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tabbedPane);
         setPatientInfoPanel();
@@ -247,7 +272,7 @@ public class MainFrame extends JFrame {
     public final void onConnect() {
         createModalFrames();
         try {
-            lShablonNames.setData(ClientHospital.tcl.getShablonNames(
+            lMedicalHistoryShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lLifeHistoryShabloNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
@@ -448,7 +473,7 @@ public class MainFrame extends JFrame {
         tfChamber = new JTextField();
         tfChamber.setColumns(15);
 
-        lblStatus = new JLabel("Статус");
+        lblStatus = new JLabel("Профиль отделения");
         tfStatus = new JTextField();
         tfStatus.setEditable(false);
         tfStatus.setColumns(15);
@@ -501,6 +526,7 @@ public class MainFrame extends JFrame {
         });
 
         btnMedication = new JButton("Медицинские назначения");
+        btnMedication.setVisible(false);
         btnMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
@@ -566,7 +592,9 @@ public class MainFrame extends JFrame {
             tfOms.setText(patient.getOms());
             tfDms.setText(patient.getDms());
             tfChamber.setText(String.valueOf(patient.getChamber()));
-            tfStatus.setText(String.valueOf(patient.getStatus()));
+            if (patient.getStatus() != null) {
+                tfStatus.setText(patient.getStatus());
+            }
             tfWork.setText(patient.getJob());
             tfRegistrationAddress.setText(patient.getRegistrationAddress());
             tfRealAddress.setText(patient.getRealAddress());
@@ -646,32 +674,76 @@ public class MainFrame extends JFrame {
 
     private void setLifeHistoryPanel() {
         pLifeHistory = new JPanel();
+        pLifeHistory.setLayout(new BoxLayout(pLifeHistory, BoxLayout.X_AXIS));
         tabbedPane.addTab("История жизни", null, pLifeHistory, null);
+
+        hsLifeHistoryFirst = Box.createHorizontalStrut(5);
+        pLifeHistory.add(hsLifeHistoryFirst);
+
+        setLifeHistoryVerticalTextPanels();
+
+        hsLifeHistorySecond = Box.createHorizontalStrut(5);
+        pLifeHistory.add(hsLifeHistorySecond);
+
+        setLifeHistoryVerticalShablonPanel();
+
+        hsLifeHistoryThird = Box.createHorizontalStrut(5);
+        pLifeHistory.add(hsLifeHistoryThird);
+    }
+
+    private void setLifeHistoryVerticalTextPanels() {
+        vbLifeHistoryTextFields = Box.createVerticalBox();
+        vbLifeHistoryTextFields.setPreferredSize(new Dimension(500, 0));
+        vbLifeHistoryTextFields.setAlignmentX(Component.LEFT_ALIGNMENT);
+        vbLifeHistoryTextFields.setBorder(
+                new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+        pLifeHistory.add(vbLifeHistoryTextFields);
+
         setLifeHistoryTextAreas();
-        setLifeHistoryShablonComponents();
         setLifeHistoryButtons();
-        setLifeHistoryPanelGroupLayout();
     }
 
     private void setLifeHistoryTextAreas() {
+        setLifeHistoryScrollPane();
+        setAllergoScrollPane();
+        setFarmoScrollPane();
+    }
+
+    private void setLifeHistoryScrollPane() {
         lblLifeHistory = new JLabel("История жизни");
+        lblLifeHistory.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblLifeHistory.setFont(new Font("Tahoma", Font.BOLD, 13));
+        vbLifeHistoryTextFields.add(lblLifeHistory);
         spLifeHistory = new JScrollPane();
+        vbLifeHistoryTextFields.add(spLifeHistory);
         taLifeHistory = new JTextArea();
+        spLifeHistory.setViewportView(taLifeHistory);
         taLifeHistory.setLineWrap(true);
         taLifeHistory.setWrapStyleWord(true);
         taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        spLifeHistory.setViewportView(taLifeHistory);
+    }
 
+    private void setAllergoScrollPane() {
         lblAllergo = new JLabel("Аллергоанамнез");
+        lblAllergo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblAllergo.setFont(new Font("Tahoma", Font.BOLD, 13));
+        vbLifeHistoryTextFields.add(lblAllergo);
         spAllergo = new JScrollPane();
+        vbLifeHistoryTextFields.add(spAllergo);
         taAllergo = new JTextArea();
         taAllergo.setWrapStyleWord(true);
         taAllergo.setLineWrap(true);
         taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spAllergo.setViewportView(taAllergo);
+    }
 
+    private void setFarmoScrollPane() {
         lblFarmo = new JLabel("Фармоанамнез");
+        lblFarmo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblFarmo.setFont(new Font("Tahoma", Font.BOLD, 13));
+        vbLifeHistoryTextFields.add(lblFarmo);
         spFarmo = new JScrollPane();
+        vbLifeHistoryTextFields.add(spFarmo);
         taFarmo = new JTextArea();
         taFarmo.setLineWrap(true);
         taFarmo.setWrapStyleWord(true);
@@ -679,46 +751,13 @@ public class MainFrame extends JFrame {
         spFarmo.setViewportView(taFarmo);
     }
 
-    private void clearLifeHistoryText() {
-        taLifeHistory.setText("");
-        taAllergo.setText("");
-        taFarmo.setText("");
-    }
-
-    private void setLifeHistoryShablonComponents() {
-        spLifeHShablonNames = new JScrollPane();
-        lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
-        lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
-        lLifeHistoryShabloNames.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    if (lShablonNames.getSelectedValue() != null) {
-                        try {
-                            pasteSelectedLifeHShablon(ClientHospital.tcl.getShablon(
-                                lShablonNames.getSelectedValue().pcod));
-                        } catch (KmiacServerException e1) {
-                            JOptionPane.showMessageDialog(MainFrame.this,
-                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        } catch (TException e1) {
-                            ClientHospital.conMan.reconnect(e1);
-                        }
-                    }
-                }
-            }
-        });
-        spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
-
-
-        tfLifeHShablonFilter = new CustomTextField(true, true, false);
-        lifeHiSearchListener =
-                new ShablonSearchListener(tfLifeHShablonFilter, lLifeHistoryShabloNames);
-        tfLifeHShablonFilter.getDocument().addDocumentListener(lifeHiSearchListener);
-        tfLifeHShablonFilter.setColumns(10);
-    }
-
     private void setLifeHistoryButtons() {
         btnSaveLifeHistory = new JButton("Сохранить");
+        btnSaveLifeHistory.setMaximumSize(new Dimension(350, 40));
+        btnSaveLifeHistory.setPreferredSize(new Dimension(350, 40));
+        btnSaveLifeHistory.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnSaveLifeHistory.setFont(new Font("Tahoma", Font.BOLD, 11));
+        vbLifeHistoryTextFields.add(btnSaveLifeHistory);
         btnSaveLifeHistory.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
@@ -738,6 +777,88 @@ public class MainFrame extends JFrame {
                     JOptionPane.showMessageDialog(MainFrame.this, "Ошибка при "
                             + "изменении истории жизни. Информация не будет сохранена!",
                             "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+    }
+
+    private void clearLifeHistoryText() {
+        taLifeHistory.setText("");
+        taAllergo.setText("");
+        taFarmo.setText("");
+    }
+
+    private void setLifeHistoryVerticalShablonPanel() {
+        vbLifeHistoryShablonComponents = Box.createVerticalBox();
+        vbLifeHistoryShablonComponents.setBorder(
+            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+        vbLifeHistoryShablonComponents.setPreferredSize(new Dimension(300, 0));
+        pLifeHistory.add(vbLifeHistoryShablonComponents);
+
+        setLifeHistoryShablonLabel();
+        setLifeHistoryShablonHorizontalBox();
+        setLifeHistoryShablonScrollPane();
+    }
+
+    private void setLifeHistoryShablonLabel() {
+        lblLifeHistioryShablonHeader = new JLabel("Строка поиска шаблона");
+        lblLifeHistioryShablonHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblLifeHistioryShablonHeader.setFont(new Font("Tahoma", Font.BOLD, 13));
+        vbLifeHistoryShablonComponents.add(lblLifeHistioryShablonHeader);
+        lblLifeHistioryShablonHeader.setHorizontalTextPosition(SwingConstants.LEFT);
+        lblLifeHistioryShablonHeader.setHorizontalAlignment(SwingConstants.LEFT);
+    }
+
+    private void setLifeHistoryShablonHorizontalBox() {
+        hbLifeHistoryShablonFind = Box.createHorizontalBox();
+        hbLifeHistoryShablonFind.setAlignmentY(Component.CENTER_ALIGNMENT);
+        vbLifeHistoryShablonComponents.add(hbLifeHistoryShablonFind);
+
+        setLifeHistoryShablonTextField();
+        setLifeHistoryShablonButton();
+    }
+
+    private void setLifeHistoryShablonTextField() {
+        tfLifeHShablonFilter = new CustomTextField(true, true, false);
+        tfLifeHShablonFilter.setMaximumSize(new Dimension(450, 50));
+        hbLifeHistoryShablonFind.add(tfLifeHShablonFilter);
+        tfLifeHShablonFilter.getDocument().addDocumentListener(lifeHiSearchListener);
+        tfLifeHShablonFilter.setColumns(10);
+        lifeHiSearchListener =
+            new ShablonSearchListener(tfLifeHShablonFilter, lLifeHistoryShabloNames);
+    }
+
+    private void setLifeHistoryShablonButton() {
+        btnLifeHistoryShablonFind = new JButton("Найти");
+        hbLifeHistoryShablonFind.add(btnLifeHistoryShablonFind);
+    }
+
+    private void setLifeHistoryShablonScrollPane() {
+        spLifeHShablonNames = new JScrollPane();
+        vbLifeHistoryShablonComponents.add(spLifeHShablonNames);
+
+        setLifeHistoryShablonList();
+    }
+
+    private void setLifeHistoryShablonList() {
+        lLifeHistoryShabloNames = new ThriftIntegerClassifierList();
+        spLifeHShablonNames.setViewportView(lLifeHistoryShabloNames);
+        lLifeHistoryShabloNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        lLifeHistoryShabloNames.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lMedicalHistoryShablonNames.getSelectedValue() != null) {
+                        try {
+                            pasteSelectedLifeHShablon(ClientHospital.tcl.getShablon(
+                                lMedicalHistoryShablonNames.getSelectedValue().pcod));
+                        } catch (KmiacServerException e1) {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        } catch (TException e1) {
+                            ClientHospital.conMan.reconnect(e1);
+                        }
+                    }
                 }
             }
         });
@@ -800,17 +921,138 @@ public class MainFrame extends JFrame {
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
         tabbedPane.addTab("Дневник", null, pMedicalHistory, null);
-        setMedicalHistoryTabs();
-        setMedicalHistoryTablePanel();
-        setMedicalHistoryTableButtons();
-        setMedicalHistoryShablonComponents();
-        setMedicalHistoryButtons();
-        setMedicalHistoryPanelGroupLayout();
+        pMedicalHistory.setLayout(new BoxLayout(pMedicalHistory, BoxLayout.X_AXIS));
+
+        hsMedicalHistoryFirst = Box.createHorizontalStrut(5);
+        pMedicalHistory.add(hsMedicalHistoryFirst);
+
+        setMedicalHistoryVerticalTextComponents();
+
+        hsMedicalHistorySecond = Box.createHorizontalStrut(5);
+        pMedicalHistory.add(hsMedicalHistorySecond);
+
+        setMedicalHistoryVerticalShablonPanel();
+
+        hsMedicalHistoryThird = Box.createHorizontalStrut(5);
+        pMedicalHistory.add(hsMedicalHistoryThird);
     }
 
-    private void setMedicalHistoryTabs() {
+    private void setMedicalHistoryVerticalTextComponents() {
+        vbMedicalHistoryTextFields = Box.createVerticalBox();
+        vbMedicalHistoryTextFields.setBorder(
+            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+        vbMedicalHistoryTextFields.setPreferredSize(new Dimension(500, 0));
+        pMedicalHistory.add(vbMedicalHistoryTextFields);
+
+        setMedicalHistoryHorizontalTableComponents();
+        setMedicalHistoryTabPaneComponents();
+    }
+
+    private void setMedicalHistoryHorizontalTableComponents() {
+        hbMedicalHistoryTableControls = Box.createHorizontalBox();
+        hbMedicalHistoryTableControls.setBorder(
+            new MatteBorder(0, 0, 1, 0, (Color) new Color(0, 0, 0)));
+        vbMedicalHistoryTextFields.add(hbMedicalHistoryTableControls);
+
+        setMedicalHistoryTableScrollPane();
+        setMedicalHistoryTableButtonsPanel();
+    }
+
+    private void setMedicalHistoryTableScrollPane() {
+        spMedHist = new JScrollPane();
+        spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
+        spMedHist.setPreferredSize(new Dimension(300, 400));
+        hbMedicalHistoryTableControls.add(spMedHist);
+
+        addMedicalHistoryTable();
+    }
+
+    private void addMedicalHistoryTable() {
+        tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
+                true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
+        spMedHist.setViewportView(tbMedHist);
+        tbMedHist.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (tbMedHist.getSelectedItem() != null) {
+                    setMedicalHistoryText();
+                }
+            }
+        });
+        tbMedHist.setDateField(0);
+        tbMedHist.setTimeField(1);
+    }
+
+    private void setMedicalHistoryTableButtonsPanel() {
+        vbMedicalHistoryTableButtons = Box.createVerticalBox();
+        hbMedicalHistoryTableControls.add(vbMedicalHistoryTableButtons);
+
+        addMedicalHistoryButtons();
+    }
+
+    private void addMedicalHistoryButtons() {
+        addMedicalHistoryAddButton();
+        addMedicalHistoryDeleteButton();
+        addMedicalHistoryUpdateButton();
+    }
+
+    private void addMedicalHistoryAddButton() {
+        btnMedHistAdd = new JButton();
+        btnMedHistAdd.setPreferredSize(new Dimension(50, 50));
+        btnMedHistAdd.setMaximumSize(new Dimension(50, 50));
+        vbMedicalHistoryTableButtons.add(btnMedHistAdd);
+        btnMedHistAdd.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                addMedHistoryToTable();
+            }
+        });
+        btnMedHistAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+    }
+
+    private void addMedicalHistoryDeleteButton() {
+        btnMedHistDel = new JButton();
+        btnMedHistDel.setMaximumSize(new Dimension(50, 50));
+        btnMedHistDel.setPreferredSize(new Dimension(50, 50));
+        vbMedicalHistoryTableButtons.add(btnMedHistDel);
+        btnMedHistDel.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                deleteMedHistoryFormTable();
+            }
+        });
+        btnMedHistDel.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
+    }
+
+    private void addMedicalHistoryUpdateButton() {
+        btnMedHistUpd = new JButton();
+        btnMedHistUpd.setPreferredSize(new Dimension(50, 50));
+        btnMedHistUpd.setMaximumSize(new Dimension(50, 50));
+        vbMedicalHistoryTableButtons.add(btnMedHistUpd);
+        btnMedHistUpd.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                updateMedHistoryToTable();
+            }
+        });
+        btnMedHistUpd.setIcon(new ImageIcon(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
+    }
+
+
+    private void setMedicalHistoryTabPaneComponents() {
+        vsMedicalHistoryControlsDelim = Box.createVerticalStrut(20);
+        vbMedicalHistoryTextFields.add(vsMedicalHistoryControlsDelim);
+
+        addMedicalHistoryTabbedPane();
+    }
+
+    private void addMedicalHistoryTabbedPane() {
         tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
+        tbpMedicalHistory.setBorder(new MatteBorder(1, 0, 0, 0, (Color) new Color(0, 0, 0)));
+        tbpMedicalHistory.setPreferredSize(new Dimension(500, 400));
+        vbMedicalHistoryTextFields.add(tbpMedicalHistory);
         tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        setMedicalHistoryTabs();
         tbpMedicalHistory.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
@@ -826,57 +1068,14 @@ public class MainFrame extends JFrame {
                 }
             }
         });
+    }
+
+    private void setMedicalHistoryTabs() {
         addJalonPanel();
         addDesiaseHistoryPanel();
         addStatusPraencePanel();
         addFisicalObsPanel();
         addStausLocalisPanel();
-    }
-
-    private void setMedicalHistoryTablePanel() {
-        spMedHist = new JScrollPane();
-        tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
-                true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
-        tbMedHist.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (tbMedHist.getSelectedItem() != null) {
-                    setMedicalHistoryText();
-                }
-            }
-        });
-        tbMedHist.setDateField(0);
-        tbMedHist.setTimeField(1);
-        spMedHist.setViewportView(tbMedHist);
-    }
-
-    private void setMedicalHistoryTableButtons() {
-        btnMedHistUpd = new JButton();
-        btnMedHistUpd.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                updateMedHistoryToTable();
-            }
-        });
-        btnMedHistUpd.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
-
-        btnMedHistDel = new JButton();
-        btnMedHistDel.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                deleteMedHistoryFormTable();
-            }
-        });
-        btnMedHistDel.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
-
-        btnMedHistAdd = new JButton();
-        btnMedHistAdd.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                addMedHistoryToTable();
-            }
-        });
-        btnMedHistAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
     }
 
     private void deleteMedHistoryFormTable() {
@@ -959,46 +1158,12 @@ public class MainFrame extends JFrame {
         taStatusPraence.setText(tbMedHist.getSelectedItem().getStatusPraesense());
     }
 
-    private void setMedicalHistoryShablonComponents() {
-        spShablonNames = new JScrollPane();
-        lShablonNames = new ThriftIntegerClassifierList();
-        lShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
-        lShablonNames.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    if (lShablonNames.getSelectedValue() != null) {
-                        try {
-                            pasteSelectedShablon(ClientHospital.tcl.getShablon(
-                                lShablonNames.getSelectedValue().pcod));
-                        } catch (KmiacServerException e1) {
-                            JOptionPane.showMessageDialog(MainFrame.this,
-                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                        } catch (TException e1) {
-                            ClientHospital.conMan.reconnect(e1);
-                        }
-                    }
-                }
-            }
-        });
-        spShablonNames.setViewportView(lShablonNames);
-
-
-        tfShablonFilter = new CustomTextField(true, true, false);
-        medHiSearchListener = new ShablonSearchListener(tfShablonFilter, lShablonNames);
-        tfShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
-        tfShablonFilter.setColumns(10);
-    }
-
-    private void setMedicalHistoryButtons() {
-    }
-
     private void addJalonPanel() {
         pnJalob = new JPanel();
-        pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("Жалобы", null, pnJalob, null);
         tbpMedicalHistory.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
         ((JLabel) tbpMedicalHistory.getTabComponentAt(0)).setForeground(selCol);
+        pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnJalob.setLayout(new BoxLayout(pnJalob, BoxLayout.Y_AXIS));
 
         taJalob = new JTextArea();
@@ -1009,11 +1174,11 @@ public class MainFrame extends JFrame {
     }
 
     private void addDesiaseHistoryPanel() {
-        pnDesiaseHistory = new JPanel();
-        pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("История болезни", null, pnDesiaseHistory, null);
         tbpMedicalHistory.setTabComponentAt(
-                1, new JLabel("<html><br>История болезни<br><br></html>"));
+            1, new JLabel("<html><br>История болезни<br><br></html>"));
+        pnDesiaseHistory = new JPanel();
+        pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnDesiaseHistory.setLayout(new BoxLayout(pnDesiaseHistory, BoxLayout.X_AXIS));
 
         taDesiaseHistory = new JTextArea();
@@ -1021,15 +1186,16 @@ public class MainFrame extends JFrame {
         taDesiaseHistory.setLineWrap(true);
         taDesiaseHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnDesiaseHistory.add(taDesiaseHistory);
+
     }
 
     private void addStatusPraencePanel() {
+        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
+                null, pnStatusPraence, null);
+        tbpMedicalHistory.setTabComponentAt(
+            2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
         pnStatusPraence = new JPanel();
         pnStatusPraence.setBorder(new LineBorder(new Color(0, 0, 0)));
-        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
-            null, pnStatusPraence, null);
-        tbpMedicalHistory.setTabComponentAt(
-                2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
         pnStatusPraence.setLayout(new BoxLayout(pnStatusPraence, BoxLayout.X_AXIS));
 
         taStatusPraence = new JTextArea();
@@ -1040,11 +1206,11 @@ public class MainFrame extends JFrame {
     }
 
     private void addFisicalObsPanel() {
-        pnFisicalObs = new JPanel();
-        pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("Физикальное обследование", null, pnFisicalObs, null);
         tbpMedicalHistory.setTabComponentAt(
             3, new JLabel("<html><br>Физикальное обследование<br><br></html>"));
+        pnFisicalObs = new JPanel();
+        pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnFisicalObs.setLayout(new BoxLayout(pnFisicalObs, BoxLayout.X_AXIS));
 
         taFisicalObs = new JTextArea();
@@ -1055,14 +1221,13 @@ public class MainFrame extends JFrame {
     }
 
     private void addStausLocalisPanel() {
-        pnStatusLocalis = new JPanel();
-        pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
         tbpMedicalHistory.addTab("Локальный статус (Status localis)",
             null, pnStatusLocalis, null);
         tbpMedicalHistory.setTabComponentAt(
             4, new JLabel("<html><br>Локальный статус (Status localis)<br><br></html>"));
+        pnStatusLocalis = new JPanel();
+        pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusLocalis.setLayout(new BoxLayout(pnStatusLocalis, BoxLayout.X_AXIS));
-
         taStatusLocalis = new JTextArea();
         taStatusLocalis.setLineWrap(true);
         taStatusLocalis.setWrapStyleWord(true);
@@ -1085,6 +1250,86 @@ public class MainFrame extends JFrame {
         taFisicalObs.setText("");
         taStatusLocalis.setText("");
         taStatusPraence.setText("");
+    }
+
+    private void setMedicalHistoryVerticalShablonPanel() {
+        vbMedicalHistoryShablonComponents = Box.createVerticalBox();
+        vbMedicalHistoryShablonComponents.setBorder(
+            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+        vbMedicalHistoryShablonComponents.setPreferredSize(new Dimension(300, 0));
+        pMedicalHistory.add(vbMedicalHistoryShablonComponents);
+
+        setMedicalHistoryShablonLabel();
+        setMedicalHistoryShablonHorizontalBox();
+        setMedicalHistoryShablonScrollPane();
+    }
+
+    private void setMedicalHistoryShablonLabel() {
+        lblMedicalHistioryShablonHeader = new JLabel("Строка поиска шаблона");
+        lblMedicalHistioryShablonHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblLifeHistioryShablonHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblMedicalHistioryShablonHeader.setFont(new Font("Tahoma", Font.BOLD, 13));
+        vbMedicalHistoryShablonComponents.add(lblMedicalHistioryShablonHeader);
+        lblMedicalHistioryShablonHeader.setHorizontalTextPosition(SwingConstants.LEFT);
+        lblMedicalHistioryShablonHeader.setHorizontalAlignment(SwingConstants.LEFT);
+    }
+
+    private void setMedicalHistoryShablonHorizontalBox() {
+        hbMedicalHistoryShablonFind = Box.createHorizontalBox();
+        vbMedicalHistoryShablonComponents.add(hbMedicalHistoryShablonFind);
+
+        setMedicalHistoryShablonTextField();
+        setMedicalHistoryShablonButton();
+    }
+
+    private void setMedicalHistoryShablonTextField() {
+        tfMedHShablonFilter = new CustomTextField(true, true, false);
+        tfMedHShablonFilter.setMaximumSize(new Dimension(450, 50));
+        hbMedicalHistoryShablonFind.add(tfMedHShablonFilter);
+        tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
+        tfMedHShablonFilter.setColumns(10);
+        medHiSearchListener =
+            new ShablonSearchListener(tfMedHShablonFilter, lMedicalHistoryShablonNames);
+    }
+
+    private void setMedicalHistoryShablonButton() {
+        btnMedicalHistoryShablonFind = new JButton("Найти");
+        btnMedicalHistoryShablonFind.setMinimumSize(new Dimension(63, 23));
+        btnMedicalHistoryShablonFind.setMaximumSize(new Dimension(63, 23));
+        btnMedicalHistoryShablonFind.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnMedicalHistoryShablonFind.setPreferredSize(new Dimension(63, 23));
+        hbMedicalHistoryShablonFind.add(btnMedicalHistoryShablonFind);
+    }
+
+    private void setMedicalHistoryShablonScrollPane() {
+        spMedicalHistoryShablonNames = new JScrollPane();
+        vbMedicalHistoryShablonComponents.add(spMedicalHistoryShablonNames);
+
+        setMedicalHistoryShablonList();
+    }
+
+    private void setMedicalHistoryShablonList() {
+        lMedicalHistoryShablonNames = new ThriftIntegerClassifierList();
+        spMedicalHistoryShablonNames.setViewportView(lMedicalHistoryShablonNames);
+        lMedicalHistoryShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
+        lMedicalHistoryShablonNames.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lMedicalHistoryShablonNames.getSelectedValue() != null) {
+                        try {
+                            pasteSelectedShablon(ClientHospital.tcl.getShablon(
+                                lMedicalHistoryShablonNames.getSelectedValue().pcod));
+                        } catch (KmiacServerException e1) {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        } catch (TException e1) {
+                            ClientHospital.conMan.reconnect(e1);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void pasteSelectedShablon(final Shablon shablon) {
@@ -1121,7 +1366,7 @@ public class MainFrame extends JFrame {
         if (patient != null) {
             try {
                 tbMedHist.setData(
-                        ClientHospital.tcl.getMedicalHistory((patient.getGospitalCod())));
+                        ClientHospital.tcl.getMedicalHistory(patient.getGospitalCod()));
             } catch (MedicalHistoryNotFoundException e) {
                 tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
             } catch (KmiacServerException e) {
@@ -1385,8 +1630,8 @@ public class MainFrame extends JFrame {
             "Этап", 3, "МЭС");
         tbStages.setDateField(0);
         tbStages.setDateField(1);
-        tbStages.setIntegerClassifierSelector(2, new ArrayList<IntegerClassifier>());
-        tbStages.setStringClassifierSelector(3, new ArrayList<StringClassifier>());
+        tbStages.setIntegerClassifierSelector(2, IntegerClassifiers.n_etp);
+//        tbStages.setStringClassifierSelector(3, new ArrayList<StringClassifier>());
         spStageTable.setViewportView(tbStages);
     }
 
@@ -1494,10 +1739,13 @@ public class MainFrame extends JFrame {
                     ClientHospital.tcl.updateStage(tbStages.getSelectedItem());
                 }
             }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
+        } catch (MesNotFoundException e) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Данного кода МЭС не существует!", "Ошибка!", JOptionPane.ERROR_MESSAGE);
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            ClientHospital.conMan.reconnect(e);
         }
     }
 
@@ -1591,7 +1839,7 @@ public class MainFrame extends JFrame {
         cdeZaklTime.setTime(new Date());
     }
 
-    private void setZaklTextAreas() {        
+    private void setZaklTextAreas() {
         spRecomend = new JScrollPane();
         lblRecomend = new JLabel("Рекомендации");
         taRecomend = new JTextArea();
@@ -1623,18 +1871,20 @@ public class MainFrame extends JFrame {
     }
 
     private void setZaklComboboxes() {
-        lblNewLabel = new JLabel("Вид помощи");
-        
-        textField = new JComboBox();
-        
-        textField_1 = new JComboBox();
-        
-        lblNewLabel_2 = new JLabel("Дефекты доп. этапа");
-        
-        lblNewLabel_1 = new JLabel("УКЛ");
-        
-        textField_2 = new JTextField();
-        textField_2.setColumns(10);
+        lblVidPom = new JLabel("Вид помощи");
+
+        cbxVidPom = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
+                IntegerClassifiers.n_vp1);
+
+        cbxDefect = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
+                IntegerClassifiers.n_def);
+
+        lblDefect = new JLabel("Дефекты доп. этапа");
+
+        lblUkl = new JLabel("УКЛ");
+
+        tfUkl = new JTextField();
+        tfUkl.setColumns(10);
         cbxIshod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxResult = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
     }
@@ -1645,13 +1895,18 @@ public class MainFrame extends JFrame {
             public void actionPerformed(final ActionEvent e) {
                 try {
                     if ((patient != null)
-                            && (cbxIshod.getSelectedItem() != null)
-                            && (cbxResult.getSelectedItem() != null)) {
+                            && (((cbxIshod.getSelectedItem() != null)
+                                    && (cbxResult.getSelectedItem() != null)
+                                    && (cbxIshod.getSelectedPcod() != 2))
+                                ||  ((cbxIshod.getSelectedPcod() == 2)
+                                    && (cbxResult.getSelectedItem() == null)))) {
                         Zakl tmpZakl = new Zakl();
                         tmpZakl.setRecom(taRecomend.getText());
                         tmpZakl.setSostv(taZakluch.getText());
                         tmpZakl.setIshod(cbxIshod.getSelectedPcod());
-                        tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        if (cbxResult.getSelectedItem() != null) {
+                            tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        }
                         tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                         tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                         tmpZakl.setIdGosp(patient.getGospitalCod());
@@ -1699,12 +1954,9 @@ public class MainFrame extends JFrame {
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPersonalInfo.createSequentialGroup()
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfGender, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfGender, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addGap(31)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblSurname)
@@ -1712,12 +1964,9 @@ public class MainFrame extends JFrame {
                                 .addComponent(lblStatus))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addGap(34)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblName)
@@ -1727,37 +1976,26 @@ public class MainFrame extends JFrame {
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addGroup(glPersonalInfo.createSequentialGroup()
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE,
-                                                GroupLayout.DEFAULT_SIZE,
-                                                GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
-                                                GroupLayout.DEFAULT_SIZE,
-                                                GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(tfOms, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                     .addGap(43)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(lblMiddlename)
                                         .addComponent(lblDms)))
-                                .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
-                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                        .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(tfWork, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addGap(18)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.TRAILING, false)
-                        .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE, 248,
-                                GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfDms, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
-                                248, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnIssled, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
-                                248, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnMedication, Alignment.LEADING, GroupLayout.PREFERRED_SIZE,
-                                248, GroupLayout.PREFERRED_SIZE)
-                        .addGroup(Alignment.LEADING, glPersonalInfo.createSequentialGroup()
-                            .addComponent(btnUpdateChamber, GroupLayout.PREFERRED_SIZE, 87,
-                                    GroupLayout.PREFERRED_SIZE)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                        .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE, 248, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfDms, GroupLayout.PREFERRED_SIZE, 248, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(glPersonalInfo.createSequentialGroup()
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnShowPatientInfo)))
+                            .addComponent(btnUpdateChamber, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnShowPatientInfo))
+                        .addComponent(btnMedication, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnIssled, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGap(5))
         );
         glPersonalInfo.setVerticalGroup(
@@ -1766,181 +2004,45 @@ public class MainFrame extends JFrame {
                     .addContainerGap()
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblNumberDesiaseHistory)
-                        .addComponent(tfNumberOfDesiaseHistory, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfNumberOfDesiaseHistory, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblSurname)
-                        .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblName)
-                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblMiddlename)
-                        .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblGender)
-                        .addComponent(tfGender, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfGender, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblBirthdate)
-                        .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblOms)
-                        .addComponent(tfOms, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfOms, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblDms)
-                        .addComponent(tfDms, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(tfDms, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblChamber)
-                        .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblStatus)
-                        .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(lblWork)
-                        .addComponent(tfWork, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfWork, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnShowPatientInfo)
                         .addComponent(btnUpdateChamber))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRegistrationAddress)
-                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnMedication))
-                    .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
-                            Short.MAX_VALUE)
+                    .addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblRealAddress)
-                        .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(btnIssled)))
         );
         pPersonalInfo.setLayout(glPersonalInfo);
-    }
-
-    private void setMedicalHistoryPanelGroupLayout() {
-        GroupLayout glPMedicalHistory = new GroupLayout(pMedicalHistory);
-        glPMedicalHistory.setHorizontalGroup(
-            glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPMedicalHistory.createSequentialGroup()
-                    .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(spMedHist, GroupLayout.PREFERRED_SIZE, 646,
-                                    GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                                .addComponent(btnMedHistAdd, GroupLayout.PREFERRED_SIZE, 52,
-                                        GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnMedHistDel, GroupLayout.PREFERRED_SIZE, 52,
-                                        GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnMedHistUpd, GroupLayout.PREFERRED_SIZE, 52,
-                                        GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addGap(16)
-                            .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 700,
-                                    GroupLayout.PREFERRED_SIZE)))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                        .addComponent(tfShablonFilter, GroupLayout.DEFAULT_SIZE, 373,
-                                Short.MAX_VALUE)
-                        .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 373,
-                                Short.MAX_VALUE))
-                    .addContainerGap())
-        );
-        glPMedicalHistory.setVerticalGroup(
-            glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPMedicalHistory.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(glPMedicalHistory.createParallelGroup(Alignment.TRAILING)
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addGroup(glPMedicalHistory.createParallelGroup(Alignment.LEADING)
-                                .addGroup(glPMedicalHistory.createSequentialGroup()
-                                    .addComponent(btnMedHistAdd, GroupLayout.PREFERRED_SIZE, 54,
-                                            GroupLayout.PREFERRED_SIZE)
-                                    .addGap(6)
-                                    .addComponent(btnMedHistDel, GroupLayout.PREFERRED_SIZE, 54,
-                                            GroupLayout.PREFERRED_SIZE)
-                                    .addGap(6)
-                                    .addComponent(btnMedHistUpd, GroupLayout.PREFERRED_SIZE, 54,
-                                            GroupLayout.PREFERRED_SIZE))
-                                .addComponent(spMedHist, GroupLayout.DEFAULT_SIZE, 195,
-                                        Short.MAX_VALUE))
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tbpMedicalHistory, GroupLayout.PREFERRED_SIZE, 367,
-                                    GroupLayout.PREFERRED_SIZE))
-                        .addGroup(glPMedicalHistory.createSequentialGroup()
-                            .addComponent(tfShablonFilter, GroupLayout.PREFERRED_SIZE,
-                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spShablonNames, GroupLayout.DEFAULT_SIZE, 542,
-                                    Short.MAX_VALUE)))
-                    .addContainerGap())
-        );
-        pMedicalHistory.setLayout(glPMedicalHistory);
-    }
-
-    private void setLifeHistoryPanelGroupLayout() {
-        GroupLayout glPLifeHistory = new GroupLayout(pLifeHistory);
-        glPLifeHistory.setHorizontalGroup(
-            glPLifeHistory.createParallelGroup(Alignment.TRAILING)
-                .addGroup(glPLifeHistory.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING, false)
-                        .addComponent(btnSaveLifeHistory, GroupLayout.PREFERRED_SIZE,
-                                722, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblLifeHistory)
-                        .addComponent(lblAllergo)
-                        .addComponent(lblFarmo)
-                        .addComponent(spLifeHistory, GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE)
-                        .addComponent(spAllergo, GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE)
-                        .addComponent(spFarmo, GroupLayout.PREFERRED_SIZE, 722,
-                                GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
-                        .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE,
-                                    356, Short.MAX_VALUE)
-                            .addGap(5))
-                        .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addComponent(tfLifeHShablonFilter, GroupLayout.DEFAULT_SIZE,
-                                    351, Short.MAX_VALUE)
-                            .addContainerGap())))
-        );
-        glPLifeHistory.setVerticalGroup(
-            glPLifeHistory.createParallelGroup(Alignment.LEADING)
-                .addGroup(glPLifeHistory.createSequentialGroup()
-                    .addGroup(glPLifeHistory.createParallelGroup(Alignment.LEADING)
-                        .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(lblLifeHistory)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spLifeHistory, GroupLayout.DEFAULT_SIZE, 152,
-                                    Short.MAX_VALUE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(lblAllergo)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spAllergo, GroupLayout.PREFERRED_SIZE, 152,
-                                    Short.MAX_VALUE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(lblFarmo)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spFarmo, GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
-                            .addGap(17)
-                            .addComponent(btnSaveLifeHistory))
-                        .addGroup(glPLifeHistory.createSequentialGroup()
-                            .addGap(1)
-                            .addComponent(tfLifeHShablonFilter, GroupLayout.PREFERRED_SIZE,
-                                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addGap(8)
-                            .addComponent(spLifeHShablonNames, GroupLayout.DEFAULT_SIZE, 550,
-                                    Short.MAX_VALUE)))
-                    .addContainerGap())
-        );
-        pLifeHistory.setLayout(glPLifeHistory);
     }
 
     private void setDiagnosisPanelGroupLayout() {
@@ -2026,10 +2128,10 @@ public class MainFrame extends JFrame {
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblZakluch)
                         .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                        .addComponent(lblNewLabel)
-                        .addComponent(lblNewLabel_2)
-                        .addComponent(textField, 0, 701, Short.MAX_VALUE)
-                        .addComponent(textField_1, 0, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                        .addComponent(lblVidPom)
+                        .addComponent(lblDefect)
+                        .addComponent(cbxVidPom, 0, 701, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
                         .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblResult)
                         .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
@@ -2042,8 +2144,8 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.UNRELATED)
                             .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                         .addComponent(lblIshod)
-                        .addComponent(lblNewLabel_1)
-                        .addComponent(textField_2))
+                        .addComponent(lblUkl)
+                        .addComponent(tfUkl))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
@@ -2073,17 +2175,17 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
                             .addGap(1)
-                            .addComponent(lblNewLabel)
+                            .addComponent(lblVidPom)
                             .addGap(1)
-                            .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbxVidPom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addGap(4)
-                            .addComponent(lblNewLabel_2)
+                            .addComponent(lblDefect)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(textField_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(cbxDefect, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(lblNewLabel_1)
+                            .addComponent(lblUkl)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(textField_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfUkl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)

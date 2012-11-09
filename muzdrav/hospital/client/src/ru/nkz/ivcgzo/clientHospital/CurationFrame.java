@@ -87,7 +87,7 @@ public class CurationFrame extends JDialog {
                             .get(table.convertRowIndexToModel(table.getSelectedRow()));
                     try {
                         ClientHospital.tcl.addPatientToDoctor(currentPatient.getIdGosp(),
-                                cbxStationType.getSelectedPcod(), authInfo.getPcod());
+                            authInfo.getPcod(), cbxStationType.getSelectedPcod());
                         CurationTableModel tbModel =
                                 new CurationTableModel(authInfo.getCpodr());
                         table.setModel(tbModel);
@@ -127,12 +127,13 @@ public class CurationFrame extends JDialog {
         getContentPane().add(pStationType);
         pStationType.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-        lblStationType = new JLabel("Тип стационара: ");
+        lblStationType = new JLabel("Профиль отделения: ");
         pStationType.add(lblStationType);
 
         cbxStationType = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         try {
-            cbxStationType.setData(ClientHospital.tcl.getStationTypes());
+            cbxStationType.setData(ClientHospital.tcl.getStationTypes(
+                    ClientHospital.authInfo.getCpodr()));
         } catch (KmiacServerException e) {
             cbxStationType.setData(Collections.<IntegerClassifier>emptyList());
         } catch (TException e) {

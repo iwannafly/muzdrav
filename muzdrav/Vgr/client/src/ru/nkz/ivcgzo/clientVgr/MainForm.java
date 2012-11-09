@@ -5,12 +5,15 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
+
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+//import ru.nkz.ivcgzo.clientOsm.MainForm;
+//import ru.nkz.ivcgzo.clientOsm.Vvod;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-import ru.nkz.ivcgzo.thriftVgr.KartaBer;
+//import ru.nkz.ivcgzo.thriftOsm.KartaBer;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
 import javax.swing.JMenuBar;
 import javax.swing.JPopupMenu;
@@ -34,7 +37,6 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 //	protected static final JFrame Per = null;
 	private JFrame frame;
 	private Period per;
-    private String oslname;
 	public static MainForm instance;
 	public static ThriftVgr.Client tcl;
 	/**
@@ -117,6 +119,14 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		mnNewMenu.add(menuItem);
 		
 		JMenuItem menuItem_1 = new JMenuItem("Диспансеризация подростков");
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				per = new Period();
+				per.Cslu = 2;
+				per.showPeriod();
+			}
+		});
 		mnNewMenu.add(menuItem_1);
 		
 		JMenuItem menuItem_2 = new JMenuItem("Диспансеризация детей-сирот");
@@ -141,10 +151,9 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		menuItem_8.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
-//					KartaBer kartaber = new KartaBer();
 					String servPath = MainForm.tcl.formfilecsv();
 					String cliPath;
-					oslname = "kartl";
+					String oslname = "kartl";
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);
