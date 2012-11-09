@@ -149,13 +149,17 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 	 * @throws SQLException
 	 */
 	protected <T extends TBase<?, F>, F extends TFieldIdEnum> void prepareStatementT(PreparedStatement ps, T obj, Class<?>[] types, int... indexes) throws SQLException {
+		F fld = null;
+		Class<?> cls = null;
+		int i = 0;
+		
 		try {
-			for (int i = 0; i < indexes.length; i++) {
-				F fld = obj.fieldForId(indexes[i] + 1);
+			for (i = 0; i < indexes.length; i++) {
+				fld = obj.fieldForId(indexes[i] + 1);
 				if (!obj.isSet(fld)) {
 					ps.setNull(i + 1, java.sql.Types.NULL);
 				} else {
-					Class<?> cls = types[indexes[i]];
+					cls = types[indexes[i]];
 					if (cls == Integer.class)
 						ps.setInt(i + 1, (Integer) obj.getFieldValue(fld));
 					else if (cls == String.class)
@@ -178,6 +182,8 @@ public class SqlSelectExecutor implements ISqlSelectExecutor {
 						ps.setBoolean(i + 1, (Boolean) obj.getFieldValue(fld));
 				}
 			}
+		} catch (ClassCastException e) {
+			throw new SQLException(String.format("Thrift field: %s, class: %s, number: %d, index: %d.", fld, cls, indexes[i], i), e);
 		} catch (ArrayIndexOutOfBoundsException e) {
 			throw new SQLException(e.getMessage(), e);
 		}
