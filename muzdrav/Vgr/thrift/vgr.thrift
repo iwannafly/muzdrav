@@ -158,10 +158,10 @@ struct RdPatient{
 struct RdVizit{
          1: optional i32    uid;
          2: optional i64    dv;
-         3: optional string sp;
-         4: optional string famwr;
-         5: optional string imwr;
-         6: optional string otwr;
+         3: optional i32 sp;
+         4: optional string famvr;
+         5: optional string imvr;
+         6: optional string otvr;
          7: optional string diag;
          8: optional i32    mso;
          9: optional i32    rzp;
