@@ -676,6 +676,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 setPdiag(1: PdiagZ diag) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagZ getPdiagZ(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
+	list<PdiagZ> getPdiagZInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getPdiagInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);

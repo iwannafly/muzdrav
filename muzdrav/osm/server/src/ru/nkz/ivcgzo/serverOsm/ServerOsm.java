@@ -1528,7 +1528,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
 				getPdiagZ(diag.npasp, diag.diag);
-				sme.execPreparedT("UPDATE p_diag SET diag = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ?, named = ?, ppi = ? WHERE npasp = ? and diag = ?", false, diag, pdiagZTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1, 2);
+				sme.execPreparedT("UPDATE p_diag SET diag = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ?, named = ?, ppi = ? WHERE npasp = ? and diag = ?", false, diag, pdiagZTypes, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1, 2);
 				sme.setCommit();
 				return diag.getId();
 			} catch (PdiagNotFoundException e) {
@@ -1544,6 +1544,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
+		
 	}
 
 	@Override
@@ -3256,6 +3257,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select named as pcod, diag as name from p_diag where npasp = ? ", npasp)) 
 		{
 			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+	}
+	}
+
+	@Override
+	public List<PdiagZ> getPdiagZInfo(int npasp) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_diag where npasp = ? ", npasp)) 
+		{
+			return rsmPdiagZ.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
