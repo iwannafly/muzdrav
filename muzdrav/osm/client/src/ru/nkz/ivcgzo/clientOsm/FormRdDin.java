@@ -678,7 +678,17 @@ try {
 //					else
 //						CBOteki.setSelectedItem(null);
                     oslrod = rddin.getOteki();
-        			method2();
+//        			method2();
+            		if ((oslrod-8)>=0)
+            		{ChBot4.setSelected(true);   iw1=oslrod-8;}
+            		else {iw1=oslrod;ChBot4.setSelected(false);}
+            		if ((iw1-4)>=0)
+            		{ChBot3.setSelected(true);		iw1=iw1-4;}
+            		else ChBot3.setSelected(false);
+            		if ((iw1-2)>=0)
+            		{ChBot2.setSelected(true);		iw1=iw1-2;}	
+            		else  ChBot2.setSelected(false);   		
+            		ChBot1.setSelected(iw1 ==1 );
 					if (rddin.isSetDspos())
 						CBDiag.setSelectedPcod(rddin.getDspos());
 					else
@@ -688,16 +698,16 @@ try {
 		});
 		scrollPane.setViewportView(tablePos);
 	}
-	protected void method2() {
-		if ((oslrod-8)>=0)
-		{ChBot4.setSelected(true);   iw1=oslrod-8;}	
-		if ((iw1-4)>=0)
-		{ChBot3.setSelected(true);		iw1=iw1-4;}	
-		if ((iw1-2)>=0)
-		{ChBot2.setSelected(true);		iw1=iw1-2;}	
-		ChBot1.setSelected(iw1 ==1 );
-		
-	}
+//	protected void method2() {
+//		if ((oslrod-8)>=0)
+//		{ChBot4.setSelected(true);   iw1=oslrod-8;}	
+//		if ((iw1-4)>=0)
+//		{ChBot3.setSelected(true);		iw1=iw1-4;}	
+//		if ((iw1-2)>=0)
+//		{ChBot2.setSelected(true);		iw1=iw1-2;}	
+//		ChBot1.setSelected(iw1 ==1 );
+//		
+//	}
 	protected void setDefaultValues() {
 		// TODO Auto-generated method stub
 //		rddin.setNpasp(Vvod.pvizitAmb.npasp);

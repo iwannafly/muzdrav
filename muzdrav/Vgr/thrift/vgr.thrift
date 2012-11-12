@@ -85,7 +85,7 @@ struct RdPatient{
          6: optional i64    datar;
          7: optional string docser;
          8: optional string docnum;
-         9: optional i32    tawn;
+         9: optional string    tawn;
         10: optional string street;
         11: optional string house;  
         12: optional string flat;
@@ -95,7 +95,7 @@ struct RdPatient{
         16: optional i32    stat;
         17: optional i32    lpup;
         18: optional i32    terp;
-        19: optional i32    ftawn; 
+        19: optional string ftawn; 
         20: optional string fstreet;
         21: optional string fhouse;
         22: optional string fflat;
@@ -130,7 +130,7 @@ struct RdPatient{
         51: optional i32 oslrod;
         52: optional i32 sem;
         53: optional i32 rost;
-        54: optional i32 vesd; 
+        54: optional double vesd; 
         55: optional i32 osoco;
         56: optional i32 uslpr;
         57: optional i64 dataz;
@@ -158,10 +158,10 @@ struct RdPatient{
 struct RdVizit{
          1: optional i32    uid;
          2: optional i64    dv;
-         3: optional string sp;
-         4: optional string famwr;
-         5: optional string imwr;
-         6: optional string otwr;
+         3: optional i32 sp;
+         4: optional string famvr;
+         5: optional string imvr;
+         6: optional string otvr;
          7: optional string diag;
          8: optional i32    mso;
          9: optional i32    rzp;
