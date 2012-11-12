@@ -589,8 +589,8 @@ throw new TException(e);
 					throw new KmiacServerException();
 				}}
 			sb1.append(String.format("%d;%d;%td.%3$tm.%3$tY;%d;%s %s %s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, rvz.famvr,rvz.imvr,rvz.otvr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
-			System.out.println(sb1);		
 					}
+		System.out.println(sb1);		
 		// Con_vizit.scv
 		j = 0;
 		List<RdConVizit> rdConVizit = getRdConVizit();
@@ -601,8 +601,8 @@ throw new TException(e);
 			if (rcv.oteki != 0 ) ot = 1;
 			sb2.append(String.format("%d;%d;%d;%.2f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
 //			sb2.append(String.format("%d;%d;%d;%.2f;", j, rcv.uiv,rcv.npasp, rcv.ves));		
-			System.out.println(sb2);		
 		}
+		System.out.println(sb2);		
 		osw.write(sb.toString());
 		return "c:\\patient.html";
 	} /*catch (SQLException e) {
