@@ -2446,11 +2446,14 @@ public class Vvod extends JFrame {
 					if (tblObr.getSelectedItem() != null) {
 						zapVr.setId_pvizit(tblObr.getSelectedItem().id);
 //						tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().getId()));
-						if (tblDiag.getRowCount() > 0)
-							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+//						if (tblDiag.getRowCount() > 0)
+//							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
 						tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 						treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 						checkZapVrNext();
+					} else {
+						tblPos.setData(new ArrayList<PvizitAmb>());
+						treeRezIssl.setModel(null);
 					}
 				} catch (KmiacServerException e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Не удалось загрузить список посещений.", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -2912,6 +2915,8 @@ public class Vvod extends JFrame {
 					return false;
 				}
 		if (!checkTalInput())
+			return false;
+		if (pvizit == null)
 			return false;
 		
 		priem = new Priem();
