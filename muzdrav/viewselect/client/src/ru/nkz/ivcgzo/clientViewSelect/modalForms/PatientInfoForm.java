@@ -293,8 +293,8 @@ public class PatientInfoForm extends ModalForm {
 		 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 		 					addLineToDetailInfo("Медицинское описание диагноза",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 		 					addLineToDetailInfo("Статус диагноза",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
-		 					if (pdiagamb.predv==false) addHeader("Вид диагноза: предварительный");
-		 					else addHeader("Вид диагноза: заключительный");
+		 					if (pdiagamb.predv==false) addHeader("Вид диагноза: заключительный");
+		 					else addHeader("Вид диагноза: предварительный");
 		 					}
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
