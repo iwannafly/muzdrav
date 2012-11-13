@@ -232,8 +232,8 @@ public class ServerOsm extends Server implements Iface {
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
-		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol",        "id_obr");
-		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class};
+		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol",        "id_obr",     "cod_sp",       "cdol_n");
+		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
 
 		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz",    "id_obr");
 		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class};
@@ -2348,7 +2348,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz, id_obr) values (?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 15, 7, 16);
+			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz, id_obr, cdol, cod_sp) values (?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 14, 6, 15, 9, 16);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2364,7 +2364,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public void UpdatePmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_mer set pmer = ?, pdat = ?, fdat = ?, prichina = ?, rez = ?, dnl = ?, dkl = ?, lpu = ?, ter = ? where id = ? ", false, pm, pmerTypes, 3, 4, 5, 8, 9, 11, 12, 13, 14, 0);
+			sme.execPreparedT("update p_mer set pmer = ?, pdat = ?, fdat = ?, prichina = ?, rez = ?, dnl = ?, dkl = ?, lpu = ?, ter = ?, cdol_n = ? where id = ? ", false, pm, pmerTypes, 3, 4, 5, 7, 8, 10, 11, 12, 13, 17, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

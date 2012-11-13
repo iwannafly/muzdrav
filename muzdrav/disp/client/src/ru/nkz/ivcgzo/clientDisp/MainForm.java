@@ -36,6 +36,9 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -49,6 +52,8 @@ import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JTable;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class MainForm extends Client<ThriftDisp.Client>{
 	public static ThriftDisp.Client tcl;
@@ -248,6 +253,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private JCheckBox cbRecdop1;
 	private JCheckBox cbRecdop2;
 	private AbstractButton cbRecdop3;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbProfil;
 
 
 	public MainForm (ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -256,7 +262,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		setFrame(frame);
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		
 		JButton btnSrc = new JButton("Поиск");
 		btnSrc.addActionListener(new ActionListener() {
@@ -270,8 +276,13 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						fiz = new Pfiz();
 						pat = new PatientInfo();
 						pat = MainForm.tcl.getPatientInfo(res[0]);
-						lblPatient.setText("ФИО: "+pat.fam+" "+pat.im+" "+pat.ot+"Серия и номер полиса: "+pat.poms_ser+" "+pat.poms_nom);
-						fiz = MainForm.tcl.getPfiz(pat.npasp);
+						int age = (int) ((System.currentTimeMillis() - pat.datar) / 31556952000L);
+						if (age>18) {
+							JOptionPane.showMessageDialog(frame, "Пациенту больше 18 лет, запись данных невозможна");
+								}
+						else {
+							lblPatient.setText("ФИО: "+pat.fam+" "+pat.im+" "+pat.ot+"Серия и номер полиса: "+pat.poms_ser+" "+pat.poms_nom);
+							fiz = MainForm.tcl.getPfiz(pat.npasp);
 						bgAkds.clearSelection();
 						rbtAkds1.setSelected(fiz.getAkds() == 1);
 						rbtAkds2.setSelected(fiz.getAkds() == 2);
@@ -398,7 +409,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						
 						/*pdisp_ds*/
 						tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
-						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
+						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));}
 						
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
@@ -577,7 +588,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblProfil = new JLabel("Профиль");
 		
-		JComboBox cmbProfil = new JComboBox();
+		 cmbProfil = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);//заменить на n_prf
 		
 		JLabel lblVedomPr = new JLabel("<html>Ведомственная <br>принадлежность &nbsp&nbspорганы</html>");
 		
@@ -816,6 +827,24 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgProfPriv.add(rbtProfPriv2);
 		
 		rbtProfPriv3 = new JRadioButton("не привит по другим причинам");
+		rbtProfPriv3.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (rbtProfPriv3.isSelected()){
+					rbtNeprivit1.setEnabled(true);
+					rbtNeprivit2.setEnabled(true);
+				} else{
+					bgPrneprivit.clearSelection();
+					rbtNeprivit1.setEnabled(false);
+					rbtNeprivit2.setEnabled(false);
+				}
+			}
+		});
+		rbtProfPriv3.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			
+			}
+		});
 		bgProfPriv.add(rbtProfPriv3);
 		
 		pnlPrNePrivit = new JPanel();
@@ -856,9 +885,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		);
 		
 		rbtNeprivit1 = new JRadioButton("полностью");
+		rbtNeprivit1.setEnabled(false);
 		bgPrneprivit.add(rbtNeprivit1);
 		
 		rbtNeprivit2 = new JRadioButton("частично");
+		rbtNeprivit2.setEnabled(false);
 		bgPrneprivit.add(rbtNeprivit2);
 		
 		GroupLayout gl_pnlPrNePrivit = new GroupLayout(pnlPrNePrivit);
@@ -885,32 +916,133 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		cbPriv_n = new JCheckBox("нуждается  в проведении вакцинации/ревакцинации");
 		
 		cbBcg = new JCheckBox("БЦЖ");
+		cbBcg.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbBcg.isSelected()){
+					rbtBcg_vr1.setEnabled(true);
+					rbtBcg_vr2.setEnabled(true);
+					rbtBcg_vr3.setEnabled(true);
+				} else{
+					bgBcg_vr.clearSelection();
+					rbtBcg_vr1.setEnabled(false);
+					rbtBcg_vr2.setEnabled(false);
+					rbtBcg_vr3.setEnabled(false);
+				}
+			}
+		});
 		
 		cbPolio = new JCheckBox("Полиомиелит");
+		cbPolio.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbPolio.isSelected()){
+					rbtPolio_vr1.setEnabled(true);
+					rbtPolio_vr2.setEnabled(true);
+					rbtPolio_vr3.setEnabled(true);
+					rbtPolio_vr4.setEnabled(true);
+					rbtPolio_vr5.setEnabled(true);
+					rbtPolio_vr6.setEnabled(true);
+				} else{
+					bgPolio.clearSelection();
+					rbtPolio_vr1.setEnabled(false);
+					rbtPolio_vr2.setEnabled(false);
+					rbtPolio_vr3.setEnabled(false);
+					rbtPolio_vr4.setEnabled(false);
+					rbtPolio_vr5.setEnabled(false);
+					rbtPolio_vr6.setEnabled(false);
+				}
+			}
+		});
 		
 		cbAkds = new JCheckBox("АКДС");
+		cbAkds.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbAkds.isSelected()){
+					rbtAkds1.setEnabled(true);
+					rbtAkds2.setEnabled(true);
+					rbtAkds3.setEnabled(true);
+					rbtAkds4.setEnabled(true);
+				} else{
+					bgAkds.clearSelection();
+					rbtAkds1.setEnabled(false);
+					rbtAkds2.setEnabled(false);
+					rbtAkds3.setEnabled(false);
+					rbtAkds4.setEnabled(false);
+				}
+			}
+		});
 		
 		cbAdsm = new JCheckBox("АДСМ");
 		
 		cbKor = new JCheckBox("Корь");
+		cbKor.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbKor.isSelected()){
+					rbtKor1.setEnabled(true);
+					rbtKor2.setEnabled(true);
+				} else{
+					bgKor.clearSelection();
+					rbtKor1.setEnabled(false);
+					rbtKor2.setEnabled(false);
+				}
+			}
+		});
 		
 		cbParotit = new JCheckBox("Эпид.паротит");
+		cbParotit.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbParotit.isSelected()){
+					rbtParotit1.setEnabled(true);
+					rbtParotit2.setEnabled(true);
+				} else{
+					bgParotit.clearSelection();
+					rbtParotit1.setEnabled(false);
+					rbtParotit2.setEnabled(false);
+				}
+			}
+		});
 		
 		cbKrasn = new JCheckBox("Краснуха");
+		cbKrasn.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbKrasn.isSelected()){
+					rbtKrasn1.setEnabled(true);
+					rbtKrasn2.setEnabled(true);
+				} else{
+					bgKrasn.clearSelection();
+					rbtKrasn1.setEnabled(false);
+					rbtKrasn2.setEnabled(false);
+				}
+			}
+		});
 		
 		cbGepatit = new JCheckBox("Гепатит В");
+		cbGepatit.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbGepatit.isSelected()){
+					rbtGepatit1.setEnabled(true);
+					rbtGepatit2.setEnabled(true);
+				} else{
+					bgGepatit.clearSelection();
+					rbtGepatit1.setEnabled(false);
+					rbtGepatit2.setEnabled(false);
+				}
+			}
+		});
 		
 		JPanel pnlBcg_vr = new JPanel();
 		pnlBcg_vr.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		bgBcg_vr = new ButtonGroup();
 		
 		 rbtBcg_vr1 = new JRadioButton("V");
+		 rbtBcg_vr1.setEnabled(false);
 		 bgBcg_vr.add(rbtBcg_vr1);
 		 
 		 rbtBcg_vr2 = new JRadioButton("R1");
+		 rbtBcg_vr2.setEnabled(false);
 		 bgBcg_vr.add(rbtBcg_vr2);
 		
 		 rbtBcg_vr3 = new JRadioButton("R2");
+		 rbtBcg_vr3.setEnabled(false);
 		 bgBcg_vr.add(rbtBcg_vr3);
 		 
 		GroupLayout gl_pnlBcg_vr = new GroupLayout(pnlBcg_vr);
@@ -941,21 +1073,27 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgPolio = new ButtonGroup();
 		
 		 rbtPolio_vr1 = new JRadioButton("V1");
+		 rbtPolio_vr1.setEnabled(false);
 		 bgPolio.add(rbtPolio_vr1);
 		
 		 rbtPolio_vr2 = new JRadioButton("V2");
+		 rbtPolio_vr2.setEnabled(false);
 		 bgPolio.add(rbtPolio_vr2);
 		
 		 rbtPolio_vr3 = new JRadioButton("V3");
+		 rbtPolio_vr3.setEnabled(false);
 		 bgPolio.add(rbtPolio_vr3);
 		
 		 rbtPolio_vr4 = new JRadioButton("R1");
+		 rbtPolio_vr4.setEnabled(false);
 		 bgPolio.add(rbtPolio_vr4);
 		
 		 rbtPolio_vr5 = new JRadioButton("R2");
+		 rbtPolio_vr5.setEnabled(false);
 		 bgPolio.add(rbtPolio_vr5);
 		
 		 rbtPolio_vr6 = new JRadioButton("R3");
+		 rbtPolio_vr6.setEnabled(false);
 		 bgPolio.add(rbtPolio_vr6);
 		
 		GroupLayout gl_pnlPolio = new GroupLayout(pnlPolio);
@@ -995,15 +1133,19 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgAkds = new ButtonGroup();
 		
 		 rbtAkds1 = new JRadioButton("V1");
+		 rbtAkds1.setEnabled(false);
 		 bgAkds.add(rbtAkds1);
 		
 		 rbtAkds2 = new JRadioButton("V2");
+		 rbtAkds2.setEnabled(false);
 		 bgAkds.add(rbtAkds2);
 		
 		 rbtAkds3 = new JRadioButton("V3");
+		 rbtAkds3.setEnabled(false);
 		 bgAkds.add(rbtAkds3);
 		
 		 rbtAkds4 = new JRadioButton("R");
+		 rbtAkds4.setEnabled(false);
 		  bgAkds.add(rbtAkds4);
 		 
 		GroupLayout gl_pnlAkds = new GroupLayout(pnlAkds);
@@ -1039,9 +1181,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgKor = new ButtonGroup();
 		
 		 rbtKor1 = new JRadioButton("V");
+		 rbtKor1.setEnabled(false);
 		 bgKor.add(rbtKor1);
 		
 		 rbtKor2 = new JRadioButton("R");
+		 rbtKor2.setEnabled(false);
 		 bgKor.add(rbtKor2);
 		
 		GroupLayout gl_pnlKor = new GroupLayout(pnlKor);
@@ -1071,9 +1215,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgParotit = new ButtonGroup();
 		
 		 rbtParotit1 = new JRadioButton("V");
+		 rbtParotit1.setEnabled(false);
 		 bgParotit.add(rbtParotit1);
 		
 		 rbtParotit2 = new JRadioButton("R");
+		 rbtParotit2.setEnabled(false);
 		  bgParotit.add(rbtParotit2);
 		 
 		GroupLayout gl_pnlParotit = new GroupLayout(pnlParotit);
@@ -1106,9 +1252,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		
 		 rbtKrasn1 = new JRadioButton("V");
+		 rbtKrasn1.setEnabled(false);
 		 bgKrasn.add(rbtKrasn1);
 		
 		 rbtKrasn2 = new JRadioButton("R");
+		 rbtKrasn2.setEnabled(false);
 		 bgKrasn.add(rbtKrasn2);
 		
 		GroupLayout gl_pnlKrasn = new GroupLayout(pnlKrasn);
@@ -1140,9 +1288,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgGepatit = new ButtonGroup();
 		
 		 rbtGepatit1 = new JRadioButton("V");
+		 rbtGepatit1.setEnabled(false);
 		 bgGepatit.add(rbtGepatit1);
 		
 		 rbtGepatit2 = new JRadioButton("R");
+		 rbtGepatit2.setEnabled(false);
 		 bgGepatit.add(rbtGepatit2);
 		
 		GroupLayout gl_pnlGepatit = new GroupLayout(pnlGepatit);
@@ -1509,6 +1659,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlPi.setLayout(gl_pnlPi);
 		
 		pnl04y = new JPanel();
+		pnl04y.setEnabled(false);
 		pnl04y.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		lbl04y = new JLabel("0-4 лет");

@@ -2865,7 +2865,7 @@ public class Vvod extends JFrame {
 		  				diagamb.setDatad(pdiag.getDatad());
 		  				else diagamb.setDatad(System.currentTimeMillis());
   			}
-		  		diagamb.setDatap(System.currentTimeMillis());
+		  		diagamb.setDatap(pvizitAmb.datap);
 		  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
 		  		diagamb.setCdol(MainForm.authInfo.getCdol());
 		  		diagamb.setPredv(true);
