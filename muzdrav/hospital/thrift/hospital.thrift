@@ -25,7 +25,7 @@ struct TPatient{
 	6:string middlename;
 	7:string gender;
 	8:i32 nist;
-	9:i32 status;
+	9:string status;
 	10:string oms;
 	11:string dms;
 	12:string job;
@@ -61,9 +61,9 @@ struct TMedicalHistory{
 	5:optional string statusPraesense;
 	6:optional string statusLocalis;
 	7:optional string fisicalObs;
-	8:i32 pcodVrach;
-	9:i64 dataz;
-	10:i64 timez;
+	8:optional i32 pcodVrach;
+	9:optional i64 dataz;
+	10:optional i64 timez;
 }
 
 struct TLifeHistory{
@@ -146,6 +146,12 @@ exception DiagnosisNotFoundException {
 exception PriemInfoNotFoundException {
 }
 
+/*
+ * Код МЭС не сущесвтует
+ */
+exception MesNotFoundException {
+}
+
 service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TSimplePatient> getAllPatientForDoctor(1:i32 doctorId, 2:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -185,8 +191,12 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
-	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
+	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
+		2: MesNotFoundException mnfe);
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
+
+	string printHospitalDiary(1: i32 idGosp, 2: i64 dateStart, 3: i64 dateEnd)
+		throws (1:kmiacServer.KmiacServerException kse)
 	
 /*Классификаторы*/
 	
@@ -205,6 +215,11 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	/**
 	* Классификатор типа стационара (N_tip0(pcod))
 	*/
-	list<classifier.IntegerClassifier> getStationTypes() throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getStationTypes(1: i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	* Классификатор этапов лечения (N_tip0(pcod))
+	*/
+	list<classifier.IntegerClassifier> getStagesClassifier(1: i32 idGosp)
+		throws (1:kmiacServer.KmiacServerException kse);
 	
 }

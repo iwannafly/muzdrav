@@ -9,30 +9,29 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-
 import org.apache.thrift.TException;
-
-
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftVgr.KovNotFoundException;
-import ru.nkz.ivcgzo.thriftVgr.ServerVgr;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Period {
 
 
 	public int Cslu = 0;
 	private JFrame frame;
-//	private CustomDateEditor textField;
-//	private CustomDateEditor textField_1;
+
 	private CustomDateEditor tfDn;
 	private CustomDateEditor tfDk;
-	private ServerVgr sfrm;
+//	private ServerVgr sfrm;
 	/**
 	 * Launch the application.
 	 */
@@ -69,17 +68,47 @@ public class Period {
 		JButton btnNewButton = new JButton("Выполнить");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			
+				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+				String servPath = null;
+				String cliPath = null;
 				if (Cslu == 1){
-//					sfrm = new ServerVgr();
-				//	sfrm.Cslu = 2;
-//					sfrm.ServerVgr();
 					try {
-						MainForm.tcl.getKovInfoPol(MainForm.authInfo.cpodr, tfDn.getDate().getTime(), tfDk.getDate().getTime(), MainForm.authInfo.clpu);
+					
+			        try {
+						servPath = MainForm.tcl.getKovInfoPol(MainForm.authInfo.cpodr, SimpleDateFormat.getDateInstance().parse("01.01.2012").getTime(), SimpleDateFormat.getDateInstance().parse("31.12.2012").getTime());
+					} catch (ParseException e3) {
+						// TODO Auto-generated catch block
+						e3.printStackTrace();
+					}
+					cliPath = "C:\\Kov"+MainForm.authInfo.getKdate()+MainForm.authInfo.cpodr+sdf.format(new Date())+".rar";
+							
+						
+						try {
+							MainForm.tcl.getKovInfoPol(MainForm.authInfo.cpodr,SimpleDateFormat.getDateInstance().parse("01.01.2012").getTime(), SimpleDateFormat.getDateInstance().parse("31.12.2012").getTime());
+						} catch (ParseException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+					    if (servPath.endsWith("zip")){
+	   						try {
+								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							JOptionPane.showMessageDialog(null, "Файл : "+cliPath, null, JOptionPane.INFORMATION_MESSAGE); 
+						}
+					
 					} catch (KmiacServerException e1) {
 						JOptionPane.showMessageDialog(frame, "Какая-то ошибка.", "error", JOptionPane.ERROR_MESSAGE);
-					} catch (KovNotFoundException e1) {
+					} /*catch (KovNotFoundException e1) {
 						JOptionPane.showMessageDialog(frame, "Что-то не найдено.", "error", JOptionPane.ERROR_MESSAGE);
-					} catch (TException e1) {
+					} */
+					catch (TException e1) {
 						e1.printStackTrace();
 						MainForm.conMan.reconnect(e1);
 					}

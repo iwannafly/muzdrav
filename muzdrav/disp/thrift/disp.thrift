@@ -107,6 +107,17 @@ struct Pdisp_ds{
 	41: optional i32 prizn_po;
 }
 
+struct PatientInfo{
+	1: optional i32 npasp;
+	2: optional string fam;
+	3: optional string im;
+	4: optional string ot;
+	5: optional i64 datar;
+	6: optional string poms_ser;
+	7: optional string poms_nom;
+	8: optional i32 pol;
+}
+
 exception PfizNotFoundException {
 }
 
@@ -115,5 +126,11 @@ exception PfizNotFoundException {
 service ThriftDisp extends kmiacServer.KmiacServer {
 	void setPfiz(1: Pfiz fiz) throws (1: kmiacServer.KmiacServerException kse);
 	Pfiz getPfiz(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PfizNotFoundException pfnfe);
+	PatientInfo getPatientInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+
+	i32 AddPdispds(1: Pdisp_ds pds) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePdispds(1: Pdisp_ds pds) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pdisp_ds> getTblDispds(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	Pdisp_ds getDispds(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	
 }

@@ -230,8 +230,8 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Исход д/у", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abb),pdiag.isSetIshod(),pdiag.getIshod()));
 			 			addLineToDetailInfo("Дата установления исхода", pdiag.isSetDataish(), DateFormat.getDateInstance().format(new Date(pdiag.getDataish())));
 						addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
-		 				addLineToDetailInfo("Врач, ведущий д/у", pdiag.isSetFio_vr(),pdiag.getFio_vr());
-						addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
+//		 				addLineToDetailInfo("Врач, ведущий д/у", pdiag.isSetFio_vr(),pdiag.getFio_vr());
+//						addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
 						addLineIf("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
 						addLineIf("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
 						addLineIf("Инвалидизующий диагноз: да", pdiag.isSetPrizi(), pdiag.getPrizi());
@@ -293,7 +293,9 @@ public class PatientInfoForm extends ModalForm {
 		 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 		 					addLineToDetailInfo("Медицинское описание диагноза",pdiagamb.isSetNamed(),pdiagamb.getNamed());
 		 					addLineToDetailInfo("Статус диагноза",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), pdiagamb.isSetDiag_stat(),pdiagamb.getDiag_stat()));
-		 				}
+		 					if (pdiagamb.predv==false) addHeader("Вид диагноза: заключительный");
+		 					else addHeader("Вид диагноза: предварительный");
+		 					}
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 			 		} else if (lastPath instanceof RdslTreeNode) {

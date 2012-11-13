@@ -1,8 +1,30 @@
 package ru.nkz.ivcgzo.clientDisp;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+
+import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
@@ -10,32 +32,13 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
+import ru.nkz.ivcgzo.thriftDisp.PatientInfo;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds;
+import ru.nkz.ivcgzo.thriftDisp.Pfiz;
+import ru.nkz.ivcgzo.thriftDisp.PfizNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
-
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.ButtonGroup;
-import javax.swing.JTabbedPane;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JLabel;
-import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
-import javax.swing.border.BevelBorder;
-import java.awt.Color;
-import javax.swing.border.TitledBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.UIManager;
-import javax.swing.JCheckBox;
-import javax.swing.JTextField;
-import javax.swing.border.LineBorder;
-import javax.swing.SwingConstants;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 public class MainForm extends Client<ThriftDisp.Client>{
 	public static ThriftDisp.Client tcl;
@@ -177,6 +180,59 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private JRadioButton rbtVmp2_1;
 	private JRadioButton rbtVmp2_2;
 	private JRadioButton rbtAkds4;
+	private JLabel lblPatient;
+	protected Pfiz fiz;
+	private JCheckBox cbPrb;
+	private JCheckBox cbPrk;
+	private JCheckBox cbPrs;
+	private JCheckBox cbPriv_n;
+	private JCheckBox cbBcg;
+	private JCheckBox cbPolio;
+	private JCheckBox cbAkds;
+	private JCheckBox cbAdsm;
+	private JCheckBox cbKor;
+	private JCheckBox cbParotit;
+	private JCheckBox cbKrasn;
+	private JCheckBox cbGepatit;
+	private JCheckBox cbVrec1;
+	private JCheckBox cbVrec2;
+	private JCheckBox cbVrec3;
+	private JCheckBox cbVrec4;
+	private JCheckBox cbNrec10;
+	private JCheckBox cbNrec9;
+	private JCheckBox cbNrec8;
+	private JCheckBox cbNrec7;
+	private JCheckBox cbNrec6;
+	private JCheckBox cbNrec5;
+	private JCheckBox cbNrec4;
+	private JCheckBox cbNrec3;
+	private JCheckBox cbNrec2;
+	private JCheckBox cbNrec1;
+	private JCheckBox cbVrec10;
+	private JCheckBox cbVrec9;
+	private JCheckBox cbVrec8;
+	private JCheckBox cbVrec7;
+	private JCheckBox cbVrec6;
+	private JCheckBox cbVrec5;
+	private CustomTextField tbRost;
+	private CustomTextField tbVrk;
+	private CustomTextField tbPfm1;
+	private CustomTextField tbPfm2;
+	private CustomTextField tbPfm3;
+	private CustomTextField tbPfd1;
+	private CustomTextField tbPfd2;
+	private CustomTextField tbPfd3;
+	private CustomTextField tbPfd4;
+	private CustomTextField tbPfd5;
+	private CustomDateEditor tbDateOsm;
+	private JCheckBox cbAdm;
+	private CustomDateEditor tbDatNaznIpr;
+	private CustomTextField tbOkr;
+	private CustomTextField tbRf1;
+	private CustomTextField tbMf1;
+	private CustomTextField tbEf1;
+	private CustomTextField tbPf1;
+	private PatientInfo pat;
 
 
 	public MainForm (ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -189,11 +245,275 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JButton btnSrc = new JButton("Поиск");
 		btnSrc.addActionListener(new ActionListener() {
+
+			
+
 			public void actionPerformed(ActionEvent e) {
-//				int[] res = conMan.showPatientSearchForm("Поиск пациентов", false, true);
-//				
-//				if (res != null) {
-//				}
+				int[] res = MainForm.conMan.showPatientSearchForm("Поиск пациента", true, true);			
+				if (res != null) {
+					try {
+						fiz = new Pfiz();
+						pat = new PatientInfo();
+						pat = MainForm.tcl.getPatientInfo(res[0]);
+						lblPatient.setText("ФИО: "+pat.fam+" "+pat.im+" "+pat.ot+"Серия и номер полиса: "+pat.poms_ser+" "+pat.poms_nom);
+						fiz = MainForm.tcl.getPfiz(pat.npasp);
+						bgAkds.clearSelection();
+						rbtAkds1.setSelected(fiz.getAkds() == 1);
+						rbtAkds2.setSelected(fiz.getAkds() == 2);
+						rbtAkds3.setSelected(fiz.getAkds() == 3);
+						rbtAkds4.setSelected(fiz.getAkds() == 4);
+						bgGrzd.clearSelection();
+						rbtGrzd1.setSelected(fiz.getGrzd() == 1);
+						rbtGrzd2.setSelected(fiz.getGrzd() == 2);
+						rbtGrzd3.setSelected(fiz.getGrzd() == 3);
+						rbtGrzd4.setSelected(fiz.getGrzd() == 4);
+						bgPe.clearSelection();
+						rbtPe1.setSelected(fiz.getPe() == 1);
+						rbtPe2.setSelected(fiz.getPe() == 2);
+						bgPi.clearSelection();
+						rbtPi1.setSelected(fiz.getPi() == 1);
+						rbtPi2.setSelected(fiz.getPi() == 2);
+						bgPp.clearSelection();
+						rbtPp1.setSelected(fiz.getPp() == 1);
+						rbtPp2.setSelected(fiz.getPp() == 2);
+						bgVes.clearSelection();
+						rbtVes1.setSelected(fiz.getFv() == 1);
+						rbtVes2.setSelected(fiz.getFv() == 2);
+						rbtVes3.setSelected(fiz.getFv() == 3);
+						bgRost.clearSelection();
+						rbtRost1.setSelected(fiz.getFr() == 1);
+						rbtRost2.setSelected(fiz.getFr() == 2);
+						rbtRost3.setSelected(fiz.getFr() == 3);
+						bgProfPriv.clearSelection();
+						rbtProfPriv1.setSelected(fiz.getPriv() == 1);
+						rbtProfPriv2.setSelected(fiz.getPriv() == 2);
+						rbtProfPriv3.setSelected(fiz.getPriv() == 3);
+						bgPrneprivit.clearSelection();
+						rbtNeprivit1.setSelected(fiz.getPriv_pr() == 1);
+						rbtNeprivit2.setSelected(fiz.getPriv_pr() == 2);
+						bgBcg_vr.clearSelection();
+						rbtBcg_vr1.setSelected(fiz.getBcg_vr() == 1);
+						rbtBcg_vr2.setSelected(fiz.getBcg_vr() == 2);
+						rbtBcg_vr3.setSelected(fiz.getBcg_vr() == 3);
+						bgPolio.clearSelection();
+						rbtPolio_vr1.setSelected(fiz.getPolio_vr() == 1);
+						rbtPolio_vr2.setSelected(fiz.getPolio_vr() == 2);
+						rbtPolio_vr3.setSelected(fiz.getPolio_vr() == 3);
+						rbtPolio_vr4.setSelected(fiz.getPolio_vr() == 4);
+						rbtPolio_vr5.setSelected(fiz.getPolio_vr() == 5);
+						rbtPolio_vr6.setSelected(fiz.getPolio_vr() == 6);
+						bgAkds.clearSelection();
+						rbtAkds1.setSelected(fiz.getAkds_vr() == 1);
+						rbtAkds2.setSelected(fiz.getAkds_vr() == 2);
+						rbtAkds3.setSelected(fiz.getAkds_vr() == 3);
+						bgKor.clearSelection();
+						rbtKor1.setSelected(fiz.getKor_vr() == 1);
+						rbtKor2.setSelected(fiz.getKor_vr() == 2);
+						bgParotit.clearSelection();
+						rbtParotit1.setSelected(fiz.getParotit_vr() == 1);
+						rbtParotit2.setSelected(fiz.getParotit_vr() == 2);
+						bgKrasn.clearSelection();
+						rbtKrasn1.setSelected(fiz.getKrasn_vr() == 1);
+						rbtKrasn2.setSelected(fiz.getKrasn_vr() == 2);
+						bgGepatit.clearSelection();
+						rbtGepatit1.setSelected(fiz.getGepatit_vr() == 1);
+						rbtGepatit2.setSelected(fiz.getGepatit_vr() == 2);
+						bgVedomPr.clearSelection();
+						rbtVedomPrZdrav.setSelected(fiz.getVedom() == 1);
+						rbtVedomPrObr.setSelected(fiz.getVedom() == 2);
+						rbtVedomPrSoc.setSelected(fiz.getVedom() == 3);
+						bgVib.clearSelection();
+						rbtVib1.setSelected(fiz.getVib1() == 1);
+						rbtVib2.setSelected(fiz.getVib1() == 2);
+						rbtVib3.setSelected(fiz.getVib1() == 3);
+						rbtVib4.setSelected(fiz.getVib1() == 4);
+						rbtVib5.setSelected(fiz.getVib1() == 5);
+						bgVib2.clearSelection();
+						rbtVib2_1.setSelected(fiz.getVib2() == 1);
+						rbtVib2_2.setSelected(fiz.getVib2() == 2);
+						rbtVib2_3.setSelected(fiz.getVib2() == 3);
+						rbtVib2_4.setSelected(fiz.getVib2() == 4);
+						bgIpr.clearSelection();
+						rbtIpr1.setSelected(fiz.getIpr() == 1);
+						rbtIpr2.setSelected(fiz.getIpr() == 2);
+						rbtIpr3.setSelected(fiz.getIpr() == 3);
+						rbtIpr4.setSelected(fiz.getIpr() == 4);
+						bgPdf5.clearSelection();
+						rbtPdf5_1.setSelected(fiz.getMenses() == 1);
+						rbtPdf5_2.setSelected(fiz.getMenses() == 2);
+						bgMenses1.clearSelection();
+						rbtMenses1_1.setSelected(fiz.getMenses1() == 1);
+						rbtMenses1_2.setSelected(fiz.getMenses1() == 2);
+						
+						cbPrb.setSelected(fiz.getPrb() == 1);
+						cbPrk.setSelected(fiz.getPrk() == 1);
+						cbPrs.setSelected(fiz.getPrs() == 1);
+						cbPriv_n.setSelected(fiz.getPriv_n() == 1);
+						cbBcg.setSelected(fiz.getBcg() == 1);
+						cbPolio.setSelected(fiz.getPolio() == 1);
+						cbAkds.setSelected(fiz.getAkds() == 1);
+						cbAdsm.setSelected(fiz.getAdsm() == 1);
+						cbAdm.setSelected(fiz.getAdm() == 1);
+						cbKor.setSelected(fiz.getKor() == 1);
+						cbParotit.setSelected(fiz.getParotit() == 1);
+						cbKrasn.setSelected(fiz.getKrasn() == 1);
+						cbGepatit.setSelected(fiz.getGepatit() == 1);
+						if (fiz.isSetDat_p())
+							tbDataPostup.setDate(fiz.getDat_p());
+						if (fiz.isSetDataz())
+							tbDateOsm.setDate(fiz.getDataz());
+						if (fiz.isSetDat_ipr())
+							tbDatNaznIpr.setDate(fiz.getDat_ipr());
+						tbVes.setText(Double.toString(fiz.getVes()));
+						tbRost.setText(Double.toString(fiz.getRost()));
+						tbVrk.setText(fiz.getVrk());
+						tbPfm1.setText(fiz.getPfm1());
+						tbPfm2.setText(fiz.getPfm2());
+						tbPfm3.setText(fiz.getPfm3());
+						tbPfd1.setText(fiz.getPfd1());
+						tbPfd2.setText(fiz.getPfd2());
+						tbPfd3.setText(fiz.getPfd3());
+						tbPfd4.setText(fiz.getPfd4());
+						tbPfd5.setText(fiz.getPfd5());
+						tbOkr.setText(fiz.getOkr());
+						tbPf1.setText(Integer.toString(fiz.getPf1()));
+						tbMf1.setText(Integer.toString(fiz.getMf1()));
+						tbEf1.setText(Integer.toString(fiz.getEf1()));
+						tbRf1.setText(Integer.toString(fiz.getRf1()));
+						
+						/*pdisp_ds*/
+						tabDiag_do.setData(MainForm.tcl.getTblDispds(pat.npasp));
+						
+					} catch (KmiacServerException e1) {
+						e1.printStackTrace();
+					} catch (PfizNotFoundException e1) {
+						System.out.println("nx");
+					} catch (TException e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		lblPatient = new JLabel("Пациент:");
+		
+		JButton button = new JButton("Сохранить");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					fiz = new Pfiz();
+					fiz.setNpasp(pat.npasp);
+					if (rbtAkds1.isSelected()) fiz.setAkds(1);
+					if (rbtAkds2.isSelected()) fiz.setAkds(2);
+					if (rbtAkds3.isSelected()) fiz.setAkds(3);
+					if (rbtAkds4.isSelected()) fiz.setAkds(4);
+					if (rbtGrzd1.isSelected()) fiz.setGrzd(1);
+					if (rbtGrzd2.isSelected()) fiz.setGrzd(2);
+					if (rbtGrzd3.isSelected()) fiz.setGrzd(3);
+					if (rbtGrzd4.isSelected()) fiz.setGrzd(4);
+					if (rbtPe1.isSelected()) fiz.setPe(1);
+					if (rbtPe2.isSelected()) fiz.setPe(2);
+					if (rbtPi1.isSelected()) fiz.setPi(1);
+					if (rbtPi2.isSelected()) fiz.setPi(2);
+					if (rbtPp1.isSelected()) fiz.setPp(1);
+					if (rbtPp2.isSelected()) fiz.setPp(2);
+					if (rbtVes1.isSelected()) fiz.setFv(1);
+					if (rbtVes2.isSelected()) fiz.setFv(2);
+					if (rbtVes3.isSelected()) fiz.setFv(3);
+					if (rbtRost1.isSelected()) fiz.setFr(1);
+					if (rbtRost2.isSelected()) fiz.setFr(2);
+					if (rbtRost3.isSelected()) fiz.setFr(3);
+					if (rbtProfPriv1.isSelected()) fiz.setPriv(1);
+					if (rbtProfPriv2.isSelected()) fiz.setPriv(2);
+					if (rbtProfPriv3.isSelected()) fiz.setPriv(3);
+					if (rbtNeprivit1.isSelected()) fiz.setPriv_pr(1);
+					if (rbtNeprivit2.isSelected()) fiz.setPriv_pr(2);
+					if (rbtBcg_vr1.isSelected()) fiz.setBcg_vr(1);
+					if (rbtBcg_vr2.isSelected()) fiz.setBcg_vr(2);
+					if (rbtBcg_vr3.isSelected()) fiz.setBcg_vr(3);
+					if (rbtPolio_vr1.isSelected()) fiz.setPolio_vr(1);
+					if (rbtPolio_vr2.isSelected()) fiz.setPolio_vr(2);
+					if (rbtPolio_vr3.isSelected()) fiz.setPolio_vr(3);
+					if (rbtPolio_vr4.isSelected()) fiz.setPolio_vr(4);
+					if (rbtPolio_vr5.isSelected()) fiz.setPolio_vr(5);
+					if (rbtPolio_vr6.isSelected()) fiz.setPolio_vr(6);
+					if (rbtAkds1.isSelected()) fiz.setAkds_vr(1);
+					if (rbtAkds2.isSelected()) fiz.setAkds_vr(2);
+					if (rbtAkds3.isSelected()) fiz.setAkds_vr(3);
+					if (rbtKor1.isSelected()) fiz.setKor_vr(1);
+					if (rbtKor2.isSelected()) fiz.setKor_vr(2);
+					if (rbtParotit1.isSelected()) fiz.setParotit_vr(1);
+					if (rbtParotit2.isSelected()) fiz.setParotit_vr(2);
+					if (rbtKrasn1.isSelected()) fiz.setKrasn_vr(1);
+					if (rbtKrasn2.isSelected()) fiz.setKrasn_vr(2);
+					if (rbtGepatit1.isSelected()) fiz.setGepatit_vr(1);
+					if (rbtGepatit2.isSelected()) fiz.setGepatit_vr(2);
+					if (rbtVedomPrZdrav.isSelected()) fiz.setVedom(1);
+					if (rbtVedomPrObr.isSelected()) fiz.setVedom(2);
+					if (rbtVedomPrSoc.isSelected()) fiz.setVedom(3);
+					if (rbtVib1.isSelected()) fiz.setVib1(1);
+					if (rbtVib2.isSelected()) fiz.setVib1(2);
+					if (rbtVib3.isSelected()) fiz.setVib1(3);
+					if (rbtVib4.isSelected()) fiz.setVib1(4);
+					if (rbtVib5.isSelected()) fiz.setVib1(5);
+					if (rbtVib2_1.isSelected()) fiz.setVib2(1);
+					if (rbtVib2_2.isSelected()) fiz.setVib2(2);
+					if (rbtVib2_3.isSelected()) fiz.setVib2(3);
+					if (rbtVib2_4.isSelected()) fiz.setVib2(4);
+					if (rbtIpr1.isSelected()) fiz.setIpr(1);
+					if (rbtIpr2.isSelected()) fiz.setIpr(2);
+					if (rbtIpr3.isSelected()) fiz.setIpr(3);
+					if (rbtIpr4.isSelected()) fiz.setIpr(4);
+					if (rbtPdf5_1.isSelected()) fiz.setMenses(1);
+					if (rbtPdf5_2.isSelected()) fiz.setMenses(2);
+					if (rbtMenses1_1.isSelected()) fiz.setMenses1(1);
+					if (rbtMenses1_2.isSelected()) fiz.setMenses1(2);
+					
+					if (cbPrb.isSelected()) fiz.setPrb(1);
+					if (cbPrk.isSelected()) fiz.setPrk(1);
+					if (cbPrs.isSelected()) fiz.setPrs(1);
+					if (cbPriv_n.isSelected()) fiz.setPriv_n(1);
+					if (cbBcg.isSelected()) fiz.setBcg(1);
+					if (cbPolio.isSelected()) fiz.setPolio(1);
+					if (cbAkds.isSelected()) fiz.setAkds(1);
+					if (cbAdsm.isSelected()) fiz.setAdsm(1);
+					if (cbAdm.isSelected()) fiz.setAdm(1);
+					if (cbKor.isSelected()) fiz.setKor(1);
+					if (cbParotit.isSelected()) fiz.setParotit(1);
+					if (cbKrasn.isSelected()) fiz.setKrasn(1);
+					if (cbGepatit.isSelected()) fiz.setGepatit(1);
+					if (tbDataPostup.getDate()!=null)
+							fiz.setDat_p(tbDataPostup.getDate().getTime());
+					if (tbDatNaznIpr.getDate()!=null)
+						fiz.setDat_ipr(tbDatNaznIpr.getDate().getTime());
+					if (tbDateOsm.getDate()!=null)
+						fiz.setDataz(tbDateOsm.getDate().getTime());
+					if (!tbVes.getText().isEmpty()) fiz.setVes(Double.valueOf(tbVes.getText()));
+					if (!tbRost.getText().isEmpty())fiz.setRost(Double.valueOf(tbRost.getText()));
+					fiz.setVrk(tbVrk.getText());
+					fiz.setPfm1(tbPfm1.getText());
+					fiz.setPfm2(tbPfm2.getText());
+					fiz.setPfm3(tbPfm3.getText());
+					fiz.setPfd1(tbPfd1.getText());
+					fiz.setPfd2(tbPfd2.getText());
+					fiz.setPfd3(tbPfd3.getText());
+					fiz.setPfd4(tbPfd4.getText());
+					fiz.setPfd5(tbPfd5.getText());
+					fiz.setOkr(tbOkr.getText());
+					if (!tbPf1.getText().isEmpty()) fiz.setPf1(Integer.valueOf(tbPf1.getText()));
+					if (!tbMf1.getText().isEmpty()) fiz.setMf1(Integer.valueOf(tbMf1.getText()));
+					if (!tbEf1.getText().isEmpty()) fiz.setEf1(Integer.valueOf(tbEf1.getText()));
+					if (!tbRf1.getText().isEmpty()) fiz.setRf1(Integer.valueOf(tbRf1.getText()));
+				
+					MainForm.tcl.setPfiz(fiz);
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
 			}
 		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
@@ -203,16 +523,24 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 967, Short.MAX_VALUE)
-						.addComponent(btnSrc))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addComponent(btnSrc)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button))
+						.addComponent(lblPatient))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-					.addComponent(btnSrc)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 650, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap()
+					.addComponent(lblPatient)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnSrc)
+						.addComponent(button))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 632, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
 		bgVedomPr = new ButtonGroup();
@@ -413,7 +741,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblDatNaznIpr = new JLabel("Дата назначения ИПР");
 		
-		CustomDateEditor tbDatNaznIpr = new CustomDateEditor();
+		tbDatNaznIpr = new CustomDateEditor();
 		tbDatNaznIpr.setColumns(10);
 		
 		JPanel pnlGrzd = new JPanel();
@@ -538,23 +866,23 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlPrNePrivit.setLayout(gl_pnlPrNePrivit);
 		pnlProfPriv.setLayout(gl_pnlProfPriv);
 		
-		JCheckBox cbPriv_n = new JCheckBox("нуждается  в проведении вакцинации/ревакцинации");
+		cbPriv_n = new JCheckBox("нуждается  в проведении вакцинации/ревакцинации");
 		
-		JCheckBox cbBcg = new JCheckBox("БЦЖ");
+		cbBcg = new JCheckBox("БЦЖ");
 		
-		JCheckBox cbPolio = new JCheckBox("Полиомиелит");
+		cbPolio = new JCheckBox("Полиомиелит");
 		
-		JCheckBox cbAkds = new JCheckBox("АКДС");
+		cbAkds = new JCheckBox("АКДС");
 		
-		JCheckBox cbAdsm = new JCheckBox("АДСМ");
+		cbAdsm = new JCheckBox("АДСМ");
 		
-		JCheckBox cbKor = new JCheckBox("Корь");
+		cbKor = new JCheckBox("Корь");
 		
-		JCheckBox cbParotit = new JCheckBox("Эпид.паротит");
+		cbParotit = new JCheckBox("Эпид.паротит");
 		
-		JCheckBox cbKrasn = new JCheckBox("Краснуха");
+		cbKrasn = new JCheckBox("Краснуха");
 		
-		JCheckBox cbGepatit = new JCheckBox("Гепатит В");
+		cbGepatit = new JCheckBox("Гепатит В");
 		
 		JPanel pnlBcg_vr = new JPanel();
 		pnlBcg_vr.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -688,7 +1016,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		);
 		pnlAkds.setLayout(gl_pnlAkds);
 		
-		JCheckBox cbAdm = new JCheckBox("АДМ");
+		cbAdm = new JCheckBox("АДМ");
 		
 		JPanel pnlKor = new JPanel();
 		pnlKor.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -827,14 +1155,15 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblDateOsm = new JLabel("Дата осмотра");
 		
-		CustomDateEditor tbDateOsm = new CustomDateEditor();
+		tbDateOsm = new CustomDateEditor();
 		tbDateOsm.setColumns(10);
 		
-		JCheckBox cbPrb = new JCheckBox("Относится к категории часто болеющих детей");
+		cbPrb = new JCheckBox("Относится к категории часто болеющих детей");
 		
-		JCheckBox cbPrk = new JCheckBox("Потребность в медико-педагогической коррекции");
+		cbPrk = new JCheckBox("Потребность в медико-педагогической коррекции");
 		
-		JCheckBox bcPrs = new JCheckBox("Потребность в медико-социальной коррекции");
+		cbPrs = new JCheckBox("Потребность в медико-социальной коррекции");
+		
 		GroupLayout gl_pnlSveden = new GroupLayout(pnlSveden);
 		gl_pnlSveden.setHorizontalGroup(
 			gl_pnlSveden.createParallelGroup(Alignment.LEADING)
@@ -850,25 +1179,33 @@ public class MainForm extends Client<ThriftDisp.Client>{
 								.addGroup(gl_pnlSveden.createSequentialGroup()
 									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
 										.addGroup(gl_pnlSveden.createSequentialGroup()
-											.addComponent(lblProfil)
-											.addGap(4)
-											.addComponent(cmbProfil, GroupLayout.PREFERRED_SIZE, 249, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_pnlSveden.createSequentialGroup()
-											.addComponent(lblVedomPr, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
-											.addGap(4)
-											.addComponent(pnlVedomPr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+											.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+												.addGroup(gl_pnlSveden.createSequentialGroup()
+													.addComponent(lblProfil)
+													.addGap(4)
+													.addComponent(cmbProfil, GroupLayout.PREFERRED_SIZE, 249, GroupLayout.PREFERRED_SIZE))
+												.addGroup(gl_pnlSveden.createSequentialGroup()
+													.addComponent(lblVedomPr, GroupLayout.PREFERRED_SIZE, 137, GroupLayout.PREFERRED_SIZE)
+													.addGap(4)
+													.addComponent(pnlVedomPr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+												.addGroup(gl_pnlSveden.createSequentialGroup()
+													.addPreferredGap(ComponentPlacement.RELATED)
+													.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+														.addGroup(gl_pnlSveden.createSequentialGroup()
+															.addComponent(lblVib2, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
+															.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+															.addComponent(pnlVib2, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE))
+														.addGroup(gl_pnlSveden.createSequentialGroup()
+															.addComponent(lblVib, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+															.addPreferredGap(ComponentPlacement.RELATED)
+															.addComponent(pnlVib, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE)))))
+											.addGap(32))
 										.addGroup(gl_pnlSveden.createSequentialGroup()
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addGroup(gl_pnlSveden.createParallelGroup(Alignment.TRAILING)
-												.addGroup(gl_pnlSveden.createSequentialGroup()
-													.addComponent(lblVib2, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE)
-													.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-													.addComponent(pnlVib2, GroupLayout.PREFERRED_SIZE, 314, GroupLayout.PREFERRED_SIZE))
-												.addGroup(Alignment.LEADING, gl_pnlSveden.createSequentialGroup()
-													.addComponent(lblVib, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
-													.addPreferredGap(ComponentPlacement.RELATED)
-													.addComponent(pnlVib, GroupLayout.PREFERRED_SIZE, 396, GroupLayout.PREFERRED_SIZE)))))
-									.addGap(32)
+											.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+												.addComponent(cbPriv_n)
+												.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 420, GroupLayout.PREFERRED_SIZE))
+											.addGap(99)))
 									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
 										.addComponent(cbPrb)
 										.addGroup(gl_pnlSveden.createSequentialGroup()
@@ -882,12 +1219,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 											.addGap(4)
 											.addComponent(tbDateOsm, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE))
 										.addComponent(cbPrk)
-										.addComponent(bcPrs)))))
-						.addGroup(gl_pnlSveden.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbPriv_n)
-								.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 420, GroupLayout.PREFERRED_SIZE)))
+										.addComponent(cbPrs)))))
 						.addGroup(gl_pnlSveden.createSequentialGroup()
 							.addGap(44)
 							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
@@ -959,7 +1291,9 @@ public class MainForm extends Client<ThriftDisp.Client>{
 											.addComponent(pnlVib2, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE))
 										.addGroup(gl_pnlSveden.createSequentialGroup()
 											.addGap(24)
-											.addComponent(lblVib2))))
+											.addComponent(lblVib2)))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_pnlSveden.createSequentialGroup()
 									.addGap(14)
 									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.BASELINE)
@@ -968,22 +1302,18 @@ public class MainForm extends Client<ThriftDisp.Client>{
 									.addPreferredGap(ComponentPlacement.UNRELATED)
 									.addComponent(pnlGrzd, GroupLayout.PREFERRED_SIZE, 47, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(cbPrb)))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(cbPrb)
+									.addGap(29)
+									.addComponent(cbPrs)))
+							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+								.addGroup(Alignment.TRAILING, gl_pnlSveden.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_pnlSveden.createSequentialGroup()
+										.addGap(3)
+										.addComponent(lblDateOsm))
+									.addComponent(tbDateOsm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addGroup(gl_pnlSveden.createSequentialGroup()
-									.addComponent(pnlProfPriv, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-									.addGap(3)
-									.addComponent(cbPriv_n))
-								.addGroup(gl_pnlSveden.createSequentialGroup()
-									.addGap(18)
-									.addComponent(bcPrs)
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addGroup(gl_pnlSveden.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_pnlSveden.createSequentialGroup()
-											.addGap(3)
-											.addComponent(lblDateOsm))
-										.addComponent(tbDateOsm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(cbPriv_n)))
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_pnlSveden.createParallelGroup(Alignment.TRAILING)
 								.addComponent(cbBcg)
@@ -1042,7 +1372,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblRost = new JLabel("Рост (м)");
 		
-		CustomTextField tbRost = new CustomTextField();
+		tbRost = new CustomTextField();
 		tbRost.setColumns(10);
 		
 		JPanel pnlRost = new JPanel();
@@ -1084,7 +1414,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblOkr = new JLabel("Окружность головы, см (0-4 лет)");
 		
-		CustomTextField tbOkr = new CustomTextField();
+		tbOkr = new CustomTextField();
 		tbOkr.setColumns(10);
 		
 		JLabel lblVrk = new JLabel("Весо-ростовой коэффициент");
@@ -1127,7 +1457,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		lblOcenps = new JLabel("<html>Оценка <br>психического <be>здоровья</html>");
 		
-		CustomTextField tbVrk = new CustomTextField();
+		tbVrk = new CustomTextField();
 		tbVrk.setColumns(10);
 		
 		JPanel pnlPi = new JPanel();
@@ -1290,44 +1620,44 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		lblPfm1 = new JLabel("Р");
 		
-		CustomTextField tbPfm1 = new CustomTextField();
+		 tbPfm1 = new CustomTextField();
 		tbPfm1.setColumns(10);
 		
 		JLabel lblPfm2 = new JLabel("Ах");
 		
-		CustomTextField tbPfm2 = new CustomTextField();
+		 tbPfm2 = new CustomTextField();
 		tbPfm2.setColumns(10);
 		
 		JLabel lblPfm3 = new JLabel("Fa");
 		
-		CustomTextField tbPfm3 = new CustomTextField();
+		 tbPfm3 = new CustomTextField();
 		tbPfm3.setColumns(10);
 		
 		JLabel lblPfd = new JLabel("половая формула девочки:");
 		
 		JLabel lblPfd1 = new JLabel("Р");
 		
-		CustomTextField tbPdf1 = new CustomTextField();
-		tbPdf1.setColumns(10);
+		 tbPfd1 = new CustomTextField();
+		tbPfd1.setColumns(10);
 		
 		JLabel lblPdf2 = new JLabel("Мф");
 		
-		CustomTextField tbPdf2 = new CustomTextField();
-		tbPdf2.setColumns(10);
+		 tbPfd2 = new CustomTextField();
+		tbPfd2.setColumns(10);
 		
 		JLabel lblPdf3 = new JLabel("Ах");
 		
-		CustomTextField tbPdf3 = new CustomTextField();
-		tbPdf3.setColumns(10);
+		 tbPfd3 = new CustomTextField();
+		tbPfd3.setColumns(10);
 		
 		JLabel lblPdf4 = new JLabel("Ме");
 		
-		CustomTextField tbPdf4 = new CustomTextField();
-		tbPdf4.setColumns(10);
+		 tbPfd4 = new CustomTextField();
+		tbPfd4.setColumns(10);
 		
 		JLabel lblMenarhe = new JLabel("Menarhe (лет, месяцев)");
 		
-		CustomTextField tbPfd5 = new CustomTextField();
+		 tbPfd5 = new CustomTextField();
 		tbPfd5.setColumns(10);
 		
 		JLabel lblMenses = new JLabel("Menses(хар-ка)");
@@ -1423,19 +1753,19 @@ public class MainForm extends Client<ThriftDisp.Client>{
 									.addGap(10)
 									.addComponent(lblPfd1, GroupLayout.PREFERRED_SIZE, 6, GroupLayout.PREFERRED_SIZE)
 									.addGap(10)
-									.addComponent(tbPdf1, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+									.addComponent(tbPfd1, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 									.addGap(18)
 									.addComponent(lblPdf2, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
 									.addGap(4)
-									.addComponent(tbPdf2, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+									.addComponent(tbPfd2, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 									.addGap(18)
 									.addComponent(lblPdf3, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
 									.addGap(4)
-									.addComponent(tbPdf3, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+									.addComponent(tbPfd3, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 									.addGap(18)
 									.addComponent(lblPdf4, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tbPdf4, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)))
+									.addComponent(tbPfd4, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)))
 							.addPreferredGap(ComponentPlacement.RELATED))
 						.addGroup(gl_pnlOcenPr.createSequentialGroup()
 							.addComponent(lblMenses)
@@ -1470,18 +1800,18 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						.addGroup(gl_pnlOcenPr.createSequentialGroup()
 							.addGap(3)
 							.addComponent(lblPfd1))
-						.addComponent(tbPdf1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tbPfd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlOcenPr.createSequentialGroup()
 							.addGap(3)
 							.addComponent(lblPdf2))
-						.addComponent(tbPdf2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tbPfd2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlOcenPr.createSequentialGroup()
 							.addGap(3)
 							.addComponent(lblPdf3))
 						.addGroup(gl_pnlOcenPr.createParallelGroup(Alignment.BASELINE)
-							.addComponent(tbPdf3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tbPfd3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(lblPdf4)
-							.addComponent(tbPdf4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(tbPfd4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_pnlOcenPr.createParallelGroup(Alignment.LEADING)
 						.addComponent(lblMenarhe)
@@ -1501,23 +1831,24 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		lblPf1 = new JLabel("<html>Познавательная функция (возраст <br>развития, мес.)</html>");
 		
-		CustomTextField tbPf1 = new CustomTextField();
+		tbPf1 = new CustomTextField();
 		tbPf1.setColumns(10);
 		
 		JLabel lblEf1 = new JLabel("<html>Эмоциональная и социальная функции <br>(контакт с окруж.миром) <br>(возраст развития, мес.)</html>");
 		
-		CustomTextField tbEf1 = new CustomTextField();
+		tbEf1 = new CustomTextField();
 		tbEf1.setColumns(10);
 		
 		JLabel lblMf1 = new JLabel("<html>Моторная функция<br> (возраст развития, мес.)</html>");
 		
-		CustomTextField tbMf1 = new CustomTextField();
+		tbMf1 = new CustomTextField();
 		tbMf1.setColumns(10);
 		
 		JLabel lblRf1 = new JLabel("<html>Предречевое и речевое <br> развитие (возраст развития, мес.)</html>");
 		
-		CustomTextField tbRf1 = new CustomTextField();
+		tbRf1 = new CustomTextField();
 		tbRf1.setColumns(10);
+		
 		GroupLayout gl_pnl04y = new GroupLayout(pnl04y);
 		gl_pnl04y.setHorizontalGroup(
 			gl_pnl04y.createParallelGroup(Alignment.LEADING)
@@ -2195,45 +2526,46 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblSan = new JLabel("в санатории");
 		
-		JCheckBox cbVrec1 = new JCheckBox("");
+		cbVrec1 = new JCheckBox("");
 		
-		JCheckBox cbVrec2 = new JCheckBox("");
+		cbVrec2 = new JCheckBox("");
 		
-		JCheckBox cbVrec3 = new JCheckBox("");
+		cbVrec3 = new JCheckBox("");
 		
-		JCheckBox cbVrec4 = new JCheckBox("");
+		cbVrec4 = new JCheckBox("");
 		
-		JCheckBox cbVrec5 = new JCheckBox("");
+		cbVrec5 = new JCheckBox("");
 		
-		JCheckBox cbVrec6 = new JCheckBox("");
+		cbVrec6 = new JCheckBox("");
 		
-		JCheckBox cbVrec7 = new JCheckBox("");
+		cbVrec7 = new JCheckBox("");
 		
-		JCheckBox cbVrec8 = new JCheckBox("");
+		cbVrec8 = new JCheckBox("");
 		
-		JCheckBox cbVrec9 = new JCheckBox("");
+		cbVrec9 = new JCheckBox("");
 		
-		JCheckBox cbVrec10 = new JCheckBox("");
+		cbVrec10 = new JCheckBox("");
 		
-		JCheckBox cbNrec1 = new JCheckBox("");
+		cbNrec1 = new JCheckBox("");
 		
-		JCheckBox cbNrec2 = new JCheckBox("");
+		cbNrec2 = new JCheckBox("");
 		
-		JCheckBox cbNrec3 = new JCheckBox("");
+		cbNrec3 = new JCheckBox("");
 		
-		JCheckBox cbNrec4 = new JCheckBox("");
+		cbNrec4 = new JCheckBox("");
 		
-		JCheckBox cbNrec5 = new JCheckBox("");
+		cbNrec5 = new JCheckBox("");
 		
-		JCheckBox cbNrec6 = new JCheckBox("");
+		cbNrec6 = new JCheckBox("");
 		
-		JCheckBox cbNrec7 = new JCheckBox("");
+		cbNrec7 = new JCheckBox("");
 		
-		JCheckBox cbNrec8 = new JCheckBox("");
+		cbNrec8 = new JCheckBox("");
 		
-		JCheckBox cbNrec9 = new JCheckBox("");
+		cbNrec9 = new JCheckBox("");
 		
-		JCheckBox cbNrec10 = new JCheckBox("");
+		cbNrec10 = new JCheckBox("");
+		
 		GroupLayout gl_pnlProvOzd = new GroupLayout(pnlProvOzd);
 		gl_pnlProvOzd.setHorizontalGroup(
 			gl_pnlProvOzd.createParallelGroup(Alignment.LEADING)
@@ -2368,6 +2700,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 
 	private void initialize() {
 		frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Диспансеризация");
 		frame.setBounds(100, 100, 995, 737);
 	}
@@ -2375,5 +2708,13 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	@Override
 	public String getName() {
 		return configuration.appName;
+	}
+	
+	@Override
+	public void onConnect(ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServer.Client conn) {
+		super.onConnect(conn);
+		if (conn instanceof ThriftDisp.Client) {
+			tcl = thrClient;
+		}
 	}
 }

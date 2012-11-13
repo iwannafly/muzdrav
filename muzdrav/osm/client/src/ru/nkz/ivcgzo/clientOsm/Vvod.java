@@ -70,6 +70,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -102,6 +103,8 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import javax.swing.AbstractListModel;
+import javax.swing.JTable;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -206,10 +209,12 @@ public class Vvod extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbKonsMesto;
 	private JLabel lblVidStacionar;
 	private JLabel lblKonsMesto;
-	private CustomTable<Pvizit, Pvizit._Fields> tblObr;
+	public static CustomTable<Pvizit, Pvizit._Fields> tblObr;
 	private JButton btnObrDel;
 	private JButton btnObrSave;
 	private JButton btnObrAdd;
+	private CustomTable<PdiagZ, PdiagZ._Fields> table;
+
 	
 	/**
 	 * Create the dialog.
@@ -771,7 +776,7 @@ public class Vvod extends JFrame {
 					if (tblDiag.getSelectedItem()!= null)
 					if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 		  			MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
-					tblDiag.setData(MainForm.tcl.getPdiagAmb(Vvod.zapVr.getId_pvizit()));}
+					tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));}
 					if (tblDiag.getRowCount() > 0)
 						tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
 				} catch (KmiacServerException e1) {
@@ -790,7 +795,6 @@ public class Vvod extends JFrame {
 		  		try {
 			  		diagamb.setDiag(tblDiag.getSelectedItem().getDiag());
 			  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
-			  		diagamb.setDatad(tblDiag.getSelectedItem().getDatad());
 			  		diagamb.setDatap(pvizitAmb.getDatap());
 			  		diagamb.setId_pos(pvizitAmb.getId());
 			  		if (rbtDiagOsn.isSelected()) diagamb.setDiag_stat(1);
@@ -805,15 +809,11 @@ public class Vvod extends JFrame {
 			  			diagamb.setPredv(true);
 			  		if (rbtDiagZakl.isSelected()) {
 			  			diagamb.setPredv(false);
-			  			pdiag.setId_diag_amb(diagamb.getId());
 			  			pdiag.setNpasp(diagamb.getNpasp());
 			  			pdiag.setDiag(diagamb.getDiag());
-			  			pdiag.setCpodr(MainForm.authInfo.getCpodr());
 			  			pdiag.setNmvd(diagamb.getObstreg());
-			  			pdiag.setCod_sp(diagamb.getCod_sp());
-			  			pdiag.setCdol_ot(diagamb.getCdol());
 			  			pdiag.setNamed(diagamb.getNamed());
-			  			pdiag.setUch(zapVr.getNuch());
+			  			pdiag.setDatad(diagamb.getDatad());
 			  			if (rbtInvUst1.isSelected())pdiag.setPpi(1);
 			  			if (rbtInvUst2.isSelected())pdiag.setPpi(2);
 			  			if (rbtDiagHarOstr.isSelected()) pdiag.setXzab(1);
@@ -829,9 +829,12 @@ public class Vvod extends JFrame {
 		  		if (diagamb.isSetNamed()) MainForm.tcl.UpdatePdiagAmb(diagamb);
 		  		else JOptionPane.showMessageDialog(Vvod.this, "Введите описание диагноза");
 		  		
+		  		for (PdiagAmb pd : tblDiag.getData())
+		  			if (pd.diag_stat == 1) {
+		  				pvizitAmb.setDiag(pd.getDiag());
+		  				MainForm.tcl.UpdatePvizitAmb(pvizitAmb);}
+		  		
 	  			if (tbDiagDispDatVz.getDate() != null){
-		  			pdisp.setId_diag(diagamb.getId());
-		  			pdiag.setId_diag_amb(diagamb.getId());
 		  			pdisp.setNpasp(diagamb.getNpasp());
 		  			pdisp.setDiag(diagamb.getDiag());
 		  			pdisp.setPcod(MainForm.authInfo.getCpodr());
@@ -852,24 +855,26 @@ public class Vvod extends JFrame {
 		  				diagamb.setDiag(tfNewDs.getText());
 		  				diagamb.setId_obr(zapVr.getId_pvizit());
 				  		diagamb.setNpasp(zapVr.getNpasp());
-				  		diagamb.setDatap(System.currentTimeMillis());
-				  		diagamb.setDatad(System.currentTimeMillis());
+				  		diagamb.setDatap(tblPos.getSelectedItem().datap);
+				  		for (PdiagZ pd : table.getData()){
+				  			if (pd.getDiag().equals(tfNewDs.getText())) 
+				  				diagamb.setDatad(pdiag.getDatad());
+				  				else diagamb.setDatad(System.currentTimeMillis());
+		  			}
 				  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
 				  		diagamb.setCdol(MainForm.authInfo.getCdol());
 				  		diagamb.setPredv(false);
 				  		diagamb.setDiag_stat(1);
 						diagamb.setNamed(diag_named);
 						diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
-						pdiag.setId_diag_amb(diagamb.getId());
 						pdiag.setDiag(tfNewDs.getText());
 						MainForm.tcl.setPdiag(pdiag);
-						pdisp.setId_diag(diagamb.getId());
-		  				pdisp.setDiag_s(tblDiag.getSelectedItem().diag);
+		  				pdisp.setDiag_s(pdisp.diag);
 		  				pdisp.setDiag(tfNewDs.getText());
 		  				pdisp.setDiag_n(null);
 		  				pdisp.setDatad(tfDataIzmNewDs.getDate().getTime());
 		  				MainForm.tcl.setPdisp(pdisp); 
-		  				tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
+		  				tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));
 		  			}
 		  			/*pdiag*/
 		  			if (tbDiagDispDatVz.getDate() != null)
@@ -884,34 +889,110 @@ public class Vvod extends JFrame {
 		  	} catch (TException e1) {
 		  		MainForm.conMan.reconnect(e1);
 		  	}
+		  		try {
+					table.setData(MainForm.tcl.getPdiagZInfo(tblPos.getSelectedItem().getNpasp()));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		btnDiagSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
+		
+		JLabel label = new JLabel("Диагнозы посещения");
+		
+		JLabel label_1 = new JLabel("Заключительные диагнозы");
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
 		GroupLayout gl_PnlDiag = new GroupLayout(PnlDiag);
 		gl_PnlDiag.setHorizontalGroup(
 			gl_PnlDiag.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_PnlDiag.createSequentialGroup()
-					.addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 517, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_PnlDiag.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(label))
+						.addGroup(gl_PnlDiag.createSequentialGroup()
+							.addGap(2)
+							.addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 312, GroupLayout.PREFERRED_SIZE)))
+					.addGap(18)
+					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_PnlDiag.createParallelGroup(Alignment.LEADING)
+							.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnDiagDel, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
+						.addComponent(btnDiagSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnDiagDel, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnDiagSave, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
-					.addGap(123))
+						.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_1))
+					.addGap(142))
 		);
 		gl_PnlDiag.setVerticalGroup(
 			gl_PnlDiag.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_PnlDiag.createSequentialGroup()
-					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.LEADING)
-						.addComponent(spDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
-						.addGroup(gl_PnlDiag.createSequentialGroup()
-							.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnDiagDel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnDiagSave, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)))
-					.addGap(0))
+					.addGroup(gl_PnlDiag.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.LEADING, gl_PnlDiag.createSequentialGroup()
+							.addGap(3)
+							.addComponent(label)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(spDiag, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE))
+						.addGroup(Alignment.LEADING, gl_PnlDiag.createParallelGroup(Alignment.TRAILING, false)
+							.addGroup(Alignment.LEADING, gl_PnlDiag.createSequentialGroup()
+								.addGap(5)
+								.addComponent(label_1)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(scrollPane_1, 0, 0, Short.MAX_VALUE))
+							.addGroup(Alignment.LEADING, gl_PnlDiag.createSequentialGroup()
+								.addComponent(btnDiagAdd, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(btnDiagDel, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(btnDiagSave))))
+					.addContainerGap(10, Short.MAX_VALUE))
 		);
+		
+		table = new CustomTable<>(false, false, PdiagZ.class, 2, "Диагноз");
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
+					if (e.getClickCount() == 2)
+					if (table.getSelectedItem().diag != null){
+						diagamb = new PdiagAmb();
+	 			  		diagamb.setId_obr(zapVr.getId_pvizit());
+	 			  		diagamb.setId_pos(tblPos.getSelectedItem().id);
+	 			  		diagamb.setNpasp(zapVr.getNpasp());
+	 			  		diagamb.setDatap(System.currentTimeMillis());
+	 			  		if (table.getSelectedItem().isSetDatad()) diagamb.setDatad(table.getSelectedItem().getDatad());
+	 			  		else diagamb.setDatap(System.currentTimeMillis());
+	 			  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
+	 			  		diagamb.setCdol(MainForm.authInfo.getCdol());
+	 			  		diagamb.setPredv(true);
+	 			  		diagamb.setDiag_stat(1);
+	 					diagamb.setDiag(table.getSelectedItem().getDiag());
+	 					diagamb.setNamed(table.getSelectedItem().getNamed());
+	 					
+							diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
+							tblDiag.addItem(diagamb);
+						}
+				}
+					catch (KmiacServerException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (TException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+	 		 			
+			
+			}
+		});
+
+		table.setFillsViewportHeight(true);
+		scrollPane_1.setViewportView(table);
 		
 		tblDiag = new CustomTable<>(true, true, PdiagAmb.class, 7, "Дата установления диагноза", 3, "Код МКБ");
 		tblDiag.addMouseListener(new MouseAdapter() {
@@ -1016,6 +1097,16 @@ public class Vvod extends JFrame {
 						cmbDiagDispGrup.setSelectedItem(null);
 					tfNuch.setText(String.valueOf(pdisp.getD_uch()));
 				}
+				try {
+					table.setData(MainForm.tcl.getPdiagZInfo(tblPos.getSelectedItem().getNpasp()));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
 			}
 		});
 		tblDiag.setFillsViewportHeight(true);
@@ -1187,47 +1278,53 @@ public class Vvod extends JFrame {
 				.addGroup(gl_pnlDiag.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING)
-						.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 582, GroupLayout.PREFERRED_SIZE)
-						.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDiag.createSequentialGroup()
-							.addComponent(lblDiagVidTr, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbDiagVidTr, GroupLayout.PREFERRED_SIZE, 157, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(lblDiagObstReg)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbDiagObstReg, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
+							.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 582, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addComponent(PnlDiag, 0, 0, Short.MAX_VALUE)
+						.addGroup(gl_pnlDiag.createSequentialGroup()
+							.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_pnlDiag.createSequentialGroup()
+									.addComponent(lblDiagVidTr, GroupLayout.PREFERRED_SIZE, 73, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbDiagVidTr, GroupLayout.PREFERRED_SIZE, 157, GroupLayout.PREFERRED_SIZE)
+									.addGap(18)
+									.addComponent(lblDiagObstReg)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(cmbDiagObstReg, GroupLayout.PREFERRED_SIZE, 156, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_pnlDiag.createSequentialGroup()
+									.addComponent(pnlDiagStadZab, GroupLayout.PREFERRED_SIZE, 292, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(pnlDiagHarZab, GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
+								.addGroup(gl_pnlDiag.createSequentialGroup()
+									.addComponent(pnlDiagStat, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(pnlDiagPredv, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_pnlDiag.createSequentialGroup()
+									.addComponent(lblDiagOpis, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addComponent(spDiagOpis, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)))
+							.addContainerGap())
 						.addGroup(gl_pnlDiag.createSequentialGroup()
 							.addComponent(chbDiagInv)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(chbDiagBoe)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(chbDiagBer, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))
-						.addComponent(PnlDiag, 0, 0, Short.MAX_VALUE)
+							.addComponent(chbDiagBer, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
+							.addGap(14))
 						.addGroup(gl_pnlDiag.createSequentialGroup()
-							.addComponent(lblDiagOpis, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(spDiagOpis, GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE))
-						.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING, false)
-							.addGroup(gl_pnlDiag.createSequentialGroup()
-								.addComponent(pnlDiagStadZab, GroupLayout.PREFERRED_SIZE, 292, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.UNRELATED)
-								.addComponent(pnlDiagHarZab, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-							.addGroup(gl_pnlDiag.createSequentialGroup()
-								.addComponent(pnlDiagStat, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(pnlDiagPredv, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap())
+							.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, 191, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap(401, Short.MAX_VALUE))))
 		);
 		gl_pnlDiag.setVerticalGroup(
 			gl_pnlDiag.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlDiag.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(PnlDiag, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+					.addGap(1)
+					.addComponent(PnlDiag, GroupLayout.PREFERRED_SIZE, 122, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING)
-						.addComponent(spDiagOpis, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-						.addComponent(lblDiagOpis))
+						.addComponent(lblDiagOpis)
+						.addComponent(spDiagOpis, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.LEADING)
 						.addComponent(pnlDiagStat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -1243,7 +1340,7 @@ public class Vvod extends JFrame {
 						.addComponent(lblDiagObstReg)
 						.addComponent(cmbDiagObstReg, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 106, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlDiagDisp, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlDiag.createParallelGroup(Alignment.BASELINE)
 						.addComponent(chbDiagInv)
@@ -1251,7 +1348,7 @@ public class Vvod extends JFrame {
 						.addComponent(chbDiagBer))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(pnlInvUst, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(19))
+					.addGap(5))
 		);
 		
 		tbDiagDispDatVz = new CustomDateEditor();
@@ -1593,6 +1690,7 @@ public class Vvod extends JFrame {
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
+				treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 			}
 		});
 		
@@ -2371,12 +2469,15 @@ public class Vvod extends JFrame {
 				try {
 					if (tblObr.getSelectedItem() != null) {
 						zapVr.setId_pvizit(tblObr.getSelectedItem().id);
-						tblDiag.setData(MainForm.tcl.getPdiagAmb(zapVr.getId_pvizit()));
-						if (tblDiag.getRowCount() > 0)
-							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
+//						tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().getId()));
+//						if (tblDiag.getRowCount() > 0)
+//							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
 						tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 						treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 						checkZapVrNext();
+					} else {
+						tblPos.setData(new ArrayList<PvizitAmb>());
+						treeRezIssl.setModel(null);
 					}
 				} catch (KmiacServerException e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Не удалось загрузить список посещений.", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -2402,6 +2503,15 @@ public class Vvod extends JFrame {
 				if (tblPos.getSelectedItem()!= null) {
 					pvizitAmb = tblPos.getSelectedItem();
 					try {
+						tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().getId()));
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+						try {
 						
 						priem = MainForm.tcl.getPriem(tblPos.getSelectedItem().npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
@@ -2453,6 +2563,7 @@ public class Vvod extends JFrame {
 				tbFiz.setText(priem.getT_fiz_obsl());
 				tbOcen.setText(priem.getT_ocenka());
 				tbStat.setText(priem.getT_status_praesense());
+				tbRecom.setText(priem.getT_recom());
 				tbAnam.setText(anamZab.getT_ist_zab());
 				tbZakl.setText(pvizit.getZakl());
 				tbZaklRek.setText(pvizit.getRecomend());
@@ -2600,6 +2711,7 @@ public class Vvod extends JFrame {
 			cmbLpu.setData(MainForm.tcl.get_m00());
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));
+
 		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
@@ -2618,7 +2730,6 @@ public class Vvod extends JFrame {
 			btnBer.setEnabled((zapVr.pol != 1) && ((age > 13) && (age < 50)));
 			chbDiagBer.setEnabled(btnBer.isEnabled());
 			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
-			
 			tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp, MainForm.authInfo.pcod, MainForm.authInfo.cdol));
 			if ((idPvizit > 0) && (tblObr.getRowCount() > 0)) {
 				for (selIdx = 0; selIdx < tblObr.getRowCount(); selIdx++) {
@@ -2749,8 +2860,12 @@ public class Vvod extends JFrame {
 		  		diagamb.setId_obr(zapVr.getId_pvizit());
 		  		diagamb.setId_pos(tblPos.getSelectedItem().id);
 		  		diagamb.setNpasp(zapVr.getNpasp());
+		  		for (PdiagZ pd : table.getData()){
+		  			if (pd.getDiag().equals(mkb.pcod)) 
+		  				diagamb.setDatad(pdiag.getDatad());
+		  				else diagamb.setDatad(System.currentTimeMillis());
+  			}
 		  		diagamb.setDatap(System.currentTimeMillis());
-		  		diagamb.setDatad(System.currentTimeMillis());
 		  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
 		  		diagamb.setCdol(MainForm.authInfo.getCdol());
 		  		diagamb.setPredv(true);
@@ -2777,13 +2892,13 @@ public class Vvod extends JFrame {
 //	}
 
 	private void checkZapVrNext() throws KmiacServerException, TException {
-		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
-			cmbZaklIsh.setSelectedIndex(-1);
-			cmbZaklIsh.setEnabled(false);
-			btnPosSave.doClick();
-		} else {
-			cmbZaklIsh.setEnabled(true);
-		}
+//		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
+//			cmbZaklIsh.setSelectedIndex(-1);
+//			cmbZaklIsh.setEnabled(false);
+//			btnPosSave.doClick();
+//		} else {
+//			cmbZaklIsh.setEnabled(true);
+//		}
 	}
 
 	/**
@@ -2823,6 +2938,8 @@ public class Vvod extends JFrame {
 					return false;
 				}
 		if (!checkTalInput())
+			return false;
+		if (pvizit == null)
 			return false;
 		
 		priem = new Priem();
