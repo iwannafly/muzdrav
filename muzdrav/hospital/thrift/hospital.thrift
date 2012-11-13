@@ -25,7 +25,7 @@ struct TPatient{
 	6:string middlename;
 	7:string gender;
 	8:i32 nist;
-	9:string status;
+	9:i32 status;
 	10:string oms;
 	11:string dms;
 	12:string job;
@@ -97,6 +97,13 @@ struct Shablon {
 	3: list<ShablonText> textList;
 }
 
+struct DopShablon {
+	1: i32 id;
+	2: i32 nShablon;
+	3: string name;
+	4: string text;
+}
+
 struct Zakl {
 	1: optional i32 ishod;
 	2: optional i32 result;
@@ -161,7 +168,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum) throws (1:kmiacServer.KmiacServerException kse);
+	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod)
+		throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -170,6 +178,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getDopShablonNames(1:i32 nShablon, 2:string srcText)
+		throws (1:kmiacServer.KmiacServerException kse);
+	DopShablon getDopShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);

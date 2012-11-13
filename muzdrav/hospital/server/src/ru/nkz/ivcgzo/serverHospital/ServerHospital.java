@@ -27,6 +27,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.DopShablon;
 import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
@@ -217,7 +218,7 @@ public class ServerHospital extends Server implements Iface {
     public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
-                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.name_s as sgrp, "
+                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
                 + "(patient.poms_ser||patient.poms_nom) as poms, "
                 + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
@@ -246,14 +247,14 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void updatePatientChamberNumber(final int gospId, final int chamberNum)
-            throws TException {
-        final String sqlQuery = "UPDATE c_otd SET npal = ? WHERE id_gosp = ?;";
+    public final void updatePatientChamberNumber(final int gospId, final int chamberNum,
+            final int profPcod) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, chamberNum, gospId);
+            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
-            throw new TException(e);
+            throw new KmiacServerException();
         }
     }
 
@@ -441,6 +442,27 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
+    public final List<IntegerClassifier> getDopShablonNames(final int nShablon,
+            final String srcText) throws KmiacServerException {
+        String sql = "SELECT id as pcod, name "
+                + "FROM sh_dop WHERE id_n_shablon = ? ";
+
+        if (srcText != null) {
+            sql += "AND ((name LIKE ?) OR (text LIKE ?)) ";
+        }
+
+        sql += "ORDER BY name ";
+        try (AutoCloseableResultSet acrs = (srcText == null)
+                ? sse.execPreparedQuery(sql, nShablon)
+                : sse.execPreparedQuery(sql, nShablon, srcText, srcText)) {
+            return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            System.err.println(e.getCause());
+            throw new KmiacServerException("Error searching template");
+        }
+    }
+
+    @Override
     public final Shablon getShablon(final int idSh) throws KmiacServerException {
         final String sqlQuery = "SELECT nd.name, sho.next, nsh.pcod,nsh.name, sht.sh_text "
             + "FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) "
@@ -450,11 +472,30 @@ public class ServerHospital extends Server implements Iface {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idSh)) {
             if (acrs.getResultSet().next()) {
                 Shablon sho = new Shablon(acrs.getResultSet().getString(1),
-                        acrs.getResultSet().getString(2), new ArrayList<ShablonText>());
+                    acrs.getResultSet().getString(2), new ArrayList<ShablonText>());
                 do {
                     sho.textList.add(new ShablonText(acrs.getResultSet().getInt(3),
                             acrs.getResultSet().getString(4), acrs.getResultSet().getString(5)));
                 } while (acrs.getResultSet().next());
+                return sho;
+            } else {
+                throw new SQLException("No templates with this id");
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getCause());
+            throw new KmiacServerException("Error loading template by its id");
+        }
+    }
+
+    @Override
+    public final DopShablon getDopShablon(final int idSh) throws KmiacServerException {
+        final String sqlQuery = "SELECT id, id_n_shablon, name, text "
+            + "FROM sh_dop WHERE id = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idSh)) {
+            if (acrs.getResultSet().next()) {
+                DopShablon sho = new DopShablon(acrs.getResultSet().getInt(1),
+                        acrs.getResultSet().getInt(2), acrs.getResultSet().getString(3),
+                        acrs.getResultSet().getString(4));
                 return sho;
             } else {
                 throw new SQLException("No templates with this id");

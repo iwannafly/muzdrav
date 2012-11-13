@@ -97,7 +97,8 @@ public class TestServerHospital {
     public final void updatePatientChamberNumber_isActuallyUpdated() throws TException {
         final int gospId = 4;
         final int chamberNum = 108;
-        testServer.updatePatientChamberNumber(gospId, chamberNum);
+        final int profPcod = 123;
+        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod);
     }
 
     @Test
