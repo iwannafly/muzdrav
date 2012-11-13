@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -13,6 +14,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -23,6 +25,8 @@ import javax.swing.UIManager;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.thrift.TException;
 
@@ -32,13 +36,19 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftDisp.PatientInfo;
-import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds;
+import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_do;
+import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_po;
 import ru.nkz.ivcgzo.thriftDisp.Pfiz;
 import ru.nkz.ivcgzo.thriftDisp.PfizNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JTable;
 
 public class MainForm extends Client<ThriftDisp.Client>{
 	public static ThriftDisp.Client tcl;
@@ -144,7 +154,6 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private ButtonGroup bgD_do;
 	private JRadioButton rbtD_do1;
 	private JRadioButton rbtD_do2;
-	private CustomTable<Pdisp_ds, Pdisp_ds._Fields> tabDiag_do;
 	private JRadioButton rbtObs_n1;
 	private JRadioButton rbtObs_n2;
 	private ButtonGroup bgObs_n;
@@ -162,7 +171,6 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private ButtonGroup bgDiag_po;
 	private JRadioButton rbtDiag_po1;
 	private JRadioButton rbtDiag_po2;
-	private CustomTable<Pdisp_ds, Pdisp_ds._Fields> tabDiag_po;
 	private ButtonGroup bgXzab;
 	private JRadioButton rbtXzab1;
 	private JRadioButton rbtXzab2;
@@ -181,7 +189,9 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private JRadioButton rbtVmp2_2;
 	private JRadioButton rbtAkds4;
 	private JLabel lblPatient;
-	protected Pfiz fiz;
+	private Pfiz fiz;
+	private Pdisp_ds_do pdisp_do;
+	private Pdisp_ds_po pdisp_po;
 	private JCheckBox cbPrb;
 	private JCheckBox cbPrk;
 	private JCheckBox cbPrs;
@@ -233,6 +243,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private CustomTextField tbEf1;
 	private CustomTextField tbPf1;
 	private PatientInfo pat;
+	private CustomTable<Pdisp_ds_do, Pdisp_ds_do._Fields> tabDiag_do;
+	private CustomTable<Pdisp_ds_po, Pdisp_ds_po._Fields> tblDiag_po;
+	private JCheckBox cbRecdop1;
+	private JCheckBox cbRecdop2;
+	private AbstractButton cbRecdop3;
 
 
 	public MainForm (ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -382,7 +397,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						tbRf1.setText(Integer.toString(fiz.getRf1()));
 						
 						/*pdisp_ds*/
-						tabDiag_do.setData(MainForm.tcl.getTblDispds(pat.npasp));
+						tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
+						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
 						
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
@@ -1988,10 +2004,87 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		JLabel lblD_do = new JLabel("Состояние здоровья до проведения настоящего диспансерного обследования");
 		
 		JButton btnAdd = new JButton("+");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", "");
+					
+						try {
+							if (res != null) {
+						pdisp_do = new Pdisp_ds_do();
+						pdisp_do.setNpasp(pat.npasp);
+						pdisp_do.setDataz(System.currentTimeMillis());
+						pdisp_do.setDiag_do(res.pcod);
+							pdisp_do.setId(MainForm.tcl.AddPdispds_do(pdisp_do));}
+						} catch (KmiacServerException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (TException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+			 			tabDiag_do.addItem(pdisp_do);
+
+			}
+		});
 		
 		JButton btnDel = new JButton("-");
+		btnDel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (tabDiag_do.getSelectedItem()!= null)
+					if (JOptionPane.showConfirmDialog(tabDiag_do, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+		  			try {
+						MainForm.tcl.DeleteDispds_do(tabDiag_do.getSelectedItem().getId());
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
+						tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}}
+					if (tabDiag_do.getRowCount() > 0)
+						tabDiag_do.setRowSelectionInterval(tabDiag_do.getRowCount() - 1, tabDiag_do.getRowCount() - 1);
+			}
+		});
 		
 		JButton btnSave = new JButton("v");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pdisp_do = new Pdisp_ds_do();
+				pdisp_do.setId(tabDiag_do.getSelectedItem().id);
+				pdisp_do.setNpasp(pat.npasp);
+				pdisp_do.setDiag_do(tabDiag_do.getSelectedItem().diag_do);
+				if (rbtD_do1.isSelected()) pdisp_do.setD_do(1);
+				if (rbtD_do2.isSelected()) pdisp_do.setD_do(2);
+				if (rbtObs_n1.isSelected()) pdisp_do.setObs_n(1);
+				if (rbtObs_n2.isSelected()) pdisp_do.setObs_n(2);
+				if (rbtObs_v1.isSelected()) pdisp_do.setObs_v(1);
+				if (rbtObs_v2.isSelected()) pdisp_do.setObs_v(2);
+				if (rbtObs_v3.isSelected()) pdisp_do.setObs_v(3);
+				if (rbtLech_n1.isSelected()) pdisp_do.setLech_n(1);
+				if (rbtLech_n2.isSelected()) pdisp_do.setLech_n(2);
+				if (rbtLech_v1.isSelected()) pdisp_do.setLech_v(1);
+				if (rbtLech_v2.isSelected()) pdisp_do.setLech_v(2);
+				if (rbtLech_v3.isSelected()) pdisp_do.setLech_v(3);
+				try {
+					MainForm.tcl.UpdatePdispds_do(pdisp_do);
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		
 		JScrollPane spDiag_do = new JScrollPane();
 		
@@ -2095,7 +2188,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		);
 		pnlLech_n.setLayout(gl_pnlLech_n);
 		
-		JLabel lblLech = new JLabel("Доосбледование (по результатам прошлой диспансеризации)");
+		JLabel lblLech = new JLabel("Лечение (по результатам прошлой диспансеризации)");
 		
 		JPanel pnlLech_v = new JPanel();
 		pnlLech_v.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -2155,12 +2248,13 @@ public class MainForm extends Client<ThriftDisp.Client>{
 							.addGap(18)
 							.addComponent(pnlObs_v, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_pnlDiagDo.createSequentialGroup()
-							.addComponent(lblLech, GroupLayout.PREFERRED_SIZE, 315, GroupLayout.PREFERRED_SIZE)
-							.addGap(10)
+							.addGap(43)
+							.addComponent(lblLech)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(pnlLech_n, GroupLayout.PREFERRED_SIZE, 189, GroupLayout.PREFERRED_SIZE)
 							.addGap(18)
 							.addComponent(pnlLech_v, GroupLayout.PREFERRED_SIZE, 251, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(10, Short.MAX_VALUE))
+					.addContainerGap(169, Short.MAX_VALUE))
 		);
 		gl_pnlDiagDo.setVerticalGroup(
 			gl_pnlDiagDo.createParallelGroup(Alignment.LEADING)
@@ -2183,19 +2277,62 @@ public class MainForm extends Client<ThriftDisp.Client>{
 							.addComponent(label_1, Alignment.TRAILING)
 							.addComponent(pnlObs_n, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 29, Short.MAX_VALUE)))
 					.addGap(18)
-					.addGroup(gl_pnlDiagDo.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_pnlDiagDo.createSequentialGroup()
-							.addGap(15)
-							.addComponent(lblLech))
-						.addComponent(pnlLech_n, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
-						.addComponent(pnlLech_v, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
-					.addGap(296))
+					.addGroup(gl_pnlDiagDo.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_pnlDiagDo.createParallelGroup(Alignment.LEADING)
+							.addComponent(pnlLech_n, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
+							.addComponent(pnlLech_v, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+						.addComponent(lblLech))
+					.addGap(278))
 		);
 		
-		tabDiag_do = new CustomTable<>(false, false, Pdisp_ds.class, 3, "Диагноз");
-		tabDiag_do.setFillsViewportHeight(true);
+		tabDiag_do = new CustomTable<>(false, false, Pdisp_ds_do.class, 3, "Диагноз");
+		tabDiag_do.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					if (tabDiag_do.getSelectedItem().diag_do != null)
+						if (tabDiag_do.getSelectedColumn() == 1) {
+							StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tabDiag_do.getSelectedItem().diag_do);
+							if (res != null) {
+								tabDiag_do.getSelectedItem().setDiag_do(res.pcod);
+								tabDiag_do.updateSelectedItem();
+							}
+					}
+			}
+		});
+		
+		tabDiag_do.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+		if (!e.getValueIsAdjusting()){
+			if (tabDiag_do.getSelectedItem()!= null) {
+				pdisp_do = tabDiag_do.getSelectedItem();
+				bgD_do.clearSelection();
+				rbtD_do1.setSelected(pdisp_do.getD_do() == 1);
+				rbtD_do2.setSelected(pdisp_do.getD_do() == 1);
+				bgObs_n.clearSelection();
+				rbtObs_n1.setSelected(pdisp_do.getObs_n() == 1);
+				rbtObs_n2.setSelected(pdisp_do.getObs_n() == 2);
+				bgObs_v.clearSelection();
+				rbtObs_v1.setSelected(pdisp_do.getObs_v() == 1);
+				rbtObs_v2.setSelected(pdisp_do.getObs_v() == 2);
+				rbtObs_v3.setSelected(pdisp_do.getObs_v() == 3);
+				bgLech_n.clearSelection();
+				rbtLech_n1.setSelected(pdisp_do.getLech_n() == 1);
+				rbtLech_n2.setSelected(pdisp_do.getLech_n() == 2);
+				bgLech_v.clearSelection();
+				rbtLech_v1.setSelected(pdisp_do.getLech_v() == 1);
+				rbtLech_v2.setSelected(pdisp_do.getLech_v() == 2);
+				rbtLech_v3.setSelected(pdisp_do.getLech_v() == 3);
+			}
+		}
+			}
+		});
+		
 		spDiag_do.setViewportView(tabDiag_do);
+		tabDiag_do.setFillsViewportHeight(true);
 		pnlDiagDo.setLayout(gl_pnlDiagDo);
+		
 		
 		
 		JPanel pnlDiagPosle = new JPanel();
@@ -2236,12 +2373,113 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlDiag_po.setLayout(gl_pnlDiag_po);
 		
 		JButton btnSave1 = new JButton("v");
+		btnSave1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pdisp_po = new Pdisp_ds_po();
+				pdisp_po.setNpasp(pat.npasp);
+				pdisp_po.setId(tblDiag_po.getSelectedItem().id);
+				pdisp_po.setDiag_po(tblDiag_po.getSelectedItem().diag_po);
+				if (rbtDiag_po1.isSelected()) pdisp_po.setD_po(1);
+				if (rbtDiag_po2.isSelected()) pdisp_po.setD_po(2);
+				if (rbtXzab1.isSelected()) pdisp_po.setXzab(1);
+				if (rbtXzab2.isSelected()) pdisp_po.setXzab(2);
+				if (rbtPu1.isSelected()) pdisp_po.setPu(1);
+				if (rbtPu2.isSelected()) pdisp_po.setPu(2);
+				if (rbtDisp1.isSelected()) pdisp_po.setDisp(1);
+				if (rbtDisp2.isSelected()) pdisp_po.setDisp(2);
+				if (rbtDisp3.isSelected()) pdisp_po.setDisp(3);
+				if (rbtVmp1_1.isSelected()) pdisp_po.setVmp1(1);
+				if (rbtVmp1_2.isSelected()) pdisp_po.setVmp1(2);
+				if (rbtVmp2_1.isSelected()) pdisp_po.setVmp2(1);
+				if (rbtVmp2_2.isSelected()) pdisp_po.setVmp2(2);
+				
+				if (cbVrec1.isSelected()) pdisp_po.setVrec1(1);
+				if (cbVrec2.isSelected()) pdisp_po.setVrec2(1);
+				if (cbVrec3.isSelected()) pdisp_po.setVrec3(1);
+				if (cbVrec4.isSelected()) pdisp_po.setVrec4(1);
+				if (cbVrec5.isSelected()) pdisp_po.setVrec5(1);
+				if (cbVrec6.isSelected()) pdisp_po.setVrec6(1);
+				if (cbVrec7.isSelected()) pdisp_po.setVrec7(1);
+				if (cbVrec8.isSelected()) pdisp_po.setVrec8(1);
+				if (cbVrec9.isSelected()) pdisp_po.setVrec9(1);
+				if (cbVrec10.isSelected()) pdisp_po.setVrec10(1);
+				if (cbNrec1.isSelected()) pdisp_po.setNrec1(1);
+				if (cbNrec2.isSelected()) pdisp_po.setNrec2(1);
+				if (cbNrec3.isSelected()) pdisp_po.setNrec3(1);
+				if (cbNrec4.isSelected()) pdisp_po.setNrec4(1);
+				if (cbNrec5.isSelected()) pdisp_po.setNrec5(1);
+				if (cbNrec6.isSelected()) pdisp_po.setNrec6(1);
+				if (cbNrec7.isSelected()) pdisp_po.setNrec7(1);
+				if (cbNrec8.isSelected()) pdisp_po.setNrec8(1);
+				if (cbNrec9.isSelected()) pdisp_po.setNrec9(1);
+				if (cbNrec10.isSelected()) pdisp_po.setNrec10(1);
+				if (cbRecdop1.isSelected()) pdisp_po.setRecdop1(1);
+				if (cbRecdop2.isSelected()) pdisp_po.setRecdop2(1);
+				if (cbRecdop3.isSelected()) pdisp_po.setRecdop3(1);
+				try {
+					MainForm.tcl.UpdatePdispds_po(pdisp_po);
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		
 		JButton btnDel1 = new JButton("-");
+		btnDel1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (tblDiag_po.getSelectedItem()!= null)
+					if (JOptionPane.showConfirmDialog(tblDiag_po, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
+		  			try {
+						MainForm.tcl.DeleteDispds_po(tblDiag_po.getSelectedItem().getId());
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		  			try {
+						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
+					} catch (KmiacServerException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}}
+					if (tblDiag_po.getRowCount() > 0)
+						tblDiag_po.setRowSelectionInterval(tblDiag_po.getRowCount() - 1, tblDiag_po.getRowCount() - 1);
+			}
+		});
 		
 		JButton btnAdd1 = new JButton("+");
+		btnAdd1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", "");
+				
+				try {
+					if (res != null) {
+				pdisp_po = new Pdisp_ds_po();
+				pdisp_po.setNpasp(pat.npasp);
+				pdisp_po.setDataz(System.currentTimeMillis());
+				pdisp_po.setDiag_po(res.pcod);
+					pdisp_po.setId(MainForm.tcl.AddPdispds_po(pdisp_po));}
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	 			tblDiag_po.addItem(pdisp_po);
+			}
+		});
 		
-		JScrollPane scrollPane = new JScrollPane();
+		JScrollPane spDiag_po = new JScrollPane();
 		
 		JPanel pnlXzab = new JPanel();
 		pnlXzab.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -2413,13 +2651,14 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblRecdop = new JLabel("Рекомендации по дополнительному обследованию для уточнения диагноза");
 		
-		JCheckBox cbRecdop3 = new JCheckBox("на федеральном уровне");
+		 cbRecdop3 = new JCheckBox("на федеральном уровне");
 		cbRecdop3.setHorizontalTextPosition(SwingConstants.RIGHT);
 		
-		JCheckBox cbRecdop2 = new JCheckBox("на областном/краевом/республиканском уровне");
+		 cbRecdop2 = new JCheckBox("на областном/краевом/республиканском уровне");
 		cbRecdop2.setHorizontalTextPosition(SwingConstants.RIGHT);
 		
-		JCheckBox cbRecdop1 = new JCheckBox("на окружном уровне");
+		 cbRecdop1 = new JCheckBox("на окружном уровне");
+		 
 		cbRecdop1.setHorizontalTextPosition(SwingConstants.RIGHT);
 		GroupLayout gl_pnlDiagPosle = new GroupLayout(pnlDiagPosle);
 		gl_pnlDiagPosle.setHorizontalGroup(
@@ -2434,7 +2673,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 							.addComponent(btnDel1, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
 							.addGap(10)
 							.addComponent(btnSave1, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
-						.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
+						.addComponent(spDiag_po, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblDiag_po, GroupLayout.PREFERRED_SIZE, 455, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
 							.addComponent(pnlXzab, GroupLayout.PREFERRED_SIZE, 353, GroupLayout.PREFERRED_SIZE)
@@ -2473,7 +2712,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						.addComponent(btnDel1)
 						.addComponent(btnSave1))
 					.addGap(18)
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
+					.addComponent(spDiag_po, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
 						.addComponent(pnlXzab, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
@@ -2689,9 +2928,80 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		);
 		pnlProvOzd.setLayout(gl_pnlProvOzd);
 		
-		tabDiag_po = new CustomTable<>(false, false, Pdisp_ds.class, 9, "Диагноз");
-		tabDiag_po.setFillsViewportHeight(true);
-		scrollPane.setViewportView(tabDiag_po);
+		
+		tblDiag_po = new CustomTable<>(false, false, Pdisp_ds_po.class, 3, "Диагноз");
+		tblDiag_po.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+				if (tblDiag_po.getSelectedItem().diag_po != null)
+					if (tblDiag_po.getSelectedColumn() == 1) {
+							StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tblDiag_po.getSelectedItem().diag_po);
+							if (res != null) {
+								tblDiag_po.getSelectedItem().setDiag_po(res.pcod);
+								tblDiag_po.updateSelectedItem();
+							}
+						}
+			}
+		});
+		
+		tblDiag_po.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+		if (!e.getValueIsAdjusting()){
+			if (tblDiag_po.getSelectedItem()!= null) {
+				pdisp_po = tblDiag_po.getSelectedItem();
+				bgDiag_po.clearSelection();
+				rbtDiag_po1.setSelected(pdisp_po.getD_po() == 1);
+				rbtDiag_po2.setSelected(pdisp_po.getD_po() == 1);
+				bgXzab.clearSelection();
+				rbtXzab1.setSelected(pdisp_po.getXzab() == 1);
+				rbtXzab2.setSelected(pdisp_po.getXzab() == 2);
+				bgPu.clearSelection();
+				rbtPu1.setSelected(pdisp_po.getPu() == 1);
+				rbtPu2.setSelected(pdisp_po.getPu() == 2);
+				bgVmp1.clearSelection();
+				rbtVmp1_1.setSelected(pdisp_po.getVmp1() == 1);
+				rbtVmp1_2.setSelected(pdisp_po.getVmp1() == 2);
+				bgVmp2.clearSelection();
+				rbtVmp2_1.setSelected(pdisp_po.getVmp2() == 1);
+				rbtVmp2_2.setSelected(pdisp_po.getVmp2() == 2);
+				bgDisp.clearSelection();
+				rbtDisp1.setSelected(pdisp_po.getDisp() == 1);
+				rbtDisp2.setSelected(pdisp_po.getDisp() == 2);
+				rbtDisp3.setSelected(pdisp_po.getDisp() == 3);
+				
+				cbVrec1.setSelected(pdisp_po.getVrec1() == 1);
+				cbVrec2.setSelected(pdisp_po.getVrec2() == 1);
+				cbVrec3.setSelected(pdisp_po.getVrec3() == 1);
+				cbVrec4.setSelected(pdisp_po.getVrec4() == 1);
+				cbVrec5.setSelected(pdisp_po.getVrec5() == 1);
+				cbVrec6.setSelected(pdisp_po.getVrec6() == 1);
+				cbVrec7.setSelected(pdisp_po.getVrec7() == 1);
+				cbVrec8.setSelected(pdisp_po.getVrec8() == 1);
+				cbVrec9.setSelected(pdisp_po.getVrec9() == 1);
+				cbVrec10.setSelected(pdisp_po.getVrec10() == 1);
+				cbNrec1.setSelected(pdisp_po.getNrec1() == 1);
+				cbNrec2.setSelected(pdisp_po.getNrec2() == 1);
+				cbNrec3.setSelected(pdisp_po.getNrec3() == 1);
+				cbNrec4.setSelected(pdisp_po.getNrec4() == 1);
+				cbNrec5.setSelected(pdisp_po.getNrec5() == 1);
+				cbNrec6.setSelected(pdisp_po.getNrec6() == 1);
+				cbNrec7.setSelected(pdisp_po.getNrec7() == 1);
+				cbNrec8.setSelected(pdisp_po.getNrec8() == 1);
+				cbNrec9.setSelected(pdisp_po.getNrec9() == 1);
+				cbNrec10.setSelected(pdisp_po.getNrec10() == 1);
+				cbRecdop1.setSelected(pdisp_po.getRecdop1() == 1);
+				cbRecdop2.setSelected(pdisp_po.getRecdop2() == 1);
+				cbRecdop3.setSelected(pdisp_po.getRecdop3() == 1);
+			}
+		}
+			}
+		});
+		
+		tblDiag_po.setFillsViewportHeight(true);
+		spDiag_po.setViewportView(tblDiag_po);
+		
 		pnlDiagPosle.setLayout(gl_pnlDiagPosle);
 		frame.getContentPane().setLayout(groupLayout);
 		
