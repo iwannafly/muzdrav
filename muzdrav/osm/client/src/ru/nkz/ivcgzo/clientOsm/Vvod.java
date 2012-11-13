@@ -2892,13 +2892,13 @@ public class Vvod extends JFrame {
 //	}
 
 	private void checkZapVrNext() throws KmiacServerException, TException {
-		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
-			cmbZaklIsh.setSelectedIndex(-1);
-			cmbZaklIsh.setEnabled(false);
-			btnPosSave.doClick();
-		} else {
-			cmbZaklIsh.setEnabled(true);
-		}
+//		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
+//			cmbZaklIsh.setSelectedIndex(-1);
+//			cmbZaklIsh.setEnabled(false);
+//			btnPosSave.doClick();
+//		} else {
+//			cmbZaklIsh.setEnabled(true);
+//		}
 	}
 
 	/**
