@@ -1,10 +1,13 @@
 package ru.nkz.ivcgzo.serverHospital;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -716,4 +719,84 @@ public class ServerHospital extends Server implements Iface {
         }
     }
 
+    @Override
+    public final String printHospitalDiary(
+            final int idGosp, final long dateStart, final long dateEnd)
+            throws KmiacServerException {
+        final String path;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+//            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+            HtmTemplate htmTemplate = new HtmTemplate(
+                new File(this.getClass().getProtectionDomain().getCodeSource()
+                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                + "\\plugin\\reports\\HospitalDiary.htm");
+            String recurentBody = htmTemplate.getBody();
+            List<TMedicalHistory> tmpDiaries = getMedicalHistoryBetweenDates(
+                idGosp, new Date(dateStart), new Date(dateEnd));
+            int prevDoctor = -1;
+            String curVrachFio = "";
+            for (TMedicalHistory curDayNotes:tmpDiaries) {
+                if (prevDoctor != curDayNotes.getPcodVrach()) {
+                    curVrachFio = getDoctorFio(curDayNotes.getPcodVrach());
+                    prevDoctor = curDayNotes.getPcodVrach();
+                }
+                htmTemplate.replaceLabels(
+                    true,
+                    dateFormat.format(curDayNotes.getDataz()),
+                    curDayNotes.isSetJalob() ? curDayNotes.getJalob() : " ",
+                    curDayNotes.isSetMorbi() ? curDayNotes.getMorbi() : " ",
+                    curDayNotes.isSetStatusPraesense() ? curDayNotes.getStatusPraesense() : " ",
+                    curDayNotes.isSetFisicalObs() ? curDayNotes.getFisicalObs() : " ",
+                    curDayNotes.isSetStatusLocalis() ? curDayNotes.getStatusLocalis() : " ",
+                    curVrachFio
+                );
+                htmTemplate.insertInEndOfBodySection(recurentBody);
+                htmTemplate.refindLabels();
+            }
+            htmTemplate.replaceText(recurentBody, "");
+            osw.write(htmTemplate.getTemplateText());
+            return path;
+        } catch (Exception e) {
+            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+        }
+    }
+
+    private List<TMedicalHistory> getMedicalHistoryBetweenDates(
+            final int idGosp, final Date dateStart, final Date dateEnd)
+            throws KmiacServerException {
+        final String sqlQuery = "SELECT * FROM c_osmotr "
+            + "WHERE id_gosp = ? AND dataz >= ? AND dataz <= ?"
+            + "ORDER BY dataz, timez;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                sqlQuery, idGosp, dateStart, dateEnd)) {
+            List<TMedicalHistory> tmpMedHistories =
+                rsmMedicalHistory.mapToList(acrs.getResultSet());
+            return tmpMedHistories;
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private String getDoctorFio(final int doctorPcod)
+            throws KmiacServerException {
+        final String sqlQuery = "SELECT fam, im, ot FROM s_vrach "
+            + "WHERE pcod = ?;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+                sqlQuery, doctorPcod)) {
+            if (acrs.getResultSet().next()) {
+                return String.format("%s %s %s",
+                    acrs.getResultSet().getString("fam"),
+                    acrs.getResultSet().getString("im"),
+                    acrs.getResultSet().getString("ot"));
+            } else {
+                return "";
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
 }
