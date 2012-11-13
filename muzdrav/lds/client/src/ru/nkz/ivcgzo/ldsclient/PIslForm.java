@@ -741,14 +741,14 @@ public class PIslForm {
 					}
 				}
 				
-				if (tn_ldi.getSelectedItem().vrach != 0 ){
+				if ((tn_ldi.getSelectedItem().vrach != 0)&&(cBVrach.getSelectedItem() != null) ){
 					cBVrach.setSelectedPcod(tn_ldi.getSelectedItem().vrach);
 				} else{
 					cBVrach.setSelectedItem(null);
 				}
 				
 				
-				if ((cBvopl.getSelectedItem() != null)||(cBvopl.getSelectedIndex()!=0)){
+				if ((cBvopl.getSelectedItem() != null)&&(cBvopl.getSelectedIndex()!=0)){
 					cBvopl.setSelectedPcod(tn_ldi.getSelectedItem().vopl);
 				}else{
 					cBvopl.setSelectedItem(2);

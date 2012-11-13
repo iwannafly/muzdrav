@@ -447,65 +447,65 @@ throw new TException(e);
 					sb6.append(String.format("%d;%d;%d;%4$td.%4$tm.%4$tY;%s;%s;%7$td.%7$tm.%7$tY;%s;%d", j,rdp.npasp,rdp.npasp,p1,acrs21.getResultSet().getString(6),acrs21.getResultSet().getString(1),p2,acrs21.getResultSet().getString(6),disp1,hr));		
 					System.out.println(sb6);		
 					 	//				dex = dex + ' '+ acrs1.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex1")){ dex1 =dex1 +' '+ acrs21.getResultSet().getString(1);
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex1")){ dex1 =(dex1 +' '+ acrs21.getResultSet().getString(1)).trim();
 			k1 = k1+1; k2 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex2")) {dex2 =dex2 +' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex2")) {dex2 =(dex2 +' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k5 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex3")) {dex3 =dex3 +' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex3")) {dex3 =(dex3 +' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k4 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex4")) {dex4 =dex4 +' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex4")) {dex4 =(dex4 +' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k6 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex5")) {dex5 =dex5+' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex5")) {dex5 =(dex5+' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k3 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex6")) {dex6 =dex6+' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex6")) {dex6 =(dex6+' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k7 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex7")) {dex7 =dex7 +' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex7")) {dex7 =(dex7 +' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1;k8 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex9")) {dex9 =dex9 +' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex9")) {dex9 =(dex9 +' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k9 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dex10")) {dex10 =dex10 +' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 5).equals("dex10")) {dex10 =(dex10 +' '+ acrs21.getResultSet().getString(1)).trim();	
 			k1 = k1+1; k10 = 1;}	
-			if (acrs21.getResultSet().getString(2).equals("dak")) dak =dak +' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dsost")) dsost =dsost +' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dosl")) dosl =dosl +' '+ acrs21.getResultSet().getString(1);
+			if (acrs21.getResultSet().getString(2).substring(0, 3).equals("dak")) dak =(dak +' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 5).equals("dsost")) dsost =(dsost +' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dosl")) dosl =(dosl +' '+ acrs21.getResultSet().getString(1)).trim();
 				
 				if (acrs21.getResultSet().getString(1).charAt(0) == 'N') kod2 = 1;
-				if (acrs21.getResultSet().getString(1).equals("O21")) kod5 = kod5+1;			
-				if (acrs21.getResultSet().getString(1).equals("O44")) kod5 = kod5+2;			
-				if (acrs21.getResultSet().getString(1).equals("O45")) kod5 = kod5+2;			
-				if (acrs21.getResultSet().getString(1).equals("O23.0")) kod5 = kod5+4;			
-				if (acrs21.getResultSet().getString(1).equals("O24")) kod5 = kod5+8;			
-				if (acrs21.getResultSet().getString(1).equals("O30")) kod5 = kod5+16;			
-				if (acrs21.getResultSet().getString(1).equals("O32")) kod5 = kod5+32;			
-				if (acrs21.getResultSet().getString(1).equals("O36.0")) kod5 = kod5+64;			
-				if (acrs21.getResultSet().getString(1).equals("O99.0")) kod5 = kod5+128;			
-				if (acrs21.getResultSet().getString(1).equals("O13")) kod5 = kod5+256;			
-				if (acrs21.getResultSet().getString(1).equals("O14")) kod5 = kod5+512;			
-				if (acrs21.getResultSet().getString(1).equals("O15")) kod5 = kod5+1024;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I11")) kod7 =  kod7 + 1;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I12")) kod7 =  kod7 + 2;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I50")) kod7 =  kod7 + 4;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I49")) kod7 =  kod7 + 8;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I34")) kod7 =  kod7 + 16;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I35")) kod7 =  kod7 + 32;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I80")) kod7 =  kod7 + 64;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("N11")) kod7 =  kod7 + 128;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("N03")) kod7 =  kod7 + 256;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("N18")) kod7 =  kod7 + 512;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E10")) kod8 =  kod8+1;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E03")) kod8 =  kod8+2;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E04")) kod8 =  kod8+4;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O21")) kod5 = kod5+1;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O44")) kod5 = kod5+2;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O45")) kod5 = kod5+2;			
+				if (acrs21.getResultSet().getString(1).substring(0, 5).equals("O23.0")) kod5 = kod5+4;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O24")) kod5 = kod5+8;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O30")) kod5 = kod5+16;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O32")) kod5 = kod5+32;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O36.0")) kod5 = kod5+64;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O99.0")) kod5 = kod5+128;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O13")) kod5 = kod5+256;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O14")) kod5 = kod5+512;			
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O15")) kod5 = kod5+1024;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I11")) kod7 =  kod7 + 1;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I12")) kod7 =  kod7 + 2;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I50")) kod7 =  kod7 + 4;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I49")) kod7 =  kod7 + 8;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I34")) kod7 =  kod7 + 16;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I35")) kod7 =  kod7 + 32;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I80")) kod7 =  kod7 + 64;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("N11")) kod7 =  kod7 + 128;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("N03")) kod7 =  kod7 + 256;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("N18")) kod7 =  kod7 + 512;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E10")) kod8 =  kod8+1;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E03")) kod8 =  kod8+2;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E04")) kod8 =  kod8+4;
 				
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E27")) kod8 =  kod8+16;
-				if (acrs21.getResultSet().getString(1).substring(0, 1).equals("D6")) kod8 =  kod8+32;
-				if (acrs21.getResultSet().getString(1).substring(0, 1).equals("B1")) kod8 =  kod8+64;
-				if (acrs21.getResultSet().getString(1).equals("K72.1")) kod8 =  kod8+128;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("J96")) kod8 =  kod8+256;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E27")) kod8 =  kod8+16;
+				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("D6")) kod8 =  kod8+32;
+				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("B1")) kod8 =  kod8+64;
+				if (acrs21.getResultSet().getString(1).substring(0, 5).equals("K72.1")) kod8 =  kod8+128;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("J96")) kod8 =  kod8+256;
 				if (acrs21.getResultSet().getString(1).charAt(0) == 'F') kod8 =  kod8+512;
-				if (acrs21.getResultSet().getString(1).substring(0, 1).equals("A1")) kod8 =  kod8+1024;
-				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("B20")) kod8 =  kod8+2048;
-				if (acrs21.getResultSet().getString(1).equals("M95.5")) kod8 =  kod8+4098;
-				if (acrs21.getResultSet().getString(1).substring(0, 1).equals("M3")) kod8 =  kod8+8196;
+				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("A1")) kod8 =  kod8+1024;
+				if (acrs21.getResultSet().getString(1).substring(0, 3).equals("B20")) kod8 =  kod8+2048;
+				if (acrs21.getResultSet().getString(1).substring(0, 5).equals("M95.5")) kod8 =  kod8+4098;
+				if (acrs21.getResultSet().getString(1).substring(0, 2).equals("M3")) kod8 =  kod8+8196;
 				if (k1 >=3) kod6 = kod6+1;
 				if ((k2+k3+k4+k5+k6+k7+k8+k9+k10)>=3) kod6 = kod6 + 2;
 				if (k3>0) kod6 = kod6 + 4;
@@ -519,50 +519,62 @@ throw new TException(e);
 			try (AutoCloseableResultSet acrs21 = sse.execPreparedQuery("SELECT d.dspos,c.dex from p_rd_din d,n_c00 c where c.dex is not null and d.npasp=?",rdp.npasp)) {
 				if (acrs21.getResultSet().next()){
 //					dex = dex + ' '+ acrs1.getResultSet().getString(0);	
-			if (acrs21.getResultSet().getString(2).equals("dex1")) dex1 =dex1 +' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex2")) dex2 =dex2 +' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex3")) dex3 =dex3 + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex4")) dex4 =dex4 + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex5")) dex5 =dex5 + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex6")) dex6 =dex6 + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex7")) dex7 =dex7 + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex9")) dex9 =dex9 +' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dex10")) dex10 =dex10 + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dak")) dak =dak + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dsost")) dsost =dsost + ' '+ acrs21.getResultSet().getString(1);	
-			if (acrs21.getResultSet().getString(2).equals("dosl")) dosl =dosl + ' '+ acrs21.getResultSet().getString(1);	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex1")) 
+				dex1 =(dex1 +' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex2")) 
+				dex2 =(dex2 +' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex3")) 
+				dex3 =(dex3 + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex4")) 
+				dex4 =(dex4 + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex5")) 
+				dex5 =(dex5 + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex6")) 
+				dex6 =(dex6 + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex7")) 
+				dex7 =(dex7 + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dex9")) 
+				dex9 =(dex9 +' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 5).equals("dex10")) 
+				dex10 =(dex10 + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 3).equals("dak")) 
+				dak =(dak + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 5).equals("dsost")) 
+				dsost =(dsost + ' '+ acrs21.getResultSet().getString(1)).trim();	
+			if (acrs21.getResultSet().getString(2).substring(0, 4).equals("dosl")) 
+				dosl =(dosl + ' '+ acrs21.getResultSet().getString(1)).trim();	
 			if (acrs21.getResultSet().getString(1).charAt(0) == 'N') kod2 = 1;
-			if (acrs21.getResultSet().getString(1).equals("O21")) kod5 = kod5+1;			
-			if (acrs21.getResultSet().getString(1).equals("O44")) kod5 = kod5+2;			
-			if (acrs21.getResultSet().getString(1).equals("O45")) kod5 = kod5+2;			
-			if (acrs21.getResultSet().getString(1).equals("O23.0")) kod5 = kod5+4;			
-			if (acrs21.getResultSet().getString(1).equals("O24")) kod5 = kod5+8;			
-			if (acrs21.getResultSet().getString(1).equals("O30")) kod5 = kod5+16;			
-			if (acrs21.getResultSet().getString(1).equals("O32")) kod5 = kod5+32;			
-			if (acrs21.getResultSet().getString(1).equals("O36.0")) kod5 = kod5+64;			
-			if (acrs21.getResultSet().getString(1).equals("O99.0")) kod5 = kod5+128;			
-			if (acrs21.getResultSet().getString(1).equals("O13")) kod5 = kod5+256;			
-			if (acrs21.getResultSet().getString(1).equals("O14")) kod5 = kod5+512;			
-			if (acrs21.getResultSet().getString(1).equals("O15")) kod5 = kod5+1024;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I11")) kod7 =  kod7 + 1;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I12")) kod7 =  kod7 + 2;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I50")) kod7 =  kod7 + 4;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I49")) kod7 =  kod7 + 8;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I34")) kod7 =  kod7 + 16;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I35")) kod7 =  kod7 + 32;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("I80")) kod7 =  kod7 + 64;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("N11")) kod7 =  kod7 + 128;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("N03")) kod7 =  kod7 + 256;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("N18")) kod7 =  kod7 + 512;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E10")) kod8 =  kod8+1;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E03")) kod8 =  kod8+2;
-			if (acrs21.getResultSet().getString(1).substring(0, 2).equals("E04")) kod8 =  kod8+4;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O21")) kod5 = kod5+1;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O44")) kod5 = kod5+2;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O45")) kod5 = kod5+2;			
+			if (acrs21.getResultSet().getString(1).substring(0, 5).equals("O23.0")) kod5 = kod5+4;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O24")) kod5 = kod5+8;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O30")) kod5 = kod5+16;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O32")) kod5 = kod5+32;			
+			if (acrs21.getResultSet().getString(1).substring(0, 5).equals("O36.0")) kod5 = kod5+64;			
+			if (acrs21.getResultSet().getString(1).substring(0, 5).equals("O99.0")) kod5 = kod5+128;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O13")) kod5 = kod5+256;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O14")) kod5 = kod5+512;			
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("O15")) kod5 = kod5+1024;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I11")) kod7 =  kod7 + 1;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I12")) kod7 =  kod7 + 2;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I50")) kod7 =  kod7 + 4;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I49")) kod7 =  kod7 + 8;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I34")) kod7 =  kod7 + 16;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I35")) kod7 =  kod7 + 32;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("I80")) kod7 =  kod7 + 64;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("N11")) kod7 =  kod7 + 128;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("N03")) kod7 =  kod7 + 256;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("N18")) kod7 =  kod7 + 512;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E10")) kod8 =  kod8+1;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E03")) kod8 =  kod8+2;
+			if (acrs21.getResultSet().getString(1).substring(0, 3).equals("E04")) kod8 =  kod8+4;
 				}
 			} catch (SQLException e) {
 				((SQLException) e.getCause()).printStackTrace();
 				throw new KmiacServerException();
 			}
-			dex = dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10;
+			dex = (dex1+' '+dex2+' '+dex3+' '+dex4+' '+dex5+ ' '+dex6+' '+dex7 +' '+dex9+' '+dex10).trim();
 			sb3.append(String.format("%d;%d;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s",j,rdp.npasp,dex1,dex2,dex3,dex4,dex5,dex6,dex7,dex9,dex10,dex,dak,dsost,dosl));	
 			System.out.println(sb3);		
 		    sb5.append(String.format("%d;%d;%d;%d;%d;",j,rdp.npasp,rdp.obr,rdp.sem,rdp.rost));
@@ -589,8 +601,8 @@ throw new TException(e);
 					throw new KmiacServerException();
 				}}
 			sb1.append(String.format("%d;%d;%td.%3$tm.%3$tY;%d;%s %s %s;%s;%d;%d;%d;%d", rvz.uid, rvz.npasp, p1, rvz.sp, rvz.famvr,rvz.imvr,rvz.otvr,rvz.diag,rvz.mso,rvz.rzp,rvz.aim,rvz.npr));		
-			System.out.println(sb1);		
 					}
+		System.out.println(sb1);		
 		// Con_vizit.scv
 		j = 0;
 		List<RdConVizit> rdConVizit = getRdConVizit();
@@ -601,8 +613,8 @@ throw new TException(e);
 			if (rcv.oteki != 0 ) ot = 1;
 			sb2.append(String.format("%d;%d;%d;%.2f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;;;%d;%d;%d;%d;%d;%d;", j, rcv.uiv,rcv.npasp, rcv.ves, rcv.ned,rcv.hdm,rcv.spl,rcv.lcad,rcv.ldad,rcv.rcad,rcv.rdad,ball1,ball2,ball3,ball4,rcv.oj,rcv.chcc,rcv.polpl,rcv.predpl,rcv.serd,rcv.serd1,ot,rcv.oteki));		
 //			sb2.append(String.format("%d;%d;%d;%.2f;", j, rcv.uiv,rcv.npasp, rcv.ves));		
-			System.out.println(sb2);		
 		}
+		System.out.println(sb2);		
 		osw.write(sb.toString());
 		return "c:\\patient.html";
 	} /*catch (SQLException e) {
