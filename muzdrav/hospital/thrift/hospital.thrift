@@ -61,9 +61,9 @@ struct TMedicalHistory{
 	5:optional string statusPraesense;
 	6:optional string statusLocalis;
 	7:optional string fisicalObs;
-	8:i32 pcodVrach;
-	9:i64 dataz;
-	10:i64 timez;
+	8:optional i32 pcodVrach;
+	9:optional i64 dataz;
+	10:optional i64 timez;
 }
 
 struct TLifeHistory{
@@ -194,6 +194,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
 		2: MesNotFoundException mnfe);
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
+
+	string printHospitalDiary(1: i32 idGosp, 2: i64 dateStart, 3: i64 dateEnd)
+		throws (1:kmiacServer.KmiacServerException kse)
 	
 /*Классификаторы*/
 	

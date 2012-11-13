@@ -76,11 +76,10 @@ import javax.swing.JRadioButton;
 import java.awt.Component;
 import javax.swing.Box;
 import java.awt.Dimension;
-import javax.swing.JComboBox;
+
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.JToolBar;
 
 public class MainFrame extends JFrame {
 
@@ -254,6 +253,9 @@ public class MainFrame extends JFrame {
     private Component hsDiagnosisFirst;
     private Component vsDiagnosisControlsDelimFirst;
     private Component verticalStrut;
+    private JMenu mnPrintForms;
+    private JMenuItem mntmPrintStationDiary;
+    private PrintFrame frmPrint;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(800, 600));
@@ -392,6 +394,8 @@ public class MainFrame extends JFrame {
         });
         frmCuration = new CurationFrame(doctorAuth);
         frmCuration.pack();
+        frmPrint = new PrintFrame();
+        frmPrint.pack();
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,6 +406,11 @@ public class MainFrame extends JFrame {
         mbMain = new JMenuBar();
         setJMenuBar(mbMain);
 
+        addPatientOptionsMenu();
+        addPrintFormsMenu();
+    }
+
+    private void addPatientOptionsMenu() {
         mnPatientOperation = new JMenu("Управление пациентами");
         mbMain.add(mnPatientOperation);
 
@@ -426,9 +435,27 @@ public class MainFrame extends JFrame {
         mnPatientOperation.add(mntmReception);
     }
 
+    private void addPrintFormsMenu() {
+        mnPrintForms = new JMenu("Печатные формы");
+        mbMain.add(mnPrintForms);
+
+        mntmPrintStationDiary = new JMenuItem("Дневник стационарного больного");
+        mntmPrintStationDiary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    frmPrint.setPatient(patient);
+                    frmPrint.setVisible(true);
+                }
+            }
+        });
+        mnPrintForms.add(mntmPrintStationDiary);
+    }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////   Информация о пациенте   //////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     private void setPatientInfoPanel() {
         spPatientInfo = new JSplitPane();
@@ -631,7 +658,7 @@ public class MainFrame extends JFrame {
     private void fillReceptionPanel() {
         try {
             priemInfo = ClientHospital.tcl.getPriemInfo(
-                    patient.getGospitalCod());
+                patient.getGospitalCod());
         } catch (PriemInfoNotFoundException e) {
             priemInfo = null;
         } catch (KmiacServerException e) {
@@ -1020,7 +1047,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnMedHistAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
     }
 
     private void addMedicalHistoryDeleteButton() {
@@ -1034,7 +1061,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnMedHistDel.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
     }
 
     private void addMedicalHistoryUpdateButton() {
@@ -1048,7 +1075,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnMedHistUpd.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
     }
 
 
@@ -1691,7 +1718,6 @@ public class MainFrame extends JFrame {
                 rdbtnOsl.setSelected(false);
             }
         }
-
     }
 
     private void delDiagnosisFromTable() {
