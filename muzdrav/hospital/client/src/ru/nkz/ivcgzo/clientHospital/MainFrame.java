@@ -2,6 +2,11 @@ package ru.nkz.ivcgzo.clientHospital;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -26,6 +31,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.DopShablon;
 import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
@@ -80,6 +86,7 @@ import java.awt.Dimension;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
+import javax.swing.JComboBox;
 
 public class MainFrame extends JFrame {
 
@@ -106,7 +113,7 @@ public class MainFrame extends JFrame {
     private JLabel lblStatus;
     private JTextField tfSurname;
     private JTextField tfBirthdate;
-    private JTextField tfStatus;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> tfStatus;
     private JLabel lblName;
     private JLabel lblOms;
     private JLabel lblWork;
@@ -256,6 +263,9 @@ public class MainFrame extends JFrame {
     private JMenu mnPrintForms;
     private JMenuItem mntmPrintStationDiary;
     private PrintFrame frmPrint;
+    private JLabel lblVidOpl;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidOpl;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxAnotherOtd;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(800, 600));
@@ -289,14 +299,16 @@ public class MainFrame extends JFrame {
         try {
             lMedicalHistoryShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
-            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
+                3, null));
             lDiagShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             cbxIshod.setData(ClientHospital.tcl.getAp0());
             cbxResult.setData(ClientHospital.tcl.getAq0());
+            tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
+            cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -514,9 +526,8 @@ public class MainFrame extends JFrame {
         tfChamber.setColumns(15);
 
         lblStatus = new JLabel("Профиль отделения");
-        tfStatus = new JTextField();
+        tfStatus = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         tfStatus.setEditable(false);
-        tfStatus.setColumns(15);
 
         lblWork = new JLabel("Место работы");
         tfWork = new JTextField();
@@ -536,21 +547,31 @@ public class MainFrame extends JFrame {
         btnUpdateChamber = new JButton("Сохранить");
         btnUpdateChamber.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if ((patient != null) || (!tfChamber.getText().isEmpty())) {
+                if ((patient != null) && (!tfChamber.getText().isEmpty())
+                        && (tfStatus.getSelectedItem() != null)) {
                     try {
                         ClientHospital.tcl.updatePatientChamberNumber(
-                                patient.gospitalCod, Integer.parseInt(tfChamber.getText()));
+                            patient.gospitalCod,
+                            Integer.parseInt(tfChamber.getText()),
+                            tfStatus.getSelectedPcod());
+                        JOptionPane.showMessageDialog(MainFrame.this,
+                                "Информация успешно сохранена!", "Сохранение завершено!",
+                                JOptionPane.INFORMATION_MESSAGE);
                     } catch (NumberFormatException e1) {
                         JOptionPane.showMessageDialog(frmPatientSelect,
-                                "Формат номера палаты неверный",
-                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                            "Формат номера палаты неверный",
+                            "Ошибка!", JOptionPane.ERROR_MESSAGE);
                     } catch (KmiacServerException e1) {
                         JOptionPane.showMessageDialog(frmPatientSelect,
-                                "Ошибка сохранения номера палаты",
-                                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                            "Ошибка сохранения номера палаты",
+                            "Ошибка!", JOptionPane.ERROR_MESSAGE);
                     } catch (TException e1) {
                         ClientHospital.conMan.reconnect(e1);
                     }
+                } else {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Не проставлен номер палаты или тип стационара", "Ошибка!",
+                        JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -599,6 +620,7 @@ public class MainFrame extends JFrame {
         tfBirthdate.setText("");
         tfOms.setText("");
         tfDms.setText("");
+        tfStatus.setSelectedIndex(-1);
         tfChamber.setText("");
         tfStatus.setText("");
         tfWork.setText("");
@@ -632,8 +654,8 @@ public class MainFrame extends JFrame {
             tfOms.setText(patient.getOms());
             tfDms.setText(patient.getDms());
             tfChamber.setText(String.valueOf(patient.getChamber()));
-            if (patient.getStatus() != null) {
-                tfStatus.setText(patient.getStatus());
+            if (patient.getStatus() != 0) {
+                tfStatus.setSelectedPcod(patient.getStatus());
             }
             tfWork.setText(patient.getJob());
             tfRegistrationAddress.setText(patient.getRegistrationAddress());
@@ -761,6 +783,26 @@ public class MainFrame extends JFrame {
         taLifeHistory.setLineWrap(true);
         taLifeHistory.setWrapStyleWord(true);
         taLifeHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        taLifeHistory.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(final FocusEvent e) {
+                try {
+                    if (!tfLifeHShablonFilter.isEmpty()) {
+                        lLifeHistoryShabloNames.setData(
+                            ClientHospital.tcl.getDopShablonNames(
+                                4, tfLifeHShablonFilter.getText()));
+                    } else {
+                        lLifeHistoryShabloNames.setData(
+                                ClientHospital.tcl.getDopShablonNames(4, null));
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    e1.printStackTrace();
+                    ClientHospital.conMan.reconnect(e1);
+                }
+            }
+        });
     }
 
     private void setAllergoScrollPane() {
@@ -775,6 +817,26 @@ public class MainFrame extends JFrame {
         taAllergo.setLineWrap(true);
         taAllergo.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spAllergo.setViewportView(taAllergo);
+        taAllergo.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(final FocusEvent e) {
+                try {
+                    if (!tfLifeHShablonFilter.isEmpty()) {
+                        lLifeHistoryShabloNames.setData(
+                            ClientHospital.tcl.getDopShablonNames(
+                                3, tfLifeHShablonFilter.getText()));
+                    } else {
+                        lLifeHistoryShabloNames.setData(
+                                ClientHospital.tcl.getDopShablonNames(3, null));
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    e1.printStackTrace();
+                    ClientHospital.conMan.reconnect(e1);
+                }
+            }
+        });
     }
 
     private void setFarmoScrollPane() {
@@ -789,6 +851,26 @@ public class MainFrame extends JFrame {
         taFarmo.setWrapStyleWord(true);
         taFarmo.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spFarmo.setViewportView(taFarmo);
+        taFarmo.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(final FocusEvent e) {
+                try {
+                    if (!tfLifeHShablonFilter.isEmpty()) {
+                        lLifeHistoryShabloNames.setData(
+                            ClientHospital.tcl.getDopShablonNames(
+                                5, tfLifeHShablonFilter.getText()));
+                    } else {
+                        lLifeHistoryShabloNames.setData(
+                                ClientHospital.tcl.getDopShablonNames(5, null));
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    e1.printStackTrace();
+                    ClientHospital.conMan.reconnect(e1);
+                }
+            }
+        });
     }
 
     private void setLifeHistoryButtons() {
@@ -888,10 +970,10 @@ public class MainFrame extends JFrame {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    if (lMedicalHistoryShablonNames.getSelectedValue() != null) {
+                    if (lLifeHistoryShabloNames.getSelectedValue() != null) {
                         try {
-                            pasteSelectedLifeHShablon(ClientHospital.tcl.getShablon(
-                                lMedicalHistoryShablonNames.getSelectedValue().pcod));
+                            pasteSelectedLifeHShablon(ClientHospital.tcl.getDopShablon(
+                                lLifeHistoryShabloNames.getSelectedValue().pcod));
                         } catch (KmiacServerException e1) {
                             JOptionPane.showMessageDialog(MainFrame.this,
                                 "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -922,21 +1004,19 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void pasteSelectedLifeHShablon(final Shablon shablon) {
+    private void pasteSelectedLifeHShablon(final DopShablon shablon) {
         if (shablon == null) {
             return;
-        }
-
-        for (ShablonText shText : shablon.textList) {
-            switch (shText.grupId) {
+        } else {
+            switch (shablon.getNShablon()) {
                 case 4:
-                    taLifeHistory.setText(shText.getText());
+                    taLifeHistory.setText(shablon.getText());
                     break;
                 case 3:
-                    taAllergo.setText(shText.getText());
+                    taAllergo.setText(shablon.getText());
                     break;
                 case 5:
-                    taFarmo.setText(shText.getText());
+                    taFarmo.setText(shablon.getText());
                     break;
                 default:
                     break;
@@ -1307,6 +1387,7 @@ public class MainFrame extends JFrame {
         setMedicalHistoryShablonLabel();
         setMedicalHistoryShablonHorizontalBox();
         setMedicalHistoryShablonScrollPane();
+        setMedicalHistoryShablonListener();
     }
 
     private void setMedicalHistoryShablonLabel() {
@@ -1330,10 +1411,7 @@ public class MainFrame extends JFrame {
         tfMedHShablonFilter = new CustomTextField(true, true, false);
         tfMedHShablonFilter.setMaximumSize(new Dimension(450, 50));
         hbMedicalHistoryShablonFind.add(tfMedHShablonFilter);
-        tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
         tfMedHShablonFilter.setColumns(10);
-        medHiSearchListener =
-            new ShablonSearchListener(tfMedHShablonFilter, lMedicalHistoryShablonNames);
     }
 
     private void setMedicalHistoryShablonButton() {
@@ -1376,6 +1454,12 @@ public class MainFrame extends JFrame {
         });
     }
 
+    private void setMedicalHistoryShablonListener() {
+        medHiSearchListener =
+                new ShablonSearchListener(tfMedHShablonFilter, lMedicalHistoryShablonNames);
+        tfMedHShablonFilter.getDocument().addDocumentListener(medHiSearchListener);
+    }
+
     private void pasteSelectedShablon(final Shablon shablon) {
         if (shablon == null) {
             return;
@@ -1410,7 +1494,7 @@ public class MainFrame extends JFrame {
         if (patient != null) {
             try {
                 tbMedHist.setData(
-                        ClientHospital.tcl.getMedicalHistory(patient.getGospitalCod()));
+                    ClientHospital.tcl.getMedicalHistory(patient.getGospitalCod()));
             } catch (MedicalHistoryNotFoundException e) {
                 tbMedHist.setData(Collections.<TMedicalHistory>emptyList());
             } catch (KmiacServerException e) {
@@ -1442,6 +1526,7 @@ public class MainFrame extends JFrame {
 
         hsDiagnosisThird = Box.createHorizontalStrut(5);
         pDiagnosis.add(hsDiagnosisThird);
+
     }
 
     private void setDiagnosisVerticalTextComponents() {
@@ -1629,6 +1714,7 @@ public class MainFrame extends JFrame {
         setDiagnosisShablonLabel();
         setDiagnosisShablonHorizontalBox();
         setDiagnosisShablonScrollPane();
+        setDiagnosisShablonListener();
     }
 
     private void setDiagnosisShablonLabel() {
@@ -1653,9 +1739,7 @@ public class MainFrame extends JFrame {
         tfDiagShablonFilter = new CustomTextField(true, true, false);
         tfDiagShablonFilter.setMaximumSize(new Dimension(450, 50));
         hbDiagnosisShablonFind.add(tfDiagShablonFilter);
-        tfDiagShablonFilter.getDocument().addDocumentListener(diagSearchListener);
         tfDiagShablonFilter.setColumns(10);
-        diagSearchListener = new ShablonSearchListener(tfDiagShablonFilter, lDiagShablonNames);
     }
 
     private void setDiagnosisShablonButton() {
@@ -1678,6 +1762,11 @@ public class MainFrame extends JFrame {
         lDiagShablonNames = new ThriftIntegerClassifierList();
         lDiagShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
         spDiagShablonNames.setViewportView(lDiagShablonNames);
+    }
+
+    private void setDiagnosisShablonListener() {
+        diagSearchListener = new ShablonSearchListener(tfDiagShablonFilter, lDiagShablonNames);
+        tfDiagShablonFilter.getDocument().addDocumentListener(diagSearchListener);
     }
 
     private void clearDiagnosisText() {
@@ -1840,7 +1929,7 @@ public class MainFrame extends JFrame {
         btnAddStage = new JButton();
         btnAddStage.setMaximumSize(new Dimension(50, 50));
         btnAddStage.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
         btnAddStage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -1860,6 +1949,10 @@ public class MainFrame extends JFrame {
                 tbStages.addItem(stage);
                 tbStages.setData(
                     ClientHospital.tcl.getStage(patient.getGospitalCod()));
+                if (tbStages.getData().size() > 1) {
+                    tbStages.getData().get(
+                        tbStages.getData().size() - 1).setMes(tbStages.getData().get(0).getMes());
+                }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -2063,10 +2156,10 @@ public class MainFrame extends JFrame {
         lblVidPom = new JLabel("Вид помощи");
 
         cbxVidPom = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
-                IntegerClassifiers.n_vp1);
+            IntegerClassifiers.n_vp1);
 
         cbxDefect = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
-                IntegerClassifiers.n_def);
+            IntegerClassifiers.n_def);
 
         lblDefect = new JLabel("Дефекты доп. этапа");
 
@@ -2075,7 +2168,24 @@ public class MainFrame extends JFrame {
         tfUkl = new JTextField();
         tfUkl.setColumns(10);
         cbxIshod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxIshod.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                if (((IntegerClassifier) e.getItem()).getPcod() == 3) {
+                    cbxAnotherOtd.setVisible(true);
+                } else {
+                    cbxAnotherOtd.setVisible(false);
+                }
+            }
+        });
         cbxResult = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+
+        lblVidOpl = new JLabel("Вид оплаты");
+        cbxVidOpl =
+            new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_opl);
+
+        cbxAnotherOtd = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxAnotherOtd.setVisible(false);
     }
 
     private void setZaklButtons() {
@@ -2083,26 +2193,43 @@ public class MainFrame extends JFrame {
         btnSaveZakl.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 try {
+                    // TODO растащить условия по методам, чтобы было читаемо.
                     if ((patient != null)
                             && (((cbxIshod.getSelectedItem() != null)
                                     && (cbxResult.getSelectedItem() != null)
                                     && (cbxIshod.getSelectedPcod() != 2))
-                                ||  ((cbxIshod.getSelectedPcod() == 2)
+                                ||  ((cbxIshod.getSelectedItem() != null)
+                                    && ((cbxIshod.getSelectedPcod() == 2)
+                                        || (cbxIshod.getSelectedPcod() == 3))
                                     && (cbxResult.getSelectedItem() == null)))) {
-                        Zakl tmpZakl = new Zakl();
-                        tmpZakl.setRecom(taRecomend.getText());
-                        tmpZakl.setSostv(taZakluch.getText());
-                        tmpZakl.setIshod(cbxIshod.getSelectedPcod());
-                        if (cbxResult.getSelectedItem() != null) {
-                            tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        if ((tbStages.getData() != null) && (tbStages.getData().size() != 0)) {
+                            Zakl tmpZakl = new Zakl();
+                            tmpZakl.setRecom(taRecomend.getText());
+                            tmpZakl.setSostv(taZakluch.getText());
+                            tmpZakl.setIshod(cbxIshod.getSelectedPcod());
+                            if (cbxResult.getSelectedItem() != null) {
+                                tmpZakl.setResult(cbxResult.getSelectedPcod());
+                            }
+                            if ((cbxIshod.getSelectedPcod() == 3)
+                                    && (cbxAnotherOtd.getSelectedItem() != null)) {
+                                tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
+                            } else {
+                                JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Не выбрано отделение для перевода", "Ошибка",
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
+                            tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
+                            tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                            tmpZakl.setIdGosp(patient.getGospitalCod());
+                            ClientHospital.tcl.addZakl(tmpZakl);
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Пациент успешно выписан", "Выписка пациента",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Не выбран ни один этап лечения! Выписка невозможна.",
+                                    "Ошибка", JOptionPane.ERROR_MESSAGE);
                         }
-                        tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
-                        tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
-                        tmpZakl.setIdGosp(patient.getGospitalCod());
-                        ClientHospital.tcl.addZakl(tmpZakl);
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                            "Пациент успешно выписан", "Выписка пациента",
-                            JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "Не выбран пациент, либо не заполнены поля \"Результат лечения\" "
@@ -2152,10 +2279,10 @@ public class MainFrame extends JFrame {
                                 .addComponent(lblBirthdate)
                                 .addComponent(lblStatus))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfBirthdate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfSurname, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfStatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                                .addComponent(tfBirthdate)
+                                .addComponent(tfSurname)
+                                .addComponent(tfStatus, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addGap(34)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblName)
@@ -2240,7 +2367,8 @@ public class MainFrame extends JFrame {
             glPZakl.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPZakl.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(glPZakl.createParallelGroup(Alignment.LEADING, false)
+                    .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblRecomend)
                         .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
@@ -2249,8 +2377,7 @@ public class MainFrame extends JFrame {
                         .addComponent(lblVidPom)
                         .addComponent(lblDefect)
                         .addComponent(cbxVidPom, 0, 701, Short.MAX_VALUE)
-                        .addComponent(cbxDefect, 0, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, 701, Short.MAX_VALUE)
                         .addComponent(lblResult)
                         .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addGroup(glPZakl.createSequentialGroup()
@@ -2261,16 +2388,19 @@ public class MainFrame extends JFrame {
                             .addComponent(lblZaklTime)
                             .addPreferredGap(ComponentPlacement.UNRELATED)
                             .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(lblIshod)
                         .addComponent(lblUkl)
-                        .addComponent(tfUkl))
+                        .addComponent(tfUkl, 701, 701, Short.MAX_VALUE)
+                        .addComponent(lblVidOpl)
+                        .addComponent(cbxVidOpl, 0, 701, Short.MAX_VALUE)
+                        .addComponent(cbxAnotherOtd, 0, 701, Short.MAX_VALUE)
+                        .addComponent(lblIshod))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
                             .addGap(5))
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
+                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
                             .addContainerGap())))
         );
         glPZakl.setVerticalGroup(
@@ -2304,11 +2434,17 @@ public class MainFrame extends JFrame {
                             .addComponent(lblUkl)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(tfUkl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lblVidOpl)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(cbxVidOpl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(cbxAnotherOtd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                             .addComponent(lblResult)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxResult, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
