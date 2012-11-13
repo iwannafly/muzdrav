@@ -1925,7 +1925,7 @@ public class MainFrame extends JFrame {
         btnAddStage = new JButton();
         btnAddStage.setMaximumSize(new Dimension(50, 50));
         btnAddStage.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
         btnAddStage.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -1945,6 +1945,10 @@ public class MainFrame extends JFrame {
                 tbStages.addItem(stage);
                 tbStages.setData(
                     ClientHospital.tcl.getStage(patient.getGospitalCod()));
+                if (tbStages.getData().size() > 1) {
+                    tbStages.getData().get(
+                        tbStages.getData().size() - 1).setMes(tbStages.getData().get(0).getMes());
+                }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -2163,7 +2167,8 @@ public class MainFrame extends JFrame {
         cbxResult = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
 
         lblVidOpl = new JLabel("Вид оплаты");
-        cbxVidOpl = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_opl);
+        cbxVidOpl =
+            new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_opl);
     }
 
     private void setZaklButtons() {
@@ -2171,26 +2176,34 @@ public class MainFrame extends JFrame {
         btnSaveZakl.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 try {
+                    // TODO растащить условия по методам, чтобы было читаемо.
                     if ((patient != null)
                             && (((cbxIshod.getSelectedItem() != null)
                                     && (cbxResult.getSelectedItem() != null)
                                     && (cbxIshod.getSelectedPcod() != 2))
-                                ||  ((cbxIshod.getSelectedPcod() == 2)
+                                ||  ((cbxIshod.getSelectedItem() != null)
+                                    && (cbxIshod.getSelectedPcod() == 2)
                                     && (cbxResult.getSelectedItem() == null)))) {
-                        Zakl tmpZakl = new Zakl();
-                        tmpZakl.setRecom(taRecomend.getText());
-                        tmpZakl.setSostv(taZakluch.getText());
-                        tmpZakl.setIshod(cbxIshod.getSelectedPcod());
-                        if (cbxResult.getSelectedItem() != null) {
-                            tmpZakl.setResult(cbxResult.getSelectedPcod());
+                        if ((tbStages.getData() != null) && (tbStages.getData().size() != 0)) {
+                            Zakl tmpZakl = new Zakl();
+                            tmpZakl.setRecom(taRecomend.getText());
+                            tmpZakl.setSostv(taZakluch.getText());
+                            tmpZakl.setIshod(cbxIshod.getSelectedPcod());
+                            if (cbxResult.getSelectedItem() != null) {
+                                tmpZakl.setResult(cbxResult.getSelectedPcod());
+                            }
+                            tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
+                            tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                            tmpZakl.setIdGosp(patient.getGospitalCod());
+                            ClientHospital.tcl.addZakl(tmpZakl);
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                "Пациент успешно выписан", "Выписка пациента",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        } else {
+                            JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Не выбран ни один этап лечения! Выписка невозможна.",
+                                    "Ошибка", JOptionPane.ERROR_MESSAGE);
                         }
-                        tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
-                        tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
-                        tmpZakl.setIdGosp(patient.getGospitalCod());
-                        ClientHospital.tcl.addZakl(tmpZakl);
-                        JOptionPane.showMessageDialog(MainFrame.this,
-                            "Пациент успешно выписан", "Выписка пациента",
-                            JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "Не выбран пациент, либо не заполнены поля \"Результат лечения\" "
