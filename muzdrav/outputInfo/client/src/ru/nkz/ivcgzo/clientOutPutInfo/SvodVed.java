@@ -67,19 +67,19 @@ public class SvodVed extends JPanel {
 				
 				isv.setDateb(sdf.format(tfDateB.getDate()));
 				isv.setDatef(sdf.format(tfDateF.getDate()));
-					InputAuthInfo iaf = new InputAuthInfo();
-					iaf.setUserId(MainForm.authInfo.getUser_id());
-					iaf.setCpodr_name(MainForm.authInfo.getCpodr_name());
-					iaf.setClpu_name(MainForm.authInfo.getClpu_name());
-									
-					
-					//OutputTest ot = new OutputTest();
-					String servPath = MainForm.tcl.printSvodVed(iaf,isv);
-					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
-					MainForm.conMan.transferFileFromServer(servPath, cliPath);
-					MainForm.conMan.openFileInEditor(cliPath, false);
-					//catch (TException e1) {
-					//	MainForm.conMan.reconnect(e1);
+				InputAuthInfo iaf = new InputAuthInfo();
+				iaf.setUserId(MainForm.authInfo.getUser_id());
+				iaf.setCpodr_name(MainForm.authInfo.getCpodr_name());
+				iaf.setClpu_name(MainForm.authInfo.getClpu_name());
+								
+				
+				//OutputTest ot = new OutputTest();
+				String servPath = MainForm.tcl.printSvodVed(iaf,isv);
+				String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+				MainForm.conMan.transferFileFromServer(servPath, cliPath);
+				MainForm.conMan.openFileInEditor(cliPath, false);
+				//catch (TException e1) {
+				//	MainForm.conMan.reconnect(e1);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
