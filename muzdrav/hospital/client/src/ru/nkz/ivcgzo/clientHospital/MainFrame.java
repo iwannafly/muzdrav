@@ -5,6 +5,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -263,6 +265,7 @@ public class MainFrame extends JFrame {
     private PrintFrame frmPrint;
     private JLabel lblVidOpl;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidOpl;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxAnotherOtd;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(800, 600));
@@ -305,6 +308,7 @@ public class MainFrame extends JFrame {
             cbxIshod.setData(ClientHospital.tcl.getAp0());
             cbxResult.setData(ClientHospital.tcl.getAq0());
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
+            cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -2152,10 +2156,10 @@ public class MainFrame extends JFrame {
         lblVidPom = new JLabel("Вид помощи");
 
         cbxVidPom = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
-                IntegerClassifiers.n_vp1);
+            IntegerClassifiers.n_vp1);
 
         cbxDefect = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
-                IntegerClassifiers.n_def);
+            IntegerClassifiers.n_def);
 
         lblDefect = new JLabel("Дефекты доп. этапа");
 
@@ -2164,11 +2168,24 @@ public class MainFrame extends JFrame {
         tfUkl = new JTextField();
         tfUkl.setColumns(10);
         cbxIshod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxIshod.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                if (((IntegerClassifier) e.getItem()).getPcod() == 3) {
+                    cbxAnotherOtd.setVisible(true);
+                } else {
+                    cbxAnotherOtd.setVisible(false);
+                }
+            }
+        });
         cbxResult = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
 
         lblVidOpl = new JLabel("Вид оплаты");
         cbxVidOpl =
             new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_opl);
+
+        cbxAnotherOtd = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxAnotherOtd.setVisible(false);
     }
 
     private void setZaklButtons() {
@@ -2182,7 +2199,8 @@ public class MainFrame extends JFrame {
                                     && (cbxResult.getSelectedItem() != null)
                                     && (cbxIshod.getSelectedPcod() != 2))
                                 ||  ((cbxIshod.getSelectedItem() != null)
-                                    && (cbxIshod.getSelectedPcod() == 2)
+                                    && ((cbxIshod.getSelectedPcod() == 2)
+                                        || (cbxIshod.getSelectedPcod() == 3))
                                     && (cbxResult.getSelectedItem() == null)))) {
                         if ((tbStages.getData() != null) && (tbStages.getData().size() != 0)) {
                             Zakl tmpZakl = new Zakl();
@@ -2191,6 +2209,14 @@ public class MainFrame extends JFrame {
                             tmpZakl.setIshod(cbxIshod.getSelectedPcod());
                             if (cbxResult.getSelectedItem() != null) {
                                 tmpZakl.setResult(cbxResult.getSelectedPcod());
+                            }
+                            if ((cbxIshod.getSelectedPcod() == 3)
+                                    && (cbxAnotherOtd.getSelectedItem() != null)) {
+                                tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
+                            } else {
+                                JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Не выбрано отделение для перевода", "Ошибка",
+                                    JOptionPane.ERROR_MESSAGE);
                             }
                             tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                             tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
@@ -2341,7 +2367,8 @@ public class MainFrame extends JFrame {
             glPZakl.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPZakl.createSequentialGroup()
                     .addContainerGap()
-                    .addGroup(glPZakl.createParallelGroup(Alignment.LEADING, false)
+                    .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblRecomend)
                         .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
@@ -2350,8 +2377,7 @@ public class MainFrame extends JFrame {
                         .addComponent(lblVidPom)
                         .addComponent(lblDefect)
                         .addComponent(cbxVidPom, 0, 701, Short.MAX_VALUE)
-                        .addComponent(cbxDefect, 0, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
-                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, 701, Short.MAX_VALUE)
                         .addComponent(lblResult)
                         .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addGroup(glPZakl.createSequentialGroup()
@@ -2362,11 +2388,12 @@ public class MainFrame extends JFrame {
                             .addComponent(lblZaklTime)
                             .addPreferredGap(ComponentPlacement.UNRELATED)
                             .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addComponent(lblIshod)
                         .addComponent(lblUkl)
-                        .addComponent(tfUkl)
+                        .addComponent(tfUkl, 701, 701, Short.MAX_VALUE)
                         .addComponent(lblVidOpl)
-                        .addComponent(cbxVidOpl, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(cbxVidOpl, 0, 701, Short.MAX_VALUE)
+                        .addComponent(cbxAnotherOtd, 0, 701, Short.MAX_VALUE)
+                        .addComponent(lblIshod))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
@@ -2411,11 +2438,13 @@ public class MainFrame extends JFrame {
                             .addComponent(lblVidOpl)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxVidOpl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(cbxAnotherOtd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                             .addComponent(lblResult)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxResult, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)

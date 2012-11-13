@@ -415,7 +415,7 @@ public class ServerHospital extends Server implements Iface {
                 + "WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
 
         if (srcText != null) {
-            sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?)"
+            sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) "
                     + "OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
         }
 
@@ -636,14 +636,24 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void addZakl(final Zakl zakl) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
+        String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
                 + "sostv = ?, recom = ?, vrach = ? "
                 + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
-                    new Date(zakl.getDatav()), new Time(zakl.getVremv()),
-                    zakl.getSostv(), zakl.getRecom(),
-                    null, zakl.getIdGosp());
+
+            if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
+                sqlQuery = "UPDATE c_otd SET ishod = ?, "
+                        + "sostv = ?, recom = ?, vrach = ?, cotd = ? "
+                        + "WHERE id_gosp = ?";
+                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
+                        zakl.getSostv(), zakl.getRecom(),
+                        null, zakl.getNewOtd(), zakl.getIdGosp());
+            } else {
+                sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
+                        new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                        zakl.getSostv(), zakl.getRecom(),
+                        null, zakl.getIdGosp());
+            }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -837,6 +847,20 @@ public class ServerHospital extends Server implements Iface {
             }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final List<IntegerClassifier> getOtd(final int lpu) throws KmiacServerException {
+        final String sqlQuery = "SELECT pcod, name FROM n_o00 "
+                + "WHERE clpu = ?";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmStaionTypes =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpu)) {
+            return rsmStaionTypes.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }

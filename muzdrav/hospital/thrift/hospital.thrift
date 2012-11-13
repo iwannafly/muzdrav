@@ -112,6 +112,7 @@ struct Zakl {
 	5: optional string sostv;
 	6: optional string recom;
 	7: optional i32 idGosp;
+	8: optional i32 newOtd;
 }
 
 struct TStage {
@@ -228,9 +229,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	*/
 	list<classifier.IntegerClassifier> getStationTypes(1: i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 	/**
-	* Классификатор этапов лечения (N_tip0(pcod))
+	* Классификатор этапов лечения
 	*/
 	list<classifier.IntegerClassifier> getStagesClassifier(1: i32 idGosp)
+		throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	* Классификатор отделений текущего лпу
+	*/
+	list<classifier.IntegerClassifier> getOtd(1: i32 lpu)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
 }
