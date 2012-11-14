@@ -266,6 +266,8 @@ public class MainFrame extends JFrame {
     private JLabel lblVidOpl;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidOpl;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxAnotherOtd;
+    private ShablonForm frmShablon;
+    private JButton btnZaklShablonFind;
 
     public MainFrame(final UserAuthInfo authInfo) {
 //        setMinimumSize(new Dimension(800, 700));
@@ -367,6 +369,11 @@ public class MainFrame extends JFrame {
             timer.stop();
             loadShablonList(ctf, ticl);
         }
+
+        public void updateNow(final String searchString) {
+            ctf.setText(searchString);
+            updateNow();
+        }
     }
 
     private void loadShablonList(final CustomTextField inCtf,
@@ -385,6 +392,20 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private void syncShablonList(final String searchString, final Shablon shablon,
+            final ShablonSearchListener shSl, final ThriftIntegerClassifierList ticl) {
+        if (shablon != null) {
+            shSl.updateNow(searchString);
+            for (int i = 0; i < ticl.getData().size(); i++) {
+                if (ticl.getData().get(i).pcod == shablon.getId()) {
+                    ticl.setSelectedIndex(i);
+                    break;
+                }
+            }
+        } else {
+            ticl.setSelectedIndex(-1);
+        }
+    }
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// Модульные фреймы ///////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -410,6 +431,8 @@ public class MainFrame extends JFrame {
         frmCuration.pack();
         frmPrint = new PrintFrame();
         frmPrint.pack();
+        frmShablon = new ShablonForm();
+        frmShablon.pack();
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1418,6 +1441,15 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryShablonButton() {
         btnMedicalHistoryShablonFind = new JButton("Найти");
+        btnMedicalHistoryShablonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                frmShablon.showShablonForm(tfLifeHShablonFilter.getText(),
+                    lLifeHistoryShabloNames.getSelectedValue());
+                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
+                    medHiSearchListener, lMedicalHistoryShablonNames);
+                pasteSelectedShablon(frmShablon.getShablon());
+            }
+        });
         btnMedicalHistoryShablonFind.setMinimumSize(new Dimension(63, 23));
         btnMedicalHistoryShablonFind.setMaximumSize(new Dimension(63, 23));
         btnMedicalHistoryShablonFind.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -1746,6 +1778,15 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisShablonButton() {
         btnDiagnosisShablonFind = new JButton("Найти");
+        btnDiagnosisShablonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                frmShablon.showShablonForm(tfDiagShablonFilter.getText(),
+                    lDiagShablonNames.getSelectedValue());
+                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
+                    diagSearchListener, lDiagShablonNames);
+//                pasteSelectedShablon(frmShablon.getShablon());
+            }
+        });
         btnDiagnosisShablonFind.setMinimumSize(new Dimension(63, 23));
         btnDiagnosisShablonFind.setMaximumSize(new Dimension(63, 23));
         btnDiagnosisShablonFind.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -2093,6 +2134,17 @@ public class MainFrame extends JFrame {
         tfZaklShablonNames.setColumns(10);
         zaklSearchListener = new ShablonSearchListener(tfZaklShablonNames, lZaklShablonNames);
         tfZaklShablonNames.getDocument().addDocumentListener(zaklSearchListener);
+
+        btnZaklShablonFind = new JButton("Найти");
+        btnZaklShablonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                frmShablon.showShablonForm(tfZaklShablonNames.getText(),
+                    lZaklShablonNames.getSelectedValue());
+                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
+                    zaklSearchListener, lZaklShablonNames);
+                pasteZaklSelectedShablon(frmShablon.getShablon());
+            }
+        });
     }
 
     private void pasteZaklSelectedShablon(final Shablon shablon) {
@@ -2384,26 +2436,24 @@ public class MainFrame extends JFrame {
                 .addGroup(glPZakl.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                        .addComponent(spZakluch)
                         .addComponent(lblRecomend)
-                        .addComponent(spRecomend)
                         .addComponent(lblZakluch)
-                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
+                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(lblVidPom)
                         .addComponent(lblDefect)
-                        .addComponent(cbxVidPom, 0, 540, Short.MAX_VALUE)
-                        .addComponent(cbxDefect, 0, 540, Short.MAX_VALUE)
+                        .addComponent(cbxVidPom, 0, 847, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, 847, Short.MAX_VALUE)
                         .addComponent(lblUkl)
-                        .addComponent(tfUkl, 401, 540, Short.MAX_VALUE)
+                        .addComponent(tfUkl, 401, 847, Short.MAX_VALUE)
                         .addComponent(lblVidOpl)
-                        .addComponent(cbxVidOpl, 0, 540, Short.MAX_VALUE)
-                        .addComponent(cbxAnotherOtd, 0, 540, Short.MAX_VALUE)
+                        .addComponent(cbxVidOpl, 0, 847, Short.MAX_VALUE)
+                        .addComponent(cbxAnotherOtd, 0, 847, Short.MAX_VALUE)
                         .addComponent(lblIshod)
                         .addGroup(glPZakl.createSequentialGroup()
                             .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                                .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                                .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 837, Short.MAX_VALUE)
                                 .addComponent(lblResult)
-                                .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                                .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 837, Short.MAX_VALUE)
                                 .addGroup(glPZakl.createSequentialGroup()
                                     .addComponent(lblZaklDate)
                                     .addPreferredGap(ComponentPlacement.UNRELATED)
@@ -2412,11 +2462,16 @@ public class MainFrame extends JFrame {
                                     .addComponent(lblZaklTime)
                                     .addPreferredGap(ComponentPlacement.UNRELATED)
                                     .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                            .addGap(10)))
+                            .addGap(10))
+                        .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
+                        .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                        .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
-                        .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE))
+                        .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
+                        .addGroup(Alignment.TRAILING, glPZakl.createSequentialGroup()
+                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnZaklShablonFind, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addContainerGap())
         );
         glPZakl.setVerticalGroup(
@@ -2426,9 +2481,11 @@ public class MainFrame extends JFrame {
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
                             .addGap(1)
-                            .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnZaklShablonFind))
                             .addGap(8)
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE))
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
                             .addPreferredGap(ComponentPlacement.RELATED)
