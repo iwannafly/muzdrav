@@ -1322,10 +1322,10 @@ public class MainFrame extends JFrame {
         taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnStatusPraence.add(taStatusPraence);
 
-        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
+        tbpMedicalHistory.addTab("Объективный статус (Status praesens)",
             null, pnStatusPraence, null);
         tbpMedicalHistory.setTabComponentAt(
-            2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
+            2, new JLabel("<html><br>Объективный статус (Status praesens)<br><br></html>"));
     }
 
     private void addFisicalObsPanel() {
@@ -2161,7 +2161,7 @@ public class MainFrame extends JFrame {
         cbxDefect = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
             IntegerClassifiers.n_def);
 
-        lblDefect = new JLabel("Дефекты доп. этапа");
+        lblDefect = new JLabel("Дефекты догосп. этапа");
 
         lblUkl = new JLabel("УКЛ");
 
@@ -2210,13 +2210,15 @@ public class MainFrame extends JFrame {
                             if (cbxResult.getSelectedItem() != null) {
                                 tmpZakl.setResult(cbxResult.getSelectedPcod());
                             }
-                            if ((cbxIshod.getSelectedPcod() == 3)
-                                    && (cbxAnotherOtd.getSelectedItem() != null)) {
-                                tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
-                            } else {
-                                JOptionPane.showMessageDialog(MainFrame.this,
-                                    "Не выбрано отделение для перевода", "Ошибка",
-                                    JOptionPane.ERROR_MESSAGE);
+                            if (cbxIshod.getSelectedPcod() == 3) {
+                                if (cbxAnotherOtd.getSelectedItem() != null) {
+                                    tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
+                                } else {
+                                    JOptionPane.showMessageDialog(MainFrame.this,
+                                        "Не выбрано отделение для перевода", "Ошибка",
+                                        JOptionPane.ERROR_MESSAGE);
+                                    throw new KmiacServerException();
+                                }
                             }
                             tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                             tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
