@@ -243,6 +243,7 @@ public class MainForm {
 				if (lbxAvailSys.getModel().getSize() == 0)
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				else
+					btnLaunch.setEnabled(false);
 					try {
 						//FIXME что-нибудь сделать с этим костылем
 						if (conMan.getPluginLoader().getPluginList().get(lbxAvailSys.getSelectedIndex()).getId() == conMan.getViewClient().getId())

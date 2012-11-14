@@ -103,29 +103,60 @@ public class ModulesUpdater {
 		return true;
 	}
 	
-	private void updateLibs(List<LibraryInfo> updList) throws Exception {
-		String path = checkAndCreateLibFolder();
-		byte[] buf = new byte[65536];
-		for (LibraryInfo libInfo : updList) {
-			try (Socket servSct = new Socket(MainForm.appServerIp, client.openModuleReadSocket(libInfo.id))) {
-				try (FileOutputStream fos = new FileOutputStream(new File(path, libInfo.name))) {
-					fos.getChannel().lock();
-					int read = servSct.getInputStream().read(buf);
-					int readFile = read;
-					while (readFile < libInfo.size) {
-						fos.write(buf, 0, read);
-						read = servSct.getInputStream().read(buf);
-						readFile += read;
-					}
-					fos.write(buf, 0, read);
-					client.closeReadSocket(servSct.getPort());
-				} catch (Exception e) {
-					throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
-				}
-			} catch (Exception e) {
-				throw new Exception("Error transferring files from server.", e);
-			}
+	private void updateLibs(final List<LibraryInfo> updList) throws Exception {
+		int overallSize = 0;
+		final ModulesUpdaterDialog mud = new ModulesUpdaterDialog();
+		for (LibraryInfo libraryInfo : updList) {
+			overallSize += libraryInfo.size;
 		}
+		mud.setLocationRelativeTo(null);
+		mud.setTitle("МИС \"Инфо МуЗдрав\" - Обновление пользовательских модулей");
+		mud.setOverallMessage("Всего загружено");
+		mud.setOverallMaximum(overallSize);
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				String path = checkAndCreateLibFolder();
+				byte[] buf = new byte[65536];
+				try {
+					for (LibraryInfo libInfo : updList) {
+						try (Socket servSct = new Socket(MainForm.appServerIp, client.openModuleReadSocket(libInfo.id))) {
+							try (FileOutputStream fos = new FileOutputStream(new File(path, libInfo.name))) {
+								mud.setCurrentMessage(String.format("Загрузка модуля %s", libInfo.name));
+								mud.setCurrentMaximum(libInfo.size);
+								mud.setCurrentValue(0);
+								
+								fos.getChannel().lock();
+								int read = servSct.getInputStream().read(buf);
+								int readFile = read;
+								while (readFile < libInfo.size) {
+									fos.write(buf, 0, read);
+									mud.addToProgress(read);
+									read = servSct.getInputStream().read(buf);
+									readFile += read;
+								}
+								fos.write(buf, 0, read);
+								mud.addToProgress(read);
+								client.closeReadSocket(servSct.getPort());
+							} catch (Exception e) {
+								throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
+							}
+						} catch (Exception e) {
+							throw new Exception("Error transferring files from server.", e);
+						}
+					}
+				} catch (Exception e) {
+					mud.setException(e);
+				} finally {
+					mud.dispose();
+				}
+			}
+		}).start();
+		if (updList.size() > 0)
+			mud.setVisible(true);
+		if (mud.getException() != null)
+			throw mud.getException();
 	}
 	
 	private void checkUpdate(List<LibraryInfo> servModList, List<Integer> availModList) throws Exception {
