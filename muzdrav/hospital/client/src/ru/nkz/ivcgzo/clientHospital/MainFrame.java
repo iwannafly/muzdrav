@@ -268,13 +268,15 @@ public class MainFrame extends JFrame {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxAnotherOtd;
 
     public MainFrame(final UserAuthInfo authInfo) {
-        setMinimumSize(new Dimension(800, 600));
+//        setMinimumSize(new Dimension(800, 700));
+//        setPreferredSize(new Dimension(1000, 800));
+//        setSize(new Dimension(1000, 800));
         doctorAuth = authInfo;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle(WINDOW_HEADER);
         setMainMenu();
         setTabbedPane();
-//        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
@@ -1081,7 +1083,7 @@ public class MainFrame extends JFrame {
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(300, 400));
+        spMedHist.setPreferredSize(new Dimension(300, 250));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
@@ -1169,7 +1171,7 @@ public class MainFrame extends JFrame {
     private void addMedicalHistoryTabbedPane() {
         tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
         tbpMedicalHistory.setBorder(new MatteBorder(1, 0, 0, 0, (Color) new Color(0, 0, 0)));
-        tbpMedicalHistory.setPreferredSize(new Dimension(500, 400));
+        tbpMedicalHistory.setPreferredSize(new Dimension(500, 250));
         vbMedicalHistoryTextFields.add(tbpMedicalHistory);
         tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         setMedicalHistoryTabs();
@@ -1552,7 +1554,7 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisTableScrollPane() {
         spDiag = new JScrollPane();
-        spDiag.setPreferredSize(new Dimension(300, 400));
+        spDiag.setPreferredSize(new Dimension(300, 250));
         spDiag.setBorder(
             new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
         hbDiagnosisTableControls.add(spDiag);
@@ -1653,7 +1655,7 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisMedOpScrollPane() {
         spDiagnosisMedOp = new JScrollPane();
-        spDiagnosisMedOp.setPreferredSize(new Dimension(500, 250));
+        spDiagnosisMedOp.setPreferredSize(new Dimension(300, 250));
         vbDiagnosisTextFields.add(spDiagnosisMedOp);
 
         addDiagnosisMedOpTextArea();
@@ -2370,40 +2372,40 @@ public class MainFrame extends JFrame {
                 .addGroup(glPZakl.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(spZakluch)
                         .addComponent(lblRecomend)
-                        .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                        .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(spRecomend)
                         .addComponent(lblZakluch)
-                        .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
                         .addComponent(lblVidPom)
                         .addComponent(lblDefect)
-                        .addComponent(cbxVidPom, 0, 701, Short.MAX_VALUE)
-                        .addComponent(cbxDefect, 0, 701, Short.MAX_VALUE)
-                        .addComponent(lblResult)
-                        .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(lblZaklDate)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(cdeZaklDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(lblZaklTime)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbxVidPom, 0, 540, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, 540, Short.MAX_VALUE)
                         .addComponent(lblUkl)
-                        .addComponent(tfUkl, 701, 701, Short.MAX_VALUE)
+                        .addComponent(tfUkl, 401, 540, Short.MAX_VALUE)
                         .addComponent(lblVidOpl)
-                        .addComponent(cbxVidOpl, 0, 701, Short.MAX_VALUE)
-                        .addComponent(cbxAnotherOtd, 0, 701, Short.MAX_VALUE)
-                        .addComponent(lblIshod))
+                        .addComponent(cbxVidOpl, 0, 540, Short.MAX_VALUE)
+                        .addComponent(cbxAnotherOtd, 0, 540, Short.MAX_VALUE)
+                        .addComponent(lblIshod)
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                                .addComponent(lblResult)
+                                .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                                .addGroup(glPZakl.createSequentialGroup()
+                                    .addComponent(lblZaklDate)
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(cdeZaklDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(lblZaklTime)
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addGap(10)))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
-                            .addGap(5))
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
-                            .addContainerGap())))
+                        .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE)
+                        .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 409, Short.MAX_VALUE))
+                    .addContainerGap())
         );
         glPZakl.setVerticalGroup(
             glPZakl.createParallelGroup(Alignment.LEADING)
@@ -2414,17 +2416,16 @@ public class MainFrame extends JFrame {
                             .addGap(1)
                             .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addGap(8)
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
-                            .addGap(1))
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 662, Short.MAX_VALUE))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE, 148, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblZakluch)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
-                            .addGap(1)
+                            .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblVidPom)
                             .addGap(1)
                             .addComponent(cbxVidPom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2446,7 +2447,7 @@ public class MainFrame extends JFrame {
                             .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxAnotherOtd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblResult)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxResult, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2457,9 +2458,8 @@ public class MainFrame extends JFrame {
                                 .addComponent(lblZaklTime)
                                 .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnSaveZakl)
-                            .addGap(9)))
-                    .addGap(0))
+                            .addComponent(btnSaveZakl)))
+                    .addContainerGap())
         );
         pZakl.setLayout(glPZakl);
     }

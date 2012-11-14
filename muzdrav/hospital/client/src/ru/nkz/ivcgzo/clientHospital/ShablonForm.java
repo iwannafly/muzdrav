@@ -43,6 +43,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
+import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 
 import java.awt.Font;
 
@@ -77,12 +78,14 @@ public class ShablonForm  extends JDialog {
 //        );
 //        groupLayout.setVerticalGroup(
 //            groupLayout.createParallelGroup(Alignment.LEADING)
-//                .addComponent(splitPaneSh, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+//                .addComponent(splitPaneSh, Alignment.TRAILING,
+//                    GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
 //        );
 //
 //        JPanel gbSearch = new JPanel();
 //        gbSearch.setMinimumSize(new Dimension(256, 128));
-//        gbSearch.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Поиск", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+//        gbSearch.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"),
+//                "Поиск", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 //        splitPaneSh.setLeftComponent(gbSearch);
 //
 //        tbSearch = new CustomTextField(true, true, false);
@@ -114,7 +117,8 @@ public class ShablonForm  extends JDialog {
 //        gl_gbSearch.setVerticalGroup(
 //            gl_gbSearch.createParallelGroup(Alignment.LEADING)
 //                .addGroup(gl_gbSearch.createSequentialGroup()
-//                    .addComponent(tbSearch, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+//                    .addComponent(tbSearch, GroupLayout.PREFERRED_SIZE,
+//                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 //                    .addPreferredGap(ComponentPlacement.RELATED)
 //                    .addComponent(spSearch, GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE))
 //        );
@@ -188,7 +192,7 @@ public class ShablonForm  extends JDialog {
 //        try {
 //            String str;
 //            String nl = System.lineSeparator();
-//            sho = MainForm.tcl.getShOsm(code);
+//            sho = ClientHospital.tcl.getShablon(code);
 //
 //            str = String.format("Динамика: %s%s", sho.din, nl);
 //            str += nl;
@@ -200,7 +204,7 @@ public class ShablonForm  extends JDialog {
 //        } catch (KmiacServerException e) {
 //            JOptionPane.showMessageDialog(this, "Ошибка загрузка текстов шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
 //        } catch (TException e) {
-//            MainForm.conMan.reconnect(e);
+//            ClientHospital.conMan.reconnect(e);
 //        }
 //    }
 //
@@ -258,7 +262,7 @@ public class ShablonForm  extends JDialog {
 //                            JOptionPane.showMessageDialog(ShablonForm.this, "Ошибка загрузки шаблонов на данный диагноз", "Ошибка", JOptionPane.ERROR_MESSAGE);
 //                        } catch (TException e) {
 //                            collapsePath(new TreePath(lp));
-//                            MainForm.conMan.reconnect(e);
+//                            ClientHospital.conMan.reconnect(e);
 //                        }
 //                    }
 //                }
@@ -330,7 +334,7 @@ public class ShablonForm  extends JDialog {
 //            } catch (KmiacServerException e) {
 //                JOptionPane.showMessageDialog(ShablonForm.this, "Ошибка загрузки результатов поиска", "Ошибка", JOptionPane.ERROR_MESSAGE);
 //            } catch (TException e) {
-//                MainForm.conMan.reconnect(e);
+//                ClientHospital.conMan.reconnect(e);
 //            }
 //        }
 //
