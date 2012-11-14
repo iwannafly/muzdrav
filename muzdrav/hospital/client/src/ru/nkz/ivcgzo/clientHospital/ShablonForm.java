@@ -46,12 +46,14 @@ import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 
 import java.awt.Font;
+import javax.swing.JTextPane;
+import javax.swing.JEditorPane;
 
 public class ShablonForm  extends JDialog {
     private static final long serialVersionUID = -6616098681222163927L;
     private final CustomTextField tbSearch;
     private final SearchTree trSearch;
-    private final JTextArea tbView;
+    private final JTextPane tbView;
     private Shablon sho;
     private boolean accepted;
 
@@ -69,7 +71,8 @@ public class ShablonForm  extends JDialog {
         setModalityType(ModalityType.TOOLKIT_MODAL);
         setTitle("Поиск шаблона");
         setBounds(100, 100, 714, 574);
-
+        setPreferredSize(new Dimension(650, 650));
+        setSize(new Dimension(650, 650));
         JSplitPane splitPaneSh = new JSplitPane();
         GroupLayout groupLayout = new GroupLayout(getContentPane());
         groupLayout.setHorizontalGroup(
@@ -163,10 +166,9 @@ public class ShablonForm  extends JDialog {
                 .addContainerGap())
         );
 
-        tbView = new JTextArea();
+        tbView = new JTextPane();
+        tbView.setContentType("text/html");
         tbView.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        tbView.setWrapStyleWord(true);
-        tbView.setLineWrap(true);
         tbView.setEditable(false);
         new CustomTextComponentWrapper(tbView).setPopupMenu();
         spView.setViewportView(tbView);
@@ -194,16 +196,17 @@ public class ShablonForm  extends JDialog {
             String nl = System.lineSeparator();
             sho = ClientHospital.tcl.getShablon(code);
 
-            str = String.format("Динамика: %s%s", sho.din, nl);
+            str = String.format("Динамика: %s%s<br>", sho.din, nl);
             str += nl;
             for (ShablonText st : sho.textList) {
                 if (st.text.length() > 0) {
-                    str += String.format("%s:%s%s%s%s", st.grupName, nl, st.text, nl, nl);
+                    str += String.format("<b>%s</b>:<br>%s%s%s%s<br>",
+                        st.grupName, nl, st.text, nl, nl);
                 }
             }
             tbView.setText(str);
         } catch (KmiacServerException e) {
-            JOptionPane.showMessageDialog(this, "Ошибка загрузка текстов шаблона",
+            JOptionPane.showMessageDialog(this, "Ошибка загрузки текстов шаблона",
                 "Ошибка", JOptionPane.ERROR_MESSAGE);
         } catch (TException e) {
             ClientHospital.conMan.reconnect(e);
