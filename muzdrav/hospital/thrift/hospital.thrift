@@ -95,6 +95,7 @@ struct Shablon {
 	1: string din;
 	2: string next_osm;
 	3: list<ShablonText> textList;
+	4: i32 id;
 }
 
 struct DopShablon {
@@ -182,6 +183,10 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<classifier.IntegerClassifier> getDopShablonNames(1:i32 nShablon, 2:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
 	DopShablon getDopShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShablonDiagnosis(1:i32 cspec, 2:i32 cslu, 3:string srcText)
+		throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShablonBySelectedDiagnosis(
+		1:i32 cspec, 2:i32 cslu, 3:string diag, 4:string srcText) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);

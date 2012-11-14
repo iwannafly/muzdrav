@@ -155,7 +155,10 @@ public class ViewMkbTreeForm extends ModalForm {
 		Object sel = tree.getSelectionPath().getLastPathComponent();
 		
 		if (sel instanceof mkb_2)
-			results = new StringClassifier(((mkb_2) sel).pcod, ((mkb_2) sel).name);
+			if (((mkb_2) sel).getMlb3Size() == 0)
+				results = new StringClassifier(((mkb_2) sel).pcod, ((mkb_2) sel).name);
+			else
+				return;
 		else if (sel instanceof StringClassifier)
 			results = sel;
 		else
@@ -201,9 +204,9 @@ public class ViewMkbTreeForm extends ModalForm {
 			for (mkb_1 m1 : m0.mlb1) {
 				mkb_1 ml1 = new mkb_1(null, null, m1.name.toLowerCase(), new ArrayList<mkb_2>());
 				for (mkb_2 m2 : m1.mkb2) {
-					mkb_2 ml2 = new mkb_2(null, m2.name.toLowerCase(), new ArrayList<StringClassifier>());
+					mkb_2 ml2 = new mkb_2(m2.pcod.toLowerCase(), m2.name.toLowerCase(), new ArrayList<StringClassifier>());
 					for (StringClassifier sc : m2.mlb3) {
-						ml2.addToMlb3(new StringClassifier(null, sc.name.toLowerCase()));
+						ml2.addToMlb3(new StringClassifier(sc.pcod.toLowerCase(), sc.name.toLowerCase()));
 					}
 					ml1.addToMkb2(ml2);
 				}
@@ -338,7 +341,7 @@ public class ViewMkbTreeForm extends ModalForm {
 							for (int i2 = 0; i2 < m1.getMkb2Size(); i2++) {
 								mkb_2 m2 = m1.mkb2.get(i2);
 								mkb_2 ml2 = ml1.mkb2.get(i2);
-								if (ml2.name.indexOf(cond) > -1) {
+								if ((ml2.name.indexOf(cond) > -1) || (ml2.pcod.indexOf(cond) > -1)) {
 									mn1.addToMkb2(m2);
 								} else {
 									List<StringClassifier> mn3 = new ArrayList<>();
@@ -346,7 +349,7 @@ public class ViewMkbTreeForm extends ModalForm {
 									for (int i3 = 0; i3 < m2.getMlb3Size(); i3++) {
 										StringClassifier sc = m2.mlb3.get(i3);
 										StringClassifier sl = ml2.mlb3.get(i3);
-										if (sl.name.indexOf(cond) > -1)
+										if ((sl.name.indexOf(cond) > -1) || (sl.pcod.indexOf(cond) > -1))
 											mn3.add(sc);
 									}
 									if (mn3.size() > 0) {

@@ -266,15 +266,19 @@ public class MainFrame extends JFrame {
     private JLabel lblVidOpl;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxVidOpl;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxAnotherOtd;
+    private ShablonForm frmShablon;
+    private JButton btnZaklShablonFind;
 
     public MainFrame(final UserAuthInfo authInfo) {
-        setMinimumSize(new Dimension(800, 600));
+//        setMinimumSize(new Dimension(800, 700));
+//        setPreferredSize(new Dimension(1000, 800));
+//        setSize(new Dimension(1000, 800));
         doctorAuth = authInfo;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle(WINDOW_HEADER);
         setMainMenu();
         setTabbedPane();
-//        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
@@ -365,6 +369,11 @@ public class MainFrame extends JFrame {
             timer.stop();
             loadShablonList(ctf, ticl);
         }
+
+        public void updateNow(final String searchString) {
+            ctf.setText(searchString);
+            updateNow();
+        }
     }
 
     private void loadShablonList(final CustomTextField inCtf,
@@ -383,6 +392,20 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private void syncShablonList(final String searchString, final Shablon shablon,
+            final ShablonSearchListener shSl, final ThriftIntegerClassifierList ticl) {
+        if (shablon != null) {
+            shSl.updateNow(searchString);
+            for (int i = 0; i < ticl.getData().size(); i++) {
+                if (ticl.getData().get(i).pcod == shablon.getId()) {
+                    ticl.setSelectedIndex(i);
+                    break;
+                }
+            }
+        } else {
+            ticl.setSelectedIndex(-1);
+        }
+    }
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// Модульные фреймы ///////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,6 +431,8 @@ public class MainFrame extends JFrame {
         frmCuration.pack();
         frmPrint = new PrintFrame();
         frmPrint.pack();
+        frmShablon = new ShablonForm();
+        frmShablon.pack();
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1081,7 +1106,7 @@ public class MainFrame extends JFrame {
     private void setMedicalHistoryTableScrollPane() {
         spMedHist = new JScrollPane();
         spMedHist.setBorder(new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
-        spMedHist.setPreferredSize(new Dimension(300, 400));
+        spMedHist.setPreferredSize(new Dimension(300, 250));
         hbMedicalHistoryTableControls.add(spMedHist);
 
         addMedicalHistoryTable();
@@ -1169,7 +1194,7 @@ public class MainFrame extends JFrame {
     private void addMedicalHistoryTabbedPane() {
         tbpMedicalHistory = new JTabbedPane(JTabbedPane.LEFT);
         tbpMedicalHistory.setBorder(new MatteBorder(1, 0, 0, 0, (Color) new Color(0, 0, 0)));
-        tbpMedicalHistory.setPreferredSize(new Dimension(500, 400));
+        tbpMedicalHistory.setPreferredSize(new Dimension(500, 250));
         vbMedicalHistoryTextFields.add(tbpMedicalHistory);
         tbpMedicalHistory.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         setMedicalHistoryTabs();
@@ -1322,10 +1347,10 @@ public class MainFrame extends JFrame {
         taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 11));
         pnStatusPraence.add(taStatusPraence);
 
-        tbpMedicalHistory.addTab("Объективный статус (Status praense)",
+        tbpMedicalHistory.addTab("Объективный статус (Status praesens)",
             null, pnStatusPraence, null);
         tbpMedicalHistory.setTabComponentAt(
-            2, new JLabel("<html><br>Объективный статус (Status praense)<br><br></html>"));
+            2, new JLabel("<html><br>Объективный статус (Status praesens)<br><br></html>"));
     }
 
     private void addFisicalObsPanel() {
@@ -1416,6 +1441,15 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryShablonButton() {
         btnMedicalHistoryShablonFind = new JButton("Найти");
+        btnMedicalHistoryShablonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                frmShablon.showShablonForm(tfLifeHShablonFilter.getText(),
+                    lLifeHistoryShabloNames.getSelectedValue());
+                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
+                    medHiSearchListener, lMedicalHistoryShablonNames);
+                pasteSelectedShablon(frmShablon.getShablon());
+            }
+        });
         btnMedicalHistoryShablonFind.setMinimumSize(new Dimension(63, 23));
         btnMedicalHistoryShablonFind.setMaximumSize(new Dimension(63, 23));
         btnMedicalHistoryShablonFind.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -1552,7 +1586,7 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisTableScrollPane() {
         spDiag = new JScrollPane();
-        spDiag.setPreferredSize(new Dimension(300, 400));
+        spDiag.setPreferredSize(new Dimension(300, 250));
         spDiag.setBorder(
             new MatteBorder(0, 0, 0, 1, (Color) new Color(0, 0, 0)));
         hbDiagnosisTableControls.add(spDiag);
@@ -1653,7 +1687,7 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisMedOpScrollPane() {
         spDiagnosisMedOp = new JScrollPane();
-        spDiagnosisMedOp.setPreferredSize(new Dimension(500, 250));
+        spDiagnosisMedOp.setPreferredSize(new Dimension(300, 250));
         vbDiagnosisTextFields.add(spDiagnosisMedOp);
 
         addDiagnosisMedOpTextArea();
@@ -1744,6 +1778,15 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisShablonButton() {
         btnDiagnosisShablonFind = new JButton("Найти");
+        btnDiagnosisShablonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                frmShablon.showShablonForm(tfDiagShablonFilter.getText(),
+                    lDiagShablonNames.getSelectedValue());
+                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
+                    diagSearchListener, lDiagShablonNames);
+//                pasteSelectedShablon(frmShablon.getShablon());
+            }
+        });
         btnDiagnosisShablonFind.setMinimumSize(new Dimension(63, 23));
         btnDiagnosisShablonFind.setMaximumSize(new Dimension(63, 23));
         btnDiagnosisShablonFind.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -2091,6 +2134,17 @@ public class MainFrame extends JFrame {
         tfZaklShablonNames.setColumns(10);
         zaklSearchListener = new ShablonSearchListener(tfZaklShablonNames, lZaklShablonNames);
         tfZaklShablonNames.getDocument().addDocumentListener(zaklSearchListener);
+
+        btnZaklShablonFind = new JButton("Найти");
+        btnZaklShablonFind.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                frmShablon.showShablonForm(tfZaklShablonNames.getText(),
+                    lZaklShablonNames.getSelectedValue());
+                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
+                    zaklSearchListener, lZaklShablonNames);
+                pasteZaklSelectedShablon(frmShablon.getShablon());
+            }
+        });
     }
 
     private void pasteZaklSelectedShablon(final Shablon shablon) {
@@ -2161,7 +2215,7 @@ public class MainFrame extends JFrame {
         cbxDefect = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
             IntegerClassifiers.n_def);
 
-        lblDefect = new JLabel("Дефекты доп. этапа");
+        lblDefect = new JLabel("Дефекты догосп. этапа");
 
         lblUkl = new JLabel("УКЛ");
 
@@ -2210,13 +2264,15 @@ public class MainFrame extends JFrame {
                             if (cbxResult.getSelectedItem() != null) {
                                 tmpZakl.setResult(cbxResult.getSelectedPcod());
                             }
-                            if ((cbxIshod.getSelectedPcod() == 3)
-                                    && (cbxAnotherOtd.getSelectedItem() != null)) {
-                                tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
-                            } else {
-                                JOptionPane.showMessageDialog(MainFrame.this,
-                                    "Не выбрано отделение для перевода", "Ошибка",
-                                    JOptionPane.ERROR_MESSAGE);
+                            if (cbxIshod.getSelectedPcod() == 3) {
+                                if (cbxAnotherOtd.getSelectedItem() != null) {
+                                    tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
+                                } else {
+                                    JOptionPane.showMessageDialog(MainFrame.this,
+                                        "Не выбрано отделение для перевода", "Ошибка",
+                                        JOptionPane.ERROR_MESSAGE);
+                                    throw new KmiacServerException();
+                                }
                             }
                             tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                             tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
@@ -2270,16 +2326,16 @@ public class MainFrame extends JFrame {
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPersonalInfo.createSequentialGroup()
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfChamber, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfGender, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(tfChamber)
+                                .addComponent(tfGender)
+                                .addComponent(tfNumberOfDesiaseHistory))
                             .addGap(31)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblSurname)
                                 .addComponent(lblBirthdate)
                                 .addComponent(lblStatus))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                            .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(tfBirthdate)
                                 .addComponent(tfSurname)
                                 .addComponent(tfStatus, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -2292,27 +2348,39 @@ public class MainFrame extends JFrame {
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addGroup(glPersonalInfo.createSequentialGroup()
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                        .addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(tfOms, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(glPersonalInfo.createSequentialGroup()
+                                            .addComponent(tfName)
+                                            .addGap(40))
+                                        .addComponent(tfOms))
                                     .addGap(43)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(lblMiddlename)
                                         .addComponent(lblDms)))
-                                .addComponent(tfWork, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                        .addComponent(tfRealAddress, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfRegistrationAddress, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addGroup(glPersonalInfo.createSequentialGroup()
+                                    .addComponent(tfWork)
+                                    .addGap(99))))
+                        .addGroup(glPersonalInfo.createSequentialGroup()
+                            .addComponent(tfRealAddress)
+                            .addGap(79))
+                        .addGroup(glPersonalInfo.createSequentialGroup()
+                            .addComponent(tfRegistrationAddress)
+                            .addGap(79)))
                     .addGap(18)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
-                        .addComponent(tfMiddlename, GroupLayout.PREFERRED_SIZE, 248, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tfDms, GroupLayout.PREFERRED_SIZE, 248, GroupLayout.PREFERRED_SIZE)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
+                        .addGroup(glPersonalInfo.createSequentialGroup()
+                            .addComponent(tfMiddlename, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                            .addGap(31))
+                        .addGroup(glPersonalInfo.createSequentialGroup()
+                            .addComponent(tfDms, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                            .addGap(31))
                         .addGroup(glPersonalInfo.createSequentialGroup()
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnUpdateChamber, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnUpdateChamber, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnShowPatientInfo))
+                            .addComponent(btnShowPatientInfo, GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
                         .addComponent(btnMedication, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnIssled, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGap(5))
+                    .addGap(0))
         );
         glPersonalInfo.setVerticalGroup(
             glPersonalInfo.createParallelGroup(Alignment.LEADING)
@@ -2368,40 +2436,43 @@ public class MainFrame extends JFrame {
                 .addGroup(glPZakl.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblRecomend)
-                        .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                        .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
                         .addComponent(lblZakluch)
-                        .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
+                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(lblVidPom)
                         .addComponent(lblDefect)
-                        .addComponent(cbxVidPom, 0, 701, Short.MAX_VALUE)
-                        .addComponent(cbxDefect, 0, 701, Short.MAX_VALUE)
-                        .addComponent(lblResult)
-                        .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 701, Short.MAX_VALUE)
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(lblZaklDate)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(cdeZaklDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(lblZaklTime)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbxVidPom, 0, 847, Short.MAX_VALUE)
+                        .addComponent(cbxDefect, 0, 847, Short.MAX_VALUE)
                         .addComponent(lblUkl)
-                        .addComponent(tfUkl, 701, 701, Short.MAX_VALUE)
+                        .addComponent(tfUkl, 401, 847, Short.MAX_VALUE)
                         .addComponent(lblVidOpl)
-                        .addComponent(cbxVidOpl, 0, 701, Short.MAX_VALUE)
-                        .addComponent(cbxAnotherOtd, 0, 701, Short.MAX_VALUE)
-                        .addComponent(lblIshod))
+                        .addComponent(cbxVidOpl, 0, 847, Short.MAX_VALUE)
+                        .addComponent(cbxAnotherOtd, 0, 847, Short.MAX_VALUE)
+                        .addComponent(lblIshod)
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addComponent(btnSaveZakl, GroupLayout.DEFAULT_SIZE, 837, Short.MAX_VALUE)
+                                .addComponent(lblResult)
+                                .addComponent(cbxResult, GroupLayout.DEFAULT_SIZE, 837, Short.MAX_VALUE)
+                                .addGroup(glPZakl.createSequentialGroup()
+                                    .addComponent(lblZaklDate)
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(cdeZaklDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(lblZaklTime)
+                                    .addPreferredGap(ComponentPlacement.UNRELATED)
+                                    .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addGap(10))
+                        .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
+                        .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE))
                     .addPreferredGap(ComponentPlacement.UNRELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 476, Short.MAX_VALUE)
-                            .addGap(5))
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
-                            .addContainerGap())))
+                        .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
+                        .addGroup(Alignment.TRAILING, glPZakl.createSequentialGroup()
+                            .addComponent(tfZaklShablonNames, GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnZaklShablonFind, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addContainerGap())
         );
         glPZakl.setVerticalGroup(
             glPZakl.createParallelGroup(Alignment.LEADING)
@@ -2410,19 +2481,20 @@ public class MainFrame extends JFrame {
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPZakl.createSequentialGroup()
                             .addGap(1)
-                            .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnZaklShablonFind))
                             .addGap(8)
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 683, Short.MAX_VALUE)
-                            .addGap(1))
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE, 148, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spRecomend, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblZakluch)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
-                            .addGap(1)
+                            .addComponent(spZakluch, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblVidPom)
                             .addGap(1)
                             .addComponent(cbxVidPom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2444,7 +2516,7 @@ public class MainFrame extends JFrame {
                             .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxAnotherOtd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblResult)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxResult, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2455,9 +2527,8 @@ public class MainFrame extends JFrame {
                                 .addComponent(lblZaklTime)
                                 .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnSaveZakl)
-                            .addGap(9)))
-                    .addGap(0))
+                            .addComponent(btnSaveZakl)))
+                    .addContainerGap())
         );
         pZakl.setLayout(glPZakl);
     }
