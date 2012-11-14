@@ -332,7 +332,8 @@ public class FormPostBer extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
 					MainForm.tcl.DeleteRdSl(rdSlStruct.getId(), rdSlStruct.getNpasp());
-				} catch (KmiacServerException e) {
+					MainForm.tcl.DeleteRdDin(rdSlStruct.getId());
+									} catch (KmiacServerException e) {
 					e.printStackTrace();
 				} catch (TException e) {
 					MainForm.conMan.reconnect(e);
