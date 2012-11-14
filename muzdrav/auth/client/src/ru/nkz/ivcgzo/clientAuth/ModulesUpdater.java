@@ -25,7 +25,7 @@ public class ModulesUpdater {
 	
 	public void checkAndUpdate(String pdost) throws Exception {
 		List<LibraryInfo> servModList = client.getModulesList();
-		List<Integer> availModList = getModuleIdList(pdost);
+		List<Integer> availModList = getModuleIdList(pdost, servModList);
 		List<LibraryInfo> updList = getUpdateList(servModList, availModList);
 		if (updList.size() > 0) {
 			updateLibs(updList);
@@ -33,12 +33,18 @@ public class ModulesUpdater {
 		}
 	}
 	
-	private List<Integer> getModuleIdList(String pdost) {
+	private List<Integer> getModuleIdList(String pdost, List<LibraryInfo> servModList) {
 		List<Integer> availModList = new ArrayList<>();
 		
 		for (int i = 1; i < pdost.length(); i++)
 			if (Integer.parseInt(pdost.substring(i, i + 1)) > 0)
 			availModList.add(i);
+		
+		for (LibraryInfo libInf : servModList) {
+			if (libInf.req)
+				if (!availModList.contains(libInf.id))
+					availModList.add(libInf.id);
+		}
 		
 		return availModList;
 	}
