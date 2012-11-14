@@ -166,20 +166,21 @@ public class GenReestr extends Server implements Iface {
    				StringBuilder sb = new StringBuilder(0x10000);
     				
 				while (rs.next()){
-    	           	String str = RsTest(rs);
+	           		if (rs.isFirst()){
+	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	        			sb.append("<head>");
+             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+           				sb.append("<title>Файл проверок реестра</title>");
+           				sb.append("</head>");
+           				sb.append("<body>");
+        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+	            	}
+
+	           		String str = RsTest(rs);
     	            	
     	           	if(str!=null){
-    	           		if (!flag){
-    	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-    	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-    	        			sb.append("<head>");
-  	             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-   	           				sb.append("<title>Файл проверок реестра</title>");
-   	           				sb.append("</head>");
-   	           				sb.append("<body>");
-   	        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-   	        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-   	            		}
    	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
    						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
    						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
@@ -190,8 +191,20 @@ public class GenReestr extends Server implements Iface {
    	                }
    	            }
    					osw.write(sb.toString());
-   					//if (sb.length()>0)
-//   					return path;
+   	   				if (sb.length()==0) {
+	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	        			sb.append("<head>");
+	           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	       				sb.append("<title>Файл проверок реестра</title>");
+	       				sb.append("</head>");
+	       				sb.append("<body>");
+	      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+	       				sb.append("ДАННЫЕ ДЛЯ ФОРМИРОВАНИЯ РЕЕСТА ОТСУТСТВУЮТ !!!");
+   	   					osw.write(sb.toString());
+   	   					return path;
+   	   				}
             	
    			} catch (IOException e) {
    				e.printStackTrace();
@@ -222,13 +235,26 @@ public class GenReestr extends Server implements Iface {
 						    "FROM p_vizit_amb v, patient p " + 
 							"WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? ";
 				    	sqlmed += sqlwhere;
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk)));
-							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-						zos.putNextEntry(new ZipEntry("med.dbf"));
-						while ((bufRead = dbfStr.read(buffer)) > 0)
-							zos.write(buffer, 0, bufRead);
+
+//					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk)));
+//						InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+//						zos.putNextEntry(new ZipEntry("med.dbf"));
+//						while ((bufRead = dbfStr.read(buffer)) > 0)
+//							zos.write(buffer, 0, bufRead);
+//					} catch (SQLException e) {
+//				        log.log(Level.ERROR, "SQl Exception: ", e);
+//						throw new KmiacServerException();
+//					}
+					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk)))){
+						while (acrs.getResultSet().next()){
+							try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+								zos.putNextEntry(new ZipEntry("med.dbf"));
+								while ((bufRead = dbfStr.read(buffer)) > 0)
+									zos.write(buffer, 0, bufRead);
+							}
+						}
 					} catch (SQLException e) {
-				        log.log(Level.ERROR, "SQl Exception: ", e);
+						log.log(Level.ERROR, "SQl Exception: ", e);
 						throw new KmiacServerException();
 					}
 				    
@@ -261,11 +287,23 @@ public class GenReestr extends Server implements Iface {
 						    " FROM p_vizit_amb v, patient p" + 
 							" WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? ";
 							sqlpasp += sqlwhere;
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)));
-							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-						zos.putNextEntry(new ZipEntry("pasp.dbf"));
-						while ((bufRead = dbfStr.read(buffer)) > 0)
-							zos.write(buffer, 0, bufRead);
+//					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)));
+//							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+//						zos.putNextEntry(new ZipEntry("pasp.dbf"));
+//						while ((bufRead = dbfStr.read(buffer)) > 0)
+//							zos.write(buffer, 0, bufRead);
+//					} catch (SQLException e) {
+//				        log.log(Level.ERROR, "SQl Exception: ", e);
+//						throw new KmiacServerException();
+//					}
+					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))){
+						while (acrs.getResultSet().next()){
+							try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()){
+								zos.putNextEntry(new ZipEntry("pasp.dbf"));
+								while ((bufRead = dbfStr.read(buffer)) > 0)
+									zos.write(buffer, 0, bufRead);
+							}
+						}
 					} catch (SQLException e) {
 				        log.log(Level.ERROR, "SQl Exception: ", e);
 						throw new KmiacServerException();
@@ -615,20 +653,21 @@ public class GenReestr extends Server implements Iface {
    				StringBuilder sb = new StringBuilder(0x10000);
     				
 				while (rs.next()){
-    	           	String str = RsTest(rs);
+	           		if (rs.isFirst()){
+	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	        			sb.append("<head>");
+	           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	       				sb.append("<title>Файл проверок реестра</title>");
+	       				sb.append("</head>");
+	       				sb.append("<body>");
+	      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+	            	}
+
+	           		String str = RsTest(rs);
     	            	
     	           	if(str!=null){
-    	           		if (!flag){
-    	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-    	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-    	        			sb.append("<head>");
-  	             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-   	           				sb.append("<title>Файл проверок реестра</title>");
-   	           				sb.append("</head>");
-   	           				sb.append("<body>");
-   	        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-   	        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-   	            		}
    	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
    						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
    						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
@@ -639,8 +678,20 @@ public class GenReestr extends Server implements Iface {
    	                }
    	            }
    					osw.write(sb.toString());
-   					//if (sb.length()>0)
-//   					return path;
+   	   				if (sb.length()==0) {
+	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	        			sb.append("<head>");
+	           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	       				sb.append("<title>Файл проверок реестра</title>");
+	       				sb.append("</head>");
+	       				sb.append("<body>");
+	      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+	       				sb.append("ДАННЫЕ ДЛЯ ФОРМИРОВАНИЯ РЕЕСТА ОТСУТСТВУЮТ !!!");
+   	   					osw.write(sb.toString());
+   	   					return path;
+   	   				}
             	
    			} catch (IOException e) {
    				e.printStackTrace();
@@ -842,20 +893,21 @@ public class GenReestr extends Server implements Iface {
             		StringBuilder sb = new StringBuilder(0x10000);
     				
 				while (rs.next()){
-    	           	String str = RsTest(rs);
+					if (rs.isFirst()){
+	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	        			sb.append("<head>");
+             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+           				sb.append("<title>Файл проверок реестра</title>");
+           				sb.append("</head>");
+           				sb.append("<body>");
+        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+	            	}
+
+					String str = RsTest(rs);
     	            	
     	           	if(str!=null){
-    	           		if (!flag){
-    	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-    	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-    	        			sb.append("<head>");
-  	             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-   	           				sb.append("<title>Файл проверок реестра</title>");
-   	           				sb.append("</head>");
-   	           				sb.append("<body>");
-   	        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-   	        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-   	            		}
    	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
    						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
    						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
@@ -866,7 +918,20 @@ public class GenReestr extends Server implements Iface {
    	                }
    	            }
    				osw.write(sb.toString());
-   				//if (sb.length()>0) return path;
+   				if (sb.length()==0) {
+        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+        			sb.append("<head>");
+           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+       				sb.append("<title>Файл проверок реестра</title>");
+       				sb.append("</head>");
+       				sb.append("<body>");
+      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+       				sb.append("ДАННЫЕ ДЛЯ ФОРМИРОВАНИЯ РЕЕСТА ОТСУТСТВУЮТ !!!");
+   					osw.write(sb.toString());
+   					return path;
+   				}
             	
    			} catch (IOException e) {
    				e.printStackTrace();
@@ -909,15 +974,28 @@ public class GenReestr extends Server implements Iface {
             	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
             	sqlmed += " ORDER BY p.npasp "; //ругается
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)));
-					InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-						zos.putNextEntry(new ZipEntry("med.dbf"));
-						while ((bufRead = dbfStr.read(buffer)) > 0)
-							zos.write(buffer, 0, bufRead);
-					} catch (SQLException e) {
-						log.log(Level.ERROR, "SQl Exception: ", e);
-						throw new KmiacServerException();
-					}
+//    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)));
+//	    				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+//							zos.putNextEntry(new ZipEntry("med.dbf"));
+//							while ((bufRead = dbfStr.read(buffer)) > 0)
+//								zos.write(buffer, 0, bufRead);
+//						} catch (SQLException e) {
+//							log.log(Level.ERROR, "SQl Exception: ", e);
+//							throw new KmiacServerException();
+//						}
+
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)))){
+					while (acrs.getResultSet().next()){
+						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+							zos.putNextEntry(new ZipEntry("med.dbf"));
+							while ((bufRead = dbfStr.read(buffer)) > 0)
+								zos.write(buffer, 0, bufRead);
+						} catch (SQLException e) {
+							log.log(Level.ERROR, "SQl Exception: ", e);
+							throw new KmiacServerException();
+						}
+    				}
+				}
 				    
 				sqlpasp ="SELECT g.id::integer AS sl_id, 1::integer AS vid_rstr, " +
 						"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
@@ -980,15 +1058,28 @@ public class GenReestr extends Server implements Iface {
             	sqlpasp += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
 
-				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
-					InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-						zos.putNextEntry(new ZipEntry("pasp.dbf"));
-						while ((bufRead = dbfStr.read(buffer)) > 0)
-							zos.write(buffer, 0, bufRead);
-					} catch (SQLException e) {
-						log.log(Level.ERROR, "SQl Exception: ", e);
-						throw new KmiacServerException();
-					}
+//				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
+//					InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+//						zos.putNextEntry(new ZipEntry("pasp.dbf"));
+//						while ((bufRead = dbfStr.read(buffer)) > 0)
+//							zos.write(buffer, 0, bufRead);
+//					} catch (SQLException e) {
+//						log.log(Level.ERROR, "SQl Exception: ", e);
+//						throw new KmiacServerException();
+//					}
+				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)))){
+					while (acrs.getResultSet().next()){
+						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+							zos.putNextEntry(new ZipEntry("pasp.dbf"));
+							while ((bufRead = dbfStr.read(buffer)) > 0)
+								zos.write(buffer, 0, bufRead);
+						} catch (SQLException e) {
+							log.log(Level.ERROR, "SQl Exception: ", e);
+							throw new KmiacServerException();
+						}
+    				}
+				}
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1027,13 +1118,13 @@ public class GenReestr extends Server implements Iface {
 					sb.append("<br>Информация об ошибках: <br>");
 					
 					ResultSet rs = acrs.getResultSet();
-					if (rs.next())
-						if (rs.getInt("vid_rstr") != 2 && rs.getInt("kl_usl") != 2){
-							sb.append("<br></b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
-			   				osw.write(sb.toString());
-							return path;
-						}
 					while (rs.next()){
+						if (rs.isFirst())
+							if (rs.getInt("vid_rstr") != 2 && rs.getInt("kl_usl") != 2){
+								sb.append("<br></b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
+				   				osw.write(sb.toString());
+								return path;
+							}
 						int kr = rs.getInt("kod_rez");
 						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
 							kr = 81;
@@ -1157,13 +1248,14 @@ public class GenReestr extends Server implements Iface {
 					sb.append("<br>Информация об ошибках: <br>");
 					
 					ResultSet rs = acrs.getResultSet();
-					if (rs.next())
-						if (rs.getInt("vid_rstr") != 2 && (rs.getInt("kl_usl") != 2 || rs.getInt("kl_usl") != 9)){
-							sb.append("<br></b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
-			   				osw.write(sb.toString());
-							return path;
-						}
+
 					while (rs.next()){
+						if (rs.isFirst())
+							if (rs.getInt("vid_rstr") != 2 && (rs.getInt("kl_usl") != 2 || rs.getInt("kl_usl") != 9)){
+								sb.append("<br></b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
+				   				osw.write(sb.toString());
+								return path;
+							}
 						int kr = rs.getInt("kod_rez");
 						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
 							kr = 81;
@@ -1279,10 +1371,12 @@ public class GenReestr extends Server implements Iface {
 			TException {
         String sqlr;
         String path;
+        int sl_id = 0;
+        int id_med = 0;
 
-	        sqlr = "SELECT p.sl_id, p.id_lpu, p.fam, p.im, p.otch, p.dr, p.vid_rstr, m.kl_usl, m.id_med, m.kod_rez, m.d_pst, m.diag, e.kod_err, e.prim " +
-	 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med) " + 
-	 			   "ORDER BY p.id_lpu";
+        sqlr = "SELECT p.sl_id, p.id_lpu, p.kod_mu, p.fam, p.im, p.otch, p.dr, p.vid_rstr, m.kl_usl, m.id_med, m.kod_rez, m.d_pst, m.d_end, m.etap, m.diag, m.kod_otd, e.kod_err, e.prim " +
+ 			   "FROM pasp p JOIN med m ON (p.sl_id = m.sl_id) LEFT JOIN err e ON (m.sl_id = e.sl_id and m.id_med = e.id_med) " + 
+ 			   "ORDER BY p.sl_id, m.id_med";
 	        try {
 	        	SqlSelectExecutor dbfSse = new SqlSelectExecutor(String.format("jdbc:dbf:/%s", pf), prop);
 	        	
@@ -1302,13 +1396,14 @@ public class GenReestr extends Server implements Iface {
 					sb.append("<br>Информация об ошибках: <br><br>");
 					
 					ResultSet rs = acrs.getResultSet();
-					if (rs.next())
+					
+					while (rs.next()){
+						if (rs.isFirst())
 						if (rs.getInt("vid_rstr") != 1 && (rs.getInt("kl_usl") != 1 || rs.getInt("kl_usl") != 3  || rs.getInt("kl_usl") != 8)){
 							sb.append("</b>   НЕСООТВЕТСТВИЕ ПОДГРУЖАЕМОГО РЕЕСТРА ВИДУ ПОМОЩИ !!!");
 							osw.write(sb.toString());
 							return path;
 						}
-					while (rs.next()){
 						int kr = rs.getInt("kod_rez");
 						if (rs.getInt("kod_err")==14 || rs.getInt("kod_err")==81 || rs.getInt("kod_err")==82 ||rs.getInt("kod_err")==103 ||rs.getInt("kod_err")==231)
 							kr = 81;
@@ -1322,22 +1417,59 @@ public class GenReestr extends Server implements Iface {
 							e1.printStackTrace();
 							throw new KmiacServerException();
 						}
+
+						if (sl_id != rs.getInt("sl_id") && id_med != rs.getInt("id_med"))
+						try (AutoCloseableResultSet acr = sse.execPreparedQuery("select * from w_kderr where sl_id=? and id_med=? and cslu = 1", rs.getInt("sl_id"), rs.getInt("id_med"))) {
+							if (acr.getResultSet().next()){
+								try (SqlModifyExecutor sme = tse.startTransaction()) {
+									sme.execPrepared("delete from w_kderr where sl_id = ? and id_med=? and cslu = 1", false, rs.getInt("sl_id"), rs.getInt("id_med"));
+									sme.setCommit();
+								} catch (SQLException e) {
+									((SQLException) e.getCause()).printStackTrace();
+									throw new KmiacServerException();
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+									throw new KmiacServerException();
+								}
+								
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+
 						if (rs.getInt("kod_rez") != 3 && rs.getInt("kod_rez") != 10){
-		    				sb.append(String.format("<br>%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
-							sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
-							sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-							if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
-							else sb.append(String.format("%s   Диагноз :  %s", "      ",rs.getString("diag")));
+							if (kr != 81){
+								try (SqlModifyExecutor sme = tse.startTransaction()) {
+									sme.execPrepared("insert into w_kderr (cslu, cuser, cpodr, sl_id, id_med, npasp, kod_err, name_err, dataz) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", false, 1, 0, rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), rs.getInt("kod_err"), rs.getString("prim"), new Date(System.currentTimeMillis()));
+									sme.setCommit();
+								} catch (SQLException e) {
+									((SQLException) e.getCause()).printStackTrace();
+									throw new KmiacServerException();
+								} catch (InterruptedException e1) {
+									e1.printStackTrace();
+									throw new KmiacServerException();
+								}
+							}
+		    				
+							if (sl_id != rs.getInt("sl_id") && id_med != rs.getInt("id_med")){
+								sb.append(String.format("<br><br>%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
+								sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
+								sb.append(String.format("<br>   Период :  %1$td.%1$tm.%1$tY - %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime(), rs.getDate("d_end").getTime()));
+								sb.append(String.format("   Этап </b> %s", rs.getInt("etap")));
+								if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
+								else sb.append(String.format("%s   Диагноз :  %s", "      ",rs.getString("diag")));
+							}
 							sb.append(String.format("<br> %s ", rs.getString("kod_err")));
 							try (AutoCloseableResultSet acr = sse.execPreparedQuery("select name_err from n_kderr where kderr=?", rs.getInt("kod_err"))) {
 								if (acr.getResultSet().next()) 
 									sb.append(String.format(" %s ", acr.getResultSet().getString("name_err")));
-								sb.append(String.format("<br> %s <br>", rs.getString("prim")));
+								sb.append(String.format("<br> %s ", rs.getString("prim")));
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
-	    	                	
+						sl_id = rs.getInt("sl_id");
+						id_med = rs.getInt("id_med");
 	   	            }
 	   				osw.write(sb.toString());
 	   				return path;
