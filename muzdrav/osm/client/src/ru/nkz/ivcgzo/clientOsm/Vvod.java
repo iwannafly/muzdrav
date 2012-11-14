@@ -2865,7 +2865,7 @@ public class Vvod extends JFrame {
 		  				diagamb.setDatad(pdiag.getDatad());
 		  				else diagamb.setDatad(System.currentTimeMillis());
   			}
-		  		diagamb.setDatap(System.currentTimeMillis());
+		  		diagamb.setDatap(pvizitAmb.datap);
 		  		diagamb.setCod_sp(MainForm.authInfo.getPcod());
 		  		diagamb.setCdol(MainForm.authInfo.getCdol());
 		  		diagamb.setPredv(true);
@@ -2892,13 +2892,13 @@ public class Vvod extends JFrame {
 //	}
 
 	private void checkZapVrNext() throws KmiacServerException, TException {
-		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
-			cmbZaklIsh.setSelectedIndex(-1);
-			cmbZaklIsh.setEnabled(false);
-			btnPosSave.doClick();
-		} else {
-			cmbZaklIsh.setEnabled(true);
-		}
+//		if (MainForm.tcl.isZapVrNext(zapVr.id_pvizit)) {
+//			cmbZaklIsh.setSelectedIndex(-1);
+//			cmbZaklIsh.setEnabled(false);
+//			btnPosSave.doClick();
+//		} else {
+//			cmbZaklIsh.setEnabled(true);
+//		}
 	}
 
 	/**
