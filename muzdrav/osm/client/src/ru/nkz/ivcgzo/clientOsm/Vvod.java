@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -57,6 +58,7 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -181,6 +183,7 @@ public class Vvod extends JFrame {
 	private PdiagAmb diagamb;
 	public static PdiagZ pdiag;
 	public static Pdisp pdisp;
+	private int idPvizitMainForm;
 	
 	private FormSign sign;
 	private FormPostBer postber;
@@ -2347,6 +2350,11 @@ public class Vvod extends JFrame {
 						MainForm.tcl.UpdatePvizit(pvizit);
 						MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 						btnRecPriem.setEnabled(!pvizit.isSetIshod());
+						if (pvizit.isSetIshod())
+							tblObr.getSelectedItem().setIshod(pvizit.getIshod());
+						else
+							tblObr.getSelectedItem().setIshod(0);
+						tblObr.repaint();
 						
 						pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 						priemCopy = new Priem(priem);
@@ -2373,7 +2381,7 @@ public class Vvod extends JFrame {
 						return;
 					}
 				
-				addPvizit(0);
+				addPvizit();
 			}
 		});
 		btnObrAdd.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
@@ -2460,8 +2468,10 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
+		ObrCellRenderer ocr = new ObrCellRenderer();
 		tblObr = new CustomTable<>(true, false, Pvizit.class, 3, "Дата обращения");
 		tblObr.setDateField(0);
+		tblObr.setDefaultRenderer(Date.class, ocr);
 		tblObr.setFillsViewportHeight(true);
 		tblObr.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -2721,8 +2731,7 @@ public class Vvod extends JFrame {
 	
 	public void showVvod(ZapVr zapVr) {
 		Vvod.zapVr = zapVr;
-		int idPvizit = zapVr.id_pvizit;
-		int selIdx;
+		idPvizitMainForm = zapVr.id_pvizit;
 		
 		try {
 			setTitle(String.format("Врачебный осмотр - пациент: %s %s %s, номер и серия полиса: %s %s", zapVr.getFam(), zapVr.getIm(), zapVr.getOth(), zapVr.getNompolis(), zapVr.getSerpolis()));
@@ -2731,16 +2740,13 @@ public class Vvod extends JFrame {
 			chbDiagBer.setEnabled(btnBer.isEnabled());
 			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
 			tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp, MainForm.authInfo.pcod, MainForm.authInfo.cdol));
-			if ((idPvizit > 0) && (tblObr.getRowCount() > 0)) {
-				for (selIdx = 0; selIdx < tblObr.getRowCount(); selIdx++) {
-					if (tblObr.getData().get(selIdx).id == idPvizit) {
-						if (selIdx > 0)
-							tblObr.setRowSelectionInterval(selIdx, selIdx);
+			if ((idPvizitMainForm > 0) && (tblObr.getRowCount() > 0)) {
+				for (int i = 0; i < tblObr.getRowCount(); i++) {
+					if (tblObr.getData().get(i).id == idPvizitMainForm) {
+						if (i > 0)
+							tblObr.setRowSelectionInterval(i, i);
 						break;
 					}
-				}
-				if (selIdx == tblObr.getRowCount()) {
-					addPvizit(idPvizit);
 				}
 			}
 			
@@ -2939,7 +2945,7 @@ public class Vvod extends JFrame {
 				}
 		if (!checkTalInput())
 			return false;
-		if (pvizit == null)
+		if ((pvizit == null) || (pvizitAmb == null))
 			return false;
 		
 		priem = new Priem();
@@ -3031,7 +3037,15 @@ public class Vvod extends JFrame {
 		return false;
 	}
 
-	private void addPvizit(int idPvizit) {
+	private void addPvizit() {
+		int idPvizit = idPvizitMainForm;
+		
+		for (Pvizit pv : tblObr.getData())
+			if (pv.id == idPvizit) {
+				idPvizit = 0;
+				break;
+			}
+		
 		pvizit = new Pvizit();
 		try {
 			pvizit.setNpasp(zapVr.getNpasp());
@@ -3048,11 +3062,45 @@ public class Vvod extends JFrame {
 				MainForm.tcl.AddPvizit(pvizit);
 			tblObr.addItem(0, pvizit);
 			tblObr.updateSelectedItem();
+			btnPosAdd.doClick();
 		} catch (KmiacServerException e1) {
 			e1.printStackTrace();
 		} catch (TException e1) {
 			MainForm.conMan.reconnect(e1);
 		}	
 		pvizitCopy = new Pvizit(pvizit);
+	}
+	
+	private class ObrCellRenderer extends DefaultTableCellRenderer {
+		private static final long serialVersionUID = 4556543113058147883L;
+		private Color defCol = UIManager.getColor("Table.background");
+		private Color selCol = UIManager.getColor("Table.selectionBackground");
+		private SimpleDateFormat dateFrm = new CustomDateEditor().getDateFormatter();
+		
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			Component cmp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+			
+			if (cmp instanceof JLabel) {
+				JLabel lbl = (JLabel) cmp;
+				
+				if (tblObr.getData().get(row).ishod > 0) {
+					if (isSelected)
+						lbl.setBackground(selCol.darker());
+					else
+						lbl.setBackground(Color.green.brighter());
+				} else {
+					if (isSelected)
+						lbl.setBackground(selCol);
+					else
+						lbl.setBackground(defCol);
+				}
+				
+				if (value instanceof Date)
+					lbl.setText(dateFrm.format(value));
+			}
+			
+			return cmp;
+		}
 	}
 }

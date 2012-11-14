@@ -389,8 +389,8 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<Pvizit> getPvizitList(int npasp, int codsp, String cdol) throws KmiacServerException, TException {
-		String sql = "SELECT pv.id, pv.datao, TRUE AS has_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
-					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND ((ipv.ishod IS NULL) OR (ipv.ishod < 1))) " +
+		String sql = "SELECT pv.id, pv.datao, pv.ishod, TRUE AS has_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
+					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND (ipv.datao BETWEEN (CURRENT_DATE - 365) AND CURRENT_DATE)) " +
 					 "ORDER BY has_pvizit, id DESC, datao DESC ";	
 	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp, codsp, cdol)) {
 		List<Pvizit> pvizitList = rsmPvizit.mapToList(acrs.getResultSet());
