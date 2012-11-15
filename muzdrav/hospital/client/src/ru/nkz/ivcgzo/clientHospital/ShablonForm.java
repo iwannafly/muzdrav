@@ -161,9 +161,9 @@ public class ShablonForm  extends JDialog {
         glPnView.setVerticalGroup(
             glPnView.createParallelGroup(Alignment.LEADING)
                 .addGroup(glPnView.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(spView, GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
-                .addContainerGap())
+                    .addContainerGap()
+                    .addComponent(spView, GroupLayout.DEFAULT_SIZE, 516, Short.MAX_VALUE)
+                    .addContainerGap())
         );
 
         tbView = new JTextPane();
@@ -196,7 +196,7 @@ public class ShablonForm  extends JDialog {
             String nl = System.lineSeparator();
             sho = ClientHospital.tcl.getShablon(code);
 
-            str = String.format("Динамика: %s%s<br>", sho.din, nl);
+            str = String.format("<FONT SIZE=3><b>Динамика</b>: %s%s<br>", sho.din, nl);
             str += nl;
             for (ShablonText st : sho.textList) {
                 if (st.text.length() > 0) {
@@ -204,6 +204,7 @@ public class ShablonForm  extends JDialog {
                         st.grupName, nl, st.text, nl, nl);
                 }
             }
+            str += "</FONT SIZE>";
             tbView.setText(str);
         } catch (KmiacServerException e) {
             JOptionPane.showMessageDialog(this, "Ошибка загрузки текстов шаблона",

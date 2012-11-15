@@ -234,7 +234,6 @@ public class MainFrame extends JFrame {
     private Box vbLifeHistoryTextFields;
     private Component hsLifeHistorySecond;
     private Box hbLifeHistoryShablonFind;
-    private JButton btnLifeHistoryShablonFind;
     private Component hsLifeHistoryThird;
     private Component hsLifeHistoryFirst;
     private Box vbMedicalHistoryTextFields;
@@ -976,8 +975,6 @@ public class MainFrame extends JFrame {
     }
 
     private void setLifeHistoryShablonButton() {
-        btnLifeHistoryShablonFind = new JButton("Найти");
-        hbLifeHistoryShablonFind.add(btnLifeHistoryShablonFind);
     }
 
     private void setLifeHistoryShablonScrollPane() {
@@ -1440,7 +1437,7 @@ public class MainFrame extends JFrame {
     }
 
     private void setMedicalHistoryShablonButton() {
-        btnMedicalHistoryShablonFind = new JButton("Найти");
+        btnMedicalHistoryShablonFind = new JButton("...");
         btnMedicalHistoryShablonFind.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 frmShablon.showShablonForm(tfLifeHShablonFilter.getText(),
@@ -1777,7 +1774,7 @@ public class MainFrame extends JFrame {
     }
 
     private void setDiagnosisShablonButton() {
-        btnDiagnosisShablonFind = new JButton("Найти");
+        btnDiagnosisShablonFind = new JButton("...");
         btnDiagnosisShablonFind.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 frmShablon.showShablonForm(tfDiagShablonFilter.getText(),
@@ -2135,7 +2132,7 @@ public class MainFrame extends JFrame {
         zaklSearchListener = new ShablonSearchListener(tfZaklShablonNames, lZaklShablonNames);
         tfZaklShablonNames.getDocument().addDocumentListener(zaklSearchListener);
 
-        btnZaklShablonFind = new JButton("Найти");
+        btnZaklShablonFind = new JButton("...");
         btnZaklShablonFind.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 frmShablon.showShablonForm(tfZaklShablonNames.getText(),
