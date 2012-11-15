@@ -39,7 +39,7 @@ public class ServerAuth extends Server implements Iface {
 		super(sse, tse);
 		
 		rsmAuth = new TResultSetMapper<>(UserAuthInfo.class, "pcod", "clpu", "cpodr", "pdost", "name", "id", "config", "cdol", "cdol_name", "name_short", "cpodr_name", "clpu_name", "cslu", "cslu_name", "cspec", "cspec_name", "c_nom", "kdate", "kateg");
-		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size");
+		rsmLibInfo = new TResultSetMapper<>(LibraryInfo.class, "id", "name", "md5", "size", "req");
 		
 		scMan = new SocketManager(5, fileTransferConstants.bufSize);
 		
@@ -158,7 +158,7 @@ public class ServerAuth extends Server implements Iface {
 
 	@Override
 	public List<LibraryInfo> getModulesList() throws TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size FROM s_libs WHERE (id > 0) ")) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT id, name, md5, size, req FROM s_libs WHERE (id > 0) ")) {
 			return rsmLibInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);

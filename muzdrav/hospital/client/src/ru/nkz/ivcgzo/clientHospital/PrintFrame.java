@@ -45,13 +45,12 @@ public class PrintFrame extends JDialog {
     }
 
     private void initialization() {
-        setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.TOOLKIT_MODAL);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(300, 60));
         setSize(new Dimension(300, 60));
-        setLocationRelativeTo(null);
+//        setLocationRelativeTo(null);
         java.awt.Toolkit jToolkit = java.awt.Toolkit.getDefaultToolkit();
         Dimension screenSize = jToolkit.getScreenSize();
         setLocation((int) ((screenSize.getWidth() - getWidth()) / 2),

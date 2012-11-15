@@ -30,9 +30,8 @@ public class PatientSelectFrame extends JDialog {
     private TSimplePatient currentPatient;
 
     public PatientSelectFrame(final UserAuthInfo authInfo) {
-        setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.TOOLKIT_MODAL);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         addScrollPane(authInfo);
@@ -44,7 +43,7 @@ public class PatientSelectFrame extends JDialog {
         getContentPane().add(scrollPane);
         setPreferredSize(new Dimension(800, 400));
         setSize(new Dimension(800, 400));
-        setLocationRelativeTo(null);
+//        setLocationRelativeTo(null);
         java.awt.Toolkit jToolkit = java.awt.Toolkit.getDefaultToolkit();
         Dimension screenSize = jToolkit.getScreenSize();
         setLocation((int) ((screenSize.getWidth() - getWidth()) / 2),
