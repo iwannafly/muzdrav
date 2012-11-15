@@ -260,6 +260,7 @@ public class MainForm {
 								super.windowClosing(e);
 								
 								frame.setVisible(plug.getFrame().getDefaultCloseOperation() == JFrame.DISPOSE_ON_CLOSE);
+								btnLaunch.setEnabled(true);
 							}
 						});
 					} catch (Exception e1) {
