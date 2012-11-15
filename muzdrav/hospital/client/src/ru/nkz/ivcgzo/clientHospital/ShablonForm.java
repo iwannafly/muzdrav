@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.Timer;
@@ -47,7 +46,6 @@ import ru.nkz.ivcgzo.thriftHospital.ShablonText;
 
 import java.awt.Font;
 import javax.swing.JTextPane;
-import javax.swing.JEditorPane;
 
 public class ShablonForm  extends JDialog {
     private static final long serialVersionUID = -6616098681222163927L;

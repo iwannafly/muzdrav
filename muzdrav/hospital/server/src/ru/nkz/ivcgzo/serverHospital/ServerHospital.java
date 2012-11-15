@@ -204,6 +204,7 @@ public class ServerHospital extends Server implements Iface {
                 + "FROM c_otd INNER JOIN c_gosp ON c_gosp.id = c_otd.id_gosp "
                 + "INNER JOIN patient ON c_gosp.npasp = patient.npasp "
                 + "WHERE c_otd.cotd = ? AND c_otd.vrach is null AND c_otd.result is null "
+                + "AND c_otd.ishod <> 2 "
                 + "ORDER BY fam, im, ot;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, otdNum)) {
             List<TSimplePatient> patientList = rsmSimplePatient.mapToList(acrs.getResultSet());
