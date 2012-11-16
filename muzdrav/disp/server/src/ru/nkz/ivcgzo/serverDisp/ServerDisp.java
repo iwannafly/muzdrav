@@ -16,8 +16,9 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
-import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftDisp.PatientInfo;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_do;
@@ -37,6 +38,10 @@ public class ServerDisp extends Server implements Iface {
 	private final Class<?>[] pdispds_poTypes;
 	private final TResultSetMapper<PatientInfo, PatientInfo._Fields> rsmPat;
 	private final Class<?>[] patTypes;
+	private final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] intClasTypes; 
+
 
 	public ServerDisp(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -54,21 +59,24 @@ public class ServerDisp extends Server implements Iface {
 				Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class,Integer.class, Integer.class, 
 				String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 
-		rsmPdisp_ds_do = new TResultSetMapper<>(Pdisp_ds_do.class, "npasp",       "id",          "d_do",        "diag_do",    "obs_n",       "obs_v", 	"lech_n",      "lech_v",       "dataz");
-		pdispds_doTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class,Integer.class, Integer.class, Date.class};
+		rsmPdisp_ds_do = new TResultSetMapper<>(Pdisp_ds_do.class, "npasp",       "id",          "d_do",        "diag_do",    "obs_n",       "obs_v", 	"lech_n",      "lech_v",       "dataz",   "nameds");
+		pdispds_doTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class,Integer.class, Integer.class, Date.class, String.class};
 		
 		rsmPdisp_ds_po = new TResultSetMapper<>(Pdisp_ds_po.class, "npasp",        "id",          "d_po",        "diag_po",    "xzab",        "pu",          "disp",       "vmp1",        
 				"vmp2",        "vrec1",       "vrec2",		 "vrec3",         "vrec4",     "vrec5",       "vrec6",	    "vrec7",       "vrec8",       "vrec9",        "vrec10",     
 				"nrec1",       "nrec2",       "nrec3",        "nrec4",      "nrec5",       "nrec6",       "nrec7",       "nrec8",       "nrec9",        "nrec10",     "dataz",    "recdop1", 
-				"recdop2",      "recdop3",    "prizn_do",    "prizn_po");
+				"recdop2",      "recdop3",    "nameds");
 		pdispds_poTypes = new Class<?>[] {                         Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class,
 				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, 
 				Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class,
-				Integer.class, Integer.class, Integer.class, Integer.class};
+				Integer.class, Integer.class, String.class};
 		
 		rsmPat = new TResultSetMapper<>(PatientInfo.class, "npasp",       "fam",        "im",         "ot",         "datar",    "poms_ser",   "poms_nom",   "pol"); 
 		patTypes = new Class<?>[] {                        Integer.class, String.class, String.class, String.class, Date.class, String.class, String.class, Integer.class};
 	
+		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod",        "name");
+		intClasTypes = new Class<?>[] {                              Integer.class, String.class};
+
 	}
 
 	@Override
@@ -181,7 +189,7 @@ public class ServerDisp extends Server implements Iface {
 	@Override
 	public List<Pdisp_ds_do> getTblDispds_do(int npasp)
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_disp_ds_do where npasp = ? ", npasp)) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_disp_ds_do.*, n_c00.name as nameds from p_disp_ds_do join n_c00 on (p_disp_ds_do.diag_do=n_c00.pcod) where npasp = ? ", npasp)) 
 		{
 			return rsmPdisp_ds_do.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
@@ -239,7 +247,7 @@ public class ServerDisp extends Server implements Iface {
 	@Override
 	public List<Pdisp_ds_po> getTblDispds_po(int npasp)
 			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_disp_ds_po where npasp = ? ", npasp)) 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_disp_ds_po.*, n_c00.name as nameds from p_disp_ds_po join n_c00 on (p_disp_ds_po.diag_po=n_c00.pcod) where npasp = ? ", npasp)) 
 		{
 			return rsmPdisp_ds_po.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
@@ -290,5 +298,15 @@ public class ServerDisp extends Server implements Iface {
 		}
 		
 	}
+
+	@Override
+	public List<IntegerClassifier> get_n_prf() throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod, name from n_prf ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}	}
 
 }
