@@ -272,13 +272,15 @@ public class MainFrame extends JFrame {
     private JButton btnPatalogoAnDiag;
     private JTextField tfPatalogoAnDiagPcod;
     private JPanel panel;
-    private Component hzstOslDiagZaklDiag;
-    private JRadioButton rdbtnZakl;
     private JButton btnShowPatientInfo;
     private JButton btnMedication;
     private JButton btnIssled;
     private JPanel pTools;
     private JToolBar toolBar;
+    private JTextField tfZaklDiagPcod;
+    private JTextField tfZaklDiagName;
+    private JLabel lblZaklDiag;    
+    private JButton btnZaklDiag;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
@@ -554,6 +556,7 @@ public class MainFrame extends JFrame {
         btnIssled.setRequestFocusEnabled(false);
 
         btnMedication = new JButton();
+        btnMedication.setVisible(false);
         toolBar.add(btnMedication);
         btnMedication.setMaximumSize(new Dimension(35, 35));
         btnMedication.setMinimumSize(new Dimension(35, 35));
@@ -1663,6 +1666,7 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisTableButtonsPanel() {
         vbDiagnosisTableButtons = Box.createVerticalBox();
+        vbDiagnosisTableButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
         hbDiagnosisTableControls.add(vbDiagnosisTableButtons);
 
         addDiagnosisButtons();
@@ -1676,6 +1680,7 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisAddButton() {
         btnAddDiag = new JButton();
+        btnAddDiag.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnAddDiag.setMaximumSize(new Dimension(50, 50));
         btnAddDiag.setPreferredSize(new Dimension(50, 50));
         vbDiagnosisTableButtons.add(btnAddDiag);
@@ -1690,6 +1695,7 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisDeleteButton() {
         btnDelDiag = new JButton();
+        btnDelDiag.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnDelDiag.setPreferredSize(new Dimension(50, 50));
         btnDelDiag.setMaximumSize(new Dimension(50, 50));
         vbDiagnosisTableButtons.add(btnDelDiag);
@@ -1704,6 +1710,7 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisUpdateButton() {
         btnSaveDiag = new JButton();
+        btnSaveDiag.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnSaveDiag.setPreferredSize(new Dimension(50, 50));
         btnSaveDiag.setMaximumSize(new Dimension(50, 50));
         vbDiagnosisTableButtons.add(btnSaveDiag);
@@ -1764,7 +1771,8 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisRadioGroupPanel() {
         pDiagTypes = new JPanel();
-        pDiagTypes.setMaximumSize(new Dimension(600, 50));
+        pDiagTypes.setPreferredSize(new Dimension(425, 25));
+        pDiagTypes.setMaximumSize(new Dimension(425, 25));
         vbDiagnosisTextFields.add(pDiagTypes);
         pDiagTypes.setBorder(new LineBorder(new Color(0, 0, 0)));
         pDiagTypes.setLayout(new BoxLayout(pDiagTypes, BoxLayout.X_AXIS));
@@ -1796,21 +1804,10 @@ public class MainFrame extends JFrame {
         rdbtnOsl.setAlignmentX(Component.CENTER_ALIGNMENT);
         pDiagTypes.add(rdbtnOsl);
 
-        hzstOslDiagZaklDiag = Box.createHorizontalStrut(50);
-        hzstOslDiagZaklDiag.setPreferredSize(new Dimension(50, 0));
-        hzstOslDiagZaklDiag.setMaximumSize(new Dimension(50, 50));
-        hzstOslDiagZaklDiag.setMinimumSize(new Dimension(5, 0));
-        pDiagTypes.add(hzstOslDiagZaklDiag);
-
-        rdbtnZakl = new JRadioButton("Заключительный");
-        rdbtnZakl.setAlignmentX(Component.CENTER_ALIGNMENT);
-        pDiagTypes.add(rdbtnZakl);
-
         btgDiag = new ButtonGroup();
         btgDiag.add(rdbtnMain);
         btgDiag.add(rdbtnSoput);
         btgDiag.add(rdbtnOsl);
-        btgDiag.add(rdbtnZakl);
     }
 
     private void setDiagnosisVerticalShablonPanel() {
@@ -1893,7 +1890,6 @@ public class MainFrame extends JFrame {
         rdbtnMain.setSelected(false);
         rdbtnSoput.setSelected(false);
         rdbtnOsl.setSelected(false);
-        rdbtnZakl.setSelected(false);
     }
 
     private void fillDiagnosisTable() {
@@ -1920,10 +1916,7 @@ public class MainFrame extends JFrame {
                 rdbtnSoput.setSelected(true);
             } else if (tbDiag.getSelectedItem().getPrizn() == 2) {
                 rdbtnOsl.setSelected(true);
-            } else if (tbDiag.getSelectedItem().getPrizn() == 4) {
-                rdbtnZakl.setSelected(true);
             } else {
-                rdbtnZakl.setSelected(false);
                 rdbtnMain.setSelected(false);
                 rdbtnSoput.setSelected(false);
                 rdbtnOsl.setSelected(false);
@@ -1975,9 +1968,6 @@ public class MainFrame extends JFrame {
                     if (rdbtnOsl.isSelected()) {
                         tbDiag.getSelectedItem().setPrizn(2);
                     }
-                    if (rdbtnZakl.isSelected()) {
-                        tbDiag.getSelectedItem().setPrizn(4);
-                    }
                     tbDiag.getSelectedItem().setIdGosp(patient.getGospitalCod());
                     ClientHospital.tcl.updateDiagnosis(tbDiag.getSelectedItem());
                 }
@@ -2001,7 +1991,7 @@ public class MainFrame extends JFrame {
                 diag.setId(ClientHospital.tcl.addDiagnosis(diag));
                 tbDiag.addItem(diag);
                 tbDiag.setData(
-                        ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
+                    ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -2199,7 +2189,7 @@ public class MainFrame extends JFrame {
                     if (lZaklShablonNames.getSelectedValue() != null) {
                         try {
                             pasteZaklSelectedShablon(ClientHospital.tcl.getShablon(
-                                    lZaklShablonNames.getSelectedValue().pcod));
+                                lZaklShablonNames.getSelectedValue().pcod));
                         } catch (KmiacServerException e1) {
                             JOptionPane.showMessageDialog(MainFrame.this,
                                 "Ошибка загрузки шаблона", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -2303,6 +2293,25 @@ public class MainFrame extends JFrame {
             }
         });
         setPatalAnatComponentsVisble(false);
+
+        lblZaklDiag = new JLabel("Заключительный  диагноз");
+
+        tfZaklDiagPcod = new JTextField();
+        tfZaklDiagPcod.setColumns(10);
+
+        tfZaklDiagName = new JTextField();
+        tfZaklDiagName.setColumns(10);
+
+        btnZaklDiag = new JButton("Выбрать");
+        btnZaklDiag.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                StringClassifier patDiag = ClientHospital.conMan.showMkbTreeForm("Диагноз", "");
+                if (patDiag != null) {
+                    tfZaklDiagPcod.setText(patDiag.getPcod());
+                    tfZaklDiagName.setText(patDiag.getName());
+                }
+            }
+        });
     }
 
     private void setPatalAnatComponentsVisble(final boolean isVisible) {
@@ -2537,7 +2546,6 @@ public class MainFrame extends JFrame {
                     .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
                         .addComponent(lblRecomend)
                         .addComponent(lblZakluch)
-                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(lblVidPom)
                         .addComponent(lblDefect)
                         .addComponent(cbxVidPom, 0, 847, Short.MAX_VALUE)
@@ -2546,10 +2554,18 @@ public class MainFrame extends JFrame {
                         .addComponent(tfUkl, 401, 847, Short.MAX_VALUE)
                         .addComponent(lblVidOpl)
                         .addComponent(cbxVidOpl, 0, 847, Short.MAX_VALUE)
-                        .addComponent(cbxAnotherOtd, 0, 847, Short.MAX_VALUE)
-                        .addComponent(lblIshod)
                         .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
+                        .addComponent(lblZaklDiag)
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addComponent(tfZaklDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(tfZaklDiagName, GroupLayout.PREFERRED_SIZE, 631, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(btnZaklDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
+                        .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
+                        .addComponent(cbxAnotherOtd, 0, 847, Short.MAX_VALUE)
+                        .addComponent(lblIshod)
                         .addComponent(lblPatalogoAnDiagHeader)
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(tfPatalogoAnDiagPcod)
@@ -2613,6 +2629,13 @@ public class MainFrame extends JFrame {
                             .addComponent(lblVidOpl)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxVidOpl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(lblZaklDiag)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(tfZaklDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(tfZaklDiagName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnZaklDiag))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)
