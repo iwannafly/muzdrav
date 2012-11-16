@@ -1551,7 +1551,7 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 		e1.printStackTrace();
 	}	
 	
-	return null;
+	return svod;
 } 
 
 
@@ -2044,6 +2044,53 @@ public String nagrvr(int cpol) throws KmiacServerException, TException {
 		if (acrs2 != null)
 			acrs2.close();
 	}
+}
+
+
+
+@Override
+public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
+		TException {
+	String svod = null;
+	
+	// Дата от ...
+	Date dn;
+	// Дата до ...
+	Date dk;
+	try {
+		dn = (Date) sdfo.parse(ipd.getDaten());
+		dk = (Date) sdfo.parse(ipd.getDatek());
+
+		// Код полеклиники
+		int kodpol = ipd.getKpolik();
+		
+		// Код ЛПУ
+		int kodlpu = ipd.getClpu();
+		// Вид больницы (Д/В)
+		int poldv = 0;
+		
+		final String sqlQueryDetVzPol = "select c_nom from n_m00 where pcod ="+String.valueOf(kodlpu);
+		
+		try (AutoCloseableResultSet zapznach = sse.execPreparedQuery(sqlQueryDetVzPol)) {
+			
+			poldv = zapznach.getResultSet().getInt("c_nom");
+			
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		String sqlQueryObost =null;
+		
+		
+		
+		
+	} catch (ParseException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}	
+	
+	return svod;
 }
     
 

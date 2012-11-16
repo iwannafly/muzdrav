@@ -46,5 +46,20 @@
 			<type>1</type>
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/1341981970_Accept.png</locationURI>
 		</link>
+		<link>
+			<name>src/ru/nkz/ivcgzo/clientHospital/resources/issled.png</name>
+			<type>1</type>
+			<locationURI>WORKSPACE_LOC/gitrep/common/resources/issled.png</locationURI>
+		</link>
+		<link>
+			<name>src/ru/nkz/ivcgzo/clientHospital/resources/medication.png</name>
+			<type>1</type>
+			<locationURI>WORKSPACE_LOC/gitrep/common/resources/medication.png</locationURI>
+		</link>
+		<link>
+			<name>src/ru/nkz/ivcgzo/clientHospital/resources/patientInfo.png</name>
+			<type>1</type>
+			<locationURI>WORKSPACE_LOC/gitrep/common/resources/patientInfo.png</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

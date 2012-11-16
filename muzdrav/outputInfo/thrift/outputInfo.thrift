@@ -45,8 +45,7 @@ struct VrachTabel {
 	12: i32 id;
 }
 
-
-struct InputPlanDisp {
+struct InputPlanDisp{
     1: i32 kpolik;
     2: string namepol;
     3: string daten;
@@ -57,19 +56,19 @@ struct InputPlanDisp {
 
 
 /**
- * Информация отстутствует
+ * РРЅС„РѕСЂРјР°С†РёСЏ РѕС‚СЃС‚СѓС‚СЃС‚РІСѓРµС‚
  */
 exception VINotFoundException {
 }
 
 /**
- * Такая уже запись существует
+ * РўР°РєР°СЏ СѓР¶Рµ Р·Р°РїРёСЃСЊ СЃСѓС‰РµСЃС‚РІСѓРµС‚
  */
 exception VTDuplException {
 }
 
 /*
- * Информация отсутствует
+ * РРЅС„РѕСЂРјР°С†РёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
  */
 exception VTException {
 }
@@ -77,34 +76,34 @@ exception VTException {
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
     
     /**
-     * Возвращает список врачей, ведущих прием
-     * @param pcod - Уникальный код специалиста
-     * @return список thrift-объектов, содержащих информацию о врачах
+     * Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЂР°С‡РµР№, РІРµРґСѓС‰РёС… РїСЂРёРµРј
+     * @param pcod - РЈРЅРёРєР°Р»СЊРЅС‹Р№ РєРѕРґ СЃРїРµС†РёР°Р»РёСЃС‚Р°
+     * @return СЃРїРёСЃРѕРє thrift-РѕР±СЉРµРєС‚РѕРІ, СЃРѕРґРµСЂР¶Р°С‰РёС… РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Р°С…
      */
     list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: VINotFoundException vinfe,
 		2:kmiacServer.KmiacServerException kse);
     
 
      /**
-     * Возвращает время работы врачей
+     * Р’РѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ РІСЂР°С‡РµР№
      */
     list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: VTException vte, 2:VTDuplException vtde,
 		3:kmiacServer.KmiacServerException kse);
 		
 		
     /**
-     * Добавляет информацию о враче
+     * Р”РѕР±Р°РІР»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
      */
     i32 addVT(1:VrachTabel vt) throws (1: VTException vte, 2:VTDuplException vtde,
 		3:kmiacServer.KmiacServerException kse);
 
     /**
-     * Обновляет информацию о враче
+     * РћР±РЅРѕРІР»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
      */
 	void updateVT(1:VrachTabel vt) throws (1:kmiacServer.KmiacServerException kse); 
     
 	/**
-     * Удаляет информацию о враче
+     * РЈРґР°Р»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
      */
 	void deleteVT(1:i32 vt);
 
@@ -114,12 +113,14 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
 
     string printSvedDispObs(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
 
+    string printOtDetPol(1:InputPlanDisp ipd) throws (1: kmiacServer.KmiacServerException kse);
+
     string printSvodVed(1: InputAuthInfo iaf 2: InputSvodVed isv) throws (1: kmiacServer.KmiacServerException kse);
 
     string printFacZd(1: InputAuthInfo iaf 2: InputFacZd ifz) throws (1: kmiacServer.KmiacServerException kse);
 
    /**
-    * Сводки по форме 39
+    * РЎРІРѕРґРєРё РїРѕ С„РѕСЂРјРµ 39
     */
     string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
     string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 

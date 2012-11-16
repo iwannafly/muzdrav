@@ -52,6 +52,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientGospYesOrNoNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
@@ -1712,4 +1713,22 @@ public class ServerRegPatient extends Server implements Iface {
             throw new KmiacServerException();
         }
     }
+
+	@Override
+	public String getNameOtdGosp(int id)
+			throws PatientGospYesOrNoNotFoundException, KmiacServerException,
+			TException {
+        String sqlQuery = "SELECT n.name_u as otd FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN n_o00 n ON (o.cotd = n.pcod) WHERE p.npasp=? AND (g.pr_out=0 or g.pr_out is null) AND o.datav is null";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("otd");
+            } else {
+                throw new PatientGospYesOrNoNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
 }
