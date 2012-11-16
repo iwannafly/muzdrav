@@ -118,4 +118,6 @@ service ThriftLab extends kmiacServer.KmiacServer {
 	i32 addNapr(1: Napr napr) throws (1: kmiacServer.KmiacServerException kse);
 	list<Gosp> getGospList(1:i32 npasp, 2:i64 dateStart, 3: i64 dateEnd) throws (1: kmiacServer.KmiacServerException kse);
 	list<Isl> getIslList(1: i32 gospId) throws (1: kmiacServer.KmiacServerException kse);
+	string printIssl(1: i32 patId, 2: string cabinet, 3: string labName, 4: string lpuNaprName, 5: string vrachName,
+		6: list<string> issledItems) throws (1: kmiacServer.KmiacServerException kse);
 }

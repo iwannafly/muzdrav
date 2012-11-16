@@ -197,7 +197,8 @@ struct Gosp{
 	35:optional i64 vremosm,
 	36:optional i64 dataz,
 	37:optional string jalob,
-	38:optional i32 vid
+	38:optional i32 vid,
+	39:optional bool pr_ber
 }
 
 /**

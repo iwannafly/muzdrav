@@ -553,17 +553,19 @@ struct Pmer{
 	4: optional i32 pmer;
 	5: optional i64 pdat;
 	6: optional i64 fdat;
-	7: optional i32 cod_sp;
-	8: optional i64 dataz;
-	9: optional i32 prichina;
-	10: optional i32 rez;
-	11: optional string cdol;
-	12: optional i64 dnl;
-	13: optional i64 dkl;
-	14: optional i32 lpu;
-	15: optional i32 ter;
-	16: optional i32 cpol;
-	17: optional i32 id_obr;
+	7: optional i64 dataz;
+	8: optional i32 prichina;
+	9: optional i32 rez;
+	10: optional string cdol;
+	11: optional i64 dnl;
+	12: optional i64 dkl;
+	13: optional i32 lpu;
+	14: optional i32 ter;
+	15: optional i32 cpol;
+	16: optional i32 id_obr;
+	17: optional i32 cod_sp;
+	18: optional string cdol_n;
+	
 }
 
 struct Pobost{
