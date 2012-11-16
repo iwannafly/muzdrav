@@ -1551,7 +1551,7 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 		e1.printStackTrace();
 	}	
 	
-	return null;
+	return svod;
 } 
 
 
@@ -1711,7 +1711,9 @@ public String printDnevVr() throws KmiacServerException, TException {
 	String path = null;
 	
 	try 
-//	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("kart1", ".htm").getAbsolutePath()), "utf-8")) 
+	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("posvr", ".htm").getAbsolutePath()), "utf-8")) 
+//		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("posvr", ".htm").getAbsolutePath()), "utf-8")) {
+//			AutoCloseableResultSet acrs;
 			{
 		StringBuilder sb = new StringBuilder(0x10000);
 		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -1787,7 +1789,7 @@ public String printDnevVr() throws KmiacServerException, TException {
             codvr = acrs.getResultSet().getInt(17);
             codsp = acrs.getResultSet().getString(2);
             fio = acrs.getResultSet().getString(9)+' '+acrs.getResultSet().getString(10)+' '+acrs.getResultSet().getString(11);
-			while (codvr == acrs.getResultSet().getInt(17)){
+			while (codvr == acrs.getResultSet().getInt(17)&& (acrs.getResultSet().next())){
 //			if (codvr == acrs.getResultSet().getInt(17)){
 			if(acrs.getResultSet().getInt(3)==1) {ppf = ppf + acrs.getResultSet().getInt(1);
 			ippf = ippf + acrs.getResultSet().getInt(1);}
@@ -1797,10 +1799,9 @@ public String printDnevVr() throws KmiacServerException, TException {
 			ippfp = ippfp + acrs.getResultSet().getInt(1);}
 			pf = pf + acrs.getResultSet().getInt(1);
 			ipf = ipf + acrs.getResultSet().getInt(1);
-			acrs.getResultSet().next();}
+//			acrs.getResultSet().next();
+			}
 			n1 = n1 + 1;
-			System.out.println(codpol);		
-			System.out.println(codsp);		
 			//посчитать процент
 			ppp = 0;
 			pdp = 0;
@@ -1883,10 +1884,26 @@ public String printDnevVr() throws KmiacServerException, TException {
 		sb.append("</body>"); 
 		sb.append("</html>");
 		
-//		osw.write(sb.toString());
-		return path = sb.toString();
+		osw.write(sb.toString());
+		System.out.println(sb);		
+		return path;
+//		return path = sb.toString();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}
+//	catch (UnsupportedEncodingException e1) {
+//		// TODO Auto-generated catch block
+//		e1.printStackTrace();
+//		throw new KmiacServerException();
+//	} catch (FileNotFoundException e1) {
+//		// TODO Auto-generated catch block
+//		e1.printStackTrace();
+//		throw new KmiacServerException();
+//	} 
+	catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
 		throw new KmiacServerException();
 	} finally {
 		if (acrs != null)
@@ -1894,7 +1911,53 @@ public String printDnevVr() throws KmiacServerException, TException {
 		if (acrs2 != null)
 			acrs2.close();
 	}
-//	return path = sb.toString();
+}
+
+
+
+@Override
+public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
+		TException {
+	String svod = null;
+	
+	// Дата от ...
+	Date dn;
+	// Дата до ...
+	Date dk;
+	try {
+		dn = (Date) sdfo.parse(ipd.getDaten());
+		dk = (Date) sdfo.parse(ipd.getDatek());
+
+		// Код полеклиники
+		int kodpol = ipd.getKpolik();
+		
+		// Код ЛПУ
+		int kodlpu = ipd.getClpu();
+		// Вид больницы (Д/В)
+		int poldv = 0;
+		
+		final String sqlQueryDetVzPol = "select c_nom from n_m00 where pcod ="+String.valueOf(kodlpu);
+		
+		try (AutoCloseableResultSet zapznach = sse.execPreparedQuery(sqlQueryDetVzPol)) {
+			
+			poldv = zapznach.getResultSet().getInt("c_nom");
+			
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		String sqlQueryObost =null;
+		
+		
+		
+		
+	} catch (ParseException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}	
+	
+	return svod;
 }
     
 

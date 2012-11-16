@@ -73,6 +73,7 @@ struct Pdisp_ds_do{
 	7: optional i32 lech_n;
 	8: optional i32 lech_v;
 	9: optional i64 dataz;
+	10: optional string nameds;
 }
 
 struct Pdisp_ds_po{
@@ -109,6 +110,7 @@ struct Pdisp_ds_po{
 	31: optional i32 recdop1;
 	32: optional i32 recdop2;
 	33: optional i32 recdop3;
+	34: optional string nameds;
 }
 
 struct PatientInfo{
@@ -144,5 +146,9 @@ service ThriftDisp extends kmiacServer.KmiacServer {
 	list<Pdisp_ds_po> getTblDispds_po(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp_ds_po getDispds_po(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteDispds_po(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+
+//classifiers
+	list<classifier.IntegerClassifier> get_n_prf() throws (1: kmiacServer.KmiacServerException kse);
+
 	
 }
