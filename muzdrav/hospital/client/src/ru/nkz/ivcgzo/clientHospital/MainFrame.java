@@ -90,6 +90,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
+import javax.swing.JSeparator;
 
 public class MainFrame extends JFrame {
 
@@ -275,11 +276,10 @@ public class MainFrame extends JFrame {
     private JButton btnShowPatientInfo;
     private JButton btnMedication;
     private JButton btnIssled;
-    private JPanel pTools;
     private JToolBar toolBar;
     private JTextField tfZaklDiagPcod;
     private JTextField tfZaklDiagName;
-    private JLabel lblZaklDiag;    
+    private JLabel lblZaklDiag;
     private JButton btnZaklDiag;
 
     public MainFrame(final UserAuthInfo authInfo) {
@@ -2009,6 +2009,14 @@ public class MainFrame extends JFrame {
     private void setStagePanel() {
         pStage = new JPanel();
         tabbedPane.addTab("Этапы лечения", null, pStage, null);
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                if ((tabbedPane.getSelectedIndex() != 3) && (!isStageTableSaved())) {
+                    tabbedPane.setSelectedIndex(3);
+                }
+            }
+        });
         pStage.setLayout(new BoxLayout(pStage, BoxLayout.X_AXIS));
 
         addStageTablePanel();
@@ -2021,11 +2029,15 @@ public class MainFrame extends JFrame {
         pStage.add(spStageTable);
 
         tbStages = new CustomTable<TStage, TStage._Fields>(
-            true, true, TStage.class, 4, "Дата начала", 5, "Дата окончания", 2,
-            "Этап", 3, "МЭС");
+            true, true, TStage.class, 4, "Дата начала", 9, "Время начала", 5, "Дата окончания",
+            10, "Время окончания", 2, "Этап", 3, "МЭС", 6, "УКЛ", 7, "Исход", 8, "Результат");
         tbStages.setDateField(0);
-        tbStages.setDateField(1);
-        tbStages.setIntegerClassifierSelector(2, IntegerClassifiers.n_etp);
+        tbStages.setTimeField(1);
+        tbStages.setDateField(2);
+        tbStages.setTimeField(3);
+        tbStages.setIntegerClassifierSelector(4, IntegerClassifiers.n_etp);
+        tbStages.setIntegerClassifierSelector(7, IntegerClassifiers.n_ap0);
+        tbStages.setIntegerClassifierSelector(8, IntegerClassifiers.n_aq0);
         spStageTable.setViewportView(tbStages);
     }
 
@@ -2054,25 +2066,128 @@ public class MainFrame extends JFrame {
         pStageButtons.add(btnAddStage);
     }
 
-    private void addStageToTable() {
-        try {
-            if (patient != null) {
-                TStage stage = new TStage();
-                stage.setDateStart(System.currentTimeMillis());
-                stage.setIdGosp(patient.getGospitalCod());
-                stage.setId(ClientHospital.tcl.addStage(stage));
-                tbStages.addItem(stage);
-                tbStages.setData(
-                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
-                if (tbStages.getData().size() > 1) {
-                    tbStages.getData().get(
-                        tbStages.getData().size() - 1).setMes(tbStages.getData().get(0).getMes());
+    //есть ли в таблице этапов несохраненные элементы
+    private boolean isStageTableSaved() {
+        if (tbStages.getData().size() != 0) {
+            for (TStage stage: tbStages.getData()) {
+                if (!stage.isSetId()) {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Последний добавленный этап не сохранен! "
+                        + "Сохраните его перед добавлением нового этапа "
+                        + "или переходом на другую вкладку!",
+                        "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    return false;
                 }
             }
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            ClientHospital.conMan.reconnect(e1);
+        } else {
+            return true;
+        }
+        return true;
+    }
+
+    private boolean isLastStageItemSetCorrectly() {
+        return isStageUpdateRequiredFieldsSet(
+            tbStages.getData().get(tbStages.getData().size() - 1));
+    }
+
+    private long calcCorrectStageDateStart() {
+        if (tbStages.getData().size() == 0) {
+            return priemInfo.getDatap();
+        } else {
+            return tbStages.getData().get(tbStages.getData().size() - 1).getDateEnd();
+        }
+    }
+
+    private boolean isStageUpdateRequiredFieldsSet(final TStage stage) {
+        if (isStageAddRequiredFieldsSet(stage)) {
+            if (!stage.isSetDateEnd()) {
+                JOptionPane.showMessageDialog(MainFrame.this,
+                    "Дата окончания этапа не заполнена! ",
+                    "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (!stage.isSetIshod()) {
+                JOptionPane.showMessageDialog(MainFrame.this,
+                        "Исход этапа не заполнен! ",
+                        "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (!stage.isSetResult()) {
+                JOptionPane.showMessageDialog(MainFrame.this,
+                    "Результат этапа не заполнен! ",
+                    "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (!stage.isSetUkl()) {
+                JOptionPane.showMessageDialog(MainFrame.this,
+                    "Укл этапа не заполнен! ",
+                    "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            if (stage.getStage() == 1) {
+                if (!stage.isSetTimeEnd()) {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Время конца этапа не заполнено! ",
+                        "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isStageAddRequiredFieldsSet(final TStage stage) {
+        if (!stage.isSetDateStart()) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Дата начала этапа не заполнена! ",
+                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (!stage.isSetIdGosp()) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Идентификатор госпитализации этапа не заполнен! ",
+                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (!stage.isSetStage()) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Этап не заполнен! ",
+                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        } else {
+            if (stage.getStage() == 1) {
+                if (!stage.isSetTimeStart()) {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Время начала этапа не заполнено! ",
+                        "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+        }
+        if (!stage.isSetMes()) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Код МЭС этапа не заполнен! ",
+                "Ошибка!", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private void addStageToTable() {
+        if ((patient != null) && (isStageTableSaved()) && (isLastStageItemSetCorrectly())) {
+            TStage stage = new TStage();
+            stage.setDateStart(calcCorrectStageDateStart());
+            stage.setIdGosp(patient.getGospitalCod());
+//                stage.setId(ClientHospital.tcl.addStage(stage));
+            tbStages.addItem(stage);
+//                tbStages.setData(
+//                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
+            if (tbStages.getData().size() > 1) {
+                tbStages.getData().get(
+                    tbStages.getData().size() - 1).setMes(tbStages.getData().get(0).getMes());
+            }
         }
     }
 
@@ -2134,7 +2249,15 @@ public class MainFrame extends JFrame {
                         MainFrame.this, "Добавить информацию об этапе лечения?",
                     "Изменение этапа лечения", JOptionPane.YES_NO_OPTION);
                 if (opResult == JOptionPane.YES_OPTION) {
-                    ClientHospital.tcl.updateStage(tbStages.getSelectedItem());
+                    if (!tbStages.getSelectedItem().isSetId()) {
+                        if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
+                            ClientHospital.tcl.addStage(tbStages.getSelectedItem());
+                        }
+                    } else {
+                        if (isStageUpdateRequiredFieldsSet(tbStages.getSelectedItem())) {
+                            ClientHospital.tcl.updateStage(tbStages.getSelectedItem());
+                        }
+                    }
                 }
             }
         } catch (MesNotFoundException e) {
@@ -2152,11 +2275,7 @@ public class MainFrame extends JFrame {
             try {
                 List<TStage> tmpStages =
                     ClientHospital.tcl.getStage(patient.getGospitalCod());
-                if (tmpStages.size() > 0) {
-                    tbStages.setData(tmpStages);
-                } else {
-                    tbStages.setData(Collections.<TStage>emptyList());
-                }
+                tbStages.setData(tmpStages);
             } catch (KmiacServerException e) {
                 e.printStackTrace();
             } catch (TException e) {
@@ -2164,6 +2283,7 @@ public class MainFrame extends JFrame {
             }
         }
     }
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Заключение ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2558,9 +2678,9 @@ public class MainFrame extends JFrame {
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(lblZaklDiag)
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfZaklDiagPcod)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tfZaklDiagName, GroupLayout.PREFERRED_SIZE, 631, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfZaklDiagName, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(btnZaklDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
                         .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
