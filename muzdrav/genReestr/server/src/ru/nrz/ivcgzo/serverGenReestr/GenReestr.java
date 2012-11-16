@@ -883,7 +883,7 @@ public class GenReestr extends Server implements Iface {
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
             			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlr += sqlfrom; 
-            	sqlr += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
+            	sqlr += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
 //            	sqlr += " ORDER BY p.npasp ";
             	
            try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk)))) {
@@ -971,7 +971,7 @@ public class GenReestr extends Server implements Iface {
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
             			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlmed += sqlfrom; 
-            	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
+            	sqlmed += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
             	sqlmed += " ORDER BY p.npasp "; //ругается
 
 //    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)));
@@ -1055,7 +1055,7 @@ public class GenReestr extends Server implements Iface {
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
             			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlpasp += sqlfrom; 
-            	sqlpasp += "WHERE g.pr_out=0 AND o.datav is not null "+sqlwhere;
+            	sqlpasp += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
 
 //				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
