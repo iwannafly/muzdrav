@@ -228,20 +228,23 @@ public class SettingsForm extends JDialog {
 				if (rbtn2.isSelected()) vidrstr = 2;
 				if (rbtn3.isSelected()) vidrstr = 3;
 				if (rbtn4.isSelected()) vidrstr = 4;
-				try {
+				try {		//формирование реестров
 					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
 						if (Cslu == 1){
-				        	servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+				        	String clpu = null;
+				        	if (Integer.toString(MainForm.authInfo.getClpu()).length() == 2)clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
+				        	else clpu = Integer.toString(MainForm.authInfo.getClpu());
+							servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+clpu+".rar";
 						}
 				        if (Cslu == 2){
 				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-							cliPath = "C:\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
 				        }
 				        if (Cslu == 3){
 				        	if(!tf_Cpol.getText().isEmpty() && Terp != 0){
 				        		servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
-								cliPath = "C:\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+ tf_Cpol.getText()+"_usl.rar";
+								cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+ tf_Cpol.getText()+"_usl.rar";
 				        	}else 
 				        		JOptionPane.showMessageDialog(null, "Выберите поликлинику обслуживания из классификатора.", null, JOptionPane.INFORMATION_MESSAGE);
 				        }
@@ -309,17 +312,29 @@ public class SettingsForm extends JDialog {
         if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected()) rbtn1.setSelected(true);
 			try{
 		        if (Cslu == 1){//стационар
-		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 4) cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
-		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 4) cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (MainForm.authInfo.getCpodr() == 0)
+		        		cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getClpu()));
+		        	else
+		        		cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
 				}
 		        if (Cslu == 2){//поликлиника
-		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	if (MainForm.authInfo.getCpodr() == 0)
+		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
+		        	else
+		        		cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
 				}
 		        if (Cslu == 3){//лдс
-		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
-		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
-		            tf_Cpol.setVisible(true);
+//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) 
+		        	if (MainForm.authInfo.getCpodr() == 0)
+		        		cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getClpu()));
+		        	else
+		        		cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	tf_Cpol.setVisible(true);
 		            panel_4.setVisible(true);
 		        }
 	        	if (cmb_podr.getSelectedItem() != null)cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());

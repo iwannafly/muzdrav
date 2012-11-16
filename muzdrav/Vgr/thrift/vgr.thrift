@@ -85,7 +85,7 @@ struct RdPatient{
          6: optional i64    datar;
          7: optional string docser;
          8: optional string docnum;
-         9: optional i32    tawn;
+         9: optional string    tawn;
         10: optional string street;
         11: optional string house;  
         12: optional string flat;
@@ -95,7 +95,7 @@ struct RdPatient{
         16: optional i32    stat;
         17: optional i32    lpup;
         18: optional i32    terp;
-        19: optional i32    ftawn; 
+        19: optional string ftawn; 
         20: optional string fstreet;
         21: optional string fhouse;
         22: optional string fflat;
@@ -130,7 +130,7 @@ struct RdPatient{
         51: optional i32 oslrod;
         52: optional i32 sem;
         53: optional i32 rost;
-        54: optional i32 vesd; 
+        54: optional double vesd; 
         55: optional i32 osoco;
         56: optional i32 uslpr;
         57: optional i64 dataz;
@@ -158,10 +158,10 @@ struct RdPatient{
 struct RdVizit{
          1: optional i32    uid;
          2: optional i64    dv;
-         3: optional string sp;
-         4: optional string famwr;
-         5: optional string imwr;
-         6: optional string otwr;
+         3: optional i32 sp;
+         4: optional string famvr;
+         5: optional string imvr;
+         6: optional string otvr;
          7: optional string diag;
          8: optional i32    mso;
          9: optional i32    rzp;
@@ -172,29 +172,25 @@ struct RdVizit{
 struct RdConVizit{
          1: optional i32    uiv;
          2: optional i32    uid;
-         3: optional double ves;
+         3: optional i32    npasp;
          4: optional i32    ned;
-         5: optional i32    lcad;
-         6: optional i32    ldad; 
-         7: optional i32    rcad;
-         8: optional i32    rdad;
-         9: optional i32    rost;
-        10: optional i64    datar;
-        11: optional i32    obr;
-        12: optional i32    sem;
-        13: optional i32    osoco;
-        14: optional string vrpr;
-        15: optional i32 npasp;
-        16: optional i32 hdm;
-        17: optional i32 spl; 
-        18: optional i32 oj;
-        19: optional i32 chcc;
-        20: optional i32 polpl;
-        21: optional i32 predpl;
-        22: optional i32 serd;
-        23: optional i32 serd1;
-        24: optional i32 oteki;
+         5: optional double ves;
+         6: optional i32    lcad;
+         7: optional i32    ldad; 
+         8: optional i32    rcad;
+         9: optional i32    rdad;
+        10: optional i32    ball;
+        11: optional i32 hdm;
+        12: optional i32 spl; 
+        13: optional i32 oj;
+        14: optional i32 chcc;
+        15: optional i32 polpl;
+        16: optional i32 predpl;
+        17: optional i32 serd;
+        18: optional i32 serd1;
+        19: optional i32 oteki;
 }
+
 struct KartaBer {
 	1: optional i32 npasp;
 	2: optional i32 id_pvizit;
@@ -207,7 +203,7 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         * Создает KOB
 	*/
 	string getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
-   
+
 
 
 
@@ -229,5 +225,5 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdPatient> getRdPatient() throws (1: kmiacServer.KmiacServerException kse);
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
-	string formfilecsv(1:KartaBer kb) throws (1: kmiacServer.KmiacServerException kse);
+	string formfilecsv() throws (1: kmiacServer.KmiacServerException kse);
 }

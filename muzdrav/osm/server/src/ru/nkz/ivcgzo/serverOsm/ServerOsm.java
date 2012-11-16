@@ -232,8 +232,8 @@ public class ServerOsm extends Server implements Iface {
 		
 		pnaprTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, String.class};
 	
-		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "cod_sp",      "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol",        "id_obr");
-		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class};
+		rsmPmer = new TResultSetMapper<>(Pmer.class, "id",           "npasp",       "diag",       "pmer",        "pdat",     "fdat",     "dataz",    "prichina",    "rez",         "cdol",        "dnl",      "dkl",      "lpu",         "ter",         "cpol",        "id_obr",     "cod_sp",       "cdol_n");
+		pmerTypes = new Class<?>[] {                  Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Date.class, Integer.class, Integer.class, String.class,  Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class};
 
 		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz",    "id_obr");
 		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class};
@@ -389,8 +389,8 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<Pvizit> getPvizitList(int npasp, int codsp, String cdol) throws KmiacServerException, TException {
-		String sql = "SELECT pv.id, pv.datao, TRUE AS has_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
-					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND ((ipv.ishod IS NULL) OR (ipv.ishod < 1))) " +
+		String sql = "SELECT pv.id, pv.datao, pv.ishod, TRUE AS has_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
+					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND (ipv.datao BETWEEN (CURRENT_DATE - 365) AND CURRENT_DATE)) " +
 					 "ORDER BY has_pvizit, id DESC, datao DESC ";	
 	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp, codsp, cdol)) {
 		List<Pvizit> pvizitList = rsmPvizit.mapToList(acrs.getResultSet());
@@ -485,8 +485,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePvizitAmb(PvizitAmb pos) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, mobs = ?, rezult = ?, opl = ?, stoim = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ?, cpos = ?, cpol = ?, kod_ter = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 21, 22, 23, 0);
-			sme.execPreparedT("UPDATE p_vizit_amb SET diag = ? WHERE id_obr = ? ", false, pos, pvizitAmbTypes, 6, 1);
+			sme.execPreparedT("UPDATE p_vizit_amb SET id_obr = ?, npasp = ?, datap = ?, cod_sp = ?, cdol = ?, mobs = ?, rezult = ?, opl = ?, stoim = ?, uet = ?, k_lr = ?, n_sp = ?, pr_opl = ?, pl_extr = ?, vpom = ?, cpos = ?, cpol = ?, kod_ter = ?, diag = ? WHERE id = ? ", false, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 21, 22, 23, 6, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -1528,7 +1527,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			try {
 				getPdiagZ(diag.npasp, diag.diag);
-				sme.execPreparedT("UPDATE p_diag SET diag = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ?, named = ?, ppi = ? WHERE npasp = ? and diag = ?", false, diag, pdiagZTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1, 2);
+				sme.execPreparedT("UPDATE p_diag SET diag = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ?, named = ?, ppi = ? WHERE npasp = ? and diag = ?", false, diag, pdiagZTypes, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1, 2);
 				sme.setCommit();
 				return diag.getId();
 			} catch (PdiagNotFoundException e) {
@@ -1544,6 +1543,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
+		
 	}
 
 	@Override
@@ -2348,7 +2348,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public int AddPmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz, id_obr) values (?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 15, 7, 16);
+			sme.execPreparedT("insert into p_mer (npasp, diag, cpol, dataz, id_obr, cdol, cod_sp) values (?, ?, ?, ?, ?, ?, ?) ", true, pm, pmerTypes, 1, 2, 14, 6, 15, 9, 16);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -2364,7 +2364,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public void UpdatePmer(Pmer pm) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_mer set pmer = ?, pdat = ?, fdat = ?, prichina = ?, rez = ?, dnl = ?, dkl = ?, lpu = ?, ter = ? where id = ? ", false, pm, pmerTypes, 3, 4, 5, 8, 9, 11, 12, 13, 14, 0);
+			sme.execPreparedT("update p_mer set pmer = ?, pdat = ?, fdat = ?, prichina = ?, rez = ?, dnl = ?, dkl = ?, lpu = ?, ter = ?, cdol_n = ? where id = ? ", false, pm, pmerTypes, 3, 4, 5, 7, 8, 10, 11, 12, 13, 17, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -3256,6 +3256,18 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select named as pcod, diag as name from p_diag where npasp = ? ", npasp)) 
 		{
 			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+	}
+	}
+
+	@Override
+	public List<PdiagZ> getPdiagZInfo(int npasp) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_diag where npasp = ? ", npasp)) 
+		{
+			return rsmPdiagZ.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();

@@ -243,6 +243,7 @@ public class MainForm {
 				if (lbxAvailSys.getModel().getSize() == 0)
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				else
+					btnLaunch.setEnabled(false);
 					try {
 						//FIXME что-нибудь сделать с этим костылем
 						if (conMan.getPluginLoader().getPluginList().get(lbxAvailSys.getSelectedIndex()).getId() == conMan.getViewClient().getId())
@@ -259,6 +260,7 @@ public class MainForm {
 								super.windowClosing(e);
 								
 								frame.setVisible(plug.getFrame().getDefaultCloseOperation() == JFrame.DISPOSE_ON_CLOSE);
+								btnLaunch.setEnabled(true);
 							}
 						});
 					} catch (Exception e1) {
@@ -328,7 +330,7 @@ public class MainForm {
 	
 	private void showSelectionPane() {
 		frame.setTitle("Выбор модуля");
-		lblFio.setText(String.format("<html>%s, %s</html>", authInfo.getName(), authInfo.getCdol_name()));
+		lblFio.setText(String.format("<html>%s, %s, %s</html>", authInfo.getName(), authInfo.getCdol_name(), authInfo.getPriznd_name()));
 		lblLpu.setText(String.format("<html>%s</html>", authInfo.getClpu_name()));
 		lblPodr.setText(String.format("<html>%s, %s</html>", authInfo.getCpodr_name(), authInfo.getCslu_name()));
 		

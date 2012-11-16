@@ -254,7 +254,7 @@ public String VozvZak(){
 	try {
 		List<Sh_lds> perDann = MainForm.ltc.getDSh_lds(listName.getSelectedPcod(), listName.getSelectedValue().name);
 		
-		zak = perDann.get(0).opis;
+		zak = perDann.get(0).zakl;
 		//System.out.print(MainForm.ltc.getDSh_lds(listName.getSelectedPcod(), listName.getSelectedValue().name));
 		 //zak = perDann.get(listName.getSelectedIndex()).opis;
 		

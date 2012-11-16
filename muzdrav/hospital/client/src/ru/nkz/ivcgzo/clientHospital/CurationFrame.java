@@ -45,14 +45,14 @@ public class CurationFrame extends JDialog {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxStationType;
 
     public CurationFrame(final UserAuthInfo authInfo) {
-        setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.TOOLKIT_MODAL);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
         addScrollPane(authInfo);
         addStationPanel();
         addButtonsPanel(authInfo);
+        pack();
     }
 
     private void addScrollPane(final UserAuthInfo authInfo) {
@@ -60,7 +60,7 @@ public class CurationFrame extends JDialog {
         getContentPane().add(scrollPane);
         setPreferredSize(new Dimension(800, 400));
         setSize(new Dimension(800, 400));
-        setLocationRelativeTo(null);
+//        setLocationRelativeTo(null);
         java.awt.Toolkit jToolkit = java.awt.Toolkit.getDefaultToolkit();
         Dimension screenSize = jToolkit.getScreenSize();
         setLocation((int) ((screenSize.getWidth() - getWidth()) / 2),
@@ -87,7 +87,7 @@ public class CurationFrame extends JDialog {
                             .get(table.convertRowIndexToModel(table.getSelectedRow()));
                     try {
                         ClientHospital.tcl.addPatientToDoctor(currentPatient.getIdGosp(),
-                                cbxStationType.getSelectedPcod(), authInfo.getPcod());
+                            authInfo.getPcod(), cbxStationType.getSelectedPcod());
                         CurationTableModel tbModel =
                                 new CurationTableModel(authInfo.getCpodr());
                         table.setModel(tbModel);
@@ -127,12 +127,13 @@ public class CurationFrame extends JDialog {
         getContentPane().add(pStationType);
         pStationType.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-        lblStationType = new JLabel("Тип стационара: ");
+        lblStationType = new JLabel("Профиль отделения: ");
         pStationType.add(lblStationType);
 
         cbxStationType = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         try {
-            cbxStationType.setData(ClientHospital.tcl.getStationTypes());
+            cbxStationType.setData(ClientHospital.tcl.getStationTypes(
+                    ClientHospital.authInfo.getCpodr()));
         } catch (KmiacServerException e) {
             cbxStationType.setData(Collections.<IntegerClassifier>emptyList());
         } catch (TException e) {
