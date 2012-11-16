@@ -438,7 +438,7 @@ public class GenReestr extends Server implements Iface {
         		str += " 86. Некорректные код услуги/ обстоятельства<br>";
     	}
     	if (rs.getString("diag") == null)
-    		str += " Отсутствует диагноз<br>";
+    		str += " Отсутствует заключительный диагноз<br>";
 		return str;
 	}
 

@@ -515,8 +515,10 @@ public class PIslForm {
 				
 			if((cBSvrach.getSelectedPcod() == null)||(tFdiag.getText().equals(""))){	
 				String mess = "Поля для реестров:\n";
+				if (cBvopl.getSelectedPcod() == null) mess=mess+"Вид оплаты\n";
 				if (cBSvrach.getSelectedPcod() == null) mess=mess+"Код врача\n";
 				if (tFdiag.getText().equals("")) mess=mess+"Диагноз\n";
+				
 			
 				mess= mess+"не заполнены";
 				
@@ -741,17 +743,17 @@ public class PIslForm {
 					}
 				}
 				
-				if ((tn_ldi.getSelectedItem().vrach != 0)&&(cBVrach.getSelectedItem() != null) ){
+				if ((tn_ldi.getSelectedItem().vrach != 0)&&(cBVrach.getSize()!= null) ){
 					cBVrach.setSelectedPcod(tn_ldi.getSelectedItem().vrach);
 				} else{
 					cBVrach.setSelectedItem(null);
 				}
 				
 				
-				if ((cBvopl.getSelectedItem() != null)&&(cBvopl.getSelectedIndex()!=0)){
+				if ((tn_ldi.getSelectedItem().vopl != 0)&&(String.valueOf(tn_ldi.getSelectedItem().vopl) != null)){
 					cBvopl.setSelectedPcod(tn_ldi.getSelectedItem().vopl);
 				}else{
-					cBvopl.setSelectedItem(2);
+					cBvopl.setSelectedPcod(2);
 				}
 				
 				if ((tn_ldi.getSelectedItem().kodvr !=0) && (String.valueOf(tn_ldi.getSelectedItem().kodvr) != null)){
