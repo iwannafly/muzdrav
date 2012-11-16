@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public class ResultSetMapper<T> {
 	protected final Field[] flds;
 	protected final HashMap<String, Integer> rsFlds;
 	protected final Class<T> cls;
+	protected static final Hashtable<Integer, String> sqlTypeNames = getSqlTypeNames();
 	
 	public ResultSetMapper(Class<T> cls, String... fieldList) {
 		this.cls = cls;
@@ -31,9 +33,11 @@ public class ResultSetMapper<T> {
 	/**
 	 * Создает экземпляр класса типа T и записывает в его значения полей из
 	 * результирующего набора, используя рефлексию.
+	 * @throws Exception 
 	 */
-	public T map(ResultSet rs) {
+	public T map(ResultSet rs) throws SQLException {
 		T obj = null;
+		Field fld = null;
 		
 		try {
 			obj = (T) cls.newInstance();
@@ -42,7 +46,7 @@ public class ResultSetMapper<T> {
 			for (int i = 1; i < rsColCnt; i++) {
 				Integer fldIdx = rsFlds.get(rsMet.getColumnName(i));
 				if (fldIdx != null) {
-				Field fld = flds[fldIdx];
+				fld = flds[fldIdx];
 				switch (rsMet.getColumnType(i)) {
 					case java.sql.Types.INTEGER:
 						fld.set(obj, rs.getInt(i));
@@ -83,10 +87,13 @@ public class ResultSetMapper<T> {
 					case java.sql.Types.BIT:
 						fld.set(obj, rs.getBoolean(i));
 						break;
+					default:
+						throw new SQLException(String.format("Unsupported sql data type %s (%d) in column %s.", sqlTypeNames.get(rsMet.getColumnType(i)), rsMet.getColumnType(i), rsMet.getColumnName(i)));
 					}
 				}
 			}
 		} catch (Exception e) {
+			throw new SQLException(String.format("Error mapping to %s, field %s.", cls, fld), e);
 		}
 		return obj;
 	}
@@ -143,6 +150,19 @@ public class ResultSetMapper<T> {
 				lst.add(cls.cast(rs.getBoolean(1)));
 
 		return lst;
+	}
+	
+	private static Hashtable<Integer, String> getSqlTypeNames() {
+		Hashtable<Integer, String> typeNames = new Hashtable<>();
+		Field[] fields = java.sql.Types.class.getDeclaredFields();
 		
+		try {
+			for (int i = 0; i < fields.length; i++)
+				typeNames.put((int) fields[i].get(null), fields[i].getName());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return typeNames;
 	}
 }
