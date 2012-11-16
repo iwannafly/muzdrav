@@ -122,5 +122,6 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
     * Сводки по форме 39
     */
     string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
+    string nagrvr(1:i32 cpol)  throws (1: kmiacServer.KmiacServerException kse); 
 }
 
