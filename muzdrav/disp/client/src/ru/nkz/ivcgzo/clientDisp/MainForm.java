@@ -34,11 +34,11 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomNumberEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -51,9 +51,9 @@ import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JTable;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.ImageIcon;
 
 public class MainForm extends Client<ThriftDisp.Client>{
 	public static ThriftDisp.Client tcl;
@@ -277,6 +277,23 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						pat = new PatientInfo();
 						pat = MainForm.tcl.getPatientInfo(res[0]);
 						int age = (int) ((System.currentTimeMillis() - pat.datar) / 31556952000L);
+						tbOkr.setEnabled(age<4);
+						tbPf1.setEnabled(age<4);
+						tbEf1.setEnabled(age<4);
+						tbMf1.setEnabled(age<4);
+						tbRf1.setEnabled(age<4);
+						tbPfm1.setEnabled((age>10)&&(pat.pol!=2));
+						tbPfm2.setEnabled((age>10)&&(pat.pol!=2));
+						tbPfm3.setEnabled((age>10)&&(pat.pol!=2));
+						tbPfd1.setEnabled((age>10)&&(pat.pol!=1));
+						tbPfd2.setEnabled((age>10)&&(pat.pol!=1));
+						tbPfd3.setEnabled((age>10)&&(pat.pol!=1));
+						tbPfd4.setEnabled((age>10)&&(pat.pol!=1));
+						tbPfd5.setEnabled((age>10)&&(pat.pol!=1));
+						rbtPdf5_1.setEnabled((age>10)&&(pat.pol!=1));
+						rbtPdf5_2.setEnabled((age>10)&&(pat.pol!=1));
+						rbtMenses1_1.setEnabled((age>10)&&(pat.pol!=1));
+						rbtMenses1_2.setEnabled((age>10)&&(pat.pol!=1));
 						if (age>18) {
 							JOptionPane.showMessageDialog(frame, "Пациенту больше 18 лет, запись данных невозможна");
 								}
@@ -390,6 +407,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 							tbDateOsm.setDate(fiz.getDataz());
 						if (fiz.isSetDat_ipr())
 							tbDatNaznIpr.setDate(fiz.getDat_ipr());
+						if (fiz.isSetProfil())
+							cmbProfil.setSelectedPcod(fiz.getProfil());
 						tbVes.setText(Double.toString(fiz.getVes()));
 						tbRost.setText(Double.toString(fiz.getRost()));
 						tbVrk.setText(fiz.getVrk());
@@ -516,7 +535,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					if (tbDateOsm.getDate()!=null)
 						fiz.setDataz(tbDateOsm.getDate().getTime());
 					if (!tbVes.getText().isEmpty()) fiz.setVes(Double.valueOf(tbVes.getText()));
-					if (!tbRost.getText().isEmpty())fiz.setRost(Double.valueOf(tbRost.getText()));
+					if (!tbRost.getText().isEmpty()) fiz.setRost(Double.valueOf(tbRost.getText()));
+					Double vrk = fiz.getVes()/fiz.getRost();
+					tbVrk.setText(Double.toString(vrk));
+					if ((!tbRost.getText().isEmpty())&& (!tbVes.getText().isEmpty())) fiz.setVrk(tbVrk.getText());
+					if (cmbProfil.getSelectedPcod() != null) fiz.setProfil(cmbProfil.getSelectedPcod()); else fiz.unsetProfil();
 					fiz.setVrk(tbVrk.getText());
 					fiz.setPfm1(tbPfm1.getText());
 					fiz.setPfm2(tbPfm2.getText());
@@ -567,8 +590,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						.addComponent(btnSrc)
 						.addComponent(button))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 632, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 643, GroupLayout.PREFERRED_SIZE))
 		);
 		bgVedomPr = new ButtonGroup();
 		bgIpr = new ButtonGroup();
@@ -588,7 +610,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblProfil = new JLabel("Профиль");
 		
-		 cmbProfil = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);//заменить на n_prf
+		 cmbProfil = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel lblVedomPr = new JLabel("<html>Ведомственная <br>принадлежность &nbsp&nbspорганы</html>");
 		
@@ -914,8 +936,43 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlProfPriv.setLayout(gl_pnlProfPriv);
 		
 		cbPriv_n = new JCheckBox("нуждается  в проведении вакцинации/ревакцинации");
+		cbPriv_n.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (cbPriv_n.isSelected()){
+					cbAdm.setEnabled(true);
+					cbAdsm.setEnabled(true);
+					cbAkds.setEnabled(true);
+					cbBcg.setEnabled(true);
+					cbGepatit.setEnabled(true);
+					cbKor.setEnabled(true);
+					cbKrasn.setEnabled(true);
+					cbParotit.setEnabled(true);
+					cbPolio.setEnabled(true);
+				} else{
+					cbAdm.setSelected(false);
+					cbAdsm.setSelected(false);
+					cbAkds.setSelected(false);
+					cbBcg.setSelected(false);
+					cbGepatit.setSelected(false);
+					cbKor.setSelected(false);
+					cbKrasn.setSelected(false);
+					cbParotit.setSelected(false);
+					cbPolio.setSelected(false);
+					cbAdm.setEnabled(false);
+					cbAdsm.setEnabled(false);
+					cbAkds.setEnabled(false);
+					cbBcg.setEnabled(false);
+					cbGepatit.setEnabled(false);
+					cbKor.setEnabled(false);
+					cbKrasn.setEnabled(false);
+					cbParotit.setEnabled(false);
+					cbPolio.setEnabled(false);
+				}
+			}
+		});
 		
 		cbBcg = new JCheckBox("БЦЖ");
+		cbBcg.setEnabled(false);
 		cbBcg.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbBcg.isSelected()){
@@ -932,6 +989,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		});
 		
 		cbPolio = new JCheckBox("Полиомиелит");
+		cbPolio.setEnabled(false);
 		cbPolio.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbPolio.isSelected()){
@@ -954,6 +1012,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		});
 		
 		cbAkds = new JCheckBox("АКДС");
+		cbAkds.setEnabled(false);
 		cbAkds.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbAkds.isSelected()){
@@ -972,8 +1031,10 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		});
 		
 		cbAdsm = new JCheckBox("АДСМ");
+		cbAdsm.setEnabled(false);
 		
 		cbKor = new JCheckBox("Корь");
+		cbKor.setEnabled(false);
 		cbKor.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbKor.isSelected()){
@@ -988,6 +1049,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		});
 		
 		cbParotit = new JCheckBox("Эпид.паротит");
+		cbParotit.setEnabled(false);
 		cbParotit.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbParotit.isSelected()){
@@ -1002,6 +1064,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		});
 		
 		cbKrasn = new JCheckBox("Краснуха");
+		cbKrasn.setEnabled(false);
 		cbKrasn.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbKrasn.isSelected()){
@@ -1016,6 +1079,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		});
 		
 		cbGepatit = new JCheckBox("Гепатит В");
+		cbGepatit.setEnabled(false);
 		cbGepatit.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (cbGepatit.isSelected()){
@@ -1175,6 +1239,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlAkds.setLayout(gl_pnlAkds);
 		
 		cbAdm = new JCheckBox("АДМ");
+		cbAdm.setEnabled(false);
 		
 		JPanel pnlKor = new JPanel();
 		pnlKor.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
@@ -1527,7 +1592,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblOcenFiz = new JLabel("<html>Оценка<br> физического<br> развития</html>");
 		
-		tbVes = new CustomTextField();
+		tbVes = new CustomNumberEditor();
 		tbVes.setColumns(10);
 		
 		lblVes = new JLabel("Вес (кг.гр)");
@@ -1538,7 +1603,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblRost = new JLabel("Рост (м)");
 		
-		tbRost = new CustomTextField();
+		tbRost = new CustomNumberEditor();
 		tbRost.setColumns(10);
 		
 		JPanel pnlRost = new JPanel();
@@ -1580,7 +1645,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblOkr = new JLabel("Окружность головы, см (0-4 лет)");
 		
-		tbOkr = new CustomTextField();
+		tbOkr = new CustomNumberEditor();
+		tbOkr.setEnabled(false);
 		tbOkr.setColumns(10);
 		
 		JLabel lblVrk = new JLabel("Весо-ростовой коэффициент");
@@ -1624,6 +1690,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		lblOcenps = new JLabel("<html>Оценка <br>психического <be>здоровья</html>");
 		
 		tbVrk = new CustomTextField();
+		tbVrk.setEnabled(false);
 		tbVrk.setColumns(10);
 		
 		JPanel pnlPi = new JPanel();
@@ -1788,16 +1855,19 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		lblPfm1 = new JLabel("Р");
 		
 		 tbPfm1 = new CustomTextField();
+		 tbPfm1.setEnabled(false);
 		tbPfm1.setColumns(10);
 		
 		JLabel lblPfm2 = new JLabel("Ах");
 		
 		 tbPfm2 = new CustomTextField();
+		 tbPfm2.setEnabled(false);
 		tbPfm2.setColumns(10);
 		
 		JLabel lblPfm3 = new JLabel("Fa");
 		
 		 tbPfm3 = new CustomTextField();
+		 tbPfm3.setEnabled(false);
 		tbPfm3.setColumns(10);
 		
 		JLabel lblPfd = new JLabel("половая формула девочки:");
@@ -1805,26 +1875,31 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		JLabel lblPfd1 = new JLabel("Р");
 		
 		 tbPfd1 = new CustomTextField();
+		 tbPfd1.setEnabled(false);
 		tbPfd1.setColumns(10);
 		
 		JLabel lblPdf2 = new JLabel("Мф");
 		
 		 tbPfd2 = new CustomTextField();
+		 tbPfd2.setEnabled(false);
 		tbPfd2.setColumns(10);
 		
 		JLabel lblPdf3 = new JLabel("Ах");
 		
 		 tbPfd3 = new CustomTextField();
+		 tbPfd3.setEnabled(false);
 		tbPfd3.setColumns(10);
 		
 		JLabel lblPdf4 = new JLabel("Ме");
 		
 		 tbPfd4 = new CustomTextField();
+		 tbPfd4.setEnabled(false);
 		tbPfd4.setColumns(10);
 		
 		JLabel lblMenarhe = new JLabel("Menarhe (лет, месяцев)");
 		
 		 tbPfd5 = new CustomTextField();
+		 tbPfd5.setEnabled(false);
 		tbPfd5.setColumns(10);
 		
 		JLabel lblMenses = new JLabel("Menses(хар-ка)");
@@ -1834,9 +1909,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgPdf5 = new ButtonGroup();
 		
 		rbtPdf5_1 = new JRadioButton("регулярные");
+		rbtPdf5_1.setEnabled(false);
 		bgPdf5.add(rbtPdf5_1);
 		
 		rbtPdf5_2 = new JRadioButton("нерегулярные");
+		rbtPdf5_2.setEnabled(false);
 		bgPdf5.add(rbtPdf5_2);
 		
 		GroupLayout gl_pnlMenses = new GroupLayout(pnlMenses);
@@ -1864,9 +1941,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		bgMenses1 = new ButtonGroup();
 		
 		 rbtMenses1_1 = new JRadioButton("обильные");
+		 rbtMenses1_1.setEnabled(false);
 		 bgMenses1.add(rbtMenses1_1);
 		
 		 rbtMenses1_2 = new JRadioButton("скудные");
+		 rbtMenses1_2.setEnabled(false);
 		 bgMenses1.add(rbtMenses1_2);
 		 
 		GroupLayout gl_pnlMenses1 = new GroupLayout(pnlMenses1);
@@ -1999,21 +2078,25 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		lblPf1 = new JLabel("<html>Познавательная функция (возраст <br>развития, мес.)</html>");
 		
 		tbPf1 = new CustomTextField();
+		tbPf1.setEnabled(false);
 		tbPf1.setColumns(10);
 		
 		JLabel lblEf1 = new JLabel("<html>Эмоциональная и социальная функции <br>(контакт с окруж.миром) <br>(возраст развития, мес.)</html>");
 		
 		tbEf1 = new CustomTextField();
+		tbEf1.setEnabled(false);
 		tbEf1.setColumns(10);
 		
 		JLabel lblMf1 = new JLabel("<html>Моторная функция<br> (возраст развития, мес.)</html>");
 		
 		tbMf1 = new CustomTextField();
+		tbMf1.setEnabled(false);
 		tbMf1.setColumns(10);
 		
 		JLabel lblRf1 = new JLabel("<html>Предречевое и речевое <br> развитие (возраст развития, мес.)</html>");
 		
 		tbRf1 = new CustomTextField();
+		tbRf1.setEnabled(false);
 		tbRf1.setColumns(10);
 		
 		GroupLayout gl_pnl04y = new GroupLayout(pnl04y);
@@ -2154,7 +2237,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		
 		JLabel lblD_do = new JLabel("Состояние здоровья до проведения настоящего диспансерного обследования");
 		
-		JButton btnAdd = new JButton("+");
+		JButton btnAdd = new JButton("");
+		btnAdd.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1331789242_Add.png")));
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", "");
@@ -2165,6 +2249,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						pdisp_do.setNpasp(pat.npasp);
 						pdisp_do.setDataz(System.currentTimeMillis());
 						pdisp_do.setDiag_do(res.pcod);
+						pdisp_do.setNameds(res.name);
 							pdisp_do.setId(MainForm.tcl.AddPdispds_do(pdisp_do));}
 						} catch (KmiacServerException e1) {
 							// TODO Auto-generated catch block
@@ -2178,7 +2263,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 			}
 		});
 		
-		JButton btnDel = new JButton("-");
+		JButton btnDel = new JButton("");
+		btnDel.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1331789259_Delete.png")));
 		btnDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (tabDiag_do.getSelectedItem()!= null)
@@ -2206,7 +2292,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 			}
 		});
 		
-		JButton btnSave = new JButton("v");
+		JButton btnSave = new JButton("");
+		btnSave.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1341981970_Accept.png")));
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pdisp_do = new Pdisp_ds_do();
@@ -2386,11 +2473,11 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						.addComponent(pnlD_do, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblD_do)
 						.addGroup(gl_pnlDiagDo.createSequentialGroup()
-							.addComponent(btnAdd)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnDel)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnSave))
+							.addComponent(btnAdd, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnDel, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnSave, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE))
 						.addComponent(spDiag_do, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDiagDo.createSequentialGroup()
 							.addComponent(label_1)
@@ -2414,12 +2501,12 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					.addComponent(lblD_do)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(pnlD_do, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlDiagDo.createParallelGroup(Alignment.BASELINE)
+					.addGap(10)
+					.addGroup(gl_pnlDiagDo.createParallelGroup(Alignment.TRAILING)
 						.addComponent(btnAdd)
-						.addComponent(btnDel)
+						.addComponent(btnDel, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnSave))
-					.addGap(18)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(spDiag_do, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
 					.addGap(21)
 					.addGroup(gl_pnlDiagDo.createParallelGroup(Alignment.LEADING)
@@ -2436,16 +2523,16 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					.addGap(278))
 		);
 		
-		tabDiag_do = new CustomTable<>(false, false, Pdisp_ds_do.class, 3, "Диагноз");
+		tabDiag_do = new CustomTable<>(false, false, Pdisp_ds_do.class, 3, "Диагноз", 9, "Наименование");
 		tabDiag_do.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2)
-					if (tabDiag_do.getSelectedItem().diag_do != null)
-						if (tabDiag_do.getSelectedColumn() == 1) {
+					if (tabDiag_do.getSelectedItem().diag_do != null){
 							StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tabDiag_do.getSelectedItem().diag_do);
 							if (res != null) {
 								tabDiag_do.getSelectedItem().setDiag_do(res.pcod);
+								tabDiag_do.getSelectedItem().setNameds(res.name);
 								tabDiag_do.updateSelectedItem();
 							}
 					}
@@ -2523,7 +2610,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		);
 		pnlDiag_po.setLayout(gl_pnlDiag_po);
 		
-		JButton btnSave1 = new JButton("v");
+		JButton btnSave1 = new JButton("");
+		btnSave1.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1341981970_Accept.png")));
 		btnSave1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pdisp_po = new Pdisp_ds_po();
@@ -2579,7 +2667,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 			}
 		});
 		
-		JButton btnDel1 = new JButton("-");
+		JButton btnDel1 = new JButton("");
+		btnDel1.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1331789259_Delete.png")));
 		btnDel1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (tblDiag_po.getSelectedItem()!= null)
@@ -2607,7 +2696,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 			}
 		});
 		
-		JButton btnAdd1 = new JButton("+");
+		JButton btnAdd1 = new JButton("");
+		btnAdd1.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1331789242_Add.png")));
 		btnAdd1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", "");
@@ -2618,6 +2708,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 				pdisp_po.setNpasp(pat.npasp);
 				pdisp_po.setDataz(System.currentTimeMillis());
 				pdisp_po.setDiag_po(res.pcod);
+				pdisp_po.setNameds(res.name);
 					pdisp_po.setId(MainForm.tcl.AddPdispds_po(pdisp_po));}
 				} catch (KmiacServerException e1) {
 					// TODO Auto-generated catch block
@@ -2815,40 +2906,44 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		gl_pnlDiagPosle.setHorizontalGroup(
 			gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlDiagPosle.createSequentialGroup()
-					.addGap(10)
 					.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
-						.addComponent(pnlDiag_po, GroupLayout.PREFERRED_SIZE, 502, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
-							.addComponent(btnAdd1, GroupLayout.PREFERRED_SIZE, 41, GroupLayout.PREFERRED_SIZE)
 							.addGap(10)
-							.addComponent(btnDel1, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
-							.addGap(10)
-							.addComponent(btnSave1, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
-						.addComponent(spDiag_po, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblDiag_po, GroupLayout.PREFERRED_SIZE, 455, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
-							.addComponent(pnlXzab, GroupLayout.PREFERRED_SIZE, 353, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(pnlPu, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
-							.addComponent(lblDisp)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(pnlDisp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
-							.addComponent(pnlProvOzd, GroupLayout.PREFERRED_SIZE, 499, GroupLayout.PREFERRED_SIZE)
-							.addGap(6)
 							.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
-								.addComponent(cbRecdop1, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+								.addComponent(pnlDiag_po, GroupLayout.PREFERRED_SIZE, 502, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_pnlDiagPosle.createSequentialGroup()
-									.addComponent(pnlVmp1, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
+									.addComponent(btnAdd1, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnDel1, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnSave1, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
+								.addComponent(lblDiag_po, GroupLayout.PREFERRED_SIZE, 455, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_pnlDiagPosle.createSequentialGroup()
+									.addComponent(pnlXzab, GroupLayout.PREFERRED_SIZE, 353, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(pnlPu, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_pnlDiagPosle.createSequentialGroup()
+									.addComponent(lblDisp)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(pnlVmp2, GroupLayout.PREFERRED_SIZE, 244, GroupLayout.PREFERRED_SIZE))
-								.addComponent(lblVmp)
-								.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.TRAILING, false)
-									.addComponent(cbRecdop2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(lblRecdop, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-								.addComponent(cbRecdop3, GroupLayout.PREFERRED_SIZE, 339, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(27, Short.MAX_VALUE))
+									.addComponent(pnlDisp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_pnlDiagPosle.createSequentialGroup()
+									.addComponent(pnlProvOzd, GroupLayout.PREFERRED_SIZE, 499, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
+										.addComponent(cbRecdop1, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+										.addGroup(gl_pnlDiagPosle.createSequentialGroup()
+											.addComponent(pnlVmp1, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
+											.addPreferredGap(ComponentPlacement.UNRELATED)
+											.addComponent(pnlVmp2, GroupLayout.PREFERRED_SIZE, 244, GroupLayout.PREFERRED_SIZE))
+										.addComponent(lblVmp)
+										.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.TRAILING, false)
+											.addComponent(cbRecdop2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+											.addComponent(lblRecdop, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+										.addComponent(cbRecdop3, GroupLayout.PREFERRED_SIZE, 339, GroupLayout.PREFERRED_SIZE)))))
+						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(spDiag_po, GroupLayout.PREFERRED_SIZE, 335, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(39, Short.MAX_VALUE))
 		);
 		gl_pnlDiagPosle.setVerticalGroup(
 			gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
@@ -2859,12 +2954,12 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					.addComponent(pnlDiag_po, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
 					.addGap(6)
 					.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnAdd1)
-						.addComponent(btnDel1)
+						.addComponent(btnDel1, GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+						.addComponent(btnAdd1, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(btnSave1))
-					.addGap(18)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(spDiag_po, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGap(23)
 					.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
 						.addComponent(pnlXzab, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
 						.addComponent(pnlPu, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
@@ -2873,7 +2968,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						.addComponent(lblDisp)
 						.addComponent(pnlDisp, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
 					.addGap(6)
-					.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_pnlDiagPosle.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_pnlDiagPosle.createSequentialGroup()
 							.addComponent(lblVmp)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -2887,9 +2982,9 @@ public class MainForm extends Client<ThriftDisp.Client>{
 							.addGap(3)
 							.addComponent(cbRecdop2, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
 							.addGap(3)
-							.addComponent(cbRecdop3, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE))
-						.addComponent(pnlProvOzd, GroupLayout.PREFERRED_SIZE, 297, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(16, Short.MAX_VALUE))
+							.addComponent(cbRecdop3, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+							.addGap(135))
+						.addComponent(pnlProvOzd, 0, 0, Short.MAX_VALUE)))
 		);
 		
 		JLabel lblProvOzd = new JLabel("<html>Проведены лечебно-оздоровительные<br> и реабилитационные меропрития</html>");
@@ -3080,16 +3175,16 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		pnlProvOzd.setLayout(gl_pnlProvOzd);
 		
 		
-		tblDiag_po = new CustomTable<>(false, false, Pdisp_ds_po.class, 3, "Диагноз");
+		tblDiag_po = new CustomTable<>(false, false, Pdisp_ds_po.class, 3, "Диагноз", 33, "Наименование");
 		tblDiag_po.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2)
-				if (tblDiag_po.getSelectedItem().diag_po != null)
-					if (tblDiag_po.getSelectedColumn() == 1) {
+				if (tblDiag_po.getSelectedItem().diag_po != null){
 							StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", tblDiag_po.getSelectedItem().diag_po);
 							if (res != null) {
 								tblDiag_po.getSelectedItem().setDiag_po(res.pcod);
+								tblDiag_po.getSelectedItem().setNameds(res.name);
 								tblDiag_po.updateSelectedItem();
 							}
 						}
@@ -3162,7 +3257,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 	private void initialize() {
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setTitle("Диспансеризация");
+		frame.setTitle("Диспансеризация детей");
 		frame.setBounds(100, 100, 995, 737);
 	}
 
@@ -3176,6 +3271,18 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		super.onConnect(conn);
 		if (conn instanceof ThriftDisp.Client) {
 			tcl = thrClient;
+			onTclConnect();
 		}
+		
+	}
+	
+	public void onTclConnect() {
+		try {
+			cmbProfil.setData(MainForm.tcl.get_n_prf());
+		} catch (TException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }
