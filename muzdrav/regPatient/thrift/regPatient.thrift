@@ -197,7 +197,8 @@ struct Gosp{
 	35:optional i64 vremosm,
 	36:optional i64 dataz,
 	37:optional string jalob,
-	38:optional i32 vid
+	38:optional i32 vid,
+	39:optional bool pr_ber
 }
 
 /**
@@ -297,6 +298,8 @@ exception TerLiveNotFoundException {
 exception SmocodNotFoundException {
 }
 exception NambkNotFoundException{
+}
+exception PatientGospYesOrNoNotFoundException{
 }
 
 service ThriftRegPatient extends kmiacServer.KmiacServer {
@@ -512,6 +515,12 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 	* select ter from n_l00 where pcod=?
      	*/
 	i32 getTerLive(1:i32 pcod) throws (1:TerLiveNotFoundException tlnfe,
+		2:kmiacServer.KmiacServerException kse);
+
+	/**
+	* Возвращает отделение если пациент госпитализирован
+     	*/
+	string getNameOtdGosp(1:i32 id) throws (1:PatientGospYesOrNoNotFoundException pgnfe,
 		2:kmiacServer.KmiacServerException kse);
 
 /*Классификаторы*/

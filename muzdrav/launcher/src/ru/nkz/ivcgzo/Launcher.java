@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
@@ -36,12 +38,15 @@ public class Launcher {
 	public static void main(String[] args) {
 		Launcher lnc;
 		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			lnc = new Launcher();
 			lnc.checkAndUpdate();
 			
 			Runtime.getRuntime().exec("java -jar auth.jar " + clientAuthType);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Не удалось обновить системные модули. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
 		}
 	}
 	
@@ -49,7 +54,7 @@ public class Launcher {
 		rootPath = new File(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath();
 	}
 	
-	public void checkAndUpdate() {
+	public void checkAndUpdate() throws Exception {
 		String ip;
 		
 		switch (clientAuthType) {
@@ -71,8 +76,6 @@ public class Launcher {
 			Document domLibList = getLibrariesList(servSct);
 			List<LibraryInfo> updList = getUpdateList(domLibList);
 			updateLibs(servSct, updList);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -164,36 +167,65 @@ public class Launcher {
 		return true;
 	}
 	
-	private void updateLibs(Socket servSct, List<LibraryInfo> updList) throws Exception {
-		String path = checkAndCreateLibFolder(rootPath);
-		byte[] buf = new byte[65536];
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
-				PrintWriter writer = new PrintWriter(servSct.getOutputStream())) {
-			for (LibraryInfo libInfo : updList) {
-				writer.println(libInfo.id);
-				writer.flush();
-				try (FileOutputStream fos = new FileOutputStream(new File(libInfo.id == 0 ? rootPath : path, libInfo.name))) {
-					fos.getChannel().lock();
-					int read = servSct.getInputStream().read(buf);
-					int readFile = read;
-					while (readFile < libInfo.size) {
-						fos.write(buf, 0, read);
-						read = servSct.getInputStream().read(buf);
-						readFile += read;
+	private void updateLibs(final Socket servSct, final List<LibraryInfo> updList) throws Exception {
+		int overallSize = 0;
+		final ModulesUpdaterDialog mud = new ModulesUpdaterDialog();
+		for (LibraryInfo libraryInfo : updList) {
+			overallSize += libraryInfo.size;
+		}
+		mud.setLocationRelativeTo(null);
+		mud.setTitle("МИС \"Инфо МуЗдрав\" - Обновление системных модулей");
+		mud.setOverallMessage("Всего загружено");
+		mud.setOverallMaximum(overallSize);
+		
+		new Thread(new Runnable() {
+			@SuppressWarnings("resource")
+			@Override
+			public void run() {
+				String path = checkAndCreateLibFolder(rootPath);
+				byte[] buf = new byte[65536];
+				try (BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));
+						PrintWriter writer = new PrintWriter(servSct.getOutputStream())) {
+					for (LibraryInfo libInfo : updList) {
+						writer.println(libInfo.id);
+						writer.flush();
+						try (FileOutputStream fos = new FileOutputStream(new File(libInfo.id == 0 ? rootPath : path, libInfo.name))) {
+							mud.setCurrentMessage(String.format("Загрузка модуля %s", libInfo.name));
+							mud.setCurrentMaximum(libInfo.size);
+							mud.setCurrentValue(0);
+							
+							fos.getChannel().lock();
+							int read = servSct.getInputStream().read(buf);
+							int readFile = read;
+							while (readFile < libInfo.size) {
+								fos.write(buf, 0, read);
+								mud.addToProgress(read);
+								read = servSct.getInputStream().read(buf);
+								readFile += read;
+							}
+							fos.write(buf, 0, read);
+							mud.addToProgress(read);
+							writer.println("Got it.");
+							writer.flush();
+						} catch (Exception e) {
+							throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
+						}
 					}
-					fos.write(buf, 0, read);
-					writer.println("Got it.");
+					writer.println("");
 					writer.flush();
+					if (!reader.readLine().equals("Good bye."))
+						throw new Exception("Farewell failed.");
 				} catch (Exception e) {
-					throw new Exception(String.format("Transferring '%s' failed.", libInfo.name), e);
+					e = new Exception("Error transferring files from server.", e);
+					mud.setException(e);
+				} finally {
+					mud.dispose();
 				}
 			}
-			writer.println("");
-			writer.flush();
-			if (!reader.readLine().equals("Good bye."))
-				throw new Exception("Farewell failed.");
-		} catch (Exception e) {
-			throw new Exception("Error transferring files from server.", e);
-		}
+		}).start();
+		if (updList.size() > 0)
+			mud.setVisible(true);
+		if (mud.getException() != null)
+			throw mud.getException();
 	}
 }

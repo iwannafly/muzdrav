@@ -5,9 +5,9 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.util.List;
 
-import org.apache.thrift.TBase;
+//import org.apache.thrift.TBase;
 import org.apache.thrift.TException;
-import org.apache.thrift.TFieldIdEnum;
+//import org.apache.thrift.TFieldIdEnum;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
@@ -139,13 +139,13 @@ String sql;
 					"pr1n = ?, pr2n = ?, pr3n = ?, pr4n = ?, pr5n = ?, pr6n = ?, pr7n = ?, pr8n= ?, pr9n= ?, pr10n = ?, " + 
 					"pr11n = ?, pr12n = ?, pr13n = ?, pr14n = ?, pr15n = ?, pr16n = ?, pr1v = ?, pr2v = ?, pr3v = ?, pr4v = ?, pr5v = ?, pr6v = ?, pr7v = ?, " +
 					"pr8v= ?, pr9v= ?, pr10v = ?, pr11v = ?, pr12v = ?, pr13v = ?, pr14v = ?, "+
-					"pr15v = ?, pr16v = ? , pr1d = ? WHERE npasp = ?";
+					"pr15v = ?, pr16v = ? , pr1d = ? WHERE npasp = ?, ninv = ?";
 
-//	sme.execPreparedT(sql, false, npasp, invkTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 1);
+	sme.execPreparedT(sql, false, invk, invkTypes, 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132, 1);
 			sme.setCommit();
 		} catch (InterruptedException | SqlExecutorException e) {
-			try {
-				sql = "INSERT INTO p_invk (ninv, npasp, dataz, datav, vrach, mesto1, preds, " +
+			try (SqlModifyExecutor sme = tse.startTransaction()){
+				sql = "INSERT INTO p_invk (npasp, dataz, datav, vrach, mesto1, preds, " +
 					    "uchr, nom_mse, name_mse, ruk_mse, rez_mse, d_osv, d_otpr, d_inv, d_invp, d_srok, " +
 						"srok_inv, diag, diag_s1, diag_s2, diag_s3, oslog, factor, fact1, fact2, " +
 						"fact3, fact4, prognoz, potencial, klin_prognoz, med_reab, ps_reab, prof_reab, " + 
@@ -161,10 +161,10 @@ String sql;
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
 					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, " +
-					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-				//sme.execPreparedT(sql, false, npasp, ninv, invkTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80);
-				//sme.setCommit();
+					"?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+				int ninv = sme.getGeneratedKeys().getInt("ninv");
+				sme.execPreparedT(sql, true, invk, invkTypes, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133);
+				sme.setCommit();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

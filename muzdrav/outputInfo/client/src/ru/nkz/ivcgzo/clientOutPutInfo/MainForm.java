@@ -59,6 +59,7 @@ import org.apache.thrift.TException;
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
 	private JFrame frame;
+    private String oslname;
 	
 	public static ThriftOutputInfo.Client tcl;
 	//public Input_info inputInfo;
@@ -132,9 +133,10 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		menuItem_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
+					System.out.println("Посещения врачей поликлиники");		
 					String servPath = MainForm.tcl.printDnevVr();
 					String cliPath;
-					String oslname = "kartl";
+					oslname = "posvr";
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);

@@ -10,6 +10,7 @@ struct LibraryInfo {
 	2: string name;
 	3: string md5;
 	4: i32 size;
+	5: bool req;
 }
 
 /**

@@ -57,6 +57,9 @@ import javax.swing.JTextArea;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 
 import java.awt.FlowLayout;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 
@@ -235,11 +238,12 @@ public class MainFrame extends JFrame {
                                             PrezD prezd = new PrezD();
                                             fillPrezDFields(pisl, pokazMet, prezd);
                                         }
-                                        selItems.add(pokazMet.getPcod());
+                                        selItems.add(pokazMet.getNameN());
                                     }
                                 }
                             }
                         }
+                        printIssled(selItems);
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "Исследования успешно сохранены!",
                             "Запись исследования", JOptionPane.INFORMATION_MESSAGE);
@@ -264,6 +268,27 @@ public class MainFrame extends JFrame {
         });
     }
 
+    private void printIssled(List<String> selItems) {
+        if (patient != null) {
+            try {
+                String servPath =
+                    ClientLab.tcl.printIssl(patient.getId(), tfCabinet.getText(),
+                        cbxLabs.getSelectedItem().getName(),
+                        doctorAuthInfo.getClpu_name() + " " + doctorAuthInfo.getCpodr_name(),
+                        doctorAuthInfo.getName(), selItems);
+                String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                ClientLab.conMan.transferFileFromServer(servPath, cliPath);
+                ClientLab.conMan.openFileInEditor(cliPath, false);
+            } catch (KmiacServerException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (TException e1) {
+                e1.printStackTrace();
+                ClientLab.conMan.reconnect(e1);
+            }
+        }
+    }
     private void fillPislFields(final Pisl pisl) throws KmiacServerException, TException {
         pisl.setNpasp(patient.getId());
         pisl.setPcisl(cbxOrgAndSystem.getSelectedPcod());

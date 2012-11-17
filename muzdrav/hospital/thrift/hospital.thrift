@@ -25,7 +25,7 @@ struct TPatient{
 	6:string middlename;
 	7:string gender;
 	8:i32 nist;
-	9:string status;
+	9:i32 status;
 	10:string oms;
 	11:string dms;
 	12:string job;
@@ -61,9 +61,9 @@ struct TMedicalHistory{
 	5:optional string statusPraesense;
 	6:optional string statusLocalis;
 	7:optional string fisicalObs;
-	8:i32 pcodVrach;
-	9:i64 dataz;
-	10:i64 timez;
+	8:optional i32 pcodVrach;
+	9:optional i64 dataz;
+	10:optional i64 timez;
 }
 
 struct TLifeHistory{
@@ -95,6 +95,14 @@ struct Shablon {
 	1: string din;
 	2: string next_osm;
 	3: list<ShablonText> textList;
+	4: i32 id;
+}
+
+struct DopShablon {
+	1: i32 id;
+	2: i32 nShablon;
+	3: string name;
+	4: string text;
 }
 
 struct Zakl {
@@ -105,6 +113,7 @@ struct Zakl {
 	5: optional string sostv;
 	6: optional string recom;
 	7: optional i32 idGosp;
+	8: optional i32 newOtd;
 }
 
 struct TStage {
@@ -114,6 +123,11 @@ struct TStage {
 	4: optional string mes;
 	5: optional i64 dateStart;
 	6: optional i64 dateEnd;
+	7: optional i32 ukl;
+	8: optional i32 ishod;
+	9: optional i32 result;
+	10: optional i64 timeStart;
+	11: optional i64 timeEnd;
 }
 
 /**
@@ -147,7 +161,7 @@ exception PriemInfoNotFoundException {
 }
 
 /*
- * Код МЭС не сущесвтует
+ * Код МЭС не сущестdует
  */
 exception MesNotFoundException {
 }
@@ -161,7 +175,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32  chamberNum) throws (1:kmiacServer.KmiacServerException kse);
+	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod)
+		throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -170,6 +185,13 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<classifier.IntegerClassifier> getShablonNames(1:i32 cspec, 2:i32 cslu, 3:string srcText)
 		throws (1:kmiacServer.KmiacServerException kse);
 	Shablon getShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getDopShablonNames(1:i32 nShablon, 2:string srcText)
+		throws (1:kmiacServer.KmiacServerException kse);
+	DopShablon getDopShablon(1:i32 idSh) throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.StringClassifier> getShablonDiagnosis(1:i32 cspec, 2:i32 cslu, 3:string srcText)
+		throws (1:kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShablonBySelectedDiagnosis(
+		1:i32 cspec, 2:i32 cslu, 3:string diag, 4:string srcText) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TMedicalHistory> getMedicalHistory(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse,
 		2: MedicalHistoryNotFoundException mhnfe);
@@ -190,10 +212,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
-	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
+	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
+		2: MesNotFoundException mnfe);
 	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
 		2: MesNotFoundException mnfe);
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
+
+	string printHospitalDiary(1: i32 idGosp, 2: i64 dateStart, 3: i64 dateEnd)
+		throws (1:kmiacServer.KmiacServerException kse)
 	
 /*Классификаторы*/
 	
@@ -214,9 +240,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	*/
 	list<classifier.IntegerClassifier> getStationTypes(1: i32 cotd) throws (1:kmiacServer.KmiacServerException kse);
 	/**
-	* Классификатор этапов лечения (N_tip0(pcod))
+	* Классификатор этапов лечения
 	*/
 	list<classifier.IntegerClassifier> getStagesClassifier(1: i32 idGosp)
+		throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	* Классификатор отделений текущего лпу
+	*/
+	list<classifier.IntegerClassifier> getOtd(1: i32 lpu)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
 }
