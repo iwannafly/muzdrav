@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
+import ru.nkz.ivcgzo.thriftOsm.VrachInfo;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
@@ -76,6 +77,7 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<ZapVr, ZapVr._Fields> rsmZapVr;
 	@SuppressWarnings("unused")
 	private final Class<?>[] zapVrTypes; 
+	private final TResultSetMapper<VrachInfo, VrachInfo._Fields> rsmVrachInfo;
 	private final TResultSetMapper<Pvizit, Pvizit._Fields> rsmPvizit;
 	private final Class<?>[] pvizitTypes; 
 	private final TResultSetMapper<PvizitAmb, PvizitAmb._Fields> rsmPvizitAmb;
@@ -152,6 +154,8 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "fam",        "im",         "ot",         "poms_ser",   "poms_nom",   "id_pvizit",  "pol",          "datar",    "datap",    "nuch",        "has_pvizit",  "id_pvizit_amb");
 		zapVrTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Boolean.class, Integer.class};
+		
+		rsmVrachInfo = new TResultSetMapper<>(VrachInfo.class, "mrab_id", "cdol", "cdol_name", "fam", "im", "ot", "pcod");
 		
 		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "recomend",   "lech",       "cobr");
 		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class, String.class, Integer.class};
@@ -357,6 +361,17 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
+	
+	@Override
+	public List<VrachInfo> getVrachList(int clpu, int cpodr) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT mr.id AS mrab_id, mr.cdol, s00.name AS cdol_name, vr.fam, vr.im, vr.ot, vr.pcod FROM s_mrab mr JOIN s_vrach vr ON (vr.pcod = mr.pcod) JOIN n_s00 s00 ON (s00.pcod = mr.cdol) WHERE (mr.clpu = ?) AND (cpodr = ?) ORDER BY vr.fam, vr.im, vr.ot, s00.name ", clpu, cpodr)) {
+			return rsmVrachInfo.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+	
 	@Override
 	public void AddPvizit(Pvizit obr) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -388,11 +403,11 @@ public class ServerOsm extends Server implements Iface {
 	}
 	
 	@Override
-	public List<Pvizit> getPvizitList(int npasp, int codsp, String cdol) throws KmiacServerException, TException {
+	public List<Pvizit> getPvizitList(int npasp) throws KmiacServerException, TException {
 		String sql = "SELECT pv.id, pv.datao, pv.ishod, TRUE AS has_pvizit FROM patient pat LEFT JOIN p_vizit pv ON (pv.npasp = pat.npasp)  LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE pv.id IN ( " +
-					 "SELECT DISTINCT ipv.id FROM p_vizit ipv LEFT JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) WHERE (ipv.npasp = ?) AND (ipa.cod_sp = ?) AND (ipa.cdol = ?) AND (ipv.datao BETWEEN (CURRENT_DATE - 365) AND CURRENT_DATE)) " +
+					 "SELECT DISTINCT ipv.id FROM p_vizit ipv JOIN p_vizit_amb ipa ON (ipa.id_obr = ipv.id) LEFT JOIN e_talon tal ON (tal.id_pvizit = ipv.id) WHERE (ipv.npasp = ?) AND (ipv.datao BETWEEN (CURRENT_DATE - 365) AND CURRENT_DATE)) " +
 					 "ORDER BY has_pvizit, id DESC, datao DESC ";	
-	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp, codsp, cdol)) {
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, npasp)) {
 		List<Pvizit> pvizitList = rsmPvizit.mapToList(acrs.getResultSet());
 		int prevIdObr = -1;
 		
@@ -3273,6 +3288,4 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 	}
 	}
-
-	
 }
