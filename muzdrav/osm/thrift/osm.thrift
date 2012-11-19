@@ -611,6 +611,16 @@ struct Cotd{
 	5: optional i64 dataz;
 }
 
+struct VrachInfo {
+	1: optional i32 mrabId;
+	2: optional string cdol;
+	3: optional string cdolName;
+	4: optional string fam;
+	5: optional string im;
+	6: optional string ot;
+	7: optional i32 pcod;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -643,11 +653,12 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
 	ZapVr getZapVrSrc(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<VrachInfo> getVrachList(1: i32 clpu, 2: i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
-	list<Pvizit> getPvizitList(1: i32 npasp, 2: i32 codsp, 3: string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pvizit> getPvizitList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteEtalon (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
