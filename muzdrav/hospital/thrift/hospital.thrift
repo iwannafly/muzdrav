@@ -48,7 +48,7 @@ struct TPriemInfo {
 	11:string ad;
 	12:bool nal_z;
 	13:bool nal_p;
-	14:i32 alkg;
+	14:string alkg;
 	15:string vid_tran;
 	16:string jalob;
 }

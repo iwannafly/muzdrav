@@ -2252,10 +2252,14 @@ public class MainFrame extends JFrame {
                     if (!tbStages.getSelectedItem().isSetId()) {
                         if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
                             ClientHospital.tcl.addStage(tbStages.getSelectedItem());
+                            tbStages.setData(
+                                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
                         }
                     } else {
                         if (isStageUpdateRequiredFieldsSet(tbStages.getSelectedItem())) {
                             ClientHospital.tcl.updateStage(tbStages.getSelectedItem());
+                            tbStages.setData(
+                                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
                         }
                     }
                 }
