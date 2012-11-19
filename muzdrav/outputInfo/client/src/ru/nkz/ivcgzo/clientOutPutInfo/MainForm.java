@@ -132,9 +132,11 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenuItem menuItem_4 = new JMenuItem("Посещения врачей поликлиники");
 		menuItem_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Integer cpol = 200;
 				try{
 					System.out.println("Посещения врачей поликлиники");		
-					String servPath = MainForm.tcl.printDnevVr();
+//					String servPath = MainForm.tcl.printDnevVr();
+					String servPath = MainForm.tcl.nagrvr(cpol);
 					String cliPath;
 					oslname = "posvr";
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
