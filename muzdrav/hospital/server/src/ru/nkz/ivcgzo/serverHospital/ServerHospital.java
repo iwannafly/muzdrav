@@ -708,10 +708,10 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final int addStage(final TStage stage) throws KmiacServerException,
             MesNotFoundException {
-        final int[] indexes = {1, 4, 2, 3, 9};
+        final int[] indexes = {1, 4, 2, 3, 9, 6, 7, 8, 10, 5};
         final String sqlQuery = "INSERT INTO c_etap (id_gosp, date_start, stl, mes, "
-            + "time_start) "
-            + "VALUES (?, ?, ?, ?, ?);";
+            + "time_start, ukl, ishod, result, time_end, date_end) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isCodMesValid(stage.getStage(), stage.getMes())) {
                 sme.execPreparedT(sqlQuery, true, stage,

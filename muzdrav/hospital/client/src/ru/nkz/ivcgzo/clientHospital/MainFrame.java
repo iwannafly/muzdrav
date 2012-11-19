@@ -2085,9 +2085,35 @@ public class MainFrame extends JFrame {
         return true;
     }
 
+    private boolean isStageTableReadyToOut() {
+        if (tbStages.getData().size() != 0) {
+            for (TStage stage: tbStages.getData()) {
+                if (!stage.isSetId()) {
+                    JOptionPane.showMessageDialog(MainFrame.this,
+                        "Последний добавленный этап не сохранен! "
+                        + "Сохраните его перед добавлением нового этапа "
+                        + "или переходом на другую вкладку!",
+                        "Ошибка!", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                } else {
+                    if (!isStageUpdateRequiredFieldsSet(stage)) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     private boolean isLastStageItemSetCorrectly() {
-        return isStageUpdateRequiredFieldsSet(
-            tbStages.getData().get(tbStages.getData().size() - 1));
+        if (tbStages.getData().size() != 0) {
+            return isStageUpdateRequiredFieldsSet(
+                tbStages.getData().get(tbStages.getData().size() - 1));
+        } else {
+            return true;
+        }
     }
 
     private long calcCorrectStageDateStart() {
@@ -2246,16 +2272,20 @@ public class MainFrame extends JFrame {
         try {
             if (tbStages.getSelectedItem() != null) {
                 int opResult = JOptionPane.showConfirmDialog(
-                        MainFrame.this, "Добавить информацию об этапе лечения?",
+                    MainFrame.this, "Добавить информацию об этапе лечения?",
                     "Изменение этапа лечения", JOptionPane.YES_NO_OPTION);
                 if (opResult == JOptionPane.YES_OPTION) {
                     if (!tbStages.getSelectedItem().isSetId()) {
                         if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
                             ClientHospital.tcl.addStage(tbStages.getSelectedItem());
+                            tbStages.setData(
+                                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
                         }
                     } else {
-                        if (isStageUpdateRequiredFieldsSet(tbStages.getSelectedItem())) {
+                        if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
                             ClientHospital.tcl.updateStage(tbStages.getSelectedItem());
+                            tbStages.setData(
+                                ClientHospital.tcl.getStage(patient.getGospitalCod()));
                         }
                     }
                 }
@@ -2487,65 +2517,236 @@ public class MainFrame extends JFrame {
         btnSaveZakl.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    // TODO растащить условия по методам isSmth(), чтобы было читаемо.
-                    if ((patient != null)
-                            && (((cbxIshod.getSelectedItem() != null)
-                                    && (cbxResult.getSelectedItem() != null)
-                                    && (cbxIshod.getSelectedPcod() != 2))
-                                ||  ((cbxIshod.getSelectedItem() != null)
-                                    && ((cbxIshod.getSelectedPcod() == 2)
-                                        || (cbxIshod.getSelectedPcod() == 3))
-                                    && (cbxResult.getSelectedItem() == null)))) {
-                        if ((tbStages.getData() != null) && (tbStages.getData().size() != 0)) {
-                            Zakl tmpZakl = new Zakl();
-                            tmpZakl.setRecom(taRecomend.getText());
-                            tmpZakl.setSostv(taZakluch.getText());
-                            tmpZakl.setIshod(cbxIshod.getSelectedPcod());
-                            if (cbxResult.getSelectedItem() != null) {
+                    if (isStagesCorrect()) {
+                        if (isPatientOut()) {
+                            if (isAllRequiredOutFieldsSet()) {
+                                Zakl tmpZakl = new Zakl();
+                                tmpZakl.setRecom(taRecomend.getText());
+                                tmpZakl.setSostv(taZakluch.getText());
+                                tmpZakl.setIshod(cbxIshod.getSelectedPcod());
                                 tmpZakl.setResult(cbxResult.getSelectedPcod());
+                                tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
+                                tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                                tmpZakl.setIdGosp(patient.getGospitalCod());
+                                ClientHospital.tcl.addZakl(tmpZakl);
+                                JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Пациент успешно выписан", "Выписка пациента",
+                                    JOptionPane.INFORMATION_MESSAGE);
                             }
-                            if (cbxIshod.getSelectedPcod() == 3) {
-                                if (cbxAnotherOtd.getSelectedItem() != null) {
-                                    tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
-                                } else {
-                                    JOptionPane.showMessageDialog(MainFrame.this,
-                                        "Не выбрано отделение для перевода", "Ошибка",
-                                        JOptionPane.ERROR_MESSAGE);
-                                    throw new KmiacServerException();
-                                }
+                        } else if (isPatientDead()) {
+                            if (isAllRequiredDeadFieldsSet()) {
+                                Zakl tmpZakl = new Zakl();
+                                tmpZakl.setRecom(taRecomend.getText());
+                                tmpZakl.setSostv(taZakluch.getText());
+                                tmpZakl.setIshod(cbxIshod.getSelectedPcod());
+                                tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
+                                tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                                tmpZakl.setIdGosp(patient.getGospitalCod());
+                                ClientHospital.tcl.addZakl(tmpZakl);
+                                JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Пациент успешно выписан", "Выписка пациента",
+                                    JOptionPane.INFORMATION_MESSAGE);
                             }
-                            tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
-                            tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
-                            tmpZakl.setIdGosp(patient.getGospitalCod());
-                            ClientHospital.tcl.addZakl(tmpZakl);
-                            JOptionPane.showMessageDialog(MainFrame.this,
-                                "Пациент успешно выписан", "Выписка пациента",
-                                JOptionPane.INFORMATION_MESSAGE);
+                        } else if (isPatientMoved()) {
+                            if (isAllRequiredMovedFieldsSet()) {
+                                Zakl tmpZakl = new Zakl();
+                                tmpZakl.setRecom(taRecomend.getText());
+                                tmpZakl.setSostv(taZakluch.getText());
+                                tmpZakl.setIshod(cbxIshod.getSelectedPcod());
+                                tmpZakl.setResult(cbxResult.getSelectedPcod());
+                                tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
+                                tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
+                                tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                                tmpZakl.setIdGosp(patient.getGospitalCod());
+                                ClientHospital.tcl.addZakl(tmpZakl);
+                                JOptionPane.showMessageDialog(MainFrame.this,
+                                    "Пациент успешно выписан", "Выписка пациента",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                            }
                         } else {
                             JOptionPane.showMessageDialog(MainFrame.this,
-                                    "Не выбран ни один этап лечения! Выписка невозможна.",
-                                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+                                "Не выбран пациент или не установлен исход. "
+                                + "Информация не сохранена", "Ошибка", JOptionPane.ERROR_MESSAGE);
                         }
                     } else {
                         JOptionPane.showMessageDialog(MainFrame.this,
-                            "Не выбран пациент, либо не заполнены поля \"Результат лечения\" "
-                            + "или \"Исход заболевания\"", "Ошибка!",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Этапы лечения заполнены некорректно! Выписка невозможна!",
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
                     }
                 } catch (KmiacServerException e1) {
                     JOptionPane.showMessageDialog(MainFrame.this,
-                            "Ошибка при выписке пациента. Информация не сохранена", "Ошибка",
-                            JOptionPane.ERROR_MESSAGE);
+                        "Ошибка при выписке пациента. Информация не сохранена", "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
                 } catch (TException e1) {
                     JOptionPane.showMessageDialog(MainFrame.this,
-                            "Ошибка при выписке пациента. Информация не сохранена", "Ошибка",
-                            JOptionPane.ERROR_MESSAGE);
+                        "Ошибка при выписке пациента. Информация не сохранена", "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
                     ClientHospital.conMan.reconnect(e1);
                 }
             }
         });
     }
 
+    private boolean isStagesCorrect() {
+        return isStageTableReadyToOut();
+    }
+
+    private boolean isPrimaryOutValueSet() {
+        return (patient != null) && (cbxIshod.getSelectedItem() != null);
+    }
+
+    private boolean isPatientOut() {
+        if (isPrimaryOutValueSet()) {
+            return (cbxIshod.getSelectedPcod() != 2) && (cbxIshod.getSelectedPcod() != 3);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isPatientDead() {
+        if (isPrimaryOutValueSet()) {
+            return (cbxIshod.getSelectedPcod() == 2);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isPatientMoved() {
+        if (isPrimaryOutValueSet()) {
+            return (cbxIshod.getSelectedPcod() == 3);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isAllRequiredOutFieldsSet() {
+        if (cbxVidPom.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран вид помощи. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cbxVidOpl.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран вид оплаты. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ((tfZaklDiagPcod.getText().isEmpty()) || (tfZaklDiagName.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cbxResult.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран результат лечения. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cdeZaklDate.getDate() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрана дата выписки. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cdeZaklTime.getTime() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрано время выписки. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isAllRequiredDeadFieldsSet() {
+        if (cbxVidPom.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран вид помощи. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cbxVidOpl.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран вид оплаты. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ((tfZaklDiagPcod.getText().isEmpty())
+                || (tfZaklDiagName.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ((tfPatalogoAnDiagPcod.getText().isEmpty())
+                || (tfPatalogoAnDiagName.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cdeZaklDate.getDate() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрана дата смерти. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cdeZaklTime.getTime() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрано время смерти. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isAllRequiredMovedFieldsSet() {
+        if (cbxVidPom.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран вид помощи", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cbxVidOpl.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран вид оплаты. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if ((tfZaklDiagPcod.getText().isEmpty())
+                || (tfZaklDiagName.getText().isEmpty())) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран заключительный диагноз. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cdeZaklDate.getDate() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрана дата перевода. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cdeZaklTime.getTime() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрано время перевода. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cbxResult.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбран результат лечения. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (cbxAnotherOtd.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(MainFrame.this,
+                "Не выбрано отделения для перевода. Информация не сохранена", "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
 ////////////////////////////////////////// CAUTION! ///////////////////////////////////////////////
 /////////////////// Автогенерируемое нечитаемое говно. Спасибо ВиндоуБилдеру за это. //////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////

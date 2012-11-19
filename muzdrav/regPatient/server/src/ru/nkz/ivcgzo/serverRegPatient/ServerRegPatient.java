@@ -165,7 +165,7 @@ public class ServerRegPatient extends Server implements Iface {
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
     //  cuser          dataosm     vremosm     dataz       jalob
         Integer.class, Date.class, Time.class, Date.class, String.class,
-    //  vid_st			pr_ber
+    //  vid_st         pr_ber
         Integer.class, Boolean.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
@@ -1714,11 +1714,13 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
-	@Override
-	public String getNameOtdGosp(int id)
-			throws PatientGospYesOrNoNotFoundException, KmiacServerException,
-			TException {
-        String sqlQuery = "SELECT n.name_u as otd FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN n_o00 n ON (o.cotd = n.pcod) WHERE p.npasp=? AND (g.pr_out=0 or g.pr_out is null) AND o.datav is null";
+    @Override
+    public final String getNameOtdGosp(final int id)
+            throws PatientGospYesOrNoNotFoundException, KmiacServerException {
+        String sqlQuery = "SELECT n.name_u as otd FROM patient p "
+            + "JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) "
+            + "JOIN n_o00 n ON (o.cotd = n.pcod) "
+            + "WHERE p.npasp=? AND (g.pr_out=0 or g.pr_out is null) AND o.datav is null";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
@@ -1730,5 +1732,5 @@ public class ServerRegPatient extends Server implements Iface {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
-	}
+    }
 }

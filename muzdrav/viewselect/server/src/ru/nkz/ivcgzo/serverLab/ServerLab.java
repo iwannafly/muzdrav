@@ -148,8 +148,8 @@ public class ServerLab extends Server implements Iface {
     private static final Class<?>[] GOSP_TYPES = {
     //  id_gosp        npasp          cotd           cotd_name
         Integer.class, Integer.class, Integer.class, String.class,
-    //  datap       datav       ishod         result
-        Date.class, Date.class, String.class, String.class,
+    //  datap       datav       ishod          result
+        Date.class, Date.class, Integer.class, Integer.class,
     //  vrach          vrach_fio 
         Integer.class, String.class
     };
