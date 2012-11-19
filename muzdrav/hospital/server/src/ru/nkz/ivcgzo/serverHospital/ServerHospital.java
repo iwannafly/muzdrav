@@ -95,7 +95,8 @@ public class ServerHospital extends Server implements Iface {
         "pcod", "name"
     };
     private static final String[] STAGE_FIELD_NAMES = {
-        "id", "id_gosp", "stl", "mes", "date_start", "date_end"
+        "id", "id_gosp", "stl", "mes", "date_start", "date_end",
+        "ukl", "ishod", "result", "time_start", "time_end"
     };
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
@@ -117,8 +118,10 @@ public class ServerHospital extends Server implements Iface {
     private static final Class<?>[] STAGE_TYPES = {
     //  id             id_gosp        stl            mes
         Integer.class, Integer.class, Integer.class, String.class,
-    //  date_start  date_end
-        Date.class, Date.class
+    //  date_start  date_end    ukl            ishod          result
+        Date.class, Date.class, Integer.class, Integer.class, Integer.class,
+    //  time_start  time_end
+        Time.class, Time.class
     };
 
     /**
@@ -703,16 +706,22 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final int addStage(final TStage stage) throws KmiacServerException {
-        final int[] indexes = {1, 4};
-        final String sqlQuery = "INSERT INTO c_etap (id_gosp, date_start) "
-                + "VALUES (?, ?);";
+    public final int addStage(final TStage stage) throws KmiacServerException,
+            MesNotFoundException {
+        final int[] indexes = {1, 4, 2, 3, 9, 6, 7, 8, 10, 5};
+        final String sqlQuery = "INSERT INTO c_etap (id_gosp, date_start, stl, mes, "
+            + "time_start, ukl, ishod, result, time_end, date_end) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPreparedT(sqlQuery, true, stage,
-                    STAGE_TYPES, indexes);
-            int id = sme.getGeneratedKeys().getInt("id");
-            sme.setCommit();
-            return id;
+            if (isCodMesValid(stage.getStage(), stage.getMes())) {
+                sme.execPreparedT(sqlQuery, true, stage,
+                        STAGE_TYPES, indexes);
+                int id = sme.getGeneratedKeys().getInt("id");
+                sme.setCommit();
+                return id;
+            } else {
+                throw new MesNotFoundException();
+            }
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
@@ -722,8 +731,9 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void updateStage(final TStage stage)
             throws KmiacServerException, MesNotFoundException {
-        final int[] indexes = {4, 5, 2, 3, 0};
-        String sqlQuery = "UPDATE c_etap SET date_start = ?, date_end = ?, stl = ?, mes = ? "
+        final int[] indexes = {4, 5, 2, 3, 6, 7, 8, 9, 10, 0};
+        String sqlQuery = "UPDATE c_etap SET date_start = ?, date_end = ?, stl = ?, mes = ?, "
+            + "ukl = ?, ishod = ?, result = ?, time_start = ?, time_end = ? "
             + "WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isCodMesValid(stage.getStage(), stage.getMes())) {

@@ -48,7 +48,7 @@ struct TPriemInfo {
 	11:string ad;
 	12:bool nal_z;
 	13:bool nal_p;
-	14:i32 alkg;
+	14:string alkg;
 	15:string vid_tran;
 	16:string jalob;
 }
@@ -123,6 +123,11 @@ struct TStage {
 	4: optional string mes;
 	5: optional i64 dateStart;
 	6: optional i64 dateEnd;
+	7: optional i32 ukl;
+	8: optional i32 ishod;
+	9: optional i32 result;
+	10: optional i64 timeStart;
+	11: optional i64 timeEnd;
 }
 
 /**
@@ -156,7 +161,7 @@ exception PriemInfoNotFoundException {
 }
 
 /*
- * Код МЭС не сущесвтует
+ * Код МЭС не сущестdует
  */
 exception MesNotFoundException {
 }
@@ -207,7 +212,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
-	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse);
+	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
+		2: MesNotFoundException mnfe);
 	void updateStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
 		2: MesNotFoundException mnfe);
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
