@@ -2018,12 +2018,11 @@ public class Vvod extends JFrame {
 								gosp.setNamed_p(pd.getNamed());}
 						}
 						gosp.setDataz(System.currentTimeMillis());
-						gosp.setNist(444);
 						gosp.setPl_extr(2);
 						gosp.setDatap(System.currentTimeMillis());
 						gosp.setVremp(System.currentTimeMillis());
+						gosp.setN_org(MainForm.authInfo.getCpodr());
 						gosp.setCotd(MainForm.authInfo.getCpodr());
-						gosp.setCotd_p(MainForm.authInfo.getCpodr());
 						gosp.setDataosm(System.currentTimeMillis());
 						gosp.setVremosm(System.currentTimeMillis());
 						sp = MainForm.tcl.AddCGosp(gosp);
