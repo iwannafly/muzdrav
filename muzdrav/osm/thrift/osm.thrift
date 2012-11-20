@@ -601,7 +601,6 @@ struct Cgosp{
 	17: optional i32 cotd_p;
 	18: optional i64 dataosm;
 	19: optional i64 vremosm;
-	20: optional i32 cotd_p;
 }
 
 struct Cotd{
