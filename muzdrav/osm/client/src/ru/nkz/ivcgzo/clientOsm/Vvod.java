@@ -2025,6 +2025,7 @@ public class Vvod extends JFrame {
 						gosp.setVremp(System.currentTimeMillis());
 						gosp.setN_org(MainForm.authInfo.getCpodr());
 						gosp.setCotd(MainForm.authInfo.getCpodr());
+						gosp.setCotd_p(MainForm.authInfo.getCpodr());
 						gosp.setDataosm(System.currentTimeMillis());
 						gosp.setVremosm(System.currentTimeMillis());
 						sp = MainForm.tcl.AddCGosp(gosp);

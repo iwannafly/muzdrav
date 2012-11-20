@@ -242,8 +242,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPobost = new TResultSetMapper<>(Pobost.class, "id",         "npasp",       "id_pdiag",    "diag",       "sl_obostr",   "sl_hron",     "cod_sp",      "cdol",       "dataz",    "id_obr");
 		pobostTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class};
 
-		rsmCgosp = new TResultSetMapper<>(Cgosp.class, "id",          "ngosp",        "npasp",      "nist",        "naprav",     "diag_n",     "named_n",     "dataz",   "vid_st",      "n_org",     "pl_extr",    "datap",     "vremp",    "cotd",        "diag_p",     "named_p",    "cotd_p",      "dataosm",  "vremosm");
-		cgospTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Time.class, Integer.class, String.class, String.class, Integer.class, Date.class, Time.class};
+		rsmCgosp = new TResultSetMapper<>(Cgosp.class, "id",          "ngosp",        "npasp",      "nist",        "naprav",     "diag_n",     "named_n",     "dataz",   "vid_st",      "n_org",     "pl_extr",    "datap",     "vremp",    "cotd",        "diag_p",     "named_p",    "cotd_p",      "dataosm",  "vremosm",    "cotd_p");
+		cgospTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Time.class, Integer.class, String.class, String.class, Integer.class, Date.class, Time.class, Integer.class};
 		
 		rsmCotd = new TResultSetMapper<>(Cotd.class, "id",          "id_gosp",      "nist",       "cotd",         "dataz");
 		cotdTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Date.class};
@@ -2934,7 +2934,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	@Override
 	public List<Integer> AddCGosp(Cgosp cgsp) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into c_gosp (npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org, pl_extr, datap, vremp, cotd, diag_p, named_p, cotd_p, dataosm, vremosm) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
+			sme.execPreparedT("insert into c_gosp (npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org, pl_extr, datap, vremp, cotd, diag_p, named_p, cotd_p, dataosm, vremosm, cotd_p) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
 			List<Integer> ret = new ArrayList<>();
 			ret.add(sme.getGeneratedKeys().getInt("id"));
 			ret.add(sme.getGeneratedKeys().getInt("ngosp"));
