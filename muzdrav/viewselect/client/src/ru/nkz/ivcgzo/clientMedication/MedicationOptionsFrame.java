@@ -11,7 +11,6 @@ import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JCheckBox;
 import javax.swing.JButton;
@@ -25,6 +24,7 @@ import javax.swing.border.EtchedBorder;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
@@ -35,8 +35,8 @@ import ru.nkz.ivcgzo.thriftMedication.Patient;
 public class MedicationOptionsFrame extends JDialog {
 
     private static final long serialVersionUID = 2753395204214670046L;
-    private JTextField tfDateFrom;
-    private JTextField tfDateTo;
+    private CustomDateEditor cdeDateFrom;
+    private CustomDateEditor cdeDateTo;
     private JTextField tfIntakePerDay;
     private JTextField tfChargeOff;
     private JPanel pHeader;
@@ -48,18 +48,13 @@ public class MedicationOptionsFrame extends JDialog {
     private JLabel lblDateTo;
     private JPanel pOptions;
     private JLabel lblPeriod;
-    @SuppressWarnings("rawtypes")
-    private JComboBox cmbPeriod;
-    private JLabel lblOsobNazn;
-    @SuppressWarnings("rawtypes")
-    private JComboBox cbxOsobNazn;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cmbPeriod;
     private JLabel lblInputMethod;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxInputMethod;
     private Component vsSecondInterval;
     private JPanel pDailyRules;
     private JLabel lblDose;
-    @SuppressWarnings("rawtypes")
-    private JComboBox cbxDose;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxDoseEdd;
     private JLabel lblIntakePerDay;
     private JLabel lblChargeOff;
     private JLabel lblComment;
@@ -79,6 +74,8 @@ public class MedicationOptionsFrame extends JDialog {
     private IntegerClassifier curMedication;
     private IntegerClassifier curMedicationForm;
     private Patient patient;
+    private Box hzbDose;
+    private JTextField tfDose;
 
     public MedicationOptionsFrame() {
         initialization();
@@ -86,9 +83,8 @@ public class MedicationOptionsFrame extends JDialog {
 
     private void initialization() {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.TOOLKIT_MODAL);
         setFrameSize();
         setUndecorated(true);
 
@@ -161,10 +157,10 @@ public class MedicationOptionsFrame extends JDialog {
         hsSecond = Box.createHorizontalStrut(20);
         pDates.add(hsSecond);
 
-        tfDateFrom = new JTextField();
-        tfDateFrom.setMaximumSize(new Dimension(2147483647, 20));
-        pDates.add(tfDateFrom);
-        tfDateFrom.setColumns(10);
+        cdeDateFrom = new CustomDateEditor();
+        cdeDateFrom.setMaximumSize(new Dimension(2147483647, 20));
+        pDates.add(cdeDateFrom);
+        cdeDateFrom.setColumns(10);
 
         hsThird = Box.createHorizontalStrut(20);
         hsThird.setMaximumSize(new Dimension(20, 20));
@@ -178,10 +174,10 @@ public class MedicationOptionsFrame extends JDialog {
         hsFouth.setMaximumSize(new Dimension(20, 20));
         pDates.add(hsFouth);
 
-        tfDateTo = new JTextField();
-        tfDateTo.setMaximumSize(new Dimension(2147483647, 20));
-        pDates.add(tfDateTo);
-        tfDateTo.setColumns(10);
+        cdeDateTo = new CustomDateEditor();
+        cdeDateTo.setMaximumSize(new Dimension(2147483647, 20));
+        pDates.add(cdeDateTo);
+        cdeDateTo.setColumns(10);
 
         hsFifth = Box.createHorizontalStrut(20);
         hsFifth.setMaximumSize(new Dimension(20, 20));
@@ -195,35 +191,24 @@ public class MedicationOptionsFrame extends JDialog {
         pOptions.setLayout(new BoxLayout(pOptions, BoxLayout.Y_AXIS));
 
         addPeriod();
-        addOsobNazn();
         addInputMethod();
     }
 
-    @SuppressWarnings("rawtypes")
     private void addPeriod() {
         lblPeriod = new JLabel("Периодичность приёма:");
         pOptions.add(lblPeriod);
 
-        cmbPeriod = new JComboBox();
+        cmbPeriod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_period);
         cmbPeriod.setMaximumSize(new Dimension(32767, 20));
         pOptions.add(cmbPeriod);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private void addOsobNazn() {
-        lblOsobNazn = new JLabel("Особые назначения:");
-        pOptions.add(lblOsobNazn);
-
-        cbxOsobNazn = new JComboBox();
-        cbxOsobNazn.setMaximumSize(new Dimension(32767, 20));
-        pOptions.add(cbxOsobNazn);
     }
 
     private void addInputMethod() {
         lblInputMethod = new JLabel("Способ ввода:");
         pOptions.add(lblInputMethod);
 
-        cbxInputMethod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxInputMethod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
+            IntegerClassifiers.n_svl);
         cbxInputMethod.setMaximumSize(new Dimension(32767, 20));
         pOptions.add(cbxInputMethod);
 
@@ -244,18 +229,32 @@ public class MedicationOptionsFrame extends JDialog {
         addReestr();
     }
 
-    @SuppressWarnings("rawtypes")
     private void addDose() {
         lblDose = new JLabel("Количество на приём:");
+        lblDose.setAlignmentX(Component.CENTER_ALIGNMENT);
         pDailyRules.add(lblDose);
+        
+        hzbDose = Box.createHorizontalBox();
+        pDailyRules.add(hzbDose);
+        
+        tfDose = new JTextField();
+        tfDose.setMinimumSize(new Dimension(200, 20));
+        tfDose.setPreferredSize(new Dimension(200, 20));
+        tfDose.setMaximumSize(new Dimension(200, 20));
+        hzbDose.add(tfDose);
+        tfDose.setColumns(10);
 
-        cbxDose = new JComboBox();
-        cbxDose.setMaximumSize(new Dimension(32767, 20));
-        pDailyRules.add(cbxDose);
+        cbxDoseEdd = new ThriftIntegerClassifierCombobox<IntegerClassifier>(
+            IntegerClassifiers.n_edd);
+        cbxDoseEdd.setPreferredSize(new Dimension(100, 20));
+        cbxDoseEdd.setMinimumSize(new Dimension(100, 20));
+        hzbDose.add(cbxDoseEdd);
+        cbxDoseEdd.setMaximumSize(new Dimension(100, 20));
     }
 
     private void addIntakePerDay() {
         lblIntakePerDay = new JLabel("Число в день:");
+        lblIntakePerDay.setAlignmentX(Component.CENTER_ALIGNMENT);
         pDailyRules.add(lblIntakePerDay);
 
         tfIntakePerDay = new JTextField();
@@ -266,6 +265,7 @@ public class MedicationOptionsFrame extends JDialog {
 
     private void addChargeOff() {
         lblChargeOff = new JLabel("Списание:");
+        lblChargeOff.setAlignmentX(Component.CENTER_ALIGNMENT);
         pDailyRules.add(lblChargeOff);
 
         tfChargeOff = new JTextField();
@@ -276,6 +276,7 @@ public class MedicationOptionsFrame extends JDialog {
 
     private void addComment() {
         lblComment = new JLabel("Примечания:");
+        lblComment.setAlignmentX(Component.CENTER_ALIGNMENT);
         pDailyRules.add(lblComment);
 
         spComment = new JScrollPane();
@@ -290,6 +291,7 @@ public class MedicationOptionsFrame extends JDialog {
 
     private void addReestr() {
         chbxReestr = new JCheckBox("Вкл. в реестр на оплату");
+        chbxReestr.setAlignmentX(Component.CENTER_ALIGNMENT);
         pDailyRules.add(chbxReestr);
 
         vsThirdInterval = Box.createVerticalStrut(20);
@@ -314,10 +316,18 @@ public class MedicationOptionsFrame extends JDialog {
                 tmpLek.setIdGosp(patient.getIdGosp());
                 tmpLek.setVrach(ClientMedication.authInfo.getPcod());
                 tmpLek.setKlek(curMedication.getPcod());
-                tmpLek.setDatan(System.currentTimeMillis());
+                tmpLek.setDoza(Integer.valueOf(tfDose.getText()));
+                tmpLek.setEd(cbxDoseEdd.getSelectedPcod());
+                tmpLek.setFlek(curMedicationForm.getName());
+                tmpLek.setKomm(taComment.getText());
+                tmpLek.setSposv(cbxInputMethod.getSelectedPcod());
+                tmpLek.setSpriem(cmbPeriod.getSelectedPcod());
+                tmpLek.setPereod(Integer.valueOf(tfIntakePerDay.getText()));
+                tmpLek.setDatao(cdeDateTo.getDate().getTime());
+                tmpLek.setDatan(cdeDateFrom.getDate().getTime());
                 tmpLek.setDataz(System.currentTimeMillis());
                 try {
-                    ClientMedication.tcl.addLek(tmpLek);
+                    tmpLek.setNlek(ClientMedication.tcl.addLek(tmpLek));
                 } catch (KmiacServerException e1) {
                     e1.printStackTrace();
                 } catch (TException e1) {
