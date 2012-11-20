@@ -22,19 +22,17 @@ public class LpuListModel implements ListModel<Lpu>{
     private List<Lpu>  getItemsFromDb() {
         Statement statement = null;
         ResultSet resultSet = null;
-        String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
-                + "INNER JOIN s_vrach ON s_vrach.cdol = n_s00.pcod "
-                + "INNER JOIN e_talon ON s_vrach.cdol = e_talon.cdol "
-                + "where s_vrach.opl = 2 AND s_vrach.yvolen = 0 AND "
-                + "((s_vrach.prizn is null) OR (s_vrach.prizn <> '*')) "
-                + "AND e_talon.npasp = 0 order BY n_s00.name ";
+        String sqlQuery = "SELECT DISTINCT n_n00.pcod, "
+            + "(n_m00.name_s || ', ' || n_n00.name) as name "
+            + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu "
+            + "INNER JOIN e_talon ON n_n00.pcod = e_talon.cpol;";
         DbManager dbManager = DbManager.getInstance();
-        List<Speciality> specs = new ArrayList<Speciality>();
+        List<Lpu> lpuList = new ArrayList<Lpu>();
         try {
             statement = dbManager.getConnection().createStatement();
             resultSet = statement.executeQuery(sqlQuery);
             while (resultSet.next()){
-              specs.add(new Speciality(resultSet.getString("pcod"), resultSet.getString("name")));
+              lpuList.add(new Lpu(resultSet.getInt("pcod"), resultSet.getString("name")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,7 +46,7 @@ public class LpuListModel implements ListModel<Lpu>{
                 }
             }
         }
-        return specs;
+        return lpuList;
     }
     
     @Override
@@ -57,8 +55,12 @@ public class LpuListModel implements ListModel<Lpu>{
     }
 
     @Override
-    public Speciality getElementAt(int index) {
+    public Lpu getElementAt(int index) {
         return items.get(index);
+    }
+
+    public void updateModel() {
+        items = getItemsFromDb();
     }
 
     @Override
@@ -68,7 +70,7 @@ public class LpuListModel implements ListModel<Lpu>{
 
     @Override
     public void removeListDataListener(ListDataListener listener) {
-        listeners.add(listener);
+        listeners.remove(listener);
     }
 
 }

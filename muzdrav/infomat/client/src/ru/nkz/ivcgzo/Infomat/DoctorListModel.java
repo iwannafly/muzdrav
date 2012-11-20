@@ -20,25 +20,22 @@ public class DoctorListModel implements ListModel<Doctor> {
         items = Collections.emptyList();
     }
 
-    public DoctorListModel(String cdol) {
-        items = getItemsFromDb(cdol);
+    public DoctorListModel(int cpol, String cdol) {
+        items = getItemsFromDb(cpol, cdol);
     }
 
-    private List<Doctor>  getItemsFromDb(String cdol) {
+    private List<Doctor>  getItemsFromDb(int cpol, String cdol) {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
-        String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot, "
-                + "s_vrach.nkab FROM s_vrach INNER JOIN n_cdol ON s_vrach.cdol = n_cdol.pcod "
-                + "INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod "
-        		+ "WHERE n_cdol.pcod = ? AND s_vrach.yvolen = 0 AND s_vrach.opl=2 "
-        		+ "AND ((s_vrach.prizn is null) or (s_vrach.prizn <> ?))"
-        		+ "ORDER BY s_vrach.fam, s_vrach.im;";
+        String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
+                + "FROM s_vrach INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod_sp "
+                + "WHERE e_talon.cpol = ? AND e_talon.cdol = ?;";
         DbManager dbManager = DbManager.getInstance();
         List<Doctor> doctors = new ArrayList<Doctor>();
         try {
             statement = dbManager.getConnection().prepareStatement(sqlQuery);
-            statement.setString(1, cdol);
-            statement.setString(2, "*");
+            statement.setInt(1, cpol);
+            statement.setString(2, cdol);
             resultSet = statement.executeQuery();
             while (resultSet.next()){
                 doctors.add(
@@ -47,8 +44,7 @@ public class DoctorListModel implements ListModel<Doctor> {
                         cdol,
                         resultSet.getString("fam"),
                         resultSet.getString("im"),
-                        resultSet.getString("ot"),
-                        resultSet.getString("nkab")
+                        resultSet.getString("ot")
                     )
                 );
             }
@@ -72,8 +68,8 @@ public class DoctorListModel implements ListModel<Doctor> {
         return items.size();
     }
 
-    public void updateModel(String cdol) {
-        items = getItemsFromDb(cdol);
+    public void updateModel(int cpol, String cdol) {
+        items = getItemsFromDb(cpol, cdol);
     }
 
     @Override
@@ -88,7 +84,7 @@ public class DoctorListModel implements ListModel<Doctor> {
 
     @Override
     public void removeListDataListener(ListDataListener listener) {
-        listeners.add(listener);
+        listeners.remove(listener);
     }
 
 }

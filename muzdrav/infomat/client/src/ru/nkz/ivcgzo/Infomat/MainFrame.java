@@ -24,22 +24,30 @@ public class MainFrame extends JFrame {
     private JButton btnAppointment;
     private JButton btnPersonalInfo;
     private JButton btnSchedule;
-    private DoctorSelectFrame frmDoctorSelect;
+    private LpuSelectFrame frmLpuSelect;
     
     public MainFrame() {
         initialization();
     }
 
     private void initialization() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+
+        createModalFrames();
 
         addMainPanel();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
+    }
+
+    private void createModalFrames() {
+        if (frmLpuSelect == null) {
+            frmLpuSelect = new LpuSelectFrame(); 
+        }
     }
 
     private void addMainPanel() {
@@ -73,10 +81,11 @@ public class MainFrame extends JFrame {
         btnAppointment = new JButton("Запись на приём");
         btnAppointment.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (frmDoctorSelect == null) {
-                    frmDoctorSelect = new DoctorSelectFrame();
-                }
-                frmDoctorSelect.setVisible(true);
+//                if (frmDoctorSelect == null) {
+//                    frmDoctorSelect = new DoctorSelectFrame();
+//                }
+//                frmDoctorSelect.setVisible(true);
+                frmLpuSelect.showModal();
             }
         });
         btnAppointment.setFont(new Font("Courier New", Font.PLAIN, 25));

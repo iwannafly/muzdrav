@@ -14,4 +14,11 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/ru/nkz/ivcgzo/Infomat/resources/forward.png</name>
+			<type>1</type>
+			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/infomat/client/src/ru/nkz/ivcgzo/Infomat/resources/forward.png</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

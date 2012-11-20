@@ -6,16 +6,14 @@ public class Doctor {
     private String surname;
     private String name;
     private String middlename;
-    private String cab;
 
     public Doctor(int pcod, String cdol, String surname, String name,
-            String middlename, String cab) {
+            String middlename) {
         this.pcod = pcod;
         this.cdol = cdol;
         this.surname = surname;
         this.name = name;
         this.middlename = middlename;
-        this.cab = cab;
     }
 
     public int getPcod() {
@@ -38,10 +36,6 @@ public class Doctor {
         return middlename;
     }
 
-    public String getCab() {
-        return cab;
-    }
-
     public void setPcod(int pcod) {
         this.pcod = pcod;
     }
@@ -60,10 +54,6 @@ public class Doctor {
 
     public void setMiddlename(String middlename) {
         this.middlename = middlename;
-    }
-
-    public void setCab(String cab) {
-        this.cab = cab;
     }
 
     private String getShortName() {

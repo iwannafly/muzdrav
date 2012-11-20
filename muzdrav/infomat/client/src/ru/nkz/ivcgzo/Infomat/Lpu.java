@@ -1,15 +1,15 @@
 package ru.nkz.ivcgzo.Infomat;
 
 public class Lpu {
-    private String pcod;
+    private int pcod;
     private String name;
 
-    public Lpu(String inPcod, String inName) {
+    public Lpu(int inPcod, String inName) {
         pcod = inPcod;
         name = inName;
     }
 
-    public String getPcod() {
+    public int getPcod() {
         return pcod;
     }
 
@@ -17,7 +17,7 @@ public class Lpu {
         return name;
     }
 
-    public void setCdol(String inPcod) {
+    public void setCdol(int inPcod) {
         pcod = inPcod;
     }
 

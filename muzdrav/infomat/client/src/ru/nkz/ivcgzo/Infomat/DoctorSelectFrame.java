@@ -34,9 +34,13 @@ public class DoctorSelectFrame extends JFrame {
     private JScrollPane spDoctor;
     private JList<Doctor> lDoctor;
     private DoctorListModel dlm;
+    private SpecialityListModel slm;
+    private TalonSelectFrame frmTalonSelect;
+    private int cpol;
 
 
     public DoctorSelectFrame () {
+        cpol = -1;
         initialization();
     }
 
@@ -46,10 +50,17 @@ public class DoctorSelectFrame extends JFrame {
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
+        createModalFrames();
         addMainPanel();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
+    }
+
+    private void createModalFrames() {
+        if (frmTalonSelect == null) {
+            frmTalonSelect = new TalonSelectFrame(); 
+        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -112,7 +123,7 @@ public class DoctorSelectFrame extends JFrame {
             }
         });
         btnBackward.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/backward.png")));
+            "resources/backward.png")));
         btnBackward.setBorder(null);
         btnBackward.setBackground(Color.WHITE);
         btnBackward.setForeground(Color.BLACK);
@@ -151,26 +162,28 @@ public class DoctorSelectFrame extends JFrame {
     private void addSpecialityListScrollPane() {
         spSpeciality = new JScrollPane();
         spSpeciality.getVerticalScrollBar().setPreferredSize(
-                new Dimension(50, Integer.MAX_VALUE));
+            new Dimension(50, Integer.MAX_VALUE));
         addSpecialityList();
         pnLists.add(spSpeciality);
     }
 
     @SuppressWarnings("unchecked")
     private void addSpecialityList() {
-        SpecialityListModel slm = new SpecialityListModel();        
+        slm = new SpecialityListModel();
         lSpeciality = new JList<Speciality>(slm);
         lSpeciality.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (lSpeciality.getSelectedValue() != null) {
-                    dlm.updateModel(lSpeciality.getSelectedValue().getCdol());
+                    dlm = new DoctorListModel(cpol, lSpeciality.getSelectedValue().getCdol());
+//                    dlm.updateModel(cpol, lSpeciality.getSelectedValue().getCdol());
                     lDoctor.setModel(dlm);
                     spDoctor.setViewportView(lDoctor);
                 }
             }
         });
-        lSpeciality.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255), Color.red));
+        lSpeciality.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255),
+            Color.red));
         lSpeciality.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lSpeciality.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lSpeciality.setFont(new Font("Courier New", Font.PLAIN, 25));
@@ -180,7 +193,7 @@ public class DoctorSelectFrame extends JFrame {
     private void addDoctorListScrollPane() {
         spDoctor = new JScrollPane();
         spDoctor.getVerticalScrollBar().setPreferredSize(
-                new Dimension(50, Integer.MAX_VALUE));
+            new Dimension(50, Integer.MAX_VALUE));
         addDoctorList();
         pnLists.add(spDoctor);
     }
@@ -189,10 +202,28 @@ public class DoctorSelectFrame extends JFrame {
     private void addDoctorList() {
         dlm = new DoctorListModel();
         lDoctor = new JList<Doctor>();
+        lDoctor.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ((lSpeciality.getSelectedValue() != null)
+                        && (lDoctor.getSelectedValue() != null)) {
+                    frmTalonSelect.showModal(cpol, lSpeciality.getSelectedValue().getCdol(),
+                        lDoctor.getSelectedValue().getPcod());
+                }
+            }
+        });
         lDoctor.setCellRenderer(new InfomatListCellRenderer());
         lDoctor.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lDoctor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lDoctor.setFont(new Font("Courier New", Font.PLAIN, 25));
         spDoctor.setViewportView(lDoctor);
+    }
+
+    public void showModal(final int inCpol) {
+        cpol = inCpol;
+        slm = new SpecialityListModel(inCpol);
+        lSpeciality.setModel(slm);
+        spSpeciality.setViewportView(lSpeciality);
+        setVisible(true);
     }
 }
