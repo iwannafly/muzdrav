@@ -2318,6 +2318,7 @@ public class Vvod extends JFrame {
 				try {
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 					tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.id_pvizit));
+					tblPos.requestFocusInWindow();
 					tblPos.editCellAt(tblPos.getSelectedRow(), 0);
 				} catch (KmiacServerException e2) {
 					e2.printStackTrace();
