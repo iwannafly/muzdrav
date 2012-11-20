@@ -364,7 +364,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<VrachInfo> getVrachList(int clpu, int cpodr) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT mr.id AS mrab_id, mr.cdol, s00.name AS cdol_name, vr.fam, vr.im, vr.ot, vr.pcod FROM s_mrab mr JOIN s_vrach vr ON (vr.pcod = mr.pcod) JOIN n_s00 s00 ON (s00.pcod = mr.cdol) WHERE (mr.clpu = ?) AND (cpodr = ?) ORDER BY vr.fam, vr.im, vr.ot, s00.name ", clpu, cpodr)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT mr.id AS mrab_id, mr.cdol, s00.name AS cdol_name, vr.fam, vr.im, vr.ot, vr.pcod FROM s_mrab mr JOIN s_vrach vr ON (vr.pcod = mr.pcod) JOIN n_s00 s00 ON (s00.pcod = mr.cdol) JOIN n_priznd np ON (np.pcod = mr.priznd) WHERE (mr.clpu = ?) AND (mr.cpodr = ?) AND (mr.priznd = 1) ORDER BY vr.fam, vr.im, vr.ot, s00.name ", clpu, cpodr)) {
 			return rsmVrachInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

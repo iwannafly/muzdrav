@@ -261,7 +261,10 @@ public class Vvod extends JFrame {
 						}
 					}
 					
-					MainForm.instance.updateZapList();
+					if (MainForm.authInfo.priznd != 7)
+						MainForm.instance.updateZapList();
+					else
+						MainForm.instance.showVrachList();
 					MainForm.instance.setVisible(true);
 				} catch (TException e1) {
 					setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -927,7 +930,7 @@ public class Vvod extends JFrame {
 					  		pdiag.setD_grup(pdisp.getD_grup());
 					  		MainForm.tcl.setPdiag(pdiag);	
 		  				}
-						tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(tblPos.getSelectedItem().getNpasp()));
+						tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 					}
 			  	} catch (KmiacServerException e1) {
 			  		e1.printStackTrace();
@@ -1059,7 +1062,6 @@ public class Vvod extends JFrame {
 						diagamb = tblDiag.getSelectedItem();
 							
 						try {
-							tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(tblPos.getSelectedItem().getNpasp()));
 							pdiag = MainForm.tcl.getPdiagZ(zapVr.npasp, diagamb.diag);
 							pdisp = MainForm.tcl.getPdisp(zapVr.getNpasp(),tblDiag.getSelectedItem().diag,MainForm.authInfo.getCpodr());
 						} catch (KmiacServerException e1) {
@@ -2363,6 +2365,8 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (tblPos.getSelectedItem() != null)
 					try {
+						if (!checkZaklDiag())
+							return;
 						if (!prepareSavePos())
 							return;
 						
@@ -2546,7 +2550,7 @@ public class Vvod extends JFrame {
 					}
 						try {
 						
-						priem = MainForm.tcl.getPriem(tblPos.getSelectedItem().npasp, tblPos.getSelectedItem().id);
+						priem = MainForm.tcl.getPriem(zapVr.npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
 						anamZab = MainForm.tcl.getAnamZab(zapVr.getId_pvizit(), zapVr.getNpasp());
 						btnRecPriem.setEnabled(!isStat &&!pvizit.isSetIshod());
@@ -2771,15 +2775,16 @@ public class Vvod extends JFrame {
 				btnBer.setEnabled(!isStat && (zapVr.pol != 1) && ((age > 13) && (age < 50)));
 				btnRecPriem.setEnabled(!isStat);
 				chbDiagBer.setEnabled(btnBer.isEnabled());
+				tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 			} else {
 				btnRecPriem.setEnabled(false);
 				btnAnam.setEnabled(false);
 				btnProsm.setEnabled(false);
 				btnBer.setEnabled(false);
 				btnPrint.setEnabled(false);
+				tblZaklDiag.setData(new ArrayList<PdiagZ>());
 			}
 			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
-			tblZaklDiag.setData(new ArrayList<PdiagZ>());
 			tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp));
 			if ((idPvizitMainForm > 0) && (tblObr.getRowCount() > 0)) {
 				for (int i = 0; i < tblObr.getRowCount(); i++) {
@@ -2911,8 +2916,11 @@ public class Vvod extends JFrame {
 		  		for (PdiagZ pd : tblZaklDiag.getData()){
 		  			if (pd.getDiag().equals(mkb.pcod)) 
 		  				diagamb.setDatad(pdiag.getDatad());
-		  				else diagamb.setDatad(System.currentTimeMillis());
-  			}
+	  				else
+	  					diagamb.setDatad(System.currentTimeMillis());
+		  		}
+		  		if (!diagamb.isSetDatad())
+		  			diagamb.setDatad(System.currentTimeMillis());
 		  		diagamb.setDatap(pvizitAmb.datap);
 		  		diagamb.setCod_sp(MainForm.vrPcod);
 		  		diagamb.setCdol(MainForm.vrCdol);
@@ -2973,6 +2981,23 @@ public class Vvod extends JFrame {
 //			cmbMobs.requestFocusInWindow();
 //			return false;
 //		}
+		return true;
+	}
+	
+	private boolean checkZaklDiag() {
+		boolean haveZaklDiag = false;
+		
+		for (PdiagAmb pa : tblDiag.getData())
+			haveZaklDiag |= !pa.predv;
+		
+		if (haveZaklDiag && (cmbZaklIsh.getSelectedItem() == null)) {
+			JOptionPane.showMessageDialog(Vvod.this, "Пациенту выставлен заключительный диагноз, но не выставлен исход.", "Ошибка ввода данных", JOptionPane.ERROR_MESSAGE);
+			return false;
+		} else if ((cmbZaklIsh.getSelectedItem() != null) && !haveZaklDiag) {
+			JOptionPane.showMessageDialog(Vvod.this, "Пациенту выставлен исход, но не выставлен заключительный диагноз.", "Ошибка ввода данных", JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		
 		return true;
 	}
 
