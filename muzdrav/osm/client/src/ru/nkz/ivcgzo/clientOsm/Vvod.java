@@ -248,6 +248,11 @@ public class Vvod extends JFrame {
 						return;
 					}
 					
+					if (!checkSameDatePos()) {
+						setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+						return;
+					}
+					
 					if (checkDataChanged()) {
 						int res = JOptionPane.showConfirmDialog(Vvod.this, "Данные изменились, но не были сохранены. Сохранить?", "Подтверждение", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 						
@@ -1591,8 +1596,8 @@ public class Vvod extends JFrame {
 		pnlLech.setLayout(gl_pnlLech);
 		
 		JPanel pnlLabIssl = new JPanel();
-		tabbedPane.addTab("<html>Лабораторно-диагностиче-<br>ские исследования</html>", null, pnlLabIssl, null);
-		tabbedPane.setTabComponentAt(7, new JLabel("<html><html>Лабораторно-диагностиче-<br>ские исследования</html>"));
+		tabbedPane.addTab("<html>Лабораторно-диаг-<br>ностические иссл.</html>", null, pnlLabIssl, null);
+		tabbedPane.setTabComponentAt(7, new JLabel("<html>Лабораторно-диаг-<br>ностические иссл.</html>"));
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		GroupLayout gl_pnlLabIssl = new GroupLayout(pnlLabIssl);
@@ -2020,10 +2025,10 @@ public class Vvod extends JFrame {
 								gosp.setNamed_p(pd.getNamed());}
 						}
 						gosp.setDataz(System.currentTimeMillis());
-						gosp.setNist(444);
 						gosp.setPl_extr(2);
 						gosp.setDatap(System.currentTimeMillis());
 						gosp.setVremp(System.currentTimeMillis());
+						gosp.setN_org(MainForm.authInfo.getCpodr());
 						gosp.setCotd(MainForm.authInfo.getCpodr());
 						gosp.setCotd_p(MainForm.authInfo.getCpodr());
 						gosp.setDataosm(System.currentTimeMillis());
@@ -2294,11 +2299,11 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (tblObr.getSelectedItem() == null)
 					return;
-				for (PvizitAmb pviz : tblPos.getData())
-					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
-						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
-						return;
-					}
+//				for (PvizitAmb pviz : tblPos.getData())
+//					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
+//						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
+//						return;
+//					}
 				
 				pvizitAmb = new PvizitAmb();
 				pvizitAmb.setId_obr(zapVr.id_pvizit);
@@ -2313,6 +2318,8 @@ public class Vvod extends JFrame {
 				try {
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 					tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.id_pvizit));
+					tblPos.requestFocusInWindow();
+					tblPos.editCellAt(tblPos.getSelectedRow(), 0);
 				} catch (KmiacServerException e2) {
 					e2.printStackTrace();
 				} catch (TException e2) {
@@ -2990,10 +2997,11 @@ public class Vvod extends JFrame {
 		for (PdiagAmb pa : tblDiag.getData())
 			haveZaklDiag |= !pa.predv;
 		
-		if (haveZaklDiag && (cmbZaklIsh.getSelectedItem() == null)) {
-			JOptionPane.showMessageDialog(Vvod.this, "Пациенту выставлен заключительный диагноз, но не выставлен исход.", "Ошибка ввода данных", JOptionPane.ERROR_MESSAGE);
-			return false;
-		} else if ((cmbZaklIsh.getSelectedItem() != null) && !haveZaklDiag) {
+//		if (haveZaklDiag && (cmbZaklIsh.getSelectedItem() == null)) {
+//			JOptionPane.showMessageDialog(Vvod.this, "Пациенту выставлен заключительный диагноз, но не выставлен исход.", "Ошибка ввода данных", JOptionPane.ERROR_MESSAGE);
+//			return false;
+//		} else 
+		if ((cmbZaklIsh.getSelectedItem() != null) && !haveZaklDiag) {
 			JOptionPane.showMessageDialog(Vvod.this, "Пациенту выставлен исход, но не выставлен заключительный диагноз.", "Ошибка ввода данных", JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
@@ -3002,14 +3010,8 @@ public class Vvod extends JFrame {
 	}
 
 	private boolean prepareSavePos() {
-		for (PvizitAmb pv: tblPos.getData())
-			if (pv != pvizitAmb)
-				if (pv.getDatap() == pvizitAmb.getDatap()) {
-					JOptionPane.showMessageDialog(Vvod.this, "Посещение с такой датой уже занесено");
-					tblPos.cancelEdit();
-					pvizitAmb = tblPos.getSelectedItem();
-					return false;
-				}
+		if (!checkSameDatePos())
+			return false;
 		if (!checkTalInput())
 			return false;
 		if ((pvizit == null) || (pvizitAmb == null))
@@ -3084,6 +3086,36 @@ public class Vvod extends JFrame {
 				pvizitAmb.setDiag(pd.getDiag());
 				pvizitAmbCopy.setDiag(pvizitAmb.diag);
 			}
+		
+		return true;
+	}
+
+	private boolean checkSameDatePos() {
+		for (PvizitAmb pv: tblPos.getData())
+			if (pv != pvizitAmb)
+				if (pv.getDatap() == pvizitAmb.getDatap()) {
+					JOptionPane.showMessageDialog(Vvod.this, "Посещение с такой датой уже занесено.");
+					tblPos.cancelEdit();
+					pvizitAmb = tblPos.getSelectedItem();
+					return false;
+				}
+		
+		for (PvizitAmb pv: tblPos.getData()) {
+			for (PvizitAmb pv1: tblPos.getData()) {
+				if (pv != pv1)
+					if (pv.getDatap() == pv1.getDatap()) {
+						JOptionPane.showMessageDialog(Vvod.this, String.format("Есть посещения с одинаковой датой: %s.", SimpleDateFormat.getDateInstance().format(pv.getDatap())));
+						return false;
+					}
+			}
+		}
+		
+		for (PvizitAmb pv: tblPos.getData()) {
+			if (pv.getDatap() < pvizit.getDatao()) {
+				JOptionPane.showMessageDialog(Vvod.this, String.format("Дата посещения %s меньше даты обращения.", SimpleDateFormat.getDateInstance().format(pv.getDatap())));
+				return false;
+			}
+		}
 		
 		return true;
 	}

@@ -533,7 +533,7 @@ public class MainFrame extends JFrame {
         });
         btnShowPatientInfo.setBorder(null);
         btnShowPatientInfo.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/patientInfo.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/patientInfo.png")));
         btnShowPatientInfo.setRequestFocusEnabled(false);
 
         btnIssled = new JButton();
@@ -552,7 +552,7 @@ public class MainFrame extends JFrame {
         });
         btnIssled.setBorder(null);
         btnIssled.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/issled.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/issled.png")));
         btnIssled.setRequestFocusEnabled(false);
 
         btnMedication = new JButton();
@@ -561,7 +561,6 @@ public class MainFrame extends JFrame {
         btnMedication.setMaximumSize(new Dimension(35, 35));
         btnMedication.setMinimumSize(new Dimension(35, 35));
         btnMedication.setPreferredSize(new Dimension(35, 35));
-        //        btnMedication.setVisible(false);
         btnMedication.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 if (patient != null) {
