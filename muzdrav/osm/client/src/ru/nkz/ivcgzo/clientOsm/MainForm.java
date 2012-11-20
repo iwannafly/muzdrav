@@ -235,7 +235,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		}
 	}
 	
-	private void showVrachList() {
+	public void showVrachList() {
 		try {
 			tblVrach.setData(tcl.getVrachList(authInfo.clpu, authInfo.cpodr));
 		} catch (KmiacServerException e) {

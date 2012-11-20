@@ -53,6 +53,7 @@ public class ClientMedication extends Client<ThriftMedication.Client> {
         JDialog dialog = prepareModal(parent);
         medicationFrame.fillPatient((int) params[0], (String) params[1],
             (String) params[2], (String) params[3], (int) params[4]);
+        medicationFrame.prepareFrame();
         dialog.setVisible(true);
         disposeModal();
         return null;
