@@ -3111,8 +3111,8 @@ public class Vvod extends JFrame {
 		}
 		
 		for (PvizitAmb pv: tblPos.getData()) {
-			if (pv.getDatap() > pvizit.getDatao()) {
-				JOptionPane.showMessageDialog(Vvod.this, String.format("Дата посещения %s больше даты обращения.", SimpleDateFormat.getDateInstance().format(pv.getDatap())));
+			if (pv.getDatap() < pvizit.getDatao()) {
+				JOptionPane.showMessageDialog(Vvod.this, String.format("Дата посещения %s меньше даты обращения.", SimpleDateFormat.getDateInstance().format(pv.getDatap())));
 				return false;
 			}
 		}
