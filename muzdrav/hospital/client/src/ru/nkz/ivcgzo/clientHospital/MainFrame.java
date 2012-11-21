@@ -90,6 +90,9 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JSeparator;
 
 public class MainFrame extends JFrame {
@@ -281,6 +284,7 @@ public class MainFrame extends JFrame {
     private JTextField tfZaklDiagName;
     private JLabel lblZaklDiag;
     private JButton btnZaklDiag;
+    private JMenuItem mntmPrintHospitalSummary;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
@@ -506,6 +510,32 @@ public class MainFrame extends JFrame {
             }
         });
         mnPrintForms.add(mntmPrintStationDiary);
+
+        mntmPrintHospitalSummary = new JMenuItem("Выписной эпикриз");
+        mntmPrintHospitalSummary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    try {
+                        String servPath =
+                            ClientHospital.tcl.printHospitalSummary(patient.getGospitalCod(),
+                                doctorAuth.getClpu_name() + " "
+                                + doctorAuth.getCpodr_name(), patient);
+                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                        ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+                        ClientHospital.conMan.openFileInEditor(cliPath, false);
+                    } catch (KmiacServerException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        e1.printStackTrace();
+                        ClientHospital.conMan.reconnect(e1);
+                    }
+                }
+            }
+        });
+        mnPrintForms.add(mntmPrintHospitalSummary);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1988,6 +2018,7 @@ public class MainFrame extends JFrame {
                 diag.setVrach(doctorAuth.getPcod());
                 diag.setDiagName(curDiagnosis.getName());
                 diag.setId(ClientHospital.tcl.addDiagnosis(diag));
+//                taDiagMedOp.setText(curDiagnosis.getName());
                 tbDiag.addItem(diag);
                 tbDiag.setData(
                     ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
@@ -2002,7 +2033,7 @@ public class MainFrame extends JFrame {
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////            Этапы         ///////////////////////////////////////
+//////////////////////////////////            Этапы            ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void setStagePanel() {

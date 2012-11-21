@@ -931,4 +931,127 @@ public class ServerHospital extends Server implements Iface {
             throw new KmiacServerException("Error searching template");
         }
     }
+
+    @Override
+    public final String printHospitalSummary(final int idGosp, final String lpuInfo,
+            final TPatient patient) throws KmiacServerException {
+        final String path;
+        AutoCloseableResultSet acrs;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+//            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+            HtmTemplate htmTemplate = new HtmTemplate(
+                new File(this.getClass().getProtectionDomain().getCodeSource()
+                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                + "\\plugin\\reports\\HospitalSummary.htm");
+            htmTemplate.replaceLabel("~lpu", lpuInfo);
+            htmTemplate.replaceLabel("~surname", patient.getSurname());
+            htmTemplate.replaceLabel("~name", patient.getName());
+            htmTemplate.replaceLabel("~middlename", patient.getMiddlename());
+            htmTemplate.replaceLabel("~age", dateFormat.format(patient.getBirthDate()));
+            htmTemplate.replaceLabel("~gender", patient.getGender());
+            htmTemplate.replaceLabel("~address", patient.getRegistrationAddress());
+            htmTemplate.replaceLabel("~job", patient.getJob());
+            htmTemplate.replaceLabel("~surname", patient.getSurname());
+            htmTemplate.replaceLabel("~name", patient.getName());
+            htmTemplate.replaceLabel("~middlename", patient.getMiddlename());
+
+            acrs = sse.execPreparedQuery(
+                "SELECT c_gosp.nist, c_gosp.datap, c_gosp.jalob, c_otd.datav, "
+                + "c_otd.ishod, c_otd.result "
+                + "FROM c_gosp JOIN c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "WHERE c_gosp.id = ?", idGosp);
+            if (!acrs.getResultSet().next()) {
+                throw new KmiacServerException("Logged user info not found.");
+            } else {
+                htmTemplate.replaceLabel("~nist",
+                    String.valueOf(acrs.getResultSet().getInt("nist")));
+                htmTemplate.replaceLabel(
+                    "~dateStart", dateFormat.format(acrs.getResultSet().getDate("datap")));
+                if (acrs.getResultSet().getDate("datav") != null) {
+                    htmTemplate.replaceLabel(
+                        "~dateEnd", dateFormat.format(acrs.getResultSet().getDate("datav")));
+                }
+                htmTemplate.replaceLabel(
+                    "~dateStart", dateFormat.format(acrs.getResultSet().getDate("datap")));
+//                if (acrs.getResultSet().getString("jalob") != null) {
+                htmTemplate.replaceLabel(
+                        "~jalob", acrs.getResultSet().getString("jalob"));
+//                }
+            }
+
+            acrs = sse.execPreparedQuery("SELECT n_c00.name, c_diag.prizn FROM c_diag "
+                + "INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE c_diag.id_gosp = ?", idGosp);
+            while (acrs.getResultSet().next()) {
+                switch (acrs.getResultSet().getInt("prizn")) {
+                    case 1:
+                        htmTemplate.replaceLabel("~mainDiagnosis",
+                            acrs.getResultSet().getString("name") + "<br/> ~mainDiagnosis ");
+                        htmTemplate.refindLabels();
+                        break;
+                    case 2:
+                        htmTemplate.replaceLabel("~oslDiagnosis",
+                                acrs.getResultSet().getString("name") + "<br/> ~oslDiagnosis ");
+                        htmTemplate.refindLabels();
+                        break;
+                    case 3:
+                        htmTemplate.replaceLabel("~sopDiagnosis",
+                                acrs.getResultSet().getString("name") + "<br/> ~sopDiagnosis ");
+                        htmTemplate.refindLabels();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            htmTemplate.replaceLabel("~mainDiagnosis", "");
+            htmTemplate.replaceLabel("~oslDiagnosis", "");
+            htmTemplate.replaceLabel("~sopDiagnosis", "");
+
+            acrs = sse.execPreparedQuery("SELECT p_isl_ld.nisl, n_ldi.pcod, "
+                + "n_ldi.name_n, p_rez_l.zpok, "
+                + "p_isl_ld.datav, '' as op_name, '' as rez_name "
+                + "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) "
+                + "JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) "
+                + "WHERE p_isl_ld.id_gosp = ? AND p_rez_l.zpok is not null "
+                + "UNION "
+                + "SELECT p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, "
+                + "p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name "
+                + "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) "
+                + "JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) "
+                + "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) "
+                + "WHERE p_isl_ld.id_gosp = ? AND n_arez.name is not null", idGosp, idGosp);
+            while (acrs.getResultSet().next()) {
+                String tmpIsl =
+                    "<li> <b>показатель:</b> " + acrs.getResultSet().getString("name_n")
+                    + " <br/><b> &nbsp &nbsp значение:</b>"
+                    + acrs.getResultSet().getString("zpok");
+                if ((acrs.getResultSet().getString("op_name") != null)
+                        && (!acrs.getResultSet().getString("op_name").equals(""))) {
+                    tmpIsl += " <br/><b> &nbsp &nbsp описание:</b>"
+                        + acrs.getResultSet().getString("op_name");
+                }
+                if ((acrs.getResultSet().getString("rez_name") != null)
+                        && (!acrs.getResultSet().getString("rez_name").equals(""))) {
+                    tmpIsl += " <br/><b> &nbsp &nbsp заключение:</b> "
+                        + acrs.getResultSet().getString("rez_name");
+                }
+                if (acrs.getResultSet().getDate("datav") != null) {
+                    tmpIsl += "<br/><b> &nbsp &nbsp дата: </b>" + dateFormat.format(
+                            acrs.getResultSet().getDate("datav")) + "</li><br/> ~issled ";
+                } else {
+                    tmpIsl += "</li><br/> ~issled ";
+                }
+
+                htmTemplate.replaceLabel("~issled", tmpIsl);
+            }
+            htmTemplate.replaceLabel("~issled", "");
+
+            acrs.close();
+            osw.write(htmTemplate.getTemplateText());
+            return path;
+        } catch (Exception e) {
+            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+        }
+    }
 }
