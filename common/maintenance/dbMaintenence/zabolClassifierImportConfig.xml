@@ -47,6 +47,7 @@
 		<table srcName="GRUP" dstName="n_grup" />
 		<table srcName="K02" dstName="n_k02" />
 		<table srcName="KAS" dstName="n_kas" />
+		<table srcName="KDERR" dstName="n_kderr" />
 		<table srcName="L00" dstName="n_l00" />
 		<table srcName="L01" dstName="n_l01" />
 		<table srcName="L02" dstName="n_l02" />
