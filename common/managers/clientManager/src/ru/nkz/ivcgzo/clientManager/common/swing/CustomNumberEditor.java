@@ -1,5 +1,9 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
+import java.awt.event.KeyEvent;
+
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -53,6 +57,14 @@ public class CustomNumberEditor extends CustomTextField {
 		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+	
+	@Override
+	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		if (pressed && (condition == JComponent.WHEN_FOCUSED) && (e.getKeyCode() == KeyEvent.VK_ENTER) && (e.getModifiers() == 0))
+			return processKeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), new KeyEvent(this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_TAB, KeyEvent.CHAR_UNDEFINED), condition, pressed);
+		else
+			return super.processKeyBinding(ks, e, condition, pressed);
 	}
 	
 	class NumberDocument extends PlainDocument  {
