@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pobost;
@@ -111,7 +112,7 @@ public class DispHron extends JFrame{
 					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText())); 
 					pmer.setTer(ter);
 					if (!Dsph()) {
-						JOptionPane.showMessageDialog(DispHron.this, "Плановая дата не может быть меньше фактической", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(DispHron.this, "Плановая дата не может быть больше фактической", "Предупреждение", JOptionPane.ERROR_MESSAGE);
 							return;
 					}
 					if (tblDispHron.getSelectedItem() != null)
@@ -155,7 +156,7 @@ public class DispHron extends JFrame{
 		 			tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));
 		 			tabObost.setData(MainForm.tcl.getPobost(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));
 		 			tblDispHron.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
-		 			tblDispHron.setStringClassifierSelector(1, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
+		 			tblDispHron.setStringClassifierSelector(1, ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00));
 		 			tblDispHron.setIntegerClassifierSelector(4, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
 		 			tabObost.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
 		 			tabObost.setIntegerClassifierSelector(1, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));

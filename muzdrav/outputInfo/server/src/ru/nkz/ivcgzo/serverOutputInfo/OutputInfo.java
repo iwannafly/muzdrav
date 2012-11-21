@@ -1916,6 +1916,8 @@ public String nagrvr(int cpol) throws KmiacServerException, TException {
 	AutoCloseableResultSet acrs = null, acrs2 = null;
 	Date data = null;
 	Date data1 = null;
+//	String dateb = isv.getDateb();
+//	String datef = isv.getDatef();
 	Integer codpol = cpol;
 	String fio = "";
 	String path = null;
