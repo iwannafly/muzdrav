@@ -96,7 +96,6 @@ public class ServerOsm extends Server implements Iface {
 	private final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
 	@SuppressWarnings("unused")
 	private final Class<?>[] strClasTypes; 
-	@SuppressWarnings("unused")
 	private final TResultSetMapper<P_isl_ld, P_isl_ld._Fields> rsmPislld;
 	private final Class<?>[] pislldTypes; 
 	@SuppressWarnings("unused")
@@ -116,35 +115,35 @@ public class ServerOsm extends Server implements Iface {
 	private final Class<?>[] pokazTypes;
 	private final TResultSetMapper<AnamZab, AnamZab._Fields> rsmAnamZab;
 	private final Class<?>[] anamZabTypes; 
-	@SuppressWarnings("unused")
 	private final TResultSetMapper<IsslInfo, IsslInfo._Fields> rsmIsslInfo;
+	@SuppressWarnings("unused")
 	private final Class<?>[] isslInfoTypes;
 	private final TResultSetMapper<Pdisp, Pdisp._Fields> rsmPdisp;
 	private final Class<?>[] pdispTypes;
 	private final TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
 	private final Class<?>[] rdSlTypes;
-//	private final TResultSetMapper<RdSlStruct1, RdSlStruct1._Fields> rsmRdSl1;
-//	private final Class<?>[] rdSl1Types;
 	private final TResultSetMapper<RdInfStruct, RdInfStruct._Fields> rsmRdInf;
 	private final Class<?>[] rdInfTypes;
 	private final TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
 	private final Class<?>[] rdDinTypes;
-	
 	private final TResultSetMapper<RdPatient, RdPatient._Fields> rsmRdPat;
+	@SuppressWarnings("unused")
 	private final Class<?>[] rdPatientTypes;
 	private final TResultSetMapper< RdVizit, RdVizit._Fields> rsmRdViz;
+	@SuppressWarnings("unused")
 	private final Class<?>[] rdVizitTypes;
 	private final TResultSetMapper< RdConVizit, RdConVizit._Fields> rsmRdCV;
+	@SuppressWarnings("unused")
 	private final Class<?>[] rdConVizitTypes;
-
 	private final TResultSetMapper<Pmer, Pmer._Fields> rsmPmer;
 	private final Class<?>[] pmerTypes;
 	private final Class<?>[] pnaprTypes;
-//	private TResultSetMapper<ZapVr, _Fields> rsmPvizitAmb;
 	private final TResultSetMapper<Pobost, Pobost._Fields> rsmPobost;
 	private final Class<?>[] pobostTypes;
+	@SuppressWarnings("unused")
 	private final TResultSetMapper<Cgosp, Cgosp._Fields> rsmCgosp;
 	private final Class<?>[] cgospTypes;
+	@SuppressWarnings("unused")
 	private final TResultSetMapper<Cotd, Cotd._Fields> rsmCotd;
 	private final Class<?>[] cotdTypes;	
 
@@ -163,8 +162,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz",    "cpos",        "cpol",        "kod_ter");
 		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
 		
-		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "datap",    "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr",     "id_pos");
-		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class};
+		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr",     "id_pos");
+		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class};
 		
 		rsmPdiagZ = new TResultSetMapper<>(PdiagZ.class, "id",           "npasp",       "diag",       "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "nmvd",        "xzab",        "stady",       "disp",        "pat",         "prizb",       "prizi",       "named",      "ppi",         "nameC00");
 		pdiagZTypes = new Class<?>[] {                   Integer.class,  Integer.class, String.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class};
@@ -212,25 +211,18 @@ public class ServerOsm extends Server implements Iface {
 		rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost",       "eko",        "rub",        "predp",     "osp",        "cmer");
 		rdSlTypes = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,Boolean.class,Boolean.class,Boolean.class,Integer.class,Integer.class};
 
-//		rsmRdSl1 = new TResultSetMapper<>(RdSlStruct1.class, "id",          "npasp",       "datay",    "dataosl",  "abort",       "shet",        "datam",    "yavka1",      "ishod",       "datasn",   "datazs",   "kolrod",      "deti",        "kont",        "vesd",        "dsp",         "dsr",         "dtroch",      "cext",        "indsol",      "prmen",    "dataz",   "datasert",  "nsert",      "ssert",      "oslab",      "plrod",       "prrod",      "vozmen",      "oslrod",      "polj",        "dataab",   "srokab",      "cdiagt",      "cvera",       "id_pvizit",     "rost");
-//		rdSl1Types = new Class<?>[] {                       Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
-
 		rsmRdInf = new TResultSetMapper<>(RdInfStruct.class, "npasp",       "obr",        "sem",         "votec",       "grotec",     "photec",     "dataz",    "fiootec",    "mrotec",     "telotec",    "vredotec",    "osoco",       "uslpr",      "zotec");
 		rdInfTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, Date.class, String.class, String.class, String.class, Integer.class, Integer.class, Integer.class,String.class};
 
 		rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, "id_rd_sl",    "id_pvizit",   "npasp",       "srok",       "grr",          "ball",        "oj",          "hdm",         "dspos",     "art1",         "art2",        "art3",        "art4",        "spl",         "oteki",       "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "id_pos",      "ves" ,     "datap"      );
 		rdDinTypes = new Class<?>[] {                        Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class,Date.class};
 		
-//		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid",         "fam",       "im",        "ot",        "datar",   "docser",   "docnum",     "tawn",      "street",     "house",     "flat",      "poms_ser",   "poms_num",   "dog",        "stat",       "lpup",        "terp",        "ftawn",        "fstreet",   "fhouse",     "fflat",      "grk",        "rez");
-//		rdPatientTypes = new Class<?>[]{                   Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, String.class, String.class, String.class, String.class};
 		rsmRdPat = new TResultSetMapper<>(RdPatient.class,"uid","npasp"      ,"fam"       ,"im"        ,"ot"        ,"datar"   ,"docser"    ,"docnum"    ,"tawn"       ,"street"    ,"house"     ,"flat"      ,"poms_ser"  ,"poms_nom"  ,"dog"       ,"stat"       ,"lpup"       ,"terp"       ,"ftawn"      ,"fstreet"   ,"fhouse"    ,"fflat"     ,"grk"       ,"rez"       ,"telm"      ,"vred"      ,"deti"       ,"datay"   ,"yavka1"     ,"datazs"  ,"famv"      ,"imv"       ,"otv"       ,"datasn"  ,"shet"       ,"kolrod"     ,"abort"      ,"vozmmen"    ,"prmen"      ,"datam"   ,"kont"       ,"dsp"        ,"dsr"        ,"dtroch"     ,"cext"       ,"indsol"     ,"vitae"     ,"allerg"    ,"ishod"      ,"prrod"     ,"oslrod"     ,"sem"        ,"rost"       ,"vesd"      ,"osoco"      ,"uslpr"      ,"dataz"   ,"polj"       ,"obr",       "fiootec",   "mrabotec",   "telotec",   "rgotec",   "photec",    "vredotec",   "vozotec",     "mrab",     "prof",       "eko",        "rub",        "predp",       "terpr",       "oblpr",      "diag",       "cvera",      "dataosl", "osp",       "zotec");
 		rdPatientTypes = new Class<?>[]{          Integer.class,Integer.class,String.class,String.class,String.class,Date.class,String.class,String.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Date.class,Integer.class,Date.class,String.class,String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Boolean.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Date.class,Integer.class,Integer.class,String.class,String.class,String.class,String.class,String.class,Integer.class,Integer.class,String.class,String.class,Boolean.class,Boolean.class,Boolean.class, Integer.class, Integer.class,Integer.class,Integer.class,Date.class,Integer.class,String.class};
+		
 		rsmRdViz = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr",       "npasp");
 		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
-//		rsmPdata = new TResultSetMapper<>(RdVizit.class,"uid",         "dv",       "sp",        "famvr",     "imvr",      "otvr",     "diag",       "mso",         "rzp",         "aim",          "npr");
-//		rdVizitTypes = new Class<?>[]{                   Integer.class, Date.class,String.class,String.class,String.class,String.class,String.class, Integer.class, Integer.class, Integer.class, Integer.class};
-
 		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",        "uid",       "ves",       "ned",        "lcad",        "ldad",       "rcad",       "rdad",       "rost",       "datar",    "obr",        "sem",          "ososo",       "vrpr" ,      "npasp",        "hdm",         "spl",         "oj",          "chcc",        "polpl",       "predpl",      "serd",        "serd1",       "oteki");
 		rdConVizitTypes = new Class<?>[]{                 Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
@@ -247,7 +239,6 @@ public class ServerOsm extends Server implements Iface {
 		
 		rsmCotd = new TResultSetMapper<>(Cotd.class, "id",          "id_gosp",      "nist",       "cotd",         "dataz");
 		cotdTypes = new Class<?>[] {                  Integer.class, Integer.class, Integer.class, Integer.class, Date.class};
-
 	}
 
 	@Override
@@ -270,60 +261,6 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public void start() throws Exception {
-		// FIXME replace with junit
-		
-		//Priem priem = new Priem();
-//		Pvizit obr = new Pvizit(0, 1, 2, 3, 4, 5, 6, 7, 8, "9", 10, "11", 12, 13);
-//		AddPvizit(new Pvizit());
-//		obr.setId(AddPvizit(obr));
-//		Pvizit obr1 = getPvizit(obr.id);
-//		obr = new Pvizit(obr1.id, 2, 3, 4, 5, 6, 7, 8, 9, "10", 11, "12", 13, 14);
-//		UpdatePvizit(obr);
-//		DeletePvizit(obr.id);
-		
-//		Psign psign = new Psign(1, "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16");
-//		Psign psign = new Psign().setNpasp(5).setPrim_gorm("11");
-//		setPsign(psign);
-//		psign = getPsign(psign.npasp);
-		
-//		PvizitAmb pos = new PvizitAmb(2, obr.id, 2, 3, 4, "5", "6", 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
-//		AddPvizitAmb(new PvizitAmb());
-//		pos.setId(AddPvizitAmb(pos));
-//		PvizitAmb pos1 = getPvizitAmb(pos.id);
-//		pos = new PvizitAmb(pos1.id, 2, 3, 4, 5, "6", "7", 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19);
-//		UpdatePvizitAmb(pos);
-//		DeletePvizitAmb(pos.id);
-		
-//		PdiagAmb diag = new PdiagAmb(-1, 21, 2, "3", "4", 5, true, 7, 8, 9, "10", 11, 12, 13, 14, "15", 16);
-//		diag.setId(AddPdiagAmb(diag));
-//		List<PdiagAmb> diag1 = getPdiagAmb(diag.id_obr);
-//		if (diag1.size() == 1) {
-//			diag = new PdiagAmb(diag1.get(0).id, 22, 3, "4", "5", 6, true, 8, 9, 10, "11", 12, 13, 14, 15, "16", 17);
-//			UpdatePdiagAmb(diag);
-//			DeletePdiagAmb(diag.id);
-//		}
-		
-//		P_isl_ld pi = new P_isl_ld(-1, 1, 2, "3", 4, 5, 6, 7, "8", 9);
-//		pi.nisl = AddPisl(pi);
-//		AddPrezd(new Prez_d(1, pi.nisl, "3", 4));
-//		AddPrezl(new Prez_l(5, pi.nisl, "7", 8));
-		
-//		List<Metod> met = getMetod(1);
-//		List<PokazMet> pokMet = getPokazMet("50.01.001");
-//		List<Pokaz> pok = getPokaz(1, "05");
-		
-//		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.");
-//		List<Pvizit> pvl = getPvizitInfo(2, sdf.parse("01.01.2012").getTime(), sdf.parse("02.02.2012").getTime());
-//		List<PvizitAmb> pal = getPvizitAmb(6);
-		
-//		List<IsslInfo> lii = getIsslInfo(377);
-//		AnamZab az = new AnamZab(377, 2, "начало заболевания", "симптом", "отношение больного к заболеванию", "посттравматические синдромы");
-//		setAnamZab(az);
-		
-//		PdiagZ pdz = new PdiagZ().setId_diag_amb(172).setNpasp(2).setDiag("3").setCpodr(4).setD_post(5).setD_grup(6).setIshod(7).setDataish(8).setDatag(9).setDatad(10).setDiag_s("11").setD_grup_s(12).setCod_sp(13).setCdol_ot("14");
-//		AddPdiagZ(pdz);
-//		List<PdiagZ> ldz = getPdiagZ(pdz.getNpasp());
-		
 		ThriftOsm.Processor<Iface> proc = new ThriftOsm.Processor<Iface>(this);
 		thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
 		thrServ.serve();
@@ -476,6 +413,7 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPreparedT("INSERT INTO p_vizit_amb (id_obr, npasp, datap, cod_sp, cdol, dataz, cpol, kod_ter) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, pos, pvizitAmbTypes, 1, 2, 3, 4, 5, 20, 22, 23);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.execPrepared("INSERT INTO p_priem (id_obr, npasp, id_pos) VALUES (?, ?, ?) ", false, pos.id_obr, pos.npasp, id);
+			AddPrevPosPdiagAmb(sme, pos.id_obr, id);
 			sme.setCommit();
 			return id;
 		} catch (SQLException e) {
@@ -515,6 +453,7 @@ public class ServerOsm extends Server implements Iface {
 	public void DeletePvizitAmb(int posId) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM p_vizit_amb WHERE id = ? ", false, posId);
+			sme.execPrepared("DELETE FROM p_diag_amb WHERE id_pos = ? ", false, posId);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -531,7 +470,8 @@ public class ServerOsm extends Server implements Iface {
 			sme.execPrepared("DELETE FROM p_rd_din WHERE id_pvizit = ? ", false, obrId);
 			sme.execPrepared("DELETE FROM p_priem WHERE id_obr = ? ", false, obrId);
 			sme.execPrepared("DELETE FROM p_vizit_amb WHERE id_obr = ? ", false, obrId);
-			sme.execPrepared("DELETE FROM e_talon WHERE (id_pvizit = ?) AND (datap > CURRENT_DATE) ", false, obrId);
+			sme.execPrepared("UPDATE e_talon SET npasp = NULL, dataz = NULL, prv = 0, id_pvizit = NULL WHERE (id_pvizit = ?) AND (datap > CURRENT_DATE) ", false, obrId);
+			sme.execPrepared("DELETE FROM p_diag_amb WHERE id_obr = ? ", false, obrId);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -545,7 +485,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPdiagAmb(PdiagAmb diag) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_diag_amb (id_obr, npasp, diag, named, diag_stat, predv, datad, obstreg, cod_sp, cdol, datap, dataot, obstot, cod_spot, cdol_ot, vid_tr, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+			sme.execPreparedT("INSERT INTO p_diag_amb (id_obr, npasp, diag, named, diag_stat, predv, datad, obstreg, cod_sp, cdol, dataot, obstot, cod_spot, cdol_ot, vid_tr, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -557,7 +497,19 @@ public class ServerOsm extends Server implements Iface {
 			throw new KmiacServerException();
 		}
 	}
-
+	
+	public void AddPrevPosPdiagAmb(SqlModifyExecutor sme, int obrId, int posId) throws SQLException {
+		String sql = "WITH t AS (SELECT pv.id AS id_obr, pa.id AS id_pos FROM p_vizit pv JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) WHERE (pv.id = ?) ORDER BY pa.datap DESC, pa.id DESC LIMIT 1) " +
+			"SELECT da.id FROM p_vizit pv JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) JOIN t ON (t.id_obr = pv.id AND t.id_pos = pa.id) JOIN p_diag_amb da ON (da.id_obr = pv.id AND da.id_pos = pa.id) WHERE (pv.id = t.id_obr) AND (pa.id = t.id_pos) AND (da.diag_stat = 3) "; 
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery(sql, obrId)) {
+			sql = "WITH t AS (SELECT id_obr, npasp, diag, named, diag_stat, predv, datad, obstreg, cod_sp, cdol, dataot, obstot, cod_spot, cdol_ot, vid_tr FROM p_diag_amb WHERE id = ?) " +
+				"INSERT INTO p_diag_amb (id_obr, npasp, diag, named, diag_stat, predv, datad, obstreg, cod_sp, cdol, dataot, obstot, cod_spot, cdol_ot, vid_tr, id_pos) SELECT *, ? FROM t ";
+			while (acrs.getResultSet().next()) {
+				sme.execPrepared(sql, false, acrs.getResultSet().getInt(1), posId);
+			}
+		}
+	}
+	
 	@Override
 	public List<PdiagAmb> getPdiagAmb(int obrId) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_diag_amb WHERE id_pos = ? ", obrId)) {
@@ -571,7 +523,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public void UpdatePdiagAmb(PdiagAmb diag) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_diag_amb SET id_obr = ?, npasp = ?, diag = ?, named = ?, diag_stat = ?, predv = ?, datad = ?, obstreg = ?, cod_sp = ?, cdol = ?, datap = ?, dataot = ?, obstot = ?, cod_spot = ?, cdol_ot = ?, vid_tr = ?, id_pos = ? WHERE id = ? ", false, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 0);
+			sme.execPreparedT("UPDATE p_diag_amb SET id_obr = ?, npasp = ?, diag = ?, named = ?, diag_stat = ?, predv = ?, datad = ?, obstreg = ?, cod_sp = ?, cdol = ?, dataot = ?, obstot = ?, cod_spot = ?, cdol_ot = ?, vid_tr = ?, id_pos = ? WHERE id = ? ", false, diag, pdiagAmbTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -670,19 +622,6 @@ public class ServerOsm extends Server implements Iface {
 		}
 	}
 	
-//	@Override
-//	public int AddPdiagZ(PdiagZ dz) throws KmiacServerException, TException {
-//		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("INSERT INTO p_diag (id_diag_amb, npasp, diag, cpodr, d_vz, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot, nmvd, xzab, stady, disp, pat, prizb, prizi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, dz, pdiagZTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
-//			int id = sme.getGeneratedKeys().getInt("id");
-//			sme.setCommit();
-//			return id;
-//		} catch (InterruptedException | SQLException e) {
-//			throw new KmiacServerException();
-//		}
-//	}
-//
-	
 	@Override
 	public List<StringClassifier> get_n_nz1(int cotd) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT DISTINCT n_nz1.pcod, n_nz1.name FROM n_nz1 JOIN s_ot01 ON (n_nz1.pcod=s_ot01.c_nz1) WHERE s_ot01.cotd = ? ", cotd)) {
@@ -777,16 +716,6 @@ public class ServerOsm extends Server implements Iface {
 		
 	}
 
-	
-//	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
-//		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 0);
-//			sme.setCommit();
-//		} catch (InterruptedException | SQLException e) {
-//			throw new KmiacServerException();
-//		}
-//	}
-	
 	@Override
 	public void UpdateRdSl(RdSlStruct Dispb) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -997,7 +926,7 @@ public class ServerOsm extends Server implements Iface {
 				}
 				sb.append("<b>Диагноз:</b><br />");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", im.getPvizitId());
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", im.getPvizitId());
 				if (acrs.getResultSet().next()) 
 					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
 				acrs.close();
@@ -1080,7 +1009,7 @@ public class ServerOsm extends Server implements Iface {
 					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
 					sb.append("<b>Диагноз:</b><br />");
 					acrs.close();
-					acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", ip.getPvizitId());
+					acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", ip.getPvizitId());
 					if (!acrs.getResultSet().next()) 
 						throw new KmiacServerException("Diag is null");
 					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
@@ -1191,7 +1120,7 @@ public class ServerOsm extends Server implements Iface {
 			}
 			sb.append("<br>7. Код диагноза по МКБ: ");
 			acrs.close();
-			acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", na.getPvizitId());
+			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", na.getPvizitId());
 			if (acrs.getResultSet().next()) 
 			sb.append(String.format("%s", acrs.getResultSet().getString(1)));
 			if (na.getObosnov()!=null) sb.append(String.format("<br>8. Обоснование направления: %s",na.getObosnov()));
@@ -1268,7 +1197,7 @@ public class ServerOsm extends Server implements Iface {
 			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));}
 			sb.append("<br>7. Код диагноза по МКБ: ");
 			acrs.close();
-			acrs = sse.execPreparedQuery("select diag from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", nk.getPvizitId());
+			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", nk.getPvizitId());
 			if (acrs.getResultSet().next()) 
 			sb.append(String.format("%s", acrs.getResultSet().getString(1)));
 			if (nk.getObosnov()!=null) sb.append(String.format("<br>8. Обоснование направления: %s",nk.getObosnov()));
@@ -1345,19 +1274,19 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("<br>6. Полный диагноз: <br>");
 				sb.append("основное заболевание ");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", vp.getPvizit_id());
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag,p_diag_amb.named from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", vp.getPvizit_id());
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null)sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
 					}				
 				sb.append("<br>осложнение основного заболевания <br>");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=2 and predv=false order by datap", vp.getPvizit_id());
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag,p_diag_amb.named from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=2 and p_diag_amb.predv=false order by p_vizit_amb.datap", vp.getPvizit_id());
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null){sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));}else {sb.append(" -<br>");}
 					}				
 				sb.append("<br>сопутствующее заболевание <br>");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=3 and predv=false order by datap", vp.getPvizit_id());
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag,p_diag_amb.named from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=3 and p_diag_amb.predv=false order by p_vizit_amb.datap", vp.getPvizit_id());
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null){sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));}else {sb.append(" -<br>");}
 					}
@@ -1428,19 +1357,19 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				}
 				sb.append("основное заболевание ");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=1 and predv=false order by datap", pvizitId);
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag,p_diag_amb.named from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", pvizitId);
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null)sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));
 					}
 				sb.append("<br>осложнение основного заболевания <br>");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=2 and predv=false order by datap", pvizitId);
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag,p_diag_amb.named from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=2 and p_diag_amb.predv=false order by p_vizit_amb.datap", pvizitId);
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null){sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));}else {sb.append(" -<br>");}
 					}				
 				sb.append("<br>сопутствующее заболевание <br>");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select diag,named from p_diag_amb where id_obr=? and diag_stat=3 and predv=false order by datap", pvizitId);
+				acrs = sse.execPreparedQuery("select p_diag_amb.diag,p_diag_amb.named from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=3 and p_diag_amb.predv=false order by p_vizit_amb.datap", pvizitId);
 				while (acrs.getResultSet().next()){
 					if (acrs.getResultSet().getString(1)!=null){sb.append(String.format(" %s %s <br>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2)));}else {sb.append(" -<br>");}
 					}
@@ -1503,39 +1432,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}
 	}
-
-//	@Override
-//	public void UpdateDiagZ(PdiagZ dz) throws KmiacServerException, TException {
-//		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("UPDATE p_diag SET diag = ?, cpodr = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, nmvd = ?, xzab = ?, stady = ?, disp = ?, pat = ?, prizb = ?, prizi = ? WHERE id_diag_amb = ?", false, dz, pdiagZTypes, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 1);
-//			sme.setCommit();
-//		} catch (InterruptedException | SQLException e) {
-//			throw new KmiacServerException();
-//		}
-//	}
-//
-//	@Override
-//	public int AddPdisp(Pdisp disp) throws KmiacServerException, TException {
-//		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("INSERT INTO p_disp (id_diag, npasp, diag, pcod, d_vz, d_grup, ishod, dataish, datag, datad, diag_s, d_grup_s, cod_sp, cdol_ot, sob, sxoch) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, disp, pdispTypes, 0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
-//			int id = sme.getGeneratedKeys().getInt("id");
-//			sme.setCommit();
-//			return id;
-//		} catch (InterruptedException | SQLException e) {
-//			throw new KmiacServerException();
-//		}
-//	}
-//
-//	@Override
-//	public void UpdatePdisp(Pdisp disp) throws KmiacServerException, TException {
-//		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("UPDATE p_disp SET diag = ?, pcod = ?, d_vz = ?, d_grup = ?, ishod = ?, dataish = ?, datag = ?, datad = ?, diag_s = ?, d_grup_s = ?, cod_sp = ?, cdol_ot = ?, sob = ?, sxoch = ?) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) WHERE id_diag = ? ", false, disp, pdispTypes, 	3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0);
-//			sme.setCommit();
-//		} catch (InterruptedException | SQLException e) {
-//			throw new KmiacServerException();
-//		}
-//	}
-//
 
 	@Override
 	public int setPdiag(PdiagZ diag) throws KmiacServerException, TException {
@@ -1683,20 +1579,20 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 //						}
 //					acrs.close();
 					
-					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav " +
+					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
 						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
+						"join p_vizit_amb on (p_vizit_amb.id_obr = p_isl_ld.pvizit_id) "+
 						"where p_isl_ld.pvizit_id = ? " +
 						"union " +
-						"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav " +
+						"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
 						"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
+						"join p_vizit_amb on (p_vizit_amb.id_obr = p_isl_ld.pvizit_id) "+
 						"where p_isl_ld.pvizit_id = ? ", pk.getPvizit_id(), pk.getPvizit_id());
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><br><b>Назначенные исследования </b><br>");
 						while (acrs.getResultSet().next()) {
-							if (acrs.getResultSet().getString(4) != null) {sb.append(String.format("<br>Код показателя  %s <br>  Наименование показателя %s <br> Результат %s <br>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));}
-							else {sb.append(String.format("<br>Код показателя  %s <br>  Наименование показателя %s <br> Результатов нет <br>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-								
-							}
+							if ((acrs.getResultSet().getString(4) != null) && (acrs.getResultSet().getDate(6).getTime() <acrs.getResultSet().getDate(5).getTime()))
+								sb.append(String.format("<br>Код показателя  %s <br>  Наименование показателя %s <br> Результат %s <br>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
 						}			
 					}
 					acrs.close();
@@ -2470,18 +2366,6 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 		}
 	}
 
-//	@Override
-//	public List<RdSlStruct1> getRdSl() throws KmiacServerException, TException {
-//		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select rd.id,rd.npasp,rd.datay,rd.abort,rd.shet,rd.dataM,rd.yavka1,rd.ishod,rd.Datasn,rd.DataZs,rd.kolrod,rd.deti,rd.kont,rd.dsp,rd.dsr,rd.dTroch,rd.cext,rd.indsol,rd.prmen,rd.dataz,rd.prrod,rd.vozmen,rd.oslrod,rd.polj,rd.id_pvizit,vr.fam,vr.im,vr.ot,i.telm,s.vitae,s.allerg from p_sign s,p_rd_sl rd,p_vizit v,s_vrach vr,p_rd_inf i where s.npasp=rd.npasp and i.npasp=rd.npasp and rd.id_pvizit=v.id and v.cod_sp=vr.pcod")) {
-//			if (acrs.getResultSet().next())
-//				return (List<RdSlStruct1>) rsmRdSl1.map(acrs.getResultSet());
-//			else
-//				throw new KmiacServerException("нет записи");
-//		} catch (SQLException e) {
-//			((SQLException) e.getCause()).printStackTrace();
-//			throw new KmiacServerException();
-//		}
-//	}
 	@Override
 	public List<StringClassifier> get_n_s00(int clpu)
 			throws KmiacServerException, TException {
@@ -3057,11 +2941,8 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public String printDnevVr(int vrach) throws KmiacServerException,
-			TException {
+	public String printDnevVr(int vrach) throws KmiacServerException, TException {
 		AutoCloseableResultSet acrs = null, acrs2 = null;
-		Date data = null;
-		Date data1 = null;
 		
 		String path;
 		
@@ -3288,16 +3169,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public List<PdiagZ> getPdiagZInfo(int npasp) throws KmiacServerException,
-			TException {
+	public List<PdiagZ> getPdiagZInfo(int npasp) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_diag where npasp = ? ", npasp)) 
 		{
 			return rsmPdiagZ.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
+		}
 	}
-	}
-
-
 }

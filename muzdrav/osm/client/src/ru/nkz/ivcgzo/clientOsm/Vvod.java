@@ -839,7 +839,6 @@ public class Vvod extends JFrame {
 					if (tblDiag.getSelectedItem() != null) {
 				  		diagamb.setDiag(tblDiag.getSelectedItem().getDiag());
 				  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
-				  		diagamb.setDatap(pvizitAmb.getDatap());
 				  		diagamb.setId_pos(pvizitAmb.getId());
 				  		if (rbtDiagOsn.isSelected()) diagamb.setDiag_stat(1);
 				  		if (rbtDiagSop.isSelected())diagamb.setDiag_stat(3);
@@ -902,7 +901,6 @@ public class Vvod extends JFrame {
 				  				diagamb.setDiag(tfNewDs.getText());
 				  				diagamb.setId_obr(zapVr.getId_pvizit());
 						  		diagamb.setNpasp(zapVr.getNpasp());
-						  		diagamb.setDatap(tblPos.getSelectedItem().datap);
 						  		for (PdiagZ pd : tblZaklDiag.getData()){
 						  			if (pd.getDiag().equals(tfNewDs.getText())) 
 						  				diagamb.setDatad(pdiag.getDatad());
@@ -1009,14 +1007,13 @@ public class Vvod extends JFrame {
 		 			  		diagamb.setId_obr(zapVr.getId_pvizit());
 		 			  		diagamb.setId_pos(tblPos.getSelectedItem().id);
 		 			  		diagamb.setNpasp(zapVr.getNpasp());
-		 			  		diagamb.setDatap(pvizitAmb.getDatap());
 		 			  		if (tblZaklDiag.getSelectedItem().isSetDatad())
 		 			  			diagamb.setDatad(tblZaklDiag.getSelectedItem().getDatad());
 		 			  		else
 		 			  			diagamb.setDatad(System.currentTimeMillis());
 		 			  		diagamb.setCod_sp(MainForm.vrPcod);
 		 			  		diagamb.setCdol(MainForm.vrCdol);
-		 			  		diagamb.setPredv(true);
+		 			  		diagamb.setPredv(false);
 		 			  		diagamb.setDiag_stat(1);
 		 					diagamb.setDiag(tblZaklDiag.getSelectedItem().getDiag());
 		 					diagamb.setNamed(tblZaklDiag.getSelectedItem().getNamed());
@@ -2297,11 +2294,6 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (tblObr.getSelectedItem() == null)
 					return;
-//				for (PvizitAmb pviz : tblPos.getData())
-//					if (pviz.getDatap() == getDateMills(System.currentTimeMillis())) {
-//						JOptionPane.showMessageDialog(Vvod.this, "Невозможно записать два посещения за одну дату");
-//						return;
-//					}
 				
 				pvizitAmb = new PvizitAmb();
 				pvizitAmb.setId_obr(zapVr.id_pvizit);
@@ -2513,9 +2505,6 @@ public class Vvod extends JFrame {
 				try {
 					if (tblObr.getSelectedItem() != null) {
 						zapVr.setId_pvizit(tblObr.getSelectedItem().id);
-//						tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().getId()));
-//						if (tblDiag.getRowCount() > 0)
-//							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
 						tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.getId_pvizit()));
 						treeRezIssl.setModel(new DefaultTreeModel(createNodes()));
 						checkZapVrNext();
@@ -2549,11 +2538,9 @@ public class Vvod extends JFrame {
 					try {
 						tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().getId()));
 					} catch (KmiacServerException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					} catch (TException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
 					}
 						try {
 						
@@ -2688,9 +2675,9 @@ public class Vvod extends JFrame {
 					sb.append(String.format("%s: %s%s", name, value, lineSep));
 	}
 	
-	private void addLineToDetailInfo(String name, Object value) {
-		addLineToDetailInfo(name, true, value);
-	}
+//	private void addLineToDetailInfo(String name, Object value) {
+//		addLineToDetailInfo(name, true, value);
+//	}
 	
 	private class ShablonSearchListener implements DocumentListener {
 		Timer timer = new Timer(500, new ActionListener() {
@@ -2927,9 +2914,8 @@ public class Vvod extends JFrame {
 	  				else
 	  					diagamb.setDatad(System.currentTimeMillis());
 		  		}
-//		  		if (!diagamb.isSetDatad())
-//		  			diagamb.setDatad(System.currentTimeMillis());
-		  		diagamb.setDatap(pvizitAmb.datap);
+		  		if (!diagamb.isSetDatad())
+		  			diagamb.setDatad(System.currentTimeMillis());
 		  		diagamb.setCod_sp(MainForm.vrPcod);
 		  		diagamb.setCdol(MainForm.vrCdol);
 		  		diagamb.setPredv(true);
@@ -2965,9 +2951,6 @@ public class Vvod extends JFrame {
 //		}
 	}
 
-	/**
-	 * @throws TException
-	 */
 	public boolean checkTalInput() {
 //		if (!checkCmb(cmbVidOpl)) {
 //			JOptionPane.showMessageDialog(Vvod.this, "Поле 'Вид оплаты' не заполнено", "Предупреждение", JOptionPane.ERROR_MESSAGE);
