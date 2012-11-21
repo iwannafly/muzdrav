@@ -7,7 +7,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -104,6 +106,14 @@ public class CustomDateEditor extends JFormattedTextField {
 			setValue(dateFormatter.format(date));
 		else
 			setValue(null);
+	}
+	
+	@Override
+	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
+		if (pressed && (condition == JComponent.WHEN_FOCUSED) && (e.getKeyCode() == KeyEvent.VK_ENTER) && (e.getModifiers() == 0))
+			return processKeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), new KeyEvent(this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_TAB, KeyEvent.CHAR_UNDEFINED), condition, pressed);
+		else
+			return super.processKeyBinding(ks, e, condition, pressed);
 	}
 	
 	class TableDateSelector implements CaretListener {
