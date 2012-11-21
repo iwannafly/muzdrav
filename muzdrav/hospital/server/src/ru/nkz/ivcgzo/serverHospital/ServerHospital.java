@@ -650,7 +650,6 @@ public class ServerHospital extends Server implements Iface {
                 + "sostv = ?, recom = ?, vrach = ? "
                 + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-
             if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
                 sqlQuery = "UPDATE c_otd SET ishod = ?, "
                         + "sostv = ?, recom = ?, vrach = ?, cotd = ? "
@@ -932,6 +931,7 @@ public class ServerHospital extends Server implements Iface {
         }
     }
 
+    //TODO отрефакторить это уродство
     @Override
     public final String printHospitalSummary(final int idGosp, final String lpuInfo,
             final TPatient patient) throws KmiacServerException {
@@ -958,9 +958,11 @@ public class ServerHospital extends Server implements Iface {
             htmTemplate.replaceLabel("~middlename", patient.getMiddlename());
 
             acrs = sse.execPreparedQuery(
-                "SELECT c_gosp.nist, c_gosp.datap, c_gosp.jalob, c_otd.datav, "
-                + "c_otd.ishod, c_otd.result "
-                + "FROM c_gosp JOIN c_otd ON c_gosp.id = c_otd.id_gosp "
+                "SELECT DISTINCT ON (c_gosp.id) c_gosp.nist, c_gosp.datap, "
+                + "c_gosp.jalob, c_otd.datav, "
+                + "c_otd.ishod, c_otd.result, c_otd.sostv, c_otd.recom, c_osmotr.morbi "
+                + "FROM c_gosp INNER JOIN c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN c_osmotr ON c_osmotr.id_gosp = c_gosp.id "
                 + "WHERE c_gosp.id = ?", idGosp);
             if (!acrs.getResultSet().next()) {
                 throw new KmiacServerException("Logged user info not found.");
@@ -972,12 +974,24 @@ public class ServerHospital extends Server implements Iface {
                 if (acrs.getResultSet().getDate("datav") != null) {
                     htmTemplate.replaceLabel(
                         "~dateEnd", dateFormat.format(acrs.getResultSet().getDate("datav")));
+                } else {
+                    htmTemplate.replaceLabel("~dateEnd", "");
                 }
                 htmTemplate.replaceLabel(
                     "~dateStart", dateFormat.format(acrs.getResultSet().getDate("datap")));
 //                if (acrs.getResultSet().getString("jalob") != null) {
                 htmTemplate.replaceLabel(
-                        "~jalob", acrs.getResultSet().getString("jalob"));
+                    "~jalob", acrs.getResultSet().getString("jalob"));
+                htmTemplate.replaceLabel(
+                    "~result", acrs.getResultSet().getString("result"));
+                htmTemplate.replaceLabel(
+                    "~ishod", acrs.getResultSet().getString("ishod"));
+                htmTemplate.replaceLabel(
+                    "~out_cond", acrs.getResultSet().getString("sostv"));
+                htmTemplate.replaceLabel(
+                    "~recommendation", acrs.getResultSet().getString("recom"));
+                htmTemplate.replaceLabel(
+                    "~desiaseHistory", acrs.getResultSet().getString("morbi"));
 //                }
             }
 
@@ -992,12 +1006,12 @@ public class ServerHospital extends Server implements Iface {
                         break;
                     case 2:
                         htmTemplate.replaceLabel("~oslDiagnosis",
-                                acrs.getResultSet().getString("name") + "<br/> ~oslDiagnosis ");
+                            acrs.getResultSet().getString("name") + "<br/> ~oslDiagnosis ");
                         htmTemplate.refindLabels();
                         break;
                     case 3:
                         htmTemplate.replaceLabel("~sopDiagnosis",
-                                acrs.getResultSet().getString("name") + "<br/> ~sopDiagnosis ");
+                            acrs.getResultSet().getString("name") + "<br/> ~sopDiagnosis ");
                         htmTemplate.refindLabels();
                         break;
                     default:
@@ -1047,6 +1061,16 @@ public class ServerHospital extends Server implements Iface {
             }
             htmTemplate.replaceLabel("~issled", "");
 
+            acrs = sse.execPreparedQuery("SELECT n_med.name FROM c_lek "
+                + "INNER JOIN n_med ON c_lek.klek = n_med.pcod WHERE c_lek.id_gosp = ?", idGosp);
+            String medications = "";
+            while (acrs.getResultSet().next()) {
+                medications += acrs.getResultSet().getString("name") + ", ";
+            }
+            if (medications.length() > 0) {
+                medications = medications.substring(0, medications.length() - ", ".length());
+            }
+            htmTemplate.replaceLabel("~medications", medications);
             acrs.close();
             osw.write(htmTemplate.getTemplateText());
             return path;

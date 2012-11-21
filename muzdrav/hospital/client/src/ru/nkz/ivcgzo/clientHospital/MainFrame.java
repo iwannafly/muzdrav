@@ -78,6 +78,8 @@ import javax.swing.event.DocumentListener;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
+
 import javax.swing.JRadioButton;
 import java.awt.Component;
 import javax.swing.Box;
@@ -293,6 +295,8 @@ public class MainFrame extends JFrame {
         doctorAuth = authInfo;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle(WINDOW_HEADER);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/hospital.png")));
         setMainMenu();
         setToolBar();
         setTabbedPane();
@@ -566,6 +570,7 @@ public class MainFrame extends JFrame {
             "/ru/nkz/ivcgzo/clientHospital/resources/patientInfo.png")));
         btnShowPatientInfo.setRequestFocusEnabled(false);
 
+        toolBar.add(new JToolBar.Separator());
         btnIssled = new JButton();
         toolBar.add(btnIssled);
         btnIssled.setMaximumSize(new Dimension(35, 35));
@@ -586,7 +591,7 @@ public class MainFrame extends JFrame {
         btnIssled.setRequestFocusEnabled(false);
 
         btnMedication = new JButton();
-        btnMedication.setVisible(false);
+//        btnMedication.setVisible(false);
         toolBar.add(btnMedication);
         btnMedication.setMaximumSize(new Dimension(35, 35));
         btnMedication.setMinimumSize(new Dimension(35, 35));
@@ -615,7 +620,9 @@ public class MainFrame extends JFrame {
     private void setPatientInfoPanel() {
         spPatientInfo = new JSplitPane();
         spPatientInfo.setOrientation(JSplitPane.VERTICAL_SPLIT);
-        tabbedPane.addTab("Информация о пациенте", null, spPatientInfo, null);
+        tabbedPane.addTab("Информация о пациенте", new ImageIcon(
+            MainFrame.class.getResource(
+               "/ru/nkz/ivcgzo/clientHospital/resources/personalInfo.png")), spPatientInfo, null);
         setPersonalInfoPanel();
         setReceptionPanel();
     }
@@ -847,7 +854,9 @@ public class MainFrame extends JFrame {
     private void setLifeHistoryPanel() {
         pLifeHistory = new JPanel();
         pLifeHistory.setLayout(new BoxLayout(pLifeHistory, BoxLayout.X_AXIS));
-        tabbedPane.addTab("История жизни", null, pLifeHistory, null);
+        tabbedPane.addTab("История жизни", new ImageIcon(
+            MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/lifeHistory.png")), pLifeHistory, null);
 
         hsLifeHistoryFirst = Box.createHorizontalStrut(5);
         pLifeHistory.add(hsLifeHistoryFirst);
@@ -1148,7 +1157,9 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
-        tabbedPane.addTab("Дневник", null, pMedicalHistory, null);
+        tabbedPane.addTab("Дневник", new ImageIcon(MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/diary.png")),
+            pMedicalHistory, null);
         pMedicalHistory.setLayout(new BoxLayout(pMedicalHistory, BoxLayout.X_AXIS));
 
         hsMedicalHistoryFirst = Box.createHorizontalStrut(5);
@@ -1628,7 +1639,9 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisPanel() {
         pDiagnosis = new JPanel();
-        tabbedPane.addTab("Диагнозы", null, pDiagnosis, null);
+        tabbedPane.addTab("Диагнозы", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/firstAid.png")), pDiagnosis, null);
         pDiagnosis.setLayout(new BoxLayout(pDiagnosis, BoxLayout.X_AXIS));
 
         hsDiagnosisFirst = Box.createHorizontalStrut(5);
@@ -2038,7 +2051,9 @@ public class MainFrame extends JFrame {
 
     private void setStagePanel() {
         pStage = new JPanel();
-        tabbedPane.addTab("Этапы лечения", null, pStage, null);
+        tabbedPane.addTab("Этапы лечения", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/stages.png")), pStage, null);
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
@@ -2350,7 +2365,9 @@ public class MainFrame extends JFrame {
 
     private void setZaklPanel() {
         pZakl = new JPanel();
-        tabbedPane.addTab("Заключение", null, pZakl, null);
+        tabbedPane.addTab("Заключение", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/out.png")), pZakl, null);
         setZaklShablonComponents();
         setZaklTextAreas();
         setZaklComboboxes();

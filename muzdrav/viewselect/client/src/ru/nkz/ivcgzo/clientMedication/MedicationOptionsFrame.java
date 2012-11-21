@@ -316,13 +316,17 @@ public class MedicationOptionsFrame extends JDialog {
                 tmpLek.setIdGosp(patient.getIdGosp());
                 tmpLek.setVrach(ClientMedication.authInfo.getPcod());
                 tmpLek.setKlek(curMedication.getPcod());
-                tmpLek.setDoza(Integer.valueOf(tfDose.getText()));
+                if (!tfDose.getText().isEmpty()) {
+                    tmpLek.setDoza(Integer.valueOf(tfDose.getText()));
+                }
                 tmpLek.setEd(cbxDoseEdd.getSelectedPcod());
                 tmpLek.setFlek(curMedicationForm.getName());
                 tmpLek.setKomm(taComment.getText());
                 tmpLek.setSposv(cbxInputMethod.getSelectedPcod());
                 tmpLek.setSpriem(cmbPeriod.getSelectedPcod());
-                tmpLek.setPereod(Integer.valueOf(tfIntakePerDay.getText()));
+                if (!tfIntakePerDay.getText().isEmpty()) {
+                    tmpLek.setPereod(Integer.valueOf(tfIntakePerDay.getText()));
+                }
                 tmpLek.setDatao(cdeDateTo.getDate().getTime());
                 tmpLek.setDatan(cdeDateFrom.getDate().getTime());
                 tmpLek.setDataz(System.currentTimeMillis());
