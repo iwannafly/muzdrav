@@ -14,8 +14,11 @@ import java.awt.Font;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
 
@@ -25,6 +28,8 @@ public class MainFrame extends JFrame {
     private JButton btnPersonalInfo;
     private JButton btnSchedule;
     private LpuSelectFrame frmLpuSelect;
+    private AuthorizationFrame frmAuth;
+    private ReservedTalonsFrame frmResTalons;
     
     public MainFrame() {
         initialization();
@@ -32,7 +37,7 @@ public class MainFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -47,6 +52,20 @@ public class MainFrame extends JFrame {
     private void createModalFrames() {
         if (frmLpuSelect == null) {
             frmLpuSelect = new LpuSelectFrame(); 
+        }
+        if (frmAuth == null) {
+            frmAuth = new AuthorizationFrame();
+            frmAuth.addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowClosed(WindowEvent e) {
+                    if ((frmAuth.getPatient() != null) && (frmAuth.isValueAccepted())) {
+                        frmResTalons.showModal(frmAuth.getPatient().getNpasp());
+                    }
+                }           
+            });
+        }
+        if (frmResTalons == null) {
+            frmResTalons = new ReservedTalonsFrame();
         }
     }
 
@@ -85,7 +104,7 @@ public class MainFrame extends JFrame {
 //                    frmDoctorSelect = new DoctorSelectFrame();
 //                }
 //                frmDoctorSelect.setVisible(true);
-                frmLpuSelect.showModal();
+                frmLpuSelect.showModal(0);
             }
         });
         btnAppointment.setFont(new Font("Courier New", Font.PLAIN, 25));
@@ -104,13 +123,18 @@ public class MainFrame extends JFrame {
 
     private void addPersonalInfoButton() {
         btnPersonalInfo = new JButton("Личный кабинет");
+        btnPersonalInfo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frmAuth.setVisible(true);
+            }
+        });
         btnPersonalInfo.setHorizontalTextPosition(SwingConstants.CENTER);
         btnPersonalInfo.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnPersonalInfo.setFont(new Font("Courier New", Font.PLAIN, 25));
         btnPersonalInfo.setBackground(Color.WHITE);
         btnPersonalInfo.setBorder(new CompoundBorder(
-                new BevelBorder(BevelBorder.LOWERED, null, null, null, null),
-                new EtchedBorder(EtchedBorder.LOWERED, null, null))
+            new BevelBorder(BevelBorder.LOWERED, null, null, null, null),
+            new EtchedBorder(EtchedBorder.LOWERED, null, null))
         );
         btnPersonalInfo.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "resources/007.png")));
@@ -119,13 +143,18 @@ public class MainFrame extends JFrame {
 
     private void addScheduleButton() {
         btnSchedule = new JButton("Расписание");
+        btnSchedule.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                frmLpuSelect.showModal(1);
+            }
+        });
         btnSchedule.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnSchedule.setFont(new Font("Courier New", Font.PLAIN, 25));
         btnSchedule.setHorizontalTextPosition(SwingConstants.CENTER);
         btnSchedule.setBackground(Color.WHITE);
         btnSchedule.setBorder(new CompoundBorder(
-                new BevelBorder(BevelBorder.LOWERED, null, null, null, null),
-                new EtchedBorder(EtchedBorder.LOWERED, null, null))
+            new BevelBorder(BevelBorder.LOWERED, null, null, null, null),
+            new EtchedBorder(EtchedBorder.LOWERED, null, null))
         );
         btnSchedule .setIcon(new ImageIcon(MainFrame.class.getResource(
                 "resources/037.png")));

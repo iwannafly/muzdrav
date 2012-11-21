@@ -36,7 +36,9 @@ public class DoctorSelectFrame extends JFrame {
     private DoctorListModel dlm;
     private SpecialityListModel slm;
     private TalonSelectFrame frmTalonSelect;
+    private SheduleFrame frmShedule;
     private int cpol;
+    private int nextWindowFlag;
 
 
     public DoctorSelectFrame () {
@@ -46,7 +48,7 @@ public class DoctorSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -60,6 +62,9 @@ public class DoctorSelectFrame extends JFrame {
     private void createModalFrames() {
         if (frmTalonSelect == null) {
             frmTalonSelect = new TalonSelectFrame(); 
+        }
+        if (frmShedule == null) {
+            frmShedule = new SheduleFrame(); 
         }
     }
 
@@ -119,6 +124,10 @@ public class DoctorSelectFrame extends JFrame {
         btnBackward = new JButton("");
         btnBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                slm = new SpecialityListModel(cpol);
+                lSpeciality.setModel(slm);
+                dlm = new DoctorListModel();
+                lDoctor.setModel(dlm);
                 setVisible(false);
             }
         });
@@ -207,8 +216,17 @@ public class DoctorSelectFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 if ((lSpeciality.getSelectedValue() != null)
                         && (lDoctor.getSelectedValue() != null)) {
-                    frmTalonSelect.showModal(cpol, lSpeciality.getSelectedValue().getCdol(),
-                        lDoctor.getSelectedValue().getPcod());
+                    if (nextWindowFlag == 0) {
+                        frmTalonSelect.showModal(cpol, lSpeciality.getSelectedValue().getCdol(),
+                            lDoctor.getSelectedValue().getPcod());
+                    } else if (nextWindowFlag == 1) {
+                        frmShedule.showModal(lDoctor.getSelectedValue().getPcod(),
+                            cpol, lSpeciality.getSelectedValue().getCdol());
+                    }
+                    slm = new SpecialityListModel(cpol);
+                    lSpeciality.setModel(slm);
+                    dlm = new DoctorListModel();
+                    lDoctor.setModel(dlm);
                 }
             }
         });
@@ -219,7 +237,8 @@ public class DoctorSelectFrame extends JFrame {
         spDoctor.setViewportView(lDoctor);
     }
 
-    public void showModal(final int inCpol) {
+    public void showModal(final int flag, final int inCpol) {
+        nextWindowFlag = flag;
         cpol = inCpol;
         slm = new SpecialityListModel(inCpol);
         lSpeciality.setModel(slm);

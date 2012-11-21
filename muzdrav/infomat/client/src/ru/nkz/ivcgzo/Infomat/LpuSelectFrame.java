@@ -34,6 +34,7 @@ public class LpuSelectFrame extends JFrame {
     private LpuListModel llm;
     private JList<Lpu> lLpu = new JList<Lpu>();
     private DoctorSelectFrame frmDoctorSelect;
+    private int nextWindowFlag;
 
     public LpuSelectFrame() {
         initialization();
@@ -41,7 +42,7 @@ public class LpuSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -148,7 +149,9 @@ public class LpuSelectFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (lLpu.getSelectedValue() != null) {
-                    frmDoctorSelect.showModal(lLpu.getSelectedValue().getPcod());
+                    frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
+                    llm.updateModel();
+                    lLpu.setModel(llm);
 //                    setVisible(false);
                 }
             }
@@ -160,7 +163,8 @@ public class LpuSelectFrame extends JFrame {
         spLpu.setViewportView(lLpu);
     }
 
-    public void showModal() {
+    public void showModal(int flag) {
+       nextWindowFlag = flag; 
        llm.updateModel();
        lLpu.setModel(llm);       
        spLpu.setViewportView(lLpu);

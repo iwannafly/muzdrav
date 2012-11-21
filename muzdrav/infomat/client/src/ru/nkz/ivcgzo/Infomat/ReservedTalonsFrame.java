@@ -7,12 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -23,34 +20,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-public class TalonSelectFrame extends JFrame{
-    private static final long serialVersionUID = -869834846316758484L;
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
-    private static final String[] DAY_NAMES = {
-        "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"
-    };
+public class ReservedTalonsFrame extends JFrame {
+
+    private static final long serialVersionUID = 4278188155287891545L;
     private JPanel pMain;
     private Box hbBackwardButton = Box.createHorizontalBox();
     private Component hgRight = Box.createHorizontalGlue();
     private JButton btnBackward = new JButton("");
     private Component hgLeft = Box.createHorizontalGlue();
     private JScrollPane spTalon;
-    private JPanel pTableButtons;    
-    private JButton btnTalonBackward;    
-    private JButton btnTalonForward;
 //    private LpuListModel llm;
-    private JTable tbTalons = new JTable();
-    int cpol;
-    String cdol;
+    private JTable tbTalons;
     int pcod;
-    private Component horizontalGlue;
-    private AuthorizationFrame frmAuth;
-    private Talon curTalon;
 //    private DoctorSelectFrame frmDoctorSelect;
 
-    public TalonSelectFrame() {
-        cpol = -1;
-        cdol = "";
+    public ReservedTalonsFrame() {
         pcod = -1;
         initialization();
     }
@@ -68,18 +52,7 @@ public class TalonSelectFrame extends JFrame{
         pack();
     }
 
-    private void createModalFrames() {
-        frmAuth = new AuthorizationFrame();
-        frmAuth.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent e) {
-                if ((curTalon != null) && (frmAuth.isValueAccepted())) {
-                    reserveTalon(frmAuth.getPatient(), curTalon);
-                    refreshTalonTableModel();
-                }
-                curTalon = null;
-            }           
-        });     
+    private void createModalFrames() {  
     }
 
     private void addMainPanel() {
@@ -89,7 +62,6 @@ public class TalonSelectFrame extends JFrame{
         pMain.setLayout(new BoxLayout(pMain, BoxLayout.Y_AXIS));
 
         addBackwardButtonHorizBox();
-        addTableButtonsPanel();
         addTalonTablePanel();
     }
 
@@ -122,67 +94,6 @@ public class TalonSelectFrame extends JFrame{
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    private void addTableButtonsPanel() {
-        pTableButtons = new JPanel();
-        pTableButtons.setBackground(Color.WHITE);
-        pTableButtons.setPreferredSize(new Dimension(10, 50));
-        pTableButtons.setMinimumSize(new Dimension(10, 50));
-        pTableButtons.setMaximumSize(new Dimension(32767, 50));
-        pMain.add(pTableButtons);
-        
-        btnTalonBackward = new JButton("");
-        btnTalonBackward.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/forward.png")));
-        btnTalonBackward.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                ((TalonTableModel) tbTalons.getModel()).setPrevWeek();
-                tbTalons.repaint();
-                updateSelectTableHeaders();
-            }
-        });
-        btnTalonBackward.setBorder(null);
-        btnTalonBackward.setBackground(Color.WHITE);
-        btnTalonBackward.setForeground(Color.BLACK);
-        pTableButtons.setLayout(new BoxLayout(pTableButtons, BoxLayout.X_AXIS));
-        pTableButtons.add(btnTalonBackward);
-
-
-        
-        horizontalGlue = Box.createHorizontalGlue();
-        pTableButtons.add(horizontalGlue);
-
-        btnTalonForward = new JButton("");
-        btnTalonForward.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/forward.png")));
-        btnTalonForward.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                ((TalonTableModel) tbTalons.getModel()).setNextWeek();
-                tbTalons.setModel(tbTalons.getModel());
-                tbTalons.repaint();
-                updateSelectTableHeaders();
-            }
-        });
-        btnTalonForward.setBorder(null);
-        btnTalonForward.setBackground(Color.WHITE);
-        btnTalonForward.setForeground(Color.BLACK);
-        pTableButtons.add(btnTalonForward);
-    }
-
-    private void updateSelectTableHeaders() {
-        for (int i = 0; i < 7; i++) {
-            tbTalons.getColumnModel().getColumn(i).setHeaderValue(
-                DAY_NAMES[i] + " " + DEFAULT_DATE_FORMAT.format(
-                    ((TalonTableModel) tbTalons.getModel())
-                        .getTalonList().getWeekDays()[i]
-                )
-            );
-        }
-        tbTalons.repaint();
-        tbTalons.updateUI();
-    }
-
     private void addTalonTablePanel() {
         spTalon = new JScrollPane();
         spTalon.setBackground(Color.WHITE);
@@ -197,43 +108,43 @@ public class TalonSelectFrame extends JFrame{
 
     private void addTalonTable() {
         tbTalons = new JTable();
-        tbTalons.setDefaultRenderer(String.class, new TalonTableCellRenderer());
+        tbTalons.setDefaultRenderer(String.class, new ReservedTalonTableCellRenderer());
         tbTalons.setRowHeight(50);
         tbTalons.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JTable curTable = (JTable) e.getSource();
-                final int curRow = curTable.getSelectedRow();
-                final int curColumn = curTable.getSelectedColumn();
-                curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
-                    .getTalonByDay(curRow, curColumn);
-                if (curTalon != null) {
-                    frmAuth.setVisible(true);
-                }
+//                JTable curTable = (JTable) e.getSource();
+//                final int curRow = curTable.getSelectedRow();
+//                final int curColumn = curTable.getSelectedColumn();
+//                curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
+//                    .getTalonByDay(curRow, curColumn);
+//                if (curTalon != null) {
+//                    
+//                }
             }
         });
         spTalon.setViewportView(tbTalons);
     }
 
+    @SuppressWarnings("unused")
     private void refreshTalonTableModel() {
-        TalonTableModel tbtModel = new TalonTableModel(cpol, cdol, pcod);
+        ReservedTalonTableModel tbtModel = new ReservedTalonTableModel(pcod);
         tbTalons.setModel(tbtModel); 
     }
 
-    private void refreshTalonTableModel(int inCpol, String inCdol,  int inPcod) {
-        cpol = inCpol;
-        cdol = inCdol;
+    private void refreshTalonTableModel(int inPcod) {
         pcod = inPcod;
-        TalonTableModel tbtModel = new TalonTableModel(inCpol, inCdol, inPcod);
+        ReservedTalonTableModel tbtModel = new ReservedTalonTableModel(inPcod);
         tbTalons.setModel(tbtModel);
         //updateSelectTableHeaders();
     }
 
-    public void showModal(int cpol, String cdol,  int pcod) {
-        refreshTalonTableModel(cpol, cdol,  pcod);
+    public void showModal(int pcod) {
+        refreshTalonTableModel(pcod);
         setVisible(true);
     }
 
+    @SuppressWarnings("unused")
     private void reserveTalon(Patient patient, Talon curTalon) {
         final int prv = 3;
         // java.sql.Date не имеет нулевого конструктора, а preparedUpdate() не работает с

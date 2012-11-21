@@ -4,12 +4,15 @@ import java.sql.Time;
 import java.sql.Date;
 
 public class Talon {
-    public int id;
-    public int vidp;
-    public Time timep;
-    public Date datap;
-    public int npasp;
-    public int pcodSp;
+    private int id;
+    private int vidp;
+    private Time timep;
+    private Date datap;
+    private int npasp;
+    private int pcodSp;
+    private String lpuName;
+    private String doctorSpec;
+    private String doctorFio;
 
     public Talon(int inId, int inVidp, Time inTimep, Date inDatep, int inNpasp, int inPcodSp) {
         id = inId;
@@ -18,6 +21,20 @@ public class Talon {
         datap = inDatep;
         npasp = inNpasp;
         pcodSp = inPcodSp;
+    }
+
+    public Talon(int id, int vidp, Time timep, Date datap, int npasp,
+            int pcodSp, String lpuName, String doctorSpec, String doctorFio) {
+        super();
+        this.id = id;
+        this.vidp = vidp;
+        this.timep = timep;
+        this.datap = datap;
+        this.npasp = npasp;
+        this.pcodSp = pcodSp;
+        this.setDoctorSpec(doctorSpec);
+        this.doctorFio = doctorFio;
+        this.setLpuName(lpuName);
     }
 
     public int getId() {
@@ -66,6 +83,30 @@ public class Talon {
 
     public void setPcodSp(int pcodSp) {
         this.pcodSp = pcodSp;
+    }
+
+    public String getDoctorFio() {
+        return doctorFio;
+    }
+
+    public void setDoctorFio(String doctorFio) {
+        this.doctorFio = doctorFio;
+    }
+
+    public String getDoctorSpec() {
+        return doctorSpec;
+    }
+
+    public void setDoctorSpec(String doctorSpec) {
+        this.doctorSpec = doctorSpec;
+    }
+
+    public String getLpuName() {
+        return lpuName;
+    }
+
+    public void setLpuName(String lpuName) {
+        this.lpuName = lpuName;
     }
 
 }
