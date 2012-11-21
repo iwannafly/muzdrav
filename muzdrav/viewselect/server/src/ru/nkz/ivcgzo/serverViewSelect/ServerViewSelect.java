@@ -27,6 +27,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftViewSelect.CgospInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientCommonInfo;
@@ -64,6 +65,7 @@ public class ServerViewSelect extends Server implements Iface {
 	private final TResultSetMapper<PatientDiagAmbInfo, PatientDiagAmbInfo._Fields> rsmPdiagAmb;
 	private final TResultSetMapper<PatientIsslInfo, PatientIsslInfo._Fields> rsmIsslInfo;
 	private final TResultSetMapper<PatientAnamZabInfo, PatientAnamZabInfo._Fields> rsmAnamZab;
+	private final TResultSetMapper<CgospInfo, CgospInfo._Fields> rsmCgosp;
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -80,6 +82,7 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "datap", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
 		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav");
 		rsmAnamZab = new TResultSetMapper<>(PatientAnamZabInfo.class, "id_pvizit", "npasp", "t_ist_zab");
+		rsmCgosp = new TResultSetMapper<>(CgospInfo.class, "id", "ngosp", "npasp", "nist", "datap", "vremp", "pl_extr", "naprav", "n_org", "cotd", "sv_time", "sv_day", "ntalon", "vidtr", "pr_out", "alkg", "meesr", "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c", "ad", "smp_data", "smp_time", "smp_num", "cotd_p", "datagos", "vremgos", "cuser", "dataosm", "vremosm", "kod_rez", "dataz", "jalob", "vid_st", "d_rez", "pr_ber");
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -405,6 +408,16 @@ public class ServerViewSelect extends Server implements Iface {
 				return rsmAnamZab.map(acrs.getResultSet());
 			else
 				throw new SQLException("Patient anamnesis not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CgospInfo> getCgospinfo(int npasp) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_gosp where npasp = ? ", npasp)) {
+			return rsmCgosp.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException(e.getMessage());
 		}

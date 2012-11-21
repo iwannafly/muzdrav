@@ -139,10 +139,8 @@ struct PatientVizitInfo {
 	11: optional string zakl;
 	12: optional i64 dataz;
 	13: optional string recomend;
-	14: optional i32 idzab;
-	15: optional string vrach_fio;
-	16: optional string lech;
-	17: optional i32 cobr;
+	14: optional string lech;
+	15: optional i32 cobr;
 }
 
 struct PatientDiagZInfo {
@@ -305,6 +303,50 @@ struct PatientPriemInfo {
 	19: optional string t_recom;
 }
 
+struct CgospInfo{
+	1: optional i32 id;
+	2: optional i32 ngosp;
+	3: optional i32 npasp;
+	4: optional i32 nist;
+	5: optional i64 datap;
+	6: optional i64 vremp;
+	7: optional i32 pl_extr;
+	8: optional string naprav;
+	9: optional i32 n_org;
+	10: optional i32 cotd;
+	11: optional i32 sv_time;
+	12: optional i32 sv_day;
+	13: optional i32 ntalon;
+	14: optional i32 vidtr;
+	15: optional i32 pr_out;
+	16: optional i32 alkg;
+	17: optional bool meesr;
+	18: optional i32 vid_tran;
+	19: optional string diag_n;
+	20: optional string diag_p;
+	21: optional string named_n;
+	22: optional string named_p;
+	23: optional bool nal_z;
+	24: optional bool nal_p;
+	25: optional string t0c;
+	26: optional string ad;
+	27: optional i64 smp_data;
+	28: optional i64 smp_time;
+	29: optional i32 smp_num;
+	30: optional i32 cotd_p;
+	31: optional i64 datagos;
+	32: optional i64 vremgos;
+	33: optional i32 cuser;
+	34: optional i64 dataosm;
+	35: optional i64 vremosm;
+	36: optional i32 kod_rez;
+	37: optional i64 dataz;
+	38: optional string jalob;
+	39: optional i32 vid_st;
+	40: optional i64 d_rez;
+	41: optional bool pr_ber;
+}
+
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
@@ -349,4 +391,5 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<PatientDiagAmbInfo> getPatientDiagAmbInfoList(1: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	list<PatientIsslInfo> getPatientIsslInfoList(1: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	PatientAnamZabInfo getPatientAnamZabInfo(1: i32 pvizitId, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<CgospInfo> getCgospinfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 }
