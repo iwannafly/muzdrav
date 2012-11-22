@@ -315,6 +315,7 @@ public class MainFrame extends JFrame {
 
     private void setTabbedPane() {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         tabbedPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         setPatientInfoPanel();
@@ -571,6 +572,7 @@ public class MainFrame extends JFrame {
         btnShowPatientInfo.setRequestFocusEnabled(false);
 
         toolBar.add(new JToolBar.Separator());
+
         btnIssled = new JButton();
         toolBar.add(btnIssled);
         btnIssled.setMaximumSize(new Dimension(35, 35));
@@ -1656,7 +1658,6 @@ public class MainFrame extends JFrame {
 
         hsDiagnosisThird = Box.createHorizontalStrut(5);
         pDiagnosis.add(hsDiagnosisThird);
-
     }
 
     private void setDiagnosisVerticalTextComponents() {
@@ -1732,7 +1733,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnAddDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
     }
 
     private void addDiagnosisDeleteButton() {
@@ -1747,7 +1748,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnDelDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
     }
 
     private void addDiagnosisUpdateButton() {
@@ -1762,7 +1763,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnSaveDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
     }
 
     private void setDiagnosisTextComponents() {

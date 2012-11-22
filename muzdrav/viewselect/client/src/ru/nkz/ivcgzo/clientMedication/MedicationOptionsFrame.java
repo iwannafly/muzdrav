@@ -366,7 +366,18 @@ public class MedicationOptionsFrame extends JDialog {
     public void prepareForm(IntegerClassifier medication,
             IntegerClassifier medicationForm, Patient inPatient) {
         setHeader(medication, medicationForm);
+        clearTextFields();
         patient = inPatient;
+    }
+
+    private void clearTextFields() {
+        cmbPeriod.setSelectedIndex(-1);
+        cbxDoseEdd.setSelectedIndex(-1);
+        cbxInputMethod.setSelectedIndex(-1);
+        chbxReestr.setEnabled(false);
+        tfChargeOff.setText("");
+        tfDose.setText("");
+        tfIntakePerDay.setText("");
     }
 
     private void setHeader(IntegerClassifier medication,
