@@ -77,7 +77,7 @@ public class MainFrame extends JFrame {
     private void initialization() {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientMedication/resources/medication.png")));
+            "/ru/nkz/ivcgzo/clientMedication/resources/medication.png")));
 
         addMedicationPanels();
 //        addTableScrollPane();
@@ -185,14 +185,16 @@ public class MainFrame extends JFrame {
         lblInputMethod = new JLabel("  Способ ввода");
         pInfo.add(lblInputMethod);
         
-        cbxInputMethod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_svl);
+        cbxInputMethod =
+            new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_svl);
         cbxInputMethod.setEditable(false);
         pInfo.add(cbxInputMethod);
         
         lblPeriod = new JLabel("  Периодичность приёма");
         pInfo.add(lblPeriod);
         
-        cbxPeriod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_period);
+        cbxPeriod =
+            new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_period);
         cbxPeriod.setEditable(false);
         pInfo.add(cbxPeriod);
         
@@ -321,6 +323,9 @@ public class MainFrame extends JFrame {
     public final void prepareFrame() {
         if (patient != null) {
             try {
+                clearTextFields();
+                lMedication.getSelectionModel().clearSelection();
+                lMedication.setSelectedIndex(0);
                 List<IntegerClassifier> tmpLekShortList =
                     ClientMedication.tcl.getLekShortList(patient.getIdGosp());
                 lMedication.setData(tmpLekShortList);                
@@ -347,5 +352,17 @@ public class MainFrame extends JFrame {
                 ClientMedication.conMan.reconnect(e);
             }
         }
+    }
+
+    private final void  clearTextFields() {
+        tfCountInDay.setText("");
+        tfDose.setText("");
+        tfFormLek.setText("");
+        tfVrachFrom.setText("");
+        tfVrachTo.setText("");
+        cbxInputMethod.setSelectedIndex(-1);
+        cbxPeriod.setSelectedIndex(-1);
+        cdeDateFrom.setText(null);
+        cdeDateTo.setText(null);
     }
 }

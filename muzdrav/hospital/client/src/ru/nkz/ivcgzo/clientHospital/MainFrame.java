@@ -554,6 +554,7 @@ public class MainFrame extends JFrame {
         getContentPane().add(toolBar, BorderLayout.PAGE_START);
 
         btnShowPatientInfo = new JButton();
+        btnShowPatientInfo.setToolTipText("Информация о пациенте");
         toolBar.add(btnShowPatientInfo);
         btnShowPatientInfo.setMaximumSize(new Dimension(35, 35));
         btnShowPatientInfo.setMinimumSize(new Dimension(35, 35));
@@ -574,6 +575,7 @@ public class MainFrame extends JFrame {
         toolBar.add(new JToolBar.Separator());
 
         btnIssled = new JButton();
+        btnIssled.setToolTipText("Лабораторные исследования");
         toolBar.add(btnIssled);
         btnIssled.setMaximumSize(new Dimension(35, 35));
         btnIssled.setMinimumSize(new Dimension(35, 35));
@@ -593,7 +595,8 @@ public class MainFrame extends JFrame {
         btnIssled.setRequestFocusEnabled(false);
 
         btnMedication = new JButton();
-//        btnMedication.setVisible(false);
+        btnMedication.setToolTipText("Лекарственные назначения");
+        btnMedication.setVisible(false);
         toolBar.add(btnMedication);
         btnMedication.setMaximumSize(new Dimension(35, 35));
         btnMedication.setMinimumSize(new Dimension(35, 35));
