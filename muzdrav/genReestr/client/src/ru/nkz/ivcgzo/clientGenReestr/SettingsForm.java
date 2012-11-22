@@ -229,21 +229,26 @@ public class SettingsForm extends JDialog {
 				if (rbtn3.isSelected()) vidrstr = 3;
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {		//формирование реестров
-					if(cmb_podr.getSelectedPcod() != 0 || (tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
+					if((tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
 						if (Cslu == 1){
 				        	String clpu = null;
 				        	if (Integer.toString(MainForm.authInfo.getClpu()).length() == 2)clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
 				        	else clpu = Integer.toString(MainForm.authInfo.getClpu());
-							servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+clpu+".rar";
+				        	if(cmb_podr.getSelectedPcod() != 0) servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
+				        	else servPath = MainForm.tcl.getReestrInfoOtd(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
+				        	cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+clpu+".rar";
 						}
 				        if (Cslu == 2){
-				        	servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+				        	if(cmb_podr.getSelectedPcod() != 0){
+				        		servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+							}else
+								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
 				        if (Cslu == 3){
 				        	if(!tf_Cpol.getText().isEmpty() && Terp != 0){
-				        		servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
+				        		if(cmb_podr.getSelectedPcod() != 0) servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
+				        		else servPath = MainForm.tcl.getReestrInfoLDS(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
 								cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+ tf_Cpol.getText()+"_usl.rar";
 				        	}else 
 				        		JOptionPane.showMessageDialog(null, "Выберите поликлинику обслуживания из классификатора.", null, JOptionPane.INFORMATION_MESSAGE);
