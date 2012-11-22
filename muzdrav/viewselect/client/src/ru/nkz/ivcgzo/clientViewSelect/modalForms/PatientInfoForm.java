@@ -40,7 +40,13 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftViewSelect.C_etapInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CdiagInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CgospInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CizmerInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.ClekInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CosmotrInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CotdInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientDiagAmbInfo;
@@ -344,7 +350,6 @@ public class PatientInfoForm extends ModalForm {
 			 		else if (lastPath instanceof CgospTreeNode) {
 			 			CgospTreeNode gospNode = (CgospTreeNode) lastPath;
 		 				CgospInfo gosp = gospNode.gosp;
-			 			addLineToDetailInfo("Номер случая госпитализации", gosp.isSetId(), gosp.getId());
 		 				addLineToDetailInfo("Номер истории болезни", gosp.isSetNist(), gosp.getNist());
 		 				addLineToDetailInfo("Дата поступления в стационар", gosp.isSetDatap(), DateFormat.getDateInstance().format(new Date(gosp.getDatap())));
 		 				addLineToDetailInfo("Время поступления в стационар", gosp.isSetVremp(), DateFormat.getTimeInstance().format(new Time(gosp.getVremp())));
@@ -379,6 +384,61 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Жалобы при поступлении", gosp.isSetJalob(), gosp.getJalob());
 		 				addLineToDetailInfo("Вид стационара", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_tip), gosp.isSetVid_st(), gosp.getVid_st()));
 		 				addLineIfBool("Признак беременности: да", gosp.isSetPr_ber(), gosp.isPr_ber());
+		 				for (CosmotrInfo cosmotr : MainForm.tcl.getCosmotrInfoList(gosp.getId())) {
+		 					addLineToDetailInfo("Дата записи",cosmotr.isSetDataz(),DateFormat.getDateInstance().format(new Date(cosmotr.getDataz())));
+		 	 				addLineToDetailInfo("Жалобы",cosmotr.isSetJalob(),cosmotr.getJalob());
+		 					addLineToDetailInfo("История болезни",cosmotr.isSetMorbi(),cosmotr.getMorbi());
+		 					addLineToDetailInfo("Объективный статус",cosmotr.isSetStatus_praesense(),cosmotr.getStatus_praesense());
+		 					addLineToDetailInfo("Локальный статус",cosmotr.isSetStatus_localis(),cosmotr.getStatus_localis());
+		 					addLineToDetailInfo("Физикальное обследование",cosmotr.isSetFisical_obs(),cosmotr.getFisical_obs());
+		 					}
+		 				for (CdiagInfo cdiag : MainForm.tcl.getCdiagInfoList(gosp.getId())) {
+		 					addLineToDetailInfo("Дата установления диагноза",cdiag.isSetDate_ustan(),DateFormat.getDateInstance().format(new Date(cdiag.getDate_ustan())));
+		 	 				addLineToDetailInfo("Код МКБ",cdiag.isSetCod(),cdiag.getCod());
+		 					addLineToDetailInfo("Медицинское описание",cdiag.isSetMed_op(),cdiag.getMed_op());
+		 					addLineToDetailInfo("Признак диагноза",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), cdiag.isSetPrizn(), cdiag.getPrizn()));
+		 					}
+		 				for (C_etapInfo cetap : MainForm.tcl.getCEtapInfoList(gosp.getId())) {
+		 					addLineToDetailInfo("Дата начала этапа",cetap.isSetDate_start(),DateFormat.getDateInstance().format(new Date(cetap.getDate_start())));
+		 	 				addLineToDetailInfo("Этап лечения",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_etp), cetap.isSetStl(), cetap.getStl()));
+		 					//addLineToDetailInfo("МЭС",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_cmt), cetap.isSetMes(), cetap.getMes()));
+		 					addLineToDetailInfo("Дата окончания этапа",cetap.isSetDate_end(),DateFormat.getDateInstance().format(new Date(cetap.getDate_end())));
+		 				}
+		 				for (CizmerInfo cizmer : MainForm.tcl.getCizmerInfoList(gosp.getId())) {
+		 					addLineToDetailInfo("Дата записи",cizmer.isSetDataz(),DateFormat.getDateInstance().format(new Date(cizmer.getDataz())));
+		 	 				addLineToDetailInfo("Температура",cizmer.isSetTemp(),cizmer.getTemp());
+		 					addLineToDetailInfo("Артериальное давление",cizmer.isSetAd(),cizmer.getAd());
+		 	 				addLineToDetailInfo("ЧСС",cizmer.isSetChss(),cizmer.getChss());
+		 					addLineToDetailInfo("Рост", cizmer.isSetRost(), cizmer.getRost());
+		 					addLineToDetailInfo("Вес",cizmer.isSetVes(),cizmer.getVes());	
+		 				}
+		 				for (ClekInfo clek : MainForm.tcl.getClekInfoList(gosp.getId())) {
+		 					addLineToDetailInfo("Дата назначения",clek.isSetDatan(),DateFormat.getDateInstance().format(new Date(clek.getDatan())));
+		 					addLineToDetailInfo("Лекарство",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_med), clek.isSetKlek(), clek.getKlek()));
+		 					addLineToDetailInfo("Лекарственная форма",clek.isSetFlek(), clek.getFlek());	
+		 					addLineToDetailInfo("Разовая доза",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_edd), clek.isSetDoza(), clek.getDoza()));
+		 					addLineToDetailInfo("Единица метрическая",clek.isSetEd(),clek.getEd());
+		 					addLineToDetailInfo("Способ введения",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_svl), clek.isSetSposv(), clek.getSposv()));
+		 					addLineToDetailInfo("Схема приема",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_period), clek.isSetSpriem(), clek.getSpriem()));
+		 					addLineToDetailInfo("Количество в день",clek.isSetPereod(),clek.getPereod());
+		 					addLineToDetailInfo("Длительность курса в днях",clek.isSetDlitkl(),clek.getDlitkl());
+		 					addLineToDetailInfo("Указания по приему",clek.isSetKomm(),clek.getKomm());
+		 					addLineToDetailInfo("Дата отмены",clek.isSetDatao(),DateFormat.getDateInstance().format(new Date(clek.getDatao())));
+		 				}		
+		 				for (CotdInfo cotd : MainForm.tcl.getCotdInfoList(gosp.getId())) {
+		 					addLineIfBool("Признак вхождения заболевания в министерсую форму: да", cotd.isSetSign(), cotd.isSign());
+		 					addLineToDetailInfo("Профиль койки",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_t00), cotd.isSetCprof(), cotd.getCprof()));
+		 					addLineToDetailInfo("Дата открытия больничного листа",cotd.isSetDataol(),DateFormat.getDateInstance().format(new Date(cotd.getDataol())));
+		 					addLineToDetailInfo("Дата закрытия больничного листа",cotd.isSetDatazl(),DateFormat.getDateInstance().format(new Date(cotd.getDatazl())));
+		 					addLineToDetailInfo("Возраст лица, если больничный лист выдан по уходу",cotd.isSetVozrlbl(),cotd.getVozrlbl());
+		 					addLineToDetailInfo("Пол лица, если больничный лист выдан по уходу",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z30), cotd.isSetPollbl(), cotd.getPollbl()));
+		 					addLineToDetailInfo("Исход заболевания",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), cotd.isSetIshod(), cotd.getIshod()));
+		 					addLineToDetailInfo("Результат лечения",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), cotd.isSetResult(), cotd.getResult()));
+		 					addLineToDetailInfo("УКЛ",cotd.isSetUkl(), cotd.getUkl());
+		 					addLineToDetailInfo("Дата выписки",cotd.isSetDatav(),DateFormat.getDateInstance().format(new Date(cotd.getDatav())));
+		 					addLineToDetailInfo("Состояние при выписке", cotd.isSetSostv(), cotd.getSostv());
+		 					addLineToDetailInfo("Рекомендации", cotd.isSetRecom(), cotd.getRecom());
+		 				}		
 						eptxt.setText(sb.toString());
 		 			} 	
 		 			

@@ -134,8 +134,8 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		menuItem_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Integer cpol = 200;
-				CustomDateEditor datan = SvodVed.tfDateB;
-				CustomDateEditor datak = SvodVed.tfDateF;
+//				CustomDateEditor datan = SvodVed.tfDateB;
+//				CustomDateEditor datak = SvodVed.tfDateF;
 				try{
 					System.out.println("Посещения врачей поликлиники");		
 //					String servPath = MainForm.tcl.printDnevVr();
