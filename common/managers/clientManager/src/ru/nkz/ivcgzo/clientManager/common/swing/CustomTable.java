@@ -1,7 +1,6 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -67,6 +66,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	private CustomTableItemChangeEventListener<T> addRowLst;
 	private boolean itemUpd;
 	private boolean itemAdd;
+	protected boolean sorting;
 	
 	/**
 	 * Конструктор таблицы.
@@ -130,11 +130,13 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 			this.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 				@Override
 				public void valueChanged(ListSelectionEvent e) {
-					if (!e.getValueIsAdjusting()) {
+					if (!e.getValueIsAdjusting() && !sorting) {
 						if (getSelectedRow() > -1)
 							updateSelectedItem();
 						sel = getSelectedItem();
 						cop = getDeepCopySelectedItem();
+					} else if (!e.getValueIsAdjusting() && sorting) {
+						sorting = false;
 					}
 				}
 			});
@@ -149,8 +151,8 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		        }
 		    });
 		    
-		    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "updSelRow");
-		    this.getActionMap().put("updSelRow", new AbstractAction() {
+		    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "updSelRowForward");
+		    this.getActionMap().put("updSelRowForward", new AbstractAction() {
 				private static final long serialVersionUID = -626232829510479827L;
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -197,6 +199,42 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 						}
 					} else
 						addItem();
+				}
+			});
+		    
+		    this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), "updSelRowBack");
+		    this.getActionMap().put("updSelRowBack", new AbstractAction() {
+				private static final long serialVersionUID = -626232829510479827L;
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					int selRow = getSelectedRow();
+					int selCol = getSelectedColumn();
+					
+					if (lst.size() > 0) {
+						if (isEditing()) {
+							if (!getCellEditor().stopCellEditing())
+								return;
+						} else {
+							while (selCol > -1) {
+								if (isCellEditable(selRow, selCol)) {
+									changeSelection(selRow, selCol, false, false);
+									editCellAt(selRow, selCol, null);
+									return;
+								}
+								selCol--;
+							}
+						}
+						
+						while (--selCol > -1) {
+							if (isCellEditable(selRow, selCol))
+								break;
+						}
+						
+						if (selCol > -1) {
+							changeSelection(selRow, selCol, false, false);
+							editCellAt(selRow, selCol, null);
+						}
+					}
 				}
 			});
 		    
@@ -501,8 +539,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				@Override
 				public void sorterChanged(RowSorterEvent e) {
 					if (e.getType() == Type.SORT_ORDER_CHANGED)
-						if (itemAdd)
-							updateSelectedItem();
+						sorting = true;
 				}
 			});
 		}
@@ -513,62 +550,127 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 		return (AbstractTableModel) super.getModel();
 	}
 	
-	private boolean dispatching;
 	@Override
 	protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
-		Component cmp = getEditorComponent();
-		
-			if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-				if (!dispatching) {
-					if (super.processKeyBinding(ks, e, condition, pressed)) {
-						cmp = getEditorComponent();
-						if (cmp != null) {
-							cmp.requestFocusInWindow();
-							dispatching = true;
-							try {
-								CustomTable.this.dispatchEvent(new KeyEvent(this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
-							} finally {
-								dispatching = false;
-							}
-							return true;
-						} else {
-							return false;
-						}
-					} else {
-						return false;
-					}
-				} else {
-					return false;
-				}
-			} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
-				if (CustomTable.this.isEditing() && pressed) {
-					CustomTable.this.dispatchEvent(new KeyEvent(this, KeyEvent.KEY_PRESSED, System.currentTimeMillis(), 0, KeyEvent.VK_ENTER, KeyEvent.CHAR_UNDEFINED));
-					return false;
+		if (pressed && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
+			editForward();
+			return true;
+		} else if (pressed && (e.getKeyCode() == KeyEvent.VK_TAB)) {
+			if (CustomTable.this.isEditing() && pressed) {
+				if ((ks.getModifiers() & KeyEvent.SHIFT_DOWN_MASK) == KeyEvent.SHIFT_DOWN_MASK) {
+					editBackwards();
+					return true;
+				} else if (ks.getModifiers() == 0) {
+					editForward();
+					return true;
 				} else {
 					return super.processKeyBinding(ks, e, condition, pressed);
-				}
-			} else if (cmp == null) {
-				switch (e.getKeyCode()) {
-				case KeyEvent.VK_ESCAPE:
-				case KeyEvent.VK_F2:
-				case KeyEvent.VK_DELETE:
-				case KeyEvent.VK_TAB:
-				case KeyEvent.VK_LEFT:
-				case KeyEvent.VK_RIGHT:
-				case KeyEvent.VK_UP:
-				case KeyEvent.VK_DOWN:
-				case KeyEvent.VK_PAGE_UP:
-				case KeyEvent.VK_PAGE_DOWN:
-				case KeyEvent.VK_HOME:
-				case KeyEvent.VK_END:
-					return super.processKeyBinding(ks, e, condition, pressed);
-				default:
-					return false;
 				}
 			}
-			return super.processKeyBinding(ks, e, condition, pressed);
+		} else if (!CustomTable.this.isEditing()) {
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_ESCAPE:
+			case KeyEvent.VK_F2:
+			case KeyEvent.VK_DELETE:
+			case KeyEvent.VK_TAB:
+			case KeyEvent.VK_LEFT:
+			case KeyEvent.VK_RIGHT:
+			case KeyEvent.VK_UP:
+			case KeyEvent.VK_DOWN:
+			case KeyEvent.VK_PAGE_UP:
+			case KeyEvent.VK_PAGE_DOWN:
+			case KeyEvent.VK_HOME:
+			case KeyEvent.VK_END:
+				return super.processKeyBinding(ks, e, condition, pressed);
+			default:
+				return true;
+			}
+		}
+		
+		return super.processKeyBinding(ks, e, condition, pressed);
 	}
 	
+	private void editBackwards() {
+		int selRow = getSelectedRow();
+		int selCol = getSelectedColumn();
+		
+		if (lst.size() > 0) {
+			if (isEditing()) {
+				if (!getCellEditor().stopCellEditing())
+					return;
+			} else {
+				while (selCol > -1) {
+					if (isCellEditable(selRow, selCol)) {
+						changeSelection(selRow, selCol, false, false);
+						if (editCellAt(selRow, selCol, null))
+							getEditorComponent().requestFocusInWindow();
+						return;
+					}
+					selCol--;
+				}
+			}
+			
+			while (--selCol > -1) {
+				if (isCellEditable(selRow, selCol))
+					break;
+			}
+			
+			if (selCol > -1) {
+				changeSelection(selRow, selCol, false, false);
+				if (editCellAt(selRow, selCol, null))
+					getEditorComponent().requestFocusInWindow();
+			}
+		}
+	}
+
+	private void editForward() {
+		int selRow = getSelectedRow();
+		int selCol = getSelectedColumn();
+		
+		if (lst.size() > 0) {
+			if (isEditing()) {
+				if (!getCellEditor().stopCellEditing())
+					return;
+			} else {
+				while (selCol < getColumnCount()) {
+					if (isCellEditable(selRow, selCol)) {
+						changeSelection(selRow, selCol, false, false);
+						if (editCellAt(selRow, selCol, null))
+							getEditorComponent().requestFocusInWindow();
+						return;
+					}
+					selCol++;
+				}
+			}
+			
+			while (++selCol < getColumnCount()) {
+				if (isCellEditable(selRow, selCol))
+					break;
+			}
+			
+			if (selCol == getColumnCount()) {
+				++selRow;
+				if (selRow == getRowCount())
+					addItem();
+				else {
+					selCol = 0;
+					while (selCol < getColumnCount()) {
+						if (isCellEditable(selRow, selCol))
+							break;
+						selCol++;
+					}
+					updateSelectedItem();
+					changeSelection(selRow, selCol, false, false);
+				}
+			} else {
+				changeSelection(selRow, selCol, false, false);
+				if (editCellAt(selRow, selCol, null))
+					getEditorComponent().requestFocusInWindow();
+			}
+		} else
+			addItem();
+	}
+
 	/**
 	 * Регистрация слушателя, принимающего сообщения о том, что текущая строка
 	 * будет удалена.
@@ -659,7 +761,7 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 	
 	/**
 	 * Обновление текущей строки. Обновление происходит при добавлении строки,
-	 * переходе на другую строку, сортировке или обновлении данных
+	 * переходе на другую строку или обновлении данных
 	 * методом {@link #setData(List)}.
 	 */
 	public void updateSelectedItem() {

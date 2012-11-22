@@ -2124,8 +2124,13 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					sb.append(String.format("Группа крови: %s<br>", acrs.getResultSet().getString(2)));
 				}
 				acrs.close();
+				acrs = sse.execPreparedQuery("SELECT photec FROM p_rd_inf WHERE npasp = ? ", kb.getNpasp());
+				if (acrs.getResultSet().next()) {
+					sb.append(String.format("Резус-принадлежность крови мужа: %s<br>", acrs.getResultSet().getString(1)));
+				}
+				acrs.close();
 				
-				sb.append("<br>Резус-принадлежность крови мужа:__________");
+//				sb.append("<br>Резус-принадлежность крови мужа:__________");
 				sb.append("<br>Токсоплазмоз: РСК, кожная проба __________");
 //				sb.append("<br><b>Клинические анлизы</b>");
 //				sb.append("<br>Крови _____________________________");
