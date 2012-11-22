@@ -226,6 +226,9 @@ public class RaspisanieUnit {
 						}else{
 							getTalonTime(rasp.get(i).getTime_n(), rasp.get(i).getTime_k(), dlit, timepause_n, timepause_k);
 						}
+						SimpleDateFormat dt = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS");
+						SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
+						SimpleDateFormat stf = new SimpleDateFormat("HH:MM:SS");
 						for (int j=0; j <= timelist.size()-1; j++){
 							Talon tmpTalon = new Talon();
 							tmpTalon.setCpol(rasp.get(i).getCpol());
@@ -236,7 +239,9 @@ public class RaspisanieUnit {
 							tmpTalon.setTimepk(new Time(rasp.get(i).getTime_k()).getTime());
 							tmpTalon.setDatap(rasp.get(i).getDatap());
 							tmpTalon.setTimep(timelist.get(j).getTimep());
-							tmpTalon.setDatapt(tmpTalon.getDatap() + tmpTalon.getTimep());
+							tmpTalon.setDatapt(tmpTalon.getDatap());
+									//,tmpTalon.getTimep());
+							//tmpTalon.getTimep());
 							talonlist.add(tmpTalon);
 						}
 					}

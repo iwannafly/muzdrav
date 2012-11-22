@@ -317,17 +317,49 @@ public class GenReestr extends Server implements Iface {
 		
 	}
 
+	private void InsertToKderr(ResultSet rs) throws KmiacServerException, SQLException {
+		int cuser = 0;
+		try (AutoCloseableResultSet acr = sse.execPreparedQuery("select m.pcod, m.cpodr from s_vrach v, s_mrab m where v.pcod=m.pcod and v.snils=? and m.cpodr=?", rs.getString("ssd"), rs.getInt("kod_mu"))) {
+			if (acr.getResultSet().next())
+				cuser = acr.getResultSet().getInt("pcod");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("insert into w_kderr (cslu, cuser, cpodr, sl_id, id_med, npasp, kod_err, name_err, dataz) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", false, 2, cuser, rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), rs.getInt("kod_err"), rs.getString("prim"), new Date(System.currentTimeMillis()));
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+		
+	}
+
 	private String RsTest(ResultSet rs) throws KmiacServerException, SQLException {
 		String str = "";
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("delete from w_kderr where sl_id = ? and id_med=? and cslu = 2", false, rs.getInt("sl_id"), rs.getInt("id_med"));
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
 		if (rs.getInt("vid_rstr") != 1 && rs.getInt("vid_rstr") != 2 && rs.getInt("vid_rstr") != 3)
 			str += " 5. Несуществующий вид реестра VID_RSTR<br>";
     	if (rs.getInt("kod_mu") == 0)
     		str += " 9. Отсутствует код территории МО KOD_MU<br>";
     	if (rs.getInt("ter_mu") == 0)
     		str += " 10. Неверная территории МО TER_MU<br>";
-    	if (rs.getDate("df_per").getTime() == 0)
+    	if (rs.getDate("df_per") == null)
     		str += " 13. Не заполнена дата предоставления реестра в ТФ DF_PER<br>";
-		if (rs.getDate("d_pst").getTime() > rs.getDate("df_per").getTime())
+    	if (rs.getDate("d_pst") != null && rs.getDate("df_per") != null)
+    		if (rs.getDate("d_pst").getTime() > rs.getDate("df_per").getTime())
     		str += " 14. D_PST, D_END > SYSDATE. Дата услуги ранее или позднее принимаемого к оплате периода.<br>";
     	if (rs.getString("fam") == null)
     		str += " 15. Не заполнена фамилия FAM.<br>";
@@ -335,9 +367,10 @@ public class GenReestr extends Server implements Iface {
     		str += " 16. Не заполнено имя IM.<br>";
     	if (rs.getString("otch") == null)
     		str += " 17. Не заполнено отчество OTCH.<br>";
-    	if (rs.getDate("dr").getTime() == 0)
+    	if (rs.getDate("dr") == null)
     		str += " 18. Не заполнена дата рождения DR<br>";
-    	if (rs.getDate("d_pst").getTime()<rs.getDate("dr").getTime())
+    	if (rs.getDate("d_pst") != null && rs.getDate("dr") != null)
+    		if (rs.getDate("d_pst").getTime()<rs.getDate("dr").getTime())
     		str += " 19. Ошибка в дате рождения<br>";
     	if ((rs.getString("sex").toUpperCase().charAt(0) != 'М') && (rs.getString("sex").toUpperCase().charAt(0) != 'Ж'))
     		str += " 21. Ошибка в кодировании пола SEX<br>";
@@ -358,8 +391,8 @@ public class GenReestr extends Server implements Iface {
     		str += " 125. Отсутствует / некорректный номер документа, удостоверяющего личность<br>";
     	if (rs.getInt("region") != 42 && rs.getString("ogrn_str") == null)
     		str += " 246. Ошибка заполнения инообластного реестра. Не указан ОГРН.<br>";
-    	if (rs.getInt("stoim") == 0)
-    		str += " 230. Отсутствует тариф<br>";
+//    	if (rs.getInt("stoim") == 0)
+//    		str += " 230. Отсутствует тариф<br>";
 
     	if (rs.getInt("vid_rstr") == 1){
         	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8) && rs.getString("ist_bol") == null)
@@ -368,11 +401,11 @@ public class GenReestr extends Server implements Iface {
         		str += " 41. Плановый больной без талона<br>";
         	if (rs.getInt("kod_otd") == 0)
         		str += " 47. Отсутствует код отделения<br>";
-        	if (rs.getDate("d_pst").getTime() == 0)
+        	if (rs.getDate("d_pst") == null)
         		str += " 51. Не заполнена дата госпитализации D_PST<br>";
-        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 7 && rs.getInt("kl_usl") != 8) && rs.getDate("d_end").getTime() == 0)
+        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 7 && rs.getInt("kl_usl") != 8) && rs.getDate("d_end") == null)
         		str += " 52. Отсутствует дата выписки<br>";
-        	if (rs.getDate("d_pst").getTime() != 0 && rs.getDate("d_end").getTime() != 0)
+        	if (rs.getDate("d_pst") != null && rs.getDate("d_end") != null)
             	if (rs.getDate("d_pst").getTime() > rs.getDate("d_end").getTime() || (rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>=365)
             	str += " 53. Ошибка в датах госпитализации и выписки<br>";
         	if (rs.getInt("kl_usl") < 1 && rs.getInt("kl_usl") > 11)
@@ -393,7 +426,8 @@ public class GenReestr extends Server implements Iface {
         		str += " 93. Для незастрахованного указан признак планового больного<br>";
         	if (rs.getInt("kl_usl") == 1 && rs.getInt("etap") != 3 && rs.getInt("etap") != 4)
         		str += " 96. Неверно указан код этапа<br>";
-        	if ((rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>150)
+        	if (rs.getDate("d_pst") != null && rs.getDate("d_end") != null)
+        		if ((rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>150)
         		str += " 215. Срок госпитализации >150 дней<br>";
         	if (rs.getInt("prof_fn") == 0 && rs.getInt("kl_usl") != 8 && rs.getInt("pr_exp") != 1)
         		str += " 216. Отсутствует код профиля финансового норматива<br>";
@@ -540,11 +574,14 @@ public class GenReestr extends Server implements Iface {
 		AutoCloseableResultSet acr;
 
         if (vidr == 1) 
-        	sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0 ";
+        	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0 ";
         if (vidr == 2) 
-        	sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)) ";
+        	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)) ";
         if (vidr == 3) 
-        	sqlwhere = "WHERE ld.kodotd = ? AND ld.vopl = ? AND s.kdomc = 1 AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11) ";
+        	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11) ";
+
+        if (cpodr != 0) sqlwhere += " AND ld.kodotd = ?";
+        else sqlwhere += " AND substr(cast(ld.kodotd as varchar(10)),1,2)=cast(? as varchar(10))";
 
         try {
 			acr = sse.execPreparedQuery("select tip from n_lds where pcod=?", cpodr);
@@ -646,7 +683,7 @@ public class GenReestr extends Server implements Iface {
         sqlr += sqlwhere;
         sqlr += " ORDER BY p.npasp";
 
-        try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, ter_mu, kod_mu, new Date(df), kod_mu, cpodr, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, ter_mu, kod_mu, new Date(df), kod_mu, cpodr, vopl, new Date(dn), new Date(dk)))) {
+        try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, ter_mu, kod_mu, new Date(df), kod_mu, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlr, clpu, clpu, ter_mu, kod_mu, new Date(df), kod_mu, vopl, new Date(dn), new Date(dk), cpodr))) {
             ResultSet rs = acrs.getResultSet();
             
    			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
@@ -734,7 +771,7 @@ public class GenReestr extends Server implements Iface {
 						sqlmed += sqlfrom;
 						sqlmed += sqlwhere;
 						sqlmed += " ORDER BY p.npasp";
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, cpodr, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, cpodr, vopl, new Date(dn), new Date(dk)));
+					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, new Date(dn), new Date(dk), cpodr));
 							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 						zos.putNextEntry(new ZipEntry("med.dbf"));
 						while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -775,7 +812,7 @@ public class GenReestr extends Server implements Iface {
 						sqlpasp += sqlwhere;
 						sqlpasp += " ORDER BY p.npasp";
 
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, ter_mu, kod_mu, new Date(df), kod_mu, cpodr, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, ter_mu, kod_mu, new Date(df), kod_mu, cpodr, vopl, new Date(dn), new Date(dk)));
+					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, ter_mu, kod_mu, new Date(df), kod_mu, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlpasp, ter_mu, kod_mu, new Date(df), kod_mu, vopl, new Date(dn), new Date(dk), cpodr));
 							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 						zos.putNextEntry(new ZipEntry("pasp.dbf"));
 						while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -805,8 +842,11 @@ public class GenReestr extends Server implements Iface {
         boolean flag = false;
 
         if (vidr == 1) sqlwhere = " AND g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0";
-        if (vidr == 2) sqlwhere = " AND (g.kod_rez = 0 AND g.dataz >= ? AND g.dataz <= ?) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11))";
+        if (vidr == 2) sqlwhere = " AND (g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11))";
         if (vidr == 3) sqlwhere = " AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
+
+        if (cpodr != 0) sqlwhere += " AND g.cotd = ?";
+        else sqlwhere += " AND substr(cast(g.cotd as varchar(10)),1,2)=cast(? as varchar(10))";
 
         sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
 				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, g.diag_p::char(7) AS diag, null::char(7) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, "+
@@ -842,11 +882,11 @@ public class GenReestr extends Server implements Iface {
 				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
         	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
-        			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
         	sqlr += sqlfrom; 
         	sqlr += "WHERE g.pr_out<>0 "+sqlwhere;
         	sqlr += " UNION ";
-            sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
+            sqlr = "SELECT g.id::integer AS sl_id, d.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
     				"d.stl::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
     				"(select get_pr_out(o.ishod))::integer AS pr_out, (select get_res_l(o.result))::integer AS res_l, "+
     				"(select get_prof(?, o.vrach))::integer AS prof_fn, " +
@@ -880,13 +920,13 @@ public class GenReestr extends Server implements Iface {
     				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
     				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
-            			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
+            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlr += sqlfrom; 
             	sqlr += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
 //            	sqlr += " ORDER BY p.npasp ";
             	
-           try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk)))) {
+           try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), cpodr))) {
         	   ResultSet rs = acrs.getResultSet();
             
             	try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
@@ -956,11 +996,11 @@ public class GenReestr extends Server implements Iface {
 						"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
 						"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
 	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
-	        			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
 	        	sqlmed += sqlfrom; 
 	        	sqlmed += "WHERE g.pr_out<>0 "+sqlwhere;
 	        	sqlmed += " UNION ";
-	            sqlmed = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
+	            sqlmed = "SELECT g.id::integer AS sl_id, d.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
 	    				"d.stl::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
 	    				"(select get_pr_out(o.ishod))::integer AS pr_out, (select get_res_l(o.result))::integer AS res_l, "+
 	    				"(select get_prof(?, o.vrach))::integer AS prof_fn, " +
@@ -968,8 +1008,8 @@ public class GenReestr extends Server implements Iface {
 	    				"(select get_kodsp(o.vrach))::integer AS spec, " +
 	    				"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
 	    				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=1) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
-            			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
+            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlmed += sqlfrom; 
             	sqlmed += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
             	sqlmed += " ORDER BY p.npasp "; //ругается
@@ -984,7 +1024,7 @@ public class GenReestr extends Server implements Iface {
 //							throw new KmiacServerException();
 //						}
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)))){
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), cpodr))){
 					while (acrs.getResultSet().next()){
 						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 							zos.putNextEntry(new ZipEntry("med.dbf"));
@@ -1022,8 +1062,8 @@ public class GenReestr extends Server implements Iface {
 						"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
 						"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
-	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
-	        			"JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) ";
+//	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
 	        	sqlpasp += sqlfrom; 
 	        	sqlpasp += "WHERE g.pr_out<>0 "+sqlwhere;
 	        	sqlpasp += " UNION ";
@@ -1052,8 +1092,9 @@ public class GenReestr extends Server implements Iface {
 	    				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
 	    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
-            			"JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) JOIN n_s00 s ON (m.cdol = s.pcod) ";
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp)";
+//            			"LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
+//            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
             	sqlpasp += sqlfrom; 
             	sqlpasp += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
@@ -1067,7 +1108,7 @@ public class GenReestr extends Server implements Iface {
 //						log.log(Level.ERROR, "SQl Exception: ", e);
 //						throw new KmiacServerException();
 //					}
-				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)))){
+				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), cpodr))){
 					while (acrs.getResultSet().next()){
 						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 							zos.putNextEntry(new ZipEntry("pasp.dbf"));
