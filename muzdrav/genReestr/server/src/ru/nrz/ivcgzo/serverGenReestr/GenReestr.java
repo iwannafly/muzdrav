@@ -115,7 +115,7 @@ public class GenReestr extends Server implements Iface {
         boolean flag = false;
         sqlwhere = "";
         if (vidr == 1) sqlwhere = "AND v.dataz >= ? AND v.dataz <= ? AND v.kod_rez = 0";
-        if (vidr == 2) sqlwhere = "AND (v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11))";
+        if (vidr == 2) sqlwhere = "AND ((v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)))";
         if (vidr == 3) sqlwhere = "AND v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
 
         sqlr = "SELECT v.id::integer AS sl_id, v.id::integer AS id_med, v.kod_rez::integer AS kod_rez, v.datap::date as d_pst, 2::integer AS kl_usl, v.pl_extr::integer AS pl_extr, " +
@@ -178,7 +178,7 @@ public class GenReestr extends Server implements Iface {
         				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
 	            	}
 
-	           		String str = RsTest(rs);
+	           		String str = RsTest(rs, 2);
     	            	
     	           	if(str!=null){
    	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
@@ -317,16 +317,17 @@ public class GenReestr extends Server implements Iface {
 		
 	}
 
-	private void InsertToKderr(ResultSet rs) throws KmiacServerException, SQLException {
+	private void InsertToKderr(int cslu, String snils, int kod_mu, int sl_id, int id_med, int id_lpu, int kod_err, String name_err) throws KmiacServerException, SQLException {
 		int cuser = 0;
-		try (AutoCloseableResultSet acr = sse.execPreparedQuery("select m.pcod, m.cpodr from s_vrach v, s_mrab m where v.pcod=m.pcod and v.snils=? and m.cpodr=?", rs.getString("ssd"), rs.getInt("kod_mu"))) {
-			if (acr.getResultSet().next())
-				cuser = acr.getResultSet().getInt("pcod");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		if (cslu != 1)
+			try (AutoCloseableResultSet acr = sse.execPreparedQuery("select m.pcod, m.cpodr from s_vrach v, s_mrab m where v.pcod=m.pcod and v.snils=? and m.cpodr=?", snils, kod_mu)) {
+				if (acr.getResultSet().next())
+					cuser = acr.getResultSet().getInt("pcod");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("insert into w_kderr (cslu, cuser, cpodr, sl_id, id_med, npasp, kod_err, name_err, dataz) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", false, 2, cuser, rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), rs.getInt("kod_err"), rs.getString("prim"), new Date(System.currentTimeMillis()));
+			sme.execPrepared("insert into w_kderr (cslu, cuser, cpodr, sl_id, id_med, npasp, kod_err, name_err, dataz) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", false, cslu, cuser, kod_mu, sl_id, id_med, id_lpu, kod_err, name_err, new Date(System.currentTimeMillis()));
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -338,10 +339,12 @@ public class GenReestr extends Server implements Iface {
 		
 	}
 
-	private String RsTest(ResultSet rs) throws KmiacServerException, SQLException {
+	private String RsTest(ResultSet rs, int cslu) throws KmiacServerException, SQLException {
 		String str = "";
+		String name_err = "";
+		int kod_err = 0;
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("delete from w_kderr where sl_id = ? and id_med=? and cslu = 2", false, rs.getInt("sl_id"), rs.getInt("id_med"));
+			sme.execPrepared("delete from w_kderr where sl_id = ? and id_med=? and cslu = ?", false, rs.getInt("sl_id"), rs.getInt("id_med"), cslu);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -350,129 +353,419 @@ public class GenReestr extends Server implements Iface {
 			e1.printStackTrace();
 			throw new KmiacServerException();
 		}
-		if (rs.getInt("vid_rstr") != 1 && rs.getInt("vid_rstr") != 2 && rs.getInt("vid_rstr") != 3)
+
+		if (rs.getInt("vid_rstr") != 1 && rs.getInt("vid_rstr") != 2 && rs.getInt("vid_rstr") != 3){
 			str += " 5. Несуществующий вид реестра VID_RSTR<br>";
-    	if (rs.getInt("kod_mu") == 0)
+			kod_err = 5;
+			name_err = "Несуществующий вид реестра VID_RSTR";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("kod_mu") == 0){
     		str += " 9. Отсутствует код территории МО KOD_MU<br>";
-    	if (rs.getInt("ter_mu") == 0)
+			kod_err = 9;
+			name_err = "Отсутствует код территории МО KOD_MU";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("ter_mu") == 0){
     		str += " 10. Неверная территории МО TER_MU<br>";
-    	if (rs.getDate("df_per") == null)
+			kod_err = 10;
+			name_err = "Неверная территории МО TER_MU";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getDate("df_per") == null){
     		str += " 13. Не заполнена дата предоставления реестра в ТФ DF_PER<br>";
+			kod_err = 13;
+			name_err = "Не заполнена дата предоставления реестра в ТФ DF_PER";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
     	if (rs.getDate("d_pst") != null && rs.getDate("df_per") != null)
-    		if (rs.getDate("d_pst").getTime() > rs.getDate("df_per").getTime())
-    		str += " 14. D_PST, D_END > SYSDATE. Дата услуги ранее или позднее принимаемого к оплате периода.<br>";
-    	if (rs.getString("fam") == null)
+    		if (rs.getDate("d_pst").getTime() > rs.getDate("df_per").getTime()){
+    			str += " 14. D_PST, D_END > SYSDATE. Дата услуги ранее или позднее принимаемого к оплате периода.<br>";
+    			kod_err = 14;
+    			name_err = "D_PST, D_END > SYSDATE. Дата услуги ранее или позднее принимаемого к оплате периода.";
+    			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+    	if (rs.getString("fam") == null){
     		str += " 15. Не заполнена фамилия FAM.<br>";
-    	if (rs.getString("im") == null)
+			kod_err = 15;
+			name_err = "Не заполнена фамилия FAM.";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getString("im") == null){
     		str += " 16. Не заполнено имя IM.<br>";
-    	if (rs.getString("otch") == null)
+			kod_err = 16;
+			name_err = "Не заполнено имя IM.";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getString("otch") == null){
     		str += " 17. Не заполнено отчество OTCH.<br>";
-    	if (rs.getDate("dr") == null)
+			kod_err = 17;
+			name_err = "Не заполнено отчество OTCH.";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getDate("dr") == null){
     		str += " 18. Не заполнена дата рождения DR<br>";
+			kod_err = 18;
+			name_err = "Не заполнена дата рождения DR";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
     	if (rs.getDate("d_pst") != null && rs.getDate("dr") != null)
-    		if (rs.getDate("d_pst").getTime()<rs.getDate("dr").getTime())
-    		str += " 19. Ошибка в дате рождения<br>";
-    	if ((rs.getString("sex").toUpperCase().charAt(0) != 'М') && (rs.getString("sex").toUpperCase().charAt(0) != 'Ж'))
+    		if (rs.getDate("d_pst").getTime()<rs.getDate("dr").getTime()){
+    			str += " 19. Ошибка в дате рождения<br>";
+    			kod_err = 19;
+    			name_err = "Ошибка в дате рождения";
+    			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+    	if ((rs.getString("sex").toUpperCase().charAt(0) != 'М') && (rs.getString("sex").toUpperCase().charAt(0) != 'Ж')){
     		str += " 21. Ошибка в кодировании пола SEX<br>";
+			kod_err = 21;
+			name_err = "Ошибка в кодировании пола SEX";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
     	if (((rs.getString("sex").toUpperCase().charAt(0) == 'М') && (rs.getString("otch").toUpperCase().endsWith("ИЧ") || rs.getString("otch").toUpperCase().endsWith("ОГЛЫ"))) ||
-    		((rs.getString("sex").toUpperCase().charAt(0) == 'Ж') && (rs.getString("otch").toUpperCase().endsWith("НА") || rs.getString("otch").toUpperCase().endsWith("КЫЗЫ"))))
+    		((rs.getString("sex").toUpperCase().charAt(0) == 'Ж') && (rs.getString("otch").toUpperCase().endsWith("НА") || rs.getString("otch").toUpperCase().endsWith("КЫЗЫ")))){
     		str += " 22. Несоответствие пола и отчества<br>";
-    	if (rs.getInt("region") != 42 && (rs.getInt("type_doc") < 1 && rs.getInt("type_doc") > 18))
+			kod_err = 22;
+			name_err = "Несоответствие пола и отчества";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("region") != 42 && (rs.getInt("type_doc") < 1 && rs.getInt("type_doc") > 18)){
     		str += " 31. Отсутствует / некорректный тип документа TYPE_DOC<br>";
-    	if (rs.getInt("region") == 0)
+			kod_err = 31;
+			name_err = "Отсутствует / некорректный тип документа TYPE_DOC";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("region") == 0){
     		str += " 33. Отсутствует код области REGION<br>";
-    	if (rs.getInt("region") == 42 && rs.getInt("ter_liv") == 0)
+			kod_err = 33;
+			name_err = "Отсутствует код области REGION";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("region") == 42 && rs.getInt("ter_liv") == 0){
     		str += " 35. Отсутствует код административной территории места жительства TER_LIV<br>";
-    	if (rs.getInt("status") == 0)
+			kod_err = 35;
+			name_err = "Отсутствует код административной территории места жительства TER_LIV";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("status") == 0){
     		str += " 38. Неверный статус STATUS<br>";
-    	if (rs.getInt("region") == 42 && rs.getInt("vid_rstr") == 1 && rs.getInt("vid_hosp") == 1 && rs.getInt("kl_usl") == 1 && rs.getString("talon") == null)
+			kod_err = 38;
+			name_err = "Неверный статус STATUS";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("region") == 42 && rs.getInt("vid_rstr") == 1 && rs.getInt("vid_hosp") == 1 && rs.getInt("kl_usl") == 1 && rs.getString("talon") == null){
     		str += " 41. Плановый больной без талона<br>";
-    	if (rs.getInt("region") != 42 && ((rs.getString("docnum") == null) || (rs.getString("docser") == null)))
+			kod_err = 41;
+			name_err = "Плановый больной без талона";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("region") != 42 && ((rs.getString("docnum") == null) || (rs.getString("docser") == null))){
     		str += " 125. Отсутствует / некорректный номер документа, удостоверяющего личность<br>";
-    	if (rs.getInt("region") != 42 && rs.getString("ogrn_str") == null)
+			kod_err = 125;
+			name_err = "Отсутствует / некорректный номер документа, удостоверяющего личность";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
+    	if (rs.getInt("region") != 42 && rs.getString("ogrn_str") == null){
     		str += " 246. Ошибка заполнения инообластного реестра. Не указан ОГРН.<br>";
+			kod_err = 246;
+			name_err = "Ошибка заполнения инообластного реестра. Не указан ОГРН.";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+		}
 //    	if (rs.getInt("stoim") == 0)
 //    		str += " 230. Отсутствует тариф<br>";
 
     	if (rs.getInt("vid_rstr") == 1){
-        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8) && rs.getString("ist_bol") == null)
+        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8) && rs.getString("ist_bol") == null){
         		str += " 39. Отсутствует номер истории болезни<br>";
-        	if (rs.getInt("region") == 42 && rs.getInt("kl_usl") == 1 && rs.getInt("vid_hosp") == 1 && rs.getString("talon") == null)
+    			kod_err = 39;
+    			name_err = "Отсутствует номер истории болезни";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("region") == 42 && rs.getInt("kl_usl") == 1 && rs.getInt("vid_hosp") == 1 && rs.getString("talon") == null){
         		str += " 41. Плановый больной без талона<br>";
-        	if (rs.getInt("kod_otd") == 0)
+    			kod_err = 41;
+    			name_err = "Плановый больной без талона";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("kod_otd") == 0){
         		str += " 47. Отсутствует код отделения<br>";
-        	if (rs.getDate("d_pst") == null)
+    			kod_err = 47;
+    			name_err = "Отсутствует код отделения";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getDate("d_pst") == null){
         		str += " 51. Не заполнена дата госпитализации D_PST<br>";
-        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 7 && rs.getInt("kl_usl") != 8) && rs.getDate("d_end") == null)
+    			kod_err = 51;
+    			name_err = "Не заполнена дата госпитализации D_PST";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if ((rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 7 && rs.getInt("kl_usl") != 8) && rs.getDate("d_end") == null){
         		str += " 52. Отсутствует дата выписки<br>";
+    			kod_err = 52;
+    			name_err = "Отсутствует дата выписки";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
         	if (rs.getDate("d_pst") != null && rs.getDate("d_end") != null)
-            	if (rs.getDate("d_pst").getTime() > rs.getDate("d_end").getTime() || (rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>=365)
+            	if (rs.getDate("d_pst").getTime() > rs.getDate("d_end").getTime() || (rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>=365){
             	str += " 53. Ошибка в датах госпитализации и выписки<br>";
-        	if (rs.getInt("kl_usl") < 1 && rs.getInt("kl_usl") > 11)
+    			kod_err = 53;
+    			name_err = "Ошибка в датах госпитализации и выписки";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("kl_usl") < 1 && rs.getInt("kl_usl") > 11){
         		str += " 54. Неверный вид помощи KL_USL<br>";
-        	if (rs.getInt("kl_usl") != 1 && rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8)
+    			kod_err = 54;
+    			name_err = "Неверный вид помощи KL_USL";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("kl_usl") != 1 && rs.getInt("kl_usl") != 3 && rs.getInt("kl_usl") != 8){
         		str += " 55. Несоответствие вида реестра VID_RSTR виду помощи KL_USL<br>";
-        	if (rs.getInt("kl_usl") == 1 && rs.getInt("etap") == 0)
+    			kod_err = 55;
+    			name_err = "Несоответствие вида реестра VID_RSTR виду помощи KL_USL";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("kl_usl") == 1 && rs.getInt("etap") == 0){
         		str += " 58. Не задан этап<br>";
-        	if (rs.getInt("kl_usl") == 1 && (rs.getInt("pr_out") == 8 || rs.getInt("pr_out") == 15))
+    			kod_err = 58;
+    			name_err = "Не задан этап";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("kl_usl") == 1 && (rs.getInt("pr_out") == 8 || rs.getInt("pr_out") == 15)){
         		str += " 60. Ошибка кода причины выбытия<br>";
-        	if (rs.getInt("region") != 42 && rs.getInt("spec") == 0)
+    			kod_err = 60;
+    			name_err = "Ошибка кода причины выбытия";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("region") != 42 && rs.getInt("spec") == 0){
         		str += " 67. Отсутствует код врачебной специальности SPEC<br>";
-        	if (rs.getInt("res_g") != 0)
+    			kod_err = 67;
+    			name_err = "Отсутствует код врачебной специальности SPEC";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("res_g") != 0){
         		str += " 77. Неверный код результата обращения RES_G<br>";
-        	if (rs.getInt("region") == 42 && rs.getInt("str_org") == 0 && rs.getInt("etap") == 4)
+    			kod_err = 77;
+    			name_err = "Неверный код результата обращения RES_G";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("region") == 42 && rs.getInt("str_org") == 0 && rs.getInt("etap") == 4){
         		str += " 93. Для незастрахованного указан этап долечивания<br>";
-        	if (rs.getInt("region") == 42 && rs.getInt("str_org") == 0 && rs.getInt("vid_hosp") == 1)
-        		str += " 93. Для незастрахованного указан признак планового больного<br>";
-        	if (rs.getInt("kl_usl") == 1 && rs.getInt("etap") != 3 && rs.getInt("etap") != 4)
+    			kod_err = 93;
+    			name_err = "Для незастрахованного указан этап долечивания";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("region") == 42 && rs.getInt("str_org") == 0 && rs.getInt("vid_hosp") == 1){
+        		str += " 94. Для незастрахованного указан признак планового больного<br>";
+    			kod_err = 94;
+    			name_err = "Для незастрахованного указан признак планового больного";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("etap") != 3 && rs.getInt("etap") != 4){
         		str += " 96. Неверно указан код этапа<br>";
+    			kod_err = 96;
+    			name_err = "Неверно указан код этапа";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
         	if (rs.getDate("d_pst") != null && rs.getDate("d_end") != null)
-        		if ((rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>150)
-        		str += " 215. Срок госпитализации >150 дней<br>";
-        	if (rs.getInt("prof_fn") == 0 && rs.getInt("kl_usl") != 8 && rs.getInt("pr_exp") != 1)
+        		if ((rs.getDate("d_end").getTime()-rs.getDate("d_pst").getTime())>150){
+        			str += " 215. Срок госпитализации >150 дней<br>";
+        			kod_err = 215;
+        			name_err = "Срок госпитализации >150 дней";
+        			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("prof_fn") == 0 && rs.getInt("kl_usl") != 8 && rs.getInt("pr_exp") != 1){
         		str += " 216. Отсутствует код профиля финансового норматива<br>";
-        	if (rs.getInt("kl_usl") == 3 && rs.getInt("prof_fn") != 84)
+    			kod_err = 216;
+    			name_err = "Отсутствует код профиля финансового норматива";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
+        	if (rs.getInt("kl_usl") == 3 && rs.getInt("prof_fn") != 84){
         		str += " 257. Несоответствие профиля классу услуги (д.б. kl_usl=3, prof_fn=84)<br>";
+    			kod_err = 257;
+    			name_err = "Несоответствие профиля классу услуги (д.б. kl_usl=3, prof_fn=84)";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    		}
     	}
 
     	if (rs.getInt("vid_rstr") == 2){
-        	if (rs.getInt("region") == 42 && rs.getInt("ter_pol") == 0)
+        	if (rs.getInt("region") == 42 && rs.getInt("ter_pol") == 0){
         		str += " 42. Неверная территория поликлиники прикрепления TER_POL<br>";
-        	if (rs.getInt("region") == 42 && rs.getInt("pol") == 0)
+    			kod_err = 42;
+    			name_err = "Неверная территория поликлиники прикрепления TER_POL";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+    		if (rs.getInt("region") == 42 && rs.getInt("pol") == 0){
         		str += " 43. Неверная поликлиника прикрепления POL<br>";
-        	if (rs.getInt("kl_usl") != 2 && rs.getInt("kl_usl") != 9)
+    			kod_err = 43;
+    			name_err = "Неверная поликлиника прикрепления POL";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("kl_usl") != 2 && rs.getInt("kl_usl") != 9){
         		str += " 55. Несоответствие вида реестра VID_RSTR виду помощи KL_USL<br>";
-        	if (rs.getInt("pr_out") != 0)
+    			kod_err = 55;
+    			name_err = "Несоответствие вида реестра VID_RSTR виду помощи KL_USL";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("pr_out") != 0){
         		str += " 60. Ошибка кода причины выбытия<br>";
-        	if (rs.getInt("res_l") != 0)
+    			kod_err = 60;
+    			name_err = "Ошибка кода причины выбытия";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("res_l") != 0){
         		str += " 61. Ошибка кода результата лечения<br>";
-        	if (rs.getInt("case") == 0)
+    			kod_err = 61;
+    			name_err = "Ошибка кода результата лечения";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("case") == 0){
         		str += " 63. Отсутствует цель посещения<br>";
-        	if (rs.getInt("place") == 0)
+    			kod_err = 68;
+    			name_err = "Отсутствует цель посещения";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("place") == 0){
         		str += " 65. Отсутствует код места обслуживания<br>";
-        	if (rs.getInt("spec") == 0)
+    			kod_err = 65;
+    			name_err = "Отсутствует код места обслуживания";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("spec") == 0){
         		str += " 67. Отсутствует код врачебной специальности<br>";
-        	if ((rs.getInt("spec") == 1) && (rs.getString("sex").toUpperCase().charAt(0) == 'М'))
+    			kod_err = 67;
+    			name_err = "Отсутствует код врачебной специальности";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if ((rs.getInt("spec") == 1) && (rs.getString("sex").toUpperCase().charAt(0) == 'М')){
         		str += " 69. Несоответствие врачебной специальности полу пациента<br>";
-        	if (rs.getInt("prvd") == 0)
+    			kod_err = 69;
+    			name_err = "Несоответствие врачебной специальности полу пациента";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("prvd") == 0){
         		str += " 70. Отсутствует код врачебной должности PRVD<br>";
-        	if ((rs.getInt("prvd") == 11 || rs.getInt("prvd") == 12) && (rs.getString("sex").toUpperCase().charAt(0) == 'М'))
+    			kod_err = 70;
+    			name_err = "Отсутствует код врачебной должности PRVD";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if ((rs.getInt("prvd") == 11 || rs.getInt("prvd") == 12) && (rs.getString("sex").toUpperCase().charAt(0) == 'М')){
         		str += " 72. Несоответствие врачебной должности полу пациента<br>";
-        	if (rs.getInt("v_mu") == 0)
+    			kod_err = 72;
+    			name_err = "Несоответствие врачебной должности полу пациента";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("v_mu") == 0){
         		str += " 73. Отсутствует код вида первичной медико-санитарной помощи V_MU<br>";
-        	if ((rs.getInt("v_mu") == 32) && (rs.getString("sex").toUpperCase().charAt(0) == 'М'))
+    			kod_err = 73;
+    			name_err = "Отсутствует код вида первичной медико-санитарной помощи V_MU";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if ((rs.getInt("v_mu") == 32) && (rs.getString("sex").toUpperCase().charAt(0) == 'М')){
         		str += " 75. Несоответствие V_MU полу SEX пациента<br>";
-        	if (rs.getInt("res_g") == 0)
+    			kod_err = 75;
+    			name_err = "Несоответствие V_MU полу SEX пациента";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("res_g") == 0){
         		str += " 76. Отсутствует код результата обращения RES_G<br>";
-        	if (rs.getString("ssd") == null)
+    			kod_err = 76;
+    			name_err = "Отсутствует код результата обращения RES_G";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getString("ssd") == null){
         		str += " 78. Отсутствует СНИЛС врача SSD<br>";
-        	if (rs.getInt("c_mu") == 0)
+    			kod_err = 78;
+    			name_err = "Отсутствует СНИЛС врача SSD";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("c_mu") == 0){
         		str += " 79. Отсутствует код единицы учета медицинской помощи C_MU<br>";
-        	if (rs.getInt("kl_usl") == 9 && rs.getString("usl") == null)
+    			kod_err = 79;
+    			name_err = "Отсутствует код единицы учета медицинской помощи C_MU";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
+        	if (rs.getInt("kl_usl") == 9 && rs.getString("usl") == null){
         		str += " 86. Некорректные код услуги/ обстоятельства<br>";
+    			kod_err = 86;
+    			name_err = "Некорректные код услуги/ обстоятельства";
+    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+        	}
     	}
-    	if (rs.getString("diag") == null)
+    	
+    	if (rs.getString("diag") == null){
     		str += " Отсутствует заключительный диагноз<br>";
+    		kod_err = 0;
+    		name_err = "Отсутствует заключительный диагноз";
+			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	}
+    	else{
+    		try (AutoCloseableResultSet acr = sse.execPreparedQuery("select no_oms, sex_diag, no_osn_dia, no_ext_sta, no_ext_pol, vozr_min, vozr_max, stat from n_c00 where pcod=?", rs.getString("diag"))) {
+    			if (acr.getResultSet().next()){
+    	        	if (rs.getInt("region") != 42 && acr.getResultSet().getInt("no_oms") == 1){
+    	        		str += "105. Диагноз МКБ сверх программы ОМС<br>";
+    	        		kod_err = 105;
+    	        		name_err = "Диагноз МКБ сверх программы ОМС";
+    	    			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	    			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	        	}
+    	        	if ((rs.getString("sex").toUpperCase().charAt(0) != 'М' && acr.getResultSet().getInt("sex_diag") == 1) || (rs.getString("sex").toUpperCase().charAt(0) != 'Ж' && acr.getResultSet().getInt("sex_diag") == 2)){
+    	        		str += "106. Несоответствие диагноза полу<br>";
+    	        		kod_err = 106;
+    	        		name_err = "Несоответствие диагноза полу";
+    	    			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	    			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	        	}
+    	        	if (acr.getResultSet().getInt("no_osn_dia") == 1){
+    	        		str += "108. Код МКБ не может быть использован для основного диагноза<br>";
+    	        		kod_err = 108;
+    	        		name_err = "Код МКБ не может быть использован для основного диагноза";
+    	    			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	    			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	        	}
+    	        	if (rs.getInt("vid_rstr") == 1 && (rs.getInt("vid_hosp") == 2 || rs.getInt("pl_extr") == 2) && acr.getResultSet().getInt("no_ext_sta") == 1){
+    	        		str += "109. Код МКБ не относится к экстренной стационарной помощи<br>";
+    	        		kod_err = 109;
+    	        		name_err = "Код МКБ не относится к экстренной стационарной помощи";
+    	    			InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	        	}
+    	        	if (rs.getInt("vid_rstr") == 2 && rs.getInt("vid_hosp") == 2 && acr.getResultSet().getInt("no_ext_pol") == 1){
+    	        		str += "110. Код МКБ не относится к экстренной поликлинической помощи<br>";
+    	        		kod_err = 110;
+    	        		name_err = "Код МКБ не относится к экстренной поликлинической помощи";
+    	        		InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	        	}
+    	        	if (acr.getResultSet().getInt("no_oms") == 2){
+    	        		str += "126. Не указана подрубрика в диагнозе<br>";
+    	        		kod_err = 126;
+    	        		name_err = "Не указана подрубрика в диагнозе";
+    	    			if (cslu == 1)	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_otd"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	    			else	InsertToKderr(cslu, rs.getString("ssd"), rs.getInt("kod_mu"), rs.getInt("sl_id"), rs.getInt("id_med"), rs.getInt("id_lpu"), kod_err, name_err);
+    	        	}
+	        	}
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
 		return str;
 	}
 
@@ -576,7 +869,7 @@ public class GenReestr extends Server implements Iface {
         if (vidr == 1) 
         	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0 ";
         if (vidr == 2) 
-        	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND (d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11)) ";
+        	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND ((d.kod_rez = 0 AND ld.dataz >= ? AND ld.dataz <= ?) OR (d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11))) ";
         if (vidr == 3) 
         	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11) ";
 
@@ -702,7 +995,7 @@ public class GenReestr extends Server implements Iface {
 	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
 	            	}
 
-	           		String str = RsTest(rs);
+	           		String str = RsTest(rs, 3);
     	            	
     	           	if(str!=null){
    	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
@@ -842,7 +1135,7 @@ public class GenReestr extends Server implements Iface {
         boolean flag = false;
 
         if (vidr == 1) sqlwhere = " AND g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0";
-        if (vidr == 2) sqlwhere = " AND (g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11))";
+        if (vidr == 2) sqlwhere = " AND ((g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)))";
         if (vidr == 3) sqlwhere = " AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
 
         if (cpodr != 0) sqlwhere += " AND g.cotd = ?";
@@ -945,7 +1238,7 @@ public class GenReestr extends Server implements Iface {
         				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
 	            	}
 
-					String str = RsTest(rs);
+					String str = RsTest(rs, 1);
     	            	
     	           	if(str!=null){
    	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
