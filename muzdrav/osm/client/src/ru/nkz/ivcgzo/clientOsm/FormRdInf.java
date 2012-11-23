@@ -34,6 +34,9 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.RdInfStruct;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.JEditorPane;
 
 public class FormRdInf extends JFrame {
 	private static final long serialVersionUID = 8843590132227415590L;
@@ -90,6 +93,7 @@ public class FormRdInf extends JFrame {
 	private JCheckBox ChBOtsb;
 	private JCheckBox ChBSelo;
 	private JCheckBox ChBots;
+	private JEditorPane TSostOtec;
 	/**
 	 * Create the frame.
 	 */
@@ -123,22 +127,26 @@ public class FormRdInf extends JFrame {
 		contentPane.add(panel);
 		
 		LObr = new JLabel("Образование");
+		LObr.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		CBObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z00);
+		CBObr.setFont(new Font("Tahoma", Font.BOLD, 12));
 	
 		LSem = new JLabel("Семейное положение");
+		LSem.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		CBSem = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_z11);		
+		CBSem.setFont(new Font("Tahoma", Font.BOLD, 12));
 	
 		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		JPanel panel_2 = new JPanel();
+		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
 		JPanel panel_3 = new JPanel();
+		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
 			JButton Sbutton = new JButton("");
 		Sbutton.setToolTipText("Сохранить");
 		Sbutton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
-	
-		JButton btnNewButton = new JButton("");
-		btnNewButton.setToolTipText("Новая запись");
 /*		btnNewButton.setIcon(new ImageIcon(FormRdInf.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -180,129 +188,159 @@ public class FormRdInf extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 394, GroupLayout.PREFERRED_SIZE)
-							.addContainerGap())
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 375, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED))
+						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+							.addGroup(gl_panel.createSequentialGroup()
+								.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addGap(38))
+							.addGroup(gl_panel.createSequentialGroup()
+								.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_panel.createSequentialGroup()
+										.addGap(1)
+										.addComponent(LObr, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+										.addComponent(CBObr, GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE))
+									.addGroup(gl_panel.createSequentialGroup()
+										.addComponent(LSem)
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, 199, GroupLayout.PREFERRED_SIZE))
+									.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE))
+								.addGap(86))))
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
-							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addGap(38))
-								.addGroup(gl_panel.createSequentialGroup()
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_panel.createSequentialGroup()
-											.addGap(25)
-											.addComponent(LObr, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-											.addPreferredGap(ComponentPlacement.UNRELATED)
-											.addComponent(CBObr, GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_panel.createSequentialGroup()
-											.addComponent(LSem)
-											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, 145, GroupLayout.PREFERRED_SIZE))
-										.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE))
-									.addGap(86)))
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-								.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
-									.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(Sbutton, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
-								.addComponent(panel_3, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE))
-							.addGap(530))))
+							.addGap(59)
+							.addComponent(Sbutton, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE))
+						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 328, GroupLayout.PREFERRED_SIZE))
+					.addGap(530))
 		);
 		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 							.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btnNewButton)
-						.addComponent(Sbutton))
-					.addGap(33)
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+						.addComponent(Sbutton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(CBObr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(LObr))
-							.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(LObr)
+								.addComponent(CBObr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGap(10)
 							.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(LSem)
 								.addComponent(CBSem, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE))
-						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 285, GroupLayout.PREFERRED_SIZE))
-					.addGap(15)
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)
-					.addContainerGap())
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE)
+							.addContainerGap())
+						.addGroup(gl_panel.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 387, GroupLayout.PREFERRED_SIZE)
+							.addGap(15))))
 		);
 		
 		JLabel lblNewLabel_1 = new JLabel("Информация об отце ребенка");
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		JLabel LFio = new JLabel("Фамилия, имя, отчество");
+		LFio.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel LVoz = new JLabel("Возраст");
+		LVoz.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel LGrk = new JLabel("Группа крови");
+		LGrk.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel Lph = new JLabel("Резус-фактор");
+		Lph.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel LMrab = new JLabel("Место работы");
+		LMrab.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel LTel = new JLabel("Телефон");
+		LTel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBSmok = new JCheckBox("Курение");
+		ChBSmok.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBAlk = new JCheckBox("Алкоголизм");
+		ChBAlk.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBNark = new JCheckBox("Наркомания");
+		ChBNark.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		TFio = new JTextField();
+		TFio.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		SVozr = new JSpinner();
+		SVozr.setFont(new Font("Tahoma", Font.BOLD, 12));
 		SVozr.setModel(new SpinnerNumberModel(0, 0, 80, 1));
 		
 		TMrab = new JTextField();
+		TMrab.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		TTelef = new JTextField();
+		TTelef.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		TPhf = new JTextField();
+		TPhf.setFont(new Font("Tahoma", Font.BOLD, 13));
 		
 		CBGrOtec = new ThriftStringClassifierCombobox<>(StringClassifiers.n_r0z);
+		CBGrOtec.setFont(new Font("Tahoma", Font.BOLD, 12));
+		
+		JLabel lblNewLabel_2 = new JLabel("Состояние здоровья");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 12));
+		
+		TSostOtec = new JEditorPane();
+		TSostOtec.setForeground(new Color(0, 0, 0));
+		TSostOtec.setBackground(Color.WHITE);
+		TSostOtec.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-						.addComponent(ChBNark)
-						.addComponent(lblNewLabel_1)
-						.addComponent(ChBSmok)
-						.addComponent(ChBAlk)
 						.addGroup(gl_panel_3.createSequentialGroup()
+							.addContainerGap()
 							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addComponent(LFio)
-								.addComponent(LVoz)
-								.addComponent(LMrab)
-								.addComponent(LTel)
-								.addComponent(Lph))
-							.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(ChBNark)
+								.addComponent(lblNewLabel_1)
+								.addComponent(ChBSmok)
+								.addComponent(ChBAlk)
+								.addGroup(gl_panel_3.createSequentialGroup()
+									.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+										.addComponent(LFio)
+										.addComponent(LVoz)
+										.addComponent(LMrab)
+										.addComponent(LTel)
+										.addComponent(Lph))
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+										.addComponent(TTelef, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
+										.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
+										.addComponent(TPhf, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+										.addComponent(TMrab, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
+										.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
+											.addComponent(CBGrOtec, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+											.addComponent(SVozr, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))))
+								.addComponent(LGrk)))
+						.addGroup(gl_panel_3.createSequentialGroup()
+							.addGap(14)
 							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addComponent(TTelef, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TFio, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TPhf, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-								.addComponent(TMrab, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)
-								.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
-									.addComponent(CBGrOtec, Alignment.LEADING, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(SVozr, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))))
-						.addComponent(LGrk))
-					.addContainerGap(37, Short.MAX_VALUE))
+								.addComponent(TSostOtec, GroupLayout.PREFERRED_SIZE, 286, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblNewLabel_2))))
+					.addContainerGap(26, Short.MAX_VALUE))
 		);
 		gl_panel_3.setVerticalGroup(
 			gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -339,72 +377,102 @@ public class FormRdInf extends JFrame {
 					.addComponent(ChBAlk)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(ChBNark)
-					.addContainerGap(89, Short.MAX_VALUE))
+					.addGap(10)
+					.addComponent(lblNewLabel_2)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(TSostOtec, GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		panel_3.setLayout(gl_panel_3);
 		
 		JLabel label = new JLabel("Условия проживания");
-		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		label.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		ChBSelo = new JCheckBox("Сельская жительница");
+		ChBSelo.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBOtsb = new JCheckBox("Отсутствие благоустройства");
+		ChBOtsb.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBGorod = new JCheckBox("Городская жительница");
+		ChBGorod.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBBomg = new JCheckBox("БОМЖ");
+		ChBBomg.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
 		gl_panel_2.setHorizontalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addComponent(ChBSelo)
-						.addComponent(ChBOtsb))
-					.addPreferredGap(ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(ChBGorod)
-						.addComponent(ChBBomg))
-					.addContainerGap(33, Short.MAX_VALUE))
-				.addGroup(gl_panel_2.createSequentialGroup()
-					.addGap(123)
-					.addComponent(label)
-					.addContainerGap(149, Short.MAX_VALUE))
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addContainerGap()
+									.addComponent(ChBOtsb))
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addGap(5)
+									.addComponent(ChBSelo)))
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addGap(16)
+									.addComponent(ChBBomg))
+								.addGroup(gl_panel_2.createSequentialGroup()
+									.addGap(14)
+									.addComponent(ChBGorod))))
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addGap(108)
+							.addComponent(label)))
+					.addContainerGap(18, Short.MAX_VALUE))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_2.createSequentialGroup()
+					.addContainerGap(12, Short.MAX_VALUE)
 					.addComponent(label)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-						.addComponent(ChBSelo)
-						.addComponent(ChBGorod))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
-						.addComponent(ChBOtsb)
-						.addComponent(ChBBomg))
-					.addContainerGap(56, Short.MAX_VALUE))
+					.addGap(7)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
+							.addComponent(ChBSelo)
+							.addGap(30))
+						.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
+							.addComponent(ChBGorod)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+								.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
+									.addComponent(ChBOtsb)
+									.addGap(5))
+								.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
+									.addComponent(ChBBomg)
+									.addGap(9))))))
 		);
 		panel_2.setLayout(gl_panel_2);
 		
 		JLabel lblNewLabel = new JLabel("Отягощающие социальные обязательства");
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
 		ChBAss = new JCheckBox("Асоциальная личность");
+		ChBAss.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBots = new JCheckBox("Очаг туберкулеза в семье");
+		ChBots.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBInv = new JCheckBox("Инвалидность");
+		ChBInv.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBMnd = new JCheckBox("Многодетная семья");
+		ChBMnd.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBLrp = new JCheckBox("Лишение родительских прав");
+		ChBLrp.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBCnd = new JCheckBox("Семья с низким достатком");
+		ChBCnd.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBNer = new JCheckBox("Неработающие");
+		ChBNer.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		ChBNmls = new JCheckBox("Нахождение в местах лишения свободы");
+		ChBNmls.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		Sbutton.addActionListener(new ActionListener() {
 		private void calcoslrod (){
@@ -450,6 +518,7 @@ rdinf.setTelOtec(TTelef.getText());
 rdinf.setPhOtec(TPhf.getText());
 rdinf.setVOtec((int) (SVozr.getModel().getValue()));
 rdinf.setDataz(System.currentTimeMillis());
+rdinf.setZotec(TSostOtec.getText());
 if (CBObr.getSelectedPcod() != null)
 	rdinf.setObr(CBObr.getSelectedPcod());
 	else rdinf.unsetObr();
@@ -586,6 +655,7 @@ System.out.println(rdinf);
 		TMrab.setText(rdinf.getMrOtec());
 		TTelef.setText(rdinf.getTelOtec());
 		TPhf.setText(rdinf.getPhOtec());
+		TSostOtec.setText(rdinf.getZotec());
 		if (rdinf.isSetGrotec())
 			CBGrOtec.setSelectedPcod(rdinf.getGrotec());
 		else CBGrOtec.setSelectedItem(null);

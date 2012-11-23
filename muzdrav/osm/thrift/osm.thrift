@@ -193,6 +193,7 @@ struct RdSlStruct{
         39: optional bool rub;
         40: optional bool predp;
         41: optional i32 osp;
+        42: optional i32 cmer;
 }
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
@@ -234,6 +235,7 @@ struct RdInfStruct{
 	11: optional i32 vredOtec;
 	12: optional i32 osoco;
 	13: optional i32 uslpr;
+        14: optional string zotec;
 }
 /*Выгрузка для Кемерово по диспансеризации беременных*/
 struct RdPatient{
