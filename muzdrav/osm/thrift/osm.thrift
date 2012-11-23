@@ -40,6 +40,7 @@ struct Pvizit {
 	15: optional i32 cobr;
 	16: optional i32 idzab;
 	17: optional string vrach_fio;
+	18: optional bool closed;
 }
 
 struct PvizitAmb {

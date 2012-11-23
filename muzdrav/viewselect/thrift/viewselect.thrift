@@ -24,6 +24,7 @@ struct PatientSearchParams {
 	7: optional i64 datar2;
 	8: string spolis;
 	9: string npolis;
+	10: optional i32 npasp;
 }
 
 struct mkb_2{

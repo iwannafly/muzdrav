@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.apache.thrift.TException;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
@@ -74,6 +76,8 @@ public class MainFrame extends JFrame {
 
     private void initialization() {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientMedication/resources/medication.png")));
 
         addMedicationPanels();
 //        addTableScrollPane();
@@ -166,6 +170,7 @@ public class MainFrame extends JFrame {
         pInfo.add(lblFormLek);
         
         tfFormLek = new JTextField();
+        tfFormLek.setEditable(false);
         pInfo.add(tfFormLek);
         tfFormLek.setColumns(10);
         
@@ -173,25 +178,31 @@ public class MainFrame extends JFrame {
         pInfo.add(lblDose);
         
         tfDose = new JTextField();
+        tfDose.setEditable(false);
         pInfo.add(tfDose);
         tfDose.setColumns(10);
         
         lblInputMethod = new JLabel("  Способ ввода");
         pInfo.add(lblInputMethod);
         
-        cbxInputMethod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_svl);
+        cbxInputMethod =
+            new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_svl);
+        cbxInputMethod.setEditable(false);
         pInfo.add(cbxInputMethod);
         
         lblPeriod = new JLabel("  Периодичность приёма");
         pInfo.add(lblPeriod);
         
-        cbxPeriod = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_period);
+        cbxPeriod =
+            new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_period);
+        cbxPeriod.setEditable(false);
         pInfo.add(cbxPeriod);
         
         lblCountInDay = new JLabel("  Раз в день");
         pInfo.add(lblCountInDay);
         
         tfCountInDay = new JTextField();
+        tfCountInDay.setEditable(false);
         pInfo.add(tfCountInDay);
         tfCountInDay.setColumns(10);
         
@@ -199,6 +210,7 @@ public class MainFrame extends JFrame {
         pInfo.add(lblDateFrom);
         
         cdeDateFrom = new CustomDateEditor();
+        cdeDateFrom.setEditable(false);
         pInfo.add(cdeDateFrom);
         cdeDateFrom.setColumns(10);
         
@@ -206,6 +218,7 @@ public class MainFrame extends JFrame {
         pInfo.add(lblVrachFrom);
         
         tfVrachFrom = new JTextField();
+        tfVrachFrom.setEditable(false);
         pInfo.add(tfVrachFrom);
         tfVrachFrom.setColumns(10);
         
@@ -213,6 +226,7 @@ public class MainFrame extends JFrame {
         pInfo.add(lblDateTo);
         
         cdeDateTo = new CustomDateEditor();
+        cdeDateTo.setEditable(false);
         pInfo.add(cdeDateTo);
         cdeDateTo.setColumns(10);
         
@@ -220,6 +234,7 @@ public class MainFrame extends JFrame {
         pInfo.add(lblVrachTo);
         
         tfVrachTo = new JTextField();
+        tfVrachTo.setEditable(false);
         pInfo.add(tfVrachTo);
         tfVrachTo.setColumns(10);
     }
@@ -271,6 +286,7 @@ public class MainFrame extends JFrame {
                 if (lMedication.getSelectedValue() != null) {
                     try {
                         ClientMedication.tcl.deleteLek(lMedication.getSelectedPcod());
+                        prepareFrame();
                     } catch (KmiacServerException e1) {
                         e1.printStackTrace();
                     } catch (TException e1) {
@@ -307,6 +323,9 @@ public class MainFrame extends JFrame {
     public final void prepareFrame() {
         if (patient != null) {
             try {
+                clearTextFields();
+                lMedication.getSelectionModel().clearSelection();
+                lMedication.setSelectedIndex(0);
                 List<IntegerClassifier> tmpLekShortList =
                     ClientMedication.tcl.getLekShortList(patient.getIdGosp());
                 lMedication.setData(tmpLekShortList);                
@@ -333,5 +352,17 @@ public class MainFrame extends JFrame {
                 ClientMedication.conMan.reconnect(e);
             }
         }
+    }
+
+    private final void  clearTextFields() {
+        tfCountInDay.setText("");
+        tfDose.setText("");
+        tfFormLek.setText("");
+        tfVrachFrom.setText("");
+        tfVrachTo.setText("");
+        cbxInputMethod.setSelectedIndex(-1);
+        cbxPeriod.setSelectedIndex(-1);
+        cdeDateFrom.setText(null);
+        cdeDateTo.setText(null);
     }
 }
