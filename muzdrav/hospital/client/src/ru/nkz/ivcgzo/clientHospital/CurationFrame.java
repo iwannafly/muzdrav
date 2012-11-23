@@ -84,12 +84,12 @@ public class CurationFrame extends JDialog {
             public void actionPerformed(final ActionEvent e) {
                 if ((table.getSelectedRow() != -1) && (cbxStationType.getSelectedItem() != null)) {
                     currentPatient = ((CurationTableModel) table.getModel()).getPatientList()
-                            .get(table.convertRowIndexToModel(table.getSelectedRow()));
+                        .get(table.convertRowIndexToModel(table.getSelectedRow()));
                     try {
                         ClientHospital.tcl.addPatientToDoctor(currentPatient.getIdGosp(),
                             authInfo.getPcod(), cbxStationType.getSelectedPcod());
                         CurationTableModel tbModel =
-                                new CurationTableModel(authInfo.getCpodr());
+                            new CurationTableModel(authInfo.getCpodr());
                         table.setModel(tbModel);
                     } catch (PatientNotFoundException e1) {
                         e1.printStackTrace();
@@ -100,7 +100,7 @@ public class CurationFrame extends JDialog {
                     }
                 } else {
                     JOptionPane.showMessageDialog(CurationFrame.this,
-                        "Не выбран пациент или тип стационара!");
+                        "Не выбран пациент или профиль!");
                 }
             }
         });
