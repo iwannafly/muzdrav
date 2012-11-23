@@ -1,7 +1,6 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -40,7 +39,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -59,7 +57,6 @@ import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -2319,7 +2316,8 @@ public class Vvod extends JFrame {
 					pvizitAmb.setId(MainForm.tcl.AddPvizitAmb(pvizitAmb));
 					tblPos.setData(MainForm.tcl.getPvizitAmb(zapVr.id_pvizit));
 					tblPos.requestFocusInWindow();
-					tblPos.editCellAt(tblPos.getSelectedRow(), 0);
+					if (tblPos.editCellAt(tblPos.getSelectedRow(), 0))
+						tblPos.getEditorComponent().requestFocusInWindow();
 				} catch (KmiacServerException e2) {
 					e2.printStackTrace();
 				} catch (TException e2) {
@@ -2387,7 +2385,8 @@ public class Vvod extends JFrame {
 							tblObr.getSelectedItem().setIshod(pvizit.getIshod());
 						else
 							tblObr.getSelectedItem().setIshod(0);
-						tblObr.repaint();
+						tblObr.getSelectedItem().setClosed(pvizit.isSetIshod());
+						tblObr.updateChangedSelectedItem();
 						
 						pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 						priemCopy = new Priem(priem);
@@ -2502,10 +2501,9 @@ public class Vvod extends JFrame {
 					.addGap(0))
 		);
 		
-		ObrCellRenderer ocr = new ObrCellRenderer();
-		tblObr = new CustomTable<>(true, false, Pvizit.class, 3, "Дата обращения");
+		tblObr = new CustomTable<>(true, false, Pvizit.class, 3, "Дата обращения", 17, "Закрыт");
 		tblObr.setDateField(0);
-		tblObr.setDefaultRenderer(Date.class, ocr);
+		tblObr.setEditableFields(false, 1);
 		tblObr.setFillsViewportHeight(true);
 		tblObr.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -3170,39 +3168,6 @@ public class Vvod extends JFrame {
 			MainForm.conMan.reconnect(e1);
 		}	
 		pvizitCopy = new Pvizit(pvizit);
-	}
-	
-	private class ObrCellRenderer extends DefaultTableCellRenderer {
-		private static final long serialVersionUID = 4556543113058147883L;
-		private Color defCol = UIManager.getColor("Table.background");
-		private Color selCol = UIManager.getColor("Table.selectionBackground");
-		private SimpleDateFormat dateFrm = new CustomDateEditor().getDateFormatter();
-		
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			Component cmp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			
-			if (cmp instanceof JLabel) {
-				JLabel lbl = (JLabel) cmp;
-				
-				if (tblObr.getData().get(row).ishod > 0) {
-					if (isSelected)
-						lbl.setBackground(selCol.darker());
-					else
-						lbl.setBackground(Color.green.brighter());
-				} else {
-					if (isSelected)
-						lbl.setBackground(selCol);
-					else
-						lbl.setBackground(defCol);
-				}
-				
-				if (value instanceof Date)
-					lbl.setText(dateFrm.format(value));
-			}
-			
-			return cmp;
-		}
 	}
 	
 	private void setStatMode(boolean val) {
