@@ -48,8 +48,9 @@ public class ClientMedication extends Client<ThriftMedication.Client> {
 
     @Override
     public final Object showModal(final IClient parent, final Object... params) {
-        medicationFrame.setTitle(String.format("%s %s %s",
-            (String) params[1], (String) params[2], (String) params[3]));
+//        medicationFrame.setTitle(String.format("%s %s %s",
+//            (String) params[1], (String) params[2], (String) params[3]));
+        medicationFrame.setTitle("Медицинские назначения");
         JDialog dialog = prepareModal(parent);
         medicationFrame.fillPatient((int) params[0], (String) params[1],
             (String) params[2], (String) params[3], (int) params[4]);

@@ -2924,7 +2924,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    StringClassifier res = MainForm.conMan.showMkbTreeForm("диагнозы", tf_diag_p.getText());
+                    StringClassifier res = MainForm.conMan.showMkbTreeForm("Классификатор МКБ-10", tf_diag_p.getText());
 
                     if (res != null) {
                         tf_diag_p.setText(res.pcod);
@@ -2964,7 +2964,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    StringClassifier res = MainForm.conMan.showMkbTreeForm("диагнозы", tf_diag_n.getText());
+                    StringClassifier res = MainForm.conMan.showMkbTreeForm("Классификатор МКБ-10", tf_diag_n.getText());
 
                     if (res != null) {
                         tf_diag_n.setText(res.pcod);
@@ -4012,6 +4012,7 @@ public class PacientInfoFrame extends JFrame {
             if (cmb_naprav.getSelectedItem() != null) Id_gosp.setNaprav(cmb_naprav.getSelectedPcod());
             if (cmb_org.getSelectedItem() != null) Id_gosp.setN_org(cmb_org.getSelectedPcod());
             if (cmb_cotd.getSelectedItem() != null) Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
+            else	Id_gosp.setCotd(Id_gosp.getCotd_p());
 
             //System.out.println(Id_gosp.getPr_out());
             CheckNotNullTableCgosp();
@@ -4036,7 +4037,7 @@ public class PacientInfoFrame extends JFrame {
                 //if (Id_gosp.getCotd() != 0)
                 	//MainForm.tcl.updateOtd(curId_otd, curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
-            if (Id_gosp.getCotd() != 0)
+            if (Id_gosp.getCotd() != Id_gosp.getCotd_p())
                	MainForm.tcl.addOrUpdateOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
             tbl_priem.updateChangedSelectedItem();
         } catch (Exception e) {

@@ -48,8 +48,9 @@ public class ClientLab extends Client<ThriftLab.Client> {
 
     @Override
     public final Object showModal(final IClient parent, final Object... params) {
-        labFrame.setTitle(String.format("%s %s %s",
-            (String) params[1], (String) params[2], (String) params[3]));
+//        labFrame.setTitle(String.format("%s %s %s",
+//            (String) params[1], (String) params[2], (String) params[3]));
+        labFrame.setTitle("Лабораторные исследования");
         JDialog dialog = prepareModal(parent);
         labFrame.fillPatient((int) params[0], (String) params[1],
             (String) params[2], (String) params[3], (int) params[4]);

@@ -159,19 +159,21 @@ public class FormPostBer extends JFrame {
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
 					rdinf.setDataz(System.currentTimeMillis());
 		            MainForm.tcl.AddRdInf(rdinf);
-					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-					setPostBerData();
-				} catch (PrdslNotFoundException e1) {
-					try {
-						rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-						setPostBerData();
-					} catch (KmiacServerException e2) {
-						JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
-					} catch (TException e2) {
-						e2.printStackTrace();
-						MainForm.conMan.reconnect(e2);
-					}
-				} catch (KmiacServerException e1) {
+//					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+//					setPostBerData();
+				} 
+//				catch (PrdslNotFoundException e1) {
+//					try {
+//						rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+//						setPostBerData();
+//					} catch (KmiacServerException e2) {
+//						JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//					} catch (TException e2) {
+//						e2.printStackTrace();
+//						MainForm.conMan.reconnect(e2);
+//					}
+//				} 
+				catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
@@ -195,16 +197,16 @@ public class FormPostBer extends JFrame {
 		JButton btnNewButton = new JButton("");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-//				try {
-//					setDefaultValues();
-//					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-//					setPostBerData();
-//				} catch (KmiacServerException e2) {
-//					JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
-//				} catch (TException e2) {
-//					e2.printStackTrace();
-//					MainForm.conMan.reconnect(e2);
-//				}
+				try {
+					setDefaultValues();
+					rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+					setPostBerData();
+				} catch (KmiacServerException e2) {
+					JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e2) {
+					e2.printStackTrace();
+					MainForm.conMan.reconnect(e2);
+				}
 			}
 		});
 		btnNewButton.setIcon(new ImageIcon(FormPostBer.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
@@ -1262,17 +1264,20 @@ public class FormPostBer extends JFrame {
             MainForm.tcl.AddRdInf(rdinf);
 			rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 			setPostBerData();
-		} catch (PrdslNotFoundException e1) {
-			try {
-				rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-				setPostBerData();
-			} catch (KmiacServerException e2) {
-				JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
-			} catch (TException e2) {
-				e2.printStackTrace();
-				MainForm.conMan.reconnect(e2);
-			}
-		} catch (KmiacServerException e1) {
+		} 
+//		catch (PrdslNotFoundException e1) 
+//		{
+//			try {
+//				rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
+//				setPostBerData();
+//			} catch (KmiacServerException e2) {
+//				JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//			} catch (TException e2) {
+//				e2.printStackTrace();
+//				MainForm.conMan.reconnect(e2);
+//			}
+//		} 
+		catch (KmiacServerException e1) {
 			e1.printStackTrace();
 			JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e1) {

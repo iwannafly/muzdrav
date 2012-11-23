@@ -78,6 +78,8 @@ import javax.swing.event.DocumentListener;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
+
 import javax.swing.JRadioButton;
 import java.awt.Component;
 import javax.swing.Box;
@@ -90,6 +92,9 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JSeparator;
 
 public class MainFrame extends JFrame {
@@ -281,6 +286,7 @@ public class MainFrame extends JFrame {
     private JTextField tfZaklDiagName;
     private JLabel lblZaklDiag;
     private JButton btnZaklDiag;
+    private JMenuItem mntmPrintHospitalSummary;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
@@ -289,6 +295,8 @@ public class MainFrame extends JFrame {
         doctorAuth = authInfo;
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle(WINDOW_HEADER);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/hospital.png")));
         setMainMenu();
         setToolBar();
         setTabbedPane();
@@ -307,6 +315,7 @@ public class MainFrame extends JFrame {
 
     private void setTabbedPane() {
         tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         tabbedPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         setPatientInfoPanel();
@@ -506,6 +515,32 @@ public class MainFrame extends JFrame {
             }
         });
         mnPrintForms.add(mntmPrintStationDiary);
+
+        mntmPrintHospitalSummary = new JMenuItem("Выписной эпикриз");
+        mntmPrintHospitalSummary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    try {
+                        String servPath =
+                            ClientHospital.tcl.printHospitalSummary(patient.getGospitalCod(),
+                                doctorAuth.getClpu_name() + " "
+                                + doctorAuth.getCpodr_name(), patient);
+                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                        ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+                        ClientHospital.conMan.openFileInEditor(cliPath, false);
+                    } catch (KmiacServerException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        e1.printStackTrace();
+                        ClientHospital.conMan.reconnect(e1);
+                    }
+                }
+            }
+        });
+        mnPrintForms.add(mntmPrintHospitalSummary);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -519,6 +554,7 @@ public class MainFrame extends JFrame {
         getContentPane().add(toolBar, BorderLayout.PAGE_START);
 
         btnShowPatientInfo = new JButton();
+        btnShowPatientInfo.setToolTipText("Информация о пациенте");
         toolBar.add(btnShowPatientInfo);
         btnShowPatientInfo.setMaximumSize(new Dimension(35, 35));
         btnShowPatientInfo.setMinimumSize(new Dimension(35, 35));
@@ -536,7 +572,10 @@ public class MainFrame extends JFrame {
             "/ru/nkz/ivcgzo/clientHospital/resources/patientInfo.png")));
         btnShowPatientInfo.setRequestFocusEnabled(false);
 
+        toolBar.add(new JToolBar.Separator());
+
         btnIssled = new JButton();
+        btnIssled.setToolTipText("Лабораторные исследования");
         toolBar.add(btnIssled);
         btnIssled.setMaximumSize(new Dimension(35, 35));
         btnIssled.setMinimumSize(new Dimension(35, 35));
@@ -556,6 +595,7 @@ public class MainFrame extends JFrame {
         btnIssled.setRequestFocusEnabled(false);
 
         btnMedication = new JButton();
+        btnMedication.setToolTipText("Лекарственные назначения");
         btnMedication.setVisible(false);
         toolBar.add(btnMedication);
         btnMedication.setMaximumSize(new Dimension(35, 35));
@@ -585,7 +625,9 @@ public class MainFrame extends JFrame {
     private void setPatientInfoPanel() {
         spPatientInfo = new JSplitPane();
         spPatientInfo.setOrientation(JSplitPane.VERTICAL_SPLIT);
-        tabbedPane.addTab("Информация о пациенте", null, spPatientInfo, null);
+        tabbedPane.addTab("Информация о пациенте", new ImageIcon(
+            MainFrame.class.getResource(
+               "/ru/nkz/ivcgzo/clientHospital/resources/personalInfo.png")), spPatientInfo, null);
         setPersonalInfoPanel();
         setReceptionPanel();
     }
@@ -817,7 +859,9 @@ public class MainFrame extends JFrame {
     private void setLifeHistoryPanel() {
         pLifeHistory = new JPanel();
         pLifeHistory.setLayout(new BoxLayout(pLifeHistory, BoxLayout.X_AXIS));
-        tabbedPane.addTab("История жизни", null, pLifeHistory, null);
+        tabbedPane.addTab("История жизни", new ImageIcon(
+            MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientHospital/resources/lifeHistory.png")), pLifeHistory, null);
 
         hsLifeHistoryFirst = Box.createHorizontalStrut(5);
         pLifeHistory.add(hsLifeHistoryFirst);
@@ -1118,7 +1162,9 @@ public class MainFrame extends JFrame {
 
     private void setMedicalHistoryPanel() {
         pMedicalHistory = new JPanel();
-        tabbedPane.addTab("Дневник", null, pMedicalHistory, null);
+        tabbedPane.addTab("Дневник", new ImageIcon(MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/diary.png")),
+            pMedicalHistory, null);
         pMedicalHistory.setLayout(new BoxLayout(pMedicalHistory, BoxLayout.X_AXIS));
 
         hsMedicalHistoryFirst = Box.createHorizontalStrut(5);
@@ -1598,7 +1644,9 @@ public class MainFrame extends JFrame {
 
     private void setDiagnosisPanel() {
         pDiagnosis = new JPanel();
-        tabbedPane.addTab("Диагнозы", null, pDiagnosis, null);
+        tabbedPane.addTab("Диагнозы", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/firstAid.png")), pDiagnosis, null);
         pDiagnosis.setLayout(new BoxLayout(pDiagnosis, BoxLayout.X_AXIS));
 
         hsDiagnosisFirst = Box.createHorizontalStrut(5);
@@ -1613,7 +1661,6 @@ public class MainFrame extends JFrame {
 
         hsDiagnosisThird = Box.createHorizontalStrut(5);
         pDiagnosis.add(hsDiagnosisThird);
-
     }
 
     private void setDiagnosisVerticalTextComponents() {
@@ -1689,7 +1736,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnAddDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
     }
 
     private void addDiagnosisDeleteButton() {
@@ -1704,7 +1751,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnDelDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
     }
 
     private void addDiagnosisUpdateButton() {
@@ -1719,7 +1766,7 @@ public class MainFrame extends JFrame {
             }
         });
         btnSaveDiag.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
     }
 
     private void setDiagnosisTextComponents() {
@@ -1988,6 +2035,7 @@ public class MainFrame extends JFrame {
                 diag.setVrach(doctorAuth.getPcod());
                 diag.setDiagName(curDiagnosis.getName());
                 diag.setId(ClientHospital.tcl.addDiagnosis(diag));
+//                taDiagMedOp.setText(curDiagnosis.getName());
                 tbDiag.addItem(diag);
                 tbDiag.setData(
                     ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
@@ -2002,12 +2050,14 @@ public class MainFrame extends JFrame {
     }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////            Этапы         ///////////////////////////////////////
+//////////////////////////////////            Этапы            ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void setStagePanel() {
         pStage = new JPanel();
-        tabbedPane.addTab("Этапы лечения", null, pStage, null);
+        tabbedPane.addTab("Этапы лечения", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/stages.png")), pStage, null);
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
@@ -2319,7 +2369,9 @@ public class MainFrame extends JFrame {
 
     private void setZaklPanel() {
         pZakl = new JPanel();
-        tabbedPane.addTab("Заключение", null, pZakl, null);
+        tabbedPane.addTab("Заключение", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/out.png")), pZakl, null);
         setZaklShablonComponents();
         setZaklTextAreas();
         setZaklComboboxes();
