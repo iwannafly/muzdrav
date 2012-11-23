@@ -226,9 +226,10 @@ public class RaspisanieUnit {
 						}else{
 							getTalonTime(rasp.get(i).getTime_n(), rasp.get(i).getTime_k(), dlit, timepause_n, timepause_k);
 						}
-						SimpleDateFormat dtf = new SimpleDateFormat("YYYY-MM-DD HH:MM:SS");
-						SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD");
-						SimpleDateFormat stf = new SimpleDateFormat("HH:MM:SS");
+						SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+						SimpleDateFormat stf = new SimpleDateFormat("HH:mm:ss");
+						
 						for (int j=0; j <= timelist.size()-1; j++){
 							Talon tmpTalon = new Talon();
 							tmpTalon.setCpol(rasp.get(i).getCpol());
@@ -239,10 +240,9 @@ public class RaspisanieUnit {
 							tmpTalon.setTimepk(new Time(rasp.get(i).getTime_k()).getTime());
 							tmpTalon.setDatap(rasp.get(i).getDatap());
 							tmpTalon.setTimep(timelist.get(j).getTimep());
-							
-							tmpTalon.setDatapt(new Long(Long.parseLong(sdf.format(new Date(tmpTalon.getDatap()))+" "+stf.format(new Time(tmpTalon.getTimep()))))  );
-									//,tmpTalon.getTimep());
-							//tmpTalon.getTimep());
+//							tmpTalon.setDatapt(tmpTalon.getDatap()+tmpTalon.getTimep());
+							String d = dtf.format(dtf.parse((sdf.format(tmpTalon.getDatap())+' '+stf.format(tmpTalon.getTimep()) ) ) );
+							tmpTalon.setDatapt(dtf.parse(d).getTime());
 							talonlist.add(tmpTalon);
 						}
 					}
