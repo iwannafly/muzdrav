@@ -397,6 +397,7 @@ struct P_isl_ld {
 	12: optional i32 prichina;
 	13: optional i32 kodotd;
 	14: optional i64 datav;
+	15: optional i32 vopl;
 }
 
 struct Prez_d {
