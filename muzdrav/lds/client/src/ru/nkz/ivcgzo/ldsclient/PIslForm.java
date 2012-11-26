@@ -943,10 +943,12 @@ public class PIslForm {
 			JLabel lblNewLabel_4 = new JLabel("Причина обращения");
 			
 			JLabel lblNewLabel_5 = new JLabel("Обстоятельства обращения");
+			lblNewLabel_5.setVisible(false);
 			
 			cBprichina = new ThriftIntegerClassifierCombobox<>(true);
 			
 			cBpopl = new ThriftIntegerClassifierCombobox<>(true);
+			cBpopl.setVisible(false);
 			
 			JLabel lblNewLabel_6 = new JLabel("Кем направлен");
 			
