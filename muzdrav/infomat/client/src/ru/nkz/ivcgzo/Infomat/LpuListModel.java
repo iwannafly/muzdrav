@@ -11,15 +11,15 @@ import java.util.Set;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 
-public class SpecialityListModel implements ListModel<Speciality> {
+public class LpuListModel implements ListModel<Lpu>{
     private Set<ListDataListener> listeners = new HashSet<ListDataListener>();
-    private List<Speciality> items;
+    private List<Lpu> items;
 
-    public SpecialityListModel() {
+    public LpuListModel() {
         items = getItemsFromDb();
     }
 
-    private List<Speciality>  getItemsFromDb() {
+    private List<Lpu>  getItemsFromDb() {
         Statement statement = null;
         ResultSet resultSet = null;
         String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "

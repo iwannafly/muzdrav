@@ -287,6 +287,7 @@ public class MainFrame extends JFrame {
     private JLabel lblZaklDiag;
     private JButton btnZaklDiag;
     private JMenuItem mntmPrintHospitalSummary;
+    private JPanel pChildbirth;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
@@ -323,6 +324,7 @@ public class MainFrame extends JFrame {
         setMedicalHistoryPanel();
         setStagePanel();
         setDiagnosisPanel();
+        setChildbirthPanel();
         setZaklPanel();
     }
 
@@ -2362,7 +2364,16 @@ public class MainFrame extends JFrame {
             }
         }
     }
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////     Роды    ////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private void setChildbirthPanel() {
+        pChildbirth = new JPanel();
+        tabbedPane.addTab("Роды", new ImageIcon(
+            MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildbirth, null);
+    }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Заключение ///////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
