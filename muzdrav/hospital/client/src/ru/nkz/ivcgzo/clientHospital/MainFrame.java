@@ -612,7 +612,7 @@ public class MainFrame extends JFrame {
         });
         btnMedication.setBorder(null);
         btnMedication.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "/ru/nkz/ivcgzo/clientHospital/resources/medication.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/medication.png")));
         btnMedication.setRequestFocusEnabled(false);
     }
 
@@ -2578,6 +2578,11 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setResult(cbxResult.getSelectedPcod());
                                 tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                                tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
+                                tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                if (tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
                                 JOptionPane.showMessageDialog(MainFrame.this,
@@ -2592,6 +2597,11 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setIshod(cbxIshod.getSelectedPcod());
                                 tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                                tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
+                                tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                if (tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
                                 JOptionPane.showMessageDialog(MainFrame.this,
@@ -2608,6 +2618,11 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setNewOtd(cbxAnotherOtd.getSelectedPcod());
                                 tmpZakl.setDatav(cdeZaklDate.getDate().getTime());
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
+                                tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
+                                tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                if (tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
                                 JOptionPane.showMessageDialog(MainFrame.this,

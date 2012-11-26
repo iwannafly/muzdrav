@@ -114,6 +114,9 @@ struct Zakl {
 	6: optional string recom;
 	7: optional i32 idGosp;
 	8: optional i32 newOtd;
+	9: optional i32 vidOpl;
+	10: optional i32 vidPom;
+	11: optional i32 ukl;
 }
 
 struct TStage {
