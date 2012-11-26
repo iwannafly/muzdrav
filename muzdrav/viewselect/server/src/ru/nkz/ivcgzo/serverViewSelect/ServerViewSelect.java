@@ -237,18 +237,22 @@ public class ServerViewSelect extends Server implements Iface {
 		String condDateFormat = ((prms.illegibleSearch) ? "(%s BETWEEN ? AND ?) " : "(%s = ?) ") + "AND ";
 		final int andLen = 4;
 		
-		if (prms.isSetFam())
-			clause += String.format(condStringFormat, "fam");
-		if (prms.isSetIm())
-			clause += String.format(condStringFormat, "im");
-		if (prms.isSetOt())
-			clause += String.format(condStringFormat, "ot", prms.getOt());
-		if ((!prms.illegibleSearch && prms.isSetDatar()) || (prms.isSetDatar() && prms.isSetDatar2()))
-			clause += String.format(condDateFormat, "datar");
-		if (prms.isSetSpolis())
-			clause += String.format(condStringFormat, "poms_ser");
-		if (prms.isSetNpolis())
-			clause += String.format(condStringFormat, "poms_nom");
+		if (prms.isSetNpasp()) {
+			clause += "npasp = ? AND ";
+		} else {
+			if (prms.isSetFam())
+				clause += String.format(condStringFormat, "fam");
+			if (prms.isSetIm())
+				clause += String.format(condStringFormat, "im");
+			if (prms.isSetOt())
+				clause += String.format(condStringFormat, "ot", prms.getOt());
+			if ((!prms.illegibleSearch && prms.isSetDatar()) || (prms.isSetDatar() && prms.isSetDatar2()))
+				clause += String.format(condDateFormat, "datar");
+			if (prms.isSetSpolis())
+				clause += String.format(condStringFormat, "poms_ser");
+			if (prms.isSetNpolis())
+				clause += String.format(condStringFormat, "poms_nom");
+		}
 		
 		return clause.substring(0, clause.length() - andLen);
 	}
@@ -256,22 +260,26 @@ public class ServerViewSelect extends Server implements Iface {
 	private Object[] getSearchPatientParamArray(PatientSearchParams prms) {
 		List<Object> list = new ArrayList<>(PatientSearchParams.metaDataMap.size());
 		
-		if (prms.isSetFam())
-			list.add(prms.getFam());
-		if (prms.isSetIm())
-			list.add(prms.getIm());
-		if (prms.isSetOt())
-			list.add(prms.getOt());
-		if (!prms.illegibleSearch && prms.isSetDatar()) {
-			list.add(new Date(prms.getDatar()));
-		} else if (prms.isSetDatar() && prms.isSetDatar2()) {
-			list.add(new Date(prms.getDatar()));
-			list.add(new Date(prms.getDatar2()));
+		if (prms.isSetNpasp()) {
+			list.add(prms.getNpasp());
+		} else {
+			if (prms.isSetFam())
+				list.add(prms.getFam());
+			if (prms.isSetIm())
+				list.add(prms.getIm());
+			if (prms.isSetOt())
+				list.add(prms.getOt());
+			if (!prms.illegibleSearch && prms.isSetDatar()) {
+				list.add(new Date(prms.getDatar()));
+			} else if (prms.isSetDatar() && prms.isSetDatar2()) {
+				list.add(new Date(prms.getDatar()));
+				list.add(new Date(prms.getDatar2()));
+			}
+			if (prms.isSetSpolis())
+				list.add(prms.getSpolis());
+			if (prms.isSetNpolis())
+				list.add(prms.getNpolis());
 		}
-		if (prms.isSetSpolis())
-			list.add(prms.getSpolis());
-		if (prms.isSetNpolis())
-			list.add(prms.getNpolis());
 		
 		return list.toArray();
 	}
