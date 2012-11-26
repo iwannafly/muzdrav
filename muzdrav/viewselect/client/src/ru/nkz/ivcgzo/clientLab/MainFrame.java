@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientLab;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -111,6 +112,8 @@ public class MainFrame extends JFrame {
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(980, 600));
+        setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientLab/resources/issled.png")));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         addMainTabbedPane();

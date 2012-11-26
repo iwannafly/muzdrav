@@ -1737,31 +1737,18 @@ public String printDnevVr() throws KmiacServerException, TException {
 			sb.append("<TD colspan=3 align=center>Посещения в поликлинике</TD>");
 			sb.append("<TD colspan=3 align=center>Посещения на дому</TD>");
 			sb.append("<TD colspan=3 align=center>Посещения с профцелью</TD>");
-			sb.append("<TD colspan=4 align=center>Посещения всего</TD>");
-//			sb.append("<TD rowspan=2 align=center>Подпись врача</TD>");
+			sb.append("<TD colspan=3 align=center>Посещения всего</TD>");
 			sb.append("</TR>");
 			sb.append("<TR>");
 			sb.append("<TD>план</TD>");
 			sb.append("<TD>факт</TD>");
 			sb.append("<TD>процент выполнения плана</TD>");
-			sb.append("</TR>");
-			sb.append("<TR>");
-			sb.append("</TR>");
-			sb.append("<TR>");
 			sb.append("<TD>план</TD>");
 			sb.append("<TD>факт</TD>");
 			sb.append("<TD>процент выполнения плана</TD>");
-			sb.append("</TR>");
-			sb.append("<TR>");
-			sb.append("</TR>");
-			sb.append("<TR>");
 			sb.append("<TD>план</TD>");
 			sb.append("<TD>факт</TD>");
 			sb.append("<TD>процент выполнения плана</TD>");
-			sb.append("</TR>");
-			sb.append("<TR>");
-			sb.append("</TR>");
-			sb.append("<TR>");
 			sb.append("<TD>план</TD>");
 			sb.append("<TD>факт</TD>");
 			sb.append("<TD>процент выполнения плана</TD>");
@@ -1776,7 +1763,7 @@ public String printDnevVr() throws KmiacServerException, TException {
 			double ippp = 0; Integer ippf = 0; 
 			double ipdp = 0; Integer ipdf = 0; 
 			double ippfp = 0; Integer ippff = 0; 
-			double ipp = 0; Integer ipf = 0; 
+			double ipp = 0; Integer ipf = 0; double itime = 0;
 
 			System.out.println(codpol);		
 			acrs = sse.execPreparedQuery("select count(*),a.cdol,a.mobs,a.opl,a.cpos,v.cobr,(v.datao-p.datar)/365.25,p.pol,s.fam,s.im,s.ot,p.jitel,v.id,c0.name,v.cpol,v.datao,a.cod_sp "+
@@ -1790,7 +1777,6 @@ public String printDnevVr() throws KmiacServerException, TException {
             codsp = acrs.getResultSet().getString(2);
             fio = acrs.getResultSet().getString(9)+' '+acrs.getResultSet().getString(10)+' '+acrs.getResultSet().getString(11);
 			while (codvr == acrs.getResultSet().getInt(17)&& (acrs.getResultSet().next())){
-//			if (codvr == acrs.getResultSet().getInt(17)){
 			if(acrs.getResultSet().getInt(3)==1) {ppf = ppf + acrs.getResultSet().getInt(1);
 			ippf = ippf + acrs.getResultSet().getInt(1);}
 			if(acrs.getResultSet().getInt(3)==2) {pdf = pdf + acrs.getResultSet().getInt(1);
@@ -1799,7 +1785,6 @@ public String printDnevVr() throws KmiacServerException, TException {
 			ippfp = ippfp + acrs.getResultSet().getInt(1);}
 			pf = pf + acrs.getResultSet().getInt(1);
 			ipf = ipf + acrs.getResultSet().getInt(1);
-//			acrs.getResultSet().next();
 			}
 			n1 = n1 + 1;
 			//посчитать процент
@@ -1815,37 +1800,44 @@ public String printDnevVr() throws KmiacServerException, TException {
 			ppfp = acrs2.getResultSet().getDouble(2);
 			}
 			acrs2.close();
-			sb.append(String.format("<td> %d/TD>",n1));
-			sb.append(String.format("<td> %s</TD>",fio));
-			sb.append(String.format("<TD> %s</TD>",ppfp));
+			sb.append(String.format("<td> %d",n1));
+			sb.append(String.format("<td> %s",fio));
+			sb.append(String.format("<td> %s",codsp));
+//			sb.append(String.format("<TD> %s>",ppfp));
 			acrs2 = sse.execPreparedQuery("select sum(timep),sum(timed),sum(timeda),sum(timeprf),sum(timepr) from s_tabel where pcod = ?",codvr);
 			if (acrs2.getResultSet().next()) {
+				//время
 			sb.append(String.format("<TD>%.2f </TD>",(acrs2.getResultSet().getDouble(1)+acrs2.getResultSet().getDouble(2)+acrs2.getResultSet().getDouble(3)+acrs2.getResultSet().getDouble(4))));
+			itime = itime + acrs2.getResultSet().getDouble(1)+acrs2.getResultSet().getDouble(2)+acrs2.getResultSet().getDouble(3)+acrs2.getResultSet().getDouble(4);
 //			sb.append(String.format("<TD>%.2f ставок</TD>",acrs2.getResultSet().getInt(9),acrs2.getResultSet().getInt(10)));
 			sb.append(String.format("<TD>%.2f </TD>",(acrs2.getResultSet().getDouble(1)*ppp)));//план в поликлинике
 			ippp = ippp+acrs2.getResultSet().getDouble(1)*ppp;
 			pp = pp+acrs2.getResultSet().getDouble(1)*ppp;
 			ipp = ipp+acrs2.getResultSet().getDouble(1)*ppp;
 			    sb.append(String.format("<TD> %d</TD>",ppf));//факт в поликлинике
-			proc= ppf*100/(acrs2.getResultSet().getDouble(1)*ppp);
+			if ((acrs2.getResultSet().getDouble(1)*ppp)!=0)
+			    proc= ppf*100/(acrs2.getResultSet().getDouble(1)*ppp);
 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 			sb.append(String.format("<TD>%.2f </TD>",(acrs2.getResultSet().getDouble(2)*pdp)));//план на дому
 			ipdp = ipdp+acrs2.getResultSet().getDouble(2)*pdp;
 			pp = pp+acrs2.getResultSet().getDouble(2)*pdp;
 			ipp = ipp+acrs2.getResultSet().getDouble(2)*pdp;
 			    sb.append(String.format("<TD> %d</TD>",pdf));//факт на дому
-			proc= pdf*100/(acrs2.getResultSet().getDouble(2)*pdp);
+			if ((acrs2.getResultSet().getDouble(2)*pdp)!=0)
+			    proc= pdf*100/(acrs2.getResultSet().getDouble(2)*pdp);
 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 			sb.append(String.format("<TD>%.2f </TD>",(acrs2.getResultSet().getDouble(4)*ppfp)));//план профцель
 			ipdp = ipdp+acrs2.getResultSet().getDouble(4)*ppfp;
 			pp = pp+acrs2.getResultSet().getDouble(4)*ppfp;//что с прочими?
 			ipp = ipp+acrs2.getResultSet().getDouble(4)*ppfp;//что с прочими?
 		    sb.append(String.format("<TD> %d</TD>",ppff));//факт профцель
-			proc= ppff*100/(acrs2.getResultSet().getDouble(4)*ppfp);
+			if ((acrs2.getResultSet().getDouble(4)*ppfp)!=0)
+		    proc= ppff*100/(acrs2.getResultSet().getDouble(4)*ppfp);
 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 			sb.append(String.format("<TD>%.2f </TD>",pp));//план всего
 		    sb.append(String.format("<TD> %d</TD>",pf));//факт всего
-			proc= pf*100/(acrs2.getResultSet().getDouble(4)*pp);
+			if ((acrs2.getResultSet().getDouble(4)*pp)!=0)
+		    proc= pf*100/(acrs2.getResultSet().getDouble(4)*pp);
 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 			}
 			acrs2.close();
@@ -1862,22 +1854,244 @@ public String printDnevVr() throws KmiacServerException, TException {
 				sb.append("<td> /TD>");
 				sb.append("<td> ИТОГО</TD>");
 				sb.append("<TD> </TD>");
+				sb.append(String.format("<TD> %.2f",itime));//время
 				sb.append(String.format("<TD>%.2f </TD>",(acrs2.getResultSet().getDouble(1)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500)));//план в поликлинике
  			    sb.append(String.format("<TD> %d</TD>",ippf));//факт в поликлинике
 				proc= ppf*100/((acrs2.getResultSet().getDouble(1)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
 				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 				sb.append(String.format("<TD>%.2f </TD>",((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500))));//план на дому
  			    sb.append(String.format("<TD> %d</TD>",ipdf));//факт на дому
-				proc= pdf*100/((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
+				if ((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5))!=0)
+ 			    proc= pdf*100/((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
 				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 				sb.append(String.format("<TD>%.2f </TD>",((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500))));//план профцель
 			    sb.append(String.format("<TD> %d</TD>",ippff));//факт профцель
-				proc= ppff*100/((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
+				if (((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500))!=0)
+			    proc= ppff*100/((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
 				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 				ipp = (acrs2.getResultSet().getDouble(1)+acrs2.getResultSet().getDouble(2)+acrs2.getResultSet().getDouble(3))*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500;
 				sb.append(String.format("<TD>%.2f </TD>",ipp));//план всего
 			    sb.append(String.format("<TD> %d</TD>",ipf));//факт всего
-				proc= pf*100/ipp;
+				if (ipp!=0)
+			    proc= pf*100/ipp;
+				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+			}
+			sb.append("</TABLE>");
+		sb.append("</body>"); 
+		sb.append("</html>");
+		
+		osw.write(sb.toString());
+		System.out.println(sb);		
+		return path;
+//		return path = sb.toString();
+	} catch (SQLException e) {
+		((SQLException) e.getCause()).printStackTrace();
+		throw new KmiacServerException();
+	}
+//	catch (UnsupportedEncodingException e1) {
+//		// TODO Auto-generated catch block
+//		e1.printStackTrace();
+//		throw new KmiacServerException();
+//	} catch (FileNotFoundException e1) {
+//		// TODO Auto-generated catch block
+//		e1.printStackTrace();
+//		throw new KmiacServerException();
+//	} 
+	catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+		throw new KmiacServerException();
+	} finally {
+		if (acrs != null)
+			acrs.close();
+		if (acrs2 != null)
+			acrs2.close();
+	}
+}
+
+
+
+@Override
+public String nagrvr(int cpol) throws KmiacServerException, TException {
+	AutoCloseableResultSet acrs = null, acrs2 = null;
+	Date data = null;
+	Date data1 = null;
+//	String dateb = isv.getDateb();
+//	String datef = isv.getDatef();
+	Integer codpol = cpol;
+	String fio = "";
+	String path = null;
+	Integer n1 = 0;Integer vr = 0;
+	Double timep = 0.0; 
+	Double timed = 0.0; 
+	Double timeda = 0.0; 
+	Double timeprf = 0.0; 
+	Double timepr = 0.0; 
+	Double st = 0.0;
+	double ppp = 0; Integer ppf = 0; 
+	double pdp = 0; Integer pdf = 0; 
+	double ppfp = 0; Integer ppff = 0; 
+	double pp = 0; Integer pf = 0; Double proc = 0.0;
+	double ippp = 0; Integer ippf = 0; 
+	double ipdp = 0; Integer ipdf = 0; 
+	double ippfp = 0; Integer ippff = 0; 
+	double ipp = 0; Integer ipf = 0; 
+	double itime = 0;
+	
+	try 
+	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("posvr", ".htm").getAbsolutePath()), "utf-8")) 
+//		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("posvr", ".htm").getAbsolutePath()), "utf-8")) {
+//			AutoCloseableResultSet acrs;
+			{
+		StringBuilder sb = new StringBuilder(0x10000);
+		sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+		sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		sb.append("<head>");
+			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+			sb.append("<title>Посещения врачей поликлиники</title>");
+		sb.append("</head>");
+		sb.append("<body>");
+		sb.append("<p align=center>ИНФО МУЗДРАВ<br></p>");
+			sb.append("<h3 align=center>Нагрузка по врачам<br></h3>");
+			sb.append("<p align=center>Поликлиники</p>");
+			sb.append("<br>");
+			sb.append("<TABLE BORDER=2>");
+			sb.append("<TR>");
+			sb.append("<TD rowspan=2 align=center>N п/п.</TD>");
+			sb.append("<TD rowspan=2 align=center>Фамилия, имя, отчество</TD>");
+			sb.append("<TD rowspan=2 align=center>Должность</TD>");
+			sb.append("<TD rowspan=2 align=center>Время</TD>");
+//			sb.append("<TD rowspan=2 align=center>Ставок</TD>");
+			sb.append("<TD colspan=3 align=center>Посещения в поликлинике</TD>");
+			sb.append("<TD colspan=3 align=center>Посещения на дому</TD>");
+			sb.append("<TD colspan=3 align=center>Посещения с профцелью</TD>");
+			sb.append("<TD colspan=3 align=center>Посещения всего</TD>");
+			sb.append("</TR>");
+			sb.append("<TR>");
+			sb.append("<TD>план</TD>");
+			sb.append("<TD>факт</TD>");
+			sb.append("<TD>процент выполнения плана</TD>");
+			sb.append("<TD>план</TD>");
+			sb.append("<TD>факт</TD>");
+			sb.append("<TD>процент выполнения плана</TD>");
+			sb.append("<TD>план</TD>");
+			sb.append("<TD>факт</TD>");
+			sb.append("<TD>процент выполнения плана</TD>");
+			sb.append("<TD>план</TD>");
+			sb.append("<TD>факт</TD>");
+			sb.append("<TD>процент выполнения плана</TD>");
+			sb.append("</TR>");
+			sb.append("<TR>");
+
+			System.out.println(codpol);	
+			n1 = 0;
+			acrs = sse.execPreparedQuery("select sum(timep),sum(timed),sum(timeda),sum(timeprf),sum(timepr),t.pcod,t.cdol,v.fam,v.im,v.ot,v.idv "+
+//			                                              1         2           3            4           5       6      7     8    9    10   11  
+			"from s_tabel t,s_users u,s_vrach v "+
+			"where t.pcod=u.pcod and t.pcod=v.pcod and u.cpodr = ? "+
+			"group by t.pcod,t.cdol,v.fam,v.im,v.ot,v.idv ",codpol);
+			while (acrs.getResultSet().next()){
+				//выполнение на всех врачей, у которых есть часы	
+			n1 = n1+1;
+			fio = acrs.getResultSet().getString(8)+ ' '+ acrs.getResultSet().getString(9)+ ' '+acrs.getResultSet().getString(10);	
+			timep = acrs.getResultSet().getDouble(1);
+			timed = acrs.getResultSet().getDouble(2);
+			timeda = acrs.getResultSet().getDouble(3);
+			timeprf = acrs.getResultSet().getDouble(4);
+			timepr = acrs.getResultSet().getDouble(5);
+//          план			
+			acrs2 = sse.execPreparedQuery("select pospol*prpol,posprof*prprof,posdom*prdom,pospol*prproch,rabden,koldn,colst "+
+//                                                           1              2            3              4      5     6     7  
+			"from n_n63 where codpol= ? and codvrdol = ? ",codpol,acrs.getResultSet().getString(7));
+			if (acrs2.getResultSet().next()) {
+			ppp = acrs2.getResultSet().getDouble(1) * timep/100;	
+			pdp = acrs2.getResultSet().getDouble(3) * timed/100;	
+			ppfp = acrs2.getResultSet().getDouble(2) * timeprf/100;	
+			pp = acrs2.getResultSet().getDouble(1) * timep/100 +
+			acrs2.getResultSet().getDouble(3) * timed/100 +
+			acrs2.getResultSet().getDouble(2) * timeprf/100 +
+			acrs2.getResultSet().getDouble(4) * timepr/100;
+			}
+			acrs2.close();
+//          факт
+			acrs2 = sse.execPreparedQuery("select count(*),mobs,cpos from p_vizit_amb where cod_sp=? group by mobs,cpos",acrs.getResultSet().getInt(6));
+//                                                      1     2    3 
+			while (acrs2.getResultSet().next()) {
+				if(acrs2.getResultSet().getInt(2)==1) ppf = ppf + acrs2.getResultSet().getInt(1);
+				if(acrs2.getResultSet().getInt(2)==2) pdf = pdf + acrs2.getResultSet().getInt(1);
+				if(acrs2.getResultSet().getInt(3)!=1) ppff = ppff + acrs2.getResultSet().getInt(1);
+				pf = pf + acrs2.getResultSet().getInt(1);
+             }
+             acrs2.close();
+//           строка на врача             
+ 			sb.append(String.format("<td> %d",n1));
+ 			sb.append(String.format("<td> %s",fio));
+ 			sb.append(String.format("<td> %s",acrs.getResultSet().getString(7)));
+// 			sb.append(String.format("<TD> %s>",ppfp));
+ 			sb.append(String.format("<TD>%.2f </TD>",(timep + timed + timeprf + timepr)));
+ 			itime = itime + timep + timed + timeprf + timepr;
+ 			sb.append(String.format("<TD>%.2f </TD>",(ppp)));//план в поликлинике
+		    sb.append(String.format("<TD> %d</TD>",ppf));//факт в поликлинике
+		    ippf = ippf + ppf;
+		    if (ppp!=0)	proc= ppf*100/ppp; else proc = 0.0;
+ 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+ 			sb.append(String.format("<TD>%.2f </TD>",pdp));//план на дому
+ 			sb.append(String.format("<TD> %d</TD>",pdf));//факт на дому
+ 			ipdf = ipdf + pdf;
+ 			if (pdp!=0)	proc= pdf*100/pdp;  else proc = 0.0;
+ 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+ 			sb.append(String.format("<TD>%.2f </TD>",ppfp));//план профцель
+ 		    sb.append(String.format("<TD> %d</TD>",ppff));//факт профцель
+			ippff = ippff + ppff;
+ 			if (ppfp!=0) proc= ppff*100/ppfp;  else proc = 0.0;
+ 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+ 			sb.append(String.format("<TD>%.2f </TD>",pp));//план всего
+ 		    sb.append(String.format("<TD> %d</TD>",pf));//факт всего
+			ipf = ipf + pf;
+ 			if (pp!=0) proc= pf*100/pp; else proc = 0.0;
+ 			sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+			sb.append("<TD> </TD>");
+			sb.append("</TR>");
+			 ppp = 0;  ppf = 0; 
+			 pdp = 0;  pdf = 0; 
+			 ppfp = 0;  ppff = 0; 
+			 pp = 0;  pf = 0;
+			timep = 0.0; 
+			timed = 0.0; 
+			timeprf = 0.0; 
+			timepr = 0.0; 
+             }
+			//разместить строку ИТОГО вставить период по формуле	
+			acrs2 = sse.execPreparedQuery("select sum(pospol*prpol*colst),sum(posprof*prprof*colst),sum(posdom*prdom*colst),rabden,koldn "+ 
+					"from n_n63 where codpol = ? group by rabden,koldn ",codpol);
+			if (acrs2.getResultSet().next()) {
+				sb.append("<td> /TD>");
+				sb.append("<td> ИТОГО</TD>");
+				sb.append("<TD> </TD>");
+				sb.append(String.format("<TD> %.2f",itime));//время
+				sb.append(String.format("<TD>%.2f </TD>",(acrs2.getResultSet().getDouble(1)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500)));//план в поликлинике
+ 			    sb.append(String.format("<TD> %d</TD>",ippf));//факт в поликлинике
+ 			    if((acrs2.getResultSet().getDouble(1)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500) !=0)
+				proc= ppf*100/((acrs2.getResultSet().getDouble(1)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
+ 			    else proc = 0.0;
+				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+				sb.append(String.format("<TD>%.2f </TD>",((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500))));//план на дому
+ 			    sb.append(String.format("<TD> %d</TD>",ipdf));//факт на дому
+				if ((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5))!=0)
+ 			    proc= pdf*100/((acrs2.getResultSet().getDouble(2)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
+ 			    else proc = 0.0;
+				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+				sb.append(String.format("<TD>%.2f </TD>",((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500))));//план профцель
+			    sb.append(String.format("<TD> %d</TD>",ippff));//факт профцель
+				if (((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500))!=0)
+			    proc= ppff*100/((acrs2.getResultSet().getDouble(3)*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500));
+ 			    else proc = 0.0;
+				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
+				ipp = (acrs2.getResultSet().getDouble(1)+acrs2.getResultSet().getDouble(2)+acrs2.getResultSet().getDouble(3))*acrs2.getResultSet().getDouble(4)*acrs2.getResultSet().getDouble(5)/36500;
+				sb.append(String.format("<TD>%.2f </TD>",ipp));//план всего
+			    sb.append(String.format("<TD> %d</TD>",ipf));//факт всего
+				if (ipp!=0)
+			    proc= pf*100/ipp;  else proc = 0.0;
 				sb.append(String.format("<TD> %.2f</TD>",proc));//процент
 			}
 			sb.append("</TABLE>");

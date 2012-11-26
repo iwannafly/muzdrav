@@ -64,6 +64,7 @@ public class ServerMedication extends Server implements Iface {
     //  datao       vracho         dataz
         Date.class, Integer.class, Date.class
     };
+    @SuppressWarnings("unused")
     private static final Class<?>[] LEK_PRIEM_TYPES = {
     //  id             nlek           datap       timep       status 
         Integer.class, Integer.class, Date.class, Time.class, Boolean.class
@@ -178,15 +179,15 @@ public class ServerMedication extends Server implements Iface {
     }
 
     @Override
-    public List<Lek> getLek(int idGosp) throws KmiacServerException {
-        String sqlQuery = "SELECT * FROM c_lek WHERE id_gosp = ?";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
-            List<Lek> leks =
-                rsmLek.mapToList(acrs.getResultSet());
-            if (leks.size() == 0) {
+    public Lek getLek(int nlek) throws KmiacServerException {
+        String sqlQuery = "SELECT * FROM c_lek WHERE nlek = ?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, nlek)) {
+            if (acrs.getResultSet().next()) {
+                return rsmLek.map(acrs.getResultSet());
+            } else {
                 log.log(Level.INFO, "Lek not found exception");
+                throw new KmiacServerException();
             }
-            return leks;
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
@@ -261,6 +262,21 @@ public class ServerMedication extends Server implements Iface {
                 log.log(Level.INFO, "Lek short list not found");
             }
             return lekShortList;
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public List<IntegerClassifier> getPeriods() throws KmiacServerException {
+        String sqlQuery = "SELECT pcod, name FROM n_period ORDER BY name;";
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            List<IntegerClassifier> medications = rsmMedications.mapToList(acrs.getResultSet());
+            if (medications.size() == 0) {
+                log.log(Level.INFO, "Periods not found");
+            }
+            return medications;
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();

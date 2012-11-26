@@ -29,6 +29,7 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.ModalForm;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomNumberEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientViewSelect.MainForm;
@@ -40,11 +41,12 @@ public class PatientSearchForm extends ModalForm {
 	private static final long serialVersionUID = -8340824528321653697L;
 	private List<PatientBriefInfo> fullResults; 
 	
-	private static int heightWithOptionalParams = 340;
-	private static int heightWithoutOptionalParams = 240;
+	private static int heightWithOptionalParams = 360;
+	private static int heightWithoutOptionalParams = 260;
 	
 	private JPanel pnlTextFields; 
 	private JPanel pnlSearchParams;
+	private CustomNumberEditor tbNpasp;
 	private CustomTextField tbFam;
 	private CustomTextField tbIm;
 	private CustomTextField tbOt;
@@ -104,7 +106,7 @@ public class PatientSearchForm extends ModalForm {
 //		});
 		
 		setMinimumSize(new Dimension(568, 640));
-		setBounds(100, 100, 532, 640);
+		setBounds(100, 100, 568, 680);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Поиск пациентов");
 		
@@ -121,16 +123,16 @@ public class PatientSearchForm extends ModalForm {
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(pnlResults, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE)
-						.addComponent(pnlSearchParams, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(pnlSearchParams, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 540, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(pnlSearchParams, GroupLayout.PREFERRED_SIZE, heightWithOptionalParams, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlSearchParams, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlResults, GroupLayout.DEFAULT_SIZE, resultsHeight, Short.MAX_VALUE)
+					.addComponent(pnlResults, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
@@ -243,31 +245,34 @@ public class PatientSearchForm extends ModalForm {
 		gl_pnlSearchParams.setHorizontalGroup(
 			gl_pnlSearchParams.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlSearchParams.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_pnlSearchParams.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_pnlSearchParams.createSequentialGroup()
+							.addContainerGap()
+							.addGroup(gl_pnlSearchParams.createParallelGroup(Alignment.LEADING)
+								.addComponent(pnlTextFields, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
+								.addComponent(pnlOptionalParams, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)))
 						.addGroup(Alignment.TRAILING, gl_pnlSearchParams.createSequentialGroup()
-							.addComponent(chbAutoClose, GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
+							.addGap(14)
+							.addComponent(chbAutoClose, GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE)
 							.addGap(18)
 							.addComponent(btnClearFields, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE))
-						.addComponent(pnlTextFields, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
-						.addComponent(pnlOptionalParams, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
+							.addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
 		gl_pnlSearchParams.setVerticalGroup(
 			gl_pnlSearchParams.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlSearchParams.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(pnlTextFields, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlTextFields, GroupLayout.PREFERRED_SIZE, 184, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(pnlOptionalParams, GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlSearchParams.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnSearch, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-						.addComponent(btnClearFields, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(chbAutoClose, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addContainerGap())
+							.addComponent(btnSearch, GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+							.addComponent(btnClearFields, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(chbAutoClose, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addContainerGap())
 		);
 		
 		JPanel gbPatientCount = new JPanel();
@@ -394,34 +399,53 @@ public class PatientSearchForm extends ModalForm {
 		
 		tbNumPol = new CustomTextField();
 		tbNumPol.getDocument().addDocumentListener(epc);
+		tbNumPol.addKeyListener(enterKeyListener);
 		tbNumPol.setColumns(10);
+		
+		tbNpasp = new CustomNumberEditor();
+		tbNpasp.getDocument().addDocumentListener(epc);
+		tbNpasp.addKeyListener(enterKeyListener);
+		tbNpasp.setColumns(10);
+		
+		JLabel lblNpasp = new JLabel("Уникальный номер пациента");
 		
 		GroupLayout gl_pnlTextFields = new GroupLayout(pnlTextFields);
 		gl_pnlTextFields.setHorizontalGroup(
-			gl_pnlTextFields.createParallelGroup(Alignment.LEADING)
+			gl_pnlTextFields.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_pnlTextFields.createSequentialGroup()
-					.addGroup(gl_pnlTextFields.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(lblFam, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblIm, GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-						.addComponent(lblOt, GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
-						.addComponent(lblBirDate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblSerPol, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblNumPol, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(18)
+					.addContainerGap()
 					.addGroup(gl_pnlTextFields.createParallelGroup(Alignment.LEADING)
-						.addComponent(tbNumPol, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-						.addComponent(tbSerPol, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-						.addComponent(tbFam, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-						.addComponent(tbIm, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-						.addComponent(tbOt, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
-						.addGroup(Alignment.TRAILING, gl_pnlTextFields.createSequentialGroup()
-							.addComponent(tbBirDate, GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(tbBirDate2, GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))))
+						.addGroup(gl_pnlTextFields.createSequentialGroup()
+							.addGroup(gl_pnlTextFields.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(lblIm, GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+								.addComponent(lblOt, GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+								.addComponent(lblBirDate, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblSerPol, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblFam, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblNumPol, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+							.addGap(18)
+							.addGroup(gl_pnlTextFields.createParallelGroup(Alignment.LEADING)
+								.addComponent(tbNumPol, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+								.addComponent(tbSerPol, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+								.addComponent(tbFam, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+								.addComponent(tbIm, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+								.addComponent(tbOt, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+								.addGroup(gl_pnlTextFields.createSequentialGroup()
+									.addComponent(tbBirDate, GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tbBirDate2, GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))))
+						.addGroup(gl_pnlTextFields.createSequentialGroup()
+							.addComponent(lblNpasp, GroupLayout.PREFERRED_SIZE, 288, GroupLayout.PREFERRED_SIZE)
+							.addGap(18)
+							.addComponent(tbNpasp, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))))
 		);
 		gl_pnlTextFields.setVerticalGroup(
 			gl_pnlTextFields.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlTextFields.createSequentialGroup()
+					.addGroup(gl_pnlTextFields.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tbNpasp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNpasp))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_pnlTextFields.createParallelGroup(Alignment.BASELINE)
 						.addComponent(tbFam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblFam))
@@ -485,26 +509,37 @@ public class PatientSearchForm extends ModalForm {
 	private PatientSearchParams createSearchParams() {
 		PatientSearchParams params = new PatientSearchParams();
 		
-		if (!tbFam.isEmpty()) params.setFam(tbFam.getText().trim());
-		if (!tbIm.isEmpty()) params.setIm(tbIm.getText().trim());
-		if (!tbOt.isEmpty()) params.setOt(tbOt.getText().trim());
-		if (!rbtIllegible.isSelected()) {
-			params.fam += '%';
-			params.im += '%';
-			if (params.isSetOt())
-				params.ot += '%';
+		if (!tbNpasp.isEmpty()) {
+			params.setNpasp(tbNpasp.getNumber().intValue());
+		} else {
+			if (!tbFam.isEmpty()) params.setFam(tbFam.getText().trim());
+			if (!tbIm.isEmpty()) params.setIm(tbIm.getText().trim());
+			if (!tbOt.isEmpty()) params.setOt(tbOt.getText().trim());
+			if (!rbtIllegible.isSelected()) {
+				params.fam += '%';
+				params.im += '%';
+				if (params.isSetOt())
+					params.ot += '%';
+			} else {
+				if (params.isSetFam())
+					params.fam = '%' + params.fam + '%';
+				if (params.isSetIm())
+					params.im = '%' + params.im + '%';
+				if (params.isSetOt())
+					params.ot = '%' + params.ot + '%';
+			}
+			if (!rbtIllegible.isSelected() && (tbBirDate.getDate() != null)) {
+				params.setDatar(tbBirDate.getDate().getTime());
+				params.unsetDatar2();
+			} else if ((tbBirDate.getDate() != null) && (tbBirDate2.getDate() != null)) {
+				params.setDatar(tbBirDate.getDate().getTime());
+				params.setDatar2(tbBirDate2.getDate().getTime());
+			}
+			if (!tbSerPol.isEmpty()) params.setSpolis(tbSerPol.getText().trim());
+			if (!tbNumPol.isEmpty()) params.setNpolis(tbNumPol.getText().trim());
+			params.setManyPatients(rbtManyPat.isSelected());
+			params.setIllegibleSearch(rbtIllegible.isSelected());
 		}
-		if (!rbtIllegible.isSelected() && (tbBirDate.getDate() != null)) {
-			params.setDatar(tbBirDate.getDate().getTime());
-			params.unsetDatar2();
-		} else if ((tbBirDate.getDate() != null) && (tbBirDate2.getDate() != null)) {
-			params.setDatar(tbBirDate.getDate().getTime());
-			params.setDatar2(tbBirDate2.getDate().getTime());
-		}
-		if (!tbSerPol.isEmpty()) params.setSpolis(tbSerPol.getText().trim());
-		if (!tbNumPol.isEmpty()) params.setNpolis(tbNumPol.getText().trim());
-		params.setManyPatients(rbtManyPat.isSelected());
-		params.setIllegibleSearch(rbtIllegible.isSelected());
 		
 		return params;
 	}
@@ -515,6 +550,7 @@ public class PatientSearchForm extends ModalForm {
 	}
 	
 	public void clearFields() {
+		tbNpasp.clear();
 		tbFam.clear();
 		tbIm.clear();
 		tbOt.clear();
@@ -525,6 +561,37 @@ public class PatientSearchForm extends ModalForm {
 		
 		tblResults.setData(new ArrayList<PatientBriefInfo>());
 		btnAcceptResults.setEnabled(false);
+	}
+	
+	public void enableFieldsNpasp() {
+		boolean b;
+		
+		b = !tbFam.isEmpty();
+		b |= !tbIm.isEmpty();
+		b |= !tbOt.isEmpty();
+		b |= tbBirDate.getDate() != null;
+		b |= tbBirDate2.getDate() != null;
+		b |= !tbSerPol.isEmpty();
+		b |= !tbNumPol.isEmpty();
+		
+		if (!b && !tbNpasp.isEmpty()) {
+			enableFields(false, false);
+		} else if (b && tbNpasp.isEmpty()) {
+			enableFields(true, false);
+		} else {
+			enableFields(true, true);
+		}
+	}
+	
+	private void enableFields(boolean val, boolean npst) {
+		tbNpasp.setEnabled((npst) ? val : !val);
+		tbFam.setEnabled(val);
+		tbIm.setEnabled(val);
+		tbOt.setEnabled(val);
+		tbBirDate.setEnabled(val);
+		tbBirDate2.setEnabled(val);
+		tbSerPol.setEnabled(val);
+		tbNumPol.setEnabled(val);
 	}
 	
 	public void setOptionalParamsEnabledState(boolean enabled) {
@@ -589,6 +656,11 @@ public class PatientSearchForm extends ModalForm {
 				disabled &= tbSerPol.isEmpty();
 				disabled &= tbNumPol.isEmpty();
 			}
+			
+			if (disabled)
+				disabled = tbNpasp.isEmpty();
+			
+			enableFieldsNpasp();
 			
 			btnSearch.setEnabled(!disabled);
 		}

@@ -52,6 +52,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientGospYesOrNoNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
@@ -164,7 +165,7 @@ public class ServerRegPatient extends Server implements Iface {
         Time.class, Integer.class, Integer.class, Date.class, Time.class,
     //  cuser          dataosm     vremosm     dataz       jalob
         Integer.class, Date.class, Time.class, Date.class, String.class,
-    //  vid_st			pr_ber
+    //  vid_st         pr_ber
         Integer.class, Boolean.class
     };
     private static final Class<?>[] NAMBK_TYPES = new Class<?>[] {
@@ -563,20 +564,20 @@ public class ServerRegPatient extends Server implements Iface {
     public final PatientFullInfo getPatientFullInfo(final int npasp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, patient.fam, patient.im, patient.ot, "
-                + "patient.datar, patient.pol, patient.jitel, patient.poms_ser, "
-                + "patient.poms_nom, patient.sgrp, patient.adp_obl, patient.adp_gorod, "
-                + "patient.adp_ul, patient.adp_dom, patient.adp_korp, patient.adp_kv, "
-                + "patient.adm_obl, patient.adm_gorod, patient.adm_ul, patient.adm_dom, "
-                + "patient.adm_korp, patient.adm_kv, patient.mrab, patient.name_mr, "
-                + "patient.ncex, patient.poms_strg, patient.poms_tdoc, "
-                + "patient.poms_ndog, patient.pdms_strg, patient.pdms_ser, "
-                + "patient.pdms_nom, patient.pdms_ndog, patient.cpol_pr, patient.terp, "
-                + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
-                + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
-                + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
-                + "patient.region_liv "
-                + "FROM patient "
-                + "WHERE patient.npasp = ?;";
+            + "patient.datar, patient.pol, patient.jitel, patient.poms_ser, "
+            + "patient.poms_nom, patient.sgrp, patient.adp_obl, patient.adp_gorod, "
+            + "patient.adp_ul, patient.adp_dom, patient.adp_korp, patient.adp_kv, "
+            + "patient.adm_obl, patient.adm_gorod, patient.adm_ul, patient.adm_dom, "
+            + "patient.adm_korp, patient.adm_kv, patient.mrab, patient.name_mr, "
+            + "patient.ncex, patient.poms_strg, patient.poms_tdoc, "
+            + "patient.poms_ndog, patient.pdms_strg, patient.pdms_ser, "
+            + "patient.pdms_nom, patient.pdms_ndog, patient.cpol_pr, patient.terp, "
+            + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
+            + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
+            + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
+            + "patient.region_liv "
+            + "FROM patient "
+            + "WHERE patient.npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
@@ -635,7 +636,7 @@ public class ServerRegPatient extends Server implements Iface {
     public final List<Kontingent> getKontingent(final int npasp)
             throws KontingentNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT id , npasp, kateg, datal, name FROM p_konti "
-                + "INNER JOIN n_lkr ON p_konti.kateg = n_lkr.pcod WHERE npasp = ?;";
+            + "INNER JOIN n_lkr ON p_konti.kateg = n_lkr.pcod WHERE npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
             ResultSet rs = acrs.getResultSet();
             List<Kontingent> kontingent = rsmKontingent.mapToList(rs);
@@ -654,8 +655,8 @@ public class ServerRegPatient extends Server implements Iface {
     public final Lgota getLgota(final int id)
             throws LgotaNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT id, npasp, lgot, datal, name, gri, sin, pp, drg, "
-                + "dot, obo, ndoc FROM p_kov "
-                + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE id = ?;";
+            + "dot, obo, ndoc FROM p_kov "
+            + "INNER JOIN n_lkn ON p_kov.lgot = n_lkn.pcod WHERE id = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
             ResultSet rs = acrs.getResultSet();
             if (rs.next()) {
@@ -799,34 +800,34 @@ public class ServerRegPatient extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isPatientExist(patinfo)) {
                 sme.execPrepared("INSERT INTO patient "
-                        + "(fam, im, ot, datar, poms_ser, poms_nom, pol, jitel, sgrp, "
-                        + "adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, adm_obl, "
-                        + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
-                        + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
-                        + "cpol_pr, terp, tdoc, docser, docnum, datadoc, "
-                        + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?);", true,
-                        patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
-                        avoidDefaultSqlDateValue(patinfo.getDatar()),
-                        patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
-                        patinfo.getPol(), patinfo.getJitel(), patinfo.getSgrp(),
-                        patinfo.getAdpAddress().getRegion(), patinfo.getAdpAddress().getCity(),
-                        patinfo.getAdpAddress().getStreet(), patinfo.getAdpAddress().getHouse(),
-                        patinfo.getAdpAddress().getFlat(), patinfo.getAdmAddress().getRegion(),
-                        patinfo.getAdmAddress().getCity(), patinfo.getAdmAddress().getStreet(),
-                        patinfo.getAdmAddress().getHouse(), patinfo.getAdmAddress().getFlat(),
-                        patinfo.getMrab(), patinfo.getNamemr(), patinfo.getNcex(),
-                        patinfo.getPolis_oms().getStrg(), patinfo.getPolis_oms().getTdoc(),
-                        patinfo.getPolis_dms().getStrg(), patinfo.getPolis_dms().getSer(),
-                        patinfo.getPolis_dms().getNom(), patinfo.getCpol_pr(), patinfo.getTerp(),
-                        patinfo.getTdoc(), patinfo.getDocser(), patinfo.getDocnum(),
-                        avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
-                        patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
-                        patinfo.getProf(), patinfo.getTel(),
-                        avoidDefaultSqlDateValue(patinfo.getDsv()), patinfo.getPrizn(),
-                        patinfo.getTer_liv(), patinfo.getRegion_liv());
+                    + "(fam, im, ot, datar, poms_ser, poms_nom, pol, jitel, sgrp, "
+                    + "adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, adm_obl, "
+                    + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
+                    + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
+                    + "cpol_pr, terp, tdoc, docser, docnum, datadoc, "
+                    + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    + "?, ?);", true,
+                    patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
+                    avoidDefaultSqlDateValue(patinfo.getDatar()),
+                    patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
+                    patinfo.getPol(), patinfo.getJitel(), patinfo.getSgrp(),
+                    patinfo.getAdpAddress().getRegion(), patinfo.getAdpAddress().getCity(),
+                    patinfo.getAdpAddress().getStreet(), patinfo.getAdpAddress().getHouse(),
+                    patinfo.getAdpAddress().getFlat(), patinfo.getAdmAddress().getRegion(),
+                    patinfo.getAdmAddress().getCity(), patinfo.getAdmAddress().getStreet(),
+                    patinfo.getAdmAddress().getHouse(), patinfo.getAdmAddress().getFlat(),
+                    patinfo.getMrab(), patinfo.getNamemr(), patinfo.getNcex(),
+                    patinfo.getPolis_oms().getStrg(), patinfo.getPolis_oms().getTdoc(),
+                    patinfo.getPolis_dms().getStrg(), patinfo.getPolis_dms().getSer(),
+                    patinfo.getPolis_dms().getNom(), patinfo.getCpol_pr(), patinfo.getTerp(),
+                    patinfo.getTdoc(), patinfo.getDocser(), patinfo.getDocnum(),
+                    avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
+                    patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
+                    patinfo.getProf(), patinfo.getTel(),
+                    avoidDefaultSqlDateValue(patinfo.getDsv()), patinfo.getPrizn(),
+                    patinfo.getTer_liv(), patinfo.getRegion_liv());
                 int id = sme.getGeneratedKeys().getInt("npasp");
                 sme.setCommit();
                 return id;
@@ -908,11 +909,11 @@ public class ServerRegPatient extends Server implements Iface {
                     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
                 };
                 sme.execPreparedT("UPDATE p_preds SET "
-                        + "fam = ?, im = ?, ot = ?, "
-                        + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                        + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
-                        + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
-                        agent, AGENT_TYPES, indexes);
+                    + "fam = ?, im = ?, ot = ?, "
+                    + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
+                    + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
+                    + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
+                    agent, AGENT_TYPES, indexes);
                 sme.setCommit();
             }
         } catch (SQLException | InterruptedException e) {
@@ -927,16 +928,16 @@ public class ServerRegPatient extends Server implements Iface {
             if (!isSignExist(sign)) {
                 final int[] indexes = {0, 1, 2, 3, 4, 5, 6};
                 sme.execPreparedT(
-                        "INSERT INTO p_sign (npasp, grup, ph, allerg, "
-                        + "farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                        false, sign, SIGN_TYPES, indexes);
+                    "INSERT INTO p_sign (npasp, grup, ph, allerg, "
+                    + "farmkol, vitae, vred) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                    false, sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             } else {
                 final int[] indexes = {1, 2, 3, 4, 5, 6, 0};
                 sme.execPreparedT("UPDATE p_sign SET "
-                        + "grup = ?, ph = ?, allerg = ?, "
-                        + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
-                        sign, SIGN_TYPES, indexes);
+                    + "grup = ?, ph = ?, allerg = ?, "
+                    + "farmkol = ?, vitae = ?, vred = ? WHERE npasp = ?;", false,
+                    sign, SIGN_TYPES, indexes);
                 sme.setCommit();
             }
         } catch (SQLException | InterruptedException e) {
@@ -949,19 +950,19 @@ public class ServerRegPatient extends Server implements Iface {
     public final int addGosp(final Gosp gosp) throws GospAlreadyExistException,
             KmiacServerException {
         final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38};
+            18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isGospExist(gosp)) {
                 sme.execPreparedT(
-                        "INSERT INTO c_gosp(npasp, nist, datap, vremp, "
-                        + "pl_extr, naprav, n_org, cotd, sv_time, sv_day, ntalon, "
-                        + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
-                        + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
-                        + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
-                        + "dataosm, vremosm, dataz, jalob, vid_st, pr_ber) "
-                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
+                    "INSERT INTO c_gosp(npasp, nist, datap, vremp, "
+                    + "pl_extr, naprav, n_org, cotd, sv_time, sv_day, ntalon, "
+                    + "vidtr, pr_out, alkg, meesr, vid_tran, diag_n, diag_p, "
+                    + "named_n, named_p, nal_z, nal_p, t0c, ad, smp_data, "
+                    + "smp_time, smp_num, cotd_p, datagos, vremgos, cuser, "
+                    + "dataosm, vremosm, dataz, jalob, vid_st, pr_ber) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
+                    + "?, ?, ?, ?);", true, gosp, GOSP_TYPES, indexes);
                 int id = sme.getGeneratedKeys().getInt("id");
                 sme.setCommit();
                 return id;
@@ -1070,15 +1071,15 @@ public class ServerRegPatient extends Server implements Iface {
     public final void deleteGosp(final int id) throws KmiacServerException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM c_osmotr WHERE id_gosp = ?;",
-                    false, id);
+                false, id);
             sme.execPrepared("DELETE FROM c_otd WHERE id_gosp = ?;",
-                    false, id);
+                false, id);
             sme.execPrepared("DELETE FROM c_izmer WHERE id_gosp = ?;",
-                    false, id);
+                false, id);
             sme.execPrepared("DELETE FROM c_diag WHERE id_gosp = ?;",
-                    false, id);
+                false, id);
             sme.execPrepared("DELETE FROM c_gosp WHERE id = ?;",
-                    false, id);
+                false, id);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1708,6 +1709,26 @@ public class ServerRegPatient extends Server implements Iface {
                 lgota, LGOTA_TYPES, indexes);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final String getNameOtdGosp(final int id)
+            throws PatientGospYesOrNoNotFoundException, KmiacServerException {
+        String sqlQuery = "SELECT n.name_u as otd FROM patient p "
+            + "JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) "
+            + "JOIN n_o00 n ON (o.cotd = n.pcod) "
+            + "WHERE p.npasp=? AND (g.pr_out=0 or g.pr_out is null) AND o.datav is null";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
+            ResultSet rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rs.getString("otd");
+            } else {
+                throw new PatientGospYesOrNoNotFoundException();
+            }
+        } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }

@@ -33,6 +33,10 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftVgr.LgkatNotFoundException;
+import ru.nkz.ivcgzo.thriftVgr.Lgota;
+import ru.nkz.ivcgzo.thriftVgr.Patient;
+import ru.nkz.ivcgzo.thriftVgr.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftVgr.RdPatient;
 import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
 import ru.nkz.ivcgzo.thriftVgr.RdVizit;
@@ -776,5 +780,31 @@ throw new TException(e);
 		}
 
 	return path;
+	}
+
+	@Override
+	public Patient getPatientInfo(int npasp) throws PatientNotFoundException,
+			TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int setPatientInfo(Patient npasp) throws TException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<Lgota> getLgotaInfo(int npasp) throws LgkatNotFoundException,
+			TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int addLgotaInfo(Lgota npasp) throws TException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

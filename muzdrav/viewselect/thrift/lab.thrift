@@ -83,8 +83,8 @@ struct Gosp {
 	4: optional string cotd_name;
 	5: optional i64 datap;
 	6: optional i64 datav;
-	7: optional string ishod;
-	8: optional string result;
+	7: optional i32 ishod;
+	8: optional i32 result;
 	9: optional i32 vrach;
 	10: optional string vrach_fio;
 }

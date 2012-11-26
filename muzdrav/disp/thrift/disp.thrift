@@ -127,6 +127,13 @@ struct PatientInfo{
 exception PfizNotFoundException {
 }
 
+exception PdispdoNotFoundException {
+}
+
+
+exception PdisppoNotFoundException {
+}
+
 
 //русские буквы
 service ThriftDisp extends kmiacServer.KmiacServer {
@@ -139,6 +146,7 @@ service ThriftDisp extends kmiacServer.KmiacServer {
 	list<Pdisp_ds_do> getTblDispds_do(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp_ds_do getDispds_do(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteDispds_do(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	Pdisp_ds_do getDispds_d_do(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PdispdoNotFoundException pddnfe);
 
 
 	i32 AddPdispds_po(1: Pdisp_ds_po pds_po) throws (1: kmiacServer.KmiacServerException kse);
@@ -146,6 +154,7 @@ service ThriftDisp extends kmiacServer.KmiacServer {
 	list<Pdisp_ds_po> getTblDispds_po(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp_ds_po getDispds_po(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteDispds_po(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	Pdisp_ds_po getDispds_d_po(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PdisppoNotFoundException pdpnfe);
 
 //classifiers
 	list<classifier.IntegerClassifier> get_n_prf() throws (1: kmiacServer.KmiacServerException kse);

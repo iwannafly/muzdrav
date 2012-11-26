@@ -83,6 +83,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.OgrnNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
+import ru.nkz.ivcgzo.thriftRegPatient.PatientGospYesOrNoNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
@@ -431,6 +432,7 @@ public class PacientInfoFrame extends JFrame {
             public void stateChanged(ChangeEvent e) {
                 if (tbMain.getSelectedIndex() == 1) {
                     changePatientLgotaInfo(curPatientId);
+                    InfoForLgotaPatient();
                 }
                 if (tbMain.getSelectedIndex() == 2) {
                     changePatientKategInfo(curPatientId);
@@ -443,6 +445,15 @@ public class PacientInfoFrame extends JFrame {
                 }
                 if (tbMain.getSelectedIndex() == 5) {
                     selectAllPatientPriemInfo(curPatientId);
+                    try{
+                    	String nameOtd = MainForm.tcl.getNameOtdGosp(curPatientId);
+                        if  (!nameOtd.isEmpty())
+                            JOptionPane.showMessageDialog(tbl_priem, "Пациент: "+tfFam.getText()+" "+tfIm.getText()+" "+tfOt.getText()+"    Д.р. "+tfDr.getText()+"\n\r"+"находится на лечении: "+nameOtd);
+                      } catch (PatientGospYesOrNoNotFoundException pgnfe) {
+                            System.out.println("Госпитализаций нет.");
+                      } catch (Exception e1) {
+                        e1.printStackTrace();
+                      }
                 }
             }
         });
@@ -543,7 +554,6 @@ public class PacientInfoFrame extends JFrame {
                     changePatientSignInfo(curPatientId);
                     selectAllPatientPriemInfo(curPatientId);
                     changePatientPriemInfo(curPatientId);
-                    InfoForLgotaPatient();
                     setTitle(String.format("%s %s %s", PersonalInfo.getFam(), PersonalInfo.getIm(), PersonalInfo.getOt()));
 
                   SwingUtilities.invokeLater(new Runnable() {
@@ -2914,7 +2924,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    StringClassifier res = MainForm.conMan.showMkbTreeForm("диагнозы", tf_diag_p.getText());
+                    StringClassifier res = MainForm.conMan.showMkbTreeForm("Классификатор МКБ-10", tf_diag_p.getText());
 
                     if (res != null) {
                         tf_diag_p.setText(res.pcod);
@@ -2954,7 +2964,7 @@ public class PacientInfoFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent arg0) {
                 if (arg0.getClickCount() == 2) {
-                    StringClassifier res = MainForm.conMan.showMkbTreeForm("диагнозы", tf_diag_n.getText());
+                    StringClassifier res = MainForm.conMan.showMkbTreeForm("Классификатор МКБ-10", tf_diag_n.getText());
 
                     if (res != null) {
                         tf_diag_n.setText(res.pcod);
@@ -4002,6 +4012,7 @@ public class PacientInfoFrame extends JFrame {
             if (cmb_naprav.getSelectedItem() != null) Id_gosp.setNaprav(cmb_naprav.getSelectedPcod());
             if (cmb_org.getSelectedItem() != null) Id_gosp.setN_org(cmb_org.getSelectedPcod());
             if (cmb_cotd.getSelectedItem() != null) Id_gosp.setCotd(cmb_cotd.getSelectedPcod());
+            else	Id_gosp.setCotd(Id_gosp.getCotd_p());
 
             //System.out.println(Id_gosp.getPr_out());
             CheckNotNullTableCgosp();
@@ -4026,7 +4037,7 @@ public class PacientInfoFrame extends JFrame {
                 //if (Id_gosp.getCotd() != 0)
                 	//MainForm.tcl.updateOtd(curId_otd, curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
-            if (Id_gosp.getCotd() != 0)
+            if (Id_gosp.getCotd() != Id_gosp.getCotd_p())
                	MainForm.tcl.addOrUpdateOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
             tbl_priem.updateChangedSelectedItem();
         } catch (Exception e) {
@@ -4061,7 +4072,7 @@ public class PacientInfoFrame extends JFrame {
             String strerr = "";
             if (Id_gosp.getPl_extr() == 0)
                 strerr += "плановое/экстренное; \n\r";
-            if (Id_gosp.getPl_extr() == 1 && Id_gosp.getNtalon() == 0)
+            if (Id_gosp.getPl_extr() == 2 && Id_gosp.getNtalon() == 0)
                 strerr += "плановый больной без талона; \n\r";
             if (Id_gosp.getNist() == 0 && Id_gosp.getCotd() != 0)
                 strerr += "отсутствует номер истории болезни; \n\r";
