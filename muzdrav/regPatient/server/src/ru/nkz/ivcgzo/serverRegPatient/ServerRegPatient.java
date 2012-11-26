@@ -135,12 +135,10 @@ public class ServerRegPatient extends Server implements Iface {
     private static final Class<?>[] AGENT_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
         Integer.class, String.class, String.class, String.class,
-    //  datar       pol          name_str      ogrn_str
+    //  datar       pol             name_str      ogrn_str
         Date.class, Integer.class, String.class, String.class,
-    //  vpolis         spolis        npolis        tdoc
-        Integer.class, String.class, String.class, Integer.class,
-    //  docser        docnum        birthplace
-        String.class, String.class, String.class
+    //  vpolis         spolis        npolis		   birthplace     
+        Integer.class, String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
     //  npasp          grup          ph            allerg
@@ -211,7 +209,7 @@ public class ServerRegPatient extends Server implements Iface {
     };
     private static final String[] AGENT_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "name_str", "ogrn_str",
-        "vpolis", "spolis" , "npolis", "tdoc", "docser", "docnum", "birthplace"
+        "vpolis", "spolis" , "npolis", "birthplace"
     };
     private static final String[] KONTINGENT_FIELD_NAMES = {
         "id", "npasp", "kateg", "datal", "name"
@@ -894,25 +892,22 @@ public class ServerRegPatient extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isAgentExist(agent)) {
                 final int[] indexes = {
-                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-                };
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
                 sme.execPreparedT(
                         "INSERT INTO p_preds (npasp, fam, im, ot, "
                         + "datar, pol, name_str, ogrn_str, vpolis, "
-                        + "spolis, npolis, tdoc, docser, docnum, "
-                        + "birthplace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?, ?, ?);", false, agent,
+                        + "spolis, npolis, birthplace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
+                        + "?, ?, ?, ?);", false, agent,
                         AGENT_TYPES, indexes);
                 sme.setCommit();
             } else {
                 final int[] indexes = {
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0
                 };
                 sme.execPreparedT("UPDATE p_preds SET "
                         + "fam = ?, im = ?, ot = ?, "
                         + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                        + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
-                        + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
+                        + "vpolis = ?, spolis = ?, npolis = ?, birthplace  = ? WHERE npasp = ?;", false,
                         agent, AGENT_TYPES, indexes);
                 sme.setCommit();
             }
