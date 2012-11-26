@@ -32,11 +32,11 @@ public class DbManager {
     }
 
     private void setDefaults() {
-        host = "localhost";
-        port = "3050";
-        name = "C:\\Asupol\\DB\\zabol.gdb";
-        user = "sysdba";
-        password = "masterkey";
+        host = "10.0.0.248";
+        port = "5432";
+        name = "zabol";
+        user = "postgres";
+        password = "postgres";
     }
 
     public Connection getConnection() throws SQLException {
@@ -48,9 +48,9 @@ public class DbManager {
 
     private Connection createConnection() {
         try {
-//            Class.forName("org.firebirdsql.jdbc.FBDriver");
-            DriverManager.registerDriver(new org.firebirdsql.jdbc.FBDriver());
-            String connString = String.format("jdbc:firebirdsql://%s:%s/%s?characterEncoding=cp1251", host, port, name);
+//            Class.forName("org.firebirdsql.jdbc.FBDriver");Class.forName("org.postgresql.Driver");
+            DriverManager.registerDriver(new org.postgresql.Driver());
+            String connString = String.format("jdbc:postgresql://%s:%s/%s", host, port, name);
             fbConnection = DriverManager.getConnection(connString, user, password);
             fbConnection.setAutoCommit(false);
             return fbConnection;

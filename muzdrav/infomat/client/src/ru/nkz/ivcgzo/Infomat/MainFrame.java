@@ -70,7 +70,7 @@ public class MainFrame extends JFrame {
     }
 
     private void addAppointmentButton() {
-        btnAppointment = new JButton("Запись на приём");
+        btnAppointment = new JButton("Р—Р°РїРёСЃСЊ РЅР° РїСЂРёС‘Рј");
         btnAppointment.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (frmDoctorSelect == null) {
@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
     }
 
     private void addPersonalInfoButton() {
-        btnPersonalInfo = new JButton("Личный кабинет");
+        btnPersonalInfo = new JButton("Р›РёС‡РЅС‹Р№ РєР°Р±РёРЅРµС‚");
         btnPersonalInfo.setHorizontalTextPosition(SwingConstants.CENTER);
         btnPersonalInfo.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnPersonalInfo.setFont(new Font("Courier New", Font.PLAIN, 25));
@@ -109,7 +109,7 @@ public class MainFrame extends JFrame {
     }
 
     private void addScheduleButton() {
-        btnSchedule = new JButton("Расписание");
+        btnSchedule = new JButton("Р Р°СЃРїРёСЃР°РЅРёРµ");
         btnSchedule.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnSchedule.setFont(new Font("Courier New", Font.PLAIN, 25));
         btnSchedule.setHorizontalTextPosition(SwingConstants.CENTER);
