@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.ServerPbol;
 
+import java.sql.Date;
+
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -10,14 +12,21 @@ import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftPbol.Pbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol.Iface;
 
 public class serverPbol extends Server implements Iface {
 	private TServer thrServ;
+	private final TResultSetMapper<Pbol, Pbol._Fields> rsmPbol;
+	private final Class<?>[] pbolTypes; 
 
 	public serverPbol(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
+		rsmPbol = new TResultSetMapper<>(Pbol.class, "id",          "id_obr",      "id_gosp",     "npasp",       "bol_l",       "s_bl", 	"po_bl",    "pol",         "vozr",        "nombl", 	    "cod_sp",      "cdol",       "pcod",        "dataz");
+		pbolTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Integer.class, Date.class};
+
 		// TODO Auto-generated constructor stub
 	}
 
