@@ -158,9 +158,6 @@ public class PermForm extends JDialog {
 		TaggedJCheckBox chbMss = new TaggedJCheckBox("Медицинское свидетельство о смерти", 6, CsluPdost.CsluAll);
 		pnlPermChb.add(chbMss);
 
-		TaggedJCheckBox chbClasVIew = new TaggedJCheckBox("Просмотр и выбор из классификатора", 7, CsluPdost.CsluAll);
-		pnlPermChb.add(chbClasVIew);
-
 		TaggedJCheckBox chbGenTal = new TaggedJCheckBox("Формирование талонов", 8, CsluPdost.CsluAll);
 		pnlPermChb.add(chbGenTal);
 
@@ -178,6 +175,9 @@ public class PermForm extends JDialog {
 
 		TaggedJCheckBox chbDisp = new TaggedJCheckBox("Диспансеризация", 16, CsluPdost.CsluAll);
 		pnlPermChb.add(chbDisp);
+
+		TaggedJCheckBox chbPbol = new TaggedJCheckBox("Больничный лист", 19, CsluPdost.CsluAll);
+		pnlPermChb.add(chbPbol);
 
 		gbPerm.setLayout(gl_gbPerm);
 		
@@ -359,6 +359,7 @@ public class PermForm extends JDialog {
 		char[] perm = new char[128];
 
 		perm[0] = '1';
+		perm[7] = '1';
 		for (Component cmp : pnlPermChb.getComponents()) {
 			TaggedJCheckBox chb = (TaggedJCheckBox) cmp;
 			
