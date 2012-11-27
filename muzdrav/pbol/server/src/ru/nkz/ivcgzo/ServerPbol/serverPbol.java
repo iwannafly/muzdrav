@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.ServerPbol;
+package ru.nkz.ivcgzo.serverPbol;
 
 import java.sql.Date;
 
@@ -17,12 +17,12 @@ import ru.nkz.ivcgzo.thriftPbol.Pbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol.Iface;
 
-public class serverPbol extends Server implements Iface {
+public class ServerPbol extends Server implements Iface {
 	private TServer thrServ;
 	private final TResultSetMapper<Pbol, Pbol._Fields> rsmPbol;
 	private final Class<?>[] pbolTypes; 
 
-	public serverPbol(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
+	public ServerPbol(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		rsmPbol = new TResultSetMapper<>(Pbol.class, "id",          "id_obr",      "id_gosp",     "npasp",       "bol_l",       "s_bl", 	"po_bl",    "pol",         "vozr",        "nombl", 	    "cod_sp",      "cdol",       "pcod",        "dataz");
 		pbolTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Integer.class, Date.class};
