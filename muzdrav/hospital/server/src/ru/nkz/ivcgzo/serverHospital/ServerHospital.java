@@ -39,6 +39,7 @@ import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
+import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
@@ -1080,4 +1081,32 @@ public class ServerHospital extends Server implements Iface {
             throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
         }
     }
+
+	@Override
+	public TRdIshod getRdIshodInfo(int npasp, int ngosp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateRdIshod(int npasp, int ngosp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteRdIshod(int npasp, int ngosp)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		
+	}
 }
