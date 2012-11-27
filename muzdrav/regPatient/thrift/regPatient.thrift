@@ -78,20 +78,17 @@ struct PatientFullInfo{
 /*сведени о представителе табл. p_preds*/
 struct Agent{
 	1:i32 npasp,
-	2:string fam,
-	3:string im,
-	4:string ot,
+	2:optional string fam,
+	3:optional string im,
+	4:optional string ot,
 	5:optional i64 datar,
-	6:i32 pol,
-	7:string name_str,
-	8:string ogrn_str,
-	9:i32 vpolis,
-	10:string spolis,
-	11:string npolis,
-	12:optional i32 tdoc,
-	13:optional string docser,
-	14:optional string docnum,
-	15:string birthplace
+	6:optional i32 pol,
+	7:optional string name_str,
+	8:optional string ogrn_str,
+	9:optional i32 vpolis,
+	10:optional string spolis,
+	11:optional string npolis,
+	12:optional string birthplace
 }
 
 /*pkov*/
