@@ -82,13 +82,12 @@ struct PdiagAmb {
 	 9: optional i32 obstreg;
 	10: optional i32 cod_sp;
 	11: optional string cdol;
-	12: optional i64 datap;
-	13: optional i64 dataot;
-	14: optional i32 obstot;
-	15: optional i32 codsp_ot;
-	16: optional string cdol_ot;
-	17: optional i32 vid_tr;
-	18: optional i32 id_pos;
+	12: optional i64 dataot;
+	13: optional i32 obstot;
+	14: optional i32 codsp_ot;
+	15: optional string cdol_ot;
+	16: optional i32 vid_tr;
+	17: optional i32 id_pos;
 }
 
 struct Psign{

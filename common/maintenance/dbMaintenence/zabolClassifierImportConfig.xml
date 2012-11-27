@@ -63,6 +63,7 @@
 		<table srcName="N45" dstName="n_n45" />
 		<table srcName="N63" dstName="n_n63" />
 		<table srcName="NSI_OBST" dstName="n_nsi_obst" />
+		<table srcName="NSIKODREZ" dstName="n_nsikodrez" />
 		<table srcName="NSILPU" dstName="n_nsilpu" />
 		<table srcName="NSIPOL" dstName="n_nsipol" />
 		<table srcName="NZ1" dstName="n_nz1" />

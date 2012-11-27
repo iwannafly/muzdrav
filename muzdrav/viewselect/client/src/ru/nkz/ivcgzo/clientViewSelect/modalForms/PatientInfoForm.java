@@ -354,7 +354,7 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Дата поступления в стационар", gosp.isSetDatap(), DateFormat.getDateInstance().format(new Date(gosp.getDatap())));
 		 				addLineToDetailInfo("Время поступления в стационар", gosp.isSetVremp(), DateFormat.getTimeInstance().format(new Time(gosp.getVremp())));
 		 				addLineToDetailInfo("Вид обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vgo), gosp.isSetPl_extr(), gosp.getPl_extr()));
-		 				//addLineToDetailInfo("Кем направлен", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_k02), gosp.isSetPl_extr(), gosp.getPl_extr()));
+		 				addLineToDetailInfo("Кем направлен", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_k02), gosp.isSetNaprav(), gosp.getNaprav()));
 		 				addLineToNaprCls("Направившее учреждение", gosp.getNaprav(), gosp.isSetN_org(), gosp.getN_org());
 		 				addLineToDetailInfo("Отделение стационара, куда госпитализирован", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), gosp.isSetCotd(), gosp.getCotd()));
 		 				addLineToDetailInfo("Своевременность госпитализации (в часах от начала заболевания)", gosp.isSetSv_time(), gosp.getSv_time());
