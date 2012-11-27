@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.ServerPbol;
+package ru.nkz.ivcgzo.serverPbol;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
@@ -13,10 +13,10 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol.Iface;
 
-public class serverPbol extends Server implements Iface {
+public class ServerPbol extends Server implements Iface {
 	private TServer thrServ;
 
-	public serverPbol(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
+	public ServerPbol(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		// TODO Auto-generated constructor stub
 	}

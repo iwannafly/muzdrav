@@ -1,11 +1,8 @@
 package ru.nkz.ivcgzo.clientPbol;
 
-import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JFrame;
-
-import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
