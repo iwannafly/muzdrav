@@ -1009,11 +1009,11 @@ public class Vvod extends JFrame {
 		 			  		diagamb.setId_obr(zapVr.getId_pvizit());
 		 			  		diagamb.setId_pos(tblPos.getSelectedItem().id);
 		 			  		diagamb.setNpasp(zapVr.getNpasp());
-		 			  		diagamb.setDatap(System.currentTimeMillis());
+		 			  		diagamb.setDatap(pvizitAmb.getDatap());
 		 			  		if (tblZaklDiag.getSelectedItem().isSetDatad())
 		 			  			diagamb.setDatad(tblZaklDiag.getSelectedItem().getDatad());
 		 			  		else
-		 			  			diagamb.setDatap(System.currentTimeMillis());
+		 			  			diagamb.setDatad(System.currentTimeMillis());
 		 			  		diagamb.setCod_sp(MainForm.vrPcod);
 		 			  		diagamb.setCdol(MainForm.vrCdol);
 		 			  		diagamb.setPredv(true);
@@ -1670,6 +1670,7 @@ public class Vvod extends JFrame {
 						pisl.setPvizit_id(tblPos.getSelectedItem().getId_obr());
 						pisl.setPrichina(pvizit.getCobr());
 						pisl.setKodotd(cmbNaprMesto.getSelectedPcod());
+						pisl.setVopl(cmbVidOpl.getSelectedPcod());
 						pisl.setNisl(MainForm.tcl.AddPisl(pisl));
 						List<String> selItems = new ArrayList<>();
 						for (IntegerClassifier el : listVidIssl)
@@ -2324,6 +2325,7 @@ public class Vvod extends JFrame {
 					MainForm.conMan.reconnect(e2);
 					e2.printStackTrace();
 				}
+		
 				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 				priemCopy = new Priem(priem);
 				anamZabCopy = new AnamZab(anamZab);
@@ -2754,6 +2756,7 @@ public class Vvod extends JFrame {
 			tblPos.setStringClassifierSelector(2, ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00));
 			cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 			cmbLpu.setData(MainForm.tcl.get_m00());
+			cmbLpu.setSelectedPcod(MainForm.authInfo.getClpu());
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			if (!isStat)
 				lbShabSrc.setData(MainForm.tcl.getShOsmPoiskName(MainForm.authInfo.cspec, MainForm.authInfo.cslu,  null));
@@ -2920,12 +2923,12 @@ public class Vvod extends JFrame {
 		  		diagamb.setNpasp(zapVr.getNpasp());
 		  		for (PdiagZ pd : tblZaklDiag.getData()){
 		  			if (pd.getDiag().equals(mkb.pcod)) 
-		  				diagamb.setDatad(pdiag.getDatad());
+		  				diagamb.setDatad(pd.getDatad());
 	  				else
 	  					diagamb.setDatad(System.currentTimeMillis());
 		  		}
-		  		if (!diagamb.isSetDatad())
-		  			diagamb.setDatad(System.currentTimeMillis());
+//		  		if (!diagamb.isSetDatad())
+//		  			diagamb.setDatad(System.currentTimeMillis());
 		  		diagamb.setDatap(pvizitAmb.datap);
 		  		diagamb.setCod_sp(MainForm.vrPcod);
 		  		diagamb.setCdol(MainForm.vrCdol);

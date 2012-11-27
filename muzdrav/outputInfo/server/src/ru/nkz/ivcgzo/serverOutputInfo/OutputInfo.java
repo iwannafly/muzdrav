@@ -1427,7 +1427,7 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 					}
 				
 					//Обследование
-					if ((spat.getResultSet().getInt("pmer") == 1)||(spat.getResultSet().getInt("pmer") == 18)||(spat.getResultSet().getInt("pmer") == 24)){
+					if ((spat.getResultSet().getInt("pmer") == 1)||((spat.getResultSet().getInt("pmer") >= 18)&&(spat.getResultSet().getInt("pmer") <= 24))){
 						if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
 							mas[1]= mas[1]+1;
 							sum[1]= sum[1]+1;
@@ -2161,7 +2161,246 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 			e1.printStackTrace();
 		}
 		
-		String sqlQueryObost =null;
+		final String sqlQueryKolDis ="select nd.name_s, count(distinct(pd.npasp)) as kol"+
+									 "from p_diag pd join n_ot100 ot on (pd.cdol_ot = ot.pcod)"+
+									 "		join n_d0s nd on (nd.pcod = ot.pcod1)"+
+									 "		join p_nambk pn on (pn.npasp = pd.npasp)"+
+									 "where (pn.ishod is null)and(pn.dataot is null) and"+
+									 "		(((pd.d_grup>2)and(pd.d_grup<10))or(pd.d_grup=22)) and"+
+									 "		(pn.cpol="+ String.valueOf(kodpol)+") and"+
+									 "		(pd.disp in(1,2,3))and"+
+									 "		(pd.d_vz is not null)and(pd.d_vz<'"+String.valueOf(dk)+"')"+
+									 "group by ot.pcod1, nd.name_s"+
+									 "order by ot.pcod1, nd.name_s";
+		
+		
+		
+		
+		String [][] mas = null;
+		try (AutoCloseableResultSet koldisp = sse.execPreparedQuery(sqlQueryKolDis)) {
+			
+			//String [][] prom = new String [1][2]; 
+			try {
+				int i =0;
+				while (koldisp.getResultSet().next())i++;				
+				
+				mas = new String[i+1][26];
+				
+				int j=1;
+				
+				koldisp.getResultSet().first();
+				
+					mas [0][0] = koldisp.getResultSet().getString("name_s");
+					mas [0][1] = koldisp.getResultSet().getString("kol");
+					mas [i-1] [0] = "Итого";
+				
+				while (koldisp.getResultSet().next()){
+					
+					mas [j][0] = koldisp.getResultSet().getString("name_s");
+					mas [j][1] = koldisp.getResultSet().getString("kol");
+					
+					j++;
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		} catch (SqlExecutorException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}		
+		
+		
+		final String sqlQuerySvedDisp ="select nd.name_s, count(pm.pmer), pm.pmer, pm.pdat, pm.fdat"+
+				 "from p_mer pm join n_ot100 ot on(pm.cdol =ot.pcod)"+
+				 "		join n_d0s nd on (nd.pcod = ot.pcod1)"+
+				 "where ((pm.pdat between '"+ dn +"' and '"+ dk+"') or"+
+				 "		(pm.fdat between '"+ dn +"' and '"+ dk+"')) and"+
+				 "		(pm.cpol="+ String.valueOf(kodpol)+") and"+
+				 "group by nd.name_s, pm.pmer, pm.pdat, pm.fdat"+
+				 "order by nd.name_s, pm.pmer, pm.pdat, pm.fdat";		
+		
+		try (AutoCloseableResultSet spat = sse.execPreparedQuery(sqlQuerySvedDisp)) {
+			
+			
+			
+			try {
+				while (spat.getResultSet().next()){
+
+/*				if (!nuch.equals(nuchn)){
+						mas[3]=(mas[2]/mas[1]*100);
+						mas[6]=(mas[5]/mas[4]*100);
+						mas[9]=(mas[8]/mas[7]*100);
+						mas[12]=(mas[11]/mas[10]*100);
+						mas[15]=(mas[14]/mas[13]*100);
+						mas[18]=(mas[17]/mas[16]*100);
+						mas[21]=(mas[20]/mas[19]*100);
+						mas[24]=(mas[23]/mas[22]*100);
+					
+						
+						/*Наполнение таблицы*/
+/*					sb.append(String.format(ZapTab(nuch, mas)));
+						
+						
+						
+						nuch=nuchn;
+						mas = null;
+						chek = false;
+					}
+*/			
+				
+				
+/*				//Обострения
+					if (chek==false){
+					
+						for (int i = 0 ; i<obos.length; i++){
+							if (nuch.equals(obos[i][0])){
+								mas[25] = Integer.valueOf(obos[i][1]);
+								sum[25] = sum[25] + Integer.valueOf(obos[i][1]);
+								break;
+							}
+						
+						}
+						chek=true;
+					}
+				*/
+					
+					
+					for (int i=0; i<mas.length;i++){
+						if(spat.getResultSet().getString("name_s").equals(mas[i][0])){
+							
+							
+							//Обследование
+							if ((spat.getResultSet().getInt("pmer") == 1)||((spat.getResultSet().getInt("pmer") >= 18)&&(spat.getResultSet().getInt("pmer") <= 24))){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][2]= mas[i][2]+1;
+									mas[mas.length-1][2]= mas[mas.length-1][2]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][3]= mas[i][3]+1;
+									mas[mas.length-1][3]= mas[mas.length-1][3]+1;	
+									}
+							}
+							//Явки
+							if (spat.getResultSet().getInt("pmer")==2){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][5]= mas[i][5]+1;
+									mas[mas.length-1][5]= mas[mas.length-1][5]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][6]= mas[i][6]+1;
+									mas[mas.length-1][6]= mas[mas.length-1][6]+1;
+								}
+											
+							}
+							//Госпитализация
+							if ((spat.getResultSet().getInt("pmer")==3)||(spat.getResultSet().getInt("pmer")==12)){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][8]= mas[i][8]+1;
+									mas[mas.length-1][8]= mas[mas.length-1][8]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][9]= mas[i][9]+1;
+									mas[mas.length-1][9]= mas[mas.length-1][9]+1;
+								}
+											
+							}	
+							//Противрец. лечение
+							if ((spat.getResultSet().getInt("pmer")==4)||(spat.getResultSet().getInt("pmer")==10)||(spat.getResultSet().getInt("pmer")==11)
+									||(spat.getResultSet().getInt("pmer")==13)||(spat.getResultSet().getInt("pmer")==25)||(spat.getResultSet().getInt("pmer")==27)
+									||(spat.getResultSet().getInt("pmer")==29)){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][11]= mas[i][11]+1;
+									mas[mas.length-1][11]= mas[mas.length-1][11]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][12]= mas[i][12]+1;
+									mas[mas.length-1][12]= mas[mas.length-1][12]+1;
+								}
+											
+							}		
+							//СКЛ
+							if ((spat.getResultSet().getInt("pmer")==5)||(spat.getResultSet().getInt("pmer")==16)){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][14]= mas[i][14]+1;
+									mas[mas.length-1][14]= mas[mas.length-1][14]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][15]= mas[i][15]+1;
+									mas[mas.length-1][15]= mas[mas.length-1][15]+1;
+								}
+											
+							}	
+							//Консультация
+							if ((spat.getResultSet().getInt("pmer")==7)||(spat.getResultSet().getInt("pmer")==28)){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][17]= mas[i][17]+1;
+									mas[mas.length-1][17]= mas[mas.length-1][17]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][18]= mas[i][18]+1;
+									mas[mas.length-1][18]= mas[mas.length-1][18]+1;
+								}
+							
+							}
+						
+							//Санации
+							if ((spat.getResultSet().getInt("pmer")==9)||(spat.getResultSet().getInt("pmer")==14)||(spat.getResultSet().getInt("pmer")==15)){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][20]= mas[i][20]+1;
+									mas[mas.length-1][20]= mas[mas.length-1][20]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][21]= mas[i][21]+1;
+									mas[mas.length-1][21]= mas[mas.length-1][21]+1;
+								}
+											
+							}
+						
+							//Проф. мероп.
+							if ((spat.getResultSet().getInt("pmer")==8)||(spat.getResultSet().getInt("pmer")==17)||(spat.getResultSet().getInt("pmer")==26)){
+								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
+									mas[i][23]= mas[i][23]+1;
+									mas[mas.length-1][23]= mas[mas.length-1][5]+1;
+								}
+								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
+									mas[i][24]= mas[i][24]+1;
+									mas[mas.length-1][24]= mas[mas.length-1][24]+1;
+								}
+											
+							}
+//						if (spat.getResultSet().last()){
+//							sb.append(String.format(ZapTab(nuch, mas)));
+//							sb.append(String.format(ZapTab("Итого", sum)));
+//						}
+
+							
+							
+							
+						}
+						
+
+						
+						
+					}
+						
+				
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+			
+			
+			
+			
+		} catch (SqlExecutorException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		
 		
 		

@@ -400,6 +400,7 @@ struct P_isl_ld {
 	12: optional i32 prichina;
 	13: optional i32 kodotd;
 	14: optional i64 datav;
+	15: optional i32 vopl;
 }
 
 struct Prez_d {
@@ -772,7 +773,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Shablon getShOsm(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShDopNames(1: i32 idRazd) throws (1: kmiacServer.KmiacServerException kse);
 	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
-
+	
 /*DispMer*/
 	list<Pmer> getPmer (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	Pmer getDispMer (1: i32 id_pmer) throws (1: kmiacServer.KmiacServerException kse);
@@ -788,5 +789,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*Stoim_p*/
 	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
+
 
 }

@@ -45,6 +45,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftDisp.PatientInfo;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_do;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_po;
+import ru.nkz.ivcgzo.thriftDisp.PdispdoNotFoundException;
+import ru.nkz.ivcgzo.thriftDisp.PdisppoNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.Pfiz;
 import ru.nkz.ivcgzo.thriftDisp.PfizNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
@@ -427,8 +429,45 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						tbRf1.setText(Integer.toString(fiz.getRf1()));
 						
 						/*pdisp_ds*/
-						tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
-						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));}
+						try {
+							tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
+						} catch (TException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+						pdisp_do = new Pdisp_ds_do();
+						 try {
+							pdisp_do = MainForm.tcl.getDispds_d_do(pat.npasp);
+							rbtD_do1.setSelected(pdisp_do.getD_do() == 1);
+						} catch (PdispdoNotFoundException e1) {
+							pdisp_do = new Pdisp_ds_do();
+							pdisp_do.setNpasp(pat.npasp);
+							pdisp_do.setDataz(System.currentTimeMillis());
+							pdisp_do.setD_do(1);
+							pdisp_do.setId(MainForm.tcl.AddPdispds_do(pdisp_do));
+							rbtD_do1.setSelected(true);
+						}
+						 
+						 try {
+								tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
+							} catch (TException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							}
+							pdisp_po = new Pdisp_ds_po();
+							 try {
+								pdisp_po = MainForm.tcl.getDispds_d_po(pat.npasp);
+								rbtDiag_po1.setSelected(pdisp_po.getD_po() == 1);
+							} catch (PdisppoNotFoundException e1) {
+								pdisp_po = new Pdisp_ds_po();
+								pdisp_po.setNpasp(pat.npasp);
+								pdisp_po.setDataz(System.currentTimeMillis());
+								pdisp_po.setD_po(1);
+								pdisp_po.setId(MainForm.tcl.AddPdispds_po(pdisp_po));
+								rbtDiag_po1.setSelected(true);
+							}
+
+						}
 						
 					} catch (KmiacServerException e1) {
 						e1.printStackTrace();
@@ -2244,13 +2283,26 @@ public class MainForm extends Client<ThriftDisp.Client>{
 				StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", "");
 					
 						try {
-							if (res != null) {
-						pdisp_do = new Pdisp_ds_do();
-						pdisp_do.setNpasp(pat.npasp);
-						pdisp_do.setDataz(System.currentTimeMillis());
-						pdisp_do.setDiag_do(res.pcod);
-						pdisp_do.setNameds(res.name);
-							pdisp_do.setId(MainForm.tcl.AddPdispds_do(pdisp_do));}
+							if (res != null) 
+								if (tabDiag_do.getRowCount()==0){
+									rbtD_do2.setSelected(true);
+									pdisp_do.setNpasp(pat.npasp);
+									pdisp_do.setDataz(System.currentTimeMillis());
+									pdisp_do.setD_do(2);
+									pdisp_do.setDiag_do(res.pcod);
+									pdisp_do.setNameds(res.name);
+									MainForm.tcl.UpdatePdispds_do(pdisp_do);
+									tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
+								}else{
+								rbtD_do2.setSelected(true);
+								pdisp_do = new Pdisp_ds_do();
+								pdisp_do.setNpasp(pat.npasp);
+								pdisp_do.setDataz(System.currentTimeMillis());
+								pdisp_do.setD_do(2);
+								pdisp_do.setDiag_do(res.pcod);
+								pdisp_do.setNameds(res.name);
+								pdisp_do.setId(MainForm.tcl.AddPdispds_do(pdisp_do));}
+								tabDiag_do.setData(MainForm.tcl.getTblDispds_do(pat.npasp));
 						} catch (KmiacServerException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -2258,7 +2310,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-			 			tabDiag_do.addItem(pdisp_do);
+			 			
 
 			}
 		});
@@ -2271,6 +2323,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					if (JOptionPane.showConfirmDialog(tabDiag_do, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 		  			try {
 						MainForm.tcl.DeleteDispds_do(tabDiag_do.getSelectedItem().getId());
+						
 					} catch (KmiacServerException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -2287,6 +2340,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}}
+				if (tabDiag_do.getRowCount()==0) {rbtD_do1.setEnabled(true);rbtD_do1.setSelected
+				(true);}
 					if (tabDiag_do.getRowCount() > 0)
 						tabDiag_do.setRowSelectionInterval(tabDiag_do.getRowCount() - 1, tabDiag_do.getRowCount() - 1);
 			}
@@ -2296,6 +2351,42 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		btnSave.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1341981970_Accept.png")));
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if ((rbtD_do1.isSelected())&&(tabDiag_do.getRowCount()==0))		{
+			pdisp_do = new Pdisp_ds_do();
+						 try {
+							pdisp_do = MainForm.tcl.getDispds_d_do(pat.npasp);
+							pdisp_do = new Pdisp_ds_do();
+							pdisp_do.setNpasp(pat.npasp);
+							pdisp_do.setDataz(System.currentTimeMillis());
+							pdisp_do.setD_do(1);
+							MainForm.tcl.UpdatePdispds_do(pdisp_do);
+						} catch (PdispdoNotFoundException e1) {
+							pdisp_do = new Pdisp_ds_do();
+							pdisp_do.setNpasp(pat.npasp);
+							pdisp_do.setDataz(System.currentTimeMillis());
+							pdisp_do.setD_do(1);
+							try {
+								pdisp_do.setId(MainForm.tcl.AddPdispds_do(pdisp_do));
+							} catch (KmiacServerException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							} catch (TException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							}
+							rbtD_do1.setSelected(true);
+						} catch (KmiacServerException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (TException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					
+					
+					
+				}
+				else{
 				pdisp_do = new Pdisp_ds_do();
 				pdisp_do.setId(tabDiag_do.getSelectedItem().id);
 				pdisp_do.setNpasp(pat.npasp);
@@ -2321,6 +2412,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+			}
 			}
 		});
 		
@@ -2546,8 +2638,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 			if (tabDiag_do.getSelectedItem()!= null) {
 				pdisp_do = tabDiag_do.getSelectedItem();
 				bgD_do.clearSelection();
-				rbtD_do1.setSelected(pdisp_do.getD_do() == 1);
-				rbtD_do2.setSelected(pdisp_do.getD_do() == 1);
+				rbtD_do1.setEnabled(false);
+				rbtD_do2.setSelected(pdisp_do.getD_do() == 2);
 				bgObs_n.clearSelection();
 				rbtObs_n1.setSelected(pdisp_do.getObs_n() == 1);
 				rbtObs_n2.setSelected(pdisp_do.getObs_n() == 2);
@@ -2614,6 +2706,42 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		btnSave1.setIcon(new ImageIcon(MainForm.class.getResource("/ru/nkz/ivcgzo/clientDisp/resources/1341981970_Accept.png")));
 		btnSave1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if ((rbtDiag_po1.isSelected())&&(tblDiag_po.getRowCount()==0))		{
+					pdisp_po = new Pdisp_ds_po();
+								 try {
+									pdisp_po = MainForm.tcl.getDispds_d_po(pat.npasp);
+									pdisp_po = new Pdisp_ds_po();
+									pdisp_po.setNpasp(pat.npasp);
+									pdisp_po.setDataz(System.currentTimeMillis());
+									pdisp_po.setD_po(1);
+									MainForm.tcl.UpdatePdispds_po(pdisp_po);
+								} catch (PdisppoNotFoundException e1) {
+									pdisp_po = new Pdisp_ds_po();
+									pdisp_po.setNpasp(pat.npasp);
+									pdisp_po.setDataz(System.currentTimeMillis());
+									pdisp_po.setD_po(1);
+									try {
+										pdisp_po.setId(MainForm.tcl.AddPdispds_po(pdisp_po));
+									} catch (KmiacServerException e2) {
+										// TODO Auto-generated catch block
+										e2.printStackTrace();
+									} catch (TException e2) {
+										// TODO Auto-generated catch block
+										e2.printStackTrace();
+									}
+									rbtDiag_po1.setSelected(true);
+								} catch (KmiacServerException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								} catch (TException e1) {
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+							
+							
+							
+						}
+						else{
 				pdisp_po = new Pdisp_ds_po();
 				pdisp_po.setNpasp(pat.npasp);
 				pdisp_po.setId(tblDiag_po.getSelectedItem().id);
@@ -2665,6 +2793,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					e1.printStackTrace();
 				}
 			}
+			}
 		});
 		
 		JButton btnDel1 = new JButton("");
@@ -2675,6 +2804,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					if (JOptionPane.showConfirmDialog(tblDiag_po, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION){
 		  			try {
 						MainForm.tcl.DeleteDispds_po(tblDiag_po.getSelectedItem().getId());
+						
 					} catch (KmiacServerException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -2682,7 +2812,7 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-		  			try {
+					try {
 						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
 					} catch (KmiacServerException e1) {
 						// TODO Auto-generated catch block
@@ -2691,9 +2821,10 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}}
+				if (tblDiag_po.getRowCount()==0) {rbtDiag_po1.setEnabled(true);
+				rbtDiag_po1.setSelected(true);}
 					if (tblDiag_po.getRowCount() > 0)
-						tblDiag_po.setRowSelectionInterval(tblDiag_po.getRowCount() - 1, tblDiag_po.getRowCount() - 1);
-			}
+						tblDiag_po.setRowSelectionInterval(tblDiag_po.getRowCount() - 1, tblDiag_po.getRowCount() - 1);			}
 		});
 		
 		JButton btnAdd1 = new JButton("");
@@ -2701,15 +2832,27 @@ public class MainForm extends Client<ThriftDisp.Client>{
 		btnAdd1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StringClassifier res = ConnectionManager.instance.showMkbTreeForm("Диагнозы", "");
-				
 				try {
-					if (res != null) {
-				pdisp_po = new Pdisp_ds_po();
-				pdisp_po.setNpasp(pat.npasp);
-				pdisp_po.setDataz(System.currentTimeMillis());
-				pdisp_po.setDiag_po(res.pcod);
-				pdisp_po.setNameds(res.name);
-					pdisp_po.setId(MainForm.tcl.AddPdispds_po(pdisp_po));}
+					if (res != null) 
+						if (tblDiag_po.getRowCount()==0){
+							rbtDiag_po2.setSelected(true);
+							pdisp_po.setNpasp(pat.npasp);
+							pdisp_po.setDataz(System.currentTimeMillis());
+							pdisp_po.setD_po(2);
+							pdisp_po.setDiag_po(res.pcod);
+							pdisp_po.setNameds(res.name);
+							MainForm.tcl.UpdatePdispds_po(pdisp_po);
+							tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
+						}else{
+						rbtDiag_po2.setSelected(true);
+						pdisp_po = new Pdisp_ds_po();
+						pdisp_po.setNpasp(pat.npasp);
+						pdisp_po.setDataz(System.currentTimeMillis());
+						pdisp_po.setD_po(2);
+						pdisp_po.setDiag_po(res.pcod);
+						pdisp_po.setNameds(res.name);
+						pdisp_po.setId(MainForm.tcl.AddPdispds_po(pdisp_po));}
+						tblDiag_po.setData(MainForm.tcl.getTblDispds_po(pat.npasp));
 				} catch (KmiacServerException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -2717,7 +2860,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-	 			tblDiag_po.addItem(pdisp_po);
+	 			
+
 			}
 		});
 		
@@ -3198,8 +3342,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 			if (tblDiag_po.getSelectedItem()!= null) {
 				pdisp_po = tblDiag_po.getSelectedItem();
 				bgDiag_po.clearSelection();
-				rbtDiag_po1.setSelected(pdisp_po.getD_po() == 1);
-				rbtDiag_po2.setSelected(pdisp_po.getD_po() == 1);
+				rbtDiag_po1.setEnabled(false);
+				rbtDiag_po2.setSelected(pdisp_po.getD_po() == 2);
 				bgXzab.clearSelection();
 				rbtXzab1.setSelected(pdisp_po.getXzab() == 1);
 				rbtXzab2.setSelected(pdisp_po.getXzab() == 2);

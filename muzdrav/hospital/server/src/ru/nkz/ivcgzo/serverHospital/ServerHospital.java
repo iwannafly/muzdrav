@@ -647,21 +647,23 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void addZakl(final Zakl zakl) throws KmiacServerException {
         String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
-                + "sostv = ?, recom = ?, vrach = ? "
-                + "WHERE id_gosp = ?";
+            + "sostv = ?, recom = ?, vrach = ?,  vid_opl = ?, vid_pom = ?, ukl = ? "
+            + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
                 sqlQuery = "UPDATE c_otd SET ishod = ?, "
-                        + "sostv = ?, recom = ?, vrach = ?, cotd = ? "
-                        + "WHERE id_gosp = ?";
+                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
+                    + "WHERE id_gosp = ?";
                 sme.execPrepared(sqlQuery, false, zakl.getIshod(),
-                        zakl.getSostv(), zakl.getRecom(),
-                        null, zakl.getNewOtd(), zakl.getIdGosp());
+                    zakl.getSostv(), zakl.getRecom(),
+                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+                    zakl.getIdGosp());
             } else {
                 sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
-                        new Date(zakl.getDatav()), new Time(zakl.getVremv()),
-                        zakl.getSostv(), zakl.getRecom(),
-                        null, zakl.getIdGosp());
+                    new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                    zakl.getSostv(), zakl.getRecom(),
+                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+                    zakl.getIdGosp());
             }
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {

@@ -23,6 +23,8 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftDisp.PatientInfo;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_do;
 import ru.nkz.ivcgzo.thriftDisp.Pdisp_ds_po;
+import ru.nkz.ivcgzo.thriftDisp.PdispdoNotFoundException;
+import ru.nkz.ivcgzo.thriftDisp.PdisppoNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.Pfiz;
 import ru.nkz.ivcgzo.thriftDisp.PfizNotFoundException;
 import ru.nkz.ivcgzo.thriftDisp.ThriftDisp;
@@ -157,7 +159,7 @@ public class ServerDisp extends Server implements Iface {
 	public int AddPdispds_do(Pdisp_ds_do pds_do) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_disp_ds_do (npasp, dataz, diag_do) VALUES (?, ?, ?) ", true, pds_do, pdispds_doTypes, 0, 8, 3);
+			sme.execPreparedT("insert into p_disp_ds_do (npasp, dataz, d_do, diag_do) VALUES (?, ?, ?, ?) ", true, pds_do, pdispds_doTypes, 0, 8, 2, 3);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -174,7 +176,7 @@ public class ServerDisp extends Server implements Iface {
 	public void UpdatePdispds_do(Pdisp_ds_do pds_do)
 			throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_disp_ds_do set d_do = ?, diag_do = ?, obs_n = ?, obs_v = ?, lech_n = ?, lech_v = ? where id = ? ", false, pds_do, pdispds_doTypes, 2, 3, 4, 5, 6, 7, 1);
+			sme.execPreparedT("update p_disp_ds_do set d_do = ?, diag_do = ?, obs_n = ?, obs_v = ?, lech_n = ?, lech_v = ?, dataz = ? where id = ? ", false, pds_do, pdispds_doTypes, 2, 3, 4, 5, 6, 7, 8, 1);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -215,7 +217,7 @@ public class ServerDisp extends Server implements Iface {
 	public int AddPdispds_po(Pdisp_ds_po pds_po) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_disp_ds_po (npasp, dataz, diag_po) VALUES (?, ?, ?) ", true, pds_po, pdispds_poTypes, 0, 29, 3);
+			sme.execPreparedT("insert into p_disp_ds_po (npasp, dataz, d_po, diag_po) VALUES (?, ?, ?, ?) ", true, pds_po, pdispds_poTypes, 0, 29, 2, 3);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -232,7 +234,7 @@ public class ServerDisp extends Server implements Iface {
 	public void UpdatePdispds_po(Pdisp_ds_po pds_po)
 			throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_disp_ds_po set d_po = ?, diag_po = ?, xzab = ?, pu = ?, disp = ?, vmp1 = ?, vmp2 = ?, vrec1 = ?, vrec2 = ?, vrec3 = ?, vrec4 = ?, vrec5 = ?, vrec6 = ?, vrec7 = ?, vrec8 = ?, vrec9 = ?, vrec10 = ?, nrec1 = ?, nrec2 = ?, nrec3 = ?, nrec4 = ?, nrec5 = ?, nrec6 = ?, nrec7 = ?, nrec8 = ?, nrec9 = ?, nrec10 = ?, recdop1 = ?, recdop2 = ?, recdop3 = ? where id = ? ", false, pds_po, pdispds_poTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 1);
+			sme.execPreparedT("update p_disp_ds_po set d_po = ?, diag_po = ?, xzab = ?, pu = ?, disp = ?, vmp1 = ?, vmp2 = ?, vrec1 = ?, vrec2 = ?, vrec3 = ?, vrec4 = ?, vrec5 = ?, vrec6 = ?, vrec7 = ?, vrec8 = ?, vrec9 = ?, vrec10 = ?, nrec1 = ?, nrec2 = ?, nrec3 = ?, nrec4 = ?, nrec5 = ?, nrec6 = ?, nrec7 = ?, nrec8 = ?, nrec9 = ?, nrec10 = ?, recdop1 = ?, recdop2 = ?, recdop3 = ?, dataz = ? where id = ? ", false, pds_po, pdispds_poTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 29, 1);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -308,5 +310,37 @@ public class ServerDisp extends Server implements Iface {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		}	}
+
+	@Override
+	public Pdisp_ds_do getDispds_d_do(int npasp) throws KmiacServerException,
+			PdispdoNotFoundException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_disp_ds_do where npasp = ? ", npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmPdisp_ds_do.map(acrs.getResultSet());
+			else
+				throw new PdispdoNotFoundException();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public Pdisp_ds_po getDispds_d_po(int npasp) throws KmiacServerException,
+			PdisppoNotFoundException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_disp_ds_po where npasp = ? ", npasp)) {
+			if (acrs.getResultSet().next())
+				return rsmPdisp_ds_po.map(acrs.getResultSet());
+			else
+				throw new PdisppoNotFoundException();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	
+
+	
 
 }

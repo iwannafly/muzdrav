@@ -114,6 +114,9 @@ struct Zakl {
 	6: optional string recom;
 	7: optional i32 idGosp;
 	8: optional i32 newOtd;
+	9: optional i32 vidOpl;
+	10: optional i32 vidPom;
+	11: optional i32 ukl;
 }
 
 struct TStage {
@@ -128,6 +131,47 @@ struct TStage {
 	9: optional i32 result;
 	10: optional i64 timeStart;
 	11: optional i64 timeEnd;
+}
+struct TRdIshod{
+   1: optional i32 npasp;
+   2: optional i32 ngosp;
+   3: optional i32 id_berem;
+   4: optional i32 id;
+   5: optional double oj;
+   6: optional i32 hdm;
+   7: optional i32 polpl;
+   8: optional i32 predpl;
+   9: optional i32 vidpl;
+  10: optional i32 serd;
+  11: optional i32 serd1;
+  12: optional i32 serdm;
+  13: optional i32 chcc;
+  14: optional i32 pozpl;
+  15: optional i32 mesto;
+  16: optional string deyat;
+  17: optional string shvat;
+  18: optional string vody;
+  19: optional string kashetv;
+  20: optional string poln;
+  21: optional string potugi;
+  22: optional i32 posled;
+  23: optional string vremp;
+  24: optional i32 obol;
+  25: optional i32 pupov;
+  26: optional i32 obvit;
+  27: optional string osobp;
+  28: optional i32 krov;
+  29: optional bool psih;
+  30: optional string obezb;
+  31: optional i32 eff;
+  32: optional string prr1;
+  33: optional string prr2;
+  34: optional string prr3;
+  35: optional string prinyl;
+  36: optional string osmposl;
+  37: optional string vrash;
+  38: optional string akush;
+  39: optional i64 datarod;
 }
 
 /**
@@ -251,5 +295,10 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	*/
 	list<classifier.IntegerClassifier> getOtd(1: i32 lpu)
 		throws (1:kmiacServer.KmiacServerException kse);
+/* родовспоможение*/
+	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void updateRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	
 }
