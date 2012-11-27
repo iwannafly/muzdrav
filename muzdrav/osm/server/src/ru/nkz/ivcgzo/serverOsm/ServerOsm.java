@@ -778,15 +778,6 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	
-//	public void UpdatePvizit(Pvizit obr) throws KmiacServerException, TException {
-//		try (SqlModifyExecutor sme = tse.startTransaction()) {
-//			sme.execPreparedT("UPDATE p_vizit SET ishod = ?, rezult = ?, talon = ?, zakl = ?, recomend = ?, dataz = ? WHERE id = ?", false, obr, pvizitTypes, 5, 6, 7, 11, 13, 12, 0);
-//			sme.setCommit();
-//		} catch (InterruptedException | SQLException e) {
-//			throw new KmiacServerException();
-//		}
-//	}
-	
 	@Override
 	public void UpdateRdSl(RdSlStruct Dispb) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {

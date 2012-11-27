@@ -310,7 +310,23 @@ public class MainFrame extends JFrame {
     private JTextField TIm;
     private JTextField TOt;
     private JTextField TDatarod;
-
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPolpl;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPoz;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBVid;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSerd;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSerd1;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPred;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBGde;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBRod;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPrinial;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBOsmotr;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBAkush;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPosled;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBDet;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBObvit;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBVrash;
+	private JSpinner Soj;
+	
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
 //        setPreferredSize(new Dimension(1000, 800));
@@ -2531,13 +2547,13 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_31 = new JLabel("Акушерка");
         lblNewLabel_31.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        JComboBox CBPrinial = new JComboBox();
+        CBPrinial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBPrinial.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBOsmotr = new JComboBox();
+        CBOsmotr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBOsmotr.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBVrash = new JComboBox();
+        CBVrash = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBVrash.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         JComboBox CBAkush = new JComboBox();
@@ -2614,10 +2630,10 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_27 = new JLabel("III период");
         lblNewLabel_27.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        JComboBox CBPosled = new JComboBox();
+        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBPosled.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBDet = new JComboBox();
+        CBDet = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBDet.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         JLabel LVrem = new JLabel("Через ");
@@ -2631,7 +2647,7 @@ public class MainFrame extends JFrame {
         TObol.setFont(new Font("Tahoma", Font.BOLD, 12));
         TObol.setColumns(10);
         
-        JComboBox CBObvit = new JComboBox();
+        CBObvit = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBObvit.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         textField = new JTextField();
@@ -2919,32 +2935,32 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_10 = new JLabel("Предполагаемый вес");
         lblNewLabel_10.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        JSpinner Soj = new JSpinner();
+        Soj = new JSpinner();
         Soj.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         JSpinner Shdm = new JSpinner();
         Shdm.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBPolpl = new JComboBox();
+		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBPolpl.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBPoz = new JComboBox();
+        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBPoz.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBVid = new JComboBox();
+        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBVid.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBSerd = new JComboBox();
+        CBSerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);;
         CBSerd.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBSerd1 = new JComboBox();
+        CBSerd1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db4);;
         CBSerd1.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBPred = new JComboBox();
+        CBPred = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db2);;
         CBPred.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox comboBox_6 = new JComboBox();
-        comboBox_6.setFont(new Font("Tahoma", Font.BOLD, 12));
+        CBGde = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBGde.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         JSpinner Schcc = new JSpinner();
         Schcc.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -2997,7 +3013,7 @@ public class MainFrame extends JFrame {
         						.addComponent(CBSerd1, 0, 125, Short.MAX_VALUE)
         						.addComponent(CBSerd, 0, 125, Short.MAX_VALUE)
         						.addComponent(CBPred, 0, 125, Short.MAX_VALUE)
-        						.addComponent(comboBox_6, 0, 125, Short.MAX_VALUE)
+        						.addComponent(CBGde, 0, 125, Short.MAX_VALUE)
         						.addComponent(Schcc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)))
         				.addGroup(gl_panel_3.createSequentialGroup()
         					.addContainerGap()
@@ -3045,7 +3061,7 @@ public class MainFrame extends JFrame {
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_6)
-        				.addComponent(comboBox_6, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        				.addComponent(CBGde, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_7)

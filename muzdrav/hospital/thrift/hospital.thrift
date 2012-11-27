@@ -209,6 +209,8 @@ exception PriemInfoNotFoundException {
  */
 exception MesNotFoundException {
 }
+exception PrdIshodNotFoundException{
+}
 
 service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TSimplePatient> getAllPatientForDoctor(1:i32 doctorId, 2:i32 otdNum) throws (1:PatientNotFoundException pnfe,
@@ -297,8 +299,8 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		throws (1:kmiacServer.KmiacServerException kse);
 /* родовспоможение*/
 	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-    void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-    void updateRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void addRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
+    void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	
 }
