@@ -4033,15 +4033,15 @@ public class PacientInfoFrame extends JFrame {
             tf_datagosp.setEnabled(cbx_gosp.isSelected());
             tf_timegosp.setEnabled(cbx_gosp.isSelected());
             if (cbx_gosp.isSelected()){
-                tf_datagosp.setDate(System.currentTimeMillis());
-                tf_timegosp.setTime(System.currentTimeMillis());
+            	if (tf_datagosp.getDate() == null) tf_datagosp.setDate(System.currentTimeMillis());
+                if (tf_timegosp.getTime() == null) tf_timegosp.setTime(System.currentTimeMillis());
             }else{
                 tf_datagosp.setValue(null);
                 tf_timegosp.setValue(null);
             }
-            if (cbx_gosp.isSelected()){
-                tf_datasmp.setDate(System.currentTimeMillis());
-                tf_timesmp.setTime(System.currentTimeMillis());
+            if (cbx_smp.isSelected()){
+            	if (tf_datasmp.getDate() == null) tf_datasmp.setDate(System.currentTimeMillis());
+            	if (tf_timesmp.getTime() == null) tf_timesmp.setTime(System.currentTimeMillis());
             }else{
                 tf_datasmp.setValue(null);
                 tf_timesmp.setValue(null);
@@ -4146,8 +4146,8 @@ public class PacientInfoFrame extends JFrame {
             if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
             if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
 
-            if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(2);
-            if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(1);
+            if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(1);
+            if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(2);
 
             Id_gosp.setMessr(cbx_messr.isSelected());
             Id_gosp.setNal_z(cbx_nalz.isSelected());
@@ -4186,7 +4186,7 @@ public class PacientInfoFrame extends JFrame {
                 //if (Id_gosp.getCotd() != 0)
                 	//MainForm.tcl.updateOtd(curId_otd, curId, Id_gosp.getNist(), Id_gosp.getCotd());
             }
-            if (Id_gosp.getCotd() != Id_gosp.getCotd_p())
+            if (Id_gosp.getCotd() != 0)
                	MainForm.tcl.addOrUpdateOtd(curId, Id_gosp.getNist(), Id_gosp.getCotd());
             tbl_priem.updateChangedSelectedItem();
         } catch (Exception e) {
