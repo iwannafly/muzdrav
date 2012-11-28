@@ -400,6 +400,7 @@ struct P_isl_ld {
 	13: optional i32 kodotd;
 	14: optional i64 datav;
 	15: optional i32 vopl;
+	16: optional i32 id_pos;
 }
 
 struct Prez_d {
