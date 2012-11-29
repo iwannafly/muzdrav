@@ -46,6 +46,7 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
+import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -291,6 +292,7 @@ public class MainFrame extends JFrame {
     private JButton btnZaklDiag;
     private JMenuItem mntmPrintHospitalSummary;
     private JPanel pChildbirth;
+    public static TRdIshod trdIshod;
     private JPanel panel_1;
     private JPanel panel_2;
     private JTextField TVes;
@@ -299,7 +301,6 @@ public class MainFrame extends JFrame {
     private JTextField TKash;
     private JTextField TPoln;
     private JTextField TNash;
-    private JTextField TEff;
     private JTextField TVremp;
     private JTextField TObol;
     private JTextField textField;
@@ -329,7 +330,9 @@ public class MainFrame extends JFrame {
 	private JSpinner Shdm;
 	private JSpinner Schcc;
 	private JTextField TGde;
-	
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
+//    private JLabel lblNewLabel_33;
+//    private JTextField textField_1;
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
 //        setPreferredSize(new Dimension(1000, 800));
@@ -2455,17 +2458,30 @@ public class MainFrame extends JFrame {
         			.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
         			.addPreferredGap(ComponentPlacement.UNRELATED)
         			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING)
-        				.addGroup(gl_pChildbirth.createSequentialGroup()
-        					.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-        					.addPreferredGap(ComponentPlacement.RELATED))
-        				.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
-        			.addGap(18)
+        				.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+        				.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING, false)
+        					.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        					.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)))
+        			.addPreferredGap(ComponentPlacement.RELATED)
         			.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
-        			.addGap(134))
+        			.addGap(82))
         );
         
         JButton btnNewButton = new JButton("");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+				try {
+				trdIshod = new TRdIshod();	
+				ClientHospital.tcl.addRdIshod(patient.getPatientId(), patient.gospitalCod);
+				trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
+				} catch (KmiacServerException e2) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Не удалось добавить запись", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				} catch (TException e2) {
+//					e2.printStackTrace();
+//					MainFrame.conMan.reconnect(e2);
+				}
+        	}
+        });
         btnNewButton.setToolTipText("Новая запись");
         btnNewButton.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
         
@@ -2674,54 +2690,45 @@ public class MainFrame extends JFrame {
         		.addGroup(gl_panel_1.createSequentialGroup()
         			.addContainerGap()
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        				.addComponent(LVrem)
+        				.addComponent(lblNewLabel_17)
+        				.addComponent(lblNewLabel_18)
         				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addComponent(LVrem)
-        					.addContainerGap(314, Short.MAX_VALUE))
+        					.addComponent(lblNewLabel_16)
+        					.addGap(18)
+        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        						.addComponent(TVremp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(CBPosled, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(TObol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(CBDet, GroupLayout.PREFERRED_SIZE, 218, GroupLayout.PREFERRED_SIZE))
+        					.addPreferredGap(ComponentPlacement.RELATED, 21, Short.MAX_VALUE))
         				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addComponent(lblNewLabel_17)
-        					.addContainerGap(267, Short.MAX_VALUE))
-        				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addComponent(lblNewLabel_18)
-        					.addContainerGap(295, Short.MAX_VALUE))
+        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        						.addComponent(lblNewLabel_19)
+        						.addComponent(lblNewLabel_22)
+        						.addComponent(lblNewLabel_20)
+        						.addComponent(lblNewLabel_21))
+        					.addGap(18)
+        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        						.addComponent(CBObvit, 0, 236, Short.MAX_VALUE)
+        						.addComponent(textField, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
         				.addGroup(gl_panel_1.createSequentialGroup()
         					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-        						.addGroup(Alignment.LEADING, gl_panel_1.createSequentialGroup()
-        							.addComponent(lblNewLabel_16)
-        							.addGap(18)
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        								.addComponent(TVremp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(CBPosled, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(TObol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(CBDet, GroupLayout.PREFERRED_SIZE, 218, GroupLayout.PREFERRED_SIZE))
-        							.addPreferredGap(ComponentPlacement.RELATED, 21, Short.MAX_VALUE))
-        						.addGroup(gl_panel_1.createSequentialGroup()
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        									.addComponent(lblNewLabel_19)
-        									.addComponent(lblNewLabel_20)
-        									.addComponent(lblNewLabel_21))
-        								.addComponent(lblNewLabel_22))
-        							.addGap(18)
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        								.addComponent(CBObvit, 0, 240, Short.MAX_VALUE)
-        								.addComponent(textField, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
-        						.addGroup(Alignment.LEADING, gl_panel_1.createSequentialGroup()
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-        								.addComponent(lblNewLabel_26)
-        								.addComponent(lblNewLabel_23)
-        								.addComponent(lblNewLabel_27))
-        							.addPreferredGap(ComponentPlacement.UNRELATED)
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        								.addComponent(TPer3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(TPer2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(TPer1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-        					.addContainerGap())))
+        						.addComponent(lblNewLabel_26)
+        						.addComponent(lblNewLabel_23)
+        						.addComponent(lblNewLabel_27))
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        						.addComponent(TPer3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(TPer2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(TPer1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+        			.addContainerGap())
         );
         gl_panel_1.setVerticalGroup(
-        	gl_panel_1.createParallelGroup(Alignment.LEADING)
-        		.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
+        	gl_panel_1.createParallelGroup(Alignment.TRAILING)
+        		.addGroup(gl_panel_1.createSequentialGroup()
         			.addContainerGap()
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
         				.addComponent(TPer1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2746,19 +2753,18 @@ public class MainFrame extends JFrame {
         						.addComponent(lblNewLabel_19)
         						.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        						.addGroup(gl_panel_1.createSequentialGroup()
-        							.addPreferredGap(ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
-        							.addComponent(lblNewLabel_20)
-        							.addGap(18)
-        							.addComponent(lblNewLabel_21)
-        							.addPreferredGap(ComponentPlacement.RELATED)
+        						.addGroup(Alignment.TRAILING, gl_panel_1.createSequentialGroup()
         							.addComponent(lblNewLabel_22)
         							.addPreferredGap(ComponentPlacement.RELATED))
         						.addGroup(gl_panel_1.createSequentialGroup()
         							.addPreferredGap(ComponentPlacement.RELATED)
-        							.addComponent(CBObvit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+        								.addComponent(CBObvit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        								.addComponent(lblNewLabel_20))
         							.addPreferredGap(ComponentPlacement.RELATED)
-        							.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+        								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        								.addComponent(lblNewLabel_21))
         							.addPreferredGap(ComponentPlacement.RELATED)
         							.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         							.addPreferredGap(ComponentPlacement.RELATED)))
@@ -2819,18 +2825,16 @@ public class MainFrame extends JFrame {
         TNash.setFont(new Font("Tahoma", Font.BOLD, 12));
         TNash.setColumns(10);
         
-        TEff = new JTextField();
-        TEff.setFont(new Font("Tahoma", Font.BOLD, 12));
-        TEff.setColumns(10);
-        
         CBMed = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBMed.setFont(new Font("Tahoma", Font.BOLD, 12));
+        
+        CBEff = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         GroupLayout gl_panel_2 = new GroupLayout(panel_2);
         gl_panel_2.setHorizontalGroup(
         	gl_panel_2.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_panel_2.createSequentialGroup()
         			.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
-        				.addGroup(gl_panel_2.createSequentialGroup()
+        				.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
         					.addContainerGap()
         					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
         						.addGroup(gl_panel_2.createSequentialGroup()
@@ -2850,19 +2854,19 @@ public class MainFrame extends JFrame {
         							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
         								.addComponent(TNash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         								.addComponent(TPoln, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(TKash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-        					.addPreferredGap(ComponentPlacement.RELATED, 4, Short.MAX_VALUE))
-        				.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
-        					.addContainerGap()
-        					.addComponent(lblNewLabel_25)
-        					.addPreferredGap(ComponentPlacement.RELATED, 125, Short.MAX_VALUE)
-        					.addComponent(TEff, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        								.addComponent(TKash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        						.addComponent(chckbxNewCheckBox))
+        					.addPreferredGap(ComponentPlacement.RELATED, 14, Short.MAX_VALUE))
         				.addGroup(Alignment.TRAILING, gl_panel_2.createSequentialGroup()
         					.addContainerGap()
         					.addComponent(lblNewLabel_24)
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(CBMed, 0, 125, Short.MAX_VALUE))
-        				.addComponent(chckbxNewCheckBox))
+        					.addComponent(CBMed, 0, 99, Short.MAX_VALUE))
+        				.addGroup(gl_panel_2.createSequentialGroup()
+        					.addContainerGap()
+        					.addComponent(lblNewLabel_25)
+        					.addPreferredGap(ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
+        					.addComponent(CBEff, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)))
         			.addContainerGap())
         );
         gl_panel_2.setVerticalGroup(
@@ -2894,11 +2898,11 @@ public class MainFrame extends JFrame {
         			.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
         				.addComponent(CBMed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         				.addComponent(lblNewLabel_24))
-        			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addGroup(gl_panel_2.createParallelGroup(Alignment.TRAILING)
-        				.addComponent(TEff, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        				.addComponent(lblNewLabel_25))
-        			.addContainerGap(58, Short.MAX_VALUE))
+        			.addGap(12)
+        			.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblNewLabel_25)
+        				.addComponent(CBEff, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addContainerGap(154, Short.MAX_VALUE))
         );
         panel_2.setLayout(gl_panel_2);
         
@@ -2972,64 +2976,73 @@ public class MainFrame extends JFrame {
         TGde = new JTextField();
         TGde.setFont(new Font("Tahoma", Font.BOLD, 12));
         TGde.setColumns(10);
+        
+        JLabel lblNewLabel_33 = new JLabel("Вес женщины");
+        lblNewLabel_33.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        
+        JSpinner SVes = new JSpinner();
+        SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
+//        lblNewLabel_33 = new JLabel("New label");
+//        
+//        textField_1 = new JTextField();
+//        textField_1.setColumns(10);
         GroupLayout gl_panel_3 = new GroupLayout(panel_3);
         gl_panel_3.setHorizontalGroup(
         	gl_panel_3.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_panel_3.createSequentialGroup()
+        			.addContainerGap()
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
         				.addGroup(gl_panel_3.createSequentialGroup()
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-        						.addGroup(gl_panel_3.createSequentialGroup()
-        							.addGap(10)
-        							.addComponent(lblNewLabel))
-        						.addGroup(gl_panel_3.createSequentialGroup()
-        							.addContainerGap()
-        							.addComponent(lblNewLabel_1))
-        						.addGroup(gl_panel_3.createSequentialGroup()
-        							.addContainerGap()
-        							.addComponent(lblNewLabel_2))
-        						.addGroup(gl_panel_3.createSequentialGroup()
-        							.addContainerGap()
-        							.addComponent(lblNewLabel_3))
-        						.addGroup(gl_panel_3.createSequentialGroup()
-        							.addContainerGap()
-        							.addComponent(lblNewLabel_4)))
-        					.addGap(18)
-        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-        						.addComponent(CBPolpl, 0, 127, Short.MAX_VALUE)
-        						.addComponent(CBPoz, 0, 127, Short.MAX_VALUE)
-        						.addComponent(CBVid, 0, 127, Short.MAX_VALUE)
-        						.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
-        							.addComponent(Shdm, Alignment.LEADING)
-        							.addComponent(Soj, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))))
-        				.addGroup(gl_panel_3.createSequentialGroup()
-        					.addContainerGap()
-        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-        						.addComponent(lblNewLabel_5)
         						.addComponent(lblNewLabel_8)
         						.addComponent(lblNewLabel_6)
         						.addComponent(lblNewLabel_7))
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addGap(48)
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-        						.addComponent(CBSerd1, 0, 125, Short.MAX_VALUE)
-        						.addComponent(CBSerd, 0, 125, Short.MAX_VALUE)
         						.addComponent(CBPred, 0, 125, Short.MAX_VALUE)
         						.addComponent(Schcc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
         						.addComponent(TGde, GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)))
         				.addGroup(gl_panel_3.createSequentialGroup()
-        					.addContainerGap()
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
         						.addComponent(lblNewLabel_9)
         						.addComponent(lblNewLabel_10))
         					.addPreferredGap(ComponentPlacement.RELATED)
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
         						.addComponent(TVes, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(CBRod, 0, 123, Short.MAX_VALUE))))
+        						.addComponent(CBRod, 0, 123, Short.MAX_VALUE)))
+        				.addGroup(gl_panel_3.createSequentialGroup()
+        					.addComponent(lblNewLabel_5)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+        						.addComponent(CBSerd1, 0, 125, Short.MAX_VALUE)
+        						.addComponent(CBSerd, 0, 125, Short.MAX_VALUE)))
+        				.addGroup(gl_panel_3.createSequentialGroup()
+        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+        						.addComponent(lblNewLabel)
+        						.addComponent(lblNewLabel_1)
+        						.addComponent(lblNewLabel_2)
+        						.addComponent(lblNewLabel_3)
+        						.addComponent(lblNewLabel_4)
+        						.addComponent(lblNewLabel_33))
+        					.addGap(18)
+        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+        						.addComponent(CBPolpl, 0, 127, Short.MAX_VALUE)
+        						.addComponent(CBPoz, 0, 127, Short.MAX_VALUE)
+        						.addComponent(CBVid, 0, 127, Short.MAX_VALUE)
+        						.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
+        							.addComponent(SVes, Alignment.LEADING)
+        							.addComponent(Shdm, Alignment.LEADING)
+        							.addComponent(Soj, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)))))
         			.addContainerGap())
         );
         gl_panel_3.setVerticalGroup(
         	gl_panel_3.createParallelGroup(Alignment.LEADING)
-        		.addGroup(gl_panel_3.createSequentialGroup()
+        		.addGroup(Alignment.TRAILING, gl_panel_3.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblNewLabel_33)
+        				.addComponent(SVes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addGap(4)
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel)
         				.addComponent(Soj, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -3055,7 +3068,7 @@ public class MainFrame extends JFrame {
         				.addComponent(CBSerd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addComponent(CBSerd1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        			.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        			.addPreferredGap(ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_8)
         				.addComponent(CBPred, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))

@@ -69,10 +69,12 @@ struct PatientFullInfo{
 	24:optional i32 prizn,
 	25:optional i32 ter_liv,
 	26:optional i32 region_liv,
-	27:optional Address adpAddress,
-	28:optional Address admAddress,
-	29:optional Polis polis_oms,
-	30:optional Polis polis_dms,
+	27:optional string birthplace,
+	28:optional string ogrn_smo,
+	29:optional Address adpAddress,
+	30:optional Address admAddress,
+	31:optional Polis polis_oms,
+	32:optional Polis polis_dms
 }
 
 /*сведени о представителе табл. p_preds*/

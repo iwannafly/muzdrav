@@ -181,8 +181,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
 		strClasTypes = new Class<?>[] {                              String.class, String.class};
 		
-		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl");
-		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class};
+		rsmPislld = new TResultSetMapper<>(P_isl_ld.class, "nisl",        "npasp",       "cisl",        "pcisl",      "napravl",     "naprotd",     "datan",    "vrach",       "diag",       "dataz",    "pvizit_id",   "prichina",    "kodotd",      "datav",    "vopl",        "id_pos");
+		pislldTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class};
 		
 		rsmPrezd = new TResultSetMapper<>(Prez_d.class, "id",          "npasp",       "nisl",        "kodisl",     "rez");
 		prezdTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, String.class, String.class};
@@ -826,7 +826,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14);
+			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
 			int id = sme.getGeneratedKeys().getInt("nisl");
 			sme.setCommit();
 			return id;
@@ -1581,17 +1581,17 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					
 					acrs = sse.execPreparedQuery("select p_isl_ld.nisl, n_ldi.pcod , n_ldi.name_n , p_rez_l.zpok, p_isl_ld.datav, p_vizit_amb.datap " +
 						"from p_isl_ld  join p_rez_l on (p_rez_l.nisl = p_isl_ld.nisl) join n_ldi  on (n_ldi.pcod = p_rez_l.cpok)  " +
-						"join p_vizit_amb on (p_vizit_amb.id_obr = p_isl_ld.pvizit_id) "+
-						"where p_isl_ld.pvizit_id = ? " +
+						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+						"where p_isl_ld.id_pos = ? " +
 						"union " +
 						"select p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, p_isl_ld.datav, p_vizit_amb.datap " +
 						"from p_isl_ld  join p_rez_d  on (p_rez_d.nisl = p_isl_ld.nisl) join n_ldi on (n_ldi.pcod = p_rez_d.kodisl) left join n_arez  on (n_arez.pcod = p_rez_d.rez)  " +
-						"join p_vizit_amb on (p_vizit_amb.id_obr = p_isl_ld.pvizit_id) "+
-						"where p_isl_ld.pvizit_id = ? ", pk.getPvizit_id(), pk.getPvizit_id());
+						"join p_vizit_amb on (p_vizit_amb.id = p_isl_ld.id_pos) "+
+						"where p_isl_ld.id_pos = ? ", pk.getPvizit_ambId(), pk.getPvizit_ambId());
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><br><b>Назначенные исследования </b><br>");
 						while (acrs.getResultSet().next()) {
-							if ((acrs.getResultSet().getString(4) != null) && (acrs.getResultSet().getDate(6).getTime() <acrs.getResultSet().getDate(5).getTime()))
+							if (acrs.getResultSet().getString(4) != null) 
 								sb.append(String.format("<br>Код показателя  %s <br>  Наименование показателя %s <br> Результат %s <br>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
 						}			
 					}
