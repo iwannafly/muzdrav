@@ -20,5 +20,8 @@ struct Pbol{
 }
 
 service ThriftPbol extends kmiacServer.KmiacServer {
-	list<Pbol> getPbol (1: i32 npasp)
+	list<Pbol> getPbol (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePbol(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

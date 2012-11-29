@@ -16,12 +16,16 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class MainForm extends Client<ThriftPbol.Client>{
 	public static ThriftPbol.Client tcl;
 	public static MainForm instance;
 	private JFrame frame;
 	private CustomTable<Pbol, Pbol._Fields> tblPbol;
+	private Pbol pbol;
+	
 
 	public MainForm (ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftPbol.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -32,6 +36,12 @@ public class MainForm extends Client<ThriftPbol.Client>{
 		JScrollPane spPbol = new JScrollPane();
 		
 		JButton button = new JButton("+");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pbol = new Pbol();
+			
+			}
+		});
 		
 		JButton button_1 = new JButton("-");
 		

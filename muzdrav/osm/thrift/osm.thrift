@@ -479,6 +479,9 @@ struct IsslInfo{
 	7: optional i64 datav;
 	8: optional i64 datan;
 	9: optional i32 id;
+	10: optional string op_name;
+	11: optional string rez_name;
+	12: optional i32 gruppa;
 }
 
 

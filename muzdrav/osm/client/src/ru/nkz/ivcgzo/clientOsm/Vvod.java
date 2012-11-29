@@ -1916,6 +1916,12 @@ public class Vvod extends JFrame {
 						addLineToDetailInfo("id: ", iinfo.isSetId(), iinfo.getId());
 						addLineToDetailInfo("Наименование",iinfo.isSetPokaz_name(), iinfo.getPokaz_name());
 						addLineToDetailInfo("Результат",iinfo.isSetRez(), iinfo.getRez());
+						if (iinfo.getGruppa()==2)
+	 					{
+	 						addLineToDetailInfo("Описание исследования",iinfo.isSetOp_name(),iinfo.getOp_name());
+		 					addLineToDetailInfo("Заключение",iinfo.isSetRez_name(),iinfo.getRez_name());
+
+	 					}
 						epTxtRezIssl.setText(sb.toString());
 					
 		 		}
