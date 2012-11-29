@@ -92,9 +92,9 @@ public class SheduleFrame extends JFrame {
         spTalon = new JScrollPane();
         spTalon.setBackground(Color.WHITE);
         spTalon.getVerticalScrollBar().setPreferredSize(
-                new Dimension(50, Integer.MAX_VALUE));
+            new Dimension(50, Integer.MAX_VALUE));
         spTalon.getHorizontalScrollBar().setPreferredSize(
-                new Dimension(Integer.MAX_VALUE, 50));
+            new Dimension(Integer.MAX_VALUE, 50));
         pMain.add(spTalon);
 
         addTalonTable();

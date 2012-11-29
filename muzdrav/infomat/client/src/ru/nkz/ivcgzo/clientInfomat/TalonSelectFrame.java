@@ -44,7 +44,7 @@ public class TalonSelectFrame extends JFrame{
     private JButton btnTalonBackward;    
     private JButton btnTalonForward;
 //    private LpuListModel llm;
-    private JTable tbTalons = new JTable();
+    private JTable tbTalons;
     int cpol;
     String cdol;
     int pcod;

@@ -13,6 +13,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -27,10 +28,10 @@ public class ReservedTalonsFrame extends JFrame {
 
     private static final long serialVersionUID = 4278188155287891545L;
     private JPanel pMain;
-    private Box hbBackwardButton = Box.createHorizontalBox();
-    private Component hgRight = Box.createHorizontalGlue();
+    private Box hbBackwardButton;
+    private Component hgRight;
     private JButton btnBackward;
-    private Component hgLeft = Box.createHorizontalGlue();
+    private Component hgLeft;
     private JScrollPane spTalon;
     private JTable tbTalons;
     int pcod;
@@ -115,12 +116,20 @@ public class ReservedTalonsFrame extends JFrame {
         tbTalons.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JTable curTable = (JTable) e.getSource();
-                final int curRow = curTable.getSelectedRow();
-                TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel()).getReservedTalonList()
-                    .get(curRow);
-                if (curTalon != null) {
-                    releaseTalon(curTalon);
+                int dialogResult = JOptionPane.showConfirmDialog(tbTalons,
+                    "Отменить запись на приём", "Отмена талона",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (dialogResult == JOptionPane.YES_OPTION) {
+                    JTable curTable = (JTable) e.getSource();
+                    final int curRow = curTable.getSelectedRow();
+                    TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
+                        .getReservedTalonList()
+                        .get(curRow);
+                    if (curTalon != null) {
+                        releaseTalon(curTalon);
+                        refreshTalonTableModel(pcod);
+                    }
+                } else {
                     refreshTalonTableModel(pcod);
                 }
             }

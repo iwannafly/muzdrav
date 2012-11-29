@@ -36,7 +36,7 @@ public class LpuSelectFrame extends JFrame {
     private Component hgRight;
     private JButton btnBackward;
     private Component hgLeft;
-    private JScrollPane spLpu = new JScrollPane();
+    private JScrollPane spLpu;
     private ThriftIntegerClassifierList lLpu;
     private DoctorSelectFrame frmDoctorSelect;
     private int nextWindowFlag;
