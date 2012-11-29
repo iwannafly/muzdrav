@@ -197,9 +197,9 @@ public class TestServerRegPatient {
         assertEquals("vpolis value", vpolis, agent.getVpolis());
         assertEquals("spolis value", "сполис", agent.getSpolis());
         assertEquals("npolis value", "нполис", agent.getNpolis());
-        assertEquals("tdoc value", tdoc, agent.getTdoc());
-        assertEquals("docser value", "доксер", agent.getDocser());
-        assertEquals("docnum value", "докнум", agent.getDocnum());
+//        assertEquals("tdoc value", tdoc, agent.getTdoc());
+//        assertEquals("docser value", "доксер", agent.getDocser());
+//        assertEquals("docnum value", "докнум", agent.getDocnum());
         assertEquals("birthplace value", "бертхплэйс", agent.getBirthplace());
     }
 

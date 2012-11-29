@@ -316,7 +316,6 @@ public class MainFrame extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSerd;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSerd1;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPred;
-	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBRod;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPrinial;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBOsmotr;
@@ -325,7 +324,11 @@ public class MainFrame extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBDet;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBObvit;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBVrash;
+	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBMed;
 	private JSpinner Soj;
+	private JSpinner Shdm;
+	private JSpinner Schcc;
+	private JTextField TGde;
 	
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
@@ -2411,7 +2414,7 @@ public class MainFrame extends JFrame {
         tabbedPane.addTab("Роды", new ImageIcon(
             MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildbirth, null);
-        
+// процедуру на сервер (если есть запись - вызвать, если нет - создать), определить npasp, ngosp        
         panel_2 = new JPanel();
         panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
         
@@ -2427,23 +2430,22 @@ public class MainFrame extends JFrame {
         JPanel panel_5 = new JPanel();
         GroupLayout gl_pChildbirth = new GroupLayout(pChildbirth);
         gl_pChildbirth.setHorizontalGroup(
-        	gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
-        		.addGroup(Alignment.LEADING, gl_pChildbirth.createSequentialGroup()
+        	gl_pChildbirth.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_pChildbirth.createSequentialGroup()
         			.addContainerGap()
         			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING)
         				.addGroup(gl_pChildbirth.createSequentialGroup()
         					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 963, GroupLayout.PREFERRED_SIZE)
         					.addContainerGap())
         				.addGroup(gl_pChildbirth.createSequentialGroup()
-        					.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE)
-        						.addGroup(gl_pChildbirth.createSequentialGroup()
-        							.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 279, GroupLayout.PREFERRED_SIZE)
-        							.addPreferredGap(ComponentPlacement.UNRELATED)
-        							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
-        							.addPreferredGap(ComponentPlacement.UNRELATED)
-        							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 364, GroupLayout.PREFERRED_SIZE)
-        							.addPreferredGap(ComponentPlacement.RELATED)))
+        					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 279, GroupLayout.PREFERRED_SIZE)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 364, GroupLayout.PREFERRED_SIZE)
+        					.addGap(37))
+        				.addGroup(gl_pChildbirth.createSequentialGroup()
+        					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE)
         					.addGap(37))))
         );
         gl_pChildbirth.setVerticalGroup(
@@ -2454,15 +2456,13 @@ public class MainFrame extends JFrame {
         			.addPreferredGap(ComponentPlacement.UNRELATED)
         			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING)
         				.addGroup(gl_pChildbirth.createSequentialGroup()
-        					.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
-        						.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 314, Short.MAX_VALUE))
-        					.addGap(11))
-        				.addGroup(gl_pChildbirth.createSequentialGroup()
         					.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-        					.addPreferredGap(ComponentPlacement.RELATED)))
+        					.addPreferredGap(ComponentPlacement.RELATED))
+        				.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE))
+        			.addGap(18)
         			.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
-        			.addGap(171))
+        			.addGap(134))
         );
         
         JButton btnNewButton = new JButton("");
@@ -2547,16 +2547,16 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_31 = new JLabel("Акушерка");
         lblNewLabel_31.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        CBPrinial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBPrinial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBPrinial.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBOsmotr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBOsmotr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBOsmotr.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVrash = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBVrash = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBVrash.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBAkush = new JComboBox();
+        CBAkush = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBAkush.setFont(new Font("Tahoma", Font.BOLD, 12));
         GroupLayout gl_panel_4 = new GroupLayout(panel_4);
         gl_panel_4.setHorizontalGroup(
@@ -2823,7 +2823,7 @@ public class MainFrame extends JFrame {
         TEff.setFont(new Font("Tahoma", Font.BOLD, 12));
         TEff.setColumns(10);
         
-        JComboBox CBMed = new JComboBox();
+        CBMed = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBMed.setFont(new Font("Tahoma", Font.BOLD, 12));
         GroupLayout gl_panel_2 = new GroupLayout(panel_2);
         gl_panel_2.setHorizontalGroup(
@@ -2938,7 +2938,7 @@ public class MainFrame extends JFrame {
         Soj = new JSpinner();
         Soj.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JSpinner Shdm = new JSpinner();
+        Shdm = new JSpinner();
         Shdm.setFont(new Font("Tahoma", Font.BOLD, 12));
         
 		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
@@ -2950,27 +2950,28 @@ public class MainFrame extends JFrame {
         CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
         CBVid.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBSerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);;
+        CBSerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);
         CBSerd.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBSerd1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db4);;
+        CBSerd1 = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db4);
         CBSerd1.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBPred = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db2);;
+        CBPred = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db2);
         CBPred.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBGde = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
-        CBGde.setFont(new Font("Tahoma", Font.BOLD, 12));
-        
-        JSpinner Schcc = new JSpinner();
+        Schcc = new JSpinner();
         Schcc.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        JComboBox CBRod = new JComboBox();
+        CBRod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBRod.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         TVes = new JTextField();
         TVes.setFont(new Font("Tahoma", Font.BOLD, 12));
         TVes.setColumns(10);
+        
+        TGde = new JTextField();
+        TGde.setFont(new Font("Tahoma", Font.BOLD, 12));
+        TGde.setColumns(10);
         GroupLayout gl_panel_3 = new GroupLayout(panel_3);
         gl_panel_3.setHorizontalGroup(
         	gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -2996,11 +2997,11 @@ public class MainFrame extends JFrame {
         					.addGap(18)
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
         						.addComponent(CBPolpl, 0, 127, Short.MAX_VALUE)
-        						.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING, false)
-        							.addComponent(Shdm)
-        							.addComponent(Soj, GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
         						.addComponent(CBPoz, 0, 127, Short.MAX_VALUE)
-        						.addComponent(CBVid, 0, 127, Short.MAX_VALUE)))
+        						.addComponent(CBVid, 0, 127, Short.MAX_VALUE)
+        						.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
+        							.addComponent(Shdm, Alignment.LEADING)
+        							.addComponent(Soj, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))))
         				.addGroup(gl_panel_3.createSequentialGroup()
         					.addContainerGap()
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -3013,8 +3014,8 @@ public class MainFrame extends JFrame {
         						.addComponent(CBSerd1, 0, 125, Short.MAX_VALUE)
         						.addComponent(CBSerd, 0, 125, Short.MAX_VALUE)
         						.addComponent(CBPred, 0, 125, Short.MAX_VALUE)
-        						.addComponent(CBGde, 0, 125, Short.MAX_VALUE)
-        						.addComponent(Schcc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)))
+        						.addComponent(Schcc, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(TGde, GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)))
         				.addGroup(gl_panel_3.createSequentialGroup()
         					.addContainerGap()
         					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -3061,7 +3062,7 @@ public class MainFrame extends JFrame {
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_6)
-        				.addComponent(CBGde, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        				.addComponent(TGde, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_7)
