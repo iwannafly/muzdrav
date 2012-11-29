@@ -715,7 +715,7 @@ public class ServerOsm extends Server implements Iface {
 		}
 		
 	}
-
+	
 	@Override
 	public void UpdateRdSl(RdSlStruct Dispb) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
