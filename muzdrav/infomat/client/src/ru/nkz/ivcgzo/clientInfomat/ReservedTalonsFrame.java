@@ -13,7 +13,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -31,6 +30,7 @@ public class ReservedTalonsFrame extends JFrame {
     private Box hbBackwardButton;
     private Component hgRight;
     private JButton btnBackward;
+    private OptionsDialog optDialog;
     private Component hgLeft;
     private JScrollPane spTalon;
     private JTable tbTalons;
@@ -54,7 +54,8 @@ public class ReservedTalonsFrame extends JFrame {
         pack();
     }
 
-    private void createModalFrames() {  
+    private void createModalFrames() {
+        optDialog = new OptionsDialog();
     }
 
     private void addMainPanel() {
@@ -116,10 +117,9 @@ public class ReservedTalonsFrame extends JFrame {
         tbTalons.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int dialogResult = JOptionPane.showConfirmDialog(tbTalons,
-                    "Отменить запись на приём", "Отмена талона",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (dialogResult == JOptionPane.YES_OPTION) {
+                int dialogResult = optDialog.showConfirmDialog(ReservedTalonsFrame.this,
+                    "Отменить запись?");
+                if (dialogResult == OptionsDialog.ACCEPT) {
                     JTable curTable = (JTable) e.getSource();
                     final int curRow = curTable.getSelectedRow();
                     TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
