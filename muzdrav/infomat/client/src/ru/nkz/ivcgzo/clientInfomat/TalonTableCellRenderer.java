@@ -10,6 +10,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 
+import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
+
 public class TalonTableCellRenderer extends JLabel implements TableCellRenderer {
 
     private static final long serialVersionUID = -6093149415269084185L;

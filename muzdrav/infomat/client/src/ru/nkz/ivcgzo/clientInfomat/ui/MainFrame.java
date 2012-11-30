@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -14,6 +14,7 @@ import java.awt.Font;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
+
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;

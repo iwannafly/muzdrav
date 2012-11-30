@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.model.tableModels;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -10,6 +10,7 @@ import javax.swing.table.TableModel;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 

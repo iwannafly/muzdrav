@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import java.awt.Dimension;
 
@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
