@@ -21,6 +21,7 @@ CALL :generateJavaSource muzdrav\kartaRInv\thrift"
 CALL :generateJavaSource muzdrav\disp\thrift"
 CALL :generateJavaSource muzdrav\autoProc\thrift"
 CALL :generateJavaSource muzdrav\pbol\thrift"
+CALL :generateJavaSource muzdrav\infomat\thrift"
 
 COLOR 2
 ECHO All sources successfully generated

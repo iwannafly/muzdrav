@@ -147,7 +147,7 @@ struct TRdIshod{
   12: optional i32 serdm;
   13: optional i32 chcc;
   14: optional i32 pozpl;
-  15: optional i32 mesto;
+  15: optional string mesto;
   16: optional string deyat;
   17: optional string shvat;
   18: optional string vody;
@@ -172,6 +172,9 @@ struct TRdIshod{
   37: optional string vrash;
   38: optional string akush;
   39: optional i64 datarod;
+  40: optional i32 srok;
+  41: optional i32 ves;
+  42: optional i32 vespl; 
 }
 
 /**
@@ -208,6 +211,8 @@ exception PriemInfoNotFoundException {
  * РљРѕРґ РњР­РЎ РЅРµ СЃСѓС‰РµСЃС‚dСѓРµС‚
  */
 exception MesNotFoundException {
+}
+exception PrdIshodNotFoundException{
 }
 
 service ThriftHospital extends kmiacServer.KmiacServer{
@@ -298,7 +303,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 /* родовспоможение*/
 	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
     void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-    void updateRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	
 }

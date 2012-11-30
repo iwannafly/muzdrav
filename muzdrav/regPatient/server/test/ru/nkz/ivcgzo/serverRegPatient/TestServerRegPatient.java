@@ -182,7 +182,6 @@ public class TestServerRegPatient {
             throws TException, AgentNotFoundException, KmiacServerException {
         final int npasp = 2;
         final int vpolis = 3;
-        final int tdoc = 5;
         final Date birthDate = new Date(85, 1, 5);
         Agent agent =
                 testServer.getAgent(npasp);

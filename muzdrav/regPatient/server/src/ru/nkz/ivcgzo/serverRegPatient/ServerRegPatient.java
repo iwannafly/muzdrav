@@ -137,7 +137,7 @@ public class ServerRegPatient extends Server implements Iface {
         Integer.class, String.class, String.class, String.class,
     //  datar       pol             name_str      ogrn_str
         Date.class, Integer.class, String.class, String.class,
-    //  vpolis         spolis        npolis		   birthplace     
+    //  vpolis         spolis        npolis		   birthplace
         Integer.class, String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {

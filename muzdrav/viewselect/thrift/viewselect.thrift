@@ -250,6 +250,9 @@ struct PatientIsslInfo{
 	5: optional string pokaz_name;
 	6: optional string rez;
 	7: optional i64 datav;
+	8: optional string op_name;
+	9: optional string rez_name;
+	10: optional i32 gruppa;
 }
 
 struct PatientDiagAmbInfo {
