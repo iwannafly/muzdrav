@@ -246,10 +246,17 @@ public class TalonSelectFrame extends JFrame{
         try {
             ClientInfomat.tcl.reserveTalon(patient, curTalon);
         } catch (KmiacServerException e) {
+            new OptionsDialog().showConfirmDialog(TalonSelectFrame.this,
+                "Ошибка во время записи талона!");
             e.printStackTrace();
         } catch (ReserveTalonOperationFailedException e) {
+            new OptionsDialog().showConfirmDialog(TalonSelectFrame.this,
+                "Ошибка во время записи талона!");
             e.printStackTrace();
         } catch (PatientHasSomeReservedTalonsOnThisDay e) {
+            new OptionsDialog().showConfirmDialog(TalonSelectFrame.this,
+                "У вас уже есть запись к данному врачу на выбранный день!"
+                + "Повторная запись невозможна!");
             e.printStackTrace();
         } catch (TException e) {
             e.printStackTrace();

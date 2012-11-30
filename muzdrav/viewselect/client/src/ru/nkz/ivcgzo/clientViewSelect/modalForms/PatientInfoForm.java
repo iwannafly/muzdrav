@@ -168,7 +168,7 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_am0), info.isSetJitel(), info.getJitel()));
 		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_az9), info.isSetSgrp(), info.getSgrp()));
 		 				addHeader("");
-		 				addHeader("Прописка:");
+		 				addBoldFont("Прописка:");
 		 				addLineToDetailInfo("Область", info.getAdp_obl());
 		 				addLineToDetailInfo("Город", info.getAdp_gorod());
 		 				addLineToDetailInfo("Улица", info.getAdp_ul());
@@ -176,7 +176,7 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Корпус", info.getAdp_korp());
 		 				addLineToDetailInfo("Квартира", info.getAdp_kv());
 		 				addHeader("");
-		 				addHeader("Проживание:");
+		 				addBoldFont("Проживание:");
 		 				addLineToDetailInfo("Область", info.getAdm_obl());
 		 				addLineToDetailInfo("Город", info.getAdm_gorod());
 		 				addLineToDetailInfo("Улица", info.getAdm_ul());
@@ -219,7 +219,7 @@ public class PatientInfoForm extends ModalForm {
 							addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
 							addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
 							addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-							addHeader("Вредные привычки");
+							addBoldFont("Вредные привычки");
 							if (psign.getVred().charAt(0) == '1') addHeader("курение");
 							if (psign.getVred().charAt(1) == '1') addHeader("злоупотребление алкоголем");
 							if (psign.getVred().charAt(2) == '1') addHeader("алкоголизм");
@@ -256,8 +256,8 @@ public class PatientInfoForm extends ModalForm {
 		 			} else if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 				PatientVizitInfo pvizit = pvizitNode.pvizit;
-						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
-		 				addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
+//						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
+//		 				addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
 		 				try {
 							PatientAnamZabInfo anamnez =  MainForm.tcl.getPatientAnamZabInfo(pvizit.getId(),pvizit.getNpasp());
 							addLineToDetailInfo("История настоящего заболевания",anamnez.isSetT_ist_zab(), anamnez.getT_ist_zab());
@@ -266,6 +266,7 @@ public class PatientInfoForm extends ModalForm {
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
+		 				addHeader("");
 						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
 							
 		 					if (issl.isSetNisl()) {
@@ -280,17 +281,19 @@ public class PatientInfoForm extends ModalForm {
 		 					}
 		 					}
 		 				}
-		 				
+						addHeader("");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование мед.документа, выписанного пациенту",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование для направления",pnapr.isSetText(),pnapr.getText());
 		 					addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
 		 				}
-		 				addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
-						addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
+		 				addHeader("");
+		 				addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 			 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
 			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());
+			 			addHeader("");
+			 			addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
+						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
 	
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitAmbNode) {
@@ -538,6 +541,7 @@ public class PatientInfoForm extends ModalForm {
 		);
 		
 		eptxt = new JEditorPane();
+		eptxt.setContentType("text/html");
 		eptxt.setFont(new Font("Arial", Font.PLAIN, 12));
 		sptxt.setViewportView(eptxt);
 		eptxt.setEditable(false);
@@ -672,7 +676,7 @@ public class PatientInfoForm extends ModalForm {
 		if (isSet)
 			if ((name != null) && (value != null))
 				if ((name.length() > 0) && (value.toString().length() > 0))
-					sb.append(String.format("%s: %s%s", name, value, lineSep));
+					sb.append(String.format("%s: %s%s<br>", name, value, lineSep));
 	}
 	
 	private void addLineToDetailInfo(String name, Object value) {
@@ -702,8 +706,13 @@ public class PatientInfoForm extends ModalForm {
 		return null;
 	}
 	
+	private void addBoldFont(String name) {
+		sb.append(String.format("<b>%s</b><br>", name) + lineSep);
+
+	}
+	
 	private void addHeader(String name) {
-		sb.append(String.format("%s", name) + lineSep);
+		sb.append(String.format("%s<br>", name) + lineSep);
 
 	}
 	
@@ -711,14 +720,14 @@ public class PatientInfoForm extends ModalForm {
 		if (isSet)
 			if (value == 1)
 				if (txt.toString().length() > 0)
-					sb.append(txt + lineSep);
+					sb.append(String.format("%s<br>", txt));
 	}
 
 	private void addLineIfBool(String txt,boolean isSet, boolean value) {
 		if (isSet)
 			if (value == true)
 				if (txt.toString().length() > 0)
-					sb.append(txt + lineSep);
+					sb.append(String.format("%s<br>", txt));
 	}
 	
 	private void addLineToNaprCls(String txt, String value, boolean isSet, int valueCls) {
@@ -727,15 +736,15 @@ public class PatientInfoForm extends ModalForm {
 				if ((txt.length() > 0) && (value.toString().length() > 0))
 				{
 					if (value.equals("К"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00), isSet, valueCls), lineSep));
 					if (value.equals("Г"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_al0), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_al0), isSet, valueCls), lineSep));
 					if (value.equals("Л"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_m00), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_m00), isSet, valueCls), lineSep));
 					if (value.equals("Р"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_w04), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_w04), isSet, valueCls), lineSep));
 					if (value.equals("Т"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), isSet, valueCls), lineSep));
 				}
 	}
 	
