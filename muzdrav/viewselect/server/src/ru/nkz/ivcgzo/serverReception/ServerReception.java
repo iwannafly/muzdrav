@@ -323,9 +323,9 @@ public class ServerReception extends Server implements Iface {
                         pat.getIdPvizit(), talon.getId());
                 } else {
                     numUpdated = sme.execPreparedUpdate("UPDATE e_talon SET npasp = ?, dataz = ?, "
-                            + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
-                            + "WHERE  id = ?;",
-                            false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+                        + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
+                        + "WHERE  id = ?;",
+                        false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
                 }
                 if (numUpdated == 1) {
                     sme.setCommit();

@@ -93,8 +93,8 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmPvizitAmb = new TResultSetMapper<>(PatientVizitAmbInfo.class, "id", "id_obr", "npasp", "datap", "cod_sp", "cdol", "diag", "mobs", "rezult", "opl", "stoim", "uet", "datak", "kod_rez", "k_lr", "n_sp", "pr_opl", "pl_extr", "vpom", "fio_vr", "dataz", "cpos");
 		rsmPriem = new TResultSetMapper<>(PatientPriemInfo.class, "id_obr","npasp", "id_pos", "sl_ob", "n_is", "n_kons", "n_proc", "n_lek", "t_chss", "t_temp", "t_ad", "t_rost", "t_ves", "t_st_localis", "t_ocenka", "t_jalob", "t_status_praesense", "t_fiz_obsl", "t_recom");
 		rsmPnapr = new TResultSetMapper<>(PatientNaprInfo.class, "id", "idpvizit", "vid_doc", "text", "preds", "zaved", "name");
-		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "datap", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
-		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav");
+		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
+		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav", "op_name", "rez_name", "gruppa");
 		rsmAnamZab = new TResultSetMapper<>(PatientAnamZabInfo.class, "id_pvizit", "npasp", "t_ist_zab");
 		rsmCgosp = new TResultSetMapper<>(CgospInfo.class, "id", "ngosp", "npasp", "nist", "datap", "vremp", "pl_extr", "naprav", "n_org", "cotd", "sv_time", "sv_day", "ntalon", "vidtr", "pr_out", "alkg", "meesr", "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c", "ad", "smp_data", "smp_time", "smp_num", "cotd_p", "datagos", "vremgos", "cuser", "dataosm", "vremosm", "kod_rez", "dataz", "jalob", "vid_st", "d_rez", "pr_ber");
 		rsmCdepicris = new TResultSetMapper<>(CdepicrisInfo.class, "id", "id_gosp", "datas", "times", "dspat", "prizn", "named", "dataz");
@@ -415,13 +415,16 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public List<PatientIsslInfo> getPatientIsslInfoList(int pvizitId) throws KmiacServerException, TException {
-		String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, p_rez_l.zpok, p_isl_ld.datav " +
+		String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, p_rez_l.zpok, p_isl_ld.datav, p_rez_l.pcod_m as op_name,n_nsikodrez.name as rez_name, n_p0e1.gruppa as gruppa " +
 			     "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " + 
-				 "WHERE p_isl_ld.pvizit_id = ? " +
+			     "JOIN n_nsikodrez ON (n_nsikodrez.kod_rez=p_rez_l.kod_rez) "+
+				 "JOIN n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
+			     "WHERE p_isl_ld.pvizit_id = ? " +
 				 "UNION " +
-				 "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav " + 
+				 "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name, n_p0e1.gruppa as gruppa " + 
 				 "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " + 
 				 "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+				 "JOIN n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
 				 "WHERE p_isl_ld.pvizit_id = ? ";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, pvizitId, pvizitId)) {
 			return rsmIsslInfo.mapToList(acrs.getResultSet());

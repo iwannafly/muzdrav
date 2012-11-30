@@ -167,20 +167,28 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Пол", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z30), info.isSetPol(), info.getPol()));
 		 				addLineToDetailInfo("Место жительства", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_am0), info.isSetJitel(), info.getJitel()));
 		 				addLineToDetailInfo("Социальный статус", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_az9), info.isSetSgrp(), info.getSgrp()));
-		 				addLineToDetailInfo("Область (прописка)", info.getAdp_obl());
-		 				addLineToDetailInfo("Город (прописка)", info.getAdp_gorod());
-		 				addLineToDetailInfo("Улица (прописка)", info.getAdp_ul());
-		 				addLineToDetailInfo("Дом (прописка)", info.getAdp_dom());
-		 				addLineToDetailInfo("Корпус (прописка)", info.getAdp_korp());
-		 				addLineToDetailInfo("Квартира (прописка)", info.getAdp_kv());
-		 				addLineToDetailInfo("Область (проживание)", info.getAdm_obl());
-		 				addLineToDetailInfo("Город (проживание)", info.getAdm_gorod());
-		 				addLineToDetailInfo("Улица (проживание)", info.getAdm_ul());
-		 				addLineToDetailInfo("Дом (проживание)", info.getAdm_dom());
-		 				addLineToDetailInfo("Корпус (проживание)", info.getAdm_korp());
-		 				addLineToDetailInfo("Квартира (проживание)", info.getAdm_kv());
+		 				addHeader("");
+		 				addBoldFont("Прописка:");
+		 				addLineToDetailInfo("Область", info.getAdp_obl());
+		 				addLineToDetailInfo("Город", info.getAdp_gorod());
+		 				addLineToDetailInfo("Улица", info.getAdp_ul());
+		 				addLineToDetailInfo("Дом", info.getAdp_dom());
+		 				addLineToDetailInfo("Корпус", info.getAdp_korp());
+		 				addLineToDetailInfo("Квартира", info.getAdp_kv());
+		 				addHeader("");
+		 				addBoldFont("Проживание:");
+		 				addLineToDetailInfo("Область", info.getAdm_obl());
+		 				addLineToDetailInfo("Город", info.getAdm_gorod());
+		 				addLineToDetailInfo("Улица", info.getAdm_ul());
+		 				addLineToDetailInfo("Дом", info.getAdm_dom());
+		 				addLineToDetailInfo("Корпус", info.getAdm_korp());
+		 				addLineToDetailInfo("Квартира", info.getAdm_kv());
+		 				addLineToDetailInfo("Телефон", info.getTel());
+		 				addHeader("");
 		 				addLineToDetailInfo("Место работы/учебы", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z43), info.isSetMrab(), info.getMrab()));
+		 				addLineToDetailInfo("Профессия", info.getProf());
 		 				addLineToDetailInfo("Тип места работы", info.getNcex());
+		 				addHeader("");
 		 				addLineToDetailInfo("Страховая организация ОМС", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_kas), info.isSetPoms_strg(), info.getPoms_strg()));
 		 				addLineToDetailInfo("Тип документа ОМС", info.getPoms_tdoc());
 		 				addLineToDetailInfo("Номер договора ОМС", info.getPoms_ndog());
@@ -188,9 +196,11 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Серия полиса ДМС", info.getPdms_ser());
 		 				addLineToDetailInfo("Номер полиса ДМС", info.getPdms_nom());
 		 				addLineToDetailInfo("Номер договора ДМС", info.getPdms_ndog());
+		 				addHeader("");
 		 				addLineToDetailInfo("Поликлиника прикрепления", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00), info.isSetCpol_pr(), info.getCpol_pr()));
 		 				addLineToDetailInfo("Территория прикрепления", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTerp(), info.getTerp()));
 		 				addLineToDetailInfo("Дата прикрепления", info.isSetDatapr(), DateFormat.getDateInstance().format(new Date(info.getDatapr())));
+		 				addHeader("");
 		 				addLineToDetailInfo("Тип удостоверения личности", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_az0), info.isSetTdoc(), info.getTdoc()));
 		 				addLineToDetailInfo("Серия документа", info.getDocser());
 		 				addLineToDetailInfo("Номер документа", info.getDocnum());
@@ -198,10 +208,8 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Дата сверки данных", info.isSetDsv(), DateFormat.getDateInstance().format(new Date(info.getDsv())));
 		 				addLineToDetailInfo("Кем выдан документ", info.getOdoc());
 		 				addLineToDetailInfo("СНИЛС", info.getSnils());
-		 				addLineToDetailInfo("Профессия", info.getProf());
-		 				addLineToDetailInfo("Телефон", info.getTel());
-		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l02), info.isSetRegion_liv(), info.getRegion_liv()));
-		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTer_liv(), info.getTer_liv()));
+//		 				addLineToDetailInfo("Область проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l02), info.isSetRegion_liv(), info.getRegion_liv()));
+//		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTer_liv(), info.getTer_liv()));
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath.toString() ==  "Анамнез жизни"){
 		 				try {
@@ -211,7 +219,7 @@ public class PatientInfoForm extends ModalForm {
 							addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
 							addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
 							addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-							addHeader("Вредные привычки");
+							addBoldFont("Вредные привычки");
 							if (psign.getVred().charAt(0) == '1') addHeader("курение");
 							if (psign.getVred().charAt(1) == '1') addHeader("злоупотребление алкоголем");
 							if (psign.getVred().charAt(2) == '1') addHeader("алкоголизм");
@@ -227,12 +235,13 @@ public class PatientInfoForm extends ModalForm {
 		 			} else if (lastPath instanceof PdiagTreeNode) {
 			 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
 			 			PatientDiagZInfo pdiag = pdiagNode.pdiag;
-						addLineToDetailInfo("Поликлиника",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
+						//addLineToDetailInfo("Поликлиника",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00),pdiag.isSetCpodr(),MainForm.authInfo.getCpodr()));
 						addLineToDetailInfo("Медицинское описание", pdiag.isSetNamed(),pdiag.getNamed());
 						addLineToDetailInfo("Дата регистрации", pdiag.isSetDatad(),DateFormat.getDateInstance().format(new Date(pdiag.getDatad())));
 						addLineToDetailInfo("Обстоятельства регистрации", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abv),pdiag.isSetNmvd(),pdiag.getNmvd()));
 						addLineToDetailInfo("Характер заболевания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abx),pdiag.isSetXzab(),pdiag.getXzab()));
 						addLineToDetailInfo("Стадия заболевания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aby),pdiag.isSetStady(),pdiag.getStady()));
+						if (pdiag.isSetD_vz()) addHeader("");
 						addLineIfInt("Состоит на д.учете: да", pdiag.isSetDisp(), pdiag.getDisp());
 						addLineToDetailInfo("Дата постановки на д/у ", pdiag.isSetD_vz(), DateFormat.getDateInstance().format(new Date(pdiag.getD_vz())));
 						addLineToDetailInfo("Группа д/у", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abc),pdiag.isSetD_grup(),pdiag.getD_grup()));
@@ -241,6 +250,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Дата установления группы д/у", pdiag.isSetDatag(), DateFormat.getDateInstance().format(new Date(pdiag.getDatag())));
 //		 				addLineToDetailInfo("Врач, ведущий д/у", pdiag.isSetFio_vr(),pdiag.getFio_vr());
 //						addLineToDetailInfo("Должность врача, ведущего д/у", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00),pdiag.isSetCdol_ot(),pdiag.getCdol_ot()));
+						if ((pdiag.isSetPat()) || (pdiag.isSetPrizb()) || (pdiag.isSetPrizi())) addHeader("");
 						addLineIfInt("Противопоказания к вынашиванию беременности: есть", pdiag.isSetPat(), pdiag.getPat());
 						addLineIfInt("Участие в боевых действиях: да", pdiag.isSetPrizb(), pdiag.getPrizb());
 						addLineIfInt("Инвалидизующий диагноз: да", pdiag.isSetPrizi(), pdiag.getPrizi());
@@ -248,8 +258,8 @@ public class PatientInfoForm extends ModalForm {
 		 			} else if (lastPath instanceof PvizitTreeNode) {
 		 				PvizitTreeNode pvizitNode = (PvizitTreeNode) lastPath;
 		 				PatientVizitInfo pvizit = pvizitNode.pvizit;
-						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
-		 				addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
+//						addLineToDetailInfo("Цель обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pvizit.isSetCobr(), pvizit.getCobr()));
+//		 				addLineToDetailInfo("Должность", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pvizit.isSetCdol(), pvizit.getCdol()));
 		 				try {
 							PatientAnamZabInfo anamnez =  MainForm.tcl.getPatientAnamZabInfo(pvizit.getId(),pvizit.getNpasp());
 							addLineToDetailInfo("История настоящего заболевания",anamnez.isSetT_ist_zab(), anamnez.getT_ist_zab());
@@ -258,24 +268,35 @@ public class PatientInfoForm extends ModalForm {
 						} catch (TException e1) {
 							MainForm.conMan.reconnect(e1);
 						}
+		 				
 						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
 							
 		 					if (issl.isSetNisl()) {
+		 						addHeader("");
 		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
 		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
-		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));}
+		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+		 					if (issl.getGruppa()==2)
+		 					{
+		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
+			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
+	
+		 					}
+		 					}
 		 				}
-		 				
+						 addHeader("");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование мед.документа, выписанного пациенту",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование для направления",pnapr.isSetText(),pnapr.getText());
 		 					addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
 		 				}
-		 				addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
-						addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
+						if ((pvizit.isSetZakl()) || (pvizit.isSetRecomend()) || (pvizit.isSetLech())) addHeader("");
+		 				addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
 			 			addLineToDetailInfo("Рекомендации", pvizit.isSetRecomend(),pvizit.getRecomend());
 			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());
+						if ((pvizit.isSetIshod()) || (pvizit.isSetRezult())) addHeader("");
+			 			addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
+						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
 	
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitAmbNode) {
@@ -283,10 +304,12 @@ public class PatientInfoForm extends ModalForm {
 		 				PatientVizitAmbInfo pam = pvizitAmbNode.pam;
 		 				PatientPriemInfo priem =  MainForm.tcl.getPatientPriemInfo(pam.getNpasp(),pam.getId());
 //						addLineToDetailInfo("id: ", pam.isSetId(), pam.getId());
-						addLineToDetailInfo("Должность врача, ведущего прием",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pam.isSetCdol(), pam.getCdol()));
-						addLineToDetailInfo("Врач, ведущий прием",pam.isSetFio_vr(),pam.getFio_vr());
+						addLineToDetailInfo("Должность врача",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00), pam.isSetCdol(), pam.getCdol()));
+						addLineToDetailInfo("Врач",pam.isSetFio_vr(),pam.getFio_vr());
+						addHeader("");
 						addLineToDetailInfo("Место обслуживания",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abs), pam.isSetMobs(), pam.getMobs()));
 						addLineToDetailInfo("Цель посещения",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_p0c), pam.isSetCpos(), pam.getCpos()));
+						addHeader("");
 						addLineToDetailInfo("Жалобы",priem.isSetT_jalob(), priem.getT_jalob());
 						addLineToDetailInfo("ЧСС",priem.isSetT_chss(), priem.getT_chss());
 						addLineToDetailInfo("Температура",priem.isSetT_temp(), priem.getT_temp());
@@ -298,6 +321,7 @@ public class PatientInfoForm extends ModalForm {
 						addLineToDetailInfo("Рекомендации",priem.isSetT_recom(), priem.getT_recom());
 						addLineToDetailInfo("Status localis",priem.isSetT_st_localis(), priem.getT_st_localis());
 						addLineToDetailInfo("Оценка данных анамнеза и объективного исследования",priem.isSetT_ocenka(), priem.getT_ocenka());
+						addHeader("");
 						for (PatientDiagAmbInfo pdiagamb : MainForm.tcl.getPatientDiagAmbInfoList(pam.getId())) {
 		 	 				addLineToDetailInfo("Код МКБ",pdiagamb.isSetDiag(),pdiagamb.getDiag());
 		 					addLineToDetailInfo("Медицинское описание диагноза",pdiagamb.isSetNamed(),pdiagamb.getNamed());
@@ -354,8 +378,9 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Дата поступления в стационар", gosp.isSetDatap(), DateFormat.getDateInstance().format(new Date(gosp.getDatap())));
 		 				addLineToDetailInfo("Время поступления в стационар", gosp.isSetVremp(), DateFormat.getTimeInstance().format(new Time(gosp.getVremp())));
 		 				addLineToDetailInfo("Вид обращения", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vgo), gosp.isSetPl_extr(), gosp.getPl_extr()));
-		 				//addLineToDetailInfo("Кем направлен", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_k02), gosp.isSetPl_extr(), gosp.getPl_extr()));
+		 				addLineToDetailInfo("Кем направлен", getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_k02), gosp.isSetNaprav(), gosp.getNaprav()));
 		 				addLineToNaprCls("Направившее учреждение", gosp.getNaprav(), gosp.isSetN_org(), gosp.getN_org());
+		 				addHeader("");
 		 				addLineToDetailInfo("Отделение стационара, куда госпитализирован", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), gosp.isSetCotd(), gosp.getCotd()));
 		 				addLineToDetailInfo("Своевременность госпитализации (в часах от начала заболевания)", gosp.isSetSv_time(), gosp.getSv_time());
 		 				addLineToDetailInfo("Своевременность госпитализации (в сутках от начала госпитализации)", gosp.isSetSv_day(), gosp.getSv_day());
@@ -365,18 +390,23 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Присутствие алкоголя в крови", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), gosp.isSetAlkg(), gosp.getAlkg()));
 		 				addLineIfBool("Отметка о сообщении родственникам: да", gosp.isSetMeesr(), gosp.isMeesr());
 		 				addLineToDetailInfo("Вид транспортировки", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vtr), gosp.isSetVid_tran(), gosp.getVid_tran()));
+		 				addHeader("");
 		 				addLineToDetailInfo("Код диагноза направившего учреждения", gosp.isSetDiag_n(), gosp.getDiag_n());
 		 				addLineToDetailInfo("Наименование диагноза направившего учреждения", gosp.isSetNamed_n(), gosp.getNamed_n());
 		 				addLineToDetailInfo("Код диагноза приемного отделения", gosp.isSetDiag_p(), gosp.getDiag_p());
 		 				addLineToDetailInfo("Наименование диагноза приемного отделения", gosp.isSetNamed_p(), gosp.getNamed_p());
+		 				addHeader("");
 		 				addLineIfBool("Наличие чесотки: да", gosp.isSetNal_z(), gosp.isNal_z());
 		 				addLineIfBool("Наличие педикулеза: да", gosp.isSetNal_p(), gosp.isNal_p());
 		 				//addLineToDetailInfo("Наличие педикулеза", gosp.isSetNal_p(), gosp.isNal_p());
+		 				addHeader("");
 		 				addLineToDetailInfo("Температура при поступлении", gosp.isSetT0c(), gosp.getT0c());
 		 				addLineToDetailInfo("Артериальное давление при поступлении", gosp.isSetAd(), gosp.getAd());
+		 				addHeader("");
 		 				addLineToDetailInfo("Дата вызова скорой помощи", gosp.isSetSmp_data(), DateFormat.getDateInstance().format(new Date(gosp.getSmp_data())));
 		 				addLineToDetailInfo("Время вызова скорой помощи",  gosp.isSetSmp_time(), DateFormat.getTimeInstance().format(new Time(gosp.getSmp_time())));
 		 				addLineToDetailInfo("Номер вызова скорой помощи", gosp.isSetSmp_num(), gosp.getSmp_num());
+		 				addHeader("");
 		 				addLineToDetailInfo("Дата госпитализации в отделение", gosp.isSetDatagos(), DateFormat.getDateInstance().format(new Date(gosp.getDatagos())));
 		 				addLineToDetailInfo("Время госпитализации", gosp.isSetVremgos(), DateFormat.getTimeInstance().format(new Time(gosp.getVremgos())));
 		 				addLineToDetailInfo("Дата осмотра в приемном отделении", gosp.isSetDataosm(), DateFormat.getDateInstance().format(new Date(gosp.getDataosm())));
@@ -384,6 +414,7 @@ public class PatientInfoForm extends ModalForm {
 		 				addLineToDetailInfo("Жалобы при поступлении", gosp.isSetJalob(), gosp.getJalob());
 		 				addLineToDetailInfo("Вид стационара", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_tip), gosp.isSetVid_st(), gosp.getVid_st()));
 		 				addLineIfBool("Признак беременности: да", gosp.isSetPr_ber(), gosp.isPr_ber());
+		 				addHeader("");
 		 				for (CosmotrInfo cosmotr : MainForm.tcl.getCosmotrInfoList(gosp.getId())) {
 		 					addLineToDetailInfo("Дата записи",cosmotr.isSetDataz(),DateFormat.getDateInstance().format(new Date(cosmotr.getDataz())));
 		 	 				addLineToDetailInfo("Жалобы",cosmotr.isSetJalob(),cosmotr.getJalob());
@@ -392,18 +423,23 @@ public class PatientInfoForm extends ModalForm {
 		 					addLineToDetailInfo("Локальный статус",cosmotr.isSetStatus_localis(),cosmotr.getStatus_localis());
 		 					addLineToDetailInfo("Физикальное обследование",cosmotr.isSetFisical_obs(),cosmotr.getFisical_obs());
 		 					}
+		 				addHeader("");
+		 				
 		 				for (CdiagInfo cdiag : MainForm.tcl.getCdiagInfoList(gosp.getId())) {
 		 					addLineToDetailInfo("Дата установления диагноза",cdiag.isSetDate_ustan(),DateFormat.getDateInstance().format(new Date(cdiag.getDate_ustan())));
 		 	 				addLineToDetailInfo("Код МКБ",cdiag.isSetCod(),cdiag.getCod());
 		 					addLineToDetailInfo("Медицинское описание",cdiag.isSetMed_op(),cdiag.getMed_op());
 		 					addLineToDetailInfo("Признак диагноза",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_vdi), cdiag.isSetPrizn(), cdiag.getPrizn()));
 		 					}
+		 				addHeader("");
 		 				for (C_etapInfo cetap : MainForm.tcl.getCEtapInfoList(gosp.getId())) {
 		 					addLineToDetailInfo("Дата начала этапа",cetap.isSetDate_start(),DateFormat.getDateInstance().format(new Date(cetap.getDate_start())));
 		 	 				addLineToDetailInfo("Этап лечения",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_etp), cetap.isSetStl(), cetap.getStl()));
 		 					//addLineToDetailInfo("МЭС",getValueFromClassifier(ConnectionManager.instance.getStringClassifier(StringClassifiers.n_cmt), cetap.isSetMes(), cetap.getMes()));
 		 					addLineToDetailInfo("Дата окончания этапа",cetap.isSetDate_end(),DateFormat.getDateInstance().format(new Date(cetap.getDate_end())));
 		 				}
+		 				addHeader("");
+		 				
 		 				for (CizmerInfo cizmer : MainForm.tcl.getCizmerInfoList(gosp.getId())) {
 		 					addLineToDetailInfo("Дата записи",cizmer.isSetDataz(),DateFormat.getDateInstance().format(new Date(cizmer.getDataz())));
 		 	 				addLineToDetailInfo("Температура",cizmer.isSetTemp(),cizmer.getTemp());
@@ -412,6 +448,7 @@ public class PatientInfoForm extends ModalForm {
 		 					addLineToDetailInfo("Рост", cizmer.isSetRost(), cizmer.getRost());
 		 					addLineToDetailInfo("Вес",cizmer.isSetVes(),cizmer.getVes());	
 		 				}
+		 				addHeader("");
 		 				for (ClekInfo clek : MainForm.tcl.getClekInfoList(gosp.getId())) {
 		 					addLineToDetailInfo("Дата назначения",clek.isSetDatan(),DateFormat.getDateInstance().format(new Date(clek.getDatan())));
 		 					addLineToDetailInfo("Лекарство",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_med), clek.isSetKlek(), clek.getKlek()));
@@ -425,6 +462,7 @@ public class PatientInfoForm extends ModalForm {
 		 					addLineToDetailInfo("Указания по приему",clek.isSetKomm(),clek.getKomm());
 		 					addLineToDetailInfo("Дата отмены",clek.isSetDatao(),DateFormat.getDateInstance().format(new Date(clek.getDatao())));
 		 				}		
+		 				addHeader("");
 		 				for (CotdInfo cotd : MainForm.tcl.getCotdInfoList(gosp.getId())) {
 		 					addLineIfBool("Признак вхождения заболевания в министерсую форму: да", cotd.isSetSign(), cotd.isSign());
 		 					addLineToDetailInfo("Профиль койки",getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_t00), cotd.isSetCprof(), cotd.getCprof()));
@@ -523,6 +561,7 @@ public class PatientInfoForm extends ModalForm {
 		);
 		
 		eptxt = new JEditorPane();
+		eptxt.setContentType("text/html");
 		eptxt.setFont(new Font("Arial", Font.PLAIN, 12));
 		sptxt.setViewportView(eptxt);
 		eptxt.setEditable(false);
@@ -657,7 +696,7 @@ public class PatientInfoForm extends ModalForm {
 		if (isSet)
 			if ((name != null) && (value != null))
 				if ((name.length() > 0) && (value.toString().length() > 0))
-					sb.append(String.format("%s: %s%s", name, value, lineSep));
+					sb.append(String.format("%s: %s%s<br>", name, value, lineSep));
 	}
 	
 	private void addLineToDetailInfo(String name, Object value) {
@@ -687,22 +726,28 @@ public class PatientInfoForm extends ModalForm {
 		return null;
 	}
 	
+	private void addBoldFont(String name) {
+		sb.append(String.format("<b>%s</b><br>", name) + lineSep);
+
+	}
+	
 	private void addHeader(String name) {
-		sb.append(name + lineSep);
+		sb.append(String.format("%s<br>", name) + lineSep);
+
 	}
 	
 	private void addLineIfInt(String txt,boolean isSet, int value) {
 		if (isSet)
 			if (value == 1)
 				if (txt.toString().length() > 0)
-					sb.append(txt + lineSep);
+					sb.append(String.format("%s<br>", txt));
 	}
 
 	private void addLineIfBool(String txt,boolean isSet, boolean value) {
 		if (isSet)
 			if (value == true)
 				if (txt.toString().length() > 0)
-					sb.append(txt + lineSep);
+					sb.append(String.format("%s<br>", txt));
 	}
 	
 	private void addLineToNaprCls(String txt, String value, boolean isSet, int valueCls) {
@@ -711,15 +756,15 @@ public class PatientInfoForm extends ModalForm {
 				if ((txt.length() > 0) && (value.toString().length() > 0))
 				{
 					if (value.equals("К"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_n00), isSet, valueCls), lineSep));
 					if (value.equals("Г"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_al0), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_al0), isSet, valueCls), lineSep));
 					if (value.equals("Л"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_m00), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_m00), isSet, valueCls), lineSep));
 					if (value.equals("Р"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_w04), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_w04), isSet, valueCls), lineSep));
 					if (value.equals("Т"))
-						sb.append(String.format("%s: %s%s", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), isSet, valueCls), lineSep));
+						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), isSet, valueCls), lineSep));
 				}
 	}
 	

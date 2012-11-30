@@ -123,8 +123,8 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv
-        Integer.class, Integer.class
+    //  ter_liv        region_liv	  birthplace	ogrn_smo
+        Integer.class, Integer.class, String.class, String.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
     //  id             npasp          kateg          datal
@@ -135,12 +135,10 @@ public class ServerRegPatient extends Server implements Iface {
     private static final Class<?>[] AGENT_TYPES = new Class<?>[] {
     //  npasp          fam           im            ot
         Integer.class, String.class, String.class, String.class,
-    //  datar       pol          name_str      ogrn_str
+    //  datar       pol             name_str      ogrn_str
         Date.class, Integer.class, String.class, String.class,
-    //  vpolis         spolis        npolis        tdoc
-        Integer.class, String.class, String.class, Integer.class,
-    //  docser        docnum        birthplace
-        String.class, String.class, String.class
+    //  vpolis         spolis        npolis		   birthplace
+        Integer.class, String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
     //  npasp          grup          ph            allerg
@@ -204,14 +202,14 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
-        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv"
+        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv", "birthplace", "ogrn_smo"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
     };
     private static final String[] AGENT_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "name_str", "ogrn_str",
-        "vpolis", "spolis" , "npolis", "tdoc", "docser", "docnum", "birthplace"
+        "vpolis", "spolis" , "npolis", "birthplace"
     };
     private static final String[] KONTINGENT_FIELD_NAMES = {
         "id", "npasp", "kateg", "datal", "name"
@@ -575,7 +573,7 @@ public class ServerRegPatient extends Server implements Iface {
             + "patient.datapr, patient.tdoc, patient.docser, patient.docnum, "
             + "patient.datadoc, patient.odoc, patient.snils, patient.dataz, "
             + "patient.prof, tel, patient.dsv, patient.prizn, patient.ter_liv, "
-            + "patient.region_liv "
+            + "patient.region_liv, patient.birthplace, patient.ogrn_smo "
             + "FROM patient "
             + "WHERE patient.npasp = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
@@ -805,10 +803,10 @@ public class ServerRegPatient extends Server implements Iface {
                     + "adm_gorod, adm_ul, adm_dom, adm_kv, mrab, name_mr, "
                     + "ncex, poms_strg, poms_tdoc, pdms_strg, pdms_ser, pdms_nom, "
                     + "cpol_pr, terp, tdoc, docser, docnum, datadoc, "
-                    + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv) "
+                    + "odoc, snils, dataz, prof, tel, dsv, prizn, ter_liv, region_liv, birthplace, ogrn_smo) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
                     + "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, "
-                    + "?, ?);", true,
+                    + "?, ?, ?, ?);", true,
                     patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                     avoidDefaultSqlDateValue(patinfo.getDatar()),
                     patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -827,7 +825,7 @@ public class ServerRegPatient extends Server implements Iface {
                     patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                     patinfo.getProf(), patinfo.getTel(),
                     avoidDefaultSqlDateValue(patinfo.getDsv()), patinfo.getPrizn(),
-                    patinfo.getTer_liv(), patinfo.getRegion_liv());
+                    patinfo.getTer_liv(), patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo());
                 int id = sme.getGeneratedKeys().getInt("npasp");
                 sme.setCommit();
                 return id;
@@ -894,26 +892,22 @@ public class ServerRegPatient extends Server implements Iface {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (!isAgentExist(agent)) {
                 final int[] indexes = {
-                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-                };
+                    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
                 sme.execPreparedT(
                         "INSERT INTO p_preds (npasp, fam, im, ot, "
                         + "datar, pol, name_str, ogrn_str, vpolis, "
-                        + "spolis, npolis, tdoc, docser, docnum, "
-                        + "birthplace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
-                        + "?, ?, ?, ?, ?, ?, ?);", false, agent,
-                        AGENT_TYPES, indexes);
+                        + "spolis, npolis, birthplace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, "
+                        + "?, ?, ?, ?);",
+                        false, agent, AGENT_TYPES, indexes);
                 sme.setCommit();
             } else {
                 final int[] indexes = {
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0
+                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0
                 };
                 sme.execPreparedT("UPDATE p_preds SET "
-                    + "fam = ?, im = ?, ot = ?, "
-                    + "datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
-                    + "vpolis = ?, spolis = ?, npolis = ?, tdoc = ?, docser = ?, "
-                    + "docnum  = ?, birthplace  = ? WHERE npasp = ?;", false,
-                    agent, AGENT_TYPES, indexes);
+                        + "fam = ?, im = ?, ot = ?, datar = ?, pol = ?, name_str = ?, ogrn_str = ?, "
+                        + "vpolis = ?, spolis = ?, npolis = ?, birthplace  = ? WHERE npasp = ?;", 
+                        false, agent, AGENT_TYPES, indexes);
                 sme.setCommit();
             }
         } catch (SQLException | InterruptedException e) {
@@ -1102,7 +1096,7 @@ public class ServerRegPatient extends Server implements Iface {
                 + "pdms_ser = ?, pdms_nom = ?, cpol_pr = ?, terp = ?, tdoc=?, "
                 + "docser = ?, docnum = ?, datadoc = ?, odoc = ?, snils = ?, "
                 + "dataz = ?, prof = ?, tel = ?, dsv = ?, prizn = ?, ter_liv = ?, "
-                + "region_liv = ? WHERE npasp = ?", false,
+                + "region_liv = ?, birthplace = ?, ogrn_smo = ? WHERE npasp = ?", false,
                 patinfo.getFam(), patinfo.getIm(), patinfo.getOt(),
                 avoidDefaultSqlDateValue(patinfo.getDatar()),
                 patinfo.getPolis_oms().getSer(), patinfo.getPolis_oms().getNom(),
@@ -1120,8 +1114,7 @@ public class ServerRegPatient extends Server implements Iface {
                 avoidDefaultSqlDateValue(patinfo.getDatadoc()), patinfo.getOdoc(),
                 patinfo.getSnils(), avoidDefaultSqlDateValue(patinfo.getDataz()),
                 patinfo.getProf(), patinfo.getTel(), avoidDefaultSqlDateValue(patinfo.getDsv()),
-                patinfo.getPrizn(), patinfo.getTer_liv(),
-                patinfo.getRegion_liv(), patinfo.getNpasp());
+                patinfo.getPrizn(), patinfo.getTer_liv(),patinfo.getRegion_liv(), patinfo.getBirthplace(), patinfo.getOgrn_smo(), patinfo.getNpasp());
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1423,9 +1416,9 @@ public class ServerRegPatient extends Server implements Iface {
     @Override
     public final List<StringClassifier> getSmorf(final int kodsmo)
             throws SmorfNotFoundException, KmiacServerException {
-        final String sqlQuery = "SELECT smocod, nam_smop FROM n_smorf WHERE pcod = ?";
+        final String sqlQuery = "SELECT smocod as pcod, nam_smop as name FROM n_smorf WHERE pcod = ?";
         final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmSmorf =
-                new TResultSetMapper<>(StringClassifier.class, "smocod", "nam_smop");
+                new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, kodsmo)) {
             return rsmSmorf.mapToList(acrs.getResultSet());
         } catch (SQLException e) {

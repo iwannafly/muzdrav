@@ -50,6 +50,7 @@
   	<copy file="${com_resources.dir}/firstAid.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/stages.png" todir="${bin_resources.dir}" />
   	<copy file="${com_resources.dir}/diary.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/childbirth.png" todir="${bin_resources.dir}" />
   </target>
 
   <!-- Создание jar файла -->

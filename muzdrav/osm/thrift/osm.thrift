@@ -82,13 +82,12 @@ struct PdiagAmb {
 	 9: optional i32 obstreg;
 	10: optional i32 cod_sp;
 	11: optional string cdol;
-	12: optional i64 datap;
-	13: optional i64 dataot;
-	14: optional i32 obstot;
-	15: optional i32 codsp_ot;
-	16: optional string cdol_ot;
-	17: optional i32 vid_tr;
-	18: optional i32 id_pos;
+	12: optional i64 dataot;
+	13: optional i32 obstot;
+	14: optional i32 codsp_ot;
+	15: optional string cdol_ot;
+	16: optional i32 vid_tr;
+	17: optional i32 id_pos;
 }
 
 struct Psign{
@@ -401,6 +400,7 @@ struct P_isl_ld {
 	13: optional i32 kodotd;
 	14: optional i64 datav;
 	15: optional i32 vopl;
+	16: optional i32 id_pos;
 }
 
 struct Prez_d {
@@ -479,6 +479,9 @@ struct IsslInfo{
 	7: optional i64 datav;
 	8: optional i64 datan;
 	9: optional i32 id;
+	10: optional string op_name;
+	11: optional string rez_name;
+	12: optional i32 gruppa;
 }
 
 
@@ -773,7 +776,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Shablon getShOsm(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShDopNames(1: i32 idRazd) throws (1: kmiacServer.KmiacServerException kse);
 	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
-
+	
 /*DispMer*/
 	list<Pmer> getPmer (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	Pmer getDispMer (1: i32 id_pmer) throws (1: kmiacServer.KmiacServerException kse);
@@ -789,5 +792,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*Stoim_p*/
 	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
+
 
 }
