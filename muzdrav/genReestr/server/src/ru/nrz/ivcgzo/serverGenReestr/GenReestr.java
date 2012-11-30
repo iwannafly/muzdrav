@@ -1,7 +1,6 @@
 package ru.nrz.ivcgzo.serverGenReestr;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +30,6 @@ import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
-import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException;
-import ru.nkz.ivcgzo.serverManager.common.DbfReader.DbfResultSet;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -131,7 +128,6 @@ public class GenReestr extends Server implements Iface {
 				"null::integer AS kod_otd, null::date AS d_end, null::integer AS pr_exp, null::integer AS etap, null::char(15) AS usl, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
 				" 2::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
 				"v.kod_ter::integer AS ter_mu, v.cpol::integer AS kod_mu, ?::date AS df_per, " +
 				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -146,8 +142,12 @@ public class GenReestr extends Server implements Iface {
 				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
+//				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
+//				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
 				"(select get_region(p.poms_strg))::integer AS region," +
 				"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 				"(select get_kov(p.npasp))::char(30) AS kob, " +
@@ -260,7 +260,6 @@ public class GenReestr extends Server implements Iface {
 				    
 					sqlpasp = "SELECT  v.id AS sl_id, 2::integer AS vid_rstr, " +
 							"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-							"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
 							"v.kod_ter::integer AS ter_mu, v.cpol::integer AS kod_mu, ?::date AS df_per, " +
 							"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -275,8 +274,11 @@ public class GenReestr extends Server implements Iface {
 							"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 							"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 							"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+		    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
+//							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
 							"(select get_region(p.poms_strg))::integer AS region," +
 							"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 							"(select get_kov(p.npasp))::char(30) AS kob, " +
@@ -892,7 +894,6 @@ public class GenReestr extends Server implements Iface {
 							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
 							" 2::integer AS vid_rstr, " +
 							"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-							"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
 							"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 							"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -907,8 +908,11 @@ public class GenReestr extends Server implements Iface {
 							"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 							"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 							"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+		    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
+//							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
 							"(select get_region(p.poms_strg))::integer AS region," +
 							"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 							"(select get_kov(p.npasp))::char(30) AS kob, " +
@@ -936,7 +940,6 @@ public class GenReestr extends Server implements Iface {
 							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
 							" 2::integer AS vid_rstr, " +
 							"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-							"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
 							"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 							"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -951,8 +954,11 @@ public class GenReestr extends Server implements Iface {
 							"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 							"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 							"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+		    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
+//							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
 							"(select get_region(p.poms_strg))::integer AS region," +
 							"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 							"(select get_kov(p.npasp))::char(30) AS kob, " +
@@ -1076,7 +1082,6 @@ public class GenReestr extends Server implements Iface {
 				    
 					sqlpasp = "SELECT d.id::integer AS sl_id, 2::integer AS vid_rstr, " +
 							"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-							"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
 							"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 							"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -1091,8 +1096,11 @@ public class GenReestr extends Server implements Iface {
 							"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
 							"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
 							"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+		    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+		    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
+//							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
 							"(select get_region(p.poms_strg))::integer AS region," +
 							"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
 							"(select get_kov(p.npasp))::char(30) AS kob, " +
@@ -1150,7 +1158,7 @@ public class GenReestr extends Server implements Iface {
 				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt, "+
 				" 1::integer AS vid_rstr, " +
 				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
+				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
 				"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -1170,8 +1178,8 @@ public class GenReestr extends Server implements Iface {
 				"(select get_kov(p.npasp))::char(30) AS kob, null::char(10) AS ist_bol, null::integer AS vid_hosp, "+
 				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
 				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
 				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
         	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
@@ -1189,7 +1197,7 @@ public class GenReestr extends Server implements Iface {
     				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt, "+
     				" 1::integer AS vid_rstr, " +
     				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-    				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
+    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
     				"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
     				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
     				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -1209,8 +1217,10 @@ public class GenReestr extends Server implements Iface {
     				"(select get_kov(p.npasp))::char(30) AS kob, o.nist::char(10) AS ist_bol, g.pl_extr::integer AS vid_hosp, "+
     				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
     				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-    				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
+    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+//    				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
     				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
@@ -1332,7 +1342,7 @@ public class GenReestr extends Server implements Iface {
 				    
 				sqlpasp ="SELECT g.id::integer AS sl_id, 1::integer AS vid_rstr, " +
 						"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-						"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
+						"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
 						"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 						"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 						"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -1352,8 +1362,11 @@ public class GenReestr extends Server implements Iface {
 						"(select get_kov(p.npasp))::char(30) AS kob, null::char(10) AS ist_bol, null::integer AS vid_hosp, "+
 						"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
 						"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-						"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-						"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
+//						"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
+//						"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, "+
+						"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+						"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+						"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
 	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) ";
 //	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
@@ -1362,7 +1375,7 @@ public class GenReestr extends Server implements Iface {
 	        	sqlpasp += " UNION ";
 	            sqlpasp = "SELECT g.id::integer AS sl_id, 1::integer AS vid_rstr, " +
 	    				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-	    				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
+	    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
 	    				"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
 	    				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
 	    				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
@@ -1382,8 +1395,9 @@ public class GenReestr extends Server implements Iface {
 	    				"(select get_kov(p.npasp))::char(30) AS kob, o.nist::char(10) AS ist_bol, g.pl_extr::integer AS vid_hosp, "+
 	    				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
 	    				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-	    				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-	    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
+	    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
+	    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
+	    				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
 
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp)";
 //            			"LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+

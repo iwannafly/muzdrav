@@ -237,6 +237,7 @@ public class PacientInfoFrame extends JFrame {
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_obst;
 //    private PatientBrief newPatBr;
     private AllGosp newPriem;
+	private AnamnezForm azfrm;
 
 //    public void refresh(List<PatientBrief> pat) {
 //        tbl_patient.requestFocus();
@@ -568,7 +569,7 @@ public class PacientInfoFrame extends JFrame {
 //                    newPatBr = tbl_patient.addExternalItem();
                     curPatientId = 0;
                     NewPatient();
-                    NewAgent();
+//                    NewAgent();
                     tfFam.requestFocus();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -3280,26 +3281,36 @@ public class PacientInfoFrame extends JFrame {
               }
             }
         });
+        
+        JButton btnNewButton = new JButton("Анамнез жизни");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		azfrm.showAnamnezForm();
+        	}
+        });
         GroupLayout gl_panel_24 = new GroupLayout(panel_24);
         gl_panel_24.setHorizontalGroup(
-            gl_panel_24.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_24.createSequentialGroup()
-                    .addGap(40)
-                    .addComponent(btnNew_priem)
-                    .addGap(239)
-                    .addComponent(btnSave_priem)
-                    .addGap(88)
-                    .addComponent(btnDel_priem, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        	gl_panel_24.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_panel_24.createSequentialGroup()
+        			.addGap(40)
+        			.addComponent(btnNew_priem)
+        			.addGap(61)
+        			.addComponent(btnSave_priem)
+        			.addGap(152)
+        			.addComponent(btnDel_priem, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.RELATED, 191, Short.MAX_VALUE)
+        			.addComponent(btnNewButton)
+        			.addContainerGap())
         );
         gl_panel_24.setVerticalGroup(
-            gl_panel_24.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_24.createSequentialGroup()
-                    .addGroup(gl_panel_24.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(btnSave_priem)
-                        .addComponent(btnDel_priem)
-                        .addComponent(btnNew_priem))
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        	gl_panel_24.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_panel_24.createSequentialGroup()
+        			.addGroup(gl_panel_24.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(btnNew_priem)
+        				.addComponent(btnSave_priem)
+        				.addComponent(btnDel_priem)
+        				.addComponent(btnNewButton))
+        			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panel_24.setLayout(gl_panel_24);
 
@@ -3504,6 +3515,9 @@ public class PacientInfoFrame extends JFrame {
 //            cmb_ogrn.setData(null);
             tbl_lgota.setIntegerClassifierSelector(1, MainForm.tcl.getLKN());
             tbl_kateg.setIntegerClassifierSelector(1, MainForm.tcl.getLKR());
+    		azfrm = new AnamnezForm();
+    		MainForm.instance.addChildFrame(azfrm);
+
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
