@@ -120,4 +120,5 @@ service ThriftLab extends kmiacServer.KmiacServer {
 	list<Isl> getIslList(1: i32 gospId) throws (1: kmiacServer.KmiacServerException kse);
 	string printIssl(1: i32 patId, 2: string cabinet, 3: string labName, 4: string lpuNaprName, 5: string vrachName,
 		6: list<string> issledItems) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getParaotdLpu() throws (1: kmiacServer.KmiacServerException kse);
 }

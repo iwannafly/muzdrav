@@ -30,7 +30,6 @@ public class ReservedTalonsFrame extends JFrame {
     private Box hbBackwardButton;
     private Component hgRight;
     private JButton btnBackward;
-    private OptionsDialog optDialog;
     private Component hgLeft;
     private JScrollPane spTalon;
     private JTable tbTalons;
@@ -47,15 +46,10 @@ public class ReservedTalonsFrame extends JFrame {
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
-        createModalFrames();
         addMainPanel();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
-    }
-
-    private void createModalFrames() {
-        optDialog = new OptionsDialog();
     }
 
     private void addMainPanel() {
@@ -117,7 +111,7 @@ public class ReservedTalonsFrame extends JFrame {
         tbTalons.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                int dialogResult = optDialog.showConfirmDialog(ReservedTalonsFrame.this,
+                int dialogResult = new OptionsDialog().showConfirmDialog(ReservedTalonsFrame.this,
                     "Отменить запись?");
                 if (dialogResult == OptionsDialog.ACCEPT) {
                     JTable curTable = (JTable) e.getSource();
