@@ -293,6 +293,7 @@ public class Vvod extends JFrame {
 		setBounds(100, 100, 1024, 755);
 		
 		btnAnam = new JButton("Анамнез жизни");
+		btnAnam.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnAnam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				sign.showPsign();
@@ -302,11 +303,13 @@ public class Vvod extends JFrame {
 		JPanel panel = new JPanel();
 		
 		JPanel pnlTalon = new JPanel();
+		pnlTalon.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		pnlTalon.setBorder(new TitledBorder(null, "Талон пациента", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		JPanel panel_2 = new JPanel();
 		
 		btnProsm = new JButton("Просмотр");
+		btnProsm.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnProsm.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -318,12 +321,14 @@ public class Vvod extends JFrame {
 		});
 		
 		btnBer = new JButton("Наблюдение за беременными");
+		btnBer.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnBer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		       		postber.setVisible(true);	
 			}
 	});
 		btnPrint = new JButton("Печатные формы");
+		btnPrint.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 	            JPopupMenu menu = new JPopupMenu();
@@ -425,6 +430,7 @@ public class Vvod extends JFrame {
 		});
 		
 		btnRecPriem = new JButton("Запись на прием");
+		btnRecPriem.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnRecPriem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                 try {
@@ -438,6 +444,7 @@ public class Vvod extends JFrame {
 		});
 		
 		btnSearch = new JButton("Поиск");
+		btnSearch.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnSearch.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -560,6 +567,7 @@ public class Vvod extends JFrame {
 		tabbedPane.setTabComponentAt(0, new JLabel("<html>Осмотр<br><br></html>"));
 		
 		JScrollPane spOsm = new JScrollPane();
+		spOsm.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		GroupLayout gl_pnlOsm = new GroupLayout(pnlOsm);
 		gl_pnlOsm.setHorizontalGroup(
 			gl_pnlOsm.createParallelGroup(Alignment.LEADING)
@@ -605,13 +613,13 @@ public class Vvod extends JFrame {
 		GroupLayout gl_pnlJal = new GroupLayout(pnlJal);
 		gl_pnlJal.setHorizontalGroup(
 			gl_pnlJal.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 578, Short.MAX_VALUE)
-				.addComponent(spJal, GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
+				.addGap(0, 300, Short.MAX_VALUE)
+				.addComponent(spJal, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
 		);
 		gl_pnlJal.setVerticalGroup(
 			gl_pnlJal.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 51, Short.MAX_VALUE)
-				.addComponent(spJal, GroupLayout.DEFAULT_SIZE, 27, Short.MAX_VALUE)
+				.addGap(0, 45, Short.MAX_VALUE)
+				.addComponent(spJal, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
 		);
 		
 		tbJal = new JTextArea();
@@ -652,26 +660,31 @@ public class Vvod extends JFrame {
 		JLabel lblStatTemp = new JLabel("Темп.");
 		
 		tbStatTemp = new CustomTextField();
+		tbStatTemp.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatTemp.setColumns(10);
 		
 		JLabel lblStatAd = new JLabel("АД");
 		
 		tbStatAd = new CustomTextField();
+		tbStatAd.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatAd.setColumns(10);
 		
 		JLabel lblStatRost = new JLabel("Рост");
 		
 		tbStatRost = new CustomTextField();
+		tbStatRost.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatRost.setColumns(10);
 		
 		JLabel lblStatVes = new JLabel("Вес");
 		
 		tbStatVes = new CustomTextField();
+		tbStatVes.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatVes.setColumns(10);
 		
 		JLabel lblStatChss = new JLabel("Чсс");
 		
 		tbStatChss = new CustomTextField();
+		tbStatChss.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatChss.setColumns(10);
 		GroupLayout gl_pnlStat = new GroupLayout(pnlStat);
 		gl_pnlStat.setHorizontalGroup(
@@ -836,40 +849,38 @@ public class Vvod extends JFrame {
 		GroupLayout gl_pnlOsmOsm = new GroupLayout(pnlOsmOsm);
 		gl_pnlOsmOsm.setHorizontalGroup(
 			gl_pnlOsmOsm.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 578, Short.MAX_VALUE)
-				.addGroup(gl_pnlOsmOsm.createSequentialGroup()
+				.addGroup(Alignment.TRAILING, gl_pnlOsmOsm.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlOsmOsm.createParallelGroup(Alignment.LEADING)
-						.addComponent(pnlRecom, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlJal, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlAnam, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlStat, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlFiz, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlLoc, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlLech, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-						.addComponent(pnlOcen, GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE))
+					.addGroup(gl_pnlOsmOsm.createParallelGroup(Alignment.TRAILING)
+						.addComponent(pnlJal, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+						.addComponent(pnlRecom, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+						.addComponent(pnlAnam, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+						.addComponent(pnlStat, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(pnlFiz, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+						.addComponent(pnlLoc, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+						.addComponent(pnlLech, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE)
+						.addComponent(pnlOcen, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 604, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_pnlOsmOsm.setVerticalGroup(
 			gl_pnlOsmOsm.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 667, Short.MAX_VALUE)
 				.addGroup(gl_pnlOsmOsm.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(pnlJal, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlJal, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlAnam, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlAnam, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlStat, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlStat, GroupLayout.PREFERRED_SIZE, 155, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlFiz, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlFiz, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlLoc, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlLoc, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlLech, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlLech, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlOcen, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlOcen, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlRecom, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlRecom, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		pnlOsmOsm.setLayout(gl_pnlOsmOsm);
@@ -1641,7 +1652,7 @@ public class Vvod extends JFrame {
 		pnlDiagStat.setLayout(gl_pnlDiagStat);
 		
 		tbDiagOpis = new JTextArea();
-		tbDiagOpis.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tbDiagOpis.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		spDiagOpis.setViewportView(tbDiagOpis);
 		pnlDiag.setLayout(gl_pnlDiag);
 		
@@ -1667,6 +1678,7 @@ public class Vvod extends JFrame {
 		);
 		
 		JPanel pnlIssl = new JPanel();
+		pnlIssl.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tabbedPane_1.addTab("Направление на исследование", null, pnlIssl, null);
 		
 		cmbNaprMesto = new ThriftIntegerClassifierCombobox<>(true);
@@ -2037,7 +2049,7 @@ public class Vvod extends JFrame {
 		tbKonsObosnov.setBorder(UIManager.getBorder("ScrollPane.border"));
 		tbKonsObosnov.setWrapStyleWord(true);
 		tbKonsObosnov.setLineWrap(true);
-		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JButton btnKonsPrint = new JButton("Печать");
 		btnKonsPrint.addActionListener(new ActionListener() {
@@ -2192,17 +2204,17 @@ public class Vvod extends JFrame {
 		GroupLayout gl_pnlZakl = new GroupLayout(pnlZakl);
 		gl_pnlZakl.setHorizontalGroup(
 			gl_pnlZakl.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_pnlZakl.createSequentialGroup()
+				.addGroup(Alignment.LEADING, gl_pnlZakl.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlZakl.createParallelGroup(Alignment.TRAILING)
-						.addComponent(spZaklRek, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-						.addComponent(spZakl, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-						.addComponent(lblZakl, GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-						.addComponent(lblZaklRek, GroupLayout.DEFAULT_SIZE, 339, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_pnlZakl.createSequentialGroup()
+					.addGroup(gl_pnlZakl.createParallelGroup(Alignment.LEADING)
+						.addComponent(spZaklRek, Alignment.LEADING)
+						.addComponent(spZakl, Alignment.LEADING)
+						.addComponent(lblZakl, GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)
+						.addComponent(lblZaklRek, GroupLayout.DEFAULT_SIZE, 623, Short.MAX_VALUE)
+						.addGroup(gl_pnlZakl.createSequentialGroup()
 							.addComponent(lblZaklIsh, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(cmbZaklIsh, 0, 259, Short.MAX_VALUE)))
+							.addComponent(cmbZaklIsh, 0, 551, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		gl_pnlZakl.setVerticalGroup(
@@ -2215,22 +2227,22 @@ public class Vvod extends JFrame {
 					.addGap(18)
 					.addComponent(lblZakl)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spZakl, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
+					.addComponent(spZakl, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblZaklRek, GroupLayout.PREFERRED_SIZE, 16, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spZaklRek, GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(spZaklRek, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(154, Short.MAX_VALUE))
 		);
 		
 		tbZaklRek = new JTextArea();
-		tbZaklRek.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tbZaklRek.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbZaklRek.setLineWrap(true);
 		tbZaklRek.setWrapStyleWord(true);
 		spZaklRek.setViewportView(tbZaklRek);
 		
 		tbZakl = new JTextArea();
-		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbZakl.setWrapStyleWord(true);
 		tbZakl.setLineWrap(true);
 		spZakl.setViewportView(tbZakl);
@@ -2267,18 +2279,24 @@ public class Vvod extends JFrame {
 		panel_2.setLayout(gl_panel_2);
 		
 		cmbVidOpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_opl);
+		cmbVidOpl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblVidOpl = new JLabel("Вид оплаты");
+		lblVidOpl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		cmbCelObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);
+		cmbCelObr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblCelObr = new JLabel("Цель посещения");
+		lblCelObr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblRez = new JLabel("Результат");
+		lblRez.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		cmbRez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq0);
 		
 		JLabel lblMobs = new JLabel("Место обслуж.");
+		lblMobs.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		cmbMobs = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abs);
 		GroupLayout gl_pnlTalon = new GroupLayout(pnlTalon);
@@ -2322,6 +2340,7 @@ public class Vvod extends JFrame {
 		pnlTalon.setLayout(gl_pnlTalon);
 		
 		JScrollPane spPos = new JScrollPane();
+		spPos.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		 btnPosAdd = new JButton("");
 		 btnPosAdd.setToolTipText("Добавление посещения");
@@ -2432,6 +2451,7 @@ public class Vvod extends JFrame {
 		btnPosSave.setIcon(new ImageIcon(Vvod.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1341981970_Accept.png")));
 		
 		JScrollPane spObr = new JScrollPane();
+		spObr.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		btnObrAdd = new JButton("");
 		btnObrAdd.addActionListener(new ActionListener() {
@@ -2531,6 +2551,7 @@ public class Vvod extends JFrame {
 		);
 		
 		tblObr = new CustomTable<>(true, false, Pvizit.class, 3, "Дата обращения", 17, "Закрыт");
+		tblObr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		tblObr.setDateField(0);
 		tblObr.setEditableFields(false, 1);
 		tblObr.setFillsViewportHeight(true);

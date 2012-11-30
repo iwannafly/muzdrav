@@ -1390,14 +1390,37 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 				
 				
 					if (!nuch.equals(nuchn)){
-						mas[3]=(mas[2]/mas[1]*100);
-						mas[6]=(mas[5]/mas[4]*100);
-						mas[9]=(mas[8]/mas[7]*100);
-						mas[12]=(mas[11]/mas[10]*100);
-						mas[15]=(mas[14]/mas[13]*100);
-						mas[18]=(mas[17]/mas[16]*100);
-						mas[21]=(mas[20]/mas[19]*100);
-						mas[24]=(mas[23]/mas[22]*100);
+						if(mas[1] != 0){
+							mas[3]=(mas[2]/mas[1]*100);
+						}else{mas[3]=0;}
+						
+						if(mas[4] != 0){
+							mas[6]=(mas[5]/mas[4]*100);
+						}else{mas[6]=0;}
+						
+						if(mas[7] != 0){
+							mas[9]=(mas[8]/mas[7]*100);
+						}else{mas[9]=0;}
+						
+						if(mas[10] != 0){
+							mas[12]=(mas[11]/mas[10]*100);
+						}else{mas[12]=0;}
+						
+						if(mas[13] != 0){
+							mas[15]=(mas[14]/mas[13]*100);
+						}else{mas[15]=0;}
+						
+						if(mas[16] != 0){
+							mas[18]=(mas[17]/mas[16]*100);
+						}else{mas[18]=0;}
+						
+						if(mas[19] != 0){
+							mas[21]=(mas[20]/mas[19]*100);
+						}else{mas[21]=0;}
+						
+						if(mas[22] != 0){
+							mas[24]=(mas[23]/mas[22]*100);
+						}else{mas[24]=0;}
 						
 						
 						/*Наполнение таблицы*/
@@ -2212,12 +2235,12 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 		}		
 		
 		
-		final String sqlQuerySvedDisp ="select nd.name_s, count(pm.pmer), pm.pmer, pm.pdat, pm.fdat"+
+		final String sqlQuerySvedDisp ="select nd.name_s, count(pm.pmer) as kol, pm.pmer, pm.pdat, pm.fdat"+
 				 "from p_mer pm join n_ot100 ot on(pm.cdol =ot.pcod)"+
 				 "		join n_d0s nd on (nd.pcod = ot.pcod1)"+
 				 "where ((pm.pdat between '"+ dn +"' and '"+ dk+"') or"+
 				 "		(pm.fdat between '"+ dn +"' and '"+ dk+"')) and"+
-				 "		(pm.cpol="+ String.valueOf(kodpol)+") and"+
+				 "		(pm.cpol="+ String.valueOf(kodpol)+")"+
 				 "group by nd.name_s, pm.pmer, pm.pdat, pm.fdat"+
 				 "order by nd.name_s, pm.pmer, pm.pdat, pm.fdat";		
 		
@@ -2274,35 +2297,35 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 							//Обследование
 							if ((spat.getResultSet().getInt("pmer") == 1)||((spat.getResultSet().getInt("pmer") >= 18)&&(spat.getResultSet().getInt("pmer") <= 24))){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][2]= mas[i][2]+1;
-									mas[mas.length-1][2]= mas[mas.length-1][2]+1;
+									mas[i][2]= mas[i][2]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][2]= mas[mas.length-1][2]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][3]= mas[i][3]+1;
-									mas[mas.length-1][3]= mas[mas.length-1][3]+1;	
+									mas[i][3]= mas[i][3]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][3]= mas[mas.length-1][3]+spat.getResultSet().getInt("kol");	
 									}
 							}
 							//Явки
 							if (spat.getResultSet().getInt("pmer")==2){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][5]= mas[i][5]+1;
-									mas[mas.length-1][5]= mas[mas.length-1][5]+1;
+									mas[i][5]= mas[i][5]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][5]= mas[mas.length-1][5]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][6]= mas[i][6]+1;
-									mas[mas.length-1][6]= mas[mas.length-1][6]+1;
+									mas[i][6]= mas[i][6]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][6]= mas[mas.length-1][6]+spat.getResultSet().getInt("kol");
 								}
 											
 							}
 							//Госпитализация
 							if ((spat.getResultSet().getInt("pmer")==3)||(spat.getResultSet().getInt("pmer")==12)){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][8]= mas[i][8]+1;
-									mas[mas.length-1][8]= mas[mas.length-1][8]+1;
+									mas[i][8]= mas[i][8]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][8]= mas[mas.length-1][8]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][9]= mas[i][9]+1;
-									mas[mas.length-1][9]= mas[mas.length-1][9]+1;
+									mas[i][9]= mas[i][9]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][9]= mas[mas.length-1][9]+spat.getResultSet().getInt("kol");
 								}
 											
 							}	
@@ -2311,36 +2334,36 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 									||(spat.getResultSet().getInt("pmer")==13)||(spat.getResultSet().getInt("pmer")==25)||(spat.getResultSet().getInt("pmer")==27)
 									||(spat.getResultSet().getInt("pmer")==29)){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][11]= mas[i][11]+1;
-									mas[mas.length-1][11]= mas[mas.length-1][11]+1;
+									mas[i][11]= mas[i][11]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][11]= mas[mas.length-1][11]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][12]= mas[i][12]+1;
-									mas[mas.length-1][12]= mas[mas.length-1][12]+1;
+									mas[i][12]= mas[i][12]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][12]= mas[mas.length-1][12]+spat.getResultSet().getInt("kol");
 								}
 											
 							}		
 							//СКЛ
 							if ((spat.getResultSet().getInt("pmer")==5)||(spat.getResultSet().getInt("pmer")==16)){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][14]= mas[i][14]+1;
-									mas[mas.length-1][14]= mas[mas.length-1][14]+1;
+									mas[i][14]= mas[i][14]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][14]= mas[mas.length-1][14]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][15]= mas[i][15]+1;
-									mas[mas.length-1][15]= mas[mas.length-1][15]+1;
+									mas[i][15]= mas[i][15]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][15]= mas[mas.length-1][15]+spat.getResultSet().getInt("kol");
 								}
 											
 							}	
 							//Консультация
 							if ((spat.getResultSet().getInt("pmer")==7)||(spat.getResultSet().getInt("pmer")==28)){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][17]= mas[i][17]+1;
-									mas[mas.length-1][17]= mas[mas.length-1][17]+1;
+									mas[i][17]= mas[i][17]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][17]= mas[mas.length-1][17]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][18]= mas[i][18]+1;
-									mas[mas.length-1][18]= mas[mas.length-1][18]+1;
+									mas[i][18]= mas[i][18]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][18]= mas[mas.length-1][18]+spat.getResultSet().getInt("kol");
 								}
 							
 							}
@@ -2348,12 +2371,12 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 							//Санации
 							if ((spat.getResultSet().getInt("pmer")==9)||(spat.getResultSet().getInt("pmer")==14)||(spat.getResultSet().getInt("pmer")==15)){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][20]= mas[i][20]+1;
-									mas[mas.length-1][20]= mas[mas.length-1][20]+1;
+									mas[i][20]= mas[i][20]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][20]= mas[mas.length-1][20]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][21]= mas[i][21]+1;
-									mas[mas.length-1][21]= mas[mas.length-1][21]+1;
+									mas[i][21]= mas[i][21]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][21]= mas[mas.length-1][21]+spat.getResultSet().getInt("kol");
 								}
 											
 							}
@@ -2361,12 +2384,12 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 							//Проф. мероп.
 							if ((spat.getResultSet().getInt("pmer")==8)||(spat.getResultSet().getInt("pmer")==17)||(spat.getResultSet().getInt("pmer")==26)){
 								if ((spat.getResultSet().getDate("pdat").after(dn))&&(spat.getResultSet().getDate("pdat").before(dk))){
-									mas[i][23]= mas[i][23]+1;
-									mas[mas.length-1][23]= mas[mas.length-1][5]+1;
+									mas[i][23]= mas[i][23]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][23]= mas[mas.length-1][5]+spat.getResultSet().getInt("kol");
 								}
 								if (( spat.getResultSet().getDate("fdat").after(dn))&&(spat.getResultSet().getDate("fdat").before(dk))){
-									mas[i][24]= mas[i][24]+1;
-									mas[mas.length-1][24]= mas[mas.length-1][24]+1;
+									mas[i][24]= mas[i][24]+spat.getResultSet().getInt("kol");
+									mas[mas.length-1][24]= mas[mas.length-1][24]+spat.getResultSet().getInt("kol");
 								}
 											
 							}
@@ -2401,7 +2424,7 @@ public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
 		}
 		
 		
-		
+// Формирование таблицы		
 		
 		
 		

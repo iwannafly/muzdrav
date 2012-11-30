@@ -73,6 +73,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.ScrollPaneConstants;
 
 public class PIslForm {
 	
@@ -293,9 +294,13 @@ public class PIslForm {
 		panel.setLayout(gl_panel);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		splitPane.setLeftComponent(scrollPane);
 		
-		tpatient = new CustomTable<>(false, true, Patient.class, 0, "Код", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения");
+		tpatient = new CustomTable<>(false, true, Patient.class, 0, "Код", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения", 7, "Город проп.", 8, "Ул. проп.", 9, "Дом проп.", 10, "Кв. проп.", 11, "Город прож.", 12, "Ул. прож.", 13, "Дом прож.", 14, "Кв. прож.");
+		tpatient.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
+		tpatient.setDateField(4);
 		
 		tpatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
@@ -744,7 +749,11 @@ public class PIslForm {
 				}
 				
 				if ((tn_ldi.getSelectedItem().vrach != 0)&&(cBVrach.getSize()!= null) ){
-					cBVrach.setSelectedPcod(tn_ldi.getSelectedItem().vrach);
+					try{
+						cBVrach.setSelectedPcod(tn_ldi.getSelectedItem().vrach);
+					}catch(Exception e){
+						cBVrach.setSelectedItem(null);
+					}
 				} else{
 					cBVrach.setSelectedItem(null);
 				}
@@ -1616,7 +1625,7 @@ public class PIslForm {
 						uplab.setPcod_m(tlab_isl.getData().get(i).pcod_m);
 						uplab.setStoim(tlab_isl.getData().get(i).stoim);
 					
-						System.out.print(uplab);
+						//System.out.print(uplab);
 						try {
 							MainForm.ltc.UpdLIsl(uplab);
 						} catch (LIslExistsException e) {
@@ -1630,14 +1639,14 @@ public class PIslForm {
 						
 					}*/
 					}else{
-						
-						try {
-							MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok);
-						} catch (TException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if ((String.valueOf(tn_ldi.getSelectedItem().id_gosp)==null)&&(String.valueOf(tn_ldi.getSelectedItem().id_pos)==null)){
+							try {
+								MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok);
+							} catch (TException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
-						
 					}
 				}
 
@@ -1923,8 +1932,13 @@ public class PIslForm {
                 try {
                     if ((cBpcisl.getSelectedItem() != null) && (tlab_isl.getSelectedItem() !=null)){
                         cBLpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), tlab_isl.getSelectedItem().cpok));
-                        if (tlab_isl.getSelectedItem().pcod_m != null){
-                        	cBLpcod_m.setSelectedPcod(tlab_isl.getSelectedItem().pcod_m);
+                        if ((tlab_isl.getSelectedItem().pcod_m != null)&&( tlab_isl.getSelectedItem().pcod_m.trim() !="")){
+                        	try{
+                        		cBLpcod_m.setSelectedPcod(tlab_isl.getSelectedItem().pcod_m);
+                        	}catch (Exception e){
+                        		cBLpcod_m.setSelectedItem(0);
+                        	}
+                        	
                         }else{
                         	cBLpcod_m.setSelectedItem(0);
                         }
@@ -1995,8 +2009,9 @@ public class PIslForm {
 	public void filtPat() {
 		try {
 			//tpatient.setData(MainForm.ltc.getPatDat(new SimpleDateFormat("dd.MM.yyyy").parse("14.08.2012").getTime(), 2000004));
-			
-				tpatient.setData(MainForm.ltc.getPatDat(System.currentTimeMillis(), MainForm.authInfo.cpodr));
+				
+				System.out.println(System.currentTimeMillis());
+				tpatient.setData(MainForm.ltc.getPatDat(MainForm.authInfo.cpodr));
 			
 			//tn_ldi.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
 			if (tpatient.getSelectedItem()!= null){
