@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.serverPbol;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.thrift.TException;
@@ -9,11 +10,15 @@ import org.apache.thrift.server.TThreadedSelectorServer;
 import org.apache.thrift.transport.TNonblockingServerSocket;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
+
 import org.apache.thrift.server.TThreadedSelectorServer.Args;
 import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftPbol.Pbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol.Iface;
@@ -61,9 +66,59 @@ public class ServerPbol extends Server implements Iface {
 	}
 
 	@Override
-	public List<Pbol> getPbol(int npasp) throws TException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Pbol> getPbol(int npasp) throws KmiacServerException,TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from p_bol where npasp = ? ", npasp)) 
+		{
+			return rsmPbol.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+	}
+	}
+
+	@Override
+	public int AddPbol(Pbol pbol) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("insert into p_bol (id_obr, npasp, cod_sp, cdol, pcod, dataz) values (?, ?, ?, ?, ?, ?) ", true, pbol, pbolTypes, 1, 3, 10, 11, 12, 13);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public void UpdatePbol(Pbol pbol) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("update p_bol set bol_l = ?, s_bl = ?, po_bl = ?, pol = ?, vozr = ?, nombl = ? where id = ? ", false, pbol, pbolTypes, 4, 5, 6, 7, 8, 9);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
+
+	@Override
+	public void DeletePbol(int id) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("delete from p_bol where id = ? ", false, id);
+			sme.setCommit();
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+			throw new KmiacServerException();
+		}
+		
 	}
 
 }

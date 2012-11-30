@@ -563,7 +563,7 @@ public class Vvod extends JFrame {
 		GroupLayout gl_pnlOsm = new GroupLayout(pnlOsm);
 		gl_pnlOsm.setHorizontalGroup(
 			gl_pnlOsm.createParallelGroup(Alignment.LEADING)
-				.addComponent(spOsm, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+				.addComponent(spOsm, GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
 		);
 		gl_pnlOsm.setVerticalGroup(
 			gl_pnlOsm.createParallelGroup(Alignment.LEADING)
@@ -1916,6 +1916,12 @@ public class Vvod extends JFrame {
 						addLineToDetailInfo("id: ", iinfo.isSetId(), iinfo.getId());
 						addLineToDetailInfo("Наименование",iinfo.isSetPokaz_name(), iinfo.getPokaz_name());
 						addLineToDetailInfo("Результат",iinfo.isSetRez(), iinfo.getRez());
+						if (iinfo.getGruppa()==2)
+	 					{
+	 						addLineToDetailInfo("Описание исследования",iinfo.isSetOp_name(),iinfo.getOp_name());
+		 					addLineToDetailInfo("Заключение",iinfo.isSetRez_name(),iinfo.getRez_name());
+
+	 					}
 						epTxtRezIssl.setText(sb.toString());
 					
 		 		}
@@ -2237,15 +2243,17 @@ public class Vvod extends JFrame {
 					.addGap(6)
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_2.createSequentialGroup()
-							.addComponent(tbShabSrc, GroupLayout.PREFERRED_SIZE, 442, GroupLayout.PREFERRED_SIZE)
+							.addComponent(tbShabSrc, GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
 							.addGap(6)
 							.addComponent(btnShabSrc, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
-						.addComponent(lblLastShab, GroupLayout.PREFERRED_SIZE, 491, GroupLayout.PREFERRED_SIZE)
-						.addComponent(spShabSrc, GroupLayout.PREFERRED_SIZE, 491, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(lblLastShab, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
+						.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)))
 		);
 		gl_panel_2.setVerticalGroup(
 			gl_panel_2.createParallelGroup(Alignment.LEADING)
-				.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addGroup(gl_panel_2.createSequentialGroup()
+					.addComponent(tabbedPane)
+					.addGap(11))
 				.addGroup(gl_panel_2.createSequentialGroup()
 					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
 						.addComponent(tbShabSrc, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -2253,7 +2261,8 @@ public class Vvod extends JFrame {
 					.addGap(6)
 					.addComponent(lblLastShab)
 					.addGap(6)
-					.addComponent(spShabSrc, GroupLayout.PREFERRED_SIZE, 628, GroupLayout.PREFERRED_SIZE))
+					.addComponent(spShabSrc, GroupLayout.DEFAULT_SIZE, 628, Short.MAX_VALUE)
+					.addGap(11))
 		);
 		panel_2.setLayout(gl_panel_2);
 		
