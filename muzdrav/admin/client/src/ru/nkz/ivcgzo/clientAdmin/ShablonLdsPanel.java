@@ -58,7 +58,6 @@ public class ShablonLdsPanel extends JPanel {
 	private JButton btSave;
 	private ShablonLds shLds;
 	private boolean fillingUI;
-	private Font defFont;
 	private String prevIssl, prevIsslName;
 	
 	public ShablonLdsPanel() {
@@ -99,7 +98,6 @@ public class ShablonLdsPanel extends JPanel {
 		
 		tbSearch = new CustomTextField(true, true, false);
 		tbSearch.setVisible(false);
-		defFont = tbSearch.getFont();
 		tbSearch.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -253,13 +251,13 @@ public class ShablonLdsPanel extends JPanel {
 		
 		tbZakl = new JTextArea();
 		tbZakl.getDocument().addDocumentListener(textListener);
-		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		tbZakl.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		new CustomTextComponentWrapper(tbZakl).setPopupMenu();
 		spZakl.setViewportView(tbZakl);
 		
 		tbOpis = new JTextArea();
 		tbOpis.getDocument().addDocumentListener(textListener);
-		tbOpis.setFont(defFont);
+		tbOpis.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		new CustomTextComponentWrapper(tbOpis).setPopupMenu();
 		spOpis.setViewportView(tbOpis);
 		gbText.setLayout(gl_gbText);
@@ -324,7 +322,7 @@ public class ShablonLdsPanel extends JPanel {
 		}
 		enb &= !tbName.isEmpty();
 		enb &= !(tbOpis.getText().length() == 0);
-		enb &= !(tbZakl.getText().length() == 0);
+//		enb &= !(tbZakl.getText().length() == 0);
 		enb &= trSearch.getSelectionPath() != null;
 		if (enb)
 			enb &= ((DefaultMutableTreeNode) trSearch.getSelectionPath().getLastPathComponent()).getLevel() == 3;
