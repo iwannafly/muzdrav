@@ -144,7 +144,7 @@ public class LDSserver extends Server implements Iface {
 	public void UpdIsl(ObInfIsl info) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1 );
+				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ?, cuser = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 1 );
 				sme.setCommit();
 //			} else
 //				throw new IslExistsException();
