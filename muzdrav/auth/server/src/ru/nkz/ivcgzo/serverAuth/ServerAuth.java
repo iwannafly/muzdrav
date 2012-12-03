@@ -76,9 +76,11 @@ public class ServerAuth extends Server implements Iface {
 		String cpodrTableName;
 		String n00KategField;
 		
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT p.pcod FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr)  JOIN n_p0s p ON (r.cslu = p.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT r.cslu, v.pcod, u.id, u.pdost FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) JOIN s_mrab r ON (r.pcod = u.pcod AND r.cpodr = u.cpodr) LEFT JOIN n_p0s p ON (r.cslu = p.pcod) WHERE (u.login = ?) AND (u.password = ?) ", login, password)) {
 			if (acrs.getResultSet().next())
 				switch (acrs.getResultSet().getInt(1)) {
+				case -1:
+					return rsmAuth.map(acrs.getResultSet());
 				case 1:
 					cpodrTableName = "n_o00";
 					n00KategField = "''::character varying(1)";
