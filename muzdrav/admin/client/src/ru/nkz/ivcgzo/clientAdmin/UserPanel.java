@@ -45,7 +45,7 @@ public class UserPanel extends JPanel {
 	private JButton btnMrAdd;
 	private JButton btnMrDel;
 	
-	public UserPanel(boolean adminMode) {
+	public UserPanel() {
 		super();
 		
 		JScrollPane spVrach = new JScrollPane();
@@ -284,8 +284,6 @@ public class UserPanel extends JPanel {
 						.addComponent(spMrab, GroupLayout.PREFERRED_SIZE, 204, GroupLayout.PREFERRED_SIZE))
 					.addGap(10))
 		);
-		if (!adminMode)
-			btnVrPerm.setVisible(false);
 		
 		spMrab.setViewportView(tblMrab);
 		spVrach.setViewportView(tblVrach);

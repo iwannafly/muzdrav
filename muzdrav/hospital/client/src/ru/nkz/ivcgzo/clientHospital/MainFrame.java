@@ -326,6 +326,7 @@ public class MainFrame extends JFrame {
 	private JSpinner Schcc;
 	private JSpinner SKrov;
 	private JSpinner SVes;
+	private JSpinner SDlina;
 	private JTextField TGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
 	private JTextField TDet;
@@ -499,6 +500,18 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
+
+        			try {
+						trdIshod = ClientHospital.tcl.getRdIshodInfo(
+							patient.getPatientId(), patient.gospitalCod);
+						setDefaultValues();
+					} catch (KmiacServerException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (TException e) {
+						e.printStackTrace();
+						ClientHospital.conMan.reconnect(e);
+					}
                 }
             }
         });
@@ -2420,16 +2433,16 @@ public class MainFrame extends JFrame {
             "/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildbirth, null);
 // процедуру на сервер (если есть запись - вызвать, если нет - создать), определить npasp, ngosp        
 		trdIshod = new TRdIshod();	
-		try {
-			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
-			setDefaultValues();
-			} catch (KmiacServerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//		try {
+//			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
+//			setDefaultValues();
+//			} catch (KmiacServerException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		} catch (TException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
         panel_2 = new JPanel();
         panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
         
@@ -3170,7 +3183,18 @@ public class MainFrame extends JFrame {
 		TDatarod.setText(null);
 		SVes.setValue(trdIshod.getVes());
 		TVes.setText(String.valueOf(trdIshod.getVespl()));// integer & string
-//		SVozMen.setValue(trdIshod.getVozmen());
+		TPoln.setText(trdIshod.getPoln());
+		TDet.setText(trdIshod.getMesto());
+		TNash.setText(trdIshod.getDeyat());
+		TVremp.setText(trdIshod.getVremp());
+//		TObol.setText(trdIshod.getObol()); //string
+		SDlina.setValue(trdIshod.getPupov());
+		TOsob.setText(trdIshod.getOsobp());
+		SKrov.setValue(trdIshod.getKrov());
+		TPer1.setText(trdIshod.getPrr1());
+		TPer2.setText(trdIshod.getPrr2());
+		TPer3.setText(trdIshod.getPrr3());
+		//		SVozMen.setValue(trdIshod.getVozmen());
 //		SMenC.setValue(trdIshod.getPrmen());
 //		SKolDet.setValue(trdIshod.getDeti());
 //		SPolJ.setValue(trdIshod.getPolj());
