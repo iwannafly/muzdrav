@@ -106,7 +106,7 @@ public class ServerHospital extends Server implements Iface {
    "vidpl","serd","serd1","serdm","chcc","pozpl","mesto",
    "deyat","shvat","vody","kashetv","poln","potugi",
    "posled","vremp","obol","pupov","obvit","osobp","krov","psih","obezb",
-   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","datarod","srok","ves","vespl"
+   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","datarod","srok","ves","vespl","detmesto"
    };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",         "oj",        "hdm",     "polpl",     "predpl",
@@ -116,9 +116,9 @@ public class ServerHospital extends Server implements Iface {
 //    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
      String.class,String.class,String.class,String.class,String.class,String.class,
 //    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
-     Integer.class, String.class, Integer.class,Integer.class,Integer.class,String.class,Integer.class,Boolean.class,String.class, 
-//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "datarod",       "srok",       "ves",   "vespl"
-     Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Date.class,Integer.class,Double.class,Double.class
+     Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
+//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "datarod",       "srok",       "ves",   "vespl", "detmesto"
+     Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Date.class,Integer.class,Double.class,Double.class,String.class
     };
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
