@@ -2429,11 +2429,13 @@ public class Vvod extends JFrame {
 						MainForm.tcl.UpdatePvizit(pvizit);
 						MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 						btnRecPriem.setEnabled(!isStat && !pvizit.isSetIshod());
-						if (pvizit.isSetIshod())
+						if (pvizit.isSetIshod()) {
 							tblObr.getSelectedItem().setIshod(pvizit.getIshod());
-						else
+							tblObr.getSelectedItem().setClosed(true);
+						} else {
 							tblObr.getSelectedItem().setIshod(0);
-						tblObr.getSelectedItem().setClosed(pvizit.isSetIshod());
+							tblObr.getSelectedItem().setClosed(false);
+						}
 						tblObr.updateChangedSelectedItem();
 						
 						pvizitAmbCopy = new PvizitAmb(pvizitAmb);
@@ -2588,7 +2590,9 @@ public class Vvod extends JFrame {
 				pvizitAmb = new PvizitAmb();
 				priem = new Priem();
 				anamZab = new AnamZab();
-				pvizit = new Pvizit();
+				pvizit = tblObr.getSelectedItem();
+				if (pvizit == null)
+					pvizit = new Pvizit();
 				if (tblPos.getSelectedItem()!= null) {
 					pvizitAmb = tblPos.getSelectedItem();
 					try {
@@ -2602,6 +2606,7 @@ public class Vvod extends JFrame {
 						
 						priem = MainForm.tcl.getPriem(zapVr.npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
+						tblObr.replaceSelectedItem(pvizit);
 						anamZab = MainForm.tcl.getAnamZab(zapVr.getId_pvizit(), zapVr.getNpasp());
 						btnRecPriem.setEnabled(!isStat &&!pvizit.isSetIshod());
 					} catch (KmiacServerException e) {
