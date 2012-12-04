@@ -118,7 +118,7 @@ public class ServerHospital extends Server implements Iface {
 //    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
      Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
 //    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "datarod",       "srok",       "ves",   "vespl", "detmesto"
-     Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Date.class,Integer.class,Double.class,Double.class,String.class
+     Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Integer.class,Double.class,Double.class,String.class
     };
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
@@ -1200,5 +1200,13 @@ public class ServerHospital extends Server implements Iface {
 		throw new KmiacServerException();
 	}
 	}
-
+	@Override
+	public List<IntegerClassifier> get_s_vrach() throws KmiacServerException, TException {
+	try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod,fam||' '||im||' '||ot as name from s_vrach")) {
+	return rsmIntClas.mapToList(acrs.getResultSet());
+} catch (SQLException e) {
+	((SQLException) e.getCause()).printStackTrace();
+	throw new KmiacServerException();
+}
+}
 }

@@ -391,6 +391,10 @@ public class MainFrame extends JFrame {
             cbxResult.setData(ClientHospital.tcl.getAq0());
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
             cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
+            CBPrinial.setData(ClientHospital.tcl.get_s_vrach());
+            CBAkush.setData(ClientHospital.tcl.get_s_vrach());
+            CBVrash.setData(ClientHospital.tcl.get_s_vrach());
+            CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -2554,6 +2558,18 @@ public class MainFrame extends JFrame {
 			if (CBPosled.getSelectedPcod() != null)
 				trdIshod.setPosled(CBPosled.getSelectedPcod());
 				else trdIshod.unsetPosled();
+			if (CBAkush.getSelectedPcod() != null)
+				trdIshod.setAkush(CBAkush.getSelectedPcod());
+				else trdIshod.unsetAkush();
+			if (CBPrinial.getSelectedPcod() != null)
+				trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
+			    else trdIshod.unsetPrinyl();
+			if (CBVrash.getSelectedPcod() != null)
+				trdIshod.setVrash(CBVrash.getSelectedPcod());
+			    else trdIshod.unsetVrash();
+			if (CBOsmotr.getSelectedPcod() != null)
+				trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
+			else trdIshod.unsetOsmposl();
   		trdIshod.setVes((int) SVes.getModel().getValue());
   		trdIshod.setDetmesto(TDet.getText());
   		System.out.println(trdIshod);	
@@ -2644,16 +2660,16 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_31 = new JLabel("Акушерка");
         lblNewLabel_31.setFont(new Font("Tahoma", Font.PLAIN, 12));
         //StringKlassifier s_vrash
-        CBPrinial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBPrinial = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBPrinial.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBOsmotr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBOsmotr = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBOsmotr.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVrash = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBVrash = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBVrash.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBAkush = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBAkush = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBAkush.setFont(new Font("Tahoma", Font.BOLD, 12));
         GroupLayout gl_panel_4 = new GroupLayout(panel_4);
         gl_panel_4.setHorizontalGroup(
@@ -3229,6 +3245,18 @@ public class MainFrame extends JFrame {
 		if (trdIshod.isSetPosled())
 		CBPosled.setSelectedPcod(trdIshod.getPosled());
 		else CBPosled.setSelectedItem(null);
+		if (trdIshod.isSetAkush())
+		CBAkush.setSelectedPcod(trdIshod.getAkush());
+		else CBAkush.setSelectedItem(null);
+		if (trdIshod.isSetVrash())
+		CBVrash.setSelectedPcod(trdIshod.getVrash());
+		else CBVrash.setSelectedItem(null);
+		if (trdIshod.isSetPrinyl())
+		CBPrinial.setSelectedPcod(trdIshod.getPrinyl());
+		else CBPrinial.setSelectedItem(null);
+		if (trdIshod.isSetOsmposl())
+		CBOsmotr.setSelectedPcod(trdIshod.getOsmposl());
+		else CBOsmotr.setSelectedItem(null);
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
