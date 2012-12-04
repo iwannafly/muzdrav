@@ -156,9 +156,9 @@ struct TRdIshod{
   21: optional string potugi;
   22: optional i32 posled;
   23: optional string vremp;
-  24: optional i32 obol;
+  24: optional string obol;
   25: optional i32 pupov;
-  26: optional i32 obvit;
+  26: optional string obvit;
   27: optional string osobp;
   28: optional i32 krov;
   29: optional bool psih;
@@ -175,6 +175,7 @@ struct TRdIshod{
   40: optional i32 srok;
   41: optional i32 ves;
   42: optional i32 vespl; 
+  43: optional string detmesto;
 }
 
 /**

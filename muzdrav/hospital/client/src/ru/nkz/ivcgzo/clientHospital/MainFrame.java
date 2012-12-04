@@ -24,6 +24,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -330,6 +331,7 @@ public class MainFrame extends JFrame {
 	private JTextField TGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
 	private JTextField TDet;
+	private JTextField TObvit;
 	private JTextField TRod;
 	private JTextField TMed;
 	private JTextField textField;
@@ -2514,18 +2516,7 @@ public class MainFrame extends JFrame {
         JButton btnNewButton_1 = new JButton("");
         btnNewButton_1.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-//    			if (CBAkush.getSelectedPcod() != null)
-//    				trdIshod.setAkush(CBAkush.getSelectedPcod());
-//    				else trdIshod.unsetAkush();  поле string
-//    			if (CBPrinal.getSelectedPcod() != null)
-//				trdIshod.setPrinal(CBPrinal.getSelectedPcod());
-//				else trdIshod.unsetPrinal();  поле string
-//    			if (CBOsmotr.getSelectedPcod() != null)
-//				trdIshod.setOsmotr(CBOsmotr.getSelectedPcod());
-//				else trdIshod.unsetOsmotr();  поле string
-//    			if (CBVrash.getSelectedPcod() != null)
-//				trdIshod.setVrash(CBVrash.getSelectedPcod());
-//				else trdIshod.unsetVrash();  поле string
+          		try {
         	trdIshod.setChcc( (int) Schcc.getModel().getValue());
       		trdIshod.setDatarod(TDatarod.getDate().getTime());
       		trdIshod.setDeyat(TRod.getText());
@@ -2537,8 +2528,8 @@ public class MainFrame extends JFrame {
       		trdIshod.setKrov((int) SKrov.getModel().getValue());
       		trdIshod.setMesto(TDet.getText());
       		trdIshod.setObezb(TMed.getText());
-// 		   	trdIshod.setObol(TObol.getText());
-// 		   	trdIshod.setObvit(TObvit.getText());
+ 		   	trdIshod.setObol(TObol.getText());
+ 		   	trdIshod.setObvit(TObvit.getText());
       		trdIshod.setOj((double) Soj.getModel().getValue());
       		trdIshod.setOsobp(TOsob.getText());
       		trdIshod.setPoln(TPoln.getText());
@@ -2564,6 +2555,16 @@ public class MainFrame extends JFrame {
 				trdIshod.setPosled(CBPosled.getSelectedPcod());
 				else trdIshod.unsetPosled();
   		trdIshod.setVes((int) SVes.getModel().getValue());
+  		trdIshod.setDetmesto(TDet.getText());
+  		System.out.println(trdIshod);	
+			ClientHospital.tcl.updateRdIshod(trdIshod);
+		} catch (KmiacServerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         	}
         });
         btnNewButton_1.setToolTipText("Сохранить");
@@ -2642,7 +2643,7 @@ public class MainFrame extends JFrame {
         
         JLabel lblNewLabel_31 = new JLabel("Акушерка");
         lblNewLabel_31.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        
+        //StringKlassifier s_vrash
         CBPrinial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBPrinial.setFont(new Font("Tahoma", Font.BOLD, 12));
         
@@ -2726,7 +2727,7 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_27 = new JLabel("III период");
         lblNewLabel_27.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db12);;
         CBPosled.setFont(new Font("Tahoma", Font.BOLD, 12));;
         
         JLabel LVrem = new JLabel("Через ");
@@ -2905,7 +2906,7 @@ public class MainFrame extends JFrame {
         TNash.setFont(new Font("Tahoma", Font.BOLD, 12));
         TNash.setColumns(10);
         
-        CBEff = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBEff = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db13);
         
         TMed = new JTextField();
         TMed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -3027,10 +3028,10 @@ public class MainFrame extends JFrame {
 		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBPolpl.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db10);;
         CBPoz.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db11);;
         CBVid.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         CBSerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);
@@ -3184,28 +3185,50 @@ public class MainFrame extends JFrame {
 		SVes.setValue(trdIshod.getVes());
 		TVes.setText(String.valueOf(trdIshod.getVespl()));// integer & string
 		TPoln.setText(trdIshod.getPoln());
-		TDet.setText(trdIshod.getMesto());
+		TDet.setText(trdIshod.getDetmesto());
 		TNash.setText(trdIshod.getDeyat());
 		TVremp.setText(trdIshod.getVremp());
-//		TObol.setText(trdIshod.getObol()); //string
+		TObol.setText(trdIshod.getObol()); 
 		SDlina.setValue(trdIshod.getPupov());
 		TOsob.setText(trdIshod.getOsobp());
 		SKrov.setValue(trdIshod.getKrov());
 		TPer1.setText(trdIshod.getPrr1());
 		TPer2.setText(trdIshod.getPrr2());
 		TPer3.setText(trdIshod.getPrr3());
-		//		SVozMen.setValue(trdIshod.getVozmen());
-//		SMenC.setValue(trdIshod.getPrmen());
-//		SKolDet.setValue(trdIshod.getDeti());
-//		SPolJ.setValue(trdIshod.getPolj());
-//		SSrokA.setValue(trdIshod.getSrokab());
-//		SCDiag.setValue(trdIshod.getCdiagt());
-//		SCvera.setValue(trdIshod.getCvera());
-//		oslrod = trdIshod.getOslrod();
-//		osostp = trdIshod.getOsp();
-//		if(trdIshod.isSetOslab())
-//		CBOslAb.setSelectedPcod(trdIshod.getOslab());
-//		else CBOslAb.setSelectedItem(null);
+		Soj.setValue(trdIshod.getOj());
+		Shdm.setValue(trdIshod.getHdm());
+		TGde.setText(trdIshod.getMesto());
+		Schcc.setValue(trdIshod.getChcc());
+		TVes.setText(String.valueOf(trdIshod.getVes()));
+		TShvat.setText(trdIshod.getShvat());
+		TVod.setText(trdIshod.getVody());
+		TKash.setText(trdIshod.getKashetv());
+		TRod.setText(trdIshod.getDeyat());
+		TMed.setText(trdIshod.getObezb());
+		if (trdIshod.isSetPolpl())
+		CBPolpl.setSelectedPcod(trdIshod.getPolpl());
+		else CBPolpl.setSelectedItem(null);
+		if (trdIshod.isSetPozpl())
+		CBPoz.setSelectedPcod(trdIshod.getPozpl());
+		else CBPoz.setSelectedItem(null);
+		if (trdIshod.isSetVidpl())
+		CBVid.setSelectedPcod(trdIshod.getVidpl());
+		else CBVid.setSelectedItem(null);
+		if (trdIshod.isSetSerd())
+		CBSerd.setSelectedPcod(trdIshod.getSerd());
+		else CBSerd.setSelectedItem(null);
+		if (trdIshod.isSetSerd1())
+		CBSerd1.setSelectedPcod(trdIshod.getSerd1());
+		else CBSerd1.setSelectedItem(null);
+		if (trdIshod.isSetPredpl())
+		CBPred.setSelectedPcod(trdIshod.getPredpl());
+		else CBPred.setSelectedItem(null);
+		if (trdIshod.isSetEff())
+		CBEff.setSelectedPcod(trdIshod.getEff());
+		else CBEff.setSelectedItem(null);
+		if (trdIshod.isSetPosled())
+		CBPosled.setSelectedPcod(trdIshod.getPosled());
+		else CBPosled.setSelectedItem(null);
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
