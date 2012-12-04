@@ -433,6 +433,11 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				return null;
 	}
 	
+	public void replaceSelectedItem(T item) {
+		if (this.getSelectedRow() > -1)
+			lst.set(getSortedRowIndex(), item);
+	}
+	
 	/**
 	 * Доступна ли таблица для редактирования.
 	 */
