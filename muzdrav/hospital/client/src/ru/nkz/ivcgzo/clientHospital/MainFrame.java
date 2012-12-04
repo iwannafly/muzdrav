@@ -942,7 +942,7 @@ public class MainFrame extends JFrame {
         vbLifeHistoryTextFields.setPreferredSize(new Dimension(500, 0));
         vbLifeHistoryTextFields.setAlignmentX(Component.LEFT_ALIGNMENT);
         vbLifeHistoryTextFields.setBorder(
-                new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
         pLifeHistory.add(vbLifeHistoryTextFields);
 
         setLifeHistoryTextAreas();
@@ -1045,7 +1045,7 @@ public class MainFrame extends JFrame {
                                 5, tfLifeHShablonFilter.getText()));
                     } else {
                         lLifeHistoryShabloNames.setData(
-                                ClientHospital.tcl.getDopShablonNames(5, null));
+                            ClientHospital.tcl.getDopShablonNames(5, null));
                     }
                 } catch (KmiacServerException e1) {
                     e1.printStackTrace();
@@ -1273,7 +1273,7 @@ public class MainFrame extends JFrame {
 
     private void addMedicalHistoryTable() {
         tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
-                true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
+            true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
         spMedHist.setViewportView(tbMedHist);
         tbMedHist.addMouseListener(new MouseAdapter() {
             @Override
@@ -1396,7 +1396,7 @@ public class MainFrame extends JFrame {
                 }
                 if (tbMedHist.getRowCount() > 0) {
                     tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
-                            tbMedHist.getRowCount() - 1);
+                        tbMedHist.getRowCount() - 1);
                 }
                 clearMedicalHistoryTextAreas();
             }
@@ -2388,7 +2388,7 @@ public class MainFrame extends JFrame {
                         if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
                             ClientHospital.tcl.addStage(tbStages.getSelectedItem());
                             tbStages.setData(
-                                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
+                                ClientHospital.tcl.getStage(patient.getGospitalCod()));
                         }
                     } else {
                         if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
