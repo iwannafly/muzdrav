@@ -116,7 +116,7 @@ struct Zakl {
 	8: optional i32 newOtd;
 	9: optional i32 vidOpl;
 	10: optional i32 vidPom;
-	11: optional i32 ukl;
+	11: optional double ukl;
 }
 
 struct TStage {
@@ -126,7 +126,7 @@ struct TStage {
 	4: optional string mes;
 	5: optional i64 dateStart;
 	6: optional i64 dateEnd;
-	7: optional i32 ukl;
+	7: optional double ukl;
 	8: optional i32 ishod;
 	9: optional i32 result;
 	10: optional i64 timeStart;

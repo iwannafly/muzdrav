@@ -292,7 +292,8 @@ public class MainFrame extends JFrame {
     private JButton btnZaklDiag;
     private JMenuItem mntmPrintHospitalSummary;
     private JPanel pChildbirth;
-    public static TRdIshod trdIshod;
+    //public static TRdIshod trdIshod;
+    private TRdIshod trdIshod;
     private JPanel panel_1;
     private JPanel panel_2;
     private JTextField TVes;
@@ -381,6 +382,7 @@ public class MainFrame extends JFrame {
     public final void onConnect() {
         createModalFrames();
         try {
+            System.out.println(ClientHospital.authInfo.getCpodr());
             lMedicalHistoryShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
             lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
@@ -2036,7 +2038,7 @@ public class MainFrame extends JFrame {
         if (patient != null) {
             try {
                 tbDiag.setData(
-                        ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
+                    ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
                 setDiagPriznRdbtn();
             } catch (DiagnosisNotFoundException e) {
                 Collections.<TDiagnosis>emptyList();
@@ -2130,9 +2132,13 @@ public class MainFrame extends JFrame {
                 diag.setDiagName(curDiagnosis.getName());
                 diag.setId(ClientHospital.tcl.addDiagnosis(diag));
 //                taDiagMedOp.setText(curDiagnosis.getName());
-                tbDiag.addItem(diag);
+//                tbDiag.addItem(diag);
                 tbDiag.setData(
                     ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
+                if (tbDiag.getRowCount() > 1) {
+                    tbDiag.setRowSelectionInterval(tbDiag.getRowCount() - 2,
+                        tbDiag.getRowCount() - 1);
+                }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -3512,8 +3518,8 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
-                                if (tfUkl.getText().isEmpty()) {
-                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                if (!tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
@@ -3531,8 +3537,8 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
-                                if (tfUkl.getText().isEmpty()) {
-                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                if (!tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
@@ -3552,8 +3558,8 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
-                                if (tfUkl.getText().isEmpty()) {
-                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                if (!tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);

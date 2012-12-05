@@ -141,7 +141,7 @@ public class ServerHospital extends Server implements Iface {
     //  id             id_gosp        stl            mes
         Integer.class, Integer.class, Integer.class, String.class,
     //  date_start  date_end    ukl            ishod          result
-        Date.class, Date.class, Integer.class, Integer.class, Integer.class,
+        Date.class, Date.class, Double.class, Integer.class, Integer.class,
     //  time_start  time_end
         Time.class, Time.class
     };
@@ -336,8 +336,9 @@ public class ServerHospital extends Server implements Iface {
     public final List<TDiagnosis> getDiagnosis(final int gospId)
             throws KmiacServerException, DiagnosisNotFoundException {
         String sqlQuery = "SELECT c_diag.id, c_diag.id_gosp, c_diag.cod, c_diag.med_op, "
-            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach , n_c00.name as diagname "
-            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ?;";
+            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach, n_c00.name as diagname "
+            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ? "
+            + "ORDER BY c_diag.date_ustan;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
             List<TDiagnosis> diagList = rsmDiagnosis.mapToList(acrs.getResultSet());
             if (diagList.size() > 0) {
