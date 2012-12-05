@@ -167,10 +167,10 @@ struct TRdIshod{
   32: optional string prr1;
   33: optional string prr2;
   34: optional string prr3;
-  35: optional string prinyl;
-  36: optional string osmposl;
-  37: optional string vrash;
-  38: optional string akush;
+  35: optional i32 prinyl;
+  36: optional i32 osmposl;
+  37: optional i32 vrash;
+  38: optional i32 akush;
   39: optional i64 datarod;
   40: optional i32 srok;
   41: optional i32 ves;
@@ -308,5 +308,5 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-	
+	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
 }
