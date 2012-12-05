@@ -335,8 +335,10 @@ public class MainFrame extends JFrame {
 	private JTextField TRod;
 	private JTextField TMed;
 	private JTextField textField;
+    private JMenuItem mntmPrintHospitalDeathSummary;
 //    private JLabel lblNewLabel_33;
 //    private JTextField textField_1;
+
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
 //        setPreferredSize(new Dimension(1000, 800));
@@ -603,6 +605,32 @@ public class MainFrame extends JFrame {
             }
         });
         mnPrintForms.add(mntmPrintHospitalSummary);
+
+        mntmPrintHospitalDeathSummary = new JMenuItem("Посмертный эпикриз");
+        mntmPrintHospitalDeathSummary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    try {
+                        String servPath =
+                            ClientHospital.tcl.printHospitalDeathSummary(patient.getGospitalCod(),
+                                doctorAuth.getClpu_name() + " "
+                                + doctorAuth.getCpodr_name(), patient);
+                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                        ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+                        ClientHospital.conMan.openFileInEditor(cliPath, false);
+                    } catch (KmiacServerException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        e1.printStackTrace();
+                        ClientHospital.conMan.reconnect(e1);
+                    }
+                }
+            }
+        });
+        mnPrintForms.add(mntmPrintHospitalDeathSummary);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1173,7 +1201,7 @@ public class MainFrame extends JFrame {
     private void fillLifeHistoryPanel() {
         try {
             lifeHistory =
-                    ClientHospital.tcl.getLifeHistory(patient.getPatientId());
+                ClientHospital.tcl.getLifeHistory(patient.getPatientId());
         } catch (LifeHistoryNotFoundException e) {
             lifeHistory = null;
         } catch (KmiacServerException e) {
