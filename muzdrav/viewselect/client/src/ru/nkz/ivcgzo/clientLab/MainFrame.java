@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientLab;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DateFormat;
@@ -57,6 +58,9 @@ import javax.swing.JTextArea;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 
 import java.awt.FlowLayout;
+import java.io.File;
+import java.io.IOException;
+
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 
@@ -99,6 +103,8 @@ public class MainFrame extends JFrame {
     private JTree trResult;
     private JTextArea taResultText;
     private StringBuilder sbResulText;
+    private JLabel lblParaotdLpu;    
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> cbxParaotdLpu;
 
     public MainFrame(final UserAuthInfo authInfo) {
         doctorAuthInfo = authInfo;
@@ -108,6 +114,8 @@ public class MainFrame extends JFrame {
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(980, 600));
+        setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource(
+                "/ru/nkz/ivcgzo/clientLab/resources/issled.png")));
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
         addMainTabbedPane();
@@ -146,6 +154,16 @@ public class MainFrame extends JFrame {
     }
 
     private final void setDefaults() {
+        if ((cbxParaotdLpu.getData() != null)
+                && (cbxParaotdLpu.getData().size() > 0)) {
+            try {
+                cbxParaotdLpu.setSelectedPcod(doctorAuthInfo.getClpu());
+            } catch (RuntimeException re) {
+                cbxParaotdLpu.setSelectedIndex(-1);
+            }
+        } else {
+            cbxParaotdLpu.setSelectedIndex(-1);
+        }
         cbxLabs.setSelectedIndex(-1);
         cbxOrgAndSystem.setSelectedIndex(-1);
         cbxOrganizationFrom.setSelectedIndex(-1);
@@ -173,8 +191,8 @@ public class MainFrame extends JFrame {
                 }
             }
         });
-        lblOrgAndSystem = new JLabel("Органы и системы");
 
+        lblOrgAndSystem = new JLabel("Органы и системы");
         cbxOrgAndSystem = new ThriftStringClassifierCombobox<StringClassifier>(true);
         cbxOrgAndSystem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent arg0) {
@@ -191,6 +209,26 @@ public class MainFrame extends JFrame {
                             "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 } catch (TException e1) {
                     ClientLab.conMan.reconnect(e1);
+                }
+            }
+        });
+        
+        
+        lblParaotdLpu = new JLabel("ЛПУ");        
+        cbxParaotdLpu = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        cbxParaotdLpu.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (cbxParaotdLpu.getSelectedItem() != null) {
+                    try {
+                        cbxLabs.setData(
+                            ClientLab.tcl.getLabs(cbxParaotdLpu.getSelectedItem().getPcod()));
+                    } catch (KmiacServerException e1) {
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        e1.printStackTrace();
+                        ClientLab.conMan.reconnect(e1);
+                    }
                 }
             }
         });
@@ -235,11 +273,12 @@ public class MainFrame extends JFrame {
                                             PrezD prezd = new PrezD();
                                             fillPrezDFields(pisl, pokazMet, prezd);
                                         }
-                                        selItems.add(pokazMet.getPcod());
+                                        selItems.add(pokazMet.getNameN());
                                     }
                                 }
                             }
                         }
+                        printIssled(selItems);
                         JOptionPane.showMessageDialog(MainFrame.this,
                             "Исследования успешно сохранены!",
                             "Запись исследования", JOptionPane.INFORMATION_MESSAGE);
@@ -264,6 +303,27 @@ public class MainFrame extends JFrame {
         });
     }
 
+    private void printIssled(List<String> selItems) {
+        if (patient != null) {
+            try {
+                String servPath =
+                    ClientLab.tcl.printIssl(patient.getId(), tfCabinet.getText(),
+                        cbxLabs.getSelectedItem().getName(),
+                        doctorAuthInfo.getClpu_name() + " " + doctorAuthInfo.getCpodr_name(),
+                        doctorAuthInfo.getName(), selItems);
+                String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                ClientLab.conMan.transferFileFromServer(servPath, cliPath);
+                ClientLab.conMan.openFileInEditor(cliPath, false);
+            } catch (KmiacServerException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (TException e1) {
+                e1.printStackTrace();
+                ClientLab.conMan.reconnect(e1);
+            }
+        }
+    }
     private void fillPislFields(final Pisl pisl) throws KmiacServerException, TException {
         pisl.setNpasp(patient.getId());
         pisl.setPcisl(cbxOrgAndSystem.getSelectedPcod());
@@ -612,7 +672,14 @@ public class MainFrame extends JFrame {
 
     public final void onConnect() {
         try {
-            cbxLabs.setData(ClientLab.tcl.getLabs(doctorAuthInfo.getClpu()));
+            cbxParaotdLpu.setData(ClientLab.tcl.getParaotdLpu());
+//            try {
+//                cbxParaotdLpu.setSelectedPcod(ClientLab.authInfo.getClpu());
+//            } catch (RuntimeException re) {
+//                re.printStackTrace();
+//                cbxParaotdLpu.setSelectedIndex(-1);
+//            }
+//            cbxLabs.setData(ClientLab.tcl.getLabs(doctorAuthInfo.getClpu()));
             vidIssled = ClientLab.tcl.getVidIssled();
         } catch (KmiacServerException e) {
             e.printStackTrace();
@@ -626,56 +693,53 @@ public class MainFrame extends JFrame {
         GroupLayout glPLabAndDiagIssled = new GroupLayout(pLabAndDiagIssled);
         glPLabAndDiagIssled.setHorizontalGroup(
             glPLabAndDiagIssled.createParallelGroup(Alignment.TRAILING)
-                .addGap(0, 577, Short.MAX_VALUE)
                 .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
-                        .addComponent(spIssled, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
-                        .addComponent(lblIssled, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
-                        .addComponent(btnPrintIssled, GroupLayout.PREFERRED_SIZE,
-                                87, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(spIssled, GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
+                        .addComponent(btnPrintIssled, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
                         .addGroup(glPLabAndDiagIssled.createSequentialGroup()
-                            .addComponent(lblCabinet, GroupLayout.PREFERRED_SIZE,
-                                    65, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCabinet, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE,
-                                    70, GroupLayout.PREFERRED_SIZE))
+                            .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblIssled, GroupLayout.DEFAULT_SIZE, 561, Short.MAX_VALUE)
                         .addGroup(glPLabAndDiagIssled.createSequentialGroup()
                             .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
-                                .addComponent(lblLab, GroupLayout.PREFERRED_SIZE, 96,
-                                        GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblOrgAndSystem, GroupLayout.PREFERRED_SIZE,
-                                        135, GroupLayout.PREFERRED_SIZE))
+                                .addComponent(lblLab, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblOrgAndSystem, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
-                                .addComponent(cbxOrgAndSystem, GroupLayout.DEFAULT_SIZE,
-                                        574, Short.MAX_VALUE)
-                                .addComponent(cbxLabs, 0, 457, Short.MAX_VALUE))))
+                                .addComponent(cbxOrgAndSystem, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)
+                                .addComponent(cbxLabs, 0, 422, Short.MAX_VALUE)))
+                        .addGroup(glPLabAndDiagIssled.createSequentialGroup()
+                            .addComponent(lblParaotdLpu)
+                            .addGap(118)
+                            .addComponent(cbxParaotdLpu, GroupLayout.DEFAULT_SIZE, 422, Short.MAX_VALUE)))
                     .addContainerGap())
         );
         glPLabAndDiagIssled.setVerticalGroup(
-            glPLabAndDiagIssled.createParallelGroup(Alignment.LEADING)
-                .addGap(0, 523, Short.MAX_VALUE)
+            glPLabAndDiagIssled.createParallelGroup(Alignment.TRAILING)
                 .addGroup(glPLabAndDiagIssled.createSequentialGroup()
-                    .addContainerGap()
+                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.BASELINE)
+                        .addComponent(lblParaotdLpu)
+                        .addComponent(cbxParaotdLpu, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblLab)
-                        .addComponent(cbxLabs, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbxLabs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblOrgAndSystem)
-                        .addComponent(cbxOrgAndSystem, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(cbxOrgAndSystem, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(lblIssled)
                     .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(spIssled, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+                    .addComponent(spIssled, GroupLayout.PREFERRED_SIZE, 325, GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPLabAndDiagIssled.createParallelGroup(Alignment.BASELINE)
                         .addComponent(lblCabinet)
-                        .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(tfCabinet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addComponent(btnPrintIssled)
                     .addContainerGap())

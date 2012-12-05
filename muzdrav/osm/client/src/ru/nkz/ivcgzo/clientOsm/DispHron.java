@@ -29,6 +29,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOsm.Pmer;
 import ru.nkz.ivcgzo.thriftOsm.Pobost;
@@ -72,7 +73,7 @@ public class DispHron extends JFrame{
 		bAddDispHron.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
 		bAddDispHron.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				if (cmbDiag.getSelectedPcod()!=null)
 				try {
 					tblDispHron.requestFocus();
 					pmer = new Pmer();
@@ -81,10 +82,14 @@ public class DispHron extends JFrame{
 					pmer.setCpol(MainForm.authInfo.getCpodr());
 					pmer.setId_obr(Vvod.tblObr.getSelectedItem().getId());
 					pmer.setDataz(System.currentTimeMillis());
+					pmer.setCdol(MainForm.authInfo.getCdol());
+					pmer.setCod_sp(MainForm.authInfo.getPcod());
 					pmer.setId(MainForm.tcl.AddPmer(pmer));
 					tblDispHron.addItem(pmer);
+					
 					//tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));
-				} catch (KmiacServerException e1) {
+				}
+				catch (KmiacServerException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (TException e1) {
@@ -107,7 +112,7 @@ public class DispHron extends JFrame{
 					pmer.setLpu(Integer.valueOf(tfNaprLpu.getText())); 
 					pmer.setTer(ter);
 					if (!Dsph()) {
-						JOptionPane.showMessageDialog(DispHron.this, "Плановая дата не может быть меньше фактической", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(DispHron.this, "Плановая дата не может быть больше фактической", "Предупреждение", JOptionPane.ERROR_MESSAGE);
 							return;
 					}
 					if (tblDispHron.getSelectedItem() != null)
@@ -151,7 +156,7 @@ public class DispHron extends JFrame{
 		 			tblDispHron.setData(MainForm.tcl.getPmer(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));
 		 			tabObost.setData(MainForm.tcl.getPobost(Vvod.zapVr.getNpasp(), cmbDiag.getSelectedPcod()));
 		 			tblDispHron.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_abd));
-		 			tblDispHron.setStringClassifierSelector(1, MainForm.tcl.get_n_s00(MainForm.authInfo.getClpu()));
+		 			tblDispHron.setStringClassifierSelector(1, ConnectionManager.instance.getStringClassifier(StringClassifiers.n_s00));
 		 			tblDispHron.setIntegerClassifierSelector(4, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_arez));
 		 			tabObost.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
 		 			tabObost.setIntegerClassifierSelector(1, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_v10));
@@ -180,14 +185,17 @@ public class DispHron extends JFrame{
 				obostr.setCdol(MainForm.authInfo.getCdol());
 				obostr.setDataz(System.currentTimeMillis());
 				obostr.setId_obr(Vvod.tblObr.getSelectedItem().getId());
+				
 				try {
-					obostr.setId(MainForm.tcl.AddPobost(obostr));
+					if (cmbDiag.getSelectedPcod()!=null){
+						obostr.setId(MainForm.tcl.AddPobost(obostr));
+						tabObost.addItem(obostr);}
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
 				} catch (TException e1) {
 					e1.printStackTrace();
 				}
-	 			tabObost.addItem(obostr);
+	 			
 			}			
 		});
 		bAddObost.setIcon(new ImageIcon(DispHron.class.getResource("/ru/nkz/ivcgzo/clientOsm/resources/1331789242_Add.png")));
@@ -346,7 +354,7 @@ public class DispHron extends JFrame{
 		tabObost.setFillsViewportHeight(true);
 		spObost.setViewportView(tabObost);
 		
-		tblDispHron = new CustomTable<>(true,true,Pmer.class,3,"Мероприятие",10,"Специалист",4,"Дата план.",5,"Дата факт.",9,"Результат");
+		tblDispHron = new CustomTable<>(true,true,Pmer.class,3,"Мероприятие",17,"Специалист",4,"Дата план.",5,"Дата факт.",8,"Результат");
 		tblDispHron.setDateField(2);
 		tblDispHron.setDateField(3);
 		

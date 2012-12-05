@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientVgr;
 
 import java.awt.EventQueue;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
@@ -37,8 +38,10 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 //	protected static final JFrame Per = null;
 	private JFrame frame;
 	private Period per;
+	private DopClas dopCl;
 	public static MainForm instance;
 	public static ThriftVgr.Client tcl;
+	String titleString ="";
 	/**
 	 * Launch the application.
 	 */
@@ -178,6 +181,13 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		menuBar.add(menu);
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("Подгрузка информации из ПФ");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+			titleString = "Подгрузка информации из ПФ";
+			dopCl = new DopClas();	
+			dopCl.OpenWindowFileChooser(titleString); 
+			}
+		});
 		menu.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Подгрузка информации об областных льготниках");

@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.serverManager.common.thrift;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -21,8 +22,9 @@ public final class TResultSetMapper<T extends TBase<?, F>, F extends TFieldIdEnu
 	}
 	
 	@Override
-	public T map(ResultSet rs) {
+	public T map(ResultSet rs) throws SQLException {
 		T obj = null;
+		F thrFld = null;
 		
 		try {
 			obj = (T) cls.newInstance();
@@ -31,7 +33,7 @@ public final class TResultSetMapper<T extends TBase<?, F>, F extends TFieldIdEnu
 			for (int i = 1; i < rsColCnt; i++) {
 				Integer fldIdx = rsFlds.get(rsMet.getColumnName(i));
 				if (fldIdx != null) {
-				F thrFld = obj.fieldForId(fldIdx + 1);
+				thrFld = obj.fieldForId(fldIdx + 1);
 				switch (rsMet.getColumnType(i)) {
 					case java.sql.Types.INTEGER:
 						obj.setFieldValue(thrFld, rs.getInt(i));
@@ -72,12 +74,15 @@ public final class TResultSetMapper<T extends TBase<?, F>, F extends TFieldIdEnu
 					case java.sql.Types.BIT:
 						obj.setFieldValue(thrFld, rs.getBoolean(i));
 						break;
+					default:
+						throw new SQLException(String.format("Unsupported sql data type %s (%d) in column %s.", sqlTypeNames.get(rsMet.getColumnType(i)), rsMet.getColumnType(i), rsMet.getColumnName(i)));
 					}
 				if (rs.wasNull())
 					obj.setFieldValue(thrFld, null);
 				}
 			}
 		} catch (Exception e) {
+			throw new SQLException(String.format("Error mapping to thrift %s, field %s.", cls, thrFld), e);
 		}
 		return obj;
 	}

@@ -49,7 +49,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 public class LDSserver extends Server implements Iface { 
 	private TServer	thrServ;
 	private TResultSetMapper<ObInfIsl, ObInfIsl._Fields> rsmObInIs;
-	private static final Class<?>[] islTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class};	
+	private static final Class<?>[] islTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class };	
 	private TResultSetMapper<DiagIsl, DiagIsl._Fields> rsmDiIs;
 	private static final Class<?>[] dislTypes = new Class<?>[] {Integer.class, Integer.class, String.class, Integer.class, String.class, String.class, String.class, Integer.class, String.class, String.class, Double.class, String.class};
 	private TResultSetMapper<LabIsl, LabIsl._Fields> rsmLabIs;	
@@ -72,12 +72,12 @@ public class LDSserver extends Server implements Iface {
 	public LDSserver(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 				
-		rsmObInIs = new TResultSetMapper<>(ObInfIsl.class, "npasp", "nisl", "kodotd", "nprob", "pcisl", "cisl", "datap", "datav", "prichina", "popl", "napravl", "naprotd", "vrach", "vopl", "diag", "kodvr", "dataz", "cuser");
+		rsmObInIs = new TResultSetMapper<>(ObInfIsl.class, "npasp", "nisl", "kodotd", "nprob", "pcisl", "cisl", "datap", "datav", "prichina", "popl", "napravl", "naprotd", "vrach", "vopl", "diag", "kodvr", "dataz", "cuser", "id_gosp", "id_pos");
 		rsmDiIs = new TResultSetMapper<>(DiagIsl.class, "npasp", "nisl", "kodisl", "rez", "anamnez", "anastezi", "model", "kol", "op_name", "rez_name", "stoim", "pcod_m");
 		rsmLabIs = new TResultSetMapper<>(LabIsl.class, "npasp", "nisl", "cpok", "name", "zpok", "norma", "stoim", "pcod_m", "nameobst");	
-		rmsPatient = new TResultSetMapper<>(Patient.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom");
+		rmsPatient = new TResultSetMapper<>(Patient.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom", "adp_gorod", "adp_ul", "adp_dom", "adp_kv", "adm_gorod", "adm_ul", "adm_dom", "adm_kv");
 		rsmS_ot01 = new TResultSetMapper<>(S_ot01.class, "cotd", "pcod", "c_obst", "c_nz1", "stoim");
-		rmsnldi = new TResultSetMapper<>(N_ldi.class, "pcod", "c_nz1", "name_n", "name", "norma", "c_p0e1", "vibor");
+		rmsnldi = new TResultSetMapper<>(N_ldi.class, "pcod", "c_nz1", "name_n", "name", "norma", "c_p0e1", "vibor", "id");
 		rmsMetod = new TResultSetMapper<>(Metod.class, "c_p0e1", "pcod", "c_obst", "name", "stoim", "vibor");
 		rmsN_lds = new TResultSetMapper<>(N_lds.class, "clpu", "pcod", "name", "tip");
 		rmsSh_lds = new TResultSetMapper<>(Sh_lds.class, "c_p0e1", "c_ldi", "name", "opis", "zakl");
@@ -103,7 +103,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<ObInfIsl> GetObInfIslt(int npasp, int kodotd) throws TException {
 		
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser FROM p_isl_ld where (npasp = ?) and (kodotd = ?) ", npasp, kodotd)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, id_gosp, id_pos FROM p_isl_ld where (npasp = ?) and (kodotd = ?) ", npasp, kodotd)) {
 			return rsmObInIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -114,7 +114,7 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public ObInfIsl GetIsl(int npasp) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser FROM p_isl_ld WHERE npasp = ? ", npasp)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT npasp, nisl, kodotd, nprob, pcisl, cisl, datap, datav, prichina, popl, napravl, naprotd, vrach, vopl, diag, kodvr, dataz, cuser, id_gosp, id_pos FROM p_isl_ld WHERE npasp = ? ", npasp)) {
 			if (acrs.getResultSet().next())
 				return rsmObInIs.map(acrs.getResultSet());
 			else
@@ -144,7 +144,7 @@ public class LDSserver extends Server implements Iface {
 	public void UpdIsl(ObInfIsl info) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 //			if (!isIslExists(info)) {
-				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 1 );
+				sme.execPreparedT("UPDATE p_isl_ld SET nprob = ?, pcisl = ?, datap = ?, datav = ?, prichina = ?, popl = ?, napravl = ?, naprotd = ?, vrach = ?, vopl = ?, diag = ?, kodvr = ?, cuser = ? WHERE nisl = ? ", false, info, islTypes, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 1 );
 				sme.setCommit();
 //			} else
 //				throw new IslExistsException();
@@ -407,7 +407,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<Patient> getPatient(String npasp)
 			throws PatientNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT npasp, fam, im, ot, datar FROM patient where npasp in " + npasp)) {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT npasp, fam, im, ot, datar, adp_gorod, adp_ul, adp_dom, adp_kv, adm_gorod, adm_ul, adm_dom, adm_kv FROM patient where npasp in " + npasp)) {
 			return rmsPatient.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -416,9 +416,13 @@ public class LDSserver extends Server implements Iface {
 	
 	
 	@Override
-	public List<Patient> getPatDat(long datan, int kodotd)
+	public List<Patient> getPatDat(int kodotd)
 			throws PatientNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT distinct Patient.npasp, Patient.fam, Patient.im, Patient.ot, Patient.datar FROM patient LEFT JOIN p_isl_ld ON (patient.npasp = p_isl_ld.npasp) where (p_isl_ld.datan = ?) and (p_isl_ld.kodotd = ?)", new Date(datan), kodotd)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT distinct Patient.npasp, Patient.fam, Patient.im, Patient.ot, Patient.datar, Patient.adp_gorod, Patient.adp_ul, Patient.adp_dom, Patient.adp_kv, Patient.adm_gorod, Patient.adm_ul, Patient.adm_dom, Patient.adm_kv "+
+																 "FROM patient JOIN p_isl_ld ON (patient.npasp = p_isl_ld.npasp) "+
+																 "		Join p_rez_l on (p_isl_ld.nisl = p_rez_l.nisl) "+
+																 "where (p_isl_ld.datan is not null) and (p_isl_ld.kodotd = ?) and (p_rez_l.zpok is null)", kodotd)) {
+																 //"order by p_isl_ld.naprotd, p_isl_ld.datan, Patient.fam, Patient.im, Patient.ot", new Date(datan), kodotd)) {
 			return rmsPatient.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -635,13 +639,24 @@ public class LDSserver extends Server implements Iface {
 
 	@Override
 	public List<IntegerClassifier> GetKlasSvrach(int cpodr) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select s_vrach.pcod, (s_vrach.fam ||' '|| s_vrach.im ||' '|| s_vrach.ot) AS name FROM s_vrach JOIN s_mrab ON (s_vrach.pcod = s_mrab.pcod) WHERE s_mrab.cpodr = ? ", cpodr)){
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select s_vrach.pcod, (s_vrach.fam ||' '|| s_vrach.im ||' '|| s_vrach.ot) AS name FROM s_vrach JOIN s_mrab ON (s_vrach.pcod = s_mrab.pcod) WHERE (s_mrab.cpodr = ?)and(priznd = 1) ", cpodr)){
 			return rsmIntClas.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
 		}
 	}
 
+	
+	@Override
+	public List<IntegerClassifier> GetKlasAllSvrach(int cpodr) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select s_vrach.pcod, (s_vrach.fam ||' '|| s_vrach.im ||' '|| s_vrach.ot) AS name FROM s_vrach JOIN s_mrab ON (s_vrach.pcod = s_mrab.pcod) WHERE s_mrab.cpodr = ? ", cpodr)){
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new TException(e);
+		}
+	}	
+	
+	
 	@Override
 	public List<N_lds> getN_lds(int pcod) throws TException {
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT clpu, pcod, name, tip FROM n_lds where (pcod = ?)", pcod)) {
@@ -681,9 +696,6 @@ public class LDSserver extends Server implements Iface {
 			throw new TException(e);
 		}
 	}
-
-
-
 
 
 	

@@ -79,7 +79,6 @@ public class ShablonOsmPanel extends JPanel {
 	private boolean fillingUI;
 	private String prevDiagCode;
 	private String diagName;
-	private Font defFont;
 	
 	public ShablonOsmPanel() {
 		textListener = new DocumentListener() {
@@ -117,7 +116,6 @@ public class ShablonOsmPanel extends JPanel {
 		splitPane.setLeftComponent(gbSearch);
 		
 		tbSearch = new CustomTextField(true, true, false);
-		defFont = tbSearch.getFont();
 		tbSearch.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -387,7 +385,7 @@ public class ShablonOsmPanel extends JPanel {
 			);
 			
 			txt = new JTextArea();
-			txt.setFont(defFont);
+			txt.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			txt.getDocument().addDocumentListener(textListener);
 			txt.setLineWrap(true);
 			txt.setWrapStyleWord(true);

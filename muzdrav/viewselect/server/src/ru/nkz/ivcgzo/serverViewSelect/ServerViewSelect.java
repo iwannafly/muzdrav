@@ -27,6 +27,14 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftViewSelect.C_etapInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CdepicrisInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CdiagInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CgospInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CizmerInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.ClekInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CosmotrInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.CotdInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientCommonInfo;
@@ -64,6 +72,14 @@ public class ServerViewSelect extends Server implements Iface {
 	private final TResultSetMapper<PatientDiagAmbInfo, PatientDiagAmbInfo._Fields> rsmPdiagAmb;
 	private final TResultSetMapper<PatientIsslInfo, PatientIsslInfo._Fields> rsmIsslInfo;
 	private final TResultSetMapper<PatientAnamZabInfo, PatientAnamZabInfo._Fields> rsmAnamZab;
+	private final TResultSetMapper<CgospInfo, CgospInfo._Fields> rsmCgosp;
+	private final TResultSetMapper<CdepicrisInfo, CdepicrisInfo._Fields> rsmCdepicris;
+	private final TResultSetMapper<CdiagInfo, CdiagInfo._Fields> rsmCdiag;
+	private final TResultSetMapper<C_etapInfo, C_etapInfo._Fields> rsmC_etap;
+	private final TResultSetMapper<CizmerInfo, CizmerInfo._Fields> rsmCizmer;
+	private final TResultSetMapper<ClekInfo, ClekInfo._Fields> rsmClek;
+	private final TResultSetMapper<CosmotrInfo, CosmotrInfo._Fields> rsmCosmotr;
+	private final TResultSetMapper<CotdInfo, CotdInfo._Fields> rsmCotd;
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -77,9 +93,17 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmPvizitAmb = new TResultSetMapper<>(PatientVizitAmbInfo.class, "id", "id_obr", "npasp", "datap", "cod_sp", "cdol", "diag", "mobs", "rezult", "opl", "stoim", "uet", "datak", "kod_rez", "k_lr", "n_sp", "pr_opl", "pl_extr", "vpom", "fio_vr", "dataz", "cpos");
 		rsmPriem = new TResultSetMapper<>(PatientPriemInfo.class, "id_obr","npasp", "id_pos", "sl_ob", "n_is", "n_kons", "n_proc", "n_lek", "t_chss", "t_temp", "t_ad", "t_rost", "t_ves", "t_st_localis", "t_ocenka", "t_jalob", "t_status_praesense", "t_fiz_obsl", "t_recom");
 		rsmPnapr = new TResultSetMapper<>(PatientNaprInfo.class, "id", "idpvizit", "vid_doc", "text", "preds", "zaved", "name");
-		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "datap", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
-		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav");
+		rsmPdiagAmb = new TResultSetMapper<>(PatientDiagAmbInfo.class, "id", "id_obr", "npasp", "diag", "named", "diag_stat", "predv", "datad", "obstreg", "cod_sp", "cdol", "dataot", "obstot", "cod_spot", "cdol_ot", "vid_tr");
+		rsmIsslInfo = new TResultSetMapper<>(PatientIsslInfo.class, "nisl", "cp0e1", "np0e1", "cldi", "nldi", "zpok", "datav", "op_name", "rez_name", "gruppa");
 		rsmAnamZab = new TResultSetMapper<>(PatientAnamZabInfo.class, "id_pvizit", "npasp", "t_ist_zab");
+		rsmCgosp = new TResultSetMapper<>(CgospInfo.class, "id", "ngosp", "npasp", "nist", "datap", "vremp", "pl_extr", "naprav", "n_org", "cotd", "sv_time", "sv_day", "ntalon", "vidtr", "pr_out", "alkg", "meesr", "vid_tran", "diag_n", "diag_p", "named_n", "named_p", "nal_z", "nal_p", "t0c", "ad", "smp_data", "smp_time", "smp_num", "cotd_p", "datagos", "vremgos", "cuser", "dataosm", "vremosm", "kod_rez", "dataz", "jalob", "vid_st", "d_rez", "pr_ber");
+		rsmCdepicris = new TResultSetMapper<>(CdepicrisInfo.class, "id", "id_gosp", "datas", "times", "dspat", "prizn", "named", "dataz");
+		rsmCdiag = new TResultSetMapper<>(CdiagInfo.class, "id", "id_gosp", "cod", "med_op", "date_ustan", "prizn", "vrach");
+		rsmC_etap = new TResultSetMapper<>(C_etapInfo.class, "id", "id_gosp", "stl", "mes", "date_start", "date_end");
+		rsmCizmer= new TResultSetMapper<>(CizmerInfo.class, "id", "id_gosp", "temp", "ad", "chss", "rost", "ves", "dataz", "timez");
+		rsmClek = new TResultSetMapper<>(ClekInfo.class, "id", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv", "spriem", "pereod", "dlitkl", "komm", "datao", "vracho", "dataz");
+		rsmCosmotr = new TResultSetMapper<>(CosmotrInfo.class, "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis", "fisical_obs", "pcod_vrach", "dataz", "timez");
+		rsmCotd = new TResultSetMapper<>(CotdInfo.class, "id", "id_gosp", "nist", "sign", "cotd", "cprof", "stt", "dataol", "datazl", "vozrlbl", "pollbl", "ishod", "result", "ukl", "vrach", "npal", "datav", "vremv", "sostv", "recom", "mes", "dataz", "stat_type");
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -213,18 +237,22 @@ public class ServerViewSelect extends Server implements Iface {
 		String condDateFormat = ((prms.illegibleSearch) ? "(%s BETWEEN ? AND ?) " : "(%s = ?) ") + "AND ";
 		final int andLen = 4;
 		
-		if (prms.isSetFam())
-			clause += String.format(condStringFormat, "fam");
-		if (prms.isSetIm())
-			clause += String.format(condStringFormat, "im");
-		if (prms.isSetOt())
-			clause += String.format(condStringFormat, "ot", prms.getOt());
-		if ((!prms.illegibleSearch && prms.isSetDatar()) || (prms.isSetDatar() && prms.isSetDatar2()))
-			clause += String.format(condDateFormat, "datar");
-		if (prms.isSetSpolis())
-			clause += String.format(condStringFormat, "poms_ser");
-		if (prms.isSetNpolis())
-			clause += String.format(condStringFormat, "poms_nom");
+		if (prms.isSetNpasp()) {
+			clause += "npasp = ? AND ";
+		} else {
+			if (prms.isSetFam())
+				clause += String.format(condStringFormat, "fam");
+			if (prms.isSetIm())
+				clause += String.format(condStringFormat, "im");
+			if (prms.isSetOt())
+				clause += String.format(condStringFormat, "ot", prms.getOt());
+			if ((!prms.illegibleSearch && prms.isSetDatar()) || (prms.isSetDatar() && prms.isSetDatar2()))
+				clause += String.format(condDateFormat, "datar");
+			if (prms.isSetSpolis())
+				clause += String.format(condStringFormat, "poms_ser");
+			if (prms.isSetNpolis())
+				clause += String.format(condStringFormat, "poms_nom");
+		}
 		
 		return clause.substring(0, clause.length() - andLen);
 	}
@@ -232,22 +260,26 @@ public class ServerViewSelect extends Server implements Iface {
 	private Object[] getSearchPatientParamArray(PatientSearchParams prms) {
 		List<Object> list = new ArrayList<>(PatientSearchParams.metaDataMap.size());
 		
-		if (prms.isSetFam())
-			list.add(prms.getFam());
-		if (prms.isSetIm())
-			list.add(prms.getIm());
-		if (prms.isSetOt())
-			list.add(prms.getOt());
-		if (!prms.illegibleSearch && prms.isSetDatar()) {
-			list.add(new Date(prms.getDatar()));
-		} else if (prms.isSetDatar() && prms.isSetDatar2()) {
-			list.add(new Date(prms.getDatar()));
-			list.add(new Date(prms.getDatar2()));
+		if (prms.isSetNpasp()) {
+			list.add(prms.getNpasp());
+		} else {
+			if (prms.isSetFam())
+				list.add(prms.getFam());
+			if (prms.isSetIm())
+				list.add(prms.getIm());
+			if (prms.isSetOt())
+				list.add(prms.getOt());
+			if (!prms.illegibleSearch && prms.isSetDatar()) {
+				list.add(new Date(prms.getDatar()));
+			} else if (prms.isSetDatar() && prms.isSetDatar2()) {
+				list.add(new Date(prms.getDatar()));
+				list.add(new Date(prms.getDatar2()));
+			}
+			if (prms.isSetSpolis())
+				list.add(prms.getSpolis());
+			if (prms.isSetNpolis())
+				list.add(prms.getNpolis());
 		}
-		if (prms.isSetSpolis())
-			list.add(prms.getSpolis());
-		if (prms.isSetNpolis())
-			list.add(prms.getNpolis());
 		
 		return list.toArray();
 	}
@@ -383,13 +415,16 @@ public class ServerViewSelect extends Server implements Iface {
 
 	@Override
 	public List<PatientIsslInfo> getPatientIsslInfoList(int pvizitId) throws KmiacServerException, TException {
-		String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, p_rez_l.zpok, p_isl_ld.datav " +
+		String sql = "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, p_rez_l.zpok, p_isl_ld.datav, p_rez_l.pcod_m as op_name,n_nsikodrez.name as rez_name, n_p0e1.gruppa as gruppa " +
 			     "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " + 
-				 "WHERE p_isl_ld.pvizit_id = ? " +
+			     "JOIN n_nsikodrez ON (n_nsikodrez.kod_rez=p_rez_l.kod_rez) "+
+				 "JOIN n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
+			     "WHERE p_isl_ld.pvizit_id = ? " +
 				 "UNION " +
-				 "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav " + 
+				 "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name, n_p0e1.gruppa as gruppa " + 
 				 "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " + 
 				 "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
+				 "JOIN n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
 				 "WHERE p_isl_ld.pvizit_id = ? ";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, pvizitId, pvizitId)) {
 			return rsmIsslInfo.mapToList(acrs.getResultSet());
@@ -405,6 +440,90 @@ public class ServerViewSelect extends Server implements Iface {
 				return rsmAnamZab.map(acrs.getResultSet());
 			else
 				throw new SQLException("Patient anamnesis not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CgospInfo> getCgospinfo(int npasp) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_gosp where npasp = ? ", npasp)) {
+			return rsmCgosp.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public CdepicrisInfo getCdepicrisInfo(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from c_depicris where id_gosp = ? ", id_gosp)) {
+			if (acrs.getResultSet().next())
+				return rsmCdepicris.map(acrs.getResultSet());
+			else
+				throw new SQLException("Depicris not found");
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CdiagInfo> getCdiagInfoList(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_diag where id_gosp = ? ", id_gosp)) {
+			return rsmCdiag.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public List<C_etapInfo> getCEtapInfoList(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_etap where id_gosp = ? ", id_gosp)) {
+			return rsmC_etap.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CizmerInfo> getCizmerInfoList(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_izmer where id_gosp = ? ", id_gosp)) {
+			return rsmCizmer.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<ClekInfo> getClekInfoList(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_lek where id_gosp = ? ", id_gosp)) {
+			return rsmClek.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CosmotrInfo> getCosmotrInfoList(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_osmotr where id_gosp = ? ", id_gosp)) {
+			return rsmCosmotr.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<CotdInfo> getCotdInfoList(int id_gosp)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select * from c_otd where id_gosp = ? ", id_gosp)) {
+			return rsmCotd.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new KmiacServerException(e.getMessage());
 		}

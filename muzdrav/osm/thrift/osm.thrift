@@ -40,6 +40,7 @@ struct Pvizit {
 	15: optional i32 cobr;
 	16: optional i32 idzab;
 	17: optional string vrach_fio;
+	18: optional bool closed;
 }
 
 struct PvizitAmb {
@@ -81,13 +82,12 @@ struct PdiagAmb {
 	 9: optional i32 obstreg;
 	10: optional i32 cod_sp;
 	11: optional string cdol;
-	12: optional i64 datap;
-	13: optional i64 dataot;
-	14: optional i32 obstot;
-	15: optional i32 codsp_ot;
-	16: optional string cdol_ot;
-	17: optional i32 vid_tr;
-	18: optional i32 id_pos;
+	12: optional i64 dataot;
+	13: optional i32 obstot;
+	14: optional i32 codsp_ot;
+	15: optional string cdol_ot;
+	16: optional i32 vid_tr;
+	17: optional i32 id_pos;
 }
 
 struct Psign{
@@ -193,6 +193,7 @@ struct RdSlStruct{
         39: optional bool rub;
         40: optional bool predp;
         41: optional i32 osp;
+        42: optional i32 cmer;
 }
 struct RdDinStruct{
 	1: optional i32 id_rd_sl;
@@ -234,6 +235,7 @@ struct RdInfStruct{
 	11: optional i32 vredOtec;
 	12: optional i32 osoco;
 	13: optional i32 uslpr;
+        14: optional string zotec;
 }
 /*Выгрузка для Кемерово по диспансеризации беременных*/
 struct RdPatient{
@@ -397,6 +399,8 @@ struct P_isl_ld {
 	12: optional i32 prichina;
 	13: optional i32 kodotd;
 	14: optional i64 datav;
+	15: optional i32 vopl;
+	16: optional i32 id_pos;
 }
 
 struct Prez_d {
@@ -475,6 +479,9 @@ struct IsslInfo{
 	7: optional i64 datav;
 	8: optional i64 datan;
 	9: optional i32 id;
+	10: optional string op_name;
+	11: optional string rez_name;
+	12: optional i32 gruppa;
 }
 
 
@@ -553,17 +560,19 @@ struct Pmer{
 	4: optional i32 pmer;
 	5: optional i64 pdat;
 	6: optional i64 fdat;
-	7: optional i32 cod_sp;
-	8: optional i64 dataz;
-	9: optional i32 prichina;
-	10: optional i32 rez;
-	11: optional string cdol;
-	12: optional i64 dnl;
-	13: optional i64 dkl;
-	14: optional i32 lpu;
-	15: optional i32 ter;
-	16: optional i32 cpol;
-	17: optional i32 id_obr;
+	7: optional i64 dataz;
+	8: optional i32 prichina;
+	9: optional i32 rez;
+	10: optional string cdol;
+	11: optional i64 dnl;
+	12: optional i64 dkl;
+	13: optional i32 lpu;
+	14: optional i32 ter;
+	15: optional i32 cpol;
+	16: optional i32 id_obr;
+	17: optional i32 cod_sp;
+	18: optional string cdol_n;
+	
 }
 
 struct Pobost{
@@ -609,6 +618,16 @@ struct Cotd{
 	5: optional i64 dataz;
 }
 
+struct VrachInfo {
+	1: optional i32 mrabId;
+	2: optional string cdol;
+	3: optional string cdolName;
+	4: optional string fam;
+	5: optional string im;
+	6: optional string ot;
+	7: optional i32 pcod;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -641,11 +660,12 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	 */
 	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
 	ZapVr getZapVrSrc(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<VrachInfo> getVrachList(1: i32 clpu, 2: i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	
 	void AddPvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPvizitId(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);	
 	Pvizit getPvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse, 2: PvizitNotFoundException pne);
-	list<Pvizit> getPvizitList(1: i32 npasp, 2: i32 codsp, 3: string cdol) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pvizit> getPvizitList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePvizit(1: Pvizit obr) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePvizit(1: i32 obrId) throws (1: kmiacServer.KmiacServerException kse);
 	void DeleteEtalon (1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
@@ -676,6 +696,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 	i32 setPdiag(1: PdiagZ diag) throws (1: kmiacServer.KmiacServerException kse);
 	PdiagZ getPdiagZ(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
+	list<PdiagZ> getPdiagZInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getPdiagInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
@@ -755,7 +776,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	Shablon getShOsm(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShDopNames(1: i32 idRazd) throws (1: kmiacServer.KmiacServerException kse);
 	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
-
+	
 /*DispMer*/
 	list<Pmer> getPmer (1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	Pmer getDispMer (1: i32 id_pmer) throws (1: kmiacServer.KmiacServerException kse);
@@ -771,5 +792,6 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 
 /*Stoim_p*/
 	double getStoim(1: string kateg, 2: i32 prv, 3: string cdol);
+
 
 }

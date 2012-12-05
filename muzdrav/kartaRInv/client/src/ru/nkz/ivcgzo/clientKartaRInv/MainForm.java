@@ -13,6 +13,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftKartaRInv.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftKartaRInv.Pinvk;
@@ -43,6 +44,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
+
+import org.apache.thrift.TException;
+
 import java.awt.ComponentOrientation;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -227,11 +231,13 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 		public void actionPerformed(ActionEvent e) {
 				pinvk  = new Pinvk();
 		
-			  pinvk.npasp = searchedNpasp;
-				//	  (PatientCommonInfo.getNpasp());
+			 // pinvk.npasp = searchedNpasp;
+			//  pinvk.ninv = searchedNpasp;
+			  
 				pinvk.setDatav(System.currentTimeMillis());
 				pinvk.setDataz(System.currentTimeMillis());
-				
+				pinvk.setNpasp(searchedNpasp);
+				pinvk.setNinv(searchedNpasp);
 				pinvk.setD_inv(t_d_inv.getDate().getTime());
 				pinvk.setD_invp(t_d_invp.getDate().getTime());
 				pinvk.setD_osv(t_d_osv.getDate().getTime());
@@ -270,6 +276,18 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 			}
 		});		
 		JButton btnDelete = new JButton("Удалить");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+			MainForm.tcl.DeletePinvk(pinvk.getNinv());
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+				MainForm.conMan.reconnect(e);
+				}
+			}
+		});
+		
 		
 		JButton btn_expkart = new JButton("Экспорт карты в МСЭ");
 		btn_expkart.setFont(new Font("Tahoma", Font.PLAIN, 12));

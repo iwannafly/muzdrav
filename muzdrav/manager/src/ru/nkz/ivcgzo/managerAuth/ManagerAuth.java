@@ -1,5 +1,7 @@
 package ru.nkz.ivcgzo.managerAuth;
 
+import java.util.regex.Pattern;
+
 import ru.nkz.ivcgzo.serverManager.serverManager;
 
 public class ManagerAuth extends serverManager {
@@ -7,6 +9,7 @@ public class ManagerAuth extends serverManager {
 	public static void main(String[] args) {
 		ManagerAuth manAuth = null;
 		String ip = null;
+		Pattern ipPattern = Pattern.compile("(^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[0-9][0-9]|[0-9])$");
 		
 		try {
 			if (args.length > 0) {
@@ -16,6 +19,9 @@ public class ManagerAuth extends serverManager {
 				} else if (args[0].equals("wrk")) {
 					System.out.println("Using work database server.");
 					ip = "10.0.0.242";
+				} else if (ipPattern.matcher(args[0]).matches()) {
+					ip = args[0];
+					System.out.println(String.format("Using %s database server.", ip));
 				} else {
 					usage();
 				}
@@ -45,7 +51,7 @@ public class ManagerAuth extends serverManager {
 	}
 	
 	private static void usage() {
-		System.out.println("Database server (tst, wrk) must be specified explicitly.");
+		System.out.println("Database server alias (tst, wrk) or ip address must be specified explicitly.");
 		
 		System.exit(2);
 	}

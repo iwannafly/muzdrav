@@ -47,6 +47,7 @@
 		<table srcName="GRUP" dstName="n_grup" />
 		<table srcName="K02" dstName="n_k02" />
 		<table srcName="KAS" dstName="n_kas" />
+		<table srcName="KDERR" dstName="n_kderr" />
 		<table srcName="L00" dstName="n_l00" />
 		<table srcName="L01" dstName="n_l01" />
 		<table srcName="L02" dstName="n_l02" />
@@ -62,6 +63,7 @@
 		<table srcName="N45" dstName="n_n45" />
 		<table srcName="N63" dstName="n_n63" />
 		<table srcName="NSI_OBST" dstName="n_nsi_obst" />
+		<table srcName="NSIKODREZ" dstName="n_nsikodrez" />
 		<table srcName="NSILPU" dstName="n_nsilpu" />
 		<table srcName="NSIPOL" dstName="n_nsipol" />
 		<table srcName="NZ1" dstName="n_nz1" />
@@ -71,6 +73,7 @@
 		<table srcName="OPL" dstName="n_opl" />
 		<table srcName="OT9" dstName="n_ot9" />
 		<table srcName="OT63" dstName="n_ot63" />
+		<table srcName="OT100" dstName="n_ot100" />
 		<table srcName="P07" dstName="n_p07" />
 		<table srcName="P0C" dstName="n_p0c" />
 		<table srcName="P0E1" dstName="n_p0e1" />

@@ -87,7 +87,7 @@
 		
 		<antcall target="compileLauncher">
 			<param name="launcher.postfix" value=""/>
-			<param name="replaceDst.str" value="clientAuthType = &quot;dev&quot;"/>
+			<param name="replaceDst.str" value="clientAuthType = &quot;unspecified&quot;"/>
 		</antcall>
 		<antcall target="compileLauncher">
 			<param name="launcher.postfix" value="_t"/>

@@ -40,6 +40,17 @@
     <copy file="${com_resources.dir}/1331789242_Add.png" todir="${bin_resources.dir}" />
     <copy file="${com_resources.dir}/1331789259_Delete.png" todir="${bin_resources.dir}" />
     <copy file="${com_resources.dir}/1341981970_Accept.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/medication.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/patientInfo.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/issled.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/hospital.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/out.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/lifeHistory.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/personalInfo.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/firstAid.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/stages.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/diary.png" todir="${bin_resources.dir}" />
+  	<copy file="${com_resources.dir}/childbirth.png" todir="${bin_resources.dir}" />
   </target>
 
   <!-- Создание jar файла -->

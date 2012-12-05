@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -33,6 +34,7 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.ConnectionManager.ConnectionException;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -42,6 +44,10 @@ import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
 
 public class MainForm {
 	public static String appServerIp;
+	private static boolean hasLoginParams;
+	private static String paramLogin;
+	private static String paramPassword;
+	private static int paramModuleIndex;
 	private JFrame frame;
 	private JPanel pnlLogin;
 	private CustomTextField tbLogin;
@@ -64,22 +70,46 @@ public class MainForm {
 	/**
 	 * Launch the application.
 	 */
+	//[{ip} [{log pas idx}]]
 	public static void main(String[] args) {
+		Pattern ipPattern = Pattern.compile("(^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[0-9][0-9]|[0-9])$");
+		
 		if (args.length == 0) {
 			System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
 			appServerIp = "localhost";
-		} else if (args[0].equals("tst")) {
-			System.out.println("Using test application server.");
-			appServerIp = "10.0.0.248";
-		} else if (args[0].equals("int")) {
-			System.out.println("Using internal application server.");
-			appServerIp = "10.0.0.243";
-		} else if (args[0].equals("ext")) {
-			System.out.println("Using external application server.");
-			appServerIp = "10.1.1.8";
 		} else {
-			System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
-			appServerIp = "localhost";
+			if (args[0].equals("tst")) {
+				System.out.println("Using test application server.");
+				appServerIp = "10.0.0.248";
+			} else if (args[0].equals("int")) {
+				System.out.println("Using internal application server.");
+				appServerIp = "10.0.0.243";
+			} else if (args[0].equals("ext")) {
+				System.out.println("Using external application server.");
+				appServerIp = "10.1.1.8";
+			} else if (ipPattern.matcher(args[0]).matches()) {
+				appServerIp = args[0];
+				System.out.println(String.format("Using %s application server.", appServerIp));
+			} else {
+				System.out.println("No valid application server alias (tst, int, ext) or ip address specified. Using dev server.");
+				appServerIp = "localhost";
+			}
+			if (args.length > 1)
+				if (args.length > 3) {
+					paramLogin = args[1];
+					paramPassword = args[2];
+					try {
+						paramModuleIndex = Integer.parseInt(args[3]);
+					} catch (NumberFormatException e) {
+						JOptionPane.showMessageDialog(null, "Неверно задан индекс запускаемого модуля. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+						System.exit(2);
+					}
+					System.out.println(String.format("Logged in with %s %s, %d.", paramLogin, paramPassword, paramModuleIndex));
+					hasLoginParams = true;
+				} else {
+					JOptionPane.showMessageDialog(null, "Недостаточное количество параметров для задания логина, пароля и индекса запускаемого модуля. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					System.exit(2);
+				}
 		}
 		
 		EventQueue.invokeLater(new Runnable() {
@@ -89,11 +119,32 @@ public class MainForm {
 //					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 					MainForm window = new MainForm();
 					window.frame.getInputContext().selectInputMethod(new Locale("ru", "RU"));
-					window.frame.setVisible(true);
+					window.frame.setVisible(!hasLoginParams);
 					
 					conMan = new ConnectionManager(appServerIp, window.frame, ThriftServerAuth.Client.class, configuration.thrPort);
 					client = (Client) conMan.get(configuration.thrPort);
-					conMan.connect();
+					try {
+						conMan.connect();
+					} catch (ConnectionException e) {
+						System.out.println("Just reconnected.");
+					}
+					
+					if (hasLoginParams) {
+						window.tbLogin.setText(paramLogin);
+						window.tbPass.setText(paramPassword);
+						window.btnEnter.doClick();
+						
+						int listIdx = 0;
+						for (listIdx = 0; listIdx < conMan.getPluginLoader().getPluginList().size(); listIdx++)
+								if (conMan.getPluginLoader().getPluginList().get(listIdx).getId() == paramModuleIndex)
+									break;
+						if (listIdx == conMan.getPluginLoader().getPluginList().size()) {
+							JOptionPane.showMessageDialog(null, "Пользователю с данным логином и паролем не доступен модуль с данным индексом. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+							System.exit(3);
+						}
+						window.lbxAvailSys.setSelectedIndex(listIdx);
+						window.btnLaunch.doClick();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -101,9 +152,6 @@ public class MainForm {
 		});
 	}
 
-	/**
-	 * Create the application.
-	 */
 	public MainForm() {
 		initialize();
 	}
@@ -170,6 +218,8 @@ public class MainForm {
 					showSelectionPane();
 				} catch (UserNotFoundException e1) {
 					JOptionPane.showMessageDialog(frame, "Пользователя с таким логином и паролем не существует");
+					if (hasLoginParams)
+						System.exit(2);
 					tbLogin.selectAll();
 					tbLogin.requestFocusInWindow();
 				} catch (TException e1) {
@@ -243,6 +293,7 @@ public class MainForm {
 				if (lbxAvailSys.getModel().getSize() == 0)
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 				else
+					btnLaunch.setEnabled(false);
 					try {
 						//FIXME что-нибудь сделать с этим костылем
 						if (conMan.getPluginLoader().getPluginList().get(lbxAvailSys.getSelectedIndex()).getId() == conMan.getViewClient().getId())
@@ -258,7 +309,10 @@ public class MainForm {
 							public void windowClosing(WindowEvent e) {
 								super.windowClosing(e);
 								
+								if (hasLoginParams)
+									System.exit(0);
 								frame.setVisible(plug.getFrame().getDefaultCloseOperation() == JFrame.DISPOSE_ON_CLOSE);
+								btnLaunch.setEnabled(true);
 							}
 						});
 					} catch (Exception e1) {
@@ -327,8 +381,13 @@ public class MainForm {
 	}
 	
 	private void showSelectionPane() {
+		if (!hasLoginParams && (authInfo.cslu == -1)) {
+			JOptionPane.showMessageDialog(frame, "Для пользователя с данным логином и паролем не доступен ручной выбор модуля. Программа будет закрыта.");
+			System.exit(2);
+		}
+		
 		frame.setTitle("Выбор модуля");
-		lblFio.setText(String.format("<html>%s, %s</html>", authInfo.getName(), authInfo.getCdol_name()));
+		lblFio.setText(String.format("<html>%s, %s, %s</html>", authInfo.getName(), authInfo.getCdol_name(), authInfo.getPriznd_name()));
 		lblLpu.setText(String.format("<html>%s</html>", authInfo.getClpu_name()));
 		lblPodr.setText(String.format("<html>%s, %s</html>", authInfo.getCpodr_name(), authInfo.getCslu_name()));
 		
