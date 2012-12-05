@@ -2433,7 +2433,7 @@ public class Vvod extends JFrame {
 							tblObr.getSelectedItem().setIshod(pvizit.getIshod());
 							tblObr.getSelectedItem().setClosed(true);
 						} else {
-							tblObr.getSelectedItem().setIshod(0);
+							tblObr.getSelectedItem().unsetIshod();
 							tblObr.getSelectedItem().setClosed(false);
 						}
 						tblObr.updateChangedSelectedItem();
@@ -2841,6 +2841,9 @@ public class Vvod extends JFrame {
 				tblZaklDiag.setData(new ArrayList<PdiagZ>());
 			}
 			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
+			cmbVidStacionar.setSelectedItem(null);
+			cmbKonsMesto.setSelectedItem(null);
+			tbKonsObosnov.setText("");
 			tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp));
 			if ((idPvizitMainForm > 0) && (tblObr.getRowCount() > 0)) {
 				for (int i = 0; i < tblObr.getRowCount(); i++) {
