@@ -462,7 +462,7 @@ public class FormPostBer extends JFrame {
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
 		
-		JLabel LVes = new JLabel("Вес до беременности");
+		JLabel LVes = new JLabel("Вес при 1 явке");
 		LVes.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel LTaz = new JLabel("Таз:");
