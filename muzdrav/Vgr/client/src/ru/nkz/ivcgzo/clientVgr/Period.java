@@ -69,10 +69,12 @@ public class Period {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			
-				SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+		//		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
 				String servPath = null;
 				String cliPath = null;
 				if (Cslu == 1){
+					SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+					
 					try {
 					
 			        try {
@@ -113,6 +115,51 @@ public class Period {
 						MainForm.conMan.reconnect(e1);
 					}
 				}
+				
+				if (Cslu == 2){
+					SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+					
+					try {
+					
+			        try {
+						servPath = MainForm.tcl.getDetInfoPol(MainForm.authInfo.cpodr, SimpleDateFormat.getDateInstance().parse("01.01.2012").getTime(), SimpleDateFormat.getDateInstance().parse("31.12.2012").getTime());
+					} catch (ParseException e3) {
+						// TODO Auto-generated catch block
+						e3.printStackTrace();
+					}
+					cliPath = "C:\\dd_"+MainForm.authInfo.getKdate()+MainForm.authInfo.cpodr+"_"+sdf.format(new Date())+".rar";
+							
+						
+						try {
+							MainForm.tcl.getDetInfoPol(MainForm.authInfo.cpodr,SimpleDateFormat.getDateInstance().parse("01.01.2012").getTime(), SimpleDateFormat.getDateInstance().parse("31.12.2012").getTime());
+						} catch (ParseException e2) {
+							// TODO Auto-generated catch block
+							e2.printStackTrace();
+						}
+					    if (servPath.endsWith("zip")){
+	   						try {
+								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+							} catch (FileNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							JOptionPane.showMessageDialog(null, "Файл : "+cliPath, null, JOptionPane.INFORMATION_MESSAGE); 
+						}
+					
+					} catch (KmiacServerException e1) {
+						JOptionPane.showMessageDialog(frame, "Какая-то ошибка.", "error", JOptionPane.ERROR_MESSAGE);
+					} /*catch (KovNotFoundException e1) {
+						JOptionPane.showMessageDialog(frame, "Что-то не найдено.", "error", JOptionPane.ERROR_MESSAGE);
+					} */
+					catch (TException e1) {
+						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
+					}
+				}
+				
 			}
 		});
 		btnNewButton.setFont(new Font("Tahoma", Font.BOLD, 12));
