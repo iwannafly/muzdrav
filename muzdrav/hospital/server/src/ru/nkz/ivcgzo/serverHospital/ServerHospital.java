@@ -441,11 +441,13 @@ public class ServerHospital extends Server implements Iface {
     public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
             final String srcText) throws KmiacServerException {
         String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
-                + "sho.diag || ' ' || sho.name AS name "
-                + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
-                + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
-                + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
-                + "WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+            + "sho.diag || ' ' || sho.name AS name "
+            + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
+            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+            + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
+            + "JOIN n_t00 t00 ON t00.spec = shp.cspec  "
+            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
+            + "WHERE (n45.codotd = ?) AND ((sho.cslu = 1) OR (sho.cslu =3)) ";
 
         if (srcText != null) {
             sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) "
@@ -453,24 +455,24 @@ public class ServerHospital extends Server implements Iface {
         }
 
         // Запрос не работает, т.к. профиль и специализация это разные вещи
-//        String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
-//            + sho.diag || ' ' || sho.name AS name "
-//            + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
-//            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
-//            + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
-//            + "JOIN n_t00 t00 ON t00.pcod = shp.cspec "
-//            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
-//            + "WHERE (n45.codotd = 2004) AND (sho.cslu & 2 = 2) ";
+//        SELECT DISTINCT sho.id AS pcod, sho.name, 
+//        sho.diag || ' ' || sho.name AS name 
+//        FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) 
+//        JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) 
+//        JOIN n_c00 c00 ON (c00.pcod = sho.diag) 
+//        JOIN n_t00 t00 ON t00.spec = shp.cspec  
+//        JOIN n_n45 n45 ON n45.codprof = t00.pcod
+//        WHERE (n45.codotd = 2019) AND ((sho.cslu = 1) OR (sho.cslu =3))
 
         sql += "ORDER BY sho.name ";
         try (AutoCloseableResultSet acrs = (srcText == null)
-                ? sse.execPreparedQuery(sql, 38, 2, 2)
-                : sse.execPreparedQuery(sql, 38, 2, 2,
+                ? sse.execPreparedQuery(sql, cspec)
+                : sse.execPreparedQuery(sql, cspec,
                         srcText, srcText, srcText, srcText)) {
             return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
-            System.err.println(e.getCause());
-            throw new KmiacServerException("Error searching template");
+            log.log(Level.ERROR, "Template searching error", e);
+            throw new KmiacServerException();
         }
     }
 

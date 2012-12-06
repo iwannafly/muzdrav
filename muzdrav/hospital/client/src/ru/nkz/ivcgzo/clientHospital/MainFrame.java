@@ -384,13 +384,13 @@ public class MainFrame extends JFrame {
         try {
             System.out.println(ClientHospital.authInfo.getCpodr());
             lMedicalHistoryShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
                 3, null));
             lDiagShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             cbxIshod.setData(ClientHospital.tcl.getAp0());
             cbxResult.setData(ClientHospital.tcl.getAq0());
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
@@ -466,7 +466,7 @@ public class MainFrame extends JFrame {
             final ThriftIntegerClassifierList inTicl) {
         try {
             List<IntegerClassifier> intClassif = ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),
                 (inCtf.getText().length() < 3)
                 ? null : '%' + inCtf.getText() + '%');
             inTicl.setData(intClassif);
@@ -3683,13 +3683,14 @@ public class MainFrame extends JFrame {
                 JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        if ((tfPatalogoAnDiagPcod.getText().isEmpty())
-                || (tfPatalogoAnDiagName.getText().isEmpty())) {
-            JOptionPane.showMessageDialog(MainFrame.this,
-                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
-                JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+//FIXME
+//        if ((tfPatalogoAnDiagPcod.getText().isEmpty())
+//                || (tfPatalogoAnDiagName.getText().isEmpty())) {
+//            JOptionPane.showMessageDialog(MainFrame.this,
+//                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
+//                JOptionPane.ERROR_MESSAGE);
+//            return false;
+//        }
         if (cdeZaklDate.getDate() == null) {
             JOptionPane.showMessageDialog(MainFrame.this,
                 "Не выбрана дата смерти. Информация не сохранена", "Ошибка",
