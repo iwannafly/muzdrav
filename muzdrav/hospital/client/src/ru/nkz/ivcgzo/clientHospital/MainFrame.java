@@ -337,6 +337,9 @@ public class MainFrame extends JFrame {
 	private JTextField TMed;
 	private JTextField textField;
     private JMenuItem mntmPrintHospitalDeathSummary;
+    private JLabel lblZaklDiagStep;
+    private JRadioButton rdbtnZaklDiagSrT;
+    private JRadioButton rdbtnZaklDiagTT; 
 //    private JLabel lblNewLabel_33;
 //    private JTextField textField_1;
 
@@ -2256,6 +2259,12 @@ public class MainFrame extends JFrame {
         return true;
     }
 
+    private boolean isStageDatesCorrect() {
+        return ((tbStages.getData().get(0).getDateStart() == priemInfo.getDatap())
+            && (tbStages.getData().get(tbStages.getData().size() - 1).getDateEnd()
+                == cdeZaklDate.getDate().getTime()));
+    }
+
     private boolean isLastStageItemSetCorrectly() {
         if (tbStages.getData().size() != 0) {
             return isStageUpdateRequiredFieldsSet(
@@ -3499,6 +3508,16 @@ public class MainFrame extends JFrame {
 
         cbxAnotherOtd = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxAnotherOtd.setVisible(false);
+
+
+
+        lblZaklDiagStep = new JLabel("Степень тяжести:");
+
+        rdbtnZaklDiagSrT = new JRadioButton("Средняя");
+        rdbtnZaklDiagTT = new JRadioButton("Тяжелая");
+        ButtonGroup btngDiagRadioT = new ButtonGroup();
+        btngDiagRadioT.add(rdbtnZaklDiagSrT);
+        btngDiagRadioT.add(rdbtnZaklDiagTT);
     }
 
     private void setZaklButtons() {
@@ -3506,7 +3525,7 @@ public class MainFrame extends JFrame {
         btnSaveZakl.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    if (isStagesCorrect()) {
+                    if (isStagesCorrect() && isStageDatesCorrect()) {
                         if (isPatientOut()) {
                             if (isAllRequiredOutFieldsSet()) {
                                 Zakl tmpZakl = new Zakl();
@@ -3772,9 +3791,9 @@ public class MainFrame extends JFrame {
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPersonalInfo.createSequentialGroup()
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfChamber, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                                .addComponent(tfGender, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                                .addComponent(tfChamber, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfGender, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE))
                             .addGap(31)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblSurname)
@@ -3782,9 +3801,9 @@ public class MainFrame extends JFrame {
                                 .addComponent(lblStatus))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfBirthdate, GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                .addComponent(tfSurname, GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                .addComponent(tfStatus, 0, 206, Short.MAX_VALUE))
+                                .addComponent(tfBirthdate, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfSurname, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfStatus, 0, 225, Short.MAX_VALUE))
                             .addGap(34)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblName)
@@ -3795,24 +3814,24 @@ public class MainFrame extends JFrame {
                                 .addGroup(glPersonalInfo.createSequentialGroup()
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addGroup(glPersonalInfo.createSequentialGroup()
-                                            .addComponent(tfName, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                                            .addComponent(tfName, GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
                                             .addGap(40))
-                                        .addComponent(tfOms, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE))
+                                        .addComponent(tfOms, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE))
                                     .addGap(43)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(lblMiddlename)
                                         .addComponent(lblDms)))
                                 .addGroup(glPersonalInfo.createSequentialGroup()
-                                    .addComponent(tfWork, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                                    .addComponent(tfWork, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                                     .addGap(99))))
                         .addGroup(glPersonalInfo.createSequentialGroup()
-                            .addComponent(tfRealAddress, GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)
+                            .addComponent(tfRealAddress, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                             .addGap(79))
                         .addGroup(glPersonalInfo.createSequentialGroup()
-                            .addComponent(tfRegistrationAddress, GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)
+                            .addComponent(tfRegistrationAddress, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                             .addGap(79)))
                     .addGap(18)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addComponent(btnUpdateChamber, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(tfDms)
                         .addComponent(tfMiddlename, GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
@@ -3883,18 +3902,12 @@ public class MainFrame extends JFrame {
                         .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(lblZaklDiag)
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklDiagPcod)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tfZaklDiagName, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnZaklDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
                         .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(cbxAnotherOtd, 0, 847, Short.MAX_VALUE)
                         .addComponent(lblIshod)
                         .addComponent(lblPatalogoAnDiagHeader)
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfPatalogoAnDiagPcod)
+                            .addComponent(tfPatalogoAnDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(tfPatalogoAnDiagName, GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
@@ -3909,7 +3922,21 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.UNRELATED)
                             .addComponent(lblZaklTime)
                             .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addComponent(tfZaklDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblZaklDiagStep))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addGroup(glPZakl.createSequentialGroup()
+                                    .addComponent(rdbtnZaklDiagSrT)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(rdbtnZaklDiagTT))
+                                .addGroup(glPZakl.createSequentialGroup()
+                                    .addComponent(tfZaklDiagName, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(btnZaklDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)))))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.TRAILING)
                         .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
@@ -3930,7 +3957,7 @@ public class MainFrame extends JFrame {
                                 .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnZaklShablonFind))
                             .addGap(8)
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
                             .addPreferredGap(ComponentPlacement.RELATED)
@@ -3963,6 +3990,11 @@ public class MainFrame extends JFrame {
                                 .addComponent(tfZaklDiagName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnZaklDiag))
                             .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblZaklDiagStep)
+                                .addComponent(rdbtnZaklDiagSrT)
+                                .addComponent(rdbtnZaklDiagTT))
+                            .addGap(18)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
