@@ -53,15 +53,15 @@ public class Launcher {
 			} else {
 				if (args[0].equals("tst")) {
 					System.out.println("Using test application server.");
-					clientAuthType = "unspecified";
+					clientAuthType = "tst";
 					appServerIp = "10.0.0.248";
 				} else if (args[0].equals("int")) {
 					System.out.println("Using internal application server.");
-					clientAuthType = "unspecified";
+					clientAuthType = "int";
 					appServerIp = "10.0.0.243";
 				} else if (args[0].equals("ext")) {
 					System.out.println("Using external application server.");
-					clientAuthType = "unspecified";
+					clientAuthType = "ext";
 					appServerIp = "10.1.1.8";
 				} else if (ipPattern.matcher(args[0]).matches()) {
 					appServerIp = args[0];

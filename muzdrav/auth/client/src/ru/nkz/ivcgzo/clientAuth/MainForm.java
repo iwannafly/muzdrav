@@ -65,7 +65,7 @@ public class MainForm {
 	private static ThriftServerAuth.Client client; 
 	private UserAuthInfo authInfo;
 	private IClient plug;
-	private ModulesUpdater modUpd;
+	//private ModulesUpdater modUpd;
 
 	/**
 	 * Launch the application.
@@ -399,12 +399,12 @@ public class MainForm {
 	}
 	
 	private void showPluginList() {
-			modUpd = new ModulesUpdater(conMan);
+			//modUpd = new ModulesUpdater(conMan);
 			while (true) {
 				try {
 					
 //					TODO На этапе разработки апдейтер будет только мешать
-					modUpd.checkAndUpdate(authInfo.pdost);
+					//modUpd.checkAndUpdate(authInfo.pdost);
 					conMan.getPluginLoader().loadPluginList(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					conMan.loadViewClient();
 					break;
