@@ -153,27 +153,27 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	/**
 	 * Получает логин пользователя.
 	 */
-	string getLogin(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod);
+	string getLogin(1: i32 userId);
 
 	/**
 	 * Устанавливает пароль для пользователя, открывая ему доступ к системе.
 	 */
-	UserIdPassword setPassword(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string login);
+	UserIdPassword setPassword(1: i32 mrId, 2: string login);
 
 	/**
 	 * Очищает пароль пользователя, закрывая ему доступ к системе.
 	 */
-	void remPassword(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod);
+	void remPassword(1: i32 userId);
 
 	/**
 	 * Получает разрешения пользователя, то есть, к каким частям системы у него есть доступ.
 	 */
-	string getPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod);
+	string getPermissions(1: i32 userId);
 
 	/**
 	 * Устанавливает разрешения пользователя.
 	 */
-	void setPermissions(1: i32 vrachPcod, 2: i32 lpuPcod, 3: i32 podrPcod, 4: string pdost);
+	void setPermissions(1: i32 userId, 2: string pdost);
 
 	list<classifier.IntegerClassifier> getReqShOsmList() throws (1: kmiacServer.KmiacServerException kse);
 	i32 saveShablonOsm(1: ShablonOsm sho) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);

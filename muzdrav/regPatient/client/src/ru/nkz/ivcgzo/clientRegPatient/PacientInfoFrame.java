@@ -2808,7 +2808,7 @@ public class PacientInfoFrame extends JFrame {
         panel_31.setBorder(new TitledBorder(null, "Состояние пациента", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
         JPanel panel_32 = new JPanel();
-        panel_32.setBorder(new TitledBorder(null, "Вызов скорой помощи", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+        panel_32.setBorder(new TitledBorder(null, "Доставлен СМП:", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
         JPanel panel_33 = new JPanel();
         panel_33.setBorder(new TitledBorder(null, "\u0416\u0430\u043B\u043E\u0431\u044B", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -2931,20 +2931,24 @@ public class PacientInfoFrame extends JFrame {
         					.addComponent(cmb_otkaz, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
         			.addContainerGap())
         );
-
-        ta_jal_pr = new JTextArea();
-        ta_jal_pr.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        ta_jal_pr.setLineWrap(true);
-        ta_jal_pr.setWrapStyleWord(true);
+        
+        JScrollPane scrollPane = new JScrollPane();
         GroupLayout gl_panel_33 = new GroupLayout(panel_33);
         gl_panel_33.setHorizontalGroup(
-            gl_panel_33.createParallelGroup(Alignment.LEADING)
-                .addComponent(ta_jal_pr, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+        	gl_panel_33.createParallelGroup(Alignment.LEADING)
+        		.addComponent(scrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE)
         );
         gl_panel_33.setVerticalGroup(
-            gl_panel_33.createParallelGroup(Alignment.LEADING)
-                .addComponent(ta_jal_pr, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+        	gl_panel_33.createParallelGroup(Alignment.LEADING)
+        		.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
         );
+        
+                ta_jal_pr = new JTextArea();
+                scrollPane.setViewportView(ta_jal_pr);
+                ta_jal_pr.setFont(new Font("Tahoma", Font.PLAIN, 12));
+                ta_jal_pr.setLineWrap(true);
+                ta_jal_pr.setWrapStyleWord(true);
+                panel_25.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{rbtn_plan, rbtn_extr, tf_ntalon, tf_nist, tf_datap, tf_timep, tf_dataosm, tf_timeosm, cmb_naprav, cmb_org, tf_diag_n, tf_diag_p, cmb_alk, cbx_nalz, cbx_nalp, tf_toc, tf_ad, cbx_smp, cbx_ber, cmb_travm, cmb_trans, cmb_otkaz, ta_jal_pr, tf_smpn, tf_datasmp, tf_timesmp}));
         panel_33.setLayout(gl_panel_33);
 
         JLabel lblNewLabel_54 = new JLabel("Дата и время");
@@ -3245,7 +3249,6 @@ public class PacientInfoFrame extends JFrame {
         );
         panel_26.setLayout(gl_panel_26);
         panel_25.setLayout(gl_panel_25);
-        panel_25.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{rbtn_plan, rbtn_extr, tf_ntalon, tf_nist, tf_datap, tf_timep, tf_dataosm, tf_timeosm, cmb_naprav, cmb_org, tf_diag_n, tf_diag_p, cmb_alk, cbx_nalz, cbx_nalp, tf_toc, tf_ad, cbx_smp, cbx_ber, cmb_travm, cmb_trans, cmb_otkaz, ta_jal_pr, tf_smpn, tf_datasmp, tf_timesmp}));
 
         JButton btnNew_priem = new JButton("Новое обращение");
         btnNew_priem.addActionListener(new ActionListener() {
@@ -4240,8 +4243,8 @@ public class PacientInfoFrame extends JFrame {
             String strerr = "";
             if (Id_gosp.getPl_extr() == 0)
                 strerr += "плановое/экстренное; \n\r";
-            if (Id_gosp.getPl_extr() == 1 && Id_gosp.getNtalon() == 0)
-                strerr += "плановый больной без талона; \n\r";
+//            if (Id_gosp.getPl_extr() == 1 && Id_gosp.getNtalon() == 0)
+//                strerr += "плановый больной без талона; \n\r";
             if (Id_gosp.getNist() == 0 && Id_gosp.getCotd() != 0)
                 strerr += "отсутствует номер истории болезни; \n\r";
             if (Id_gosp.getNaprav() == null)
