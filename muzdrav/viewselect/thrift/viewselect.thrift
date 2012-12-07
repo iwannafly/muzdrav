@@ -156,19 +156,17 @@ struct PatientDiagZInfo {
 	 9: optional i64 dataish;
 	10: optional i64 datag;
 	11: optional i64 datad;
-	12: optional string diag_s;
-	13: optional i32 d_grup_s;
-	14: optional i32 cod_sp;
-	15: optional string cdol_ot;
-	16: optional i32 nmvd;
-	17: optional i32 xzab;
-	18: optional i32 stady;
-	19: optional i32 disp;
-	20: optional i32 pat;
-	21: optional i32 prizb;
-	22: optional i32 prizi;
-	23: optional string named;
-	24: optional string fio_vr;
+	12: optional i32 cod_sp;
+	13: optional string cdol_ot;
+	14: optional i32 nmvd;
+	15: optional i32 xzab;
+	16: optional i32 stady;
+	17: optional i32 disp;
+	18: optional i32 pat;
+	19: optional i32 prizb;
+	20: optional i32 prizi;
+	21: optional string named;
+	22: optional string fio_vr;
 }
 
 struct PatientVizitAmbInfo {
