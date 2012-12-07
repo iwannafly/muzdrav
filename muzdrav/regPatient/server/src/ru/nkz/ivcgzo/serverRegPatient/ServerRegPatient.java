@@ -35,6 +35,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 import ru.nkz.ivcgzo.thriftRegPatient.AllLgota;
+import ru.nkz.ivcgzo.thriftRegPatient.Anam;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
 import ru.nkz.ivcgzo.thriftRegPatient.GospAlreadyExistException;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
@@ -63,6 +64,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
+import ru.nkz.ivcgzo.thriftRegPatient.TipPodrNotFoundException;
 
 /**
  * Класс, имплементирующий трифтовый интерфейс для связи с клиентом.
@@ -1726,4 +1728,18 @@ public class ServerRegPatient extends Server implements Iface {
             throw new KmiacServerException();
         }
     }
+
+	@Override
+	public int getTipPodr(int pcod) throws TipPodrNotFoundException,
+			KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<Anam> getAnam(int npasp) throws LgotaNotFoundException,
+			KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
