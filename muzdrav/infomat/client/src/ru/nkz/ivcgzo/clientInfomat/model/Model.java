@@ -1,14 +1,15 @@
 package ru.nkz.ivcgzo.clientInfomat.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.DoctorObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.PoliclinicObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.SpecialityObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialityObserver;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
@@ -20,10 +21,10 @@ import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
-public class HospitalModel implements HospitalModelInterface {
-    private List<DoctorObserver> doctorObservers;
-    private List<PoliclinicObserver> policlinicObservers;
-    private List<SpecialityObserver> specialityObservers;
+public class Model implements IModel {
+    private List<IDoctorObserver> doctorObservers = new ArrayList<IDoctorObserver>();
+    private List<IPoliclinicObserver> policlinicObservers = new ArrayList<IPoliclinicObserver>();
+    private List<ISpecialityObserver> specialityObservers = new ArrayList<ISpecialityObserver>();
     private List<IntegerClassifier> policlinics;
     private List<StringClassifier> specialities;
     private List<IntegerClassifier> doctors;
@@ -34,8 +35,7 @@ public class HospitalModel implements HospitalModelInterface {
     private StringClassifier currentSpeciality;
     private IntegerClassifier currentDoctor;
     private TPatient patient;
-    
-    
+
     @Override
     public List<IntegerClassifier> getPoliclinics() {
         return policlinics;
@@ -87,6 +87,7 @@ public class HospitalModel implements HospitalModelInterface {
     public void setPoliclinics() {
         try {
             policlinics = ClientInfomat.tcl.getPoliclinics();
+            notifyPoliclinicObservers();
         } catch (KmiacServerException e1) {
             policlinics = Collections.<IntegerClassifier>emptyList();
             e1.printStackTrace();
@@ -227,44 +228,50 @@ public class HospitalModel implements HospitalModelInterface {
         }
     }
 
-    public void registerDoctorObserver(DoctorObserver obs) {
+    @Override
+    public void registerDoctorObserver(IDoctorObserver obs) {
         doctorObservers.add(obs);
     }
 
-    public void removeDoctorObserver(DoctorObserver obs) {
+    @Override
+    public void removeDoctorObserver(IDoctorObserver obs) {
         doctorObservers.remove(obs);
     }
 
     public void notifyDoctorObservers() {
-        for (DoctorObserver obs: doctorObservers) {
+        for (IDoctorObserver obs: doctorObservers) {
             obs.updateDoctor();
         }
     }
 
-    public void registerPoliclinicObserver(PoliclinicObserver obs) {
+    @Override
+    public void registerPoliclinicObserver(IPoliclinicObserver obs) {
         policlinicObservers.add(obs);
     }
 
-    public void removePoliclinicObserver(PoliclinicObserver obs) {
+    @Override
+    public void removePoliclinicObserver(IPoliclinicObserver obs) {
         policlinicObservers.remove(obs);
     }
 
     public void notifyPoliclinicObservers() {
-        for (PoliclinicObserver obs: policlinicObservers) {
+        for (IPoliclinicObserver obs: policlinicObservers) {
             obs.updatePoliclinic();
         }
     }
 
-    public void registerSpecilitityObserver(SpecialityObserver obs) {
+    @Override
+    public void registerSpecialityObserver(ISpecialityObserver obs) {
         specialityObservers.add(obs);
     }
 
-    public void removeSpecilitityObserver(SpecialityObserver obs) {
+    @Override
+    public void removeSpecialityObserver(ISpecialityObserver obs) {
         specialityObservers.remove(obs);
     }
 
     public void notifySpecialityObservers() {
-        for (SpecialityObserver obs: specialityObservers) {
+        for (ISpecialityObserver obs: specialityObservers) {
             obs.updateSpeciality();
         }
     }

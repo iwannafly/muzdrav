@@ -1,5 +1,5 @@
 package ru.nkz.ivcgzo.clientInfomat.model.observers;
 
-public interface SpecialityObserver {
+public interface ISpecialityObserver {
     public void updateSpeciality();
 }

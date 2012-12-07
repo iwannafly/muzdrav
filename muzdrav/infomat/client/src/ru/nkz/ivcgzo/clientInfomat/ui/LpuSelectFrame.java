@@ -23,12 +23,14 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 public class LpuSelectFrame extends JFrame {
     private static final long serialVersionUID = 5394050664711305366L;
@@ -151,13 +153,13 @@ public class LpuSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addLpuList() {
         lLpu = new ThriftIntegerClassifierList();
-        updateLpuList();
+//        updateLpuList();
         lLpu.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (lLpu.getSelectedValue() != null) {
                     frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
-                    updateLpuList();
+//                    updateLpuList();
                 }
             }
         });
@@ -168,19 +170,21 @@ public class LpuSelectFrame extends JFrame {
         spLpu.setViewportView(lLpu);
     }
 
-    private void updateLpuList() {
-        try {
-            lLpu.setData(ClientInfomat.tcl.getPoliclinics());
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            e1.printStackTrace();
-            ClientInfomat.conMan.reconnect(e1);
-        }
+    public void updateLpuList(List<IntegerClassifier> policlinics) {
+        lLpu.setData(policlinics);
+//        try {
+//            lLpu.setData(ClientInfomat.tcl.getPoliclinics());
+//        } catch (KmiacServerException e1) {
+//            e1.printStackTrace();
+//        } catch (TException e1) {
+//            e1.printStackTrace();
+//            ClientInfomat.conMan.reconnect(e1);
+//        }
     }
+
     public void showAsModal(int flag) {
        nextWindowFlag = flag;
-       updateLpuList();
+//       updateLpuList();
        setVisible(true);
     }
 }

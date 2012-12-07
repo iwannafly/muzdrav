@@ -1,5 +1,5 @@
 package ru.nkz.ivcgzo.clientInfomat.model.observers;
 
-public interface DoctorObserver {
+public interface IDoctorObserver {
     public void updateDoctor();
 }

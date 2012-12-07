@@ -2,13 +2,16 @@ package ru.nkz.ivcgzo.clientInfomat.model;
 
 import java.util.List;
 
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialityObserver;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
-public interface HospitalModelInterface {
+public interface IModel {
     public void setPoliclinics();
 
     public void setSpecialities(int cpol);
@@ -40,4 +43,18 @@ public interface HospitalModelInterface {
     public void reserveTalon(TPatient pat, TTalon talon);
 
     public void releaseTalon(TTalon talon);
+
+    public void registerDoctorObserver(IDoctorObserver obs);
+
+    public void removeDoctorObserver(IDoctorObserver obs);
+
+    public void notifyDoctorObservers();
+
+    public void registerPoliclinicObserver(IPoliclinicObserver obs);
+
+    public void removePoliclinicObserver(IPoliclinicObserver obs);
+
+    public void registerSpecialityObserver(ISpecialityObserver obs);
+
+    public void removeSpecialityObserver(ISpecialityObserver obs);
 }

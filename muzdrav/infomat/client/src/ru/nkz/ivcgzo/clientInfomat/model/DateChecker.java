@@ -40,7 +40,7 @@ public class DateChecker {
      */
     private void setCalendarDefaults() {
         calend = new GregorianCalendar();
-        // установка дня начала недели (по умолчанию - воскресенье)
+        // установка дня начала недели на понедельник (по умолчанию - воскресенье)
         calend.setFirstDayOfWeek(Calendar.MONDAY);
         calend.set(Calendar.HOUR_OF_DAY, 0);
         calend.set(Calendar.MINUTE, 0);
