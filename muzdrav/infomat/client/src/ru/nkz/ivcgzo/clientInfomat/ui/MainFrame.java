@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -14,6 +14,7 @@ import java.awt.Font;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
+
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -106,13 +107,13 @@ public class MainFrame extends JFrame {
         btnAppointment.setHorizontalTextPosition(SwingConstants.CENTER);
         btnAppointment.setVerticalTextPosition(SwingConstants.BOTTOM);
         btnAppointment.setBorder(new CompoundBorder(
-                new BevelBorder(BevelBorder.LOWERED, null, null, null, null),
-                new EtchedBorder(EtchedBorder.LOWERED, null, null))
+            new BevelBorder(BevelBorder.LOWERED, null, null, null, null),
+            new EtchedBorder(EtchedBorder.LOWERED, null, null))
         );
         btnAppointment.setBackground(Color.WHITE);
         btnAppointment.setForeground(Color.BLACK);
         btnAppointment.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/appointment.png")));
+            "resources/appointment.png")));
         mainPanel.add(btnAppointment);
     }
 
@@ -132,7 +133,7 @@ public class MainFrame extends JFrame {
             new EtchedBorder(EtchedBorder.LOWERED, null, null))
         );
         btnPersonalInfo.setIcon(new ImageIcon(MainFrame.class.getResource(
-                "resources/personalOffice.png")));
+            "resources/personalOffice.png")));
         mainPanel.add(btnPersonalInfo);
     }
 

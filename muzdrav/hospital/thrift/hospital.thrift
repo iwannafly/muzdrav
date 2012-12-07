@@ -116,7 +116,7 @@ struct Zakl {
 	8: optional i32 newOtd;
 	9: optional i32 vidOpl;
 	10: optional i32 vidPom;
-	11: optional i32 ukl;
+	11: optional double ukl;
 }
 
 struct TStage {
@@ -126,7 +126,7 @@ struct TStage {
 	4: optional string mes;
 	5: optional i64 dateStart;
 	6: optional i64 dateEnd;
-	7: optional i32 ukl;
+	7: optional double ukl;
 	8: optional i32 ishod;
 	9: optional i32 result;
 	10: optional i64 timeStart;
@@ -269,7 +269,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	void deleteStage(1:i32 idStage) throws (1:kmiacServer.KmiacServerException kse);
 
 	string printHospitalDiary(1: i32 idGosp, 2: i64 dateStart, 3: i64 dateEnd)
-		throws (1:kmiacServer.KmiacServerException kse);	
+		throws (1:kmiacServer.KmiacServerException kse);
+	string printHospitalDeathSummary(1: i32 idGosp, 2: string lpuInfo, 3: TPatient patient)
+		throws (1:kmiacServer.KmiacServerException kse);		
 	string printHospitalSummary(1: i32 idGosp, 2: string lpuInfo, 3: TPatient patient)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
@@ -301,7 +303,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	*/
 	list<classifier.IntegerClassifier> getOtd(1: i32 lpu)
 		throws (1:kmiacServer.KmiacServerException kse);
-/* родовспоможение*/
+/* СЂРѕРґРѕРІСЃРїРѕРјРѕР¶РµРЅРёРµ*/
 	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
     void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
