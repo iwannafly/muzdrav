@@ -121,8 +121,8 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		mnNewMenu.add(menuItem);
 		
-		JMenuItem menuItem_1 = new JMenuItem("Диспансеризация подростков");
-		menuItem.addActionListener(new ActionListener() {
+		JMenuItem menuItem_1 = new JMenuItem("Диспансеризация детей");
+		menuItem_1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				per = new Period();

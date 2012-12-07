@@ -9,6 +9,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
+import ru.nkz.ivcgzo.clientInfomat.ui.MainFrame;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;

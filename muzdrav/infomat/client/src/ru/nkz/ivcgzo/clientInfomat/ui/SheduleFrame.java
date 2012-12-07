@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -14,6 +14,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
+import ru.nkz.ivcgzo.clientInfomat.SheduleTableCellRenderer;
+import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 
 public class SheduleFrame extends JFrame {
 
