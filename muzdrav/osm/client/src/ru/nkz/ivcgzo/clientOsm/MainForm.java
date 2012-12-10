@@ -253,7 +253,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		
 		try {
 			prevZapvr = tblPos.getSelectedItem();
-			tblPos.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis()));
+			tblPos.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis(), authInfo.getCpodr()));
 			if (prevZapvr != null)
 				for (int i = 0; i < tblPos.getData().size(); i++)
 					if (tblPos.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {

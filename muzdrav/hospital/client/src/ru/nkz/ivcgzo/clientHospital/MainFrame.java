@@ -24,6 +24,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -291,7 +292,8 @@ public class MainFrame extends JFrame {
     private JButton btnZaklDiag;
     private JMenuItem mntmPrintHospitalSummary;
     private JPanel pChildbirth;
-    public static TRdIshod trdIshod;
+    //public static TRdIshod trdIshod;
+    private TRdIshod trdIshod;
     private JPanel panel_1;
     private JPanel panel_2;
     private JTextField TVes;
@@ -330,11 +332,17 @@ public class MainFrame extends JFrame {
 	private JTextField TGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
 	private JTextField TDet;
+	private JTextField TObvit;
 	private JTextField TRod;
 	private JTextField TMed;
 	private JTextField textField;
+    private JMenuItem mntmPrintHospitalDeathSummary;
+    private JLabel lblZaklDiagStep;
+    private JRadioButton rdbtnZaklDiagSrT;
+    private JRadioButton rdbtnZaklDiagTT; 
 //    private JLabel lblNewLabel_33;
 //    private JTextField textField_1;
+
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(850, 750));
 //        setPreferredSize(new Dimension(1000, 800));
@@ -377,18 +385,23 @@ public class MainFrame extends JFrame {
     public final void onConnect() {
         createModalFrames();
         try {
+            System.out.println(ClientHospital.authInfo.getCpodr());
             lMedicalHistoryShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
                 3, null));
             lDiagShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),  null));
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             cbxIshod.setData(ClientHospital.tcl.getAp0());
             cbxResult.setData(ClientHospital.tcl.getAq0());
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
             cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
+            CBPrinial.setData(ClientHospital.tcl.get_s_vrach());
+            CBAkush.setData(ClientHospital.tcl.get_s_vrach());
+            CBVrash.setData(ClientHospital.tcl.get_s_vrach());
+            CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -456,7 +469,7 @@ public class MainFrame extends JFrame {
             final ThriftIntegerClassifierList inTicl) {
         try {
             List<IntegerClassifier> intClassif = ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCspec(), doctorAuth.getCslu(),
+                doctorAuth.getCpodr(), doctorAuth.getCslu(),
                 (inCtf.getText().length() < 3)
                 ? null : '%' + inCtf.getText() + '%');
             inTicl.setData(intClassif);
@@ -601,6 +614,32 @@ public class MainFrame extends JFrame {
             }
         });
         mnPrintForms.add(mntmPrintHospitalSummary);
+
+        mntmPrintHospitalDeathSummary = new JMenuItem("Посмертный эпикриз");
+        mntmPrintHospitalDeathSummary.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    try {
+                        String servPath =
+                            ClientHospital.tcl.printHospitalDeathSummary(patient.getGospitalCod(),
+                                doctorAuth.getClpu_name() + " "
+                                + doctorAuth.getCpodr_name(), patient);
+                        String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+                        ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+                        ClientHospital.conMan.openFileInEditor(cliPath, false);
+                    } catch (KmiacServerException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        e1.printStackTrace();
+                        ClientHospital.conMan.reconnect(e1);
+                    }
+                }
+            }
+        });
+        mnPrintForms.add(mntmPrintHospitalDeathSummary);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -942,7 +981,7 @@ public class MainFrame extends JFrame {
         vbLifeHistoryTextFields.setPreferredSize(new Dimension(500, 0));
         vbLifeHistoryTextFields.setAlignmentX(Component.LEFT_ALIGNMENT);
         vbLifeHistoryTextFields.setBorder(
-                new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
+            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
         pLifeHistory.add(vbLifeHistoryTextFields);
 
         setLifeHistoryTextAreas();
@@ -1045,7 +1084,7 @@ public class MainFrame extends JFrame {
                                 5, tfLifeHShablonFilter.getText()));
                     } else {
                         lLifeHistoryShabloNames.setData(
-                                ClientHospital.tcl.getDopShablonNames(5, null));
+                            ClientHospital.tcl.getDopShablonNames(5, null));
                     }
                 } catch (KmiacServerException e1) {
                     e1.printStackTrace();
@@ -1171,7 +1210,7 @@ public class MainFrame extends JFrame {
     private void fillLifeHistoryPanel() {
         try {
             lifeHistory =
-                    ClientHospital.tcl.getLifeHistory(patient.getPatientId());
+                ClientHospital.tcl.getLifeHistory(patient.getPatientId());
         } catch (LifeHistoryNotFoundException e) {
             lifeHistory = null;
         } catch (KmiacServerException e) {
@@ -1273,7 +1312,7 @@ public class MainFrame extends JFrame {
 
     private void addMedicalHistoryTable() {
         tbMedHist = new CustomTable<TMedicalHistory, TMedicalHistory._Fields>(
-                true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
+            true, true, TMedicalHistory.class, 8, "Дата", 9, "Время");
         spMedHist.setViewportView(tbMedHist);
         tbMedHist.addMouseListener(new MouseAdapter() {
             @Override
@@ -1396,7 +1435,7 @@ public class MainFrame extends JFrame {
                 }
                 if (tbMedHist.getRowCount() > 0) {
                     tbMedHist.setRowSelectionInterval(tbMedHist.getRowCount() - 1,
-                            tbMedHist.getRowCount() - 1);
+                        tbMedHist.getRowCount() - 1);
                 }
                 clearMedicalHistoryTextAreas();
             }
@@ -2002,7 +2041,7 @@ public class MainFrame extends JFrame {
         if (patient != null) {
             try {
                 tbDiag.setData(
-                        ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
+                    ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
                 setDiagPriznRdbtn();
             } catch (DiagnosisNotFoundException e) {
                 Collections.<TDiagnosis>emptyList();
@@ -2096,9 +2135,13 @@ public class MainFrame extends JFrame {
                 diag.setDiagName(curDiagnosis.getName());
                 diag.setId(ClientHospital.tcl.addDiagnosis(diag));
 //                taDiagMedOp.setText(curDiagnosis.getName());
-                tbDiag.addItem(diag);
+//                tbDiag.addItem(diag);
                 tbDiag.setData(
                     ClientHospital.tcl.getDiagnosis(patient.getGospitalCod()));
+                if (tbDiag.getRowCount() > 1) {
+                    tbDiag.setRowSelectionInterval(tbDiag.getRowCount() - 2,
+                        tbDiag.getRowCount() - 1);
+                }
             }
         } catch (KmiacServerException e1) {
             e1.printStackTrace();
@@ -2214,6 +2257,12 @@ public class MainFrame extends JFrame {
             return false;
         }
         return true;
+    }
+
+    private boolean isStageDatesCorrect() {
+        return ((tbStages.getData().get(0).getDateStart() == priemInfo.getDatap())
+            && (tbStages.getData().get(tbStages.getData().size() - 1).getDateEnd()
+                == cdeZaklDate.getDate().getTime()));
     }
 
     private boolean isLastStageItemSetCorrectly() {
@@ -2388,7 +2437,7 @@ public class MainFrame extends JFrame {
                         if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
                             ClientHospital.tcl.addStage(tbStages.getSelectedItem());
                             tbStages.setData(
-                                    ClientHospital.tcl.getStage(patient.getGospitalCod()));
+                                ClientHospital.tcl.getStage(patient.getGospitalCod()));
                         }
                     } else {
                         if (isStageAddRequiredFieldsSet(tbStages.getSelectedItem())) {
@@ -2514,18 +2563,7 @@ public class MainFrame extends JFrame {
         JButton btnNewButton_1 = new JButton("");
         btnNewButton_1.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-//    			if (CBAkush.getSelectedPcod() != null)
-//    				trdIshod.setAkush(CBAkush.getSelectedPcod());
-//    				else trdIshod.unsetAkush();  поле string
-//    			if (CBPrinal.getSelectedPcod() != null)
-//				trdIshod.setPrinal(CBPrinal.getSelectedPcod());
-//				else trdIshod.unsetPrinal();  поле string
-//    			if (CBOsmotr.getSelectedPcod() != null)
-//				trdIshod.setOsmotr(CBOsmotr.getSelectedPcod());
-//				else trdIshod.unsetOsmotr();  поле string
-//    			if (CBVrash.getSelectedPcod() != null)
-//				trdIshod.setVrash(CBVrash.getSelectedPcod());
-//				else trdIshod.unsetVrash();  поле string
+          		try {
         	trdIshod.setChcc( (int) Schcc.getModel().getValue());
       		trdIshod.setDatarod(TDatarod.getDate().getTime());
       		trdIshod.setDeyat(TRod.getText());
@@ -2537,8 +2575,8 @@ public class MainFrame extends JFrame {
       		trdIshod.setKrov((int) SKrov.getModel().getValue());
       		trdIshod.setMesto(TDet.getText());
       		trdIshod.setObezb(TMed.getText());
-// 		   	trdIshod.setObol(TObol.getText());
-// 		   	trdIshod.setObvit(TObvit.getText());
+ 		   	trdIshod.setObol(TObol.getText());
+ 		   	trdIshod.setObvit(TObvit.getText());
       		trdIshod.setOj((double) Soj.getModel().getValue());
       		trdIshod.setOsobp(TOsob.getText());
       		trdIshod.setPoln(TPoln.getText());
@@ -2563,7 +2601,29 @@ public class MainFrame extends JFrame {
 			if (CBPosled.getSelectedPcod() != null)
 				trdIshod.setPosled(CBPosled.getSelectedPcod());
 				else trdIshod.unsetPosled();
+			if (CBAkush.getSelectedPcod() != null)
+				trdIshod.setAkush(CBAkush.getSelectedPcod());
+				else trdIshod.unsetAkush();
+			if (CBPrinial.getSelectedPcod() != null)
+				trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
+			    else trdIshod.unsetPrinyl();
+			if (CBVrash.getSelectedPcod() != null)
+				trdIshod.setVrash(CBVrash.getSelectedPcod());
+			    else trdIshod.unsetVrash();
+			if (CBOsmotr.getSelectedPcod() != null)
+				trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
+			else trdIshod.unsetOsmposl();
   		trdIshod.setVes((int) SVes.getModel().getValue());
+  		trdIshod.setDetmesto(TDet.getText());
+  		System.out.println(trdIshod);	
+			ClientHospital.tcl.updateRdIshod(trdIshod);
+		} catch (KmiacServerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         	}
         });
         btnNewButton_1.setToolTipText("Сохранить");
@@ -2642,17 +2702,17 @@ public class MainFrame extends JFrame {
         
         JLabel lblNewLabel_31 = new JLabel("Акушерка");
         lblNewLabel_31.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        
-        CBPrinial = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        //StringKlassifier s_vrash
+        CBPrinial = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBPrinial.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBOsmotr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBOsmotr = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBOsmotr.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVrash = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBVrash = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBVrash.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBAkush = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBAkush = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBAkush.setFont(new Font("Tahoma", Font.BOLD, 12));
         GroupLayout gl_panel_4 = new GroupLayout(panel_4);
         gl_panel_4.setHorizontalGroup(
@@ -2726,7 +2786,7 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_27 = new JLabel("III период");
         lblNewLabel_27.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db12);;
         CBPosled.setFont(new Font("Tahoma", Font.BOLD, 12));;
         
         JLabel LVrem = new JLabel("Через ");
@@ -2905,7 +2965,7 @@ public class MainFrame extends JFrame {
         TNash.setFont(new Font("Tahoma", Font.BOLD, 12));
         TNash.setColumns(10);
         
-        CBEff = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+        CBEff = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db13);
         
         TMed = new JTextField();
         TMed.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -3027,10 +3087,10 @@ public class MainFrame extends JFrame {
 		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBPolpl.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db10);;
         CBPoz.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);;
+        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db11);;
         CBVid.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         CBSerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);
@@ -3184,28 +3244,62 @@ public class MainFrame extends JFrame {
 		SVes.setValue(trdIshod.getVes());
 		TVes.setText(String.valueOf(trdIshod.getVespl()));// integer & string
 		TPoln.setText(trdIshod.getPoln());
-		TDet.setText(trdIshod.getMesto());
+		TDet.setText(trdIshod.getDetmesto());
 		TNash.setText(trdIshod.getDeyat());
 		TVremp.setText(trdIshod.getVremp());
-//		TObol.setText(trdIshod.getObol()); //string
+		TObol.setText(trdIshod.getObol()); 
 		SDlina.setValue(trdIshod.getPupov());
 		TOsob.setText(trdIshod.getOsobp());
 		SKrov.setValue(trdIshod.getKrov());
 		TPer1.setText(trdIshod.getPrr1());
 		TPer2.setText(trdIshod.getPrr2());
 		TPer3.setText(trdIshod.getPrr3());
-		//		SVozMen.setValue(trdIshod.getVozmen());
-//		SMenC.setValue(trdIshod.getPrmen());
-//		SKolDet.setValue(trdIshod.getDeti());
-//		SPolJ.setValue(trdIshod.getPolj());
-//		SSrokA.setValue(trdIshod.getSrokab());
-//		SCDiag.setValue(trdIshod.getCdiagt());
-//		SCvera.setValue(trdIshod.getCvera());
-//		oslrod = trdIshod.getOslrod();
-//		osostp = trdIshod.getOsp();
-//		if(trdIshod.isSetOslab())
-//		CBOslAb.setSelectedPcod(trdIshod.getOslab());
-//		else CBOslAb.setSelectedItem(null);
+		Soj.setValue(trdIshod.getOj());
+		Shdm.setValue(trdIshod.getHdm());
+		TGde.setText(trdIshod.getMesto());
+		Schcc.setValue(trdIshod.getChcc());
+		TVes.setText(String.valueOf(trdIshod.getVes()));
+		TShvat.setText(trdIshod.getShvat());
+		TVod.setText(trdIshod.getVody());
+		TKash.setText(trdIshod.getKashetv());
+		TRod.setText(trdIshod.getDeyat());
+		TMed.setText(trdIshod.getObezb());
+		if (trdIshod.isSetPolpl())
+		CBPolpl.setSelectedPcod(trdIshod.getPolpl());
+		else CBPolpl.setSelectedItem(null);
+		if (trdIshod.isSetPozpl())
+		CBPoz.setSelectedPcod(trdIshod.getPozpl());
+		else CBPoz.setSelectedItem(null);
+		if (trdIshod.isSetVidpl())
+		CBVid.setSelectedPcod(trdIshod.getVidpl());
+		else CBVid.setSelectedItem(null);
+		if (trdIshod.isSetSerd())
+		CBSerd.setSelectedPcod(trdIshod.getSerd());
+		else CBSerd.setSelectedItem(null);
+		if (trdIshod.isSetSerd1())
+		CBSerd1.setSelectedPcod(trdIshod.getSerd1());
+		else CBSerd1.setSelectedItem(null);
+		if (trdIshod.isSetPredpl())
+		CBPred.setSelectedPcod(trdIshod.getPredpl());
+		else CBPred.setSelectedItem(null);
+		if (trdIshod.isSetEff())
+		CBEff.setSelectedPcod(trdIshod.getEff());
+		else CBEff.setSelectedItem(null);
+		if (trdIshod.isSetPosled())
+		CBPosled.setSelectedPcod(trdIshod.getPosled());
+		else CBPosled.setSelectedItem(null);
+		if (trdIshod.isSetAkush())
+		CBAkush.setSelectedPcod(trdIshod.getAkush());
+		else CBAkush.setSelectedItem(null);
+		if (trdIshod.isSetVrash())
+		CBVrash.setSelectedPcod(trdIshod.getVrash());
+		else CBVrash.setSelectedItem(null);
+		if (trdIshod.isSetPrinyl())
+		CBPrinial.setSelectedPcod(trdIshod.getPrinyl());
+		else CBPrinial.setSelectedItem(null);
+		if (trdIshod.isSetOsmposl())
+		CBOsmotr.setSelectedPcod(trdIshod.getOsmposl());
+		else CBOsmotr.setSelectedItem(null);
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -3414,6 +3508,16 @@ public class MainFrame extends JFrame {
 
         cbxAnotherOtd = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         cbxAnotherOtd.setVisible(false);
+
+
+
+        lblZaklDiagStep = new JLabel("Степень тяжести:");
+
+        rdbtnZaklDiagSrT = new JRadioButton("Средняя");
+        rdbtnZaklDiagTT = new JRadioButton("Тяжелая");
+        ButtonGroup btngDiagRadioT = new ButtonGroup();
+        btngDiagRadioT.add(rdbtnZaklDiagSrT);
+        btngDiagRadioT.add(rdbtnZaklDiagTT);
     }
 
     private void setZaklButtons() {
@@ -3421,7 +3525,7 @@ public class MainFrame extends JFrame {
         btnSaveZakl.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 try {
-                    if (isStagesCorrect()) {
+                    if (isStagesCorrect() && isStageDatesCorrect()) {
                         if (isPatientOut()) {
                             if (isAllRequiredOutFieldsSet()) {
                                 Zakl tmpZakl = new Zakl();
@@ -3433,8 +3537,8 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
-                                if (tfUkl.getText().isEmpty()) {
-                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                if (!tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
@@ -3452,8 +3556,8 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
-                                if (tfUkl.getText().isEmpty()) {
-                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                if (!tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
@@ -3473,8 +3577,8 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
-                                if (tfUkl.getText().isEmpty()) {
-                                    tmpZakl.setUkl(Integer.valueOf(tfUkl.getText()));
+                                if (!tfUkl.getText().isEmpty()) {
+                                    tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
                                 ClientHospital.tcl.addZakl(tmpZakl);
@@ -3598,13 +3702,14 @@ public class MainFrame extends JFrame {
                 JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        if ((tfPatalogoAnDiagPcod.getText().isEmpty())
-                || (tfPatalogoAnDiagName.getText().isEmpty())) {
-            JOptionPane.showMessageDialog(MainFrame.this,
-                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
-                JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
+//FIXME
+//        if ((tfPatalogoAnDiagPcod.getText().isEmpty())
+//                || (tfPatalogoAnDiagName.getText().isEmpty())) {
+//            JOptionPane.showMessageDialog(MainFrame.this,
+//                "Не выбран паталогоанатомический диагноз. Информация не сохранена", "Ошибка",
+//                JOptionPane.ERROR_MESSAGE);
+//            return false;
+//        }
         if (cdeZaklDate.getDate() == null) {
             JOptionPane.showMessageDialog(MainFrame.this,
                 "Не выбрана дата смерти. Информация не сохранена", "Ошибка",
@@ -3686,9 +3791,9 @@ public class MainFrame extends JFrame {
                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addGroup(glPersonalInfo.createSequentialGroup()
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfChamber, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                                .addComponent(tfGender, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE))
+                                .addComponent(tfChamber, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfGender, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfNumberOfDesiaseHistory, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE))
                             .addGap(31)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblSurname)
@@ -3696,9 +3801,9 @@ public class MainFrame extends JFrame {
                                 .addComponent(lblStatus))
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
-                                .addComponent(tfBirthdate, GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                .addComponent(tfSurname, GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                .addComponent(tfStatus, 0, 206, Short.MAX_VALUE))
+                                .addComponent(tfBirthdate, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfSurname, GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                                .addComponent(tfStatus, 0, 225, Short.MAX_VALUE))
                             .addGap(34)
                             .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblName)
@@ -3709,24 +3814,24 @@ public class MainFrame extends JFrame {
                                 .addGroup(glPersonalInfo.createSequentialGroup()
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addGroup(glPersonalInfo.createSequentialGroup()
-                                            .addComponent(tfName, GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                                            .addComponent(tfName, GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
                                             .addGap(40))
-                                        .addComponent(tfOms, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE))
+                                        .addComponent(tfOms, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE))
                                     .addGap(43)
                                     .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                                         .addComponent(lblMiddlename)
                                         .addComponent(lblDms)))
                                 .addGroup(glPersonalInfo.createSequentialGroup()
-                                    .addComponent(tfWork, GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                                    .addComponent(tfWork, GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                                     .addGap(99))))
                         .addGroup(glPersonalInfo.createSequentialGroup()
-                            .addComponent(tfRealAddress, GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)
+                            .addComponent(tfRealAddress, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                             .addGap(79))
                         .addGroup(glPersonalInfo.createSequentialGroup()
-                            .addComponent(tfRegistrationAddress, GroupLayout.DEFAULT_SIZE, 923, Short.MAX_VALUE)
+                            .addComponent(tfRegistrationAddress, GroupLayout.DEFAULT_SIZE, 981, Short.MAX_VALUE)
                             .addGap(79)))
                     .addGap(18)
-                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING, false)
+                    .addGroup(glPersonalInfo.createParallelGroup(Alignment.LEADING)
                         .addComponent(btnUpdateChamber, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(tfDms)
                         .addComponent(tfMiddlename, GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE))
@@ -3797,18 +3902,12 @@ public class MainFrame extends JFrame {
                         .addComponent(spZakluch, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(spRecomend, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(lblZaklDiag)
-                        .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfZaklDiagPcod)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(tfZaklDiagName, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(btnZaklDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
                         .addComponent(cbxIshod, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
                         .addComponent(cbxAnotherOtd, 0, 847, Short.MAX_VALUE)
                         .addComponent(lblIshod)
                         .addComponent(lblPatalogoAnDiagHeader)
                         .addGroup(glPZakl.createSequentialGroup()
-                            .addComponent(tfPatalogoAnDiagPcod)
+                            .addComponent(tfPatalogoAnDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(tfPatalogoAnDiagName, GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
                             .addPreferredGap(ComponentPlacement.RELATED)
@@ -3823,7 +3922,21 @@ public class MainFrame extends JFrame {
                             .addPreferredGap(ComponentPlacement.UNRELATED)
                             .addComponent(lblZaklTime)
                             .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(cdeZaklTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addGroup(glPZakl.createSequentialGroup()
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addComponent(tfZaklDiagPcod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lblZaklDiagStep))
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.LEADING)
+                                .addGroup(glPZakl.createSequentialGroup()
+                                    .addComponent(rdbtnZaklDiagSrT)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(rdbtnZaklDiagTT))
+                                .addGroup(glPZakl.createSequentialGroup()
+                                    .addComponent(tfZaklDiagName, GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+                                    .addPreferredGap(ComponentPlacement.RELATED)
+                                    .addComponent(btnZaklDiag, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE)))))
                     .addPreferredGap(ComponentPlacement.RELATED)
                     .addGroup(glPZakl.createParallelGroup(Alignment.TRAILING)
                         .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
@@ -3844,7 +3957,7 @@ public class MainFrame extends JFrame {
                                 .addComponent(tfZaklShablonNames, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnZaklShablonFind))
                             .addGap(8)
-                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 738, Short.MAX_VALUE))
+                            .addComponent(spZaklShablonNames, GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE))
                         .addGroup(glPZakl.createSequentialGroup()
                             .addComponent(lblRecomend)
                             .addPreferredGap(ComponentPlacement.RELATED)
@@ -3877,6 +3990,11 @@ public class MainFrame extends JFrame {
                                 .addComponent(tfZaklDiagName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnZaklDiag))
                             .addPreferredGap(ComponentPlacement.RELATED)
+                            .addGroup(glPZakl.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblZaklDiagStep)
+                                .addComponent(rdbtnZaklDiagSrT)
+                                .addComponent(rdbtnZaklDiagTT))
+                            .addGap(18)
                             .addComponent(lblIshod)
                             .addPreferredGap(ComponentPlacement.RELATED)
                             .addComponent(cbxIshod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)

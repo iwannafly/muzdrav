@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -20,6 +20,7 @@ import javax.swing.Box;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;

@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -22,6 +22,9 @@ import javax.swing.JTable;
 
 import org.apache.thrift.TException;
 
+import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
+import ru.nkz.ivcgzo.clientInfomat.TalonTableCellRenderer;
+import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftInfomat.ReserveTalonOperationFailedException;

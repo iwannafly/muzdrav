@@ -1,4 +1,4 @@
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.model;
 
 import java.sql.Time;
 import java.util.ArrayList;

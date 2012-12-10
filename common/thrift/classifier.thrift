@@ -125,7 +125,12 @@ enum IntegerClassifiers {
 	n_vp1 = 107,
 	n_vr_doc = 108,
 	n_z43_gr = 109, 
-	n_period = 110
+	n_period = 110,
+	n_db10 = 111,
+	n_db11 = 112,
+	n_db12 = 113,
+	n_db13 = 114
+
 }
 
 enum StringClassifiers {

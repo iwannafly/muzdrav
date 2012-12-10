@@ -206,7 +206,7 @@ public class MainFrame extends JFrame {
                     }
                 } catch (KmiacServerException e) {
                     JOptionPane.showMessageDialog(MainFrame.this,
-                            "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                        "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 } catch (TException e1) {
                     ClientLab.conMan.reconnect(e1);
                 }

@@ -51,6 +51,7 @@ import ru.nkz.ivcgzo.thriftVgr.Lgot;
 import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
 import ru.nkz.ivcgzo.thriftVgr.RdPatient;
 import ru.nkz.ivcgzo.thriftVgr.RdVizit;
+import ru.nkz.ivcgzo.thriftVgr.Sv3;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr.Iface;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
@@ -80,6 +81,8 @@ public class ServerVgr extends Server implements Iface {
 	private final TResultSetMapper< RdConVizit, RdConVizit._Fields> rsmRdCV;
 	private final Class<?>[] rdConVizitTypes;
 
+	private final TResultSetMapper<Sv3, Sv3._Fields> rsmSv3;
+	private final Class<?>[] Sv3Types;
 	
 	
 	public ServerVgr(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
@@ -106,7 +109,32 @@ public class ServerVgr extends Server implements Iface {
 		rsmRdCV = new TResultSetMapper<>(RdConVizit.class,"uiv",         "uid",      "npasp",        "ned",        "ves",      "lcad",       "ldad",       "rcad",       "rdad",       "ball",        "hdm",        "spl",         "oj",         "chcc",       "polpl",      "predpl",       "serd",        "serd1",       "oteki");
 		rdConVizitTypes = new Class<?>[]{          Integer.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
+/*1*/		rsmSv3 = new TResultSetMapper<>(Sv3.class, "code","dat_v","uchr","cod_uch","uchrnum",   
+/*2*/      				"uchrname","fio_u","dat_born","pol","nation","vremen","mesto_k",
+/*3*/			"mesto_k1","mesto_k2","mesto_k3","mesto_k4","mesto_k5","mesto_k6",
+/*4*/			"gorod_k","street_k","m_v", "where_s1","where_s","p_dou","pos_",   /*25*/
+/*5*/			"u_", "m_uth","m_uth1", "wedom","wedom1","vesgr","ves_kg","rost",
+/*6*/			"f_r","f_r1","massa", "post","intel","em","ps","d_do","k_s1",
+/*7*/                "k_s2","k_s3","k_s4","k_s5","d_po","k_si1",
+/*8*/			"p_u_01","n_pu1","f_h_1","k_si2","p_u_02","n_pu2","f_h_2",
+/*9*/			"k_si3","p_u_03","n_pu3","f_h_3","k_si4","p_u_04","n_pu4",    /*62*/
+/*10*/			"f_h_4","k_si5","p_u_05","n_pu5","f_h_5","inv","zab_inv",
+/*11*/			"ch_b","gr_z","l_o_d","l_o_a","l_k_s","l_o_s","m_p_z","prov",
+/*12*/			"vrach","cod_reg","err_","postpone","id_fio" );
 
+/*1*/		Sv3Types = new Class<?>[] {Integer.class, Date.class,Integer.class,Integer.class,String.class,
+/*2*/		String.class,String.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,
+/*3*/		String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,
+/*4*/       Integer.class,String.class,Boolean.class,String.class,Integer.class,Boolean.class,Integer.class,    /*25*/
+/*5*/       Boolean.class,String.class,Integer.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,
+/*6*/       Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
+/*7*/       String.class,String.class,String.class,String.class,Integer.class,String.class,
+/*8*/       Integer.class,Integer.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,
+/*9*/       String.class,Integer.class,Integer.class,Integer.class,String.class,Integer.class,Integer.class,    /*62*/
+/*10*/      Integer.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
+/*11*/      Integer.class,String.class,Integer.class, Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
+/*12*/      String.class,Integer.class,Boolean.class,Integer.class,String.class};
+		
 		// TODO Auto-generated constructor stub
 	}
 
@@ -783,6 +811,205 @@ throw new TException(e);
 	}
 
 	@Override
+
+	public String getDetInfoPol(int cpodr, long dn, long dk)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		String sqlsv3;
+		String path = null;
+		int bufRead;
+		byte[] buffer = new byte[8192];
+		
+		try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("DetInfoPol", ".zip").getAbsolutePath());
+	 		ZipOutputStream zos = new ZipOutputStream(fos)) {
+	
+		sqlsv3 = "SELECT (cpol_pr::text||p.npasp::text)::integer AS code, f.dataz AS dat_v ,1::integer AS  uchr,345141024405000::bigint AS cod_uch, "+
+                 "cpol_pr::integer AS uchrnum, n.name_u::char(50) AS uchrname, trim(p.fam)||' '||trim(p.im)||' '||trim(p.ot)::char(50) AS fio_u,  "+
+				"p.datar AS dat_born, p.pol::integer AS pol, 1::integer AS nation, null::integer AS vremen, 320000000001::bigint AS  mesto_k,p.adm_obl::char(100) AS mesto_k1,"+
+                 "p.adm_gorod::char(50) AS mesto_k2, p.adm_gorod::char(50) AS mesto_k3, 324310000001::bigint AS  mesto_k4,null::integer AS mesto_k5,null::integer AS mesto_k6,"+
+				"1::integer AS gorod_k, trim(p.adm_ul)||' '||trim(p.adm_dom)||'-'||trim(p.adm_kv):: char(50) AS street_k, false::boolean AS m_v,null::char(30) As where_s1,"+
+		       "(case when u.pr='1' then (case when (f.dataz-p.datar)/365.25<4  then 2 else 5 end)  end)::integer AS where_s,"+  /*////уточнить*/
+				"(case when p.sgrp=9 then true else false end)::boolean AS p_dou, false::boolean AS u_, "+
+				"(case when p.sgrp=9 then 2 else 0 end)::integer AS pos_, "+
+				"(case when p.sgrp=7 then 6 when p.sgrp=8 then 1 else 0 end)::integer AS m_uth1, "+
+                "null::char(65) AS  m_uth, "+
+                "null::char(20) AS  vedom1, "+
+                "null::integer AS  vedom, "+
+                "null::integer AS  l_o_a, "+
+                "null::integer AS  l_k_s, "+
+                "null::integer AS  l_o_s, "+                
+                /*Wedom ??*/
+                "(select ves_gr from get_ves(f.ves::text))::integer AS vesgr,(select ves_kg from get_ves(f.ves::text))::integer AS ves_kg,"+
+				"rost*100::integer AS rost, "+
+                "(case when f.fv=0 then 1 else 2 end):: integer AS f_r, "+
+				"(case when f.fv=0 then null  when f.fv=1 then 2  when f.fv=2 then 1 end)::integer AS massa, "+
+		        "(case when f.fr=0 then 1 else 2 end):: integer AS f_r1, "+
+				"(case when f.fr=0 then null  when f.fr=1 then 2  when f.fr=2 then 1 end)::integer AS post, "+
+		        "(case when f.pi=0 then 1 else 2 end):: integer AS intel,(case when f.pe=0 then 1 else 2 end):: integer AS em,"+
+				"(case when f.pp=0 then 1 else 2 end):: integer AS ps,"+
+	       /*диагнозы*/
+	       "(case when ddo.d_do=1 then 2 else 1 end)::integer AS d_do, "+
+	       "(case when po.d_po=1 then 2 else 1 end)::integer AS d_po,"+
+     "(case when (ddo.d_do=1) then (select diag1 from get_diag(p.npasp)) else null end)::char(6) AS k_s1, "+
+     "(case when (ddo.d_do=1) then (select diag2 from get_diag(p.npasp)) else null end)::char(6) AS k_s2, "+
+     "(case when (ddo.d_do=1) then (select diag3 from get_diag(p.npasp))else null end)::char(6) AS k_s3, "+
+     "(case when (ddo.d_do=1) then (select diag4 from get_diag(p.npasp))else null end)::char(6) AS k_s4, "+
+     "(case when (ddo.d_do=1) then (select diag5 from get_diag(p.npasp))else null end)::char(6) AS k_s5, "+
+   
+     "(case when (po.d_po=1) then (select pdiag1 from get_diag(p.npasp))else null end)::char(6) AS k_si1, "+
+     "(case when (po.d_po=1) then (select pdiag2 from get_diag(p.npasp))else null end)::char(6) AS k_si2, "+
+     "(case when (po.d_po=1) then (select pdiag3 from get_diag(p.npasp))else null end)::char(6) AS k_si3, "+
+     "(case when (po.d_po=1) then (select pdiag4 from get_diag(p.npasp))else null end)::char(6) AS k_si4, "+
+     "(case when (po.d_po=1) then (select pdiag5 from get_diag(p.npasp))else null end)::char(6) AS k_si5, "+
+ 
+  "(case when (po.d_po=1) then (select p_u1 from get_diag(p.npasp))else null end)::integer AS p_u_01, "+
+  "(case when (po.d_po=1) then (select p_u2 from get_diag(p.npasp))else null end)::integer AS p_u_02, "+
+  "(case when (po.d_po=1) then (select p_u3 from get_diag(p.npasp))else null end)::integer AS p_u_03, "+
+  "(case when (po.d_po=1) then (select p_u4 from get_diag(p.npasp))else null end)::integer AS p_u_04, "+
+  "(case when (po.d_po=1) then (select p_u5 from get_diag(p.npasp))else null end)::integer AS p_u_05, "+
+     
+ "(case when (po.d_po=1) then (select n_pu1 from get_diag(p.npasp))else null end)::integer AS n_pu1, "+
+ "(case when (po.d_po=1) then (select n_pu2 from get_diag(p.npasp))else null end)::integer AS n_pu2, "+
+ "(case when (po.d_po=1) then (select n_pu3 from get_diag(p.npasp))else null end)::integer AS n_pu3, "+
+ "(case when (po.d_po=1) then (select n_pu4 from get_diag(p.npasp))else null end)::integer AS n_pu4, "+
+ "(case when (po.d_po=1) then (select n_pu5 from get_diag(p.npasp))else null end)::integer AS n_pu5, "+
+ 
+"(case when (po.d_po=1) then (select f_h1 from get_diag(p.npasp))else null end)::integer AS f_h_1, "+
+"(case when (po.d_po=1) then (select f_h2 from get_diag(p.npasp))else null end)::integer AS f_h_2, "+
+"(case when (po.d_po=1) then (select f_h3 from get_diag(p.npasp))else null end)::integer AS f_h_3, "+
+"(case when (po.d_po=1) then (select f_h4 from get_diag(p.npasp))else null end)::integer AS f_h_4, "+
+"(case when (po.d_po=1) then (select f_h5 from get_diag(p.npasp))else null end)::integer AS f_h_5, "+
+"(case when (po.d_po=1) then (select lod from get_recom_disp(p.npasp))else 0 end)::integer AS l_o_d, "+				
+"(case when (po.d_po=1) then (select prov from get_recom_disp(p.npasp))else 0 end)::integer AS prov, "+
+/**/
+
+"(case when f.grzd=1 then 'I' when f.grzd=2 then 'II'  when f.grzd=3 then 'III'  when f.grzd=4 then 'IV'  when f.grzd=5 then 'V' end)::char(3) As gr_z,"+
+   	    "(case when f.prb=0 then 2 else 1 end):: integer AS ch_b, "+
+   	    "(case when f.prk=0 then 1 else 2 end):: integer AS m_p_z, "+
+     	"1132::integer AS cod_reg, false::boolean AS err_,"+
+   	    "0::integer AS postpone,"+
+   	   "'{'||substr(i.nidv::text,1,length(i.nidv)-length(p.npasp::varchar)-1)||p.npasp::char(6)||(length(p.npasp::varchar))||'}'::char(150) AS id_fio,"+
+   	  "(case when v.inv>0 then (select get_zab_inv(p.npasp)) else null end)::integer AS zab_inv,"+ 
+   	 "(case when v.inv>0 then v.inv else null end)::integer AS inv,"+ 
+/* участковый врач */
+"trim(vr.fam)||' '||trim(vr.im)||' '||trim(vr.ot):: char(30) AS vrach "+
+	  	   "FROM  patient p JOIN p_fiz f ON (p.npasp = f.npasp) LEFT JOIN n_n00 n ON (p.cpol_pr = n.pcod)  LEFT JOIN n_idv i ON (p.cpol_pr = i.cpol)"+
+			"LEFT JOIN n_u10 u ON (trim(p.adm_ul)||' '||trim(p.adm_dom) = u.name) LEFT JOIN p_inv v  ON (p.npasp=v.npasp) LEFT JOIN p_disp_ds_do ddo ON (p.npasp=ddo.npasp) LEFT JOIN p_disp_ds_po po ON (p.npasp=po.npasp)"+
+	  	   "LEFT JOIN p_nambk na ON (p.npasp = na.npasp AND p.cpol_pr=na.cpol) LEFT JOIN s_uch uc  ON (uc.cpol=na.cpol AND uc.uch=na.nuch)"+
+			"LEFT JOIN s_vrach vr ON (vr.pcod=uc.pcod)"+
+            "WHERE  p.cpol_pr = ? AND (f.dataz>? AND f.dataz<?) " ;		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlsv3,cpodr, new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("sv3.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String sqlsv3_14 = "SELECT (cpol_pr::text||p.npasp::text)::integer AS code, f.dataz AS dat_v ,1::integer AS  uchr,345141024405000::bigint AS cod_uch, "+
+                "cpol_pr::integer AS uchrnum, n.name_u::char(50) AS uchrname, trim(p.fam)||' '||trim(p.im)||' '||trim(p.ot)::char(50) AS fio_u,  "+
+				"p.datar AS dat_born, p.pol::integer AS pol, 1::integer AS nation, null::integer AS vremen, 320000000001::bigint AS  mesto_k,p.adm_obl::char(100) AS mesto_k1,"+
+                "p.adm_gorod::char(50) AS mesto_k2, p.adm_gorod::char(50) AS mesto_k3, 324310000001::bigint AS  mesto_k4,null::integer AS mesto_k5,null::integer AS mesto_k6,"+
+				"1::integer AS gorod_k, trim(p.adm_ul)||' '||trim(p.adm_dom)||'-'||trim(p.adm_kv):: char(50) AS street_k, false::boolean AS m_v,null::char(30) As where_s1,"+
+		       "(case when u.pr='1' then (case when (f.dataz-p.datar)/365.25<4  then 2 else 5 end)  end)::integer AS where_s,"+  /*////уточнить*/
+				"(case when p.sgrp=9 then true else false end)::boolean AS p_dou, false::boolean AS u_, "+
+				"(case when p.sgrp=9 then 2 else 0 end)::integer AS pos_, "+
+				"(case when p.sgrp=7 then 6 when p.sgrp=8 then 1 else 0 end)::integer AS m_uth1, "+
+               "null::char(65) AS  m_uth, "+
+               "null::char(20) AS  vedom1, "+
+               "null::integer AS  vedom, "+
+               "null::integer AS  l_o_a, "+
+               "null::integer AS  l_k_s, "+
+               "null::integer AS  l_o_s, "+                
+               /*Wedom ??*/
+               "(select ves_gr from get_ves(f.ves::text))::integer AS vesgr,(select ves_kg from get_ves(f.ves::text))::integer AS ves_kg,"+
+				"rost*100::integer AS rost, "+
+               "(case when f.fv=0 then 1 else 2 end):: integer AS f_r, "+
+				"(case when f.fv=0 then null  when f.fv=1 then 2  when f.fv=2 then 1 end)::integer AS massa, "+
+		        "(case when f.fr=0 then 1 else 2 end):: integer AS f_r1, "+
+				"(case when f.fr=0 then null  when f.fr=1 then 2  when f.fr=2 then 1 end)::integer AS post, "+
+		        "(case when f.pi=0 then 1 else 2 end):: integer AS intel,(case when f.pe=0 then 1 else 2 end):: integer AS em,"+
+				"(case when f.pp=0 then 1 else 2 end):: integer AS ps,"+
+	       /*диагнозы*/
+	       "(case when ddo.d_do=1 then 2 else 1 end)::integer AS d_do, "+
+	       "(case when po.d_po=1 then 2 else 1 end)::integer AS d_po,"+
+    "(case when (ddo.d_do=1) then (select diag1 from get_diag(p.npasp)) else null end)::char(6) AS k_s1, "+
+    "(case when (ddo.d_do=1) then (select diag2 from get_diag(p.npasp)) else null end)::char(6) AS k_s2, "+
+    "(case when (ddo.d_do=1) then (select diag3 from get_diag(p.npasp))else null end)::char(6) AS k_s3, "+
+    "(case when (ddo.d_do=1) then (select diag4 from get_diag(p.npasp))else null end)::char(6) AS k_s4, "+
+    "(case when (ddo.d_do=1) then (select diag5 from get_diag(p.npasp))else null end)::char(6) AS k_s5, "+
+  
+    "(case when (po.d_po=1) then (select pdiag1 from get_diag(p.npasp))else null end)::char(6) AS k_si1, "+
+    "(case when (po.d_po=1) then (select pdiag2 from get_diag(p.npasp))else null end)::char(6) AS k_si2, "+
+    "(case when (po.d_po=1) then (select pdiag3 from get_diag(p.npasp))else null end)::char(6) AS k_si3, "+
+    "(case when (po.d_po=1) then (select pdiag4 from get_diag(p.npasp))else null end)::char(6) AS k_si4, "+
+    "(case when (po.d_po=1) then (select pdiag5 from get_diag(p.npasp))else null end)::char(6) AS k_si5, "+
+
+ "(case when (po.d_po=1) then (select p_u1 from get_diag(p.npasp))else null end)::integer AS p_u_01, "+
+ "(case when (po.d_po=1) then (select p_u2 from get_diag(p.npasp))else null end)::integer AS p_u_02, "+
+ "(case when (po.d_po=1) then (select p_u3 from get_diag(p.npasp))else null end)::integer AS p_u_03, "+
+ "(case when (po.d_po=1) then (select p_u4 from get_diag(p.npasp))else null end)::integer AS p_u_04, "+
+ "(case when (po.d_po=1) then (select p_u5 from get_diag(p.npasp))else null end)::integer AS p_u_05, "+
+    
+"(case when (po.d_po=1) then (select n_pu1 from get_diag(p.npasp))else null end)::integer AS n_pu1, "+
+"(case when (po.d_po=1) then (select n_pu2 from get_diag(p.npasp))else null end)::integer AS n_pu2, "+
+"(case when (po.d_po=1) then (select n_pu3 from get_diag(p.npasp))else null end)::integer AS n_pu3, "+
+"(case when (po.d_po=1) then (select n_pu4 from get_diag(p.npasp))else null end)::integer AS n_pu4, "+
+"(case when (po.d_po=1) then (select n_pu5 from get_diag(p.npasp))else null end)::integer AS n_pu5, "+
+
+"(case when (po.d_po=1) then (select f_h1 from get_diag(p.npasp))else null end)::integer AS f_h_1, "+
+"(case when (po.d_po=1) then (select f_h2 from get_diag(p.npasp))else null end)::integer AS f_h_2, "+
+"(case when (po.d_po=1) then (select f_h3 from get_diag(p.npasp))else null end)::integer AS f_h_3, "+
+"(case when (po.d_po=1) then (select f_h4 from get_diag(p.npasp))else null end)::integer AS f_h_4, "+
+"(case when (po.d_po=1) then (select f_h5 from get_diag(p.npasp))else null end)::integer AS f_h_5, "+
+"(case when (po.d_po=1) then (select lod from get_recom_disp(p.npasp))else 0 end)::integer AS l_o_d, "+				
+"(case when (po.d_po=1) then (select prov from get_recom_disp(p.npasp))else 0 end)::integer AS prov, "+
+/**/
+
+"(case when f.grzd=1 then 'I' when f.grzd=2 then 'II'  when f.grzd=3 then 'III'  when f.grzd=4 then 'IV'  when f.grzd=5 then 'V' end)::char(3) As gr_z,"+
+  	    "(case when f.prb=0 then 2 else 1 end):: integer AS ch_b, "+
+  	    "(case when f.prk=0 then 1 else 2 end):: integer AS m_p_z, "+
+    	"1132::integer AS cod_reg, false::boolean AS err_,"+
+  	    "0::integer AS postpone,"+
+  	   "'{'||substr(i.nidv::text,1,length(i.nidv)-length(p.npasp::varchar)-1)||p.npasp::char(6)||(length(p.npasp::varchar))||'}'::char(150) AS id_fio,"+
+  	  "(case when v.inv>0 then (select get_zab_inv(p.npasp)) else null end)::integer AS zab_inv,"+ 
+  	 "(case when v.inv>0 then v.inv else null end)::integer AS inv,"+ 
+/* участковый врач*/	
+"trim(vr.fam)||' '||trim(vr.im)||' '||trim(vr.ot):: char(30) AS vrach "+
+	  	   "FROM  patient p JOIN p_fiz f ON (p.npasp = f.npasp) JOIN n_n00 n ON (p.cpol_pr = n.pcod) JOIN n_idv i ON (p.cpol_pr = i.cpol)"+
+			"JOIN n_u10 u ON (trim(p.adm_ul)||' '||trim(p.adm_dom) = u.name) JOIN p_inv v  ON (p.npasp=v.npasp) JOIN p_disp_ds_do ddo ON (p.npasp=ddo.npasp) JOIN p_disp_ds_po po ON (p.npasp=po.npasp)"+
+		   "LEFT JOIN p_nambk na ON (p.npasp = na.npasp AND p.cpol_pr=na.cpol) LEFT JOIN s_uch uc  ON (uc.cpol=na.cpol AND uc.uch=na.nuch)"+
+			"LEFT JOIN s_vrach vr ON (vr.pcod=uc.pcod)"+
+	       
+			"WHERE  p.cpol_pr = ? AND (f.dataz>? AND f.dataz<?) AND ((f.dataz-p.datar)/365.25>=14 AND (f.dataz-p.datar)/365.25<15)" ;		
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlsv3_14,cpodr, new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("sv3_14.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+	
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		return path;	}
+
 	public Patient getPatientInfo(int npasp) throws PatientNotFoundException,
 			TException {
 		// TODO Auto-generated method stub
@@ -807,4 +1034,5 @@ throw new TException(e);
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
 }

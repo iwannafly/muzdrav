@@ -106,7 +106,7 @@ public class ServerHospital extends Server implements Iface {
    "vidpl","serd","serd1","serdm","chcc","pozpl","mesto",
    "deyat","shvat","vody","kashetv","poln","potugi",
    "posled","vremp","obol","pupov","obvit","osobp","krov","psih","obezb",
-   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","datarod","srok","ves","vespl"
+   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","datarod","srok","ves","vespl","detmesto"
    };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",         "oj",        "hdm",     "polpl",     "predpl",
@@ -116,9 +116,9 @@ public class ServerHospital extends Server implements Iface {
 //    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
      String.class,String.class,String.class,String.class,String.class,String.class,
 //    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
-     Integer.class, String.class, Integer.class,Integer.class,Integer.class,String.class,Integer.class,Boolean.class,String.class, 
-//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "datarod",       "srok",       "ves",   "vespl"
-     Integer.class,String.class,String.class,String.class,String.class,String.class,String.class,String.class,Date.class,Integer.class,Double.class,Double.class
+     Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
+//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "datarod",       "srok",       "ves",   "vespl", "detmesto"
+     Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Integer.class,Double.class,Double.class,String.class
     };
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
@@ -141,7 +141,7 @@ public class ServerHospital extends Server implements Iface {
     //  id             id_gosp        stl            mes
         Integer.class, Integer.class, Integer.class, String.class,
     //  date_start  date_end    ukl            ishod          result
-        Date.class, Date.class, Integer.class, Integer.class, Integer.class,
+        Date.class, Date.class, Double.class, Integer.class, Integer.class,
     //  time_start  time_end
         Time.class, Time.class
     };
@@ -336,8 +336,9 @@ public class ServerHospital extends Server implements Iface {
     public final List<TDiagnosis> getDiagnosis(final int gospId)
             throws KmiacServerException, DiagnosisNotFoundException {
         String sqlQuery = "SELECT c_diag.id, c_diag.id_gosp, c_diag.cod, c_diag.med_op, "
-            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach , n_c00.name as diagname "
-            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ?;";
+            + "c_diag.date_ustan, c_diag.prizn, c_diag.vrach, n_c00.name as diagname "
+            + "FROM c_diag INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE id_gosp = ? "
+            + "ORDER BY c_diag.date_ustan;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, gospId)) {
             List<TDiagnosis> diagList = rsmDiagnosis.mapToList(acrs.getResultSet());
             if (diagList.size() > 0) {
@@ -440,11 +441,13 @@ public class ServerHospital extends Server implements Iface {
     public final List<IntegerClassifier> getShablonNames(final int cspec, final int cslu,
             final String srcText) throws KmiacServerException {
         String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
-                + "sho.diag || ' ' || sho.name AS name "
-                + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
-                + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
-                + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
-                + "WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+            + "sho.diag || ' ' || sho.name AS name "
+            + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
+            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
+            + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
+            + "JOIN n_t00 t00 ON t00.spec = shp.cspec  "
+            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
+            + "WHERE (n45.codotd = ?) AND ((sho.cslu = 1) OR (sho.cslu =3)) ";
 
         if (srcText != null) {
             sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) "
@@ -452,24 +455,24 @@ public class ServerHospital extends Server implements Iface {
         }
 
         // Запрос не работает, т.к. профиль и специализация это разные вещи
-//        String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, "
-//            + sho.diag || ' ' || sho.name AS name "
-//            + "FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) "
-//            + "JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) "
-//            + "JOIN n_c00 c00 ON (c00.pcod = sho.diag) "
-//            + "JOIN n_t00 t00 ON t00.pcod = shp.cspec "
-//            + "JOIN n_n45 n45 ON n45.codprof = t00.pcod "
-//            + "WHERE (n45.codotd = 2004) AND (sho.cslu & 2 = 2) ";
+//        SELECT DISTINCT sho.id AS pcod, sho.name, 
+//        sho.diag || ' ' || sho.name AS name 
+//        FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) 
+//        JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) 
+//        JOIN n_c00 c00 ON (c00.pcod = sho.diag) 
+//        JOIN n_t00 t00 ON t00.spec = shp.cspec  
+//        JOIN n_n45 n45 ON n45.codprof = t00.pcod
+//        WHERE (n45.codotd = 2019) AND ((sho.cslu = 1) OR (sho.cslu =3))
 
         sql += "ORDER BY sho.name ";
         try (AutoCloseableResultSet acrs = (srcText == null)
-                ? sse.execPreparedQuery(sql, 38, 2, 2)
-                : sse.execPreparedQuery(sql, 38, 2, 2,
+                ? sse.execPreparedQuery(sql, cspec)
+                : sse.execPreparedQuery(sql, cspec,
                         srcText, srcText, srcText, srcText)) {
             return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
-            System.err.println(e.getCause());
-            throw new KmiacServerException("Error searching template");
+            log.log(Level.ERROR, "Template searching error", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -1105,13 +1108,15 @@ public class ServerHospital extends Server implements Iface {
     }
 
 	@Override
-	public TRdIshod getRdIshodInfo(int npasp, int ngosp)
-			throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from c_rd_ishod where npasp = ? and ngosp = ? ",  npasp,ngosp)) {
-			if (acrs.getResultSet().next())
-				return rsmRdIshod.map(acrs.getResultSet());
-			else 
-				throw new PrdIshodNotFoundException();
+    public final TRdIshod getRdIshodInfo(final int npasp, final int ngosp)
+			throws KmiacServerException, PrdIshodNotFoundException{
+	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+		        "select * from c_rd_ishod where npasp = ? and ngosp = ? ",  npasp, ngosp)) {
+			if (acrs.getResultSet().next()) {
+                return rsmRdIshod.map(acrs.getResultSet());
+            } else {
+                throw new PrdIshodNotFoundException();
+            }
 		
 			} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -1120,7 +1125,7 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
+    public final void addRdIshod(final int npasp, final int ngosp) throws KmiacServerException,
 			TException {
 		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
 		Integer id1 = 0; Integer numr = 0;Integer srok = 40;Integer numdin = 0;
@@ -1137,7 +1142,9 @@ public class ServerHospital extends Server implements Iface {
 				 }
 				 acrs1.close();
 				 acrs1 = sse.execPreparedQuery("select max(id_pos) from p_rd_din where id_pvizit = ? ", numr);
-				 if (acrs1.getResultSet().next()) numdin = acrs1.getResultSet().getInt(1);
+				 if (acrs1.getResultSet().next()) {
+                    numdin = acrs1.getResultSet().getInt(1);
+                }
 				 acrs1.close();
 				 acrs1 = sse.execPreparedQuery("select (current_date-datap)/7+srok,oj,hdm,polpl,predpl,chcc,serd,serd1,ves from p_rd_din,p_vizit_amb where p_rd_din.id_pos=p_vizit_amb.id and p_rd_din.id_pos= ? ", numdin);
 				 if (acrs1.getResultSet().next()){
@@ -1164,13 +1171,13 @@ public class ServerHospital extends Server implements Iface {
 		}
 	}
 
-	private Date Date(long currentTimeMillis) {
+	private Date Date(final long currentTimeMillis) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void deleteRdIshod(int npasp, int ngosp)
+    public final void deleteRdIshod(final int npasp, final int ngosp)
 			throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM c_rd_ishod WHERE npasp = ? and ngosp = ? ", false, npasp,ngosp);
@@ -1185,7 +1192,7 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-	public void updateRdIshod(TRdIshod RdIs) throws KmiacServerException,
+    public final void updateRdIshod(final TRdIshod RdIs) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 		sme.execPreparedT("UPDATE c_rd_ishod SET oj = ?,hdm = ?,polpl = ?,predpl = ?,vidpl = ?,serd = ?,serd1 = ?,serdm = ?,chcc = ?,pozpl = ?,mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
@@ -1201,4 +1208,170 @@ public class ServerHospital extends Server implements Iface {
 	}
 	}
 
+    @Override
+    public final String printHospitalDeathSummary(final int idGosp, final String lpuInfo,
+            final TPatient patient) throws KmiacServerException {
+        final String path;
+        AutoCloseableResultSet acrs;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+//            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+            HtmTemplate htmTemplate = new HtmTemplate(
+                new File(this.getClass().getProtectionDomain().getCodeSource()
+                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                + "\\plugin\\reports\\HospitalDeathSummary.htm");
+            htmTemplate.replaceLabel("~lpu", lpuInfo);
+            htmTemplate.replaceLabel("~surname", patient.getSurname());
+            htmTemplate.replaceLabel("~name", patient.getName());
+            htmTemplate.replaceLabel("~middlename", patient.getMiddlename());
+            htmTemplate.replaceLabel("~age", dateFormat.format(patient.getBirthDate()));
+            htmTemplate.replaceLabel("~gender", patient.getGender());
+            htmTemplate.replaceLabel("~address", patient.getRegistrationAddress());
+            htmTemplate.replaceLabel("~job", patient.getJob());
+            htmTemplate.replaceLabel("~surname", patient.getSurname());
+            htmTemplate.replaceLabel("~name", patient.getName());
+            htmTemplate.replaceLabel("~middlename", patient.getMiddlename());
+
+            acrs = sse.execPreparedQuery(
+                "SELECT DISTINCT ON (c_gosp.id) c_gosp.nist, c_gosp.datap, "
+                + "c_gosp.jalob, c_otd.datav, "
+                + "c_otd.ishod, c_otd.result, c_otd.sostv, c_otd.recom, c_osmotr.morbi "
+                + "FROM c_gosp INNER JOIN c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN c_osmotr ON c_osmotr.id_gosp = c_gosp.id "
+                + "WHERE c_gosp.id = ?", idGosp);
+            if (!acrs.getResultSet().next()) {
+                throw new KmiacServerException("Logged user info not found.");
+            } else {
+                htmTemplate.replaceLabel("~nist",
+                    String.valueOf(acrs.getResultSet().getInt("nist")));
+                htmTemplate.replaceLabel(
+                    "~dateStart", dateFormat.format(acrs.getResultSet().getDate("datap")));
+                if (acrs.getResultSet().getDate("datav") != null) {
+                    htmTemplate.replaceLabel(
+                        "~dateEnd", dateFormat.format(acrs.getResultSet().getDate("datav")));
+                } else {
+                    htmTemplate.replaceLabel("~dateEnd", "");
+                }
+                if (acrs.getResultSet().getDate("datav") != null) {
+                    htmTemplate.replaceLabel(
+                        "~dateEnd", dateFormat.format(acrs.getResultSet().getDate("datav")));
+                } else {
+                    htmTemplate.replaceLabel("~dateEnd", "");
+                }
+                htmTemplate.replaceLabel(
+                    "~dateStart", dateFormat.format(acrs.getResultSet().getDate("datap")));
+//                if (acrs.getResultSet().getString("jalob") != null) {
+                htmTemplate.replaceLabel(
+                    "~jalob", acrs.getResultSet().getString("jalob"));
+                htmTemplate.replaceLabel(
+                    "~desiaseHistory", acrs.getResultSet().getString("morbi"));
+//                }
+            }
+
+            acrs = sse.execPreparedQuery("SELECT n_c00.name, c_diag.prizn FROM c_diag "
+                + "INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE c_diag.id_gosp = ?", idGosp);
+            while (acrs.getResultSet().next()) {
+                switch (acrs.getResultSet().getInt("prizn")) {
+                    case 1:
+                        htmTemplate.replaceLabel("~mainDiagnosis",
+                            acrs.getResultSet().getString("name") + "<br/> ~mainDiagnosis ");
+                        htmTemplate.refindLabels();
+                        break;
+                    case 2:
+                        htmTemplate.replaceLabel("~oslDiagnosis",
+                            acrs.getResultSet().getString("name") + "<br/> ~oslDiagnosis ");
+                        htmTemplate.refindLabels();
+                        break;
+                    case 3:
+                        htmTemplate.replaceLabel("~sopDiagnosis",
+                            acrs.getResultSet().getString("name") + "<br/> ~sopDiagnosis ");
+                        htmTemplate.refindLabels();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            htmTemplate.replaceLabel("~mainDiagnosis", "");
+            htmTemplate.replaceLabel("~oslDiagnosis", "");
+            htmTemplate.replaceLabel("~sopDiagnosis", "");
+
+            acrs = sse.execPreparedQuery("SELECT n_c00.name FROM c_diag "
+                    + "INNER JOIN n_c00 ON c_diag.cod = n_c00.pcod WHERE c_diag.id_gosp = ? "
+                    + "AND c_diag.prizn = ?", idGosp, 5);
+
+            if (acrs.getResultSet().next()) {
+                htmTemplate.replaceLabel("~patDiagnosis",
+                    acrs.getResultSet().getString("name"));
+            } else {
+                htmTemplate.replaceLabel("~patDiagnosis", "");
+            }
+
+            acrs = sse.execPreparedQuery("SELECT p_isl_ld.nisl, n_ldi.pcod, "
+                + "n_ldi.name_n, p_rez_l.zpok, "
+                + "p_isl_ld.datav, '' as op_name, '' as rez_name "
+                + "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) "
+                + "JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) "
+                + "WHERE p_isl_ld.id_gosp = ? AND p_rez_l.zpok is not null "
+                + "UNION "
+                + "SELECT p_isl_ld.nisl, n_ldi.pcod, n_ldi.name_n, n_arez.name, "
+                + "p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name "
+                + "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) "
+                + "JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) "
+                + "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) "
+                + "WHERE p_isl_ld.id_gosp = ? AND n_arez.name is not null", idGosp, idGosp);
+            while (acrs.getResultSet().next()) {
+                String tmpIsl =
+                    "<li> <b>показатель:</b> " + acrs.getResultSet().getString("name_n")
+                    + " <br/><b> &nbsp &nbsp значение:</b>"
+                    + acrs.getResultSet().getString("zpok");
+                if ((acrs.getResultSet().getString("op_name") != null)
+                        && (!acrs.getResultSet().getString("op_name").equals(""))) {
+                    tmpIsl += " <br/><b> &nbsp &nbsp описание:</b>"
+                        + acrs.getResultSet().getString("op_name");
+                }
+                if ((acrs.getResultSet().getString("rez_name") != null)
+                        && (!acrs.getResultSet().getString("rez_name").equals(""))) {
+                    tmpIsl += " <br/><b> &nbsp &nbsp заключение:</b> "
+                        + acrs.getResultSet().getString("rez_name");
+                }
+                if (acrs.getResultSet().getDate("datav") != null) {
+                    tmpIsl += "<br/><b> &nbsp &nbsp дата: </b>" + dateFormat.format(
+                            acrs.getResultSet().getDate("datav")) + "</li><br/> ~issled ";
+                } else {
+                    tmpIsl += "</li><br/> ~issled ";
+                }
+
+                htmTemplate.replaceLabel("~issled", tmpIsl);
+            }
+            htmTemplate.replaceLabel("~issled", "");
+
+            acrs = sse.execPreparedQuery("SELECT n_med.name FROM c_lek "
+                + "INNER JOIN n_med ON c_lek.klek = n_med.pcod WHERE c_lek.id_gosp = ?", idGosp);
+            String medications = "";
+            while (acrs.getResultSet().next()) {
+                medications += acrs.getResultSet().getString("name") + ", ";
+            }
+            if (medications.length() > 0) {
+                medications = medications.substring(0, medications.length() - ", ".length());
+            }
+            htmTemplate.replaceLabel("~medications", medications);
+            acrs.close();
+            osw.write(htmTemplate.getTemplateText());
+            return path;
+        } catch (Exception e) {
+            log.log(Level.ERROR, "SQL Exception:", e);
+            throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+        }
+    }
+
+	@Override
+	public List<IntegerClassifier> get_s_vrach() throws KmiacServerException, TException {
+	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select pcod,fam||' '||im||' '||ot as name from s_vrach")) {
+	        return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+        	((SQLException) e.getCause()).printStackTrace();
+        	throw new KmiacServerException();
+        }
+    }
 }

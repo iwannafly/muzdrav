@@ -1,7 +1,7 @@
 /**
  * Класс для вызова undecorated аналога JOptionPane
  */
-package ru.nkz.ivcgzo.clientInfomat;
+package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;

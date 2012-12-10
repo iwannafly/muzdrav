@@ -104,6 +104,7 @@ import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
+import java.awt.Dimension;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -951,17 +952,27 @@ public class Vvod extends JFrame {
 				  			pdiag.setNmvd(diagamb.getObstreg());
 				  			pdiag.setNamed(diagamb.getNamed());
 				  			pdiag.setDatad(diagamb.getDatad());
-				  			if (rbtInvUst1.isSelected())pdiag.setPpi(1);
-				  			if (rbtInvUst2.isSelected())pdiag.setPpi(2);
-				  			if (rbtDiagHarOstr.isSelected()) pdiag.setXzab(1);
-				  			if (rbtDiagHarHron.isSelected()) pdiag.setXzab(2);
-				  			if (rbtDiagStadPoz.isSelected()) pdiag.setStady(2);
-				  			if (rbtDiagStadRan.isSelected()) pdiag.setStady(1);
-				  			if (chbDiagBer.isSelected()) pdiag.setPat(1);
-				  			if (chbDiagBoe.isSelected()) pdiag.setPrizb(1);
-				  			if (chbDiagInv.isSelected()) pdiag.setPrizi(1);
-				  			if (tbDiagDispDatVz.getDate() != null) pdiag.setDisp(1);
-				  			MainForm.tcl.setPdiag(pdiag);
+				  			if (rbtInvUst1.isSelected())
+				  				pdiag.setPpi(1);
+				  			if (rbtInvUst2.isSelected())
+				  				pdiag.setPpi(2);
+				  			if (rbtDiagHarOstr.isSelected())
+				  				pdiag.setXzab(1);
+				  			if (rbtDiagHarHron.isSelected())
+				  				pdiag.setXzab(2);
+				  			if (rbtDiagStadPoz.isSelected())
+				  				pdiag.setStady(2);
+				  			if (rbtDiagStadRan.isSelected())
+				  				pdiag.setStady(1);
+				  			if (chbDiagBer.isSelected())
+				  				pdiag.setPat(1);
+				  			if (chbDiagBoe.isSelected())
+				  				pdiag.setPrizb(1);
+				  			if (chbDiagInv.isSelected())
+				  				pdiag.setPrizi(1);
+				  			if (tbDiagDispDatVz.getDate() != null)
+				  				pdiag.setDisp(1);
+					  		setPdiagz(pdiag);
 				  		}
 				  		
 				  		if (diagamb.isSetNamed())
@@ -981,8 +992,10 @@ public class Vvod extends JFrame {
 							pdisp.setD_vz(tbDiagDispDatVz.getDate().getTime());
 				  			if (tbDiagDispDatIsh.getDate() != null)
 								pdisp.setDataish(tbDiagDispDatIsh.getDate().getTime());
-				  			if (cmbDiagDispIsh.getSelectedPcod() != null) pdisp.setIshod(cmbDiagDispIsh.getSelectedPcod()); else pdisp.unsetIshod();
-					  		if (cmbDiagDispGrup.getSelectedPcod() != null) pdisp.setD_grup(cmbDiagDispGrup.getSelectedPcod()); else pdisp.unsetD_grup();
+				  			if (cmbDiagDispIsh.getSelectedPcod() != null)
+				  				pdisp.setIshod(cmbDiagDispIsh.getSelectedPcod()); else pdisp.unsetIshod();
+					  		if (cmbDiagDispGrup.getSelectedPcod() != null)
+					  			pdisp.setD_grup(cmbDiagDispGrup.getSelectedPcod()); else pdisp.unsetD_grup();
 		
 		
 				  			pdisp.setCod_sp(diagamb.getCod_sp());
@@ -1008,7 +1021,7 @@ public class Vvod extends JFrame {
 								diagamb.setNamed(diag_named);
 								diagamb.setId(MainForm.tcl.AddPdiagAmb(diagamb));
 								pdiag.setDiag(tfNewDs.getText());
-								MainForm.tcl.setPdiag(pdiag);
+						  		setPdiagz(pdiag);
 				  				pdisp.setDiag_s(pdisp.diag);
 				  				pdisp.setDiag(tfNewDs.getText());
 				  				pdisp.setDiag_n(null);
@@ -1019,10 +1032,11 @@ public class Vvod extends JFrame {
 				  			/*pdiag*/
 				  			if (tbDiagDispDatVz.getDate() != null)
 				  				pdiag.setD_vz(pdisp.getD_vz());
-				  			if (tbDiagDispDatIsh.getDate() != null)	pdiag.setDataish(pdisp.getDataish());
+				  			if (tbDiagDispDatIsh.getDate() != null)
+				  				pdiag.setDataish(pdisp.getDataish());
 					  		pdiag.setIshod(pdisp.getIshod());
 					  		pdiag.setD_grup(pdisp.getD_grup());
-					  		MainForm.tcl.setPdiag(pdiag);	
+					  		setPdiagz(pdiag);
 		  				}
 						tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 					}
@@ -1226,6 +1240,7 @@ public class Vvod extends JFrame {
 		PnlDiag.setLayout(gl_PnlDiag);
 		
 		JScrollPane spDiagOpis = new JScrollPane();
+		spDiagOpis.setMinimumSize(new Dimension(48, 48));
 		
 		JLabel lblDiagOpis = new JLabel("<html>Описание диагноза</html>");
 		
@@ -2429,11 +2444,13 @@ public class Vvod extends JFrame {
 						MainForm.tcl.UpdatePvizit(pvizit);
 						MainForm.tcl.UpdatePvizitAmb(pvizitAmb);
 						btnRecPriem.setEnabled(!isStat && !pvizit.isSetIshod());
-						if (pvizit.isSetIshod())
+						if (pvizit.isSetIshod()) {
 							tblObr.getSelectedItem().setIshod(pvizit.getIshod());
-						else
-							tblObr.getSelectedItem().setIshod(0);
-						tblObr.getSelectedItem().setClosed(pvizit.isSetIshod());
+							tblObr.getSelectedItem().setClosed(true);
+						} else {
+							tblObr.getSelectedItem().unsetIshod();
+							tblObr.getSelectedItem().setClosed(false);
+						}
 						tblObr.updateChangedSelectedItem();
 						
 						pvizitAmbCopy = new PvizitAmb(pvizitAmb);
@@ -2588,7 +2605,9 @@ public class Vvod extends JFrame {
 				pvizitAmb = new PvizitAmb();
 				priem = new Priem();
 				anamZab = new AnamZab();
-				pvizit = new Pvizit();
+				pvizit = tblObr.getSelectedItem();
+				if (pvizit == null)
+					pvizit = new Pvizit();
 				if (tblPos.getSelectedItem()!= null) {
 					pvizitAmb = tblPos.getSelectedItem();
 					try {
@@ -2602,6 +2621,7 @@ public class Vvod extends JFrame {
 						
 						priem = MainForm.tcl.getPriem(zapVr.npasp, tblPos.getSelectedItem().id);
 						pvizit = MainForm.tcl.getPvizit(zapVr.getId_pvizit());
+						tblObr.replaceSelectedItem(pvizit);
 						anamZab = MainForm.tcl.getAnamZab(zapVr.getId_pvizit(), zapVr.getNpasp());
 						btnRecPriem.setEnabled(!isStat &&!pvizit.isSetIshod());
 					} catch (KmiacServerException e) {
@@ -2836,6 +2856,9 @@ public class Vvod extends JFrame {
 				tblZaklDiag.setData(new ArrayList<PdiagZ>());
 			}
 			lblLastShab.setText("<html>Последний выбранный шаблон: </html>");
+			cmbVidStacionar.setSelectedItem(null);
+			cmbKonsMesto.setSelectedItem(null);
+			tbKonsObosnov.setText("");
 			tblObr.setData(MainForm.tcl.getPvizitList(zapVr.npasp));
 			if ((idPvizitMainForm > 0) && (tblObr.getRowCount() > 0)) {
 				for (int i = 0; i < tblObr.getRowCount(); i++) {
@@ -3243,5 +3266,12 @@ public class Vvod extends JFrame {
 		spZakl.setVisible(!isStat);
 		lblZaklRek.setVisible(!isStat);
 		spZaklRek.setVisible(!isStat);
+	}
+	
+	private void setPdiagz(PdiagZ pdz) throws KmiacServerException, TException {
+		for (PdiagZ d : tblZaklDiag.getData())
+			if (d.isSetDiag() && (d.diag.equals(pdz.diag)))
+				return;
+		MainForm.tcl.setPdiag(pdz);
 	}
 }
