@@ -771,14 +771,16 @@ public class PIslForm {
 					cBVrach.setSelectedItem(null);
 				}
 				
+				if (tn_ldi.getSelectedItem() != null){
+					if ((tn_ldi.getSelectedItem().cuser !=0) && (String.valueOf(tn_ldi.getSelectedItem().cuser) != null)){
+						cBCuser.setSelectedPcod(tn_ldi.getSelectedItem().cuser);
 				
-				if ((tn_ldi.getSelectedItem().cuser !=0) && (String.valueOf(tn_ldi.getSelectedItem().cuser) != null)){
-					cBCuser.setSelectedPcod(tn_ldi.getSelectedItem().cuser);
-				
-				} else {
-					cBCuser.setSelectedPcod(MainForm.authInfo.pcod);
+					} else {
+						cBCuser.setSelectedPcod(MainForm.authInfo.pcod);
+					}
+				}else{
+					cBCuser.setSelectedItem(null);
 				}
-				
 				
 				
 				if ((tn_ldi.getSelectedItem().vopl != 0)&&(String.valueOf(tn_ldi.getSelectedItem().vopl) != null)){

@@ -22,10 +22,12 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
+import ru.nkz.ivcgzo.ldsThrift.LDSThrift.Processor.InsS_ldi;
 import ru.nkz.ivcgzo.ldsThrift.LdiNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.Metod;
 import ru.nkz.ivcgzo.ldsThrift.MetodNotFoundException;
 import ru.nkz.ivcgzo.ldsThrift.N_ldi;
+import ru.nkz.ivcgzo.ldsThrift.S_ldi;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01;
 import ru.nkz.ivcgzo.ldsThrift.S_ot01ExistsException;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
@@ -35,6 +37,8 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Option {
 
@@ -57,6 +61,71 @@ public class Option {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				
+				try {
+					List<N_ldi> alis = MainForm.ltc.getAllN_ldi();
+					
+					List<S_ldi> sisl = MainForm.ltc.getAllS_ldi();
+					
+					if (sisl.size()==0){
+						
+						S_ldi is_ldi = new S_ldi(); 
+						
+						for(int i =0; i<alis.size(); i++){
+							
+							is_ldi.setId(alis.get(i).id);
+							is_ldi.setName(alis.get(i).name_n);
+							
+							MainForm.ltc.InsS_ldi(is_ldi);
+						}
+						
+					}else{
+						
+						if (sisl.size()!=alis.size()){
+							boolean chk = false; 
+						
+							for(int i=0; i < alis.size(); i++){
+							
+								for(int j=0; j < sisl.size(); j++){
+								
+									if(alis.get(i).id == sisl.get(j).id){
+										chk = true;
+										break;
+									}
+								
+								}
+							
+								if(chk==false){
+									S_ldi is_ldi = new S_ldi(); 
+									is_ldi.setId(alis.get(i).id);
+									is_ldi.setName(alis.get(i).name_n);
+									MainForm.ltc.InsS_ldi(is_ldi);
+								}
+							
+								chk= false;
+							}
+						
+						}
+						
+					}
+					
+					
+					
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+				
+				
+				
+				
+				
+				
+			}
+		});
 		frame.setBounds(100, 100, 784, 670);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
@@ -218,7 +287,14 @@ public class Option {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<N_ldi> event) {
 				try {
-					MainForm.ltc.UpdN_ldi(event.getItem());
+					//MainForm.ltc.UpdN_ldi(event.getItem());
+					
+					S_ldi upsldi = new S_ldi();
+					
+					upsldi.setName(event.getItem().name);
+					upsldi.setId(event.getItem().id);
+					MainForm.ltc.UpdS_ldi(upsldi);
+					
 					return true;
 				} catch (LdiNotFoundException e) {
 					// TODO Auto-generated catch block

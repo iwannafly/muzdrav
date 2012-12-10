@@ -103,6 +103,12 @@ struct N_ldi {
 }
 
 
+struct S_ldi{
+	1: i32 id;
+	2: string name; 
+}
+
+
 struct N_lds {
 	1: i32 clpu;
 	2: i32 pcod;
@@ -182,6 +188,15 @@ exception LdiNotFoundException {
 }
 
 
+
+/**
+ * Наименование исследования ненайдено
+ */
+exception SLdiNotFoundException {
+}
+
+
+
 /*
 * Исследование уже существует
 */
@@ -241,7 +256,12 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list<Metod> GetLabStoim(1: string pcisl, 2: i32 kodotd);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
+	list<N_ldi> getAllN_ldi();
 	void UpdN_ldi (1: N_ldi nldi) throws (1: LdiNotFoundException lnfe);
+
+	list<S_ldi> getAllS_ldi();
+	void InsS_ldi (1: S_ldi s_ldi);
+	void UpdS_ldi (1: S_ldi s_ldi) throws (1: SLdiNotFoundException s_lnfe);
 	
 	list<N_lds> getN_lds (1: i32 pcod);
 
