@@ -143,8 +143,8 @@ public class OptionsDialog implements ActionListener {
             value = DECLINE;
             dialog.setVisible(false);
             dialog.dispose();
-        } else if (e.getSource() == btnCancel) {
-            value = DECLINE;
+        } else if (e.getSource() == btnOk) {
+            value = OK;
             dialog.setVisible(false);
             dialog.dispose();
         }

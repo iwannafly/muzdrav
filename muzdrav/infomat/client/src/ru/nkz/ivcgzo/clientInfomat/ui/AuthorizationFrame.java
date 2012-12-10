@@ -16,31 +16,21 @@ import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.JLabel;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
-import ru.nkz.ivcgzo.thriftInfomat.TPatient;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowEvent;
 
 public class AuthorizationFrame extends JDialog {
     private static final long serialVersionUID = 2313445455119747466L;
     private JTextField tfOmsNumber;
-    private boolean isOmsAccepted;
-    private TPatient patient;
+    private JButton btnAccept;
+    private JButton btnCancel;
     
     public AuthorizationFrame() {
-        isOmsAccepted = false;
-        patient = null;
         initialization();
     }
 
     private void initialization() {
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setModalityType(ModalityType.TOOLKIT_MODAL);
@@ -267,16 +257,16 @@ public class AuthorizationFrame extends JDialog {
         Component horizontalGlue_2 = Box.createHorizontalGlue();
         horizontalBox_1.add(horizontalGlue_2);
 
-        JButton btnAccept = new JButton("Принять");
-        btnAccept.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                isOmsAccepted = checkOms(tfOmsNumber.getText().trim());
-                tfOmsNumber.setText("");
-                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
-                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
-                setVisible(false);
-            }
-        });
+        btnAccept = new JButton("Принять");
+//        btnAccept.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                isOmsAccepted = checkOms(tfOmsNumber.getText().trim());
+//                tfOmsNumber.setText("");
+//                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
+//                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
+//                setVisible(false);
+//            }
+//        });
         btnAccept.setFont(new Font("Courier New", Font.BOLD, 30));
         btnAccept.setMinimumSize(new Dimension(400, 80));
         btnAccept.setPreferredSize(new Dimension(400, 80));
@@ -286,17 +276,15 @@ public class AuthorizationFrame extends JDialog {
         Component horizontalGlue_3 = Box.createHorizontalGlue();
         horizontalBox_1.add(horizontalGlue_3);
 
-        JButton btnCancel = new JButton("Отмена");
-        btnCancel.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText("");
-                isOmsAccepted = false;
-                patient = null;
-                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
-                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
-                setVisible(false);
-            }
-        });
+        btnCancel = new JButton("Отмена");
+//        btnCancel.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                tfOmsNumber.setText("");
+//                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
+//                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
+//                setVisible(false);
+//            }
+//        });
         btnCancel.setFont(new Font("Courier New", Font.BOLD, 30));
         btnCancel.setPreferredSize(new Dimension(400, 80));
         btnCancel.setMinimumSize(new Dimension(400, 80));
@@ -316,47 +304,20 @@ public class AuthorizationFrame extends JDialog {
         pack();
     }
 
-    @Override
-    public void setVisible(boolean isSetVisible) {
-        if (isSetVisible) {
-            isOmsAccepted = false;
-            patient = null;
-            super.setVisible(isSetVisible);
-        } else {
-            super.setVisible(isSetVisible);
-        }
+    public void addButtonAcceptPatientCheckListener(ActionListener listener) {
+        btnAccept.addActionListener(listener);
     }
 
-    public boolean isValueAccepted() {
-        return isOmsAccepted;
+    public void addButtonCancelPatientCheckListener(ActionListener listener) {
+        btnCancel.addActionListener(listener);
     }
 
-    public TPatient getPatient() {
-        return patient;
+    public void clearOmsText() {
+        tfOmsNumber.setText("");
     }
 
-    private boolean checkOms(String oms) {
-        if ((oms == null) || (oms.isEmpty() || (oms.trim().isEmpty()))) {
-            patient = null;
-            return false;
-        }
-        try {
-            patient = ClientInfomat.tcl.checkOmsAndGetPatient(oms);
-            return true;
-        } catch (KmiacServerException e) {
-            patient = null;
-            e.printStackTrace();
-            return false;
-        } catch (OmsNotValidException e) {
-            patient = null;
-            e.printStackTrace();
-            return false;
-        } catch (TException e) {
-            patient = null;
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-            return false;
-        }
+    public String getOmsText() {
+        return tfOmsNumber.getText();
     }
 
 }

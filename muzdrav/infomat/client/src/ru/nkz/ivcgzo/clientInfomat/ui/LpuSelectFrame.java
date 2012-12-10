@@ -19,17 +19,12 @@ import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 public class LpuSelectFrame extends JFrame {
@@ -41,8 +36,7 @@ public class LpuSelectFrame extends JFrame {
     private Component hgLeft;
     private JScrollPane spLpu;
     private ThriftIntegerClassifierList lLpu;
-    private DoctorSelectFrame frmDoctorSelect;
-    private int nextWindowFlag;
+//    private DoctorSelectFrame frmDoctorSelect;
 
     public LpuSelectFrame() {
         initialization();
@@ -50,22 +44,22 @@ public class LpuSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
-        createModalFrames();
+//        createModalFrames();
         addMainPanel();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
-    private void createModalFrames() {
-        if (frmDoctorSelect == null) {
-            frmDoctorSelect = new DoctorSelectFrame(); 
-        }
-    }
+//    private void createModalFrames() {
+//        if (frmDoctorSelect == null) {
+//            frmDoctorSelect = new DoctorSelectFrame(); 
+//        }
+//    }
 
     @SuppressWarnings("rawtypes")
     private class InfomatListCellRenderer extends JLabel implements ListCellRenderer {
@@ -154,20 +148,24 @@ public class LpuSelectFrame extends JFrame {
     private void addLpuList() {
         lLpu = new ThriftIntegerClassifierList();
 //        updateLpuList();
-        lLpu.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (lLpu.getSelectedValue() != null) {
-                    frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
+//        lLpu.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (lLpu.getSelectedValue() != null) {
+//                    frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
 //                    updateLpuList();
-                }
-            }
-        });
+//                }
+//            }
+//        });
         lLpu.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255), Color.red));
         lLpu.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lLpu.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lLpu.setFont(new Font("Courier New", Font.PLAIN, 25));
         spLpu.setViewportView(lLpu);
+    }
+
+    public void addListClickListener(MouseListener listener) {
+        lLpu.addMouseListener(listener);
     }
 
     public void updateLpuList(List<IntegerClassifier> policlinics) {
@@ -182,8 +180,7 @@ public class LpuSelectFrame extends JFrame {
 //        }
     }
 
-    public void showAsModal(int flag) {
-       nextWindowFlag = flag;
+    public void showAsModal() {
 //       updateLpuList();
        setVisible(true);
     }

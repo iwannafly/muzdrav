@@ -109,13 +109,12 @@ public class SheduleFrame extends JFrame {
         tbTalons.setRowHeight(50);
         spTalon.setViewportView(tbTalons);
     }
-    private void refreshTalonTableModel(int pcod, int cpol, String cdol) {
-        SheduleTableModel tbtModel = new SheduleTableModel(pcod, cpol, cdol);
-        tbTalons.setModel(tbtModel);
+    private void refreshTalonTableModel(SheduleTableModel curSheduleTableModel) {
+        tbTalons.setModel(curSheduleTableModel);
     }
 
-    public void showModal(int pcod, int cpol, String cdol) {
-        refreshTalonTableModel(pcod, cpol, cdol);
+    public void showModal(SheduleTableModel curSheduleTableModel) {
+        refreshTalonTableModel(curSheduleTableModel);
         setVisible(true);
     }
 

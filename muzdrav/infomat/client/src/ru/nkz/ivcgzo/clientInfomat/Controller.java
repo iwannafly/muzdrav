@@ -4,6 +4,8 @@ import javax.swing.JFrame;
 
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
 import ru.nkz.ivcgzo.clientInfomat.ui.InfomatView;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
@@ -26,6 +28,11 @@ public class Controller implements IController {
     @Override
     public void setPoliclinics() {
         model.setPoliclinics();
+    }
+
+    @Override
+    public void setCurrentPoliclinic(IntegerClassifier currentPoliclinic) {
+        model.setCurrentPoliclinic(currentPoliclinic);
     }
 
     @Override
@@ -60,12 +67,27 @@ public class Controller implements IController {
 
     @Override
     public void reserveTalon(TPatient pat, TTalon talon) {
-        model.releaseTalon(talon);
+        model.reserveTalon(pat, talon);
     }
 
     @Override
     public void releaseTalon(TTalon talon) {
         model.releaseTalon(talon);
+    }
+
+    @Override
+    public void setCurrentSpeciality(StringClassifier currentSpeciality) {
+        model.setCurrentSpeciality(currentSpeciality);
+    }
+
+    @Override
+    public void setCurrentDoctor(IntegerClassifier currentDoctor) {
+        model.setCurrentDoctor(currentDoctor);
+    }
+
+    @Override
+    public void setSelectedTalon(TTalon talon) {
+        model.setTalon(talon);
     }
 
 }
