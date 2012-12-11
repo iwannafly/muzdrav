@@ -18,20 +18,15 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.Box;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.Collections;
+import java.awt.event.MouseListener;
+import java.util.List;
 
 public class DoctorSelectFrame extends JFrame {
     private static final long serialVersionUID = -7345770092441907375L;
@@ -46,18 +41,17 @@ public class DoctorSelectFrame extends JFrame {
     private ThriftIntegerClassifierList lDoctor;
     private TalonSelectFrame frmTalonSelect;
     private SheduleFrame frmShedule;
-    private int cpol;
-    private int nextWindowFlag;
+//    private int cpol;
 
 
     public DoctorSelectFrame () {
-        cpol = -1;
+//        cpol = -1;
         initialization();
     }
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -129,26 +123,12 @@ public class DoctorSelectFrame extends JFrame {
 //        addForwardButton();
     }
 
-    private void updateSpecialitiesList(int cpol) {
-        try {
-            lSpeciality.setData(ClientInfomat.tcl.getSpecialities(cpol));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public void updateSpecialitiesList(List<StringClassifier> specialities) {
+        lSpeciality.setData(specialities);
     }
 
-    private void updateDoctorsList(int cpol, String cdol) {
-        try {
-            lDoctor.setData(ClientInfomat.tcl.getDoctors(cpol, cdol));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public void updateDoctorsList(List<IntegerClassifier> doctors) {
+        lDoctor.setData(doctors);
     }
 
     private void addBackwardButton() {
@@ -156,8 +136,8 @@ public class DoctorSelectFrame extends JFrame {
         btnBackward.setRequestFocusEnabled(false);
         btnBackward.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                updateSpecialitiesList(cpol);
-                lDoctor.setData(Collections.<IntegerClassifier>emptyList());
+//                updateSpecialitiesList(cpol);
+//                lDoctor.setData(Collections.<IntegerClassifier>emptyList());
                 setVisible(false);
             }
         });
@@ -209,20 +189,28 @@ public class DoctorSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addSpecialityList() {
         lSpeciality = new ThriftStringClassifierList<StringClassifier>();
-        lSpeciality.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (lSpeciality.getSelectedValue() != null) {
-                    updateDoctorsList(cpol, lSpeciality.getSelectedPcod());
-                }
-            }
-        });
+//        lSpeciality.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (lSpeciality.getSelectedValue() != null) {
+//                    updateDoctorsList(cpol, lSpeciality.getSelectedPcod());
+//                }
+//            }
+//        });
         lSpeciality.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255),
             Color.red));
         lSpeciality.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lSpeciality.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lSpeciality.setFont(new Font("Courier New", Font.PLAIN, 25));
         spSpeciality.setViewportView(lSpeciality);
+    }
+
+    public void addSpecialityListClickListener(MouseListener listener) {
+        lSpeciality.addMouseListener(listener);
+    }
+
+    public void addDoctorListClickListener(MouseListener listener) {
+        lDoctor.addMouseListener(listener);
     }
 
     private void addDoctorListScrollPane() {
@@ -236,23 +224,23 @@ public class DoctorSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addDoctorList() {
         lDoctor = new ThriftIntegerClassifierList();
-        lDoctor.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if ((lSpeciality.getSelectedValue() != null)
-                        && (lDoctor.getSelectedValue() != null)) {
-                    if (nextWindowFlag == 0) {
-                        frmTalonSelect.showModal(cpol, lSpeciality.getSelectedPcod(),
-                            lDoctor.getSelectedValue().getPcod());
-                    } else if (nextWindowFlag == 1) {
-                        frmShedule.showModal(lDoctor.getSelectedValue().getPcod(),
-                            cpol, lSpeciality.getSelectedPcod());
-                    }
-                    updateSpecialitiesList(cpol);
-                    lDoctor.setData(Collections.<IntegerClassifier>emptyList());
-                }
-            }
-        });
+//        lDoctor.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if ((lSpeciality.getSelectedValue() != null)
+//                        && (lDoctor.getSelectedValue() != null)) {
+//                    if (nextWindowFlag == 0) {
+//                        frmTalonSelect.showModal(cpol, lSpeciality.getSelectedPcod(),
+//                            lDoctor.getSelectedValue().getPcod());
+//                    } else if (nextWindowFlag == 1) {
+//                        frmShedule.showModal(lDoctor.getSelectedValue().getPcod(),
+//                            cpol, lSpeciality.getSelectedPcod());
+//                    }
+//                    updateSpecialitiesList(cpol);
+//                    lDoctor.setData(Collections.<IntegerClassifier>emptyList());
+//                }
+//            }
+//        });
         lDoctor.setCellRenderer(new InfomatListCellRenderer());
         lDoctor.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lDoctor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -260,10 +248,9 @@ public class DoctorSelectFrame extends JFrame {
         spDoctor.setViewportView(lDoctor);
     }
 
-    public void showModal(final int flag, final int inCpol) {
-        nextWindowFlag = flag;
-        cpol = inCpol;
-        updateSpecialitiesList(inCpol);
+    public void showModal() {
+//        cpol = inCpol;
+//        updateSpecialitiesList(inCpol);
         setVisible(true);
     }
 }

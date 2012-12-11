@@ -1,15 +1,21 @@
-package ru.nkz.ivcgzo.clientInfomat.model;
+package ru.nkz.ivcgzo.clientInfomat;
 
-import java.util.List;
+import javax.swing.JFrame;
 
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
-import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
-public interface HospitalModelInterface {
+
+public interface IController {
     public void setPoliclinics();
+
+    public void setCurrentPoliclinic(IntegerClassifier currentPoliclinic);
+
+    public void setCurrentSpeciality(StringClassifier currentSpeciality);
+
+    public void setCurrentDoctor(IntegerClassifier currentDoctor);
 
     public void setSpecialities(int cpol);
 
@@ -23,21 +29,12 @@ public interface HospitalModelInterface {
 
     public void setShedule(int pcod, int cpol, String cdol);
 
-    public List<IntegerClassifier> getPoliclinics();
-
-    public List<StringClassifier> getSpecialities();
-
-    public List<IntegerClassifier> getDoctors();
-
-    public TalonList getTalons();
-
-    public TPatient getPatient();
-
-    public List<TTalon> getReservedTalon();
-
-    public List<TSheduleDay> getShedule();
-
     public void reserveTalon(TPatient pat, TTalon talon);
 
     public void releaseTalon(TTalon talon);
+
+    public void setSelectedTalon(TTalon talon);
+
+    //FIXME костыль, избавиться от него!
+    public JFrame getMainFrame();
 }

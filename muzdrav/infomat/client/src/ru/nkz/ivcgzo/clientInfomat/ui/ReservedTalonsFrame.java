@@ -124,31 +124,23 @@ public class ReservedTalonsFrame extends JFrame {
                         .get(curRow);
                     if (curTalon != null) {
                         releaseTalon(curTalon);
-                        refreshTalonTableModel(pcod);
+//                        refreshTalonTableModel(pcod);
                     }
                 } else {
-                    refreshTalonTableModel(pcod);
+//                    refreshTalonTableModel(pcod);
                 }
             }
         });
         spTalon.setViewportView(tbTalons);
     }
 
-    @SuppressWarnings("unused")
-    private void refreshTalonTableModel() {
-        ReservedTalonTableModel tbtModel = new ReservedTalonTableModel(pcod);
-        tbTalons.setModel(tbtModel); 
-    }
-
-    private void refreshTalonTableModel(int inPcod) {
-        pcod = inPcod;
-        ReservedTalonTableModel tbtModel = new ReservedTalonTableModel(inPcod);
-        tbTalons.setModel(tbtModel);
+    private void refreshTalonTableModel(ReservedTalonTableModel reservedTalonTableModel) {
+        tbTalons.setModel(reservedTalonTableModel);
         //updateSelectTableHeaders();
     }
 
-    public void showModal(int pcod) {
-        refreshTalonTableModel(pcod);
+    public void showModal(ReservedTalonTableModel reservedTalonTableModel) {
+        refreshTalonTableModel(reservedTalonTableModel);
         setVisible(true);
     }
 

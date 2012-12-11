@@ -8,7 +8,7 @@
   <property name="lib.dir" value="../../../../lib" />
   <property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
   <property name="com_resources.dir" location="../../../common/resources" />
-  <property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientInfomat/resources" />
+  <property name="bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientInfomat/ui/resources" />
   <property name="build.dir" location="bin" />
   <property name="export.jar" location="../../auth/client/plugin/clientInfomat.jar" />
   <property name="export.copy.dir" location="../../manager/client" />

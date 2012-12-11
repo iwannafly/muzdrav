@@ -19,16 +19,13 @@ import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
 
 public class LpuSelectFrame extends JFrame {
     private static final long serialVersionUID = 5394050664711305366L;
@@ -39,8 +36,7 @@ public class LpuSelectFrame extends JFrame {
     private Component hgLeft;
     private JScrollPane spLpu;
     private ThriftIntegerClassifierList lLpu;
-    private DoctorSelectFrame frmDoctorSelect;
-    private int nextWindowFlag;
+//    private DoctorSelectFrame frmDoctorSelect;
 
     public LpuSelectFrame() {
         initialization();
@@ -48,22 +44,22 @@ public class LpuSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
+//        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
-        createModalFrames();
+//        createModalFrames();
         addMainPanel();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
-    private void createModalFrames() {
-        if (frmDoctorSelect == null) {
-            frmDoctorSelect = new DoctorSelectFrame(); 
-        }
-    }
+//    private void createModalFrames() {
+//        if (frmDoctorSelect == null) {
+//            frmDoctorSelect = new DoctorSelectFrame(); 
+//        }
+//    }
 
     @SuppressWarnings("rawtypes")
     private class InfomatListCellRenderer extends JLabel implements ListCellRenderer {
@@ -151,16 +147,16 @@ public class LpuSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addLpuList() {
         lLpu = new ThriftIntegerClassifierList();
-        updateLpuList();
-        lLpu.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (lLpu.getSelectedValue() != null) {
-                    frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
-                    updateLpuList();
-                }
-            }
-        });
+//        updateLpuList();
+//        lLpu.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (lLpu.getSelectedValue() != null) {
+//                    frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
+//                    updateLpuList();
+//                }
+//            }
+//        });
         lLpu.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255), Color.red));
         lLpu.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lLpu.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -168,19 +164,24 @@ public class LpuSelectFrame extends JFrame {
         spLpu.setViewportView(lLpu);
     }
 
-    private void updateLpuList() {
-        try {
-            lLpu.setData(ClientInfomat.tcl.getPoliclinics());
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            e1.printStackTrace();
-            ClientInfomat.conMan.reconnect(e1);
-        }
+    public void addListClickListener(MouseListener listener) {
+        lLpu.addMouseListener(listener);
     }
-    public void showAsModal(int flag) {
-       nextWindowFlag = flag;
-       updateLpuList();
+
+    public void updateLpuList(List<IntegerClassifier> policlinics) {
+        lLpu.setData(policlinics);
+//        try {
+//            lLpu.setData(ClientInfomat.tcl.getPoliclinics());
+//        } catch (KmiacServerException e1) {
+//            e1.printStackTrace();
+//        } catch (TException e1) {
+//            e1.printStackTrace();
+//            ClientInfomat.conMan.reconnect(e1);
+//        }
+    }
+
+    public void showAsModal() {
+//       updateLpuList();
        setVisible(true);
     }
 }
