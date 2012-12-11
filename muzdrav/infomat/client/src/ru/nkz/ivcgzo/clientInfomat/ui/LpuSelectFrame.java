@@ -23,7 +23,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class LpuSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -118,11 +117,11 @@ public class LpuSelectFrame extends JFrame {
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-        btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        });
+//        btnBackward.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                setVisible(false);
+//            }
+//        });
         btnBackward.setIcon(new ImageIcon(LpuSelectFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
@@ -132,6 +131,9 @@ public class LpuSelectFrame extends JFrame {
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
+    public void addLpuSelectBackwardListener(ActionListener listener) {
+        btnBackward.addActionListener(listener);
+    }
 
     private void addLpuListPanel() {
         spLpu = new JScrollPane();

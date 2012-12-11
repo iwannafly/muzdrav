@@ -91,6 +91,10 @@ public class SheduleFrame extends JFrame {
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
+    public void addShedulerSelectBackwardListener(ActionListener listener) {
+        btnBackward.addActionListener(listener);
+    }
+
     private void addTalonTablePanel() {
         spTalon = new JScrollPane();
         spTalon.setBackground(Color.WHITE);

@@ -3,7 +3,6 @@ package ru.nkz.ivcgzo.clientInfomat.ui;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -81,11 +80,11 @@ public class ReservedTalonsFrame extends JFrame {
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-        btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        });
+//        btnBackward.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                setVisible(false);
+//            }
+//        });
         btnBackward.setIcon(new ImageIcon(ReservedTalonsFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
@@ -93,6 +92,10 @@ public class ReservedTalonsFrame extends JFrame {
         btnBackward.setForeground(Color.BLACK);
         hbBackwardButton.add(btnBackward);
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    public void addReservedSelectBackwardListener(ActionListener listener) {
+        btnBackward.addActionListener(listener);
     }
 
     private void addTalonTablePanel() {
@@ -124,7 +127,8 @@ public class ReservedTalonsFrame extends JFrame {
                         .get(curRow);
                     if (curTalon != null) {
                         releaseTalon(curTalon);
-//                        refreshTalonTableModel(pcod);
+                        //FIXME временный костыль
+                        refreshTalonTableModel(new ReservedTalonTableModel(curTalon.getNpasp()));
                     }
                 } else {
 //                    refreshTalonTableModel(pcod);

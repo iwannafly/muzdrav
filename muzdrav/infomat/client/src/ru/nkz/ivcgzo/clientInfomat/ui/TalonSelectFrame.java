@@ -52,7 +52,7 @@ public class TalonSelectFrame extends JFrame{
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -89,11 +89,11 @@ public class TalonSelectFrame extends JFrame{
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-        btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        });
+//        btnBackward.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                setVisible(false);
+//            }
+//        });
         btnBackward.setIcon(new ImageIcon(TalonSelectFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
@@ -101,6 +101,10 @@ public class TalonSelectFrame extends JFrame{
         btnBackward.setForeground(Color.BLACK);
         hbBackwardButton.add(btnBackward);
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    public void addTalonSelectBackwardListener(ActionListener listener) {
+        btnBackward.addActionListener(listener);
     }
 
     private void addTableButtonsPanel() {
