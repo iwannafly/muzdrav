@@ -88,12 +88,14 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
 //                mainFrame.setVisible(false);
                 lastFrameSet = FrameSet.appointment;
                 lpuSelectFrame.showAsModal();
+                mainFrame.setVisible(false);
             }
         });
         mainFrame.addPersonalInfoListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 lastFrameSet = FrameSet.personalOffice;
                 authFrame.setVisible(true);
+//                mainFrame.setVisible(false);
             }
         });
         mainFrame.addSheduleListener(new ActionListener() {
@@ -102,6 +104,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
 //                mainFrame.setVisible(false);
                 lastFrameSet = FrameSet.shedule;
                 lpuSelectFrame.showAsModal();
+                mainFrame.setVisible(false);
             }
         });
 
@@ -114,8 +117,16 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                     controller.setCurrentPoliclinic(currentPoliclinic);
                     controller.setSpecialities(currentPoliclinic.getPcod());
                     doctorFrame.showModal();
+                    lpuSelectFrame.setVisible(false);
 //                    updateLpuList();
                 }
+            }
+        });
+        lpuSelectFrame.addLpuSelectBackwardListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lpuSelectFrame.setVisible(false);
+                mainFrame.setVisible(true);
             }
         });
 
@@ -147,6 +158,8 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                                 model.getCurrentDoctor().getPcod()
                             )
                         );
+                        doctorFrame.setVisible(false);
+                        mainFrame.setVisible(false);
                     } else if (lastFrameSet == FrameSet.shedule) {
                         sheduleFrame.showModal(
                             model.getSheduleTableModel(
@@ -155,8 +168,17 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                                 model.getCurrentSpeciality().getPcod()
                             )
                         );
+                        doctorFrame.setVisible(false);
+                        mainFrame.setVisible(false);
                     }
                 }
+            }
+        });
+        doctorFrame.addDoctorSelectBackwardListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doctorFrame.setVisible(false);
+                mainFrame.setVisible(true);
             }
         });
 
@@ -174,6 +196,29 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
 //                if (curTalon != null) {
 //                    frmAuth.setVisible(true);
 //                }
+            }
+        });
+        talonSelectFrame.addTalonSelectBackwardListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                talonSelectFrame.setVisible(false);
+                mainFrame.setVisible(true);
+            }
+        });
+
+        sheduleFrame.addShedulerSelectBackwardListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sheduleFrame.setVisible(false);
+                mainFrame.setVisible(true);
+            }
+        });
+
+        resTalonSelectFrame.addReservedSelectBackwardListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resTalonSelectFrame.setVisible(false);
+                mainFrame.setVisible(true);
             }
         });
 
@@ -229,6 +274,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
             if (model.getPatient() != null) {
                 resTalonSelectFrame.showModal(model.getReservedTalonTableModel(model.getPatient().getId()));
                 authFrame.setVisible(false);
+                mainFrame.setVisible(false);
             } else {
                 authFrame.setVisible(false);
                 optionsDialog.showMessageDialog(mainFrame, "Номер ОМС не найден в базе данных!");

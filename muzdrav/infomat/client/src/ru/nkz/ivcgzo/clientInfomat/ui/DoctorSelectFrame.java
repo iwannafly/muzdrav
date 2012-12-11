@@ -26,6 +26,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
+import java.util.Collections;
 import java.util.List;
 
 public class DoctorSelectFrame extends JFrame {
@@ -51,7 +52,7 @@ public class DoctorSelectFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 
@@ -147,6 +148,10 @@ public class DoctorSelectFrame extends JFrame {
         btnBackward.setBackground(Color.WHITE);
         btnBackward.setForeground(Color.BLACK);
         pnButton.add(btnBackward);
+    }
+
+    public void addDoctorSelectBackwardListener(ActionListener listener) {
+        btnBackward.addActionListener(listener);
     }
 
     private void addLeftHorizontalDelimiter() {
@@ -251,6 +256,7 @@ public class DoctorSelectFrame extends JFrame {
     public void showModal() {
 //        cpol = inCpol;
 //        updateSpecialitiesList(inCpol);
+        lDoctor.setData(Collections.<IntegerClassifier>emptyList());
         setVisible(true);
     }
 }

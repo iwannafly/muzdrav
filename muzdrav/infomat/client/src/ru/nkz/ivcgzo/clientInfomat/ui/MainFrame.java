@@ -34,7 +34,7 @@ public class MainFrame extends JFrame {
 
     private void initialization() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setUndecorated(true);
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 

@@ -30,7 +30,7 @@ public class AuthorizationFrame extends JDialog {
     }
 
     private void initialization() {
-//        setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setModalityType(ModalityType.TOOLKIT_MODAL);
