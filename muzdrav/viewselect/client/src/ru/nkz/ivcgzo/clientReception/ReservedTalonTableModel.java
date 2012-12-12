@@ -23,13 +23,18 @@ public class ReservedTalonTableModel implements TableModel {
         "Дата приёма", "Время приёма", " Специальность" , "Ф.И.О"
     };
 
+    public ReservedTalonTableModel() {
+        reservedTalons = Collections.emptyList();
+    }
+
     public ReservedTalonTableModel(final int cpol, final String cdol, final int doctorId,
             final int patientId) {
         try {
             reservedTalons = MainForm.tcl.getReservedTalons(cpol, cdol, doctorId, patientId);
         } catch (TalonNotFoundException e) {
             reservedTalons = Collections.emptyList();
-        } catch (TException e) {
+        } catch (TException e) {            
+            reservedTalons = Collections.emptyList();
             MainForm.conMan.reconnect(e);
         }
     }

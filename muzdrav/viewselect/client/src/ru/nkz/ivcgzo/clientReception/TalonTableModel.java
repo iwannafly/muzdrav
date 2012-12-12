@@ -20,6 +20,10 @@ public final class TalonTableModel implements TableModel {
     };
     private TalonList talonList;
 
+    public TalonTableModel() {
+        talonList = new TalonList();
+    }
+
     public TalonTableModel(final int cpol, final String cdol, final int pcod) {
         setTalonList(cpol, cdol, pcod);
     }
@@ -30,6 +34,7 @@ public final class TalonTableModel implements TableModel {
         } catch (TalonNotFoundException e) {
             talonList = new TalonList();
         } catch (TException e) {
+            talonList = new TalonList();
             MainForm.conMan.reconnect(e);
         }
     }

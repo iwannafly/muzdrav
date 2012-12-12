@@ -76,13 +76,14 @@ public class DateChecker {
      * Сдвиг календаря на неделю вперед
      */
     public final void nextWeek() {
-        calend.get(Calendar.YEAR);
-        if (calend.get(Calendar.DAY_OF_YEAR) > (calend.getMaximum(Calendar.DAY_OF_YEAR)-7)) {
-            calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
-            calend.set(Calendar.YEAR, calend.get(Calendar.YEAR) + 1);
-        } else {
-            calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
-        }
+//        calend.get(Calendar.YEAR);
+//        if (calend.get(Calendar.DAY_OF_YEAR) > (calend.getMaximum(Calendar.DAY_OF_YEAR)-7)) {
+//            calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
+//            calend.set(Calendar.YEAR, calend.get(Calendar.YEAR) + 1);
+//        } else {
+//            calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
+//        }
+        calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
         fillCurrentWeekArray();
     }
 
@@ -90,9 +91,9 @@ public class DateChecker {
      * Сдвиг календаря на неделю назад
      */
     public final void prevWeek() {
-        if (calend.get(Calendar.WEEK_OF_YEAR) < 1) {
-            calend.set(Calendar.YEAR, calend.get(Calendar.YEAR) - 1);
-        }
+//        if (calend.get(Calendar.WEEK_OF_YEAR) < 1) {
+//            calend.set(Calendar.YEAR, calend.get(Calendar.YEAR) - 1);
+//        }
         calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) - 1);
         fillCurrentWeekArray();
     }
