@@ -8,6 +8,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
@@ -30,13 +31,17 @@ public interface IModel {
 
     public void setPatient(String oms);
 
-    public void setReservedTalon(int patientId);
+    public void setReservedTalons(int patientId);
 
     public void setShedule(int pcod, int cpol, String cdol);
 
     public List<IntegerClassifier> getPoliclinics();
 
     public List<StringClassifier> getSpecialities();
+
+    public TTalon getCurrentReservedTalon();
+
+    public void setCurrentReservedTalon(TTalon talon);
 
     public List<IntegerClassifier> getDoctors();
 
@@ -62,7 +67,7 @@ public interface IModel {
 
     public TPatient getPatient();
 
-    public List<TTalon> getReservedTalon();
+    public List<TTalon> getReservedTalons();
 
     public List<TSheduleDay> getShedule();
 
@@ -105,4 +110,8 @@ public interface IModel {
     public void registerSelectedTalonObserver(ISelectedTalonObserver obs);
 
     public void removeSelectedTalonObserver(ISelectedTalonObserver obs);
+
+    public void registerReservedTalonObserver(ICurrentIReservedTalonObserver obs);
+
+    public void removeReservedTalonObserver(ICurrentIReservedTalonObserver obs);
 }

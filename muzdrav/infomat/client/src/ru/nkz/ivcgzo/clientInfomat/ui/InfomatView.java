@@ -11,6 +11,7 @@ import javax.swing.JTable;
 import ru.nkz.ivcgzo.clientInfomat.IController;
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
@@ -18,6 +19,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierList;
@@ -27,7 +29,8 @@ import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         IPoliclinicsObserver, ICurrentPoliclinicObserver, ICurrentSpecialityObserver,
-        ICurrentDoctorObserver, IPatientObserver, ISelectedTalonObserver {
+        ICurrentDoctorObserver, IPatientObserver, ISelectedTalonObserver,
+        ICurrentIReservedTalonObserver {
     private enum FrameSet {
         appointment,
         personalOffice,
@@ -214,6 +217,34 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
             }
         });
 
+        resTalonSelectFrame.addReservedTalonTableMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int dialogResult = new OptionsDialog().showConfirmDialog(resTalonSelectFrame,
+                    "Отменить запись?");
+                if (dialogResult == OptionsDialog.ACCEPT) {
+                    JTable curTable = (JTable) e.getSource();
+                    final int curRow = curTable.getSelectedRow();
+                    TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
+                        .getReservedTalonList()
+                        .get(curRow);
+                    if (curTalon != null) {
+                        controller.releaseTalon(curTalon);
+                        resTalonSelectFrame.refreshTalonTableModel(
+                            model.getReservedTalonTableModel(
+                                model.getPatient().getId()
+                            )
+                        );
+                    }
+                } else {
+                    resTalonSelectFrame.refreshTalonTableModel(
+                        model.getReservedTalonTableModel(
+                            model.getPatient().getId()
+                        )
+                    );
+                }
+            }
+        });
         resTalonSelectFrame.addReservedSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -297,6 +328,11 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
     @Override
     public void updateSelectedTalon() {
         authFrame.setVisible(true);
+    }
+
+    @Override
+    public void updateReservedTalon() {
+        
     }
 
 }

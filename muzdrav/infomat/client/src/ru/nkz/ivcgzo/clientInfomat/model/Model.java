@@ -13,6 +13,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
@@ -45,6 +46,8 @@ public class Model implements IModel {
             new ArrayList<IPatientObserver>();
     private List<ISelectedTalonObserver> selectedTalonObservers =
             new ArrayList<ISelectedTalonObserver>();
+    private List<ICurrentIReservedTalonObserver> currentReservedTalonObservers =
+            new ArrayList<ICurrentIReservedTalonObserver>();
     private List<IntegerClassifier> policlinics;
     private List<StringClassifier> specialities;
     private List<IntegerClassifier> doctors;
@@ -55,6 +58,7 @@ public class Model implements IModel {
     private StringClassifier currentSpeciality;
     private IntegerClassifier currentDoctor;
     private TTalon currentTalon;
+    private TTalon currentReservedTalon;
     private TPatient patient;
 
     @Override
@@ -83,7 +87,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public List<TTalon> getReservedTalon() {
+    public List<TTalon> getReservedTalons() {
         return reservedTalons;
     }
 
@@ -189,7 +193,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setReservedTalon(int patientId) {
+    public void setReservedTalons(int patientId) {
         try {
             reservedTalons = ClientInfomat.tcl.getReservedTalon(patientId);
         } catch (KmiacServerException e) {
@@ -418,5 +422,32 @@ public class Model implements IModel {
         for (ISelectedTalonObserver obs: selectedTalonObservers) {
             obs.updateSelectedTalon();
         }
+    }
+
+    @Override
+    public void registerReservedTalonObserver(ICurrentIReservedTalonObserver obs) {
+        currentReservedTalonObservers.add(obs);
+    }
+
+    @Override
+    public void removeReservedTalonObserver(ICurrentIReservedTalonObserver obs) {
+        currentReservedTalonObservers.remove(obs);
+    }
+
+    public void notifyCurrentReservedTalonObservers() {
+        for (ICurrentIReservedTalonObserver obs: currentReservedTalonObservers) {
+            obs.updateReservedTalon();
+        }
+    }
+
+    @Override
+    public TTalon getCurrentReservedTalon() {
+        return currentReservedTalon;
+    }
+
+    @Override
+    public void setCurrentReservedTalon(TTalon talon) {
+        this.currentReservedTalon = talon;
+        notifyCurrentReservedTalonObservers();
     }
 }

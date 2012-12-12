@@ -10,6 +10,8 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Point;
+
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import java.awt.Color;
@@ -18,6 +20,7 @@ import javax.swing.JLabel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 public class AuthorizationFrame extends JDialog {
     private static final long serialVersionUID = 2313445455119747466L;
@@ -30,6 +33,9 @@ public class AuthorizationFrame extends JDialog {
     }
 
     private void initialization() {
+        setCursor(getToolkit().createCustomCursor(
+                new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
+                "null"));
         setAlwaysOnTop(true);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -258,15 +264,6 @@ public class AuthorizationFrame extends JDialog {
         horizontalBox_1.add(horizontalGlue_2);
 
         btnAccept = new JButton("Принять");
-//        btnAccept.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                isOmsAccepted = checkOms(tfOmsNumber.getText().trim());
-//                tfOmsNumber.setText("");
-//                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
-//                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
-//                setVisible(false);
-//            }
-//        });
         btnAccept.setFont(new Font("Courier New", Font.BOLD, 30));
         btnAccept.setMinimumSize(new Dimension(400, 80));
         btnAccept.setPreferredSize(new Dimension(400, 80));
@@ -277,14 +274,6 @@ public class AuthorizationFrame extends JDialog {
         horizontalBox_1.add(horizontalGlue_3);
 
         btnCancel = new JButton("Отмена");
-//        btnCancel.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                tfOmsNumber.setText("");
-//                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
-//                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
-//                setVisible(false);
-//            }
-//        });
         btnCancel.setFont(new Font("Courier New", Font.BOLD, 30));
         btnCancel.setPreferredSize(new Dimension(400, 80));
         btnCancel.setMinimumSize(new Dimension(400, 80));
@@ -297,10 +286,6 @@ public class AuthorizationFrame extends JDialog {
         Component verticalGlue_1 = Box.createVerticalGlue();
         pMain.add(verticalGlue_1);
 
-//        createModalFrames();
-//        addMainPanel();
-
-//        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 

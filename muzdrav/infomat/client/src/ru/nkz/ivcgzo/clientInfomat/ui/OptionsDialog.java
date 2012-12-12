@@ -9,6 +9,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.awt.event.*;
 //import java.io.*;
+import java.awt.image.BufferedImage;
 
 public class OptionsDialog implements ActionListener {
     protected JDialog dialog;
@@ -53,6 +54,9 @@ public class OptionsDialog implements ActionListener {
     }
 
     private void buildDialogDefaults(JDialog dialog, String msg) {
+        dialog.setCursor(dialog.getToolkit().createCustomCursor(
+            new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
+            "null"));
         dialog.setUndecorated(true);
         dialog.getContentPane().setLayout(new BoxLayout(
             dialog.getContentPane(), BoxLayout.Y_AXIS));

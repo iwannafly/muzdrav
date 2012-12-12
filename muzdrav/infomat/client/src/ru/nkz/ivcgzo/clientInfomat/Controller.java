@@ -57,7 +57,7 @@ public class Controller implements IController {
 
     @Override
     public void setReservedTalon(int patientId) {
-        model.setReservedTalon(patientId);
+        model.setReservedTalons(patientId);
     }
 
     @Override
@@ -88,6 +88,11 @@ public class Controller implements IController {
     @Override
     public void setSelectedTalon(TTalon talon) {
         model.setTalon(talon);
+    }
+
+    @Override
+    public void setCurrentReservedTalon(TTalon talon) {
+        model.setCurrentReservedTalon(talon);
     }
 
 }

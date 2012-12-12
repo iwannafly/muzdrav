@@ -4,28 +4,20 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientInfomat.ReservedTalonTableCellRenderer;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftInfomat.ReleaseTalonOperationFailedException;
-import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
-public class ReservedTalonsFrame extends JFrame {
+public class ReservedTalonsFrame extends InfomatFrame {
 
     private static final long serialVersionUID = 4278188155287891545L;
     private JPanel pMain;
@@ -43,14 +35,8 @@ public class ReservedTalonsFrame extends JFrame {
     }
 
     private void initialization() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
-        setUndecorated(true);
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-
         addMainPanel();
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
@@ -80,11 +66,6 @@ public class ReservedTalonsFrame extends JFrame {
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-//        btnBackward.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                setVisible(false);
-//            }
-//        });
         btnBackward.setIcon(new ImageIcon(ReservedTalonsFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
@@ -114,51 +95,20 @@ public class ReservedTalonsFrame extends JFrame {
         tbTalons = new JTable();
         tbTalons.setDefaultRenderer(String.class, new ReservedTalonTableCellRenderer());
         tbTalons.setRowHeight(50);
-        tbTalons.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int dialogResult = new OptionsDialog().showConfirmDialog(ReservedTalonsFrame.this,
-                    "Отменить запись?");
-                if (dialogResult == OptionsDialog.ACCEPT) {
-                    JTable curTable = (JTable) e.getSource();
-                    final int curRow = curTable.getSelectedRow();
-                    TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
-                        .getReservedTalonList()
-                        .get(curRow);
-                    if (curTalon != null) {
-                        releaseTalon(curTalon);
-                        //FIXME временный костыль
-                        refreshTalonTableModel(new ReservedTalonTableModel(curTalon.getNpasp()));
-                    }
-                } else {
-//                    refreshTalonTableModel(pcod);
-                }
-            }
-        });
         spTalon.setViewportView(tbTalons);
     }
 
-    private void refreshTalonTableModel(ReservedTalonTableModel reservedTalonTableModel) {
+    public void addReservedTalonTableMouseListener(MouseListener listener) {
+        tbTalons.addMouseListener(listener);
+    }
+
+    public void refreshTalonTableModel(ReservedTalonTableModel reservedTalonTableModel) {
         tbTalons.setModel(reservedTalonTableModel);
-        //updateSelectTableHeaders();
     }
 
     public void showModal(ReservedTalonTableModel reservedTalonTableModel) {
         refreshTalonTableModel(reservedTalonTableModel);
         setVisible(true);
     }
-
-    private void releaseTalon(TTalon curTalon) {
-        try {
-            ClientInfomat.tcl.releaseTalon(curTalon);
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (ReleaseTalonOperationFailedException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
-    } 
 
 }

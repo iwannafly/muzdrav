@@ -35,6 +35,8 @@ public interface IController {
 
     public void setSelectedTalon(TTalon talon);
 
+    public void setCurrentReservedTalon(TTalon talon);
+
     //FIXME костыль, избавиться от него!
     public JFrame getMainFrame();
 }

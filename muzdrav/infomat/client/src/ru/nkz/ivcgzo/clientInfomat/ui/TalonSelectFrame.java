@@ -12,7 +12,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,7 +19,7 @@ import javax.swing.JTable;
 import ru.nkz.ivcgzo.clientInfomat.TalonTableCellRenderer;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
 
-public class TalonSelectFrame extends JFrame{
+public class TalonSelectFrame extends InfomatFrame {
     private static final long serialVersionUID = -869834846316758484L;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
     private static final String[] DAY_NAMES = {
@@ -35,30 +34,16 @@ public class TalonSelectFrame extends JFrame{
     private JPanel pTableButtons;    
     private JButton btnTalonBackward;    
     private JButton btnTalonForward;
-//    private LpuListModel llm;
     private JTable tbTalons;
-//    int cpol;
-//    String cdol;
-//    int pcod;
     private Component horizontalGlue;
-//    private DoctorSelectFrame frmDoctorSelect;
 
     public TalonSelectFrame() {
-//        cpol = -1;
-//        cdol = "";
-//        pcod = -1;
         initialization();
     }
 
     private void initialization() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
-        setUndecorated(true);
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-
         addMainPanel();
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
@@ -89,11 +74,6 @@ public class TalonSelectFrame extends JFrame{
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-//        btnBackward.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                setVisible(false);
-//            }
-//        });
         btnBackward.setIcon(new ImageIcon(TalonSelectFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
@@ -190,62 +170,16 @@ public class TalonSelectFrame extends JFrame{
         tbTalons = new JTable();
         tbTalons.setDefaultRenderer(String.class, new TalonTableCellRenderer());
         tbTalons.setRowHeight(50);
-//        tbTalons.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                JTable curTable = (JTable) e.getSource();
-//                final int curRow = curTable.getSelectedRow();
-//                final int curColumn = curTable.getSelectedColumn();
-//                curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
-//                    .getTalonByDay(curRow, curColumn);
-//                if (curTalon != null) {
-//                    frmAuth.setVisible(true);
-//                }
-//            }
-//        });
         spTalon.setViewportView(tbTalons);
     }
 
-//    public void refreshTalonTableModel() {
-//        TalonTableModel tbtModel = new TalonTableModel(cpol, cdol, pcod);
-//        tbTalons.setModel(tbtModel);
-//    }
-
     public void refreshTalonTableModel(TalonTableModel curTableModel) {
-//        cpol = inCpol;
-//        cdol = inCdol;
-//        pcod = inPcod;
-//        TalonTableModel tbtModel = new TalonTableModel(inCpol, inCdol, inPcod);
         tbTalons.setModel(curTableModel);
-        //updateSelectTableHeaders();
     }
 
     public void showModal(TalonTableModel curTableModel) {
         refreshTalonTableModel(curTableModel);
-//        refreshTalonTableModel(cpol, cdol,  pcod);
         setVisible(true);
     }
-
-//    private void reserveTalon(TPatient patient, TTalon curTalon) {
-//        try {
-//            ClientInfomat.tcl.reserveTalon(patient, curTalon);
-//        } catch (KmiacServerException e) {
-//            new OptionsDialog().showConfirmDialog(TalonSelectFrame.this,
-//                "Ошибка во время записи талона!");
-//            e.printStackTrace();
-//        } catch (ReserveTalonOperationFailedException e) {
-//            new OptionsDialog().showConfirmDialog(TalonSelectFrame.this,
-//                "Ошибка во время записи талона!");
-//            e.printStackTrace();
-//        } catch (PatientHasSomeReservedTalonsOnThisDay e) {
-//            new OptionsDialog().showConfirmDialog(TalonSelectFrame.this,
-//                "У вас уже есть запись к данному врачу на выбранный день!"
-//                + "Повторная запись невозможна!");
-//            e.printStackTrace();
-//        } catch (TException e) {
-//            e.printStackTrace();
-//            ClientInfomat.conMan.reconnect(e);
-//        }
-//    } 
 
 }
