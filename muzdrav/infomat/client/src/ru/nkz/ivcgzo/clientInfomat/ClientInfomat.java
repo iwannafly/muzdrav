@@ -16,7 +16,7 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftInfomat.ThriftInfomat;
 
-public class ClientInfomat extends Client<ThriftInfomat.Client>{
+public class ClientInfomat extends Client<ThriftInfomat.Client> {
     public static ThriftInfomat.Client tcl;
     public static Client<ThriftInfomat.Client> instance;
 

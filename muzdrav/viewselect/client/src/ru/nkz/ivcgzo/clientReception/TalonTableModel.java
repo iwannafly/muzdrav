@@ -14,7 +14,7 @@ import ru.nkz.ivcgzo.thriftReception.TalonNotFoundException;
 public final class TalonTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd.MM.yy");
     private static final String[] DAY_NAMES = {
         "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вск"
     };
@@ -58,15 +58,15 @@ public final class TalonTableModel implements TableModel {
         String displayedTime = "";
         if ((talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex)) != null) {
             displayedTime = DEFAULT_TIME_FORMAT.format(
-                    talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex));
+                talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex));
         }
-        return displayedTime; //talonList.getTimeOfAppointmentByDay(rowIndex, columnIndex);
+        return displayedTime;
     }
 
     @Override
     public String getColumnName(final int columnIndex) {
         return String.format("%s %s", DAY_NAMES[columnIndex],
-                DEFAULT_DATE_FORMAT.format(talonList.getWeekDays()[columnIndex]));
+            DEFAULT_DATE_FORMAT.format(talonList.getWeekDays()[columnIndex]));
     }
 
     @Override

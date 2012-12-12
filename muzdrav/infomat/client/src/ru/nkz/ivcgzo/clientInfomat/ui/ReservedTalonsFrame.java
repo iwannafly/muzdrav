@@ -20,6 +20,9 @@ import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
 public class ReservedTalonsFrame extends InfomatFrame {
 
     private static final long serialVersionUID = 4278188155287891545L;
+    private static final int TABLE_ROW_HEIGHT = 50;
+    private static final int VERTICAL_SCROLLBAR_WIDTH = 50;
+    private static final int HORIZONTAL_SCROLLBAR_HEIGHT = 50;
     private JPanel pMain;
     private Box hbBackwardButton;
     private Component hgRight;
@@ -27,10 +30,8 @@ public class ReservedTalonsFrame extends InfomatFrame {
     private Component hgLeft;
     private JScrollPane spTalon;
     private JTable tbTalons;
-    int pcod;
 
     public ReservedTalonsFrame() {
-        pcod = -1;
         initialization();
     }
 
@@ -58,7 +59,7 @@ public class ReservedTalonsFrame extends InfomatFrame {
         hbBackwardButton.add(hgRight);
 
         addBackwardButton();
-        
+
         hgLeft = Box.createHorizontalGlue();
         hbBackwardButton.add(hgLeft);
     }
@@ -75,7 +76,7 @@ public class ReservedTalonsFrame extends InfomatFrame {
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    public void addReservedSelectBackwardListener(ActionListener listener) {
+    public final void addReservedSelectBackwardListener(final ActionListener listener) {
         btnBackward.addActionListener(listener);
     }
 
@@ -83,9 +84,9 @@ public class ReservedTalonsFrame extends InfomatFrame {
         spTalon = new JScrollPane();
         spTalon.setBackground(Color.WHITE);
         spTalon.getVerticalScrollBar().setPreferredSize(
-                new Dimension(50, Integer.MAX_VALUE));
+            new Dimension(VERTICAL_SCROLLBAR_WIDTH, Integer.MAX_VALUE));
         spTalon.getHorizontalScrollBar().setPreferredSize(
-                new Dimension(Integer.MAX_VALUE, 50));
+            new Dimension(Integer.MAX_VALUE, HORIZONTAL_SCROLLBAR_HEIGHT));
         pMain.add(spTalon);
 
         addTalonTable();
@@ -94,19 +95,20 @@ public class ReservedTalonsFrame extends InfomatFrame {
     private void addTalonTable() {
         tbTalons = new JTable();
         tbTalons.setDefaultRenderer(String.class, new ReservedTalonTableCellRenderer());
-        tbTalons.setRowHeight(50);
+        tbTalons.setRowHeight(TABLE_ROW_HEIGHT);
         spTalon.setViewportView(tbTalons);
     }
 
-    public void addReservedTalonTableMouseListener(MouseListener listener) {
+    public final void addReservedTalonTableMouseListener(final MouseListener listener) {
         tbTalons.addMouseListener(listener);
     }
 
-    public void refreshTalonTableModel(ReservedTalonTableModel reservedTalonTableModel) {
+    public final void refreshTalonTableModel(
+            final ReservedTalonTableModel reservedTalonTableModel) {
         tbTalons.setModel(reservedTalonTableModel);
     }
 
-    public void showModal(ReservedTalonTableModel reservedTalonTableModel) {
+    public final void showModal(final ReservedTalonTableModel reservedTalonTableModel) {
         refreshTalonTableModel(reservedTalonTableModel);
         setVisible(true);
     }

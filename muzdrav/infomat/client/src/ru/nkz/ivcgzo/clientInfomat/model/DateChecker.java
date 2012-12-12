@@ -40,8 +40,14 @@ public class DateChecker {
      */
     private void setCalendarDefaults() {
         calend = new GregorianCalendar();
+
         // установка дня начала недели на понедельник (по умолчанию - воскресенье)
         calend.setFirstDayOfWeek(Calendar.MONDAY);
+
+        // количество дней в неделе, необходимых, чтобы неделя считалась первой.
+        // Если задать не 7 - не будет переводить год если первая неделя неполная. Магия вуду.
+        calend.setMinimalDaysInFirstWeek(7);
+
         calend.set(Calendar.HOUR_OF_DAY, 0);
         calend.set(Calendar.MINUTE, 0);
         calend.set(Calendar.SECOND, 0);
@@ -67,22 +73,11 @@ public class DateChecker {
             calend.get(Calendar.DATE) - calend.getMaximum(Calendar.DAY_OF_WEEK));
     }
 
-/////////////////////////////// CAUTION ! //////////////////////////////
-//////////////////////////// АДЪ И ИЗРАИЛЪ /////////////////////////////
-////////////////////////////////////////////////////////////////////////
-    
-// FIXME временная заглушка - переделать!
+
     /**
      * Сдвиг календаря на неделю вперед
      */
     public final void nextWeek() {
-//        calend.get(Calendar.YEAR);
-//        if (calend.get(Calendar.DAY_OF_YEAR) > (calend.getMaximum(Calendar.DAY_OF_YEAR)-7)) {
-//            calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
-//            calend.set(Calendar.YEAR, calend.get(Calendar.YEAR) + 1);
-//        } else {
-//            calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
-//        }
         calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) + 1);
         fillCurrentWeekArray();
     }
@@ -91,9 +86,6 @@ public class DateChecker {
      * Сдвиг календаря на неделю назад
      */
     public final void prevWeek() {
-//        if (calend.get(Calendar.WEEK_OF_YEAR) < 1) {
-//            calend.set(Calendar.YEAR, calend.get(Calendar.YEAR) - 1);
-//        }
         calend.set(Calendar.WEEK_OF_YEAR, calend.get(Calendar.WEEK_OF_YEAR) - 1);
         fillCurrentWeekArray();
     }

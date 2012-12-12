@@ -62,57 +62,57 @@ public class Model implements IModel {
     private TPatient patient;
 
     @Override
-    public List<IntegerClassifier> getPoliclinics() {
+    public final List<IntegerClassifier> getPoliclinics() {
         return policlinics;
     }
 
     @Override
-    public List<StringClassifier> getSpecialities() {
+    public final List<StringClassifier> getSpecialities() {
         return specialities;
     }
 
     @Override
-    public List<IntegerClassifier> getDoctors() {
+    public final List<IntegerClassifier> getDoctors() {
         return doctors;
     }
 
     @Override
-    public TalonList getTalons() {
+    public final TalonList getTalons() {
         return talons;
     }
 
     @Override
-    public TPatient getPatient() {
+    public final TPatient getPatient() {
         return patient;
     }
 
     @Override
-    public List<TTalon> getReservedTalons() {
+    public final List<TTalon> getReservedTalons() {
         return reservedTalons;
     }
 
     @Override
-    public List<TSheduleDay> getShedule() {
+    public final List<TSheduleDay> getShedule() {
         return sheduleDays;
     }
 
     @Override
-    public IntegerClassifier getCurrentPoliclinic() {
+    public final IntegerClassifier getCurrentPoliclinic() {
         return currentPoliclinic;
     }
 
     @Override
-    public StringClassifier getCurrentSpeciality() {
+    public final StringClassifier getCurrentSpeciality() {
         return currentSpeciality;
     }
 
     @Override
-    public IntegerClassifier getCurrentDoctor() {
+    public final IntegerClassifier getCurrentDoctor() {
         return currentDoctor;
     }
 
     @Override
-    public void setPoliclinics() {
+    public final void setPoliclinics() {
         try {
             policlinics = ClientInfomat.tcl.getPoliclinics();
             notifyPoliclinicsObservers();
@@ -127,7 +127,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setSpecialities(int cpol) {
+    public final void setSpecialities(final int cpol) {
         try {
             specialities = ClientInfomat.tcl.getSpecialities(cpol);
             notifySpecialitiesObservers();
@@ -142,7 +142,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setDoctors(int cpol, String cdol) {
+    public final void setDoctors(final int cpol, final String cdol) {
         try {
             doctors = ClientInfomat.tcl.getDoctors(cpol, cdol);
             notifyDoctorsObservers();
@@ -157,7 +157,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setTalons(int cpol, String cdol, int pcod) {
+    public final void setTalons(final int cpol, final String cdol, final int pcod) {
         try {
             talons = new TalonList(ClientInfomat.tcl.getTalons(cpol, cdol, pcod));
         } catch (KmiacServerException e) {
@@ -169,7 +169,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setPatient(String oms) {
+    public final void setPatient(final String oms) {
         if ((oms == null) || (oms.isEmpty() || (oms.trim().isEmpty()))) {
             patient = null;
             notifyPatientObservers();
@@ -193,7 +193,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setReservedTalons(int patientId) {
+    public final void setReservedTalons(final int patientId) {
         try {
             reservedTalons = ClientInfomat.tcl.getReservedTalon(patientId);
         } catch (KmiacServerException e) {
@@ -207,7 +207,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setShedule(int pcod, int cpol, String cdol) {
+    public final void setShedule(final int pcod, final int cpol, final String cdol) {
         try {
             sheduleDays = ClientInfomat.tcl.getShedule(pcod, cpol, cdol);
         } catch (KmiacServerException e) {
@@ -221,26 +221,26 @@ public class Model implements IModel {
     }
 
     @Override
-    public void setCurrentPoliclinic(IntegerClassifier currentPoliclinic) {
-        this.currentPoliclinic = currentPoliclinic;
+    public final void setCurrentPoliclinic(final IntegerClassifier inCurrentPoliclinic) {
+        this.currentPoliclinic = inCurrentPoliclinic;
         notifyCurrentPoliclinicObservers();
     }
 
     @Override
-    public void setCurrentSpeciality(StringClassifier currentSpeciality) {
-        this.currentSpeciality = currentSpeciality;
+    public final void setCurrentSpeciality(final StringClassifier inCurrentSpeciality) {
+        this.currentSpeciality = inCurrentSpeciality;
         notifyCurrentSpecialityObservers();
     }
 
 
     @Override
-    public void setCurrentDoctor(IntegerClassifier currentDoctor) {
-        this.currentDoctor = currentDoctor;
+    public final void setCurrentDoctor(final IntegerClassifier inCurrentDoctor) {
+        this.currentDoctor = inCurrentDoctor;
         notifyCurrentDoctorObservers();
     }
 
     @Override
-    public void reserveTalon(TPatient pat, TTalon talon) {
+    public final void reserveTalon(final TPatient pat, final TTalon talon) {
         try {
             ClientInfomat.tcl.reserveTalon(pat, talon);
         } catch (KmiacServerException e) {
@@ -256,7 +256,7 @@ public class Model implements IModel {
     }
 
     @Override
-    public void releaseTalon(TTalon talon) {
+    public final void releaseTalon(final TTalon talon) {
         try {
             ClientInfomat.tcl.releaseTalon(talon);
         } catch (KmiacServerException e) {
@@ -270,183 +270,184 @@ public class Model implements IModel {
     }
 
     @Override
-    public void registerDoctorsObserver(IDoctorsObserver obs) {
+    public final void registerDoctorsObserver(final IDoctorsObserver obs) {
         doctorsObservers.add(obs);
     }
 
     @Override
-    public void removeDoctorsObserver(IDoctorsObserver obs) {
+    public final void removeDoctorsObserver(final IDoctorsObserver obs) {
         doctorsObservers.remove(obs);
     }
 
-    public void notifyDoctorsObservers() {
+    public final void notifyDoctorsObservers() {
         for (IDoctorsObserver obs: doctorsObservers) {
             obs.updateDoctors();
         }
     }
 
     @Override
-    public void registerPoliclinicsObserver(IPoliclinicsObserver obs) {
+    public final void registerPoliclinicsObserver(final IPoliclinicsObserver obs) {
         policlinicsObservers.add(obs);
     }
 
     @Override
-    public void removePoliclinicsObserver(IPoliclinicsObserver obs) {
+    public final void removePoliclinicsObserver(final IPoliclinicsObserver obs) {
         policlinicsObservers.remove(obs);
     }
 
-    public void notifyPoliclinicsObservers() {
+    public final void notifyPoliclinicsObservers() {
         for (IPoliclinicsObserver obs: policlinicsObservers) {
             obs.updatePoliclinics();
         }
     }
 
     @Override
-    public void registerSpecialitiesObserver(ISpecialitiesObserver obs) {
+    public final void registerSpecialitiesObserver(final ISpecialitiesObserver obs) {
         specialitiesObservers.add(obs);
     }
 
     @Override
-    public void removeSpecialitiesObserver(ISpecialitiesObserver obs) {
+    public final void removeSpecialitiesObserver(final ISpecialitiesObserver obs) {
         specialitiesObservers.remove(obs);
     }
 
-    public void notifySpecialitiesObservers() {
+    public final void notifySpecialitiesObservers() {
         for (ISpecialitiesObserver obs: specialitiesObservers) {
             obs.updateSpecialities();
         }
     }
 
     @Override
-    public void registerCurrentDoctorObserver(ICurrentDoctorObserver obs) {
+    public final void registerCurrentDoctorObserver(final ICurrentDoctorObserver obs) {
         currentDoctorsObservers.add(obs);
     }
 
     @Override
-    public void removeCurrentDoctorObserver(ICurrentDoctorObserver obs) {
+    public final void removeCurrentDoctorObserver(final ICurrentDoctorObserver obs) {
         currentDoctorsObservers.remove(obs);
     }
 
-    public void notifyCurrentDoctorObservers() {
+    public final void notifyCurrentDoctorObservers() {
         for (ICurrentDoctorObserver obs: currentDoctorsObservers) {
             obs.updateCurrentDoctor();
         }
     }
 
     @Override
-    public void registerCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs) {
+    public final void registerCurrentPoliclinicObserver(final ICurrentPoliclinicObserver obs) {
         currentPoliclinicObservers.add(obs);
     }
 
     @Override
-    public void removeCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs) {
+    public final void removeCurrentPoliclinicObserver(final ICurrentPoliclinicObserver obs) {
         currentPoliclinicObservers.remove(obs);
     }
 
-    public void notifyCurrentPoliclinicObservers() {
+    public final void notifyCurrentPoliclinicObservers() {
         for (ICurrentPoliclinicObserver obs: currentPoliclinicObservers) {
             obs.updateCurrentPoliclinic();
         }
     }
 
     @Override
-    public void registerCurrentSpecialityObserver(ICurrentSpecialityObserver obs) {
+    public final void registerCurrentSpecialityObserver(final ICurrentSpecialityObserver obs) {
         currentSpecialityObservers.add(obs);
     }
 
     @Override
-    public void removeCurrentSpecialityObserver(ICurrentSpecialityObserver obs) {
+    public final void removeCurrentSpecialityObserver(final ICurrentSpecialityObserver obs) {
         currentSpecialityObservers.remove(obs);
     }
 
-    public void notifyCurrentSpecialityObservers() {
+    public final void notifyCurrentSpecialityObservers() {
         for (ICurrentSpecialityObserver obs: currentSpecialityObservers) {
             obs.updateCurrentSpeciaity();
         }
     }
 
     @Override
-    public TalonTableModel getTalonTableModel(int cpol, String cdol, int pcod) {
+    public final TalonTableModel getTalonTableModel(
+            final int cpol, final String cdol, final int pcod) {
         return new TalonTableModel(cpol, cdol, pcod);
     }
 
     @Override
-    public SheduleTableModel getSheduleTableModel(int pcod, int cpol,
-            String cdol) {
+    public final SheduleTableModel getSheduleTableModel(final int pcod, final int cpol,
+            final String cdol) {
         return new SheduleTableModel(pcod, cpol, cdol);
     }
 
     @Override
-    public void registerPatientObserver(IPatientObserver obs) {
+    public final void registerPatientObserver(final IPatientObserver obs) {
         patientObservers.add(obs);
     }
 
     @Override
-    public void removePatientObserver(IPatientObserver obs) {
+    public final void removePatientObserver(final IPatientObserver obs) {
         patientObservers.remove(obs);
     }
 
-    public void notifyPatientObservers() {
+    public final void notifyPatientObservers() {
         for (IPatientObserver obs: patientObservers) {
             obs.updatePatient();
         }
     }
 
     @Override
-    public ReservedTalonTableModel getReservedTalonTableModel(int pcod) {
+    public final ReservedTalonTableModel getReservedTalonTableModel(final int pcod) {
         return new ReservedTalonTableModel(pcod);
     }
 
     @Override
-    public void setTalon(TTalon talon) {
+    public final void setTalon(final TTalon talon) {
         this.currentTalon = talon;
         notifySelectedTalonObservers();
     }
 
     @Override
-    public TTalon getTalon() {
+    public final TTalon getTalon() {
         return currentTalon;
     }
 
     @Override
-    public void registerSelectedTalonObserver(ISelectedTalonObserver obs) {
+    public final void registerSelectedTalonObserver(final ISelectedTalonObserver obs) {
         selectedTalonObservers.add(obs);
     }
 
     @Override
-    public void removeSelectedTalonObserver(ISelectedTalonObserver obs) {
+    public final void removeSelectedTalonObserver(final ISelectedTalonObserver obs) {
         selectedTalonObservers.remove(obs);
     }
 
-    public void notifySelectedTalonObservers() {
+    public final void notifySelectedTalonObservers() {
         for (ISelectedTalonObserver obs: selectedTalonObservers) {
             obs.updateSelectedTalon();
         }
     }
 
     @Override
-    public void registerReservedTalonObserver(ICurrentIReservedTalonObserver obs) {
+    public final void registerReservedTalonObserver(final ICurrentIReservedTalonObserver obs) {
         currentReservedTalonObservers.add(obs);
     }
 
     @Override
-    public void removeReservedTalonObserver(ICurrentIReservedTalonObserver obs) {
+    public final void removeReservedTalonObserver(final ICurrentIReservedTalonObserver obs) {
         currentReservedTalonObservers.remove(obs);
     }
 
-    public void notifyCurrentReservedTalonObservers() {
+    public final void notifyCurrentReservedTalonObservers() {
         for (ICurrentIReservedTalonObserver obs: currentReservedTalonObservers) {
             obs.updateReservedTalon();
         }
     }
 
     @Override
-    public TTalon getCurrentReservedTalon() {
+    public final TTalon getCurrentReservedTalon() {
         return currentReservedTalon;
     }
 
     @Override
-    public void setCurrentReservedTalon(TTalon talon) {
+    public final void setCurrentReservedTalon(final TTalon talon) {
         this.currentReservedTalon = talon;
         notifyCurrentReservedTalonObservers();
     }

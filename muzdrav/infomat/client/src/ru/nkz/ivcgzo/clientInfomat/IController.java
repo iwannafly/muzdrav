@@ -9,34 +9,34 @@ import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 
 public interface IController {
-    public void setPoliclinics();
+    void setPoliclinics();
 
-    public void setCurrentPoliclinic(IntegerClassifier currentPoliclinic);
+    void setCurrentPoliclinic(IntegerClassifier currentPoliclinic);
 
-    public void setCurrentSpeciality(StringClassifier currentSpeciality);
+    void setCurrentSpeciality(StringClassifier currentSpeciality);
 
-    public void setCurrentDoctor(IntegerClassifier currentDoctor);
+    void setCurrentDoctor(IntegerClassifier currentDoctor);
 
-    public void setSpecialities(int cpol);
+    void setSpecialities(int cpol);
 
-    public void setDoctors(int cpol, String cdol);
+    void setDoctors(int cpol, String cdol);
 
-    public void setTalons(int cpol, String cdol, int pcod);
+    void setTalons(int cpol, String cdol, int pcod);
 
-    public void setPatient(String oms);
+    void setPatient(String oms);
 
-    public void setReservedTalon(int patientId);
+    void setReservedTalon(int patientId);
 
-    public void setShedule(int pcod, int cpol, String cdol);
+    void setShedule(int pcod, int cpol, String cdol);
 
-    public void reserveTalon(TPatient pat, TTalon talon);
+    void reserveTalon(TPatient pat, TTalon talon);
 
-    public void releaseTalon(TTalon talon);
+    void releaseTalon(TTalon talon);
 
-    public void setSelectedTalon(TTalon talon);
+    void setSelectedTalon(TTalon talon);
 
-    public void setCurrentReservedTalon(TTalon talon);
+    void setCurrentReservedTalon(TTalon talon);
 
     //FIXME костыль, избавиться от него!
-    public JFrame getMainFrame();
+    JFrame getMainFrame();
 }
