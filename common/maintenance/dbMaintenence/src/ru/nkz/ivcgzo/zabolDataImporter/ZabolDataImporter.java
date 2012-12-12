@@ -355,7 +355,7 @@ public class ZabolDataImporter {
 		try (Statement srcStm = srcCon.createStatement();
 				Statement dstStm = dstCon.createStatement();
 			) {
-			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "S_VRACH", null) + "WHERE (S_VRACH.PRIZN IS DISTINCT FROM '*') AND (NOT S_VRACH.SNILS IS NULL) ");
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "S_VRACH", null) + "WHERE (S_VRACH.PRIZN IS DISTINCT FROM '*') AND (NOT S_VRACH.SNILS IS NULL) AND COALESCE(S_VRACH.FAM, '') != '' AND COALESCE(S_VRACH.IM, '') != '' AND COALESCE(S_VRACH.OT, '') != '' AND NOT S_VRACH.DATAR IS NULL ");
 			SqlClassifier<Integer> cls = new SqlClassifier<>(Integer.class, dstCon, "select pcod_s, pcod from n_z00 ");
 			
 			while (srcRs.next()) {
