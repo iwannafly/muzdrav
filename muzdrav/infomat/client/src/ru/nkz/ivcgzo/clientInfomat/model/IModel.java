@@ -8,6 +8,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
@@ -20,89 +21,97 @@ import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public interface IModel {
-    public void setPoliclinics();
+    void setPoliclinics();
 
-    public void setSpecialities(int cpol);
+    void setSpecialities(int cpol);
 
-    public void setDoctors(int cpol, String cdol);
+    void setDoctors(int cpol, String cdol);
 
-    public void setTalons(int cpol, String cdol, int pcod);
+    void setTalons(int cpol, String cdol, int pcod);
 
-    public void setPatient(String oms);
+    void setPatient(String oms);
 
-    public void setReservedTalon(int patientId);
+    void setReservedTalons(int patientId);
 
-    public void setShedule(int pcod, int cpol, String cdol);
+    void setShedule(int pcod, int cpol, String cdol);
 
-    public List<IntegerClassifier> getPoliclinics();
+    List<IntegerClassifier> getPoliclinics();
 
-    public List<StringClassifier> getSpecialities();
+    List<StringClassifier> getSpecialities();
 
-    public List<IntegerClassifier> getDoctors();
+    TTalon getCurrentReservedTalon();
 
-    public IntegerClassifier getCurrentPoliclinic();
+    void setCurrentReservedTalon(TTalon talon);
 
-    public void setCurrentPoliclinic(IntegerClassifier currentPoliclinic);
+    List<IntegerClassifier> getDoctors();
 
-    public void setCurrentSpeciality(StringClassifier currentSpeciality);
+    IntegerClassifier getCurrentPoliclinic();
 
-    public void setCurrentDoctor(IntegerClassifier currentDoctor);
+    void setCurrentPoliclinic(IntegerClassifier currentPoliclinic);
 
-    public StringClassifier getCurrentSpeciality();
+    void setCurrentSpeciality(StringClassifier currentSpeciality);
 
-    public IntegerClassifier getCurrentDoctor();
+    void setCurrentDoctor(IntegerClassifier currentDoctor);
 
-    public TalonList getTalons();
+    StringClassifier getCurrentSpeciality();
 
-    public TalonTableModel getTalonTableModel(final int cpol, final String cdol, final int pcod);
+    IntegerClassifier getCurrentDoctor();
 
-    public SheduleTableModel getSheduleTableModel(final int pcod, final int cpol, final String cdol);
+    TalonList getTalons();
 
-    public ReservedTalonTableModel getReservedTalonTableModel(final int pcod);
+    TalonTableModel getTalonTableModel(final int cpol, final String cdol, final int pcod);
 
-    public TPatient getPatient();
+    SheduleTableModel getSheduleTableModel(final int pcod, final int cpol, final String cdol);
 
-    public List<TTalon> getReservedTalon();
+    ReservedTalonTableModel getReservedTalonTableModel(final int pcod);
 
-    public List<TSheduleDay> getShedule();
+    TPatient getPatient();
 
-    public void setTalon(TTalon talon);
+    List<TTalon> getReservedTalons();
 
-    public TTalon getTalon();
+    List<TSheduleDay> getShedule();
 
-    public void reserveTalon(TPatient pat, TTalon talon);
+    void setTalon(TTalon talon);
 
-    public void releaseTalon(TTalon talon);
+    TTalon getTalon();
 
-    public void registerDoctorsObserver(IDoctorsObserver obs);
+    void reserveTalon(TPatient pat, TTalon talon);
 
-    public void removeDoctorsObserver(IDoctorsObserver obs);
+    void releaseTalon(TTalon talon);
 
-    public void registerPoliclinicsObserver(IPoliclinicsObserver obs);
+    void registerDoctorsObserver(IDoctorsObserver obs);
 
-    public void removePoliclinicsObserver(IPoliclinicsObserver obs);
+    void removeDoctorsObserver(IDoctorsObserver obs);
 
-    public void registerSpecialitiesObserver(ISpecialitiesObserver obs);
+    void registerPoliclinicsObserver(IPoliclinicsObserver obs);
 
-    public void removeSpecialitiesObserver(ISpecialitiesObserver obs);
+    void removePoliclinicsObserver(IPoliclinicsObserver obs);
 
-    public void registerCurrentDoctorObserver(ICurrentDoctorObserver obs);
+    void registerSpecialitiesObserver(ISpecialitiesObserver obs);
 
-    public void removeCurrentDoctorObserver(ICurrentDoctorObserver obs);
+    void removeSpecialitiesObserver(ISpecialitiesObserver obs);
 
-    public void registerCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs);
+    void registerCurrentDoctorObserver(ICurrentDoctorObserver obs);
 
-    public void removeCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs);
+    void removeCurrentDoctorObserver(ICurrentDoctorObserver obs);
 
-    public void registerCurrentSpecialityObserver(ICurrentSpecialityObserver obs);
+    void registerCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs);
 
-    public void removeCurrentSpecialityObserver(ICurrentSpecialityObserver obs);
+    void removeCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs);
 
-    public void registerPatientObserver(IPatientObserver obs);
+    void registerCurrentSpecialityObserver(ICurrentSpecialityObserver obs);
 
-    public void removePatientObserver(IPatientObserver obs);
+    void removeCurrentSpecialityObserver(ICurrentSpecialityObserver obs);
 
-    public void registerSelectedTalonObserver(ISelectedTalonObserver obs);
+    void registerPatientObserver(IPatientObserver obs);
 
-    public void removeSelectedTalonObserver(ISelectedTalonObserver obs);
+    void removePatientObserver(IPatientObserver obs);
+
+    void registerSelectedTalonObserver(ISelectedTalonObserver obs);
+
+    void removeSelectedTalonObserver(ISelectedTalonObserver obs);
+
+    void registerReservedTalonObserver(ICurrentIReservedTalonObserver obs);
+
+    void removeReservedTalonObserver(ICurrentIReservedTalonObserver obs);
 }

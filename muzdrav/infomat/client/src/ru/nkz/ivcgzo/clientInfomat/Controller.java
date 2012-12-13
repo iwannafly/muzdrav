@@ -13,7 +13,7 @@ public class Controller implements IController {
     private IModel model;
     private InfomatView view;
 
-    public Controller(IModel curModel) {
+    public Controller(final IModel curModel) {
         this.model = curModel;
         this.view = new InfomatView(this, model);
         view.createFrames();
@@ -21,73 +21,78 @@ public class Controller implements IController {
     }
 
     //FIXME костыль
-    public JFrame getMainFrame() {
+    public final JFrame getMainFrame() {
         return view.getMainFrame();
     }
 
     @Override
-    public void setPoliclinics() {
+    public final void setPoliclinics() {
         model.setPoliclinics();
     }
 
     @Override
-    public void setCurrentPoliclinic(IntegerClassifier currentPoliclinic) {
+    public final void setCurrentPoliclinic(final IntegerClassifier currentPoliclinic) {
         model.setCurrentPoliclinic(currentPoliclinic);
     }
 
     @Override
-    public void setSpecialities(int cpol) {
+    public final void setSpecialities(final int cpol) {
         model.setSpecialities(cpol);
     }
 
     @Override
-    public void setDoctors(int cpol, String cdol) {
+    public final void setDoctors(final int cpol, final String cdol) {
         model.setDoctors(cpol, cdol);
     }
 
     @Override
-    public void setTalons(int cpol, String cdol, int pcod) {
+    public final void setTalons(final int cpol, final String cdol, final int pcod) {
         model.setTalons(cpol, cdol, pcod);
     }
 
     @Override
-    public void setPatient(String oms) {
+    public final void setPatient(final String oms) {
         model.setPatient(oms);
     }
 
     @Override
-    public void setReservedTalon(int patientId) {
-        model.setReservedTalon(patientId);
+    public final void setReservedTalon(final int patientId) {
+        model.setReservedTalons(patientId);
     }
 
     @Override
-    public void setShedule(int pcod, int cpol, String cdol) {
+    public final void setShedule(final int pcod, final int cpol, final String cdol) {
         model.setShedule(pcod, cpol, cdol);
     }
 
     @Override
-    public void reserveTalon(TPatient pat, TTalon talon) {
+    public final void reserveTalon(final TPatient pat, final TTalon talon) {
         model.reserveTalon(pat, talon);
     }
 
     @Override
-    public void releaseTalon(TTalon talon) {
+    public final void releaseTalon(final TTalon talon) {
         model.releaseTalon(talon);
     }
 
     @Override
-    public void setCurrentSpeciality(StringClassifier currentSpeciality) {
+    public final void setCurrentSpeciality(final StringClassifier currentSpeciality) {
         model.setCurrentSpeciality(currentSpeciality);
     }
 
     @Override
-    public void setCurrentDoctor(IntegerClassifier currentDoctor) {
+    public final void setCurrentDoctor(final IntegerClassifier currentDoctor) {
         model.setCurrentDoctor(currentDoctor);
     }
 
     @Override
-    public void setSelectedTalon(TTalon talon) {
+    public final void setSelectedTalon(final TTalon talon) {
         model.setTalon(talon);
+    }
+
+    @Override
+    public final void setCurrentReservedTalon(final TTalon talon) {
+        model.setCurrentReservedTalon(talon);
     }
 
 }

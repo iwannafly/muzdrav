@@ -14,7 +14,7 @@ public class DateChecker {
      */
     private GregorianCalendar calend;
     /**
-     * Массив дней недели, отображаемой в таблице талонов
+     * Массив дней недели, отображаемый в таблице талонов
      */
     private Date[] curWeek = new Date[7];
 
@@ -40,8 +40,14 @@ public class DateChecker {
      */
     private void setCalendarDefaults() {
         calend = new GregorianCalendar();
+
         // установка дня начала недели на понедельник (по умолчанию - воскресенье)
         calend.setFirstDayOfWeek(Calendar.MONDAY);
+
+        // количество дней в неделе, необходимых, чтобы неделя считалась первой.
+        // Если задать не 7 - не будет переводить год если первая неделя неполная. Магия вуду.
+        calend.setMinimalDaysInFirstWeek(7);
+
         calend.set(Calendar.HOUR_OF_DAY, 0);
         calend.set(Calendar.MINUTE, 0);
         calend.set(Calendar.SECOND, 0);
@@ -66,6 +72,7 @@ public class DateChecker {
         calend.set(Calendar.DATE,
             calend.get(Calendar.DATE) - calend.getMaximum(Calendar.DAY_OF_WEEK));
     }
+
 
     /**
      * Сдвиг календаря на неделю вперед

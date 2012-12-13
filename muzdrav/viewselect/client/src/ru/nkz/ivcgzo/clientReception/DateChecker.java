@@ -42,6 +42,9 @@ public class DateChecker {
         calend = new GregorianCalendar();
         // установка дня начала недели (по умолчанию - воскресенье)
         calend.setFirstDayOfWeek(Calendar.MONDAY);
+     // количество дней в неделе, необходимых, чтобы неделя считалась первой - если задать не 7 - 
+        // не будет переводить год если первая неделя неполная. магия вуду.
+        calend.setMinimalDaysInFirstWeek(7);
         calend.set(Calendar.HOUR_OF_DAY, 0);
         calend.set(Calendar.MINUTE, 0);
         calend.set(Calendar.SECOND, 0);

@@ -11,15 +11,13 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientInfomat.model.Model;
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
-import ru.nkz.ivcgzo.clientInfomat.ui.MainFrame;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftInfomat.ThriftInfomat;
 
-public class ClientInfomat extends Client<ThriftInfomat.Client>{
+public class ClientInfomat extends Client<ThriftInfomat.Client> {
     public static ThriftInfomat.Client tcl;
-//    private MainFrame mainFrame;
     public static Client<ThriftInfomat.Client> instance;
 
     public ClientInfomat(final ConnectionManager conMan, final UserAuthInfo authInfo,
@@ -39,8 +37,6 @@ public class ClientInfomat extends Client<ThriftInfomat.Client>{
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         IModel model = new Model();
         IController controller = new Controller(model);
-//        mainFrame = new MainFrame();
-//        mainFrame.pack();
 
         // FIXME костыль, в контроллере должны быть только войд методы
         setFrame(controller.getMainFrame());
@@ -57,7 +53,6 @@ public class ClientInfomat extends Client<ThriftInfomat.Client>{
         super.onConnect(conn);
         if (conn instanceof ThriftInfomat.Client) {
             tcl = thrClient;
-//            mainFrame.onConnect();
         }
     }
 }

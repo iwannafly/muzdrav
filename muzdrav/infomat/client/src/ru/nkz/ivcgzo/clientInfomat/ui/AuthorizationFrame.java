@@ -10,6 +10,8 @@ import javax.swing.Box;
 import javax.swing.JButton;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Point;
+
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 import java.awt.Color;
@@ -18,31 +20,79 @@ import javax.swing.JLabel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 
 public class AuthorizationFrame extends JDialog {
     private static final long serialVersionUID = 2313445455119747466L;
+    private static final int KEYBOARD_BUTTON_SIDE_SIZE = 80;
     private JTextField tfOmsNumber;
     private JButton btnAccept;
     private JButton btnCancel;
-    
+    private Component vgBottom;
+    private Component hgRightButtonPanelGlue;
+    private Component hgMiddleButtonPanelGlue;
+    private Component hgLeftButtonPanelGlue;
+    private Box hbControlButtonPanel;
+    private Component hgKeyboardPanelRightGlue;
+    private Component vsMiddle;
+    private JPanel pMain;
+    private Box buildKeyboardPanel;
+    private Component hgKeyboardPanelLeftGlue;
+    private Component vsOsTextFieldTopGlue;
+    private Component vsOmsTextBottomGlue;
+    private Box vbOmsTextPanel;
+    private JLabel lblInstruction;
+    private Component vgTop;
+
     public AuthorizationFrame() {
         initialization();
     }
 
     private void initialization() {
+        setDialogDefaults();
+
+        buildMainPanel();
+    }
+
+    private void setDialogDefaults() {
+        setCursor(getToolkit().createCustomCursor(
+            new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
+            "null"));
         setAlwaysOnTop(true);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setModalityType(ModalityType.TOOLKIT_MODAL);
         setPreferredSize(new Dimension(950, 425));
         setSize(new Dimension(950, 425));
-        java.awt.Toolkit jToolkit = java.awt.Toolkit.getDefaultToolkit();
-        Dimension screenSize = jToolkit.getScreenSize();
-        setLocation((int) ((screenSize.getWidth() - getWidth()) / 2),
-            (int) ((screenSize.getHeight() - getHeight()) / 2));
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        setDialogToCenter();
+    }
 
-        JPanel pMain = new JPanel();
+    private void buildMainPanel() {
+        pMain = new JPanel();
+        setMainPanelDefaults();
+
+        vgTop = Box.createVerticalGlue();
+        pMain.add(vgTop);
+
+        buildOmsTextPanel();
+
+        buildKeyboardPanel();
+
+        vsMiddle = Box.createVerticalStrut(20);
+        vsMiddle.setMaximumSize(new Dimension(32767, 30));
+        vsMiddle.setMinimumSize(new Dimension(0, 30));
+        vsMiddle.setPreferredSize(new Dimension(0, 30));
+        pMain.add(vsMiddle);
+
+        buildButtonsPanel();
+
+        vgBottom = Box.createVerticalGlue();
+        pMain.add(vgBottom);
+
+        pack();
+    }
+
+    private void setMainPanelDefaults() {
         pMain.setBackground(Color.WHITE);
         pMain.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
         pMain.setMaximumSize(new Dimension(950, 425));
@@ -51,25 +101,32 @@ public class AuthorizationFrame extends JDialog {
         pMain.setPreferredSize(new Dimension(950, 425));
         getContentPane().add(pMain);
         pMain.setLayout(new BoxLayout(pMain, BoxLayout.Y_AXIS));
+    }
 
-        Component verticalGlue = Box.createVerticalGlue();
-        pMain.add(verticalGlue);
+    private void setDialogToCenter() {
+        java.awt.Toolkit jToolkit = java.awt.Toolkit.getDefaultToolkit();
+        Dimension screenSize = jToolkit.getScreenSize();
+        setLocation((int) ((screenSize.getWidth() - getWidth()) / 2),
+            (int) ((screenSize.getHeight() - getHeight()) / 2));
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+    }
 
-        Box verticalBox = Box.createVerticalBox();
-        verticalBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-        verticalBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-        pMain.add(verticalBox);
+    private void buildOmsTextPanel() {
+        vbOmsTextPanel = Box.createVerticalBox();
+        vbOmsTextPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        vbOmsTextPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        pMain.add(vbOmsTextPanel);
 
-        JLabel lblNewLabel = new JLabel("Введите серию и номер полиса: ");
-        lblNewLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblNewLabel.setFont(new Font("Courier New", Font.BOLD, 30));
-        verticalBox.add(lblNewLabel);
+        lblInstruction = new JLabel("Введите серию и номер полиса: ");
+        lblInstruction.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblInstruction.setFont(new Font("Courier New", Font.BOLD, 30));
+        vbOmsTextPanel.add(lblInstruction);
 
-        Component verticalStrut_3 = Box.createVerticalStrut(20);
-        verticalStrut_3.setPreferredSize(new Dimension(0, 30));
-        verticalStrut_3.setMinimumSize(new Dimension(0, 30));
-        verticalStrut_3.setMaximumSize(new Dimension(32767, 30));
-        verticalBox.add(verticalStrut_3);
+        vsOsTextFieldTopGlue = Box.createVerticalStrut(20);
+        vsOsTextFieldTopGlue.setPreferredSize(new Dimension(0, 30));
+        vsOsTextFieldTopGlue.setMinimumSize(new Dimension(0, 30));
+        vsOsTextFieldTopGlue.setMaximumSize(new Dimension(32767, 30));
+        vbOmsTextPanel.add(vsOsTextFieldTopGlue);
 
         tfOmsNumber = new JTextField();
         tfOmsNumber.setHorizontalAlignment(SwingConstants.CENTER);
@@ -79,244 +136,122 @@ public class AuthorizationFrame extends JDialog {
         tfOmsNumber.setMinimumSize(new Dimension(900, 100));
         tfOmsNumber.setPreferredSize(new Dimension(900, 100));
         tfOmsNumber.setMaximumSize(new Dimension(900, 100));
-        verticalBox.add(tfOmsNumber);
+        vbOmsTextPanel.add(tfOmsNumber);
         tfOmsNumber.setColumns(10);
 
-        Component verticalStrut_1 = Box.createVerticalStrut(20);
-        verticalStrut_1.setMinimumSize(new Dimension(0, 30));
-        verticalStrut_1.setMaximumSize(new Dimension(32767, 30));
-        verticalStrut_1.setPreferredSize(new Dimension(0, 30));
-        pMain.add(verticalStrut_1);
+        vsOmsTextBottomGlue = Box.createVerticalStrut(20);
+        vsOmsTextBottomGlue.setMinimumSize(new Dimension(0, 30));
+        vsOmsTextBottomGlue.setMaximumSize(new Dimension(32767, 30));
+        vsOmsTextBottomGlue.setPreferredSize(new Dimension(0, 30));
+        pMain.add(vsOmsTextBottomGlue);
+    }
 
-        Box horizontalBox = Box.createHorizontalBox();
-        horizontalBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-        pMain.add(horizontalBox);
+    private void buildKeyboardPanel() {
+        buildKeyboardPanel = Box.createHorizontalBox();
+        buildKeyboardPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        pMain.add(buildKeyboardPanel);
 
-        Component horizontalGlue = Box.createHorizontalGlue();
-        horizontalBox.add(horizontalGlue);
+        hgKeyboardPanelLeftGlue = Box.createHorizontalGlue();
+        buildKeyboardPanel.add(hgKeyboardPanelLeftGlue);
 
-        JButton btnOne = new JButton("1");
-        btnOne.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "1");
-            }
-        });
-        btnOne.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnOne.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnOne.setPreferredSize(new Dimension(80, 80));
-        btnOne.setMaximumSize(new Dimension(80, 80));
-        btnOne.setMinimumSize(new Dimension(80, 80));
-        horizontalBox.add(btnOne);
+        createKeyboardButtons();
 
-        JButton btnTwo = new JButton("2");
-        btnTwo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "2");
-            }
-        });
-        btnTwo.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnTwo.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnTwo.setPreferredSize(new Dimension(80, 80));
-        btnTwo.setMinimumSize(new Dimension(80, 80));
-        btnTwo.setMaximumSize(new Dimension(80, 80));
-        horizontalBox.add(btnTwo);
+        hgKeyboardPanelRightGlue = Box.createHorizontalGlue();
+        buildKeyboardPanel.add(hgKeyboardPanelRightGlue);
+    }
 
-        JButton btnThree = new JButton("3");
-        btnThree.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "3");
-            }
-        });
-        btnThree.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnThree.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnThree);
-        btnThree.setPreferredSize(new Dimension(80, 80));
-        btnThree.setMinimumSize(new Dimension(80, 80));
-        btnThree.setMaximumSize(new Dimension(80, 80));
+    private void createKeyboardButtons() {
+        for (int i = 0; i <= 10; i++) {
+            createCurrentKeyboardButton(i);
+        }
+    }
 
-        JButton btnFour = new JButton("4");
-        btnFour.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "4");
-            }
-        });
-        btnFour.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnFour.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnFour);
-        btnFour.setPreferredSize(new Dimension(80, 80));
-        btnFour.setMinimumSize(new Dimension(80, 80));
-        btnFour.setMaximumSize(new Dimension(80, 80));
+    private void createCurrentKeyboardButton(final int buttonNumber) {
+        JButton btnCurrentKeyboardButton = new JButton();
+        btnCurrentKeyboardButton.setFont(new Font("Courier New", Font.BOLD, 30));
+        btnCurrentKeyboardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JButton btnFive = new JButton("5");
-        btnFive.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "5");
-            }
-        });
-        btnFive.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnFive.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnFive);
-        btnFive.setPreferredSize(new Dimension(80, 80));
-        btnFive.setMinimumSize(new Dimension(80, 80));
-        btnFive.setMaximumSize(new Dimension(80, 80));
-
-        JButton btnSix = new JButton("6");
-        btnSix.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "6");
-            }
-        });
-        btnSix.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnSix.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnSix);
-        btnSix.setPreferredSize(new Dimension(80, 80));
-        btnSix.setMinimumSize(new Dimension(80, 80));
-        btnSix.setMaximumSize(new Dimension(80, 80));
-        
-        JButton btnSeven = new JButton("7");
-        btnSeven.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "7");
-            }
-        });
-        btnSeven.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnSeven.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnSeven);
-        btnSeven.setPreferredSize(new Dimension(80, 80));
-        btnSeven.setMinimumSize(new Dimension(80, 80));
-        btnSeven.setMaximumSize(new Dimension(80, 80));
-
-        JButton btnEight = new JButton("8");
-        btnEight.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "8");
-            }
-        });
-        btnEight.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnEight.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnEight);
-        btnEight.setPreferredSize(new Dimension(80, 80));
-        btnEight.setMinimumSize(new Dimension(80, 80));
-        btnEight.setMaximumSize(new Dimension(80, 80));
-
-        JButton btnNine = new JButton("9");
-        btnNine.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "9");
-            }
-        });
-        btnNine.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnNine.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnNine);
-        btnNine.setPreferredSize(new Dimension(80, 80));
-        btnNine.setMinimumSize(new Dimension(80, 80));
-        btnNine.setMaximumSize(new Dimension(80, 80));
-
-        JButton btnZero = new JButton("0");
-        btnZero.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                tfOmsNumber.setText(tfOmsNumber.getText() + "0");
-            }
-        });
-        btnZero.setPreferredSize(new Dimension(80, 80));
-        btnZero.setMinimumSize(new Dimension(80, 80));
-        btnZero.setMaximumSize(new Dimension(80, 80));
-        btnZero.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnZero.setAlignmentX(0.5f);
-        horizontalBox.add(btnZero);
-
-        JButton btnReset = new JButton("<");
-        btnReset.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (tfOmsNumber.getText().length() > 0 ) {
-                    tfOmsNumber.setText(tfOmsNumber.getText().substring(0,
-                        tfOmsNumber.getText().length()-1));
+        if (buttonNumber == 10) {
+            btnCurrentKeyboardButton.setText("<");
+            btnCurrentKeyboardButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    if (tfOmsNumber.getText().length() > 0) {
+                        tfOmsNumber.setText(tfOmsNumber.getText().substring(0,
+                            tfOmsNumber.getText().length() - 1));
+                    }
                 }
-            }
-        });
-        btnReset.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnReset.setAlignmentX(Component.CENTER_ALIGNMENT);
-        horizontalBox.add(btnReset);
-        btnReset.setPreferredSize(new Dimension(80, 80));
-        btnReset.setMinimumSize(new Dimension(80, 80));
-        btnReset.setMaximumSize(new Dimension(80, 80));
+            });
+        } else {
+            btnCurrentKeyboardButton.setText(String.valueOf(buttonNumber));
+            btnCurrentKeyboardButton.addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    tfOmsNumber.setText(tfOmsNumber.getText() + String.valueOf(buttonNumber));
+                }
+            });
+        }
 
-        Component horizontalGlue_1 = Box.createHorizontalGlue();
-        horizontalBox.add(horizontalGlue_1);
+        buildKeyboardPanel.add(btnCurrentKeyboardButton);
+        btnCurrentKeyboardButton.setPreferredSize(
+            new Dimension(KEYBOARD_BUTTON_SIDE_SIZE, KEYBOARD_BUTTON_SIDE_SIZE)
+        );
+        btnCurrentKeyboardButton.setMinimumSize(
+            new Dimension(KEYBOARD_BUTTON_SIDE_SIZE, KEYBOARD_BUTTON_SIDE_SIZE)
+        );
+        btnCurrentKeyboardButton.setMaximumSize(
+            new Dimension(KEYBOARD_BUTTON_SIDE_SIZE, KEYBOARD_BUTTON_SIDE_SIZE)
+        );
+    }
 
-        Component verticalStrut = Box.createVerticalStrut(20);
-        verticalStrut.setMaximumSize(new Dimension(32767, 30));
-        verticalStrut.setMinimumSize(new Dimension(0, 30));
-        verticalStrut.setPreferredSize(new Dimension(0, 30));
-        pMain.add(verticalStrut);
+    private void buildButtonsPanel() {
+        hbControlButtonPanel = Box.createHorizontalBox();
+        hbControlButtonPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        pMain.add(hbControlButtonPanel);
 
-        Box horizontalBox_1 = Box.createHorizontalBox();
-        horizontalBox_1.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-        pMain.add(horizontalBox_1);
+        hgLeftButtonPanelGlue = Box.createHorizontalGlue();
+        hbControlButtonPanel.add(hgLeftButtonPanelGlue);
 
-        Component horizontalGlue_2 = Box.createHorizontalGlue();
-        horizontalBox_1.add(horizontalGlue_2);
+        addAcceptButton();
 
+        hgMiddleButtonPanelGlue = Box.createHorizontalGlue();
+        hbControlButtonPanel.add(hgMiddleButtonPanelGlue);
+
+        addDeclineButton();
+
+        hgRightButtonPanelGlue = Box.createHorizontalGlue();
+        hbControlButtonPanel.add(hgRightButtonPanelGlue);
+    }
+
+    private void addAcceptButton() {
         btnAccept = new JButton("Принять");
-//        btnAccept.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                isOmsAccepted = checkOms(tfOmsNumber.getText().trim());
-//                tfOmsNumber.setText("");
-//                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
-//                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
-//                setVisible(false);
-//            }
-//        });
         btnAccept.setFont(new Font("Courier New", Font.BOLD, 30));
         btnAccept.setMinimumSize(new Dimension(400, 80));
         btnAccept.setPreferredSize(new Dimension(400, 80));
         btnAccept.setMaximumSize(new Dimension(400, 80));
-        horizontalBox_1.add(btnAccept);
+        hbControlButtonPanel.add(btnAccept);
+    }
 
-        Component horizontalGlue_3 = Box.createHorizontalGlue();
-        horizontalBox_1.add(horizontalGlue_3);
-
+    private void addDeclineButton() {
         btnCancel = new JButton("Отмена");
-//        btnCancel.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                tfOmsNumber.setText("");
-//                AuthorizationFrame.this.dispatchEvent(new WindowEvent(
-//                    AuthorizationFrame.this, WindowEvent.WINDOW_CLOSED));
-//                setVisible(false);
-//            }
-//        });
         btnCancel.setFont(new Font("Courier New", Font.BOLD, 30));
         btnCancel.setPreferredSize(new Dimension(400, 80));
         btnCancel.setMinimumSize(new Dimension(400, 80));
         btnCancel.setMaximumSize(new Dimension(400, 80));
-        horizontalBox_1.add(btnCancel);
-
-        Component horizontalGlue_4 = Box.createHorizontalGlue();
-        horizontalBox_1.add(horizontalGlue_4);
-
-        Component verticalGlue_1 = Box.createVerticalGlue();
-        pMain.add(verticalGlue_1);
-
-//        createModalFrames();
-//        addMainPanel();
-
-//        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        pack();
+        hbControlButtonPanel.add(btnCancel);
     }
 
-    public void addButtonAcceptPatientCheckListener(ActionListener listener) {
+    public final void addButtonAcceptPatientCheckListener(final ActionListener listener) {
         btnAccept.addActionListener(listener);
     }
 
-    public void addButtonCancelPatientCheckListener(ActionListener listener) {
+    public final void addButtonCancelPatientCheckListener(final ActionListener listener) {
         btnCancel.addActionListener(listener);
     }
 
-    public void clearOmsText() {
+    public final void clearOmsText() {
         tfOmsNumber.setText("");
     }
 
-    public String getOmsText() {
+    public final String getOmsText() {
         return tfOmsNumber.getText();
     }
 
