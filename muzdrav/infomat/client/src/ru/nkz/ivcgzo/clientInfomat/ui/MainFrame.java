@@ -24,7 +24,7 @@ public class MainFrame extends InfomatFrame {
     private JButton btnAppointment;
     private JButton btnPersonalInfo;
     private JButton btnSchedule;
-    
+
     public MainFrame() {
         initialization();
     }
@@ -108,15 +108,15 @@ public class MainFrame extends InfomatFrame {
         mainPanel.add(btnSchedule);
     }
 
-    public void addAppointmentListener(ActionListener listener) {
+    public final void addAppointmentListener(final ActionListener listener) {
         btnAppointment.addActionListener(listener);
     }
 
-    public void addPersonalInfoListener(ActionListener listener) {
+    public final void addPersonalInfoListener(final ActionListener listener) {
         btnPersonalInfo.addActionListener(listener);
     }
 
-    public void addSheduleListener(ActionListener listener) {
+    public final void addSheduleListener(final ActionListener listener) {
         btnSchedule.addActionListener(listener);
     }
 }

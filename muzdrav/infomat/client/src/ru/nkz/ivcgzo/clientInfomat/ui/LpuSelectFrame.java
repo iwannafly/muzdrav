@@ -59,14 +59,15 @@ public class LpuSelectFrame extends InfomatFrame {
             focusedColor = Color.red;
         }
 
-        public InfomatListCellRenderer(Color inUnfocusedColor, Color inFocusedColor) {
+        public InfomatListCellRenderer(final Color inUnfocusedColor, final Color inFocusedColor) {
             setOpaque(true);
             unfocusedColor = inUnfocusedColor;
             focusedColor = inFocusedColor;
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+                final JList list, final Object value, final int index,
+                final boolean isSelected, final boolean cellHasFocus) {
             setText(value.toString());
             setFont(new Font("Courier New", Font.PLAIN, 25));
             setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -95,7 +96,7 @@ public class LpuSelectFrame extends InfomatFrame {
         hbBackwardButton.add(hgRight);
 
         addBackwardButton();
-        
+
         hgLeft = Box.createHorizontalGlue();
         hbBackwardButton.add(hgLeft);
     }
@@ -112,7 +113,7 @@ public class LpuSelectFrame extends InfomatFrame {
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    public void addLpuSelectBackwardListener(ActionListener listener) {
+    public final void addLpuSelectBackwardListener(final ActionListener listener) {
         btnBackward.addActionListener(listener);
     }
 
@@ -123,7 +124,7 @@ public class LpuSelectFrame extends InfomatFrame {
         spLpu.getHorizontalScrollBar().setPreferredSize(
                 new Dimension(Integer.MAX_VALUE, 50));
         pMain.add(spLpu);
-        
+
         addLpuList();
     }
 
@@ -137,15 +138,15 @@ public class LpuSelectFrame extends InfomatFrame {
         spLpu.setViewportView(lLpu);
     }
 
-    public void addListClickListener(MouseListener listener) {
+    public final void addListClickListener(final MouseListener listener) {
         lLpu.addMouseListener(listener);
     }
 
-    public void updateLpuList(List<IntegerClassifier> policlinics) {
+    public final void updateLpuList(final List<IntegerClassifier> policlinics) {
         lLpu.setData(policlinics);
     }
 
-    public void showAsModal() {
+    public final void showAsModal() {
        setVisible(true);
     }
 }

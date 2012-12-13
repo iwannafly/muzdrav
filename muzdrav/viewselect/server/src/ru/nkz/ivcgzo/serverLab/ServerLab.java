@@ -456,7 +456,7 @@ public class ServerLab extends Server implements Iface {
 
     @Override
     public String printIssl(int patId, String cabinet, String labName,
-            String lpuNaprName, String vrachName, List<String> issledItems)
+            String lpuNaprName, String vrachName, List<String> issledItems, String diag)
             throws KmiacServerException {
         final String path;
         final AutoCloseableResultSet acrs;
@@ -492,7 +492,7 @@ public class ServerLab extends Server implements Iface {
                 fio, // фио
                 datar, // дата рождения
                 address, // адрес
-                " ", // диагноз
+                diag, // диагноз
                 vrachName, 
                 "~issledItems", // исследования
                 dateFormat.format(new Date(System.currentTimeMillis())) // дата направления
