@@ -773,7 +773,7 @@ public class PacientInfoFrame extends JFrame {
                 JButton btnShowError = new JButton("Контроль");
                 btnShowError.addActionListener(new ActionListener() {
                 	public void actionPerformed(ActionEvent e) {
-                		//MainForm.conMan.showp
+                		//MainForm.conMan.
                 	}
                 });
                 btnShowError.setToolTipText("Контроль реестров паспортной информации пациентов");

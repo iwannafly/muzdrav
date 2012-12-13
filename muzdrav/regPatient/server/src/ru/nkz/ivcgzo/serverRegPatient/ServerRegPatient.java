@@ -1871,6 +1871,7 @@ public class ServerRegPatient extends Server implements Iface {
 			UserAuthInfo uai) throws KmiacServerException, TException {
 	    final String path;
 		String sqlQuery = null;
+		int numline = 0;
 			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("anam", ".htm").getAbsolutePath()), "utf-8")) {
    				StringBuilder sb = new StringBuilder(0x10000);
 	    			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -1893,26 +1894,31 @@ public class ServerRegPatient extends Server implements Iface {
    				    
 
 					if (uai.getCslu() == 1){
-  	   						sqlQuery = "SELECT n.name, ot.numline "+
+  	   						sqlQuery = "SELECT n.name, n.numstr, n.yn, ot.numline  "+
   	   				                   "FROM n_anz n INNER JOIN n_ot_str ot ON (n.nstr = ot.nstr) " +
   	   				                   "INNER JOIN n_o00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
   	   				                   "WHERE n.nstr = ?";
    					}
 					if (uai.getCslu() == 2){
-  	   						sqlQuery = "SELECT n.name, ot.numline "+
+  	   						sqlQuery = "SELECT n.name, n.numstr, n.yn, ot.numline "+
   	   				                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
   	   				                   "INNER JOIN n_n00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
   	   				                   "WHERE n.nstr = ?";
    					}
    		            for (Anam elemAnam : anam) {
    						try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr(),elemAnam.getNumstr())) {
-   							if (acr.getResultSet().next())
-   			      				if (acr.getResultSet().getString("numline") != null)
+   							if (acr.getResultSet().next()){
+   			      				//if (numline != acr.getResultSet().getInt("numstr")){
+   								if (acr.getResultSet().getString("numline") != null)
    			      					 sb.append(String.format("%s %s ", acr.getResultSet().getString("numline"), acr.getResultSet().getString("name")));
    			      				else sb.append(String.format("%s ", acr.getResultSet().getString("name")));
-			      				if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("нет");
+			      				if (acr.getResultSet().getString("yn").equals("T"))
+			      					if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("<b>нет </b>");
    		      					if (elemAnam.getComment() != null) sb.append(String.format("%s <br>", elemAnam.getComment().toLowerCase()));
-   		      					else sb.append("<br>");
+   			      				else sb.append("<br>");
+   		      					
+   		      					numline = acr.getResultSet().getInt("numstr");
+   							}
    						} catch (Exception e) {
    							e.printStackTrace();
    						}
