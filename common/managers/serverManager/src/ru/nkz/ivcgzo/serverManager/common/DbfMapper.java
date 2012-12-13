@@ -124,6 +124,10 @@ public class DbfMapper {
 				rec.type = 'D';
 				rec.precision = 8;
 				break;
+			case Types.BIT:
+				rec.type = 'L';
+				rec.precision = 1;
+				break;
 			default:
 				throw new SQLException(String.format("Unsupported data type: %d.", rm.getColumnType(i + 1)));
 			}
@@ -159,6 +163,9 @@ public class DbfMapper {
 					break;
 				case 'D':
 					writeString(buf, pos, (!rs.wasNull()) ? sdf.format(rs.getDate(i + 1)) : rs.getString(i + 1), rec.precision);
+					break;
+				case 'L':
+					writeString(buf, pos, (!rs.wasNull()) ? (rs.getBoolean(i + 1) ? "T" : "F") : null, rec.precision);
 					break;
 				default:
 					throw new SQLException(String.format("Unsupported data type: %s.", rec.type));

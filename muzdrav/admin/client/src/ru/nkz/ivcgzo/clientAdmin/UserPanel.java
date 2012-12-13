@@ -211,7 +211,7 @@ public class UserPanel extends JPanel {
 				try {
 					MainForm.tcl.testConnection();
 					permForm.setLocationRelativeTo(UserPanel.this);
-					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem(), ((tblVrach.getSelectedItem().pcod == MainForm.authInfo.pcod) && (tblMrab.getSelectedItem().cpodr == MainForm.authInfo.cpodr) && (tblMrab.getSelectedItem().clpu == MainForm.authInfo.clpu)));
+					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem(), tblMrab.getSelectedItem().user_id == MainForm.authInfo.user_id);
 				} catch (TTransportException e1) {
 					MainForm.conMan.reconnect(e1);
 				} catch (TException e1) {

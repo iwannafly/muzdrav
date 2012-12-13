@@ -275,8 +275,8 @@ public class MainFrame extends JFrame {
     }
 
     private void addUpdateButton() {
-        btnUpdate = new JButton("Отменить приём");
-        pButtons.add(btnUpdate);
+//        btnUpdate = new JButton("Отменить приём");
+//        pButtons.add(btnUpdate);
     }
 
     private void addDeleteButton() {
