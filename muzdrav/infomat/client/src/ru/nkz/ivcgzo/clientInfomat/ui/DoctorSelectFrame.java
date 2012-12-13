@@ -108,7 +108,7 @@ public class DoctorSelectFrame extends InfomatFrame {
         pnButton.setBackground(Color.WHITE);
         pnMain.add(pnButton);
         pnButton.setLayout(new BoxLayout(pnButton, BoxLayout.X_AXIS));
-        
+
         addLeftHorizontalDelimiter();
         addBackwardButton();
         addRightHorizontalDelimiter();
