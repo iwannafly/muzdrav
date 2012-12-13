@@ -726,6 +726,15 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Вызов формы со списком ошибок в паспортной части пациентов.
+	 * @return код выбранного пациента или <code>null</code>, 
+	 * если пользователь закрыл форму
+	 */
+	public Integer showPaspErrorsForm() {
+		return (Integer) viewClient.showModal(client, 21);
+	}
+	
+	/**
 	 * Открывает сгенерированный отчет в офисном редакторе.
 	 * @param path - путь к отчету
 	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>
