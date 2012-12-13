@@ -25,6 +25,13 @@ import java.awt.image.BufferedImage;
 public class AuthorizationFrame extends JDialog {
     private static final long serialVersionUID = 2313445455119747466L;
     private static final int KEYBOARD_BUTTON_SIDE_SIZE = 80;
+    private static final int FRAME_WIDTH = 950;
+    private static final int FRAME_HEIGHT = 425;
+    private static final int CONTROL_BUTTON_WIDTH = 400;
+    private static final int CONTROL_BUTTON_HEIGHT = 80;
+    private static final int KEYBOARD_BUTTON_COUNT = 10;
+    private static final int FONT_SIZE = 30;
+    private static final int CUSTOM_CURSOR_SIDE_SIZE = 3;
     private JTextField tfOmsNumber;
     private JButton btnAccept;
     private JButton btnCancel;
@@ -56,14 +63,15 @@ public class AuthorizationFrame extends JDialog {
 
     private void setDialogDefaults() {
         setCursor(getToolkit().createCustomCursor(
-            new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
-            "null"));
+            new BufferedImage(CUSTOM_CURSOR_SIDE_SIZE, CUSTOM_CURSOR_SIDE_SIZE,
+                BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "null")
+        );
         setAlwaysOnTop(true);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setModalityType(ModalityType.TOOLKIT_MODAL);
-        setPreferredSize(new Dimension(950, 425));
-        setSize(new Dimension(950, 425));
+        setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
+        setSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
         setDialogToCenter();
     }
 
@@ -78,10 +86,10 @@ public class AuthorizationFrame extends JDialog {
 
         buildKeyboardPanel();
 
-        vsMiddle = Box.createVerticalStrut(20);
-        vsMiddle.setMaximumSize(new Dimension(32767, 30));
-        vsMiddle.setMinimumSize(new Dimension(0, 30));
-        vsMiddle.setPreferredSize(new Dimension(0, 30));
+        vsMiddle = Box.createVerticalStrut(30);
+//        vsMiddle.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+//        vsMiddle.setMinimumSize(new Dimension(0, 30));
+//        vsMiddle.setPreferredSize(new Dimension(0, 30));
         pMain.add(vsMiddle);
 
         buildButtonsPanel();
@@ -95,10 +103,10 @@ public class AuthorizationFrame extends JDialog {
     private void setMainPanelDefaults() {
         pMain.setBackground(Color.WHITE);
         pMain.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-        pMain.setMaximumSize(new Dimension(950, 425));
+        pMain.setMaximumSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
         pMain.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-        pMain.setMinimumSize(new Dimension(950, 425));
-        pMain.setPreferredSize(new Dimension(950, 425));
+        pMain.setMinimumSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
+        pMain.setPreferredSize(new Dimension(FRAME_WIDTH, FRAME_HEIGHT));
         getContentPane().add(pMain);
         pMain.setLayout(new BoxLayout(pMain, BoxLayout.Y_AXIS));
     }
@@ -119,20 +127,20 @@ public class AuthorizationFrame extends JDialog {
 
         lblInstruction = new JLabel("Введите серию и номер полиса: ");
         lblInstruction.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblInstruction.setFont(new Font("Courier New", Font.BOLD, 30));
+        lblInstruction.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
         vbOmsTextPanel.add(lblInstruction);
 
         vsOsTextFieldTopGlue = Box.createVerticalStrut(20);
         vsOsTextFieldTopGlue.setPreferredSize(new Dimension(0, 30));
         vsOsTextFieldTopGlue.setMinimumSize(new Dimension(0, 30));
-        vsOsTextFieldTopGlue.setMaximumSize(new Dimension(32767, 30));
+        vsOsTextFieldTopGlue.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
         vbOmsTextPanel.add(vsOsTextFieldTopGlue);
 
         tfOmsNumber = new JTextField();
         tfOmsNumber.setHorizontalAlignment(SwingConstants.CENTER);
         tfOmsNumber.setDisabledTextColor(Color.WHITE);
         tfOmsNumber.setEditable(false);
-        tfOmsNumber.setFont(new Font("Courier New", Font.BOLD, 40));
+        tfOmsNumber.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
         tfOmsNumber.setMinimumSize(new Dimension(900, 100));
         tfOmsNumber.setPreferredSize(new Dimension(900, 100));
         tfOmsNumber.setMaximumSize(new Dimension(900, 100));
@@ -161,17 +169,17 @@ public class AuthorizationFrame extends JDialog {
     }
 
     private void createKeyboardButtons() {
-        for (int i = 0; i <= 10; i++) {
+        for (int i = 0; i <= KEYBOARD_BUTTON_COUNT; i++) {
             createCurrentKeyboardButton(i);
         }
     }
 
     private void createCurrentKeyboardButton(final int buttonNumber) {
         JButton btnCurrentKeyboardButton = new JButton();
-        btnCurrentKeyboardButton.setFont(new Font("Courier New", Font.BOLD, 30));
+        btnCurrentKeyboardButton.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
         btnCurrentKeyboardButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        if (buttonNumber == 10) {
+        if (buttonNumber == KEYBOARD_BUTTON_COUNT) {
             btnCurrentKeyboardButton.setText("<");
             btnCurrentKeyboardButton.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -223,19 +231,19 @@ public class AuthorizationFrame extends JDialog {
 
     private void addAcceptButton() {
         btnAccept = new JButton("Принять");
-        btnAccept.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnAccept.setMinimumSize(new Dimension(400, 80));
-        btnAccept.setPreferredSize(new Dimension(400, 80));
-        btnAccept.setMaximumSize(new Dimension(400, 80));
+        btnAccept.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
+        btnAccept.setMinimumSize(new Dimension(CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT));
+        btnAccept.setPreferredSize(new Dimension(CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT));
+        btnAccept.setMaximumSize(new Dimension(CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT));
         hbControlButtonPanel.add(btnAccept);
     }
 
     private void addDeclineButton() {
         btnCancel = new JButton("Отмена");
-        btnCancel.setFont(new Font("Courier New", Font.BOLD, 30));
-        btnCancel.setPreferredSize(new Dimension(400, 80));
-        btnCancel.setMinimumSize(new Dimension(400, 80));
-        btnCancel.setMaximumSize(new Dimension(400, 80));
+        btnCancel.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
+        btnCancel.setPreferredSize(new Dimension(CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT));
+        btnCancel.setMinimumSize(new Dimension(CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT));
+        btnCancel.setMaximumSize(new Dimension(CONTROL_BUTTON_WIDTH, CONTROL_BUTTON_HEIGHT));
         hbControlButtonPanel.add(btnCancel);
     }
 
