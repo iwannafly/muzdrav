@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.Properties;
 
 public class ZabolDataImporter {
@@ -41,6 +42,8 @@ public class ZabolDataImporter {
 			importPfiz();
 			importPinv();
 			importPinvk();
+			importPdiag();
+			importPdisp();
 		}
 	}
 	
@@ -352,7 +355,7 @@ public class ZabolDataImporter {
 		try (Statement srcStm = srcCon.createStatement();
 				Statement dstStm = dstCon.createStatement();
 			) {
-			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "S_VRACH", null) + "WHERE (S_VRACH.PRIZN IS DISTINCT FROM '*') AND (NOT S_VRACH.SNILS IS NULL) ");
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "S_VRACH", null) + "WHERE (S_VRACH.PRIZN IS DISTINCT FROM '*') AND (NOT S_VRACH.SNILS IS NULL) AND COALESCE(S_VRACH.FAM, '') != '' AND COALESCE(S_VRACH.IM, '') != '' AND COALESCE(S_VRACH.OT, '') != '' AND NOT S_VRACH.DATAR IS NULL ");
 			SqlClassifier<Integer> cls = new SqlClassifier<>(Integer.class, dstCon, "select pcod_s, pcod from n_z00 ");
 			
 			while (srcRs.next()) {
@@ -589,7 +592,7 @@ public class ZabolDataImporter {
 	}
 	
 	private void importPinvk() throws Exception {
-		System.out.println("Importing pinv.");
+		System.out.println("Importing pinvk.");
 		String[] srcFld = new String[] {"NPASP", "DATAZ", "VRACH", "MESTO1", "PREDS", "UCHR", "NOM_MSE", "NAME_MSE", "RUK_MSE", "REZ_MSE", "D_OTPR", "D_INV", "D_INVP", "D_SROK", "SROK_INV", "DIAG", "DIAG_S1", "DIAG_S2", "DIAG_S3", "OSLOG", "FACTOR", "FACT1", "FACT2", "FACT3", "FACT4", "PROGNOZ", "POTENCIAL", "MED_REAB", "PS_REAB", "PROF_REAB", "SOC_REAB", "ZAKL", "DATAV", "ZAKL_NAME", "KLIN_PROGNOZ", "NAR1", "NAR2", "NAR3", "NAR4", "NAR5", "NAR6", "OGR1", "OGR2", "OGR3", "OGR4", "OGR5", "OGR6", "OGR7", "MR1N", "MR2N", "MR3N", "MR4N", "MR5N", "MR6N", "MR7N", "MR8N", "MR9N", "MR10N", "MR11N", "MR12N", "MR13N", "MR14N", "MR15N", "MR16N", "MR17N", "MR18N", "MR19N", "MR20N", "MR21N", "MR22N", "MR23N", "MR1V", "MR2V", "MR3V", "MR4V", "MR5V", "MR6V", "MR7V", "MR8V", "MR9V", "MR10V", "MR11V", "MR12V", "MR13V", "MR14V", "MR15V", "MR16V", "MR17V", "MR18V", "MR19V", "MR20V", "MR21V", "MR22V", "MR23V", "MR1D", "MR2D", "MR3D", "MR4D", "PR1N", "PR2N", "PR3N", "PR4N", "PR5N", "PR6N", "PR7N", "PR8N", "PR9N", "PR10N", "PR11N", "PR12N", "PR13N", "PR14N", "PR15N", "PR16N", "PR1V", "PR2V", "PR3V", "PR4V", "PR5V", "PR6V", "PR7V", "PR8V", "PR9V", "PR10V", "PR11V", "PR12V", "PR13V", "PR14V", "PR15V", "PR16V", "PR1D", "D_OSV"};
 		String[] dstFld = new String[] {"npasp", "dataz", "vrach", "mesto1", "preds", "uchr", "nom_mse", "name_mse", "ruk_mse", "rez_mse", "d_otpr", "d_inv", "d_invp", "d_srok", "srok_inv", "diag", "diag_s1", "diag_s2", "diag_s3", "oslog", "factor", "fact1", "fact2", "fact3", "fact4", "prognoz", "potencial", "med_reab", "ps_reab", "prof_reab", "soc_reab", "zakl", "datav", "zakl_name", "klin_prognoz", "nar1", "nar2", "nar3", "nar4", "nar5", "nar6", "ogr1", "ogr2", "ogr3", "ogr4", "ogr5", "ogr6", "ogr7", "mr1n", "mr2n", "mr3n", "mr4n", "mr5n", "mr6n", "mr7n", "mr8n", "mr9n", "mr10n", "mr11n", "mr12n", "mr13n", "mr14n", "mr15n", "mr16n", "mr17n", "mr18n", "mr19n", "mr20n", "mr21n", "mr22n", "mr23n", "mr1v", "mr2v", "mr3v", "mr4v", "mr5v", "mr6v", "mr7v", "mr8v", "mr9v", "mr10v", "mr11v", "mr12v", "mr13v", "mr14v", "mr15v", "mr16v", "mr17v", "mr18v", "mr19v", "mr20v", "mr21v", "mr22v", "mr23v", "mr1d", "mr2d", "mr3d", "mr4d", "pr1n", "pr2n", "pr3n", "pr4n", "pr5n", "pr6n", "pr7n", "pr8n", "pr9n", "pr10n", "pr11n", "pr12n", "pr13n", "pr14n", "pr15n", "pr16n", "pr1v", "pr2v", "pr3v", "pr4v", "pr5v", "pr6v", "pr7v", "pr8v", "pr9v", "pr10v", "pr11v", "pr12v", "pr13v", "pr14v", "pr15v", "pr16v", "pr1d", "d_osv"};
 		
@@ -597,6 +600,7 @@ public class ZabolDataImporter {
 		int updCnt = 0;
 		int insCnt = 0;
 		String sql = null;
+		String prevKey = "";
 		
 		try (Statement srcStm = srcCon.createStatement();
 				Statement dstStm = dstCon.createStatement();
@@ -652,11 +656,15 @@ public class ZabolDataImporter {
 						if (hasData && (dstRs.getInt(1) == srcRs.getInt(133)) && (dstRs.getDate(2).getTime() == srcRs.getDate(2).getTime())) {
 							dstModStm.executeUpdate(sql = String.format("%s WHERE (%s = %s) AND (%s = '%s') ", SqlGenerator.genUpdate("p_invk", dstFld, vals), dstFld[0], vals[0], dstFld[1], vals[1]));
 							updCnt++;
+							prevKey = vals[0] + vals[1];
 							srcRs.next();
 							break;
-						} else if (!hasData || (srcRs.getInt(133) < dstRs.getInt(1)) || (dstRs.getDate(2).getTime() < srcRs.getDate(2).getTime())) {
-							dstModStm.executeUpdate(sql = SqlGenerator.genInsert("p_invk", dstFld, vals));
-							insCnt++;
+						} else if (!hasData || (srcRs.getInt(133) < dstRs.getInt(1)) ||  ((srcRs.getInt(133) == dstRs.getInt(1)) && (dstRs.getDate(2).getTime() < srcRs.getDate(2).getTime()))) {
+							if (!prevKey.equals(vals[0] + vals[1])) {
+								dstModStm.executeUpdate(sql = SqlGenerator.genInsert("p_invk", dstFld, vals));
+								insCnt++;
+							}
+							prevKey = vals[0] + vals[1];
 							if (!srcRs.next())
 								break;
 						} else {
@@ -670,7 +678,177 @@ public class ZabolDataImporter {
 			
 			dstCon.commit();
 			
-			System.out.println(String.format("Pinv: %d rows updated, %d rows inserted", updCnt, insCnt));
+			System.out.println(String.format("Pinvk: %d rows updated, %d rows inserted", updCnt, insCnt));
+		} catch (Exception e) {
+			dstCon.rollback();
+			throw new Exception(sql, e);
+		}
+	}
+	
+	private void importPdiag() throws Exception {
+		System.out.println("Importing pdiag.");
+		String[] srcFld = new String[] {"NPASP", "DIAG", "DISP", "DATAD", "XZAB", "STADY", "D_VZ", "D_GRUP", "ISHOD", "DATAG", "DATAISH", "NMVD", "PAT", "PRIZ",  "PRIZI", "PPI"};
+		String[] dstFld = new String[] {"npasp", "diag", "disp", "datad", "xzab", "stady", "d_vz", "d_grup", "ishod", "datag", "dataish", "nmvd", "pat", "prizb", "prizi", "ppi"};
+		
+		boolean hasData;
+		int updCnt = 0;
+		int insCnt = 0;
+		String sql = null;
+		String prevKey = "";
+		
+		try (Statement srcStm = srcCon.createStatement();
+				Statement dstStm = dstCon.createStatement();
+			) {
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, PDIAG.PD_PU") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
+			ResultSet dstRs = dstStm.executeQuery(sql = SqlGenerator.genSelect(dstFld, "p_diag", null) + "ORDER BY p_diag.npasp, p_diag.diag ");
+			
+			if (!srcRs.next())
+				return;
+			while (true) {
+				while ((hasData = dstRs.next()) && (dstRs.getInt(1) < srcRs.getInt(17))) {
+				}
+				while (true) {
+					try (Statement dstModStm = dstCon.createStatement()) {
+						boolean write = srcRs.getInt(18) == 1;
+						String[] vals = SqlGenerator.getStringValues(srcRs);
+						vals[0] = vals[16];
+						if (vals[7] != null) {
+							if (vals[7].equals("2А"))
+								vals[7] = "21";
+							else if (vals[7].equals("2Б"))
+								vals[7] = "22";
+						}
+						if ((srcRs.getInt(3) == 1) && (srcRs.getInt(9) != 0) && (srcRs.getInt(9) != 1) && (srcRs.getInt(9) != 5) && (srcRs.getInt(9) != 12))
+							write = true;
+						if (hasData && write && (dstRs.getInt(1) == srcRs.getInt(17)) && dstRs.getString(2).equals(srcRs.getString(2))) {
+							if ((dstRs.getDate(4) != null) && (srcRs.getDate(4) != null))
+								if (dstRs.getDate(4).getTime() < srcRs.getDate(4).getTime()) {
+									dstModStm.executeUpdate(sql = String.format("%s WHERE (%s = %s) AND (%s = '%s') ", SqlGenerator.genUpdate("p_diag", dstFld, vals), dstFld[0], vals[0], dstFld[1], vals[1]));
+									updCnt++;
+								}
+							prevKey = vals[0] + vals[1];
+							srcRs.next();
+							break;
+						} else if (!hasData || ((srcRs.getInt(17) < dstRs.getInt(1)) || ((srcRs.getInt(17) == dstRs.getInt(1)) && (srcRs.getString(2).compareTo(dstRs.getString(2)) < 0)))) {
+							if (write && !prevKey.equals(vals[0] + vals[1])) {
+								dstModStm.executeUpdate(sql = SqlGenerator.genInsert("p_diag", dstFld, vals));
+								insCnt++;
+							}
+							prevKey = vals[0] + vals[1];
+							if (!srcRs.next())
+								break;
+						} else {
+							break;
+						}
+					}
+				}
+				if (srcRs.isAfterLast())
+					break;
+			}
+			
+			dstCon.commit();
+			
+			System.out.println(String.format("Pdiag: %d rows updated, %d rows inserted", updCnt, insCnt));
+		} catch (Exception e) {
+			dstCon.rollback();
+			throw new Exception(sql, e);
+		}
+	}
+	
+	private void importPdisp() throws Exception {
+		System.out.println("Importing pdisp.");
+		String[] srcFld = new String[] {"NPASP", "DIAG", "NULL", "D_VZ", "ISHOD", "DATAISH", "DATAG", "DATAD", "NULL",   "D_CDOL",  "D_GRUP", "NUCH",  "NEW_DIAG"};
+		String[] dstFld = new String[] {"npasp", "diag", "pcod", "d_vz", "ishod", "dataish", "datag", "datad", "cod_sp", "cdol_ot", "d_grup", "d_uch", "diag_n"};
+		
+		boolean hasData;
+		int updCnt = 0;
+		int insCnt = 0;
+		String sql = null;
+		String prevKey = "";
+		Hashtable<String, String> vrTbl = new Hashtable<>();
+		String vrKey;
+		String vrCode;
+		
+		try (Statement srcStm = srcCon.createStatement();
+				Statement dstStm = dstCon.createStatement();
+				Statement vrStm = dstCon.createStatement();
+			) {
+			ResultSet nparsSrcRs = srcStm.executeQuery(sql = "SELECT P1 FROM N_PARS WHERE PTS = 0 ");
+			if (!nparsSrcRs.next())
+				throw new Exception("No npars cpol specified.");
+			String npars = nparsSrcRs.getString(1);
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, S_VRACH.FAM, S_VRACH.IM, S_VRACH.OT, S_VRACH.DATAR") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) LEFT JOIN S_VRACH ON (S_VRACH.PCOD = PDIAG.D_NVR) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') AND ((PDIAG.DISP = 1) OR (PDIAG.DISP = 2)) ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
+			ResultSet dstRs = dstStm.executeQuery(sql = SqlGenerator.genSelect(dstFld, "p_disp", null) + "ORDER BY p_disp.npasp, p_disp.diag ");
+			ResultSet vrRs;
+			
+			if (!srcRs.next())
+				return;
+			while (true) {
+				while ((hasData = dstRs.next()) && (dstRs.getInt(1) < srcRs.getInt(14))) {
+				}
+				while (true) {
+					try (Statement dstModStm = dstCon.createStatement()) {
+						vrCode = null;
+						if (srcRs.getString(15) != null) {
+							vrKey = String.format("%s_%s_%s_%s", srcRs.getString(15), srcRs.getString(16), srcRs.getString(17), srcRs.getString(18));
+							if (!vrTbl.containsKey(vrKey)) {
+								vrRs = vrStm.executeQuery(String.format("SELECT pcod FROM s_vrach WHERE (fam = '%s') AND (im = '%s') AND (ot = '%s') AND (datar = '%s') ", srcRs.getString(15), srcRs.getString(16), srcRs.getString(17), srcRs.getString(18)));
+								if (vrRs.next()) {
+									vrCode = vrRs.getString(1);
+									vrTbl.put(vrKey, vrCode);
+								}
+								vrRs.close();
+							} else {
+								vrCode = vrTbl.get(vrKey);
+							}
+						}
+						String[] vals = SqlGenerator.getStringValues(srcRs);
+						vals[0] = vals[13];
+						vals[2] = npars;
+						vals[8] = vrCode;
+						if (vrCode == null) {
+							vals[8] = "0";
+							vals[9] = "0";
+						}
+						if (vals[7] == null)
+							vals[7] = "2000-01-01";
+						if (vals[3] == null)
+							vals[3] = vals[7];
+						if (vals[10] != null) {
+							if (vals[10].equals("2А"))
+								vals[10] = "21";
+							else if (vals[10].equals("2Б"))
+								vals[10] = "22";
+						}
+						if (hasData &&(dstRs.getInt(1) == srcRs.getInt(14)) && dstRs.getString(2).equals(srcRs.getString(2))) {
+							if ((dstRs.getDate(8) != null) && (srcRs.getDate(8) != null))
+								if (dstRs.getDate(8).getTime() < srcRs.getDate(8).getTime()) {
+									dstModStm.executeUpdate(sql = String.format("%s WHERE (%s = %s) AND (%s = '%s') ", SqlGenerator.genUpdate("p_disp", dstFld, vals), dstFld[0], vals[0], dstFld[1], vals[1]));
+									updCnt++;
+								}
+							prevKey = vals[0] + vals[1];
+							srcRs.next();
+							break;
+						} else if (!hasData || ((srcRs.getInt(14) < dstRs.getInt(1)) || ((srcRs.getInt(14) == dstRs.getInt(1)) && (srcRs.getString(2).compareTo(dstRs.getString(2)) < 0)))) {
+							if (!prevKey.equals(vals[0] + vals[1])) {
+								dstModStm.executeUpdate(sql = SqlGenerator.genInsert("p_disp", dstFld, vals));
+								insCnt++;
+							}
+							prevKey = vals[0] + vals[1];
+							if (!srcRs.next())
+								break;
+						} else {
+							break;
+						}
+					}
+				}
+				if (srcRs.isAfterLast())
+					break;
+			}
+			
+			dstCon.commit();
+			
+			System.out.println(String.format("Pdisp: %d rows updated, %d rows inserted", updCnt, insCnt));
 		} catch (Exception e) {
 			dstCon.rollback();
 			throw new Exception(sql, e);

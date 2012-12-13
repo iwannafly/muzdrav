@@ -453,6 +453,18 @@ struct CotdInfo{
 	23: optional i32 stat_type;
 }
 
+struct PaspErrorInfo {	
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional string fam;
+	4: optional string im;
+	5: optional string ot;
+	6: optional i64 datar;
+	7: optional i32 kderr;
+	8: optional string err_name;
+	9: optional string err_comm;
+}
+
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
@@ -505,4 +517,5 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<ClekInfo> getClekInfoList(1: i32 id_gosp) throws (1: kmiacServer.KmiacServerException kse);
 	list<CosmotrInfo> getCosmotrInfoList(1: i32 id_gosp) throws (1: kmiacServer.KmiacServerException kse);
 	list<CotdInfo> getCotdInfoList(1: i32 id_gosp) throws (1: kmiacServer.KmiacServerException kse);
+	list<PaspErrorInfo> getPaspErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
 }
