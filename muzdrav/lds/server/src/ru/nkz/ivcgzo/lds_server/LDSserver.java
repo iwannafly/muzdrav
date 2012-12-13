@@ -244,8 +244,8 @@ public class LDSserver extends Server implements Iface {
 	
 	
 	@Override
-	public List<LabIsl> GetLabIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_rez_l.cpok, s_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON (p_rez_l.pcod_m = n_nsi_obst.obst)join s_ldi on(n_ldi.id=s_ldi.id) where nisl = ? ", nisl)) {
+	public List<LabIsl> GetLabIsl(int nisl, String c_nz1) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON (p_rez_l.pcod_m = n_nsi_obst.obst) where (nisl = ?)and(c_nz1 = ?) ", nisl, c_nz1)) {
 			return rsmLabIs.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
@@ -253,8 +253,8 @@ public class LDSserver extends Server implements Iface {
 	}
 
 	@Override
-	public LabIsl GetLIsl(int nisl) throws TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON(p_rez_l.pcod_m = n_nsi_obst.obst) WHERE nisl = ? ", nisl)) {
+	public LabIsl GetLIsl(int nisl, String c_nz1) throws TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_rez_l.cpok, n_ldi.name, p_rez_l.zpok, n_ldi.norma, p_rez_l.stoim, p_rez_l.pcod_m, n_nsi_obst.nameobst from p_rez_l JOIN n_ldi ON (p_rez_l.cpok = n_ldi.pcod) Left Join n_nsi_obst ON(p_rez_l.pcod_m = n_nsi_obst.obst) WHERE (nisl = ?)and(c_nz1 = ?) ", nisl, c_nz1)) {
 			if (acrs.getResultSet().next())
 				return rsmLabIs.map(acrs.getResultSet());
 			else
@@ -505,7 +505,7 @@ public class LDSserver extends Server implements Iface {
 	@Override
 	public List<N_ldi> getN_ldi(String c_nz1, int c_p0e1)
 			throws LdiNotFoundException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT nl.pcod, nl.c_nz1, nl.name_n, sl.name, nl.norma, nl.c_p0e1, nl.id FROM n_ldi nl left join s_ldi sl on (nl.id=sl.id) where (nl.c_nz1 = ?) and (nl.c_p0e1 = ?) ", c_nz1, c_p0e1)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT nl.pcod, nl.c_nz1, nl.name_n, nl.name, nl.norma, nl.c_p0e1, nl.id FROM n_ldi nl where (nl.c_nz1 = ?) and (nl.c_p0e1 = ?) ", c_nz1, c_p0e1)) {
 			return rmsnldi.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			throw new TException(e);
