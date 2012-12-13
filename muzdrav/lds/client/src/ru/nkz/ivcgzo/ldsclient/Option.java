@@ -65,7 +65,7 @@ public class Option {
 			@Override
 			public void windowOpened(WindowEvent e) {
 				
-				try {
+				/*try {
 					List<N_ldi> alis = MainForm.ltc.getAllN_ldi();
 					
 					List<S_ldi> sisl = MainForm.ltc.getAllS_ldi();
@@ -117,7 +117,7 @@ public class Option {
 				} catch (TException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} 
+				} */
 				
 				
 				
@@ -287,13 +287,13 @@ public class Option {
 			@Override
 			public boolean doAction(CustomTableItemChangeEvent<N_ldi> event) {
 				try {
-					//MainForm.ltc.UpdN_ldi(event.getItem());
+					MainForm.ltc.UpdN_ldi(event.getItem());
 					
-					S_ldi upsldi = new S_ldi();
+					/*S_ldi upsldi = new S_ldi();
 					
 					upsldi.setName(event.getItem().name);
 					upsldi.setId(event.getItem().id);
-					MainForm.ltc.UpdS_ldi(upsldi);
+					MainForm.ltc.UpdS_ldi(upsldi);*/
 					
 					return true;
 				} catch (LdiNotFoundException e) {

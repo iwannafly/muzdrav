@@ -231,8 +231,8 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	void DelDIsl(1: i32 nisl, 2: string kodisl);
 	void DelDIslP(1: i32 nisl);
 
-	list<LabIsl> GetLabIsl(1: i32 nisl);
-	LabIsl GetLIsl(1: i32 nisl)throws (1: LIslNotFoundException line);
+	list<LabIsl> GetLabIsl(1: i32 nisl; 2: string c_nz1);
+	LabIsl GetLIsl(1: i32 nisl; 2: string c_nz1)throws (1: LIslNotFoundException line);
 	void AddLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
