@@ -32,6 +32,7 @@ public class AuthorizationFrame extends JDialog {
     private static final int KEYBOARD_BUTTON_COUNT = 10;
     private static final int FONT_SIZE = 30;
     private static final int CUSTOM_CURSOR_SIDE_SIZE = 3;
+    private static final int VERTICAL_STRUTS_HEIGHT = 30;
     private JTextField tfOmsNumber;
     private JButton btnAccept;
     private JButton btnCancel;
@@ -86,7 +87,7 @@ public class AuthorizationFrame extends JDialog {
 
         buildKeyboardPanel();
 
-        vsMiddle = Box.createVerticalStrut(30);
+        vsMiddle = Box.createVerticalStrut(VERTICAL_STRUTS_HEIGHT);
 //        vsMiddle.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
 //        vsMiddle.setMinimumSize(new Dimension(0, 30));
 //        vsMiddle.setPreferredSize(new Dimension(0, 30));
@@ -130,10 +131,11 @@ public class AuthorizationFrame extends JDialog {
         lblInstruction.setFont(new Font("Courier New", Font.BOLD, FONT_SIZE));
         vbOmsTextPanel.add(lblInstruction);
 
-        vsOsTextFieldTopGlue = Box.createVerticalStrut(20);
-        vsOsTextFieldTopGlue.setPreferredSize(new Dimension(0, 30));
-        vsOsTextFieldTopGlue.setMinimumSize(new Dimension(0, 30));
-        vsOsTextFieldTopGlue.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
+        vsOsTextFieldTopGlue = Box.createVerticalStrut(VERTICAL_STRUTS_HEIGHT);
+//        vsOsTextFieldTopGlue.setPreferredSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
+//        vsOsTextFieldTopGlue.setMinimumSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
+//        vsOsTextFieldTopGlue.setMaximumSize(
+//            new Dimension(Integer.MAX_VALUE, VERTICAL_STRUTS_HEIGHT));
         vbOmsTextPanel.add(vsOsTextFieldTopGlue);
 
         tfOmsNumber = new JTextField();
@@ -147,10 +149,11 @@ public class AuthorizationFrame extends JDialog {
         vbOmsTextPanel.add(tfOmsNumber);
         tfOmsNumber.setColumns(10);
 
-        vsOmsTextBottomGlue = Box.createVerticalStrut(20);
-        vsOmsTextBottomGlue.setMinimumSize(new Dimension(0, 30));
-        vsOmsTextBottomGlue.setMaximumSize(new Dimension(32767, 30));
-        vsOmsTextBottomGlue.setPreferredSize(new Dimension(0, 30));
+        vsOmsTextBottomGlue = Box.createVerticalStrut(VERTICAL_STRUTS_HEIGHT);
+//        vsOmsTextBottomGlue.setMinimumSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
+//        vsOmsTextBottomGlue.setMaximumSize(
+//            new Dimension(Integer.MAX_VALUE, VERTICAL_STRUTS_HEIGHT));
+//        vsOmsTextBottomGlue.setPreferredSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
         pMain.add(vsOmsTextBottomGlue);
     }
 

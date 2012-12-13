@@ -125,7 +125,7 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv	  birthplace	ogrn_smo
+    //  ter_liv        region_liv     birthplace    ogrn_smo
         Integer.class, Integer.class, String.class, String.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
@@ -139,7 +139,7 @@ public class ServerRegPatient extends Server implements Iface {
         Integer.class, String.class, String.class, String.class,
     //  datar       pol             name_str      ogrn_str
         Date.class, Integer.class, String.class, String.class,
-    //  vpolis         spolis        npolis		   birthplace
+    //  vpolis         spolis        npolis        birthplace
         Integer.class, String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
@@ -204,7 +204,8 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
-        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv", "birthplace", "ogrn_smo"
+        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv",
+        "birthplace", "ogrn_smo"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
