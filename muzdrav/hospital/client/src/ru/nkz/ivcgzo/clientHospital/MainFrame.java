@@ -695,7 +695,7 @@ public class MainFrame extends JFrame {
 
         btnMedication = new JButton();
         btnMedication.setToolTipText("Лекарственные назначения");
-        btnMedication.setVisible(false);
+//        btnMedication.setVisible(false);
         toolBar.add(btnMedication);
         btnMedication.setMaximumSize(new Dimension(35, 35));
         btnMedication.setMinimumSize(new Dimension(35, 35));

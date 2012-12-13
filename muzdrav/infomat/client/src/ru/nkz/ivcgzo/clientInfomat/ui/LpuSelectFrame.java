@@ -2,7 +2,6 @@ package ru.nkz.ivcgzo.clientInfomat.ui;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JButton;
@@ -19,18 +18,14 @@ import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.border.EtchedBorder;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
 
-public class LpuSelectFrame extends JFrame {
+public class LpuSelectFrame extends InfomatFrame {
     private static final long serialVersionUID = 5394050664711305366L;
     private JPanel pMain = new JPanel();
     private Box hbBackwardButton;
@@ -39,30 +34,16 @@ public class LpuSelectFrame extends JFrame {
     private Component hgLeft;
     private JScrollPane spLpu;
     private ThriftIntegerClassifierList lLpu;
-    private DoctorSelectFrame frmDoctorSelect;
-    private int nextWindowFlag;
 
     public LpuSelectFrame() {
+        super();
         initialization();
     }
 
     private void initialization() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
-        setUndecorated(true);
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-
-        createModalFrames();
         addMainPanel();
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
-    }
-
-    private void createModalFrames() {
-        if (frmDoctorSelect == null) {
-            frmDoctorSelect = new DoctorSelectFrame(); 
-        }
     }
 
     @SuppressWarnings("rawtypes")
@@ -90,7 +71,7 @@ public class LpuSelectFrame extends JFrame {
             setFont(new Font("Courier New", Font.PLAIN, 25));
             setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
             setHorizontalAlignment(JLabel.CENTER);
-            setBackground(isSelected ? focusedColor : unfocusedColor);// Color.white);
+            setBackground(isSelected ? focusedColor : unfocusedColor);
             setForeground(isSelected ? Color.white : Color.black);
             return this;
         }
@@ -122,11 +103,6 @@ public class LpuSelectFrame extends JFrame {
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-        btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
-            }
-        });
         btnBackward.setIcon(new ImageIcon(LpuSelectFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
@@ -136,6 +112,9 @@ public class LpuSelectFrame extends JFrame {
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
+    public void addLpuSelectBackwardListener(ActionListener listener) {
+        btnBackward.addActionListener(listener);
+    }
 
     private void addLpuListPanel() {
         spLpu = new JScrollPane();
@@ -151,16 +130,6 @@ public class LpuSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addLpuList() {
         lLpu = new ThriftIntegerClassifierList();
-        updateLpuList();
-        lLpu.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (lLpu.getSelectedValue() != null) {
-                    frmDoctorSelect.showModal(nextWindowFlag, lLpu.getSelectedValue().getPcod());
-                    updateLpuList();
-                }
-            }
-        });
         lLpu.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255), Color.red));
         lLpu.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lLpu.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -168,19 +137,15 @@ public class LpuSelectFrame extends JFrame {
         spLpu.setViewportView(lLpu);
     }
 
-    private void updateLpuList() {
-        try {
-            lLpu.setData(ClientInfomat.tcl.getPoliclinics());
-        } catch (KmiacServerException e1) {
-            e1.printStackTrace();
-        } catch (TException e1) {
-            e1.printStackTrace();
-            ClientInfomat.conMan.reconnect(e1);
-        }
+    public void addListClickListener(MouseListener listener) {
+        lLpu.addMouseListener(listener);
     }
-    public void showAsModal(int flag) {
-       nextWindowFlag = flag;
-       updateLpuList();
+
+    public void updateLpuList(List<IntegerClassifier> policlinics) {
+        lLpu.setData(policlinics);
+    }
+
+    public void showAsModal() {
        setVisible(true);
     }
 }

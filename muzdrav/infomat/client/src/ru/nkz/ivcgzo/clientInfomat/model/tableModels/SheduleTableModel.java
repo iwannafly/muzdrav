@@ -18,10 +18,11 @@ public class SheduleTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSheduleDay> sheduleList;
     private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("HH-mm");
+    private static final int ROW_COUNT = 4;
     private static final String[] COLUMN_NAMES = {
         "Понедельник", "Вторник", "Среда" , "Четверг" , "Пятница", "Суббота", "Воскресенье"
     };
-    
+
     public SheduleTableModel(final int pcod, final int cpol, final String cdol) {
         try {
             sheduleList = ClientInfomat.tcl.getShedule(pcod, cpol, cdol);
@@ -35,12 +36,12 @@ public class SheduleTableModel implements TableModel {
 
     @Override
     public final int getRowCount() {
-        return 4;
+        return ROW_COUNT;
     }
-    
+
     @Override
     public final int getColumnCount() {
-        return 7;
+        return COLUMN_NAMES.length;
     }
 
     @Override
@@ -58,14 +59,14 @@ public class SheduleTableModel implements TableModel {
         return false;
     }
 
-    public int getVidp(final int rowIndex, final int columnIndex) {
-        if (findSheduleDay(columnIndex-1, rowIndex+1) != null) {
-            return findSheduleDay(columnIndex-1, rowIndex+1).getVidp();
+    public final int getVidp(final int rowIndex, final int columnIndex) {
+        if (findSheduleDay(columnIndex - 1, rowIndex + 1) != null) {
+            return findSheduleDay(columnIndex - 1, rowIndex + 1).getVidp();
         } else {
             return 0;
         }
     }
-    private TSheduleDay findSheduleDay(int denn, int vidP) {
+    private TSheduleDay findSheduleDay(final int denn, final int vidP) {
         for (TSheduleDay sheduleDay : sheduleList) {
             if ((sheduleDay.getWeekDay() == denn) && (sheduleDay.getVidp() == vidP)) {
                 return sheduleDay;
@@ -74,7 +75,7 @@ public class SheduleTableModel implements TableModel {
         return null;
     }
 
-    private String createCellLabel(TSheduleDay sheduleDay) {
+    private String createCellLabel(final TSheduleDay sheduleDay) {
         if (sheduleDay == null) {
             return "";
         }
@@ -86,27 +87,27 @@ public class SheduleTableModel implements TableModel {
         if ((sheduleDay.isSetTimeEnd()) && (sheduleDay.getTimeEnd() != 0)) {
             timeEnd = DEFAULT_DATE_FORMAT.format(sheduleDay.getTimeEnd());
         }
-        return String.format("%s - %s", timeStart, timeEnd); 
+        return String.format("%s - %s", timeStart, timeEnd);
     }
 
     @Override
     public final Object getValueAt(final int rowIndex, final int columnIndex) {
-        return createCellLabel(findSheduleDay(columnIndex-1, rowIndex+1));
+        return createCellLabel(findSheduleDay(columnIndex - 1, rowIndex + 1));
     }
-    
+
     public final List<TSheduleDay> getSheduleTalonList() {
         return sheduleList;
     }
-    
+
     @Override
     public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
     }
-    
+
     @Override
     public final void addTableModelListener(final TableModelListener listener) {
         listeners.add(listener);
     }
-    
+
     @Override
     public final void removeTableModelListener(final TableModelListener listener) {
         listeners.remove(listener);
