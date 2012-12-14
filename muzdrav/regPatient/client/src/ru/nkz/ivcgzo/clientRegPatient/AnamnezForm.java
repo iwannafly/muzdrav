@@ -49,7 +49,7 @@ public class AnamnezForm extends JFrame{
 	public AnamnezForm() {
 		setTitle("Анамнез жизни");
         contentPane = new JPanel();
-        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setBorder(new EmptyBorder(1, 5, 1, 5));
         setContentPane(contentPane);
         
         JPanel pl_tbl = new JPanel();
@@ -191,7 +191,7 @@ public class AnamnezForm extends JFrame{
         pl_btn.setLayout(gl_pl_btn);
         pl_tbl.setLayout(gl_pl_tbl);
         contentPane.setLayout(gl_contentPane);
-		setBounds(10, 20, 793, 741);
+		setBounds(10, 20, 750, 705);
 		
 	}
 
