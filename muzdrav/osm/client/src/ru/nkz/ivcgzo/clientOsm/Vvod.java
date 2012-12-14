@@ -224,6 +224,8 @@ public class Vvod extends JFrame {
 	private JButton btnObrDel;
 	private JButton btnObrSave;
 	private JButton btnObrAdd;
+	private JButton btnNaprPrint;
+	private JButton btnKonsPrint;
 	private CustomTable<PdiagZ, PdiagZ._Fields> tblZaklDiag;
 
 	
@@ -932,6 +934,18 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 		  		try {
 					if (tblDiag.getSelectedItem() != null) {
+				  		if (!diagamb.isSetNamed()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Введите описание диагноза");
+				  			return;
+				  		}
+				  		for (PdiagAmb da : tblDiag.getData()) {
+							if (da != diagamb) {
+								if (da.diag.equals(diagamb.diag)) {
+						  			JOptionPane.showMessageDialog(Vvod.this, String.format("В списке есть одинаковые диангозы: %s", da.diag));
+						  			return;
+								}
+							}
+						}
 				  		diagamb.setDiag(tblDiag.getSelectedItem().getDiag());
 				  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
 				  		diagamb.setId_pos(pvizitAmb.getId());
@@ -975,10 +989,7 @@ public class Vvod extends JFrame {
 					  		setPdiagz(pdiag);
 				  		}
 				  		
-				  		if (diagamb.isSetNamed())
-				  			MainForm.tcl.UpdatePdiagAmb(diagamb);
-				  		else
-				  			JOptionPane.showMessageDialog(Vvod.this, "Введите описание диагноза");
+			  			MainForm.tcl.UpdatePdiagAmb(diagamb);
 				  		
 				  		for (PdiagAmb pd : tblDiag.getData())
 				  			if (pd.diag_stat == 1) {
@@ -1732,7 +1743,7 @@ public class Vvod extends JFrame {
 		
 		JScrollPane spNaprPokazMet = new JScrollPane();
 		
-		JButton btnNaprPrint = new JButton("Печать");
+		btnNaprPrint = new JButton("Печать");
 		btnNaprPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -1740,6 +1751,29 @@ public class Vvod extends JFrame {
 						P_isl_ld pisl = new P_isl_ld();
 						Prez_d prezd = new Prez_d();
 						Prez_l prezl = new Prez_l();
+						
+						for (PdiagAmb pd : tblDiag.getData()) {
+							if (pd.diag_stat == 1) {
+								pisl.setDiag(pd.diag);
+								break;
+							}
+						}
+						if (!pisl.isSetDiag()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Запись на исследование не возможна, так как в посещении не выставлено ни одного основного диагноза.");
+				  			return;
+						}
+						
+						for (PokazMet pokazMet : tblNaprPokazMet.getData()) {
+							if (pokazMet.vybor) {
+								prezd.setKodisl(pokazMet.pcod);
+								break;
+							}
+						}
+						if (!prezd.isSetKodisl()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Выберите хотя бы одно исследование.");
+				  			return;
+						}
+
 						pisl.setNpasp(Vvod.zapVr.getNpasp());
 						pisl.setPcisl(cmbOrgan.getSelectedPcod());
 						pisl.setNapravl(2);
@@ -2066,7 +2100,7 @@ public class Vvod extends JFrame {
 		tbKonsObosnov.setLineWrap(true);
 		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		JButton btnKonsPrint = new JButton("Печать");
+		btnKonsPrint = new JButton("Печать");
 		btnKonsPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -2364,6 +2398,11 @@ public class Vvod extends JFrame {
 				if (tblObr.getSelectedItem() == null)
 					return;
 				
+				if (tblObr.getSelectedItem().closed) {
+					JOptionPane.showMessageDialog(Vvod.this, "Добавить посещение не возможно, так как случай обращения закрыт.");
+					return;
+				}
+				
 				pvizitAmb = new PvizitAmb();
 				pvizitAmb.setId_obr(zapVr.id_pvizit);
 				pvizitAmb.setNpasp(zapVr.getNpasp());
@@ -2387,6 +2426,9 @@ public class Vvod extends JFrame {
 					e2.printStackTrace();
 				}
 		
+				btnNaprPrint.setEnabled((tblObr.getRowCount() > 0) && (tblPos.getRowCount() > 0));
+				btnKonsPrint.setEnabled(btnNaprPrint.isEnabled());
+				
 				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 				priemCopy = new Priem(priem);
 				anamZabCopy = new AnamZab(anamZab);
@@ -2869,6 +2911,8 @@ public class Vvod extends JFrame {
 					}
 				}
 			}
+			btnNaprPrint.setEnabled((tblObr.getRowCount() > 0) && (tblPos.getRowCount() > 0));
+			btnKonsPrint.setEnabled(btnNaprPrint.isEnabled());
 			
 			setVisible(true);
 			MainForm.instance.setVisible(false);
@@ -2983,6 +3027,12 @@ public class Vvod extends JFrame {
 	private void addDiag(StringClassifier mkb) {
 		try {
   			if (mkb != null) {
+		  		for (PdiagAmb da : tblDiag.getData()) {
+					if (da.diag.equals(mkb.pcod)) {
+			  			JOptionPane.showMessageDialog(Vvod.this, String.format("Диагноз %s уже есть в списке.", mkb.pcod));
+			  			return;
+					}
+				}
 		  		diagamb = new PdiagAmb();
 		  		diagamb.setId_obr(zapVr.getId_pvizit());
 		  		diagamb.setId_pos(tblPos.getSelectedItem().id);
@@ -2991,10 +3041,6 @@ public class Vvod extends JFrame {
 		  			if (pd.getDiag().equals(mkb.pcod)) 
 		  				{diagamb.setDatad(pd.getDatad());
 		  				diagamb.setPredv(false);}
-//	  				else {
-//	  					diagamb.setDatad(System.currentTimeMillis());
-//	  					diagamb.setPredv(true);
-//	  					}
 	  				}
 
 		  		if (!diagamb.isSetDatad()){
@@ -3220,7 +3266,7 @@ public class Vvod extends JFrame {
 		try {
 			pvizit.setNpasp(zapVr.getNpasp());
 			pvizit.setCpol(MainForm.authInfo.getCpodr());
-			pvizit.setDatao(System.currentTimeMillis());
+			pvizit.setDatao(getDateMills(System.currentTimeMillis()));
 			pvizit.setCod_sp(MainForm.vrPcod);
 			pvizit.setCdol(MainForm.vrCdol);
 			pvizit.setCuser(MainForm.authInfo.getUser_id());
