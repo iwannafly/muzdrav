@@ -17,6 +17,7 @@ import ru.nkz.ivcgzo.serverManager.common.AutoCloseableResultSet;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
+import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.serverMedication.ServerMedication;
 import ru.nkz.ivcgzo.serverReception.ServerReception;
@@ -35,6 +36,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.CizmerInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ClekInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CosmotrInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CotdInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PaspErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientCommonInfo;
@@ -80,6 +82,7 @@ public class ServerViewSelect extends Server implements Iface {
 	private final TResultSetMapper<ClekInfo, ClekInfo._Fields> rsmClek;
 	private final TResultSetMapper<CosmotrInfo, CosmotrInfo._Fields> rsmCosmotr;
 	private final TResultSetMapper<CotdInfo, CotdInfo._Fields> rsmCotd;
+	private final TResultSetMapper<PaspErrorInfo, PaspErrorInfo._Fields> rsmPaspError;
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -104,6 +107,7 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmClek = new TResultSetMapper<>(ClekInfo.class, "id", "id_gosp", "vrach", "datan", "klek", "flek", "doza", "ed", "sposv", "spriem", "pereod", "dlitkl", "komm", "datao", "vracho", "dataz");
 		rsmCosmotr = new TResultSetMapper<>(CosmotrInfo.class, "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis", "fisical_obs", "pcod_vrach", "dataz", "timez");
 		rsmCotd = new TResultSetMapper<>(CotdInfo.class, "id", "id_gosp", "nist", "sign", "cotd", "cprof", "stt", "dataol", "datazl", "vozrlbl", "pollbl", "ishod", "result", "ukl", "vrach", "npal", "datav", "vremv", "sostv", "recom", "mes", "dataz", "stat_type");
+		rsmPaspError = new TResultSetMapper<>(PaspErrorInfo.class);
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -527,5 +531,26 @@ public class ServerViewSelect extends Server implements Iface {
 		} catch (SQLException e) {
 			throw new KmiacServerException(e.getMessage());
 		}
+	}
+
+	@Override
+	public List<PaspErrorInfo> getPaspErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_pasp_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (e.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+			sme.setCommit();
+			return rsmPaspError.mapToList(acrsq.getResultSet());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not get pasp errors.");
+		}
+//		try (SqlModifyExecutor sme = tse.startTransaction();
+//				AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT r.*, e.name_err AS err_name, e.comm AS err_comm FROM get_reestr_pasp_errors(?, ?, ?) r JOIN n_kderr e ON (e.kderr = r.kderr) ORDER BY r.fam, r.im, r.ot, r.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+//			return rsmPaspError.mapToList(acrs.getResultSet());
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			throw new KmiacServerException("Could not get pasp errors.");
+//		}
+
 	}
 }

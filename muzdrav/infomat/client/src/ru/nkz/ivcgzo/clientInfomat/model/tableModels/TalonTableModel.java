@@ -72,7 +72,7 @@ public final class TalonTableModel implements TableModel {
         return String.class;
     }
 
-    @Override 
+    @Override
     public boolean isCellEditable(final int rowIndex, final int columnIndex) {
         return false;
     }

@@ -1595,7 +1595,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[2])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[3])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[3])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[4])));
@@ -1604,7 +1604,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[5])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[6])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[6])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[7])));
@@ -1613,7 +1613,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[8])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[9])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[9])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[10])));
@@ -1622,7 +1622,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[11])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[12])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[12])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[13])));
@@ -1631,7 +1631,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[14])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[15])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[15])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[16])));
@@ -1640,7 +1640,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[17])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[18])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[18])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[19])));
@@ -1649,7 +1649,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[20])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[21])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[21])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[22])));
@@ -1658,7 +1658,7 @@ sb.append(String.format("		<TD WIDTH=25 STYLE=\"border-top: 1px solid #000000; b
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[23])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=33 STYLE=\"border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0cm; padding-left: 0.19cm; padding-right: 0cm\">"));
-sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[24])));
+sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%.2f</FONT></P>",String.valueOf(mas[24])));
 sb.append(String.format("		</TD>"));
 sb.append(String.format("		<TD WIDTH=51 STYLE=\"border: 1px solid #000000; padding: 0cm 0.19cm\">"));
 sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2 STYLE=\"font-size: 9pt\">%s</FONT></P>",String.valueOf(mas[25])));

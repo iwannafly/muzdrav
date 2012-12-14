@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Класс для работы с htm-шаблонами для формирования сводок.
  * Шаблон представляет собой htm файл, где на месте подстановок стоят метки

@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.serverRegPatient;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -55,6 +56,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientBrief;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientFullInfo;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientGospYesOrNoNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.PokazNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
@@ -97,6 +99,7 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<AllGosp, AllGosp._Fields> rsmAllGosp;
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
     private QueryGenerator<PatientBrief> qgPatientBrief;
+    private TResultSetMapper<Anam, Anam._Fields> rsmAnam;
 
 //////////////////////////////// Type Arrays /////////////////////////////////
 
@@ -125,7 +128,7 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, String.class, String.class, Date.class,
     //  prof          tel           dsv         prizn
         String.class, String.class, Date.class, Integer.class,
-    //  ter_liv        region_liv	  birthplace	ogrn_smo
+    //  ter_liv        region_liv     birthplace    ogrn_smo
         Integer.class, Integer.class, String.class, String.class
     };
     private static final Class<?>[] KONTINGENT_TYPES = new Class<?>[] {
@@ -139,7 +142,7 @@ public class ServerRegPatient extends Server implements Iface {
         Integer.class, String.class, String.class, String.class,
     //  datar       pol             name_str      ogrn_str
         Date.class, Integer.class, String.class, String.class,
-    //  vpolis         spolis        npolis		   birthplace
+    //  vpolis         spolis        npolis        birthplace
         Integer.class, String.class, String.class, String.class
     };
     private static final Class<?>[] SIGN_TYPES = new Class<?>[] {
@@ -183,6 +186,10 @@ public class ServerRegPatient extends Server implements Iface {
     //  dot         obo            ndoc
         Date.class, Integer.class, String.class
     };
+    private static final Class<?>[] ANAM_TYPES = new Class<?>[] {
+    //  npasp          datap		numstr			vybor		 comment
+        Integer.class, Date.class, Integer.class, Boolean.class, String.class
+    };
 
 //////////////////////////// Field Name Arrays ////////////////////////////
 
@@ -204,7 +211,8 @@ public class ServerRegPatient extends Server implements Iface {
     private static final String[] PATIENT_FULL_INFO_FIELD_NAMES = {
         "npasp", "fam", "im", "ot", "datar", "pol", "jitel", "sgrp", "mrab", "name_mr",
         "ncex", "cpol_pr", "terp", "tdoc", "docser", "docnum",  "datadoc", "odoc",
-        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv", "birthplace", "ogrn_smo"
+        "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv",
+        "birthplace", "ogrn_smo"
     };
     private static final String[] NAMBK_FIELD_NAMES = {
         "npasp", "nambk", "nuch", "cpol", "datapr", "dataot", "ishod"
@@ -231,6 +239,9 @@ public class ServerRegPatient extends Server implements Iface {
     };
     private static final String[] LGOTA_FIELD_NAMES = {
         "id", "npasp", "lgot", "datal", "name", "gri", "sin", "pp", "drg", "dot", "obo", "ndoc"
+    };
+    private static final String[] ANAM_FIELD_NAMES = {
+    	"npasp", "datap", "numstr", "vybor", "comment"
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -270,6 +281,7 @@ public class ServerRegPatient extends Server implements Iface {
         rsmGosp = new TResultSetMapper<>(Gosp.class, GOSP_FIELD_NAMES);
         rsmAllLgota = new TResultSetMapper<>(AllLgota.class, LGOTA_FIELD_NAMES);
         rsmLgota = new TResultSetMapper<>(Lgota.class, LGOTA_FIELD_NAMES);
+        rsmAnam = new TResultSetMapper<>(Anam.class, ANAM_FIELD_NAMES);
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1729,17 +1741,246 @@ public class ServerRegPatient extends Server implements Iface {
         }
     }
 
+	//выбор показателей для отображения наименования
 	@Override
-	public int getTipPodr(int pcod) throws TipPodrNotFoundException,
-			KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return 0;
+	public final List<IntegerClassifier> getPokaz() throws KmiacServerException,
+			PokazNotFoundException, TException {
+        final String sqlQuery = "SELECT nstr as pcod, name FROM n_anz";
+        final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmAnz =
+                new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+        try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
+            return rsmAnz.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
+	@Override
+	public List<Anam> getAnamnez(int npasp, int cslu, int cpodr)
+			throws TipPodrNotFoundException, KmiacServerException, TException {
+	    String sqlQuery = null;
+
+	    if (cslu == 1){
+			sqlQuery = "SELECT p.npasp, p.datap, n.nstr "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+	                   "INNER JOIN n_o00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "ORDER BY n.nstr;";
+		}
+		if (cslu == 2){
+			sqlQuery = "SELECT p.npasp, p.datap, n.nstr "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+	                   "INNER JOIN n_n00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "ORDER BY n.nstr;";
+		}
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp, cpodr)) {
+            ResultSet rs = acrs.getResultSet();
+			try (SqlModifyExecutor sme = tse.startTransaction()) {
+				while (rs.next()){
+					if (rs.getInt("npasp") == 0){
+						sme.execPrepared("INSERT INTO p_anamnez (npasp, numstr, datap) "+
+	                    "VALUES (?, ?, ?);",  false, npasp, rs.getInt("nstr"), new Date(System.currentTimeMillis()));
+					}
+                }
+				sme.setCommit();
+			} catch (SQLException e) {
+				((SQLException) e.getCause()).printStackTrace();
+				throw new KmiacServerException();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+				throw new KmiacServerException();
+			}
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+
+		if (cslu == 1){
+			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON p.numstr = n.nstr " +
+	                   "INNER JOIN n_o00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "WHERE p.npasp = ?"+
+	                   "ORDER BY n.nstr;";
+		}
+		if (cslu == 2){
+			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON p.numstr = n.nstr " +
+	                   "INNER JOIN n_n00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "WHERE p.npasp = ?"+
+	                   "ORDER BY n.nstr;";
+		}
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, npasp)) {
+            ResultSet rs = acrs.getResultSet();
+            List<Anam> anamList = rsmAnam.mapToList(rs);
+            if (anamList.size() > 0) {
+                return anamList;
+            } else {
+                throw new TipPodrNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
 	}
 
 	@Override
-	public List<Anam> getAnam(int npasp) throws LgotaNotFoundException,
-			KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public void updateAnam(List<Anam> anam) throws KmiacServerException,
+			TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (Anam elemAnam : anam) {
+            	sme.execPrepared("UPDATE p_anamnez SET vybor = ?, comment = ? WHERE npasp = ? and numstr = ?;",
+            			false, elemAnam.vybor, elemAnam.getComment(), elemAnam.getNpasp(), elemAnam.getNumstr());
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException(e.getMessage());
+        }
 	}
+
+	@Override
+	public void deleteAnam(int npasp, int cslu, int cpodr)
+			throws KmiacServerException, TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_anamnez p " +
+            		"WHERE p.npasp=?;", false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	@Override
+	public String printAnamnez(PatientFullInfo pat, List<Anam> anam,
+			UserAuthInfo uai) throws KmiacServerException, TException {
+	    final String path;
+		String sqlQuery = null;
+		int numline = 0;
+			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("anam", ".htm").getAbsolutePath()), "utf-8")) {
+   				StringBuilder sb = new StringBuilder(0x10000);
+	    			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	    			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	    			sb.append("<head>");
+	       			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	   				sb.append("<title>Эпидемиологический анамнез</title>");
+	   				sb.append("</head>");
+	   				sb.append("<body>");
+					try (AutoCloseableResultSet acr = sse.execPreparedQuery("select name from n_m00 where pcod = ?", uai.getClpu())) {
+						if (acr.getResultSet().next())
+		      				sb.append(String.format("<h4 align=center> %s </h4>", acr.getResultSet().getString("name")));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+      				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+   					sb.append(String.format("Ф.И.О. <b> %s %s %s </b> <br>", pat.getFam(), pat.getIm(), pat.getOt()));
+					sb.append(String.format("Дата рождения  <b> %1$td.%1$tm.%1$tY </b> <br>", pat.getDatar()));
+   					sb.append(String.format("Домашний адрес  %s %s %s - %s <br>", pat.getAdmAddress().getCity(), pat.getAdmAddress().getStreet(), pat.getAdmAddress().getHouse(), pat.getAdmAddress().getFlat()));
+   				    
+
+					if (uai.getCslu() == 1){
+  	   						sqlQuery = "SELECT n.name, n.numstr, n.yn, ot.numline  "+
+  	   				                   "FROM n_anz n INNER JOIN n_ot_str ot ON (n.nstr = ot.nstr) " +
+  	   				                   "INNER JOIN n_o00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
+  	   				                   "WHERE n.nstr = ?";
+   					}
+					if (uai.getCslu() == 2){
+  	   						sqlQuery = "SELECT n.name, n.numstr, n.yn, ot.numline "+
+  	   				                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+  	   				                   "INNER JOIN n_n00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
+  	   				                   "WHERE n.nstr = ?";
+   					}
+   		            for (Anam elemAnam : anam) {
+   						try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr(),elemAnam.getNumstr())) {
+   							if (acr.getResultSet().next()){
+   			      				if (numline != acr.getResultSet().getInt("numstr")){
+   			      					sb.append("<br>");
+   			      				}else{
+   			      					sb.append(", ");
+   			      				}
+		      					if (acr.getResultSet().getString("numline") != null)
+ 			      						sb.append(String.format("%s %s ", acr.getResultSet().getString("numline"), acr.getResultSet().getString("name")));
+		      					else sb.append(String.format("%s ", acr.getResultSet().getString("name")));
+		      					if (acr.getResultSet().getString("yn").equals("T"))
+		      						if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("<b>нет </b>");
+		      					if (elemAnam.getComment() != null) sb.append(String.format("%s ", elemAnam.getComment().toLowerCase()));
+   		      					numline = acr.getResultSet().getInt("numstr");
+   							}
+   						} catch (Exception e) {
+   							e.printStackTrace();
+   						}
+   		            }
+   					sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
+   					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+
+					osw.write(sb.toString());
+   			} catch (IOException e) {
+   				e.printStackTrace();
+   				throw new KmiacServerException();
+   			}
+			return path;
+	}
+
 }
+//public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
+//        final UserAuthInfo uai, final String docInfo, final String omsOrg,
+//        final String lgot) throws KmiacServerException {
+//    final String path;
+//    try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+//            path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+//        AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
+//                + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
+//        String ogrn = "";
+//        while (acrs.getResultSet().next()) {
+//            if (acrs.getResultSet().getString(1) != null) {
+//                ogrn = acrs.getResultSet().getString(1);
+//            }
+//        }
+//        acrs.close();
+//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+//        String gender;
+//        if (pat.getPol() == 1) {
+//            gender = "мужской";
+//        } else if (pat.getPol() == 2) {
+//            gender = "женский";
+//        } else {
+//            gender = "";
+//        }
+//        HtmTemplate htmTemplate = new HtmTemplate(
+//                new File(this.getClass().getProtectionDomain().getCodeSource()
+//                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+//                + "\\plugin\\reports\\MedCardAmbPriem.htm");
+//        htmTemplate.replaceLabels(true,
+//            uai.getClpu_name(),
+//            ogrn,
+//            nambk.getNambk(),
+//            omsOrg,
+//            pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
+//            pat.getSnils(),
+//            "",
+//            lgot,
+//            pat.getFam(),
+//            pat.getIm(),
+//            pat.getOt(),
+//            gender,
+//            dateFormat.format(new Date(pat.getDatar())),
+//            pat.getAdmAddress().getCity()
+//                + "," + pat.getAdmAddress().getStreet() + " "
+//                + pat.getAdmAddress().getHouse()
+//                + " - " + pat.getAdmAddress().getFlat(),
+//            pat.getAdpAddress().getCity()
+//                + "," + pat.getAdpAddress().getStreet() + " "
+//                + pat.getAdpAddress().getHouse()
+//                + " - " + pat.getAdpAddress().getFlat(),
+//            pat.getTel(),
+//            docInfo
+//        );
+//        osw.write(htmTemplate.getTemplateText());
+//        return path;
+//    } catch (Exception e) {
+//        throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
+//    }
+//}
