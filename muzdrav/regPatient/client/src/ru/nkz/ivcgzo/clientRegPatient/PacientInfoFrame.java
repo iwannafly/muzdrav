@@ -302,8 +302,8 @@ public class PacientInfoFrame extends JFrame {
                     if (cmb_adp_gorod.getSelectedItem() != null) {
                     	if (!cmb_adp_gorod.getText().substring(0, cmb_adp_gorod.getText().indexOf('.')+1).equals("НОВОКУЗНЕЦК Г."))
                     		cmb_adp_ul.setData(new ArrayList<IntegerClassifier>());
-                    	if (cmb_adm_gorod.getText().equals(""))
-								cmb_adm_gorod.setSelectedPcod(cmb_adp_gorod.getSelectedPcod());
+//                    	if (cmb_adm_gorod.getText().equals(""))
+//								cmb_adm_gorod.setSelectedPcod(cmb_adp_gorod.getSelectedPcod());
                     }else
                         cmb_adp_ul.setData(null);
                 }
@@ -2631,13 +2631,12 @@ public class PacientInfoFrame extends JFrame {
         			.addContainerGap()
         			.addGroup(gl_tpPriem.createParallelGroup(Alignment.LEADING)
         				.addGroup(gl_tpPriem.createSequentialGroup()
-        					.addComponent(panel_25, GroupLayout.DEFAULT_SIZE, 897, Short.MAX_VALUE)
+        					.addComponent(panel_25, GroupLayout.DEFAULT_SIZE, 949, Short.MAX_VALUE)
         					.addContainerGap())
         				.addGroup(gl_tpPriem.createSequentialGroup()
         					.addComponent(panel_23, GroupLayout.PREFERRED_SIZE, 780, GroupLayout.PREFERRED_SIZE)
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(panel_20, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
-        					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        					.addComponent(panel_20, GroupLayout.PREFERRED_SIZE, 173, GroupLayout.PREFERRED_SIZE))
         				.addGroup(gl_tpPriem.createSequentialGroup()
         					.addComponent(panel_34, GroupLayout.DEFAULT_SIZE, 897, Short.MAX_VALUE)
         					.addGap(62))))
@@ -2709,11 +2708,14 @@ public class PacientInfoFrame extends JFrame {
         	gl_panel_20.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_panel_20.createSequentialGroup()
         			.addGroup(gl_panel_20.createParallelGroup(Alignment.TRAILING, false)
-        				.addComponent(btnDel_priem, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         				.addComponent(btnNew_priem, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         				.addComponent(btnSave_priem, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         				.addComponent(btnAnam, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         			.addContainerGap(40, Short.MAX_VALUE))
+        		.addGroup(Alignment.TRAILING, gl_panel_20.createSequentialGroup()
+        			.addGap(77)
+        			.addComponent(btnDel_priem, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+        			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         gl_panel_20.setVerticalGroup(
         	gl_panel_20.createParallelGroup(Alignment.LEADING)

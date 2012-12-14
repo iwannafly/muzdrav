@@ -1776,13 +1776,11 @@ public class ServerRegPatient extends Server implements Iface {
 		}
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp, cpodr)) {
             ResultSet rs = acrs.getResultSet();
-//            List<Anam> anamList = rsmAnam.mapToList(rs);
-//            if (anamList.size() > 0) {
 			try (SqlModifyExecutor sme = tse.startTransaction()) {
 				while (rs.next()){
 					if (rs.getInt("npasp") == 0){
-							sme.execPrepared("INSERT INTO p_anamnez (npasp, numstr, datap) "
-	                               + "VALUES (?, ?, ?);",  false, npasp, rs.getInt("nstr"), new Date(System.currentTimeMillis()));
+						sme.execPrepared("INSERT INTO p_anamnez (npasp, numstr, datap) "+
+	                    "VALUES (?, ?, ?);",  false, npasp, rs.getInt("nstr"), new Date(System.currentTimeMillis()));
 					}
                 }
 				sme.setCommit();
@@ -1793,9 +1791,6 @@ public class ServerRegPatient extends Server implements Iface {
 				e1.printStackTrace();
 				throw new KmiacServerException();
 			}
-//            } else {
-//                throw new TipPodrNotFoundException();
-//            }
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
@@ -1834,14 +1829,8 @@ public class ServerRegPatient extends Server implements Iface {
 	@Override
 	public void updateAnam(List<Anam> anam) throws KmiacServerException,
 			TException {
-        final int[] indexes = {0, 1, 2, 3, 4};
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             for (Anam elemAnam : anam) {
-//                sme.execPrepared("DELETE FROM p_anamnez WHERE npasp = ? and numstr = ?;",
-//                        false, elemAnam.getNpasp(), elemAnam.getNumstr());
-//                sme.execPreparedT("INSERT INTO p_anamnez (npasp, datap, numstr, vybor, comment) "
-//                        + "VALUES (?, ?, ?, ?, ?);",
-//                false, elemAnam, ANAM_TYPES, indexes);
             	sme.execPrepared("UPDATE p_anamnez SET vybor = ?, comment = ? WHERE npasp = ? and numstr = ?;",
             			false, elemAnam.vybor, elemAnam.getComment(), elemAnam.getNpasp(), elemAnam.getNumstr());
             }
@@ -1857,8 +1846,7 @@ public class ServerRegPatient extends Server implements Iface {
 			throws KmiacServerException, TException {
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPrepared("DELETE FROM p_anamnez p " +
-            		"WHERE p.npasp=?;",
-                    false, npasp);
+            		"WHERE p.npasp=?;", false, npasp);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "SQl Exception: ", e);
@@ -1908,22 +1896,24 @@ public class ServerRegPatient extends Server implements Iface {
    		            for (Anam elemAnam : anam) {
    						try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr(),elemAnam.getNumstr())) {
    							if (acr.getResultSet().next()){
-   			      				//if (numline != acr.getResultSet().getInt("numstr")){
-   								if (acr.getResultSet().getString("numline") != null)
-   			      					 sb.append(String.format("%s %s ", acr.getResultSet().getString("numline"), acr.getResultSet().getString("name")));
-   			      				else sb.append(String.format("%s ", acr.getResultSet().getString("name")));
-			      				if (acr.getResultSet().getString("yn").equals("T"))
-			      					if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("<b>нет </b>");
-   		      					if (elemAnam.getComment() != null) sb.append(String.format("%s <br>", elemAnam.getComment().toLowerCase()));
-   			      				else sb.append("<br>");
-   		      					
+   			      				if (numline != acr.getResultSet().getInt("numstr")){
+   			      					sb.append("<br>");
+   			      				}else{
+   			      					sb.append(", ");
+   			      				}
+		      					if (acr.getResultSet().getString("numline") != null)
+ 			      						sb.append(String.format("%s %s ", acr.getResultSet().getString("numline"), acr.getResultSet().getString("name")));
+		      					else sb.append(String.format("%s ", acr.getResultSet().getString("name")));
+		      					if (acr.getResultSet().getString("yn").equals("T"))
+		      						if(elemAnam.isVybor())sb.append("<b>да </b>"); else sb.append("<b>нет </b>");
+		      					if (elemAnam.getComment() != null) sb.append(String.format("%s ", elemAnam.getComment().toLowerCase()));
    		      					numline = acr.getResultSet().getInt("numstr");
    							}
    						} catch (Exception e) {
    							e.printStackTrace();
    						}
    		            }
-   					sb.append(String.format("<br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
+   					sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
    					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
 
 					osw.write(sb.toString());
