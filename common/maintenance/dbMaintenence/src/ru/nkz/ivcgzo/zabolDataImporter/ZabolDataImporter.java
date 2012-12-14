@@ -717,6 +717,8 @@ public class ZabolDataImporter {
 								vals[7] = "21";
 							else if (vals[7].equals("2Б"))
 								vals[7] = "22";
+							else if (!vals[7].equals("1") && !vals[7].equals("3") && !vals[7].equals("4") && !vals[7].equals("5"))
+									vals[7] = null;
 						}
 						if ((srcRs.getInt(3) == 1) && (srcRs.getInt(9) != 0) && (srcRs.getInt(9) != 1) && (srcRs.getInt(9) != 5) && (srcRs.getInt(9) != 12))
 							write = true;
@@ -819,6 +821,8 @@ public class ZabolDataImporter {
 								vals[10] = "21";
 							else if (vals[10].equals("2Б"))
 								vals[10] = "22";
+							else if (!vals[10].equals("1") && !vals[10].equals("3") && !vals[10].equals("4") && !vals[10].equals("5"))
+								vals[10] = null;
 						}
 						if (hasData &&(dstRs.getInt(1) == srcRs.getInt(14)) && dstRs.getString(2).equals(srcRs.getString(2))) {
 							if ((dstRs.getDate(8) != null) && (srcRs.getDate(8) != null))
