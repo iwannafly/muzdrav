@@ -1135,7 +1135,7 @@ public class ServerHospital extends Server implements Iface {
             } else {
                 throw new PrdIshodNotFoundException();
             }
-		
+
 			} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();

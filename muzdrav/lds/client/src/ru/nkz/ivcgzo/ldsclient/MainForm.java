@@ -15,6 +15,8 @@ import javax.swing.JOptionPane;
 
 import org.apache.thrift.TException;
 
+import com.sun.java.swing.plaf.windows.resources.windows;
+
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
@@ -172,9 +174,10 @@ public class MainForm extends Client<LDSThrift.Client> {
 
 			}else{
 				JOptionPane.showMessageDialog(frame, "Нет настроек на лобароторно-диагностическую службу");
-
+				
 				//frame.getDefaultCloseOperation();
-				//frame.dispose();
+				System.exit(0); 
+				
 				
 			}	
 				
