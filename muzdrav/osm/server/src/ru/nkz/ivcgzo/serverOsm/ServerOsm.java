@@ -690,6 +690,7 @@ public class ServerOsm extends Server implements Iface {
 	public void AddRdDin(RdDinStruct RdDin) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_rd_din (id_pvizit,  npasp,  srok, oj,  hdm, grr, ball,  dspos,  art1,  art2, art3, art4,  spl,   oteki, chcc, polpl, predpl, serd,  serd1, id_pos,ves) VALUES (?, ?,  ?,  ?, ?,  ?, ?,  ?,  ?, ?,  ?, ?, ?,  ?, ?,  ?, ?, ?, ?, ? ,?) ", false, RdDin, rdDinTypes,  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+			int id = sme.getGeneratedKeys().getInt("id_rd_sl");
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
