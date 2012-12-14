@@ -441,7 +441,7 @@ struct CotdInfo{
 	11: optional i32 pollbl;
 	12: optional i32 ishod;
 	13: optional i32 result;
-	14: optional i32 ukl;
+	14: optional double ukl;
 	15: optional i32 vrach;
 	16: optional i32 npal;
 	17: optional i64 datav;
