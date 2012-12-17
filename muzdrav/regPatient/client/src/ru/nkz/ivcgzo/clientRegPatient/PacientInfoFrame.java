@@ -417,6 +417,7 @@ public class PacientInfoFrame extends JFrame {
             	}
             });
             cmb_oms_smo.setFont(new Font("Tahoma", Font.PLAIN, 12));
+//            cmb_oms_smo.setVisible(false);
             cmb_dms_smo = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_kas);
             cmb_dms_smo.setFont(new Font("Tahoma", Font.PLAIN, 12));
             cmb_travm = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_ai0);
@@ -774,8 +775,54 @@ public class PacientInfoFrame extends JFrame {
                 JButton btnShowError = new JButton("Контроль");
                 btnShowError.addActionListener(new ActionListener() {
                 	public void actionPerformed(ActionEvent e) {
-                		MainForm.conMan.showPaspErrorsForm();
-                	}
+                		//MainForm.conMan.showPaspErrorsForm();
+                        Integer res = MainForm.conMan.showPaspErrorsForm();
+
+                        if (res != null) {
+                            tbMain.setSelectedIndex(0);
+                            curPatientId = res;
+                            changePatientPersonalInfo(curPatientId);
+                            changePatientLgotaInfo(curPatientId);
+                            changePatientKategInfo(curPatientId);
+                            changePatientAgentInfo(curPatientId);
+                            changePatientSignInfo(curPatientId);
+                            selectAllPatientPriemInfo(curPatientId);
+                            changePatientPriemInfo(curPatientId);
+                            setTitle(String.format("%s %s %s", PersonalInfo.getFam(), PersonalInfo.getIm(), PersonalInfo.getOt()));
+
+                          SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    cmb_adp_obl.setText(PersonalInfo.adpAddress.region);
+                                    cmb_adm_obl.setText(PersonalInfo.admAddress.region);
+//                                    cmb_adp_obl.setSelectedPcod(PersonalInfo.getRegion_liv());
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            cmb_adm_gorod.setText(PersonalInfo.admAddress.city);
+                                            cmb_adp_gorod.setText(PersonalInfo.adpAddress.city);
+                                            SwingUtilities.invokeLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    cmb_adm_ul.setText(PersonalInfo.admAddress.street);
+                                                    cmb_adp_ul.setText(PersonalInfo.adpAddress.street);
+                                                    SwingUtilities.invokeLater(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            cmb_adm_dom.setText(PersonalInfo.admAddress.house);
+                                                            cmb_adp_dom.setText(PersonalInfo.adpAddress.house);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+
+                        }
+                  }
+//                	}
                 });
                 btnShowError.setToolTipText("Контроль реестров паспортной информации пациентов");
 
@@ -849,7 +896,10 @@ public class PacientInfoFrame extends JFrame {
 
         JPanel panel_4 = new JPanel();
         panel_4.setBorder(new TitledBorder(null, "Медицинский полис :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
+//        panel_4.remove(tf_dms_ser);
+//        panel_4.remove(tf_dms_nom);
+//        panel_4.remove(cmb_dms_smo);
+        
         JPanel panel_5 = new JPanel();
         panel_5.setBorder(new TitledBorder(null, "Место работы :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
@@ -1215,6 +1265,7 @@ public class PacientInfoFrame extends JFrame {
         JLabel lblNewLabel_13 = new JLabel("ОМС");
         lblNewLabel_13.setFont(new Font("Tahoma", Font.PLAIN, 12));
         JLabel lblNewLabel_14 = new JLabel("ДМС");
+//        lblNewLabel_14.setVisible(false);
         lblNewLabel_14.setFont(new Font("Tahoma", Font.PLAIN, 12));
         JLabel lblNewLabel_15 = new JLabel("Номер");
         lblNewLabel_15.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -1228,6 +1279,7 @@ public class PacientInfoFrame extends JFrame {
         tf_oms_ser.setColumns(10);
 
         tf_dms_ser = new CustomTextField();
+//        tf_dms_ser.setVisible(false);
         tf_dms_ser.setFont(new Font("Tahoma", Font.PLAIN, 12));
         tf_dms_ser.setColumns(10);
 
@@ -1236,6 +1288,7 @@ public class PacientInfoFrame extends JFrame {
         tf_oms_nom.setColumns(10);
 
         tf_dms_nom = new CustomTextField();
+//        tf_dms_nom.setVisible(false);
         tf_dms_nom.setFont(new Font("Tahoma", Font.PLAIN, 12));
         tf_dms_nom.setColumns(10);
 
@@ -1290,10 +1343,11 @@ public class PacientInfoFrame extends JFrame {
         							.addComponent(lblNewLabel_17))
         						.addComponent(lblNewLabel_16))
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-        						.addComponent(tf_oms_ser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(tf_oms_nom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(cmb_oms_doc, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
+        						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+        							.addComponent(tf_oms_ser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addComponent(tf_oms_nom, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addComponent(cmb_oms_doc, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         						.addComponent(cmb_oms_smo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
         				.addComponent(lblNewLabel_13))
         			.addPreferredGap(ComponentPlacement.RELATED)
