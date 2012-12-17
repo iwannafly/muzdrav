@@ -690,6 +690,7 @@ public class ServerOsm extends Server implements Iface {
 	public void AddRdDin(RdDinStruct RdDin) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPreparedT("INSERT INTO p_rd_din (id_pvizit,  npasp,  srok, oj,  hdm, grr, ball,  dspos,  art1,  art2, art3, art4,  spl,   oteki, chcc, polpl, predpl, serd,  serd1, id_pos,ves) VALUES (?, ?,  ?,  ?, ?,  ?, ?,  ?,  ?, ?,  ?, ?, ?,  ?, ?,  ?, ?, ?, ?, ? ,?) ", false, RdDin, rdDinTypes,  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21);
+			int id = sme.getGeneratedKeys().getInt("id_rd_sl");
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -825,11 +826,15 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
-			int id = sme.getGeneratedKeys().getInt("nisl");
-			sme.setCommit();
-			return id;
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT nisl FROM p_isl_ld WHERE (npasp = ?) AND (pvizit_id = ?) AND (id_pos = ?) ", npisl.npasp, npisl.pvizit_id, npisl.id_pos)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("nisl");
+			} else {
+				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
+				sme.setCommit();
+				return sme.getGeneratedKeys().getInt("nisl");
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -841,11 +846,15 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPrezd(Prez_d di) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl) VALUES (?, ?, ?) ", true, di, prezdTypes, 1, 2, 3);
-			int id = sme.getGeneratedKeys().getInt("id");
-			sme.setCommit();
-			return id;
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM p_rez_d WHERE (npasp = ?) AND (nisl = ?) AND (kodisl = ?) ", di.npasp, di.nisl, di.kodisl)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("id");
+			} else {
+				sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl) VALUES (?, ?, ?) ", true, di, prezdTypes, 1, 2, 3);
+				sme.setCommit();
+				return sme.getGeneratedKeys().getInt("id");
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -857,11 +866,15 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPrezl(Prez_l li) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok) VALUES (?, ?, ?) ", true, li, prezlTypes, 1, 2, 3);
-			int id = sme.getGeneratedKeys().getInt("id");
-			sme.setCommit();
-			return id;
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM p_rez_l WHERE (npasp = ?) AND (nisl = ?) AND (cpok = ?) ", li.npasp, li.nisl, li.cpok)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("id");
+			} else {
+				sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok) VALUES (?, ?, ?) ", true, li, prezlTypes, 1, 2, 3);
+				sme.setCommit();
+				return sme.getGeneratedKeys().getInt("id");
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
