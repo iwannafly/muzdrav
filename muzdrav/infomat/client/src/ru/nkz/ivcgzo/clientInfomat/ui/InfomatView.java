@@ -80,11 +80,21 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
     }
 
     public final void createControls() {
-        setMainFrameControls();
+        setControls();
     }
 
     // FIXME Вынести управление видимостью окон на уровень контроллера
     // TODO Пробросить все манипуляции, перехваченные листенерами свинга, туда же, в контроллер
+    private void setControls() {
+        setMainFrameControls();
+        setLpuSelectFrameControls();
+        setDoctorFrameControls();
+        setTalonSelectFrameControls();
+        setSheduleFrameControls();
+        setReservedTalonFrameControls();
+        setAuthFrameControls();
+    }
+
     private void setMainFrameControls() {
         mainFrame.addAppointmentListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -108,7 +118,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 mainFrame.setVisible(false);
             }
         });
+    }
 
+    private void setLpuSelectFrameControls() {
         lpuSelectFrame.addListClickListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -129,7 +141,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 mainFrame.setVisible(true);
             }
         });
+    }
 
+    private void setDoctorFrameControls() {
         doctorFrame.addSpecialityListClickListener(new MouseAdapter() {
             @SuppressWarnings("rawtypes")
             @Override
@@ -181,7 +195,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 mainFrame.setVisible(true);
             }
         });
+    }
 
+    private void setTalonSelectFrameControls() {
         talonSelectFrame.addTalonTableMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -202,7 +218,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 mainFrame.setVisible(true);
             }
         });
+    }
 
+    private void setSheduleFrameControls() {
         sheduleFrame.addShedulerSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -210,7 +228,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 mainFrame.setVisible(true);
             }
         });
+    }
 
+    private void setReservedTalonFrameControls() {
         resTalonSelectFrame.addReservedTalonTableMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -246,7 +266,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 mainFrame.setVisible(true);
             }
         });
+    }
 
+    private void setAuthFrameControls() {
         authFrame.addButtonAcceptPatientCheckListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 controller.setPatient(authFrame.getOmsText().trim());
