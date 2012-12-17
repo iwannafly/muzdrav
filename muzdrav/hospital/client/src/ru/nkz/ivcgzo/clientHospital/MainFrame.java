@@ -392,7 +392,7 @@ public class MainFrame extends JFrame {
         setMedicalHistoryPanel();
         setStagePanel();
         setDiagnosisPanel();
-        setChildbirthPanel();
+ //       setChildbirthPanel();
         setZaklPanel();
     }
 
@@ -528,19 +528,90 @@ public class MainFrame extends JFrame {
                     fillDiagnosisTable();
                     fillStageTable();
 
-        			try {
-						trdIshod = ClientHospital.tcl.getRdIshodInfo(
-							patient.getPatientId(), patient.gospitalCod);
-						setDefaultValues();
-					} catch (KmiacServerException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (TException e) {
-						e.printStackTrace();
-						ClientHospital.conMan.reconnect(e);
-					}
+//        			try {
+//						trdIshod = ClientHospital.tcl.getRdIshodInfo(
+//							patient.getPatientId(), patient.gospitalCod);
+//						setDefaultValues();
+//					} catch (KmiacServerException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} catch (TException e) {
+//						e.printStackTrace();
+//						ClientHospital.conMan.reconnect(e);
+//					}
+//                  private void setChildbirthPanel() {
+            		rddin = new RdDinStruct();
+            		try {
+            			rddin = ClientHospital.tcl.getRdDinInfo(patient.getPatientId(), patient.gospitalCod);
+            			SVes.setValue(rddin.getVes());
+            			Soj.setValue(rddin.getOj());
+            			Shdm.setValue(rddin.getHdm());
+                        Schcc.setValue(rddin.getChcc());
+            			if (rddin.isSetPozpl())
+            			CBPoz.setSelectedPcod(rddin.getPozpl());
+            			else CBPoz.setSelectedItem(null);
+            			if (rddin.isSetPolpl())
+            			CBPolpl.setSelectedPcod(rddin.getPolpl());
+            			else CBPolpl.setSelectedItem(null);
+            			if (rddin.isSetVidpl())
+            			CBVid.setSelectedPcod(rddin.getVidpl());
+            			else CBVid.setSelectedItem(null);
+            			if (rddin.isSetSerd())
+            			CBSerd.setSelectedPcod(rddin.getSerd());
+            			else CBSerd.setSelectedItem(null);
+            			if (rddin.isSetSerd1())
+            			CBSerd1.setSelectedPcod(rddin.getSerd1());
+            			else CBSerd1.setSelectedItem(null);
+            			if (rddin.isSetPredpl())
+            			CBPred.setSelectedPcod(rddin.getPredpl());
+            			else CBPred.setSelectedItem(null);
+            			TVes.setText(String.valueOf(rddin.getOj()*rddin.getHdm()));
+
+            		} catch (KmiacServerException e2) {
+            			// TODO Auto-generated catch block
+            			e2.printStackTrace();
+            		} catch (TException e2) {
+            			// TODO Auto-generated catch block
+            			e2.printStackTrace();
+            		}
+            		trdIshod = new TRdIshod();
+            		try {
+            			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
+            			setDefaultValues();
+            			} catch (KmiacServerException e1) {
+            			// TODO Auto-generated catch block
+            			e1.printStackTrace();
+            		} catch (TException e1) {
+            			// TODO Auto-generated catch block
+            			e1.printStackTrace();
+            		}
+            		rdsl = new RdSlStruct();
+            		try {
+            			rdsl = ClientHospital.tcl.getRdSlInfo(patient.getPatientId());
+            			Tdataosl.setDate(rdsl.getDataosl());
+            			if (rdsl.getDataosl() == 0)
+            			Tdataosl.setText(null);
+            			Tdatam.setDate(rdsl.getDataM());
+            			if (rdsl.getDataM() == 0)
+            			Tdatam.setText(null);
+            			Srod.setValue(rdsl.getKolrod());
+            			Sber.setValue(rdsl.getShet());
+            			Sdtr.setValue(rdsl.getDTroch());
+            			Stvera.setValue(rdsl.getCvera());
+            			Sdcr.setValue(rdsl.getDsp());
+            			Scdiag.setValue(rdsl.getCdiagt());
+            			Sdsp.setValue(rdsl.getDsr());
+            			Scext.setValue(rdsl.getCext());
+            		} catch (KmiacServerException e2) {
+            			// TODO Auto-generated catch block
+            			e2.printStackTrace();
+            		} catch (TException e2) {
+            			// TODO Auto-generated catch block
+            			e2.printStackTrace();
+            		};;;;;
                 }
-            }
+                }
+//            }
         });
         frmCuration = new CurationFrame(doctorAuth);
         frmCuration.pack();
@@ -2201,7 +2272,9 @@ public class MainFrame extends JFrame {
 		        btnNewButton_1.addActionListener(new ActionListener() {
 		        	public void actionPerformed(ActionEvent e) {
 		          		try {
+		          	 		System.out.println(patient.getPatientId());	
 		          	trdIshod.setNpasp(patient.getPatientId());
+		 			if (TDatarod.getDate() != null)
 		            trdIshod.setDatarod(TDatarod.getDate().getTime());
       		trdIshod.setDeyat(TRod.getText());
 			if (CBEff.getSelectedPcod() != null)
@@ -2333,17 +2406,16 @@ public class MainFrame extends JFrame {
 		        					.addContainerGap()
 		        					.addComponent(lblNewLabel_32, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
 		        					.addPreferredGap(ComponentPlacement.RELATED)
-		        					.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		        				.addGroup(gl_panel_4.createSequentialGroup()
-		        					.addGap(103)
+		        					.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        					.addGap(60)
 		        					.addComponent(btnNewButton_2, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
 		        					.addPreferredGap(ComponentPlacement.UNRELATED)
 		        					.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)))
-		        			.addContainerGap(429, Short.MAX_VALUE))
+		        			.addContainerGap(28, Short.MAX_VALUE))
 		        );
 		        gl_panel_4.setVerticalGroup(
-		        	gl_panel_4.createParallelGroup(Alignment.TRAILING)
-		        		.addGroup(Alignment.LEADING, gl_panel_4.createSequentialGroup()
+		        	gl_panel_4.createParallelGroup(Alignment.LEADING)
+		        		.addGroup(gl_panel_4.createSequentialGroup()
 		        			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 		        				.addGroup(gl_panel_4.createSequentialGroup()
 		        					.addGap(4)
@@ -2359,8 +2431,7 @@ public class MainFrame extends JFrame {
 		        			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 		        				.addGroup(gl_panel_4.createSequentialGroup()
 		        					.addGap(4)
-		        					.addComponent(lblNewLabel_30)
-		        					.addGap(4))
+		        					.addComponent(lblNewLabel_30))
 		        				.addComponent(CBVrash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addPreferredGap(ComponentPlacement.UNRELATED)
 		        			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -2372,20 +2443,17 @@ public class MainFrame extends JFrame {
 		        			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 		        				.addGroup(gl_panel_4.createSequentialGroup()
 		        					.addGap(4)
-		        					.addComponent(lblNewLabel_44)
-		        					.addGap(4))
+		        					.addComponent(lblNewLabel_44))
 		        				.addComponent(CBishod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addPreferredGap(ComponentPlacement.UNRELATED)
 		        			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+		        				.addComponent(btnNewButton_1)
 		        				.addGroup(gl_panel_4.createSequentialGroup()
 		        					.addGap(3)
 		        					.addComponent(lblNewLabel_32))
-		        				.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		        			.addGap(18)
-		        			.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
-		        				.addComponent(btnNewButton_2)
-		        				.addComponent(btnNewButton_1))
-		        			.addContainerGap(40, Short.MAX_VALUE))
+		        				.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        				.addComponent(btnNewButton_2))
+		        			.addContainerGap(42, Short.MAX_VALUE))
 		        );
 		        panel_4.setLayout(gl_panel_4);
 		        GroupLayout gl_pChildbirth = new GroupLayout(pChildbirth);
@@ -2502,7 +2570,8 @@ public class MainFrame extends JFrame {
 		        							.addGap(18)
 		        							.addComponent(lblNewLabel)
 		        							.addGap(10)
-		        							.addComponent(Soj, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		        							.addComponent(Soj, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
+		        							.addPreferredGap(ComponentPlacement.RELATED))
 		        						.addComponent(panel_6, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 349, GroupLayout.PREFERRED_SIZE)))
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addContainerGap()
@@ -3418,78 +3487,78 @@ public class MainFrame extends JFrame {
 //////////////////////////////////////     Роды    ////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void setChildbirthPanel() {
+//    private void setChildbirthPanel() {
 // процедуру на сервер (если есть запись - вызвать, если нет - создать), определить npasp, ngosp        
-		rddin = new RdDinStruct();
-		try {
-			rddin = ClientHospital.tcl.getRdDinInfo(patient.getPatientId(), patient.gospitalCod);
-			SVes.setValue(rddin.getVes());
-			Soj.setValue(rddin.getOj());
-			Shdm.setValue(rddin.getHdm());
-            Schcc.setValue(rddin.getChcc());
-			if (rddin.isSetPozpl())
-			CBPoz.setSelectedPcod(rddin.getPozpl());
-			else CBPoz.setSelectedItem(null);
-			if (rddin.isSetPolpl())
-			CBPolpl.setSelectedPcod(rddin.getPolpl());
-			else CBPolpl.setSelectedItem(null);
-			if (rddin.isSetVidpl())
-			CBVid.setSelectedPcod(rddin.getVidpl());
-			else CBVid.setSelectedItem(null);
-			if (rddin.isSetSerd())
-			CBSerd.setSelectedPcod(rddin.getSerd());
-			else CBSerd.setSelectedItem(null);
-			if (rddin.isSetSerd1())
-			CBSerd1.setSelectedPcod(rddin.getSerd1());
-			else CBSerd1.setSelectedItem(null);
-			if (rddin.isSetPredpl())
-			CBPred.setSelectedPcod(rddin.getPredpl());
-			else CBPred.setSelectedItem(null);
-			TVes.setText(String.valueOf(rddin.getOj()*rddin.getHdm()));
-
-		} catch (KmiacServerException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (TException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-		trdIshod = new TRdIshod();
-		try {
-			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
-			setDefaultValues();
-			} catch (KmiacServerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		rdsl = new RdSlStruct();
-		try {
-			rdsl = ClientHospital.tcl.getRdSlInfo(patient.getPatientId());
-			Tdataosl.setDate(rdsl.getDataosl());
-			if (rdsl.getDataosl() == 0)
-			Tdataosl.setText(null);
-			Tdatam.setDate(rdsl.getDataM());
-			if (rdsl.getDataM() == 0)
-			Tdatam.setText(null);
-			Srod.setValue(rdsl.getKolrod());
-			Sber.setValue(rdsl.getShet());
-			Sdtr.setValue(rdsl.getDTroch());
-			Stvera.setValue(rdsl.getCvera());
-			Sdcr.setValue(rdsl.getDsp());
-			Scdiag.setValue(rdsl.getCdiagt());
-			Sdsp.setValue(rdsl.getDsr());
-			Scext.setValue(rdsl.getCext());
-		} catch (KmiacServerException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (TException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		};;;;;
-    }
+//		rddin = new RdDinStruct();
+//		try {
+//			rddin = ClientHospital.tcl.getRdDinInfo(patient.getPatientId(), patient.gospitalCod);
+//			SVes.setValue(rddin.getVes());
+//			Soj.setValue(rddin.getOj());
+//			Shdm.setValue(rddin.getHdm());
+//            Schcc.setValue(rddin.getChcc());
+//			if (rddin.isSetPozpl())
+//			CBPoz.setSelectedPcod(rddin.getPozpl());
+//			else CBPoz.setSelectedItem(null);
+//			if (rddin.isSetPolpl())
+//			CBPolpl.setSelectedPcod(rddin.getPolpl());
+//			else CBPolpl.setSelectedItem(null);
+//			if (rddin.isSetVidpl())
+//			CBVid.setSelectedPcod(rddin.getVidpl());
+//			else CBVid.setSelectedItem(null);
+//			if (rddin.isSetSerd())
+//			CBSerd.setSelectedPcod(rddin.getSerd());
+//			else CBSerd.setSelectedItem(null);
+//			if (rddin.isSetSerd1())
+//			CBSerd1.setSelectedPcod(rddin.getSerd1());
+//			else CBSerd1.setSelectedItem(null);
+//			if (rddin.isSetPredpl())
+//			CBPred.setSelectedPcod(rddin.getPredpl());
+//			else CBPred.setSelectedItem(null);
+//			TVes.setText(String.valueOf(rddin.getOj()*rddin.getHdm()));
+//
+//		} catch (KmiacServerException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		} catch (TException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		}
+//		trdIshod = new TRdIshod();
+//		try {
+//			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
+//			setDefaultValues();
+//			} catch (KmiacServerException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		} catch (TException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		rdsl = new RdSlStruct();
+//		try {
+//			rdsl = ClientHospital.tcl.getRdSlInfo(patient.getPatientId());
+//			Tdataosl.setDate(rdsl.getDataosl());
+//			if (rdsl.getDataosl() == 0)
+//			Tdataosl.setText(null);
+//			Tdatam.setDate(rdsl.getDataM());
+//			if (rdsl.getDataM() == 0)
+//			Tdatam.setText(null);
+//			Srod.setValue(rdsl.getKolrod());
+//			Sber.setValue(rdsl.getShet());
+//			Sdtr.setValue(rdsl.getDTroch());
+//			Stvera.setValue(rdsl.getCvera());
+//			Sdcr.setValue(rdsl.getDsp());
+//			Scdiag.setValue(rdsl.getCdiagt());
+//			Sdsp.setValue(rdsl.getDsr());
+//			Scext.setValue(rdsl.getCext());
+//		} catch (KmiacServerException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		} catch (TException e2) {
+//			// TODO Auto-generated catch block
+//			e2.printStackTrace();
+//		};;;;;
+//    }
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
