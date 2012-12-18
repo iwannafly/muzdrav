@@ -4,10 +4,15 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.MatteBorder;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -24,6 +29,7 @@ import java.awt.event.ActionListener;
 //import javax.imageio.*;
 //import java.io.*;
 import java.awt.image.BufferedImage;
+import java.awt.print.PrinterException;
 
 /**
  * Класс-костыль, вызывающий undecorated аналог JOptionPane. В самом JOptionPane установка
@@ -36,14 +42,19 @@ import java.awt.image.BufferedImage;
 public class OptionsDialog implements ActionListener {
     private JDialog dialog;
     private int value;
+    public static final int PRINT = 2;
     public static final int ACCEPT = 1;
     public static final int OK = 0;
     public static final int DECLINE = -1;
+    public static final int DEFAULT_FONT_SIZE = 25;
+    public static final int DEFAULT_ALIGN = StyleConstants.ALIGN_CENTER;
     private final JButton btnSubmit = new JButton("Да");
     private final JButton btnOk = new JButton("Ok");
-    private final JButton btnCancel = new JButton("Нет");
-    private final JPanel pMessage = new JPanel();
-    private final JPanel pButtons = new JPanel();
+    private final JButton btnCancel = new JButton("Отмена");
+    private final JButton btnPrint = new JButton("Занять талон");
+    private JPanel pMessage;
+    private JPanel pButtons;
+    private JTextPane message;
 
     /**
      * Конструктор по умолчанию. Регистрирует класс слушателем на все виды кнопок.
@@ -52,8 +63,17 @@ public class OptionsDialog implements ActionListener {
         btnSubmit.addActionListener(this);
         btnOk.addActionListener(this);
         btnCancel.addActionListener(this);
+        btnPrint.addActionListener(this);
     }
 
+    public final int showPrintDialog(final Window parent,
+            final String msg, final int fontSize, final int align) {
+        dialog = createEmptyDialog(parent);
+        buildDialogDefaults(msg, fontSize, align);
+        buildPrintDialog();
+        dialog.setVisible(true);
+        return value;
+    }
     /**
      * Отображает диалоговое окно с подтверждением.
      * @param parent - родительское окно (окно из которого вызывается диалог)
@@ -63,8 +83,18 @@ public class OptionsDialog implements ActionListener {
      * @see DECLINE
      */
     public final int showConfirmDialog(final Window parent, final String msg) {
+        return showConfirmDialog(parent, msg, DEFAULT_FONT_SIZE);
+    }
+
+    public final int showConfirmDialog(final Window parent,
+            final String msg, final int fontSize) {
+        return showConfirmDialog(parent, msg, fontSize, DEFAULT_ALIGN);
+    }
+
+    public final int showConfirmDialog(final Window parent,
+            final String msg, final int fontSize, final int align) {
         dialog = createEmptyDialog(parent);
-        buildDialogDefaults(msg);
+        buildDialogDefaults(msg, fontSize, align);
         buildAcceptDialog();
         dialog.setVisible(true);
         return value;
@@ -77,8 +107,18 @@ public class OptionsDialog implements ActionListener {
      * @see OK
      */
     public final void showMessageDialog(final Window parent, final String msg) {
+        showMessageDialog(parent, msg, DEFAULT_FONT_SIZE);
+    }
+
+    public final void showMessageDialog(final Window parent, final String msg,
+            final int fontSize) {
+        showMessageDialog(parent, msg, fontSize, DEFAULT_ALIGN);
+    }
+
+    public final void showMessageDialog(final Window parent, final String msg,
+            final int fontSize, final int align) {
         dialog = createEmptyDialog(parent);
-        buildDialogDefaults(msg);
+        buildDialogDefaults(msg, fontSize, align);
         buildMessageDialog();
         dialog.setVisible(true);
         dialog.pack();
@@ -102,16 +142,17 @@ public class OptionsDialog implements ActionListener {
      * Задает параметры диалогового окна
      * @param msg - сообщение отображаемое в диалоговом окне
      */
-    private void buildDialogDefaults(final String msg) {
+    private void buildDialogDefaults(final String msg, final int fontSize, final int align) {
         dialog.setCursor(dialog.getToolkit().createCustomCursor(
             new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0),
             "null"));
         dialog.setUndecorated(true);
         dialog.getContentPane().setLayout(new BoxLayout(
             dialog.getContentPane(), BoxLayout.Y_AXIS));
-        dialog.setPreferredSize(new Dimension(400, 300));
-        dialog.setSize(new Dimension(400, 300));
-        setMessagePanelDefaults(msg);
+        dialog.setMinimumSize(new Dimension(400, 150));
+        dialog.setPreferredSize(new Dimension(400, 150));
+        dialog.setSize(new Dimension(400, 150));
+        setMessagePanelDefaults(msg, fontSize, align);
         setButtonPanelDefaults();
         addPanelsToDialog();
         setToCenter();
@@ -121,22 +162,28 @@ public class OptionsDialog implements ActionListener {
      * Задает параметры панели сообщения диалогового окна
      * @param msg - сообщение отображаемое в диалоговом окне
      */
-    private void setMessagePanelDefaults(final String msg) {
-        pMessage.setMinimumSize(new Dimension(400, 200));
-        pMessage.setMaximumSize(new Dimension(400, 200));
-        pMessage.setPreferredSize(new Dimension(400, 200));
-        pMessage.setSize(new Dimension(400, 200));
+    private void setMessagePanelDefaults(final String msg, final int fontSize, final int align) {
+        pMessage = new JPanel();
+        pMessage.setBackground(Color.WHITE);
+        pMessage.setMinimumSize(new Dimension(400, 100));
+        pMessage.setMaximumSize(new Dimension(400, 100));
+        pMessage.setPreferredSize(new Dimension(400, 100));
+        pMessage.setSize(new Dimension(400, 100));
         pMessage.setLayout(new BoxLayout(pMessage, BoxLayout.X_AXIS));
         pMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
         pMessage.setAlignmentY(Component.CENTER_ALIGNMENT);
-        JLabel label = new JLabel(msg);
-        label.setAlignmentX(Component.CENTER_ALIGNMENT);
-        label.setAlignmentY(Component.CENTER_ALIGNMENT);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setHorizontalTextPosition(SwingConstants.CENTER);
-        label.setVerticalAlignment(SwingConstants.CENTER);
-        label.setFont(new Font("Courier New", Font.PLAIN, 25));
-        pMessage.add(label);
+//        JLabel label = new JLabel(msg);
+        StyledDocument document = new DefaultStyledDocument();
+        Style defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE);
+        StyleConstants.setAlignment(defaultStyle, align);
+        StyleConstants.setFontSize(defaultStyle, fontSize);
+        message = new JTextPane(document);
+        message.setFont(new Font("Courier New", Font.PLAIN, fontSize));
+        message.setText(msg);
+        message.setAlignmentX(Component.CENTER_ALIGNMENT);
+        message.setAlignmentY(Component.CENTER_ALIGNMENT);
+        message.setEditable(false);
+        pMessage.add(message);
         pMessage.setBorder(new MatteBorder(1, 1, 0, 1, Color.black));
     }
 
@@ -145,11 +192,13 @@ public class OptionsDialog implements ActionListener {
      * @param msg - сообщение отображаемое в диалоговом окне
      */
     private void setButtonPanelDefaults() {
+        pButtons = new JPanel();
         pButtons.setLayout(new BoxLayout(pButtons, BoxLayout.X_AXIS));
-        pButtons.setMinimumSize(new Dimension(400, 100));
-        pButtons.setSize(new Dimension(400, 100));
+        pButtons.setMinimumSize(new Dimension(400, 50));
+        pButtons.setSize(new Dimension(400, 50));
         pButtons.setAlignmentY(SwingConstants.CENTER);
         pButtons.setBorder(new MatteBorder(0, 1, 1, 1, Color.black));
+        pButtons.setBackground(Color.WHITE);
     }
 
     /**
@@ -170,6 +219,31 @@ public class OptionsDialog implements ActionListener {
 
         btnCancel.setMinimumSize(new Dimension(100, 50));
         btnCancel.setPreferredSize(new Dimension(100, 50));
+        btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnCancel.setAlignmentY(Component.CENTER_ALIGNMENT);
+        pButtons.add(btnCancel);
+
+        Component hsThird = Box.createHorizontalGlue();
+        pButtons.add(hsThird);
+    }
+
+    private void buildPrintDialog() {
+        Component hsFirst = Box.createHorizontalGlue();
+        pButtons.add(hsFirst);
+
+        btnPrint.setMinimumSize(new Dimension(100, 50));
+        btnPrint.setPreferredSize(new Dimension(100, 50));
+        btnPrint.setSize(new Dimension(100, 50));
+        btnPrint.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnPrint.setAlignmentY(Component.CENTER_ALIGNMENT);
+        pButtons.add(btnPrint);
+
+        Component hsSecond = Box.createHorizontalStrut(15);
+        pButtons.add(hsSecond);
+
+        btnCancel.setMinimumSize(new Dimension(100, 50));
+        btnCancel.setPreferredSize(new Dimension(100, 50));
+        btnCancel.setSize(new Dimension(100, 50));
         btnCancel.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnCancel.setAlignmentY(Component.CENTER_ALIGNMENT);
         pButtons.add(btnCancel);
@@ -222,6 +296,15 @@ public class OptionsDialog implements ActionListener {
         } else if (e.getSource() == btnOk) {
             value = OK;
             dialog.setVisible(false);
+            dialog.dispose();
+        } else if (e.getSource() == btnPrint) {
+            value = PRINT;
+            dialog.setVisible(false);
+            try {
+                message.print(null, null, false, null, null, false);
+            } catch (PrinterException e1) {
+                e1.printStackTrace();
+            }
             dialog.dispose();
         }
     }

@@ -4,9 +4,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Date;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 import javax.swing.JTable;
+import javax.swing.text.StyleConstants;
 
 import ru.nkz.ivcgzo.clientInfomat.IController;
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
@@ -36,6 +40,8 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         personalOffice,
         shedule
     }
+    private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
     private IModel model;
     private IController controller;
     private LpuSelectFrame lpuSelectFrame;
@@ -334,6 +340,16 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
             if ((model.getPatient() != null) && (model.getTalon() != null)) {
                 authFrame.setVisible(false);
                 controller.reserveTalon(model.getPatient(), model.getTalon());
+                String talonText = " Текущее ЛПУ:" + model.getCurrentPoliclinic().getName()
+                    + "\n Текущий врач:" + model.getCurrentDoctor().getName()
+                    + "\n Текущий пациент : " + model.getPatient().getSurname()
+                        + " " + model.getPatient().getName()
+                    + "\n Дата приёма: "
+                        + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
+                    + "\n Время приёма: "
+                        + DEFAULT_TIME_FORMAT.format(new Time(model.getTalon().getTimep()));
+                optionsDialog.showPrintDialog(talonSelectFrame, talonText,
+                    12, StyleConstants.ALIGN_LEFT);
                 talonSelectFrame.refreshTalonTableModel(
                     model.getTalonTableModel(
                         model.getCurrentPoliclinic().getPcod(),

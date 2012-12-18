@@ -354,6 +354,11 @@ public class MainFrame extends JFrame {
 	private JSpinner Sdsp;
 	private JSpinner Scext;
 	private JCheckBox ChBpsi;
+	private JScrollPane spJalob;
+	private JScrollPane spDesiaseHistory;
+	private JScrollPane spStatusLocalis;
+	private JScrollPane spFisicalObs;
+	private JScrollPane spStatusPraence;
 //    private JLabel lblNewLabel_33;
 //    private JTextField textField_1;
 
@@ -1519,12 +1524,15 @@ public class MainFrame extends JFrame {
         pnJalob = new JPanel();
         pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnJalob.setLayout(new BoxLayout(pnJalob, BoxLayout.Y_AXIS));
+        
+        spJalob = new JScrollPane();
+        pnJalob.add(spJalob);
 
         taJalob = new JTextArea();
+        spJalob.setViewportView(taJalob);
         taJalob.setFont(new Font("Tahoma", Font.PLAIN, 11));
         taJalob.setLineWrap(true);
         taJalob.setWrapStyleWord(true);
-        pnJalob.add(taJalob);
 
         tbpMedicalHistory.addTab("Жалобы", null, pnJalob, null);
         tbpMedicalHistory.setTabComponentAt(0, new JLabel("<html><br>Жалобы<br><br></html>"));
@@ -1535,12 +1543,15 @@ public class MainFrame extends JFrame {
         pnDesiaseHistory = new JPanel();
         pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnDesiaseHistory.setLayout(new BoxLayout(pnDesiaseHistory, BoxLayout.X_AXIS));
+        
+        spDesiaseHistory = new JScrollPane();
+        pnDesiaseHistory.add(spDesiaseHistory);
 
         taDesiaseHistory = new JTextArea();
+        spDesiaseHistory.setViewportView(taDesiaseHistory);
         taDesiaseHistory.setWrapStyleWord(true);
         taDesiaseHistory.setLineWrap(true);
         taDesiaseHistory.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnDesiaseHistory.add(taDesiaseHistory);
 
         tbpMedicalHistory.addTab("История болезни", null, pnDesiaseHistory, null);
         tbpMedicalHistory.setTabComponentAt(
@@ -1552,12 +1563,15 @@ public class MainFrame extends JFrame {
         pnStatusPraence = new JPanel();
         pnStatusPraence.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusPraence.setLayout(new BoxLayout(pnStatusPraence, BoxLayout.X_AXIS));
+        
+        spStatusPraence = new JScrollPane();
+        pnStatusPraence.add(spStatusPraence);
 
         taStatusPraence = new JTextArea();
+        spStatusPraence.setViewportView(taStatusPraence);
         taStatusPraence.setLineWrap(true);
         taStatusPraence.setWrapStyleWord(true);
         taStatusPraence.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnStatusPraence.add(taStatusPraence);
 
         tbpMedicalHistory.addTab("Объективный статус (Status praesens)",
             null, pnStatusPraence, null);
@@ -1569,12 +1583,15 @@ public class MainFrame extends JFrame {
         pnFisicalObs = new JPanel();
         pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnFisicalObs.setLayout(new BoxLayout(pnFisicalObs, BoxLayout.X_AXIS));
+        
+        spFisicalObs = new JScrollPane();
+        pnFisicalObs.add(spFisicalObs);
 
         taFisicalObs = new JTextArea();
+        spFisicalObs.setViewportView(taFisicalObs);
         taFisicalObs.setLineWrap(true);
         taFisicalObs.setWrapStyleWord(true);
         taFisicalObs.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnFisicalObs.add(taFisicalObs);
 
         tbpMedicalHistory.addTab("Физикальное обследование", null, pnFisicalObs, null);
         tbpMedicalHistory.setTabComponentAt(
@@ -1585,11 +1602,14 @@ public class MainFrame extends JFrame {
         pnStatusLocalis = new JPanel();
         pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusLocalis.setLayout(new BoxLayout(pnStatusLocalis, BoxLayout.X_AXIS));
+        
+        spStatusLocalis = new JScrollPane();
+        pnStatusLocalis.add(spStatusLocalis);
         taStatusLocalis = new JTextArea();
+        spStatusLocalis.setViewportView(taStatusLocalis);
         taStatusLocalis.setLineWrap(true);
         taStatusLocalis.setWrapStyleWord(true);
         taStatusLocalis.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        pnStatusLocalis.add(taStatusLocalis);
 
         tbpMedicalHistory.addTab("Локальный статус (Status localis)",
             null, pnStatusLocalis, null);
