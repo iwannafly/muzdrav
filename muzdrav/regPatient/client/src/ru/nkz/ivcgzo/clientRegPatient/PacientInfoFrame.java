@@ -727,8 +727,9 @@ public class PacientInfoFrame extends JFrame {
                     }
                     else{
                         MainForm.tcl.updatePatient(PersonalInfo);
-                        MainForm.tcl.updateNambk(NambInfo);
-                        }
+                        MainForm.tcl.addNambk(NambInfo);
+//                        MainForm.tcl.updateNambk(NambInfo);
+                    }
                 } catch (PatientAlreadyExistException paee) {
                 	JOptionPane.showMessageDialog(tfFam, "Пациент существует. Сделайте поиск.");
                     System.out.println("Пациент существует. Сделайте поиск.");
