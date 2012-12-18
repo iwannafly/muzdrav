@@ -197,112 +197,6 @@ struct KartaBer {
 	3: optional i32 id_pos;
 	4: optional i32 id_rd_sl;
 }
-/*Инфорация о льготниках из пенсионного фонда*/
-struct Rr_pl {
-	1: optional i32 id_lg;
-	2: optional string ss;
-	3: optional string fam;
-	4: optional string im;
-	5: optional string ot;
-	6: optional string w;
-	7: optional i64 dr;
-	8: optional i32 c_doc;
-	9: optional string name_doc;
-	10: optional string sn_doc;
-	11: optional string s_doc;
-	12: optional string n_doc;
-	13: optional i64 date_doc;
-	14: optional string n_org;
-	15: optional string adres;
-	16: optional i32 okato_reg;
-	17: optional i32 kd_ter;
-	18: optional i32 kd_ter_mu;
-	19: optional string post_reg;
-	20: optional string reg_reg;
-	21: optional string area_reg;
-	22: optional string set_reg;	
-	23: optional string str_reg;	
-	24: optional string h_reg;	
-	25: optional string fr_reg;	
-	26: optional string fl_reg;	
-	27: optional string post_loc;	
-	28: optional string reg_loc;	
-	29: optional string area_loc;	
-	30: optional string set_loc;	
-	31: optional string str_loc;	
-	32: optional string h_loc;	
-	33: optional string fr_loc;	
-	34: optional string fl_loc;	
-	35: optional string mesto_pr;	
-	36: optional string c_kat1;	
-	37: optional string c_kat2;	
-	38: optional i32 s_gsp;	
-	39: optional i32 s_gspn;	
-	40: optional i64 db_edv;	
-	41: optional i64 de_edv;	
-	42: optional i64 date_rsb;	
-	43: optional i64 date_rse;	
-	44: optional i32 u_type;	
-	45: optional string c_katl;	
-	46: optional string name_dl;	
-	47: optional string s_dl;	
-	48: optional string n_dl;	
-	49: optional string name_vd;	
-	50: optional i64 date_vd;	
-	51: optional i64 date_bl;	
-	52: optional i64 date_el;
-}
-
-/*информация о льготнике из базы*/
-struct Patient {
-	1: optional i32 id;
-	2: optional i32 npasp;
-	3: optional string fam;
-	4: optional string im;
-	5: optional string ot;
-	6: optional i32 pol;
-	7: optional i64 datar;
-	8: optional i32 poms_tdoc;
-	9: optional string poms_ser;
-	10: optional string poms_nom;
-	11: optional i32 tdoc;
-	12: optional string docser;
-	13: optional string docnum;
-	14: optional i64 datadoc;
-	15: optional string snils;
-	16: optional string adp_obl;
-	17: optional string adp_raion;
-	18: optional string adp_gorod;
-	19: optional string adp_ul;
-	20: optional string adp_dom;
-	21: optional string adp_korp;
-	22: optional string adp_kv;
-}
-
-struct Lgota {
-	1: optional i32 id;
-	2: optional i32 npasp;
-	3: optional i32 lgot;
-	4: optional i64 datal;
-	5: optional i32 gri;
-	6: optional i32 sin;
-	7: optional i32 pp;
-	8: optional i64 drg;
-	9: optional i64 dot;
-	10: optional i32 obo;
-	11: optional string ndoc;
-}
-
-/** 
- *пациент не найден
- */
-exception PatientNotFoundException {
-}
-/**
- *не найдена льготная категория
- */
-exception LgkatNotFoundException {
-}
 
 service ThriftVgr extends kmiacServer.KmiacServer {
 	/**
@@ -328,24 +222,11 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv() throws (1: kmiacServer.KmiacServerException kse);
 
-
 /**
- * поиск льготника в таблице Patient
- */
-	Patient getPatientInfo(1:i32 npasp) throws (1: PatientNotFoundException le); 
+ * информация, необходимая для формирования порций для АСУ "Горздрав"
+ * дата начала и конца периода, номер порции, код формы
+*/
+	string dataSelection(1:i64 dbegin, 2:i64 dend, 3:i32 porc, 4:string cform, 5:i32 cpodr, 6:i64 dclose) throws (1:kmiacServer.KmiacServerException kse);
 
-/**
- * корректировка информации (снилса) пациента
- */
-	i32 setPatientInfo(1: Patient npasp);
-
-/**
- * поиск льготы в таблице P_kov
- */ 
-	list<Lgota> getLgotaInfo(1:i32 npasp) throws (1: LgkatNotFoundException le);
-
-/**
- * добавление льготы 
- */
-	i32 addLgotaInfo(1:Lgota npasp);
 }
+
