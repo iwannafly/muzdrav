@@ -18,6 +18,7 @@ import javax.swing.border.LineBorder;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.List;
@@ -62,9 +63,8 @@ public class MedicationCatalogFrame extends JDialog{
 
     private void initialization() {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-        setAlwaysOnTop(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setModalityType(ModalityType.APPLICATION_MODAL);
+        setModalityType(ModalityType.TOOLKIT_MODAL);
         setFrameSize();
         setUndecorated(true);
 
@@ -74,6 +74,12 @@ public class MedicationCatalogFrame extends JDialog{
 
     private void createModalFrames() {
         frmMedicationOptions = new MedicationOptionsFrame();
+        frmMedicationOptions.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                setVisible(true);
+            }
+        });
         frmMedicationOptions.pack();
     }
 
@@ -146,7 +152,7 @@ public class MedicationCatalogFrame extends JDialog{
         lMedications.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()){
+                if (!e.getValueIsAdjusting()) {
                     if ((lMedicationForms != null) && (lMedications.getSelectedValue() != null)) {
                         try {
                             lMedicationForms.setData(
@@ -200,8 +206,9 @@ public class MedicationCatalogFrame extends JDialog{
         btnAddMedication.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MedicationCatalogFrame.this.dispatchEvent(new WindowEvent(
-                    MedicationCatalogFrame.this, WindowEvent.WINDOW_CLOSING));
+                setVisible(false);
+//                MedicationCatalogFrame.this.dispatchEvent(new WindowEvent(
+//                    MedicationCatalogFrame.this, WindowEvent.WINDOW_CLOSING));
                 if (lMedications.getSelectedValue() != null) {
                     if (lMedicationForms.getData().size() > 0) {
                         frmMedicationOptions.prepareForm(lMedications.getSelectedValue(),

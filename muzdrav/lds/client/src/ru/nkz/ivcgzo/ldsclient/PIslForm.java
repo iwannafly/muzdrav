@@ -73,6 +73,9 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.ScrollPaneConstants;
+import java.awt.Font;
+import javax.swing.JTextArea;
 
 public class PIslForm {
 	
@@ -88,7 +91,6 @@ public class PIslForm {
 	private CustomTable<ObInfIsl, ObInfIsl._Fields> tn_ldi;
 	private CustomTable<LabIsl, LabIsl._Fields> tlab_isl;
 	private CustomTextField tFkodisl;
-	private CustomTextField tFrez_name;
 	public ThriftStringClassifierCombobox<StringClassifier> cBpcisl;
 	public ThriftStringClassifierCombobox<StringClassifier> cBkodisl;
 	public ThriftStringClassifierCombobox<StringClassifier> cBpcod_m;
@@ -100,9 +102,11 @@ public class PIslForm {
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBnapravl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBvopl;
 	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBrez;
+	public ThriftIntegerClassifierCombobox<IntegerClassifier> cBCuser;
 	private JTable table;
 	public JTabbedPane tabbedPane;
 	public JTextPane tPop_name;
+	public JTextPane tFrez_name;
 	public JSpinner spkol;
 	
 	/**
@@ -293,9 +297,13 @@ public class PIslForm {
 		panel.setLayout(gl_panel);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		splitPane.setLeftComponent(scrollPane);
 		
-		tpatient = new CustomTable<>(false, true, Patient.class, 0, "Код", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения");
+		tpatient = new CustomTable<>(false, true, Patient.class, 0, "Код", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Дата рождения", 7, "Город проп.", 8, "Ул. проп.", 9, "Дом проп.", 10, "Кв. проп.", 11, "Город прож.", 12, "Ул. прож.", 13, "Дом прож.", 14, "Кв. прож.");
+		tpatient.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		
+		tpatient.setDateField(4);
 		
 		tpatient.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
@@ -375,6 +383,7 @@ public class PIslForm {
 		);
 		
 		JButton btnNewButton_1 = new JButton("Добавить");
+		btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -411,6 +420,7 @@ public class PIslForm {
 		});
 		
 		JButton btnNewButton_2 = new JButton("Сохранить");
+		btnNewButton_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnNewButton_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -461,10 +471,13 @@ public class PIslForm {
 				upnisl.setKodvr(cBSvrach.getSelectedPcod());
 				}
 				
+				upnisl.setCuser(cBCuser.getSelectedPcod());
+				
 				//System.out.print(upnisl);
 // , , , , , , , , , , , 				
 				MainForm.ltc.UpdIsl(upnisl);
 				
+				tn_ldi.updateChangedSelectedItem();
 				
 				if (tFnprob.getText() != null){
 					tn_ldi.getSelectedItem().setNprob(Integer.parseInt(tFnprob.getText()));
@@ -500,6 +513,10 @@ public class PIslForm {
 				}
 				
 				tn_ldi.getSelectedItem().setDiag(tFdiag.getText());
+
+				if (cBCuser.getSelectedPcod() != null){
+					tn_ldi.getSelectedItem().setCuser(cBCuser.getSelectedPcod());
+				}
 				
 				if (cBSvrach.getSelectedPcod() != null){
 					tn_ldi.getSelectedItem().setKodvr(cBSvrach.getSelectedPcod());
@@ -570,7 +587,7 @@ public class PIslForm {
 				List<LabIsl> lbIs;
 				
 				try {
-					lbIs = MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl);
+					lbIs = MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl, tn_ldi.getSelectedItem().pcisl);
 					
 					if (lbIs.size() == 0){
 					
@@ -616,7 +633,7 @@ public class PIslForm {
 									e.printStackTrace();
 								}
 							}
-							lbIs = MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl);
+							lbIs = MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl);
 							
 							tlab_isl.setData(lbIs);
 							
@@ -637,6 +654,7 @@ public class PIslForm {
 		});
 		
 		JButton btnNewButton_4 = new JButton("Удалить");
+		btnNewButton_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnNewButton_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -744,9 +762,24 @@ public class PIslForm {
 				}
 				
 				if ((tn_ldi.getSelectedItem().vrach != 0)&&(cBVrach.getSize()!= null) ){
-					cBVrach.setSelectedPcod(tn_ldi.getSelectedItem().vrach);
+					try{
+						cBVrach.setSelectedPcod(tn_ldi.getSelectedItem().vrach);
+					}catch(Exception e){
+						cBVrach.setSelectedItem(null);
+					}
 				} else{
 					cBVrach.setSelectedItem(null);
+				}
+				
+				if (tn_ldi.getSelectedItem() != null){
+					if ((tn_ldi.getSelectedItem().cuser !=0) && (String.valueOf(tn_ldi.getSelectedItem().cuser) != null)){
+						cBCuser.setSelectedPcod(tn_ldi.getSelectedItem().cuser);
+				
+					} else {
+						cBCuser.setSelectedPcod(MainForm.authInfo.pcod);
+					}
+				}else{
+					cBCuser.setSelectedItem(null);
 				}
 				
 				
@@ -811,7 +844,7 @@ public class PIslForm {
 				}else{
 					try {
 						
-						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl));
+						tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
 						
 					} catch (TException e) {
 						// TODO Auto-generated catch block
@@ -903,6 +936,7 @@ public class PIslForm {
 		JPanel panel_1 = new JPanel();
 		
 		JLabel lblNewLabel = new JLabel("Органы и системы");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		cBpcisl = new ThriftStringClassifierCombobox<>(true);
 		cBpcisl.addActionListener(new ActionListener() {
@@ -926,8 +960,10 @@ public class PIslForm {
 			
 			
 			JLabel lblNewLabel_1 = new JLabel("Дата поступления");
+			lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			JLabel lblNewLabel_2 = new JLabel("Дата выполнения");
+			lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			tFdatap = new CustomDateEditor();
 			tFdatap.setColumns(10);
@@ -936,21 +972,28 @@ public class PIslForm {
 			tFdatav.setColumns(10);
 			
 			JLabel lblNewLabel_3 = new JLabel("Номер пробы");
+			lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			tFnprob = new CustomTextField();
 			tFnprob.setColumns(10);
 			
 			JLabel lblNewLabel_4 = new JLabel("Причина обращения");
+			lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			JLabel lblNewLabel_5 = new JLabel("Обстоятельства обращения");
+			lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 12));
+			lblNewLabel_5.setVisible(false);
 			
 			cBprichina = new ThriftIntegerClassifierCombobox<>(true);
 			
 			cBpopl = new ThriftIntegerClassifierCombobox<>(true);
+			cBpopl.setVisible(false);
 			
 			JLabel lblNewLabel_6 = new JLabel("Кем направлен");
+			lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			JLabel lblNewLabel_7 = new JLabel("Код направившего ЛПУ");
+			lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			cBnapravl = new ThriftIntegerClassifierCombobox<>(true);
 			
@@ -1040,14 +1083,18 @@ public class PIslForm {
 			});
 			
 			JLabel lblNewLabel_8 = new JLabel("Ф.И.О. направившего врача");
+			lblNewLabel_8.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			JLabel lblNewLabel_9 = new JLabel("Вид оплаты");
+			lblNewLabel_9.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			JLabel lblNewLabel_10 = new JLabel("Код врача");
+			lblNewLabel_10.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			cBvopl = new ThriftIntegerClassifierCombobox<>(true);
 			
 			JLabel lblNewLabel_14 = new JLabel("Диагноз");
+			lblNewLabel_14.setFont(new Font("Tahoma", Font.PLAIN, 12));
 			
 			tFdiag = new CustomTextField();
 			tFdiag.setDefaultLanguage(DefaultLanguage.English);
@@ -1069,11 +1116,17 @@ public class PIslForm {
 			cBSvrach = new ThriftIntegerClassifierCombobox<>(true);
 			
 			cBVrach = new ThriftIntegerClassifierCombobox<>(true);
+			
+			JLabel label_2 = new JLabel("Исследовал");
+			label_2.setFont(new Font("Tahoma", Font.PLAIN, 12));
+			
+			cBCuser = new ThriftIntegerClassifierCombobox<>(true);
+			
 			GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 			gl_panel_1.setHorizontalGroup(
 				gl_panel_1.createParallelGroup(Alignment.LEADING)
 					.addGroup(gl_panel_1.createSequentialGroup()
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addGap(121)
 								.addComponent(lblNewLabel)
@@ -1118,20 +1171,23 @@ public class PIslForm {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(cBVrach, GroupLayout.PREFERRED_SIZE, 237, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(lblNewLabel_9, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblNewLabel_9, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(cBvopl, GroupLayout.PREFERRED_SIZE, 220, GroupLayout.PREFERRED_SIZE))
+								.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addContainerGap()
 								.addComponent(lblNewLabel_10)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(cBSvrach, GroupLayout.PREFERRED_SIZE, 246, GroupLayout.PREFERRED_SIZE)
-								.addGap(28)
+								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(lblNewLabel_14)
-								.addGap(4)
-								.addComponent(tFdiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-						//.addContainerGap(86, Short.MAX_VALUE)
-								)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(tFdiag, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(label_2)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(cBCuser, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+						.addGap(50))
 			);
 			gl_panel_1.setVerticalGroup(
 				gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -1189,20 +1245,19 @@ public class PIslForm {
 									.addGap(3)
 									.addComponent(lblNewLabel_8))
 								.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-									.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(lblNewLabel_9)))
+									.addComponent(lblNewLabel_9)
+									.addComponent(cBvopl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addGap(3)
 								.addComponent(cBVrach, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblNewLabel_10)
-								.addComponent(cBSvrach, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGroup(gl_panel_1.createSequentialGroup()
-								.addGap(3)
-								.addComponent(lblNewLabel_14))
-							.addComponent(tFdiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+							.addComponent(lblNewLabel_10)
+							.addComponent(cBSvrach, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblNewLabel_14)
+							.addComponent(tFdiag, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(label_2)
+							.addComponent(cBCuser, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 						.addGap(0))
 			);
 			panel_1.setLayout(gl_panel_1);
@@ -1244,6 +1299,7 @@ public class PIslForm {
 		JPanel panel_4 = new JPanel();
 		
 		JLabel label = new JLabel("Исследование");
+		label.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		tFkodisl = new CustomTextField();
 		tFkodisl.addFocusListener(new FocusAdapter() {
@@ -1283,19 +1339,21 @@ public class PIslForm {
 		});
 		
 		JLabel label_1 = new JLabel("Количество");
+		label_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		spkol = new JSpinner();
 		
 		JLabel label_3 = new JLabel("Результат");
+		label_3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		cBrez = new ThriftIntegerClassifierCombobox<>(true);
 		
 		JLabel label_4 = new JLabel("Стоимость");
-		
-		tFrez_name = new CustomTextField();
-		tFrez_name.setColumns(10);
+		label_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		//tFrez_name.setColumns(10);
 		
 		JButton button_4 = new JButton("Выбрать");
+		button_4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		button_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -1334,12 +1392,13 @@ public class PIslForm {
 		cBpcod_m = new ThriftStringClassifierCombobox<>(true);
 		
 		JLabel label_7 = new JLabel("Заключение");
+		label_7.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JLabel label_8 = new JLabel("Описание");
-		
-		tPop_name = new JTextPane();
+		label_8.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		JButton button = new JButton("Сохранить");
+		button.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
@@ -1443,6 +1502,7 @@ public class PIslForm {
 		});
 		
 		JButton button_1 = new JButton("Удалить");
+		button_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
@@ -1461,51 +1521,56 @@ public class PIslForm {
 				cBrez.setSelectedItem(0);
 			}
 		});
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setAutoscrolls(true);
+		
+		JScrollPane scrollPane_4 = new JScrollPane();
 		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
 		gl_panel_4.setHorizontalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(label)
-					.addGap(4)
-					.addComponent(tFkodisl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(cBkodisl, GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
-					.addGap(182))
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(label_1)
-					.addGap(4)
-					.addComponent(spkol, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-					.addGap(4)
-					.addComponent(label_3)
-					.addGap(4)
-					.addComponent(cBrez, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
-					.addGap(10)
-					.addComponent(label_4)
-					.addGap(6)
-					.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(180, Short.MAX_VALUE))
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addGap(281)
-					.addComponent(button, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
-					.addGap(6)
-					.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(328, Short.MAX_VALUE))
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_8)
+							.addComponent(label)
 							.addGap(4)
-							.addComponent(tPop_name, GroupLayout.PREFERRED_SIZE, 506, GroupLayout.PREFERRED_SIZE))
+							.addComponent(tFkodisl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(cBkodisl, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+							.addGap(182))
 						.addGroup(gl_panel_4.createSequentialGroup()
-							.addComponent(label_7)
-							.addGap(18)
-							.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, 478, GroupLayout.PREFERRED_SIZE)))
+							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_4.createSequentialGroup()
+									.addComponent(label_8)
+									.addGap(18)
+									.addComponent(scrollPane_3, GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE))
+								.addGroup(gl_panel_4.createSequentialGroup()
+									.addComponent(label_1)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(spkol, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(label_3)
+									.addGap(4)
+									.addComponent(cBrez, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
+									.addGap(10)
+									.addComponent(label_4)
+									.addGap(6)
+									.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE))
+								.addGroup(gl_panel_4.createSequentialGroup()
+									.addComponent(label_7)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(scrollPane_4, GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
+									.addGap(1)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button_4)
+							.addGap(187))))
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addGap(266)
+					.addComponent(button, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(button_4)
-					.addGap(127))
+					.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(418, Short.MAX_VALUE))
 		);
 		gl_panel_4.setVerticalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -1521,7 +1586,6 @@ public class PIslForm {
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(3)
 							.addComponent(label_1))
-						.addComponent(spkol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(3)
 							.addComponent(label_3))
@@ -1529,7 +1593,8 @@ public class PIslForm {
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(3)
 							.addComponent(label_4))
-						.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(cBpcod_m, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(spkol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
 						.addGroup(gl_panel_4.createSequentialGroup()
@@ -1537,22 +1602,27 @@ public class PIslForm {
 								.addGroup(gl_panel_4.createSequentialGroup()
 									.addGap(48)
 									.addComponent(label_8))
-								.addComponent(tPop_name, GroupLayout.PREFERRED_SIZE, 113, GroupLayout.PREFERRED_SIZE))
-							.addGap(4)
+								.addComponent(scrollPane_3, GroupLayout.PREFERRED_SIZE, 169, GroupLayout.PREFERRED_SIZE))
 							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel_4.createSequentialGroup()
-									.addGap(4)
+									.addGap(29)
 									.addComponent(label_7))
 								.addGroup(gl_panel_4.createSequentialGroup()
-									.addGap(1)
-									.addComponent(tFrez_name, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(scrollPane_4, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE))))
 						.addComponent(button_4, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(8)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addComponent(button)
 						.addComponent(button_1))
-					.addGap(641))
+					.addGap(24))
 		);
+		
+		tFrez_name = new JTextPane();
+		scrollPane_4.setViewportView(tFrez_name);
+		
+		tPop_name = new JTextPane();
+		scrollPane_3.setViewportView(tPop_name);
 		panel_4.setLayout(gl_panel_4);
 		GroupLayout gl_panel_10 = new GroupLayout(panel_10);
 		gl_panel_10.setHorizontalGroup(
@@ -1614,7 +1684,7 @@ public class PIslForm {
 						uplab.setPcod_m(tlab_isl.getData().get(i).pcod_m);
 						uplab.setStoim(tlab_isl.getData().get(i).stoim);
 					
-						System.out.print(uplab);
+						//System.out.print(uplab);
 						try {
 							MainForm.ltc.UpdLIsl(uplab);
 						} catch (LIslExistsException e) {
@@ -1628,19 +1698,19 @@ public class PIslForm {
 						
 					}*/
 					}else{
-						
-						try {
-							MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok);
-						} catch (TException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if ((String.valueOf(tn_ldi.getSelectedItem().id_gosp)==null)&&(String.valueOf(tn_ldi.getSelectedItem().id_pos)==null)){
+							try {
+								MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok);
+							} catch (TException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
-						
 					}
 				}
 
 				try {
-					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl));
+					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl, tn_ldi.getSelectedItem().pcisl));
 				} catch (TException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -1662,7 +1732,7 @@ public class PIslForm {
 				}
 				try {
 					
-					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl));
+					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl,tn_ldi.getSelectedItem().pcisl));
 					
 				} catch (TException e) {
 					// TODO Auto-generated catch block
@@ -1726,7 +1796,7 @@ public class PIslForm {
 						
 					}
 					
-					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl));
+					tlab_isl.setData(MainForm.ltc.GetLabIsl(tn_ldi.getSelectedItem().nisl, tn_ldi.getSelectedItem().pcisl));
 					
 					
 				} catch (TException e) {
@@ -1921,8 +1991,13 @@ public class PIslForm {
                 try {
                     if ((cBpcisl.getSelectedItem() != null) && (tlab_isl.getSelectedItem() !=null)){
                         cBLpcod_m.setData(MainForm.ltc.GetKlasMetS_ot01(MainForm.authInfo.cpodr,cBpcisl.getSelectedPcod(), tlab_isl.getSelectedItem().cpok));
-                        if (tlab_isl.getSelectedItem().pcod_m != null){
-                        	cBLpcod_m.setSelectedPcod(tlab_isl.getSelectedItem().pcod_m);
+                        if ((tlab_isl.getSelectedItem().pcod_m != null)&&( tlab_isl.getSelectedItem().pcod_m.trim() !="")){
+                        	try{
+                        		cBLpcod_m.setSelectedPcod(tlab_isl.getSelectedItem().pcod_m);
+                        	}catch (Exception e){
+                        		cBLpcod_m.setSelectedItem(0);
+                        	}
+                        	
                         }else{
                         	cBLpcod_m.setSelectedItem(0);
                         }
@@ -1993,8 +2068,9 @@ public class PIslForm {
 	public void filtPat() {
 		try {
 			//tpatient.setData(MainForm.ltc.getPatDat(new SimpleDateFormat("dd.MM.yyyy").parse("14.08.2012").getTime(), 2000004));
-			
-				tpatient.setData(MainForm.ltc.getPatDat(System.currentTimeMillis(), MainForm.authInfo.cpodr));
+				
+				System.out.println(System.currentTimeMillis());
+				tpatient.setData(MainForm.ltc.getPatDat(MainForm.authInfo.cpodr));
 			
 			//tn_ldi.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
 			if (tpatient.getSelectedItem()!= null){

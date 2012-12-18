@@ -78,6 +78,7 @@
 		<copy file="${basedir}/auth.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
 		<copy file="${basedir}/managerAuth.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
 		<copy file="${basedir}/log4j.xml" todir="${muzdrav.public.dir}" overwrite="true" force="true" />
+		<copy file="${basedir}/launcher.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false"/>
 		<copy file="${basedir}/launcher_t.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false"/>
 		<copy file="${basedir}/launcher_e.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false" />
 		<copy file="${basedir}/launcher_i.jar" todir="${muzdrav.public.dir}" overwrite="true" force="true" failonerror="false" />

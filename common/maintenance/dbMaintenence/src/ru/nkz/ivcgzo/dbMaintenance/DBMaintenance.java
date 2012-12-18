@@ -13,6 +13,8 @@ public class DBMaintenance {
 	public static void main(String[] args) {
 		System.out.println("This program does some suportive shit.");
 		
+//		args = new String[] {"--impZabol", "10.0.0.242/zabol", "postgres", "postgres", "10.37.11.40/C:\\Program Files\\ASUPOL\\DB\\zabol.gdb", "sysdba", "masterkey"};
+		
 		if (args.length < 1)
 			usage();
 		

@@ -5,7 +5,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.thrift.TBase;
 import org.apache.thrift.TFieldIdEnum;
@@ -18,7 +20,27 @@ import ru.nkz.ivcgzo.serverManager.common.ResultSetMapper;
  */
 public final class TResultSetMapper<T extends TBase<?, F>, F extends TFieldIdEnum> extends ResultSetMapper<T> {
 	public TResultSetMapper(Class<T> cls, String... fieldList) {
-		super(cls, fieldList);
+		super(cls, (fieldList.length > 0) ? fieldList : getDefaultThriftFieldList(cls));
+	}
+	
+	private static <T extends TBase<?, F>, F extends TFieldIdEnum> String[] getDefaultThriftFieldList(Class<T> cls) {
+		try {
+			T thriftFields = cls.newInstance();
+			List<String> fields = new ArrayList<>();
+			int id = 1;
+			
+			while (true) {
+				F thriftField = thriftFields.fieldForId(id++);
+				if (thriftField != null)
+					fields.add(thriftField.getFieldName());
+				else
+					break;
+			}
+			
+			return fields.toArray(new String[]{});
+		} catch (Exception e) {
+			throw new RuntimeException(String.format("Coud not create mapper from thrift %s.", cls), e);
+		}
 	}
 	
 	@Override

@@ -117,7 +117,10 @@ public class ResultSetMapper<T> {
 	 */
 	public static <E> List<E> mapToList(Class<E> cls, ResultSet rs) throws SQLException {
 		ArrayList<E> lst = new ArrayList<>();
-
+		
+		if (rs.getMetaData().getColumnCount() != 1)
+			throw new SQLException("Error mapping to list. Result set has to has exactly one field.");
+			
 		if (cls == Integer.class)
 			while (rs.next())
 				lst.add(cls.cast(rs.getInt(1)));
@@ -148,8 +151,67 @@ public class ResultSetMapper<T> {
 		else if (cls == Boolean.class)
 			while (rs.next())
 				lst.add(cls.cast(rs.getBoolean(1)));
+		else
+			throw new SQLException(String.format("Error mapping to list. Unsupported %s.", cls));
 
 		return lst;
+	}
+	
+	/**
+	 * Отображает все записи из результирующего набора в карту с ключом
+	 * типа K и значением типа V. Работает только с простыми типами 
+	 * данных и наборами, содержащими не более двух полей.
+	 */
+	public static <K, V> HashMap<K, V> mapToHashMap(Class<K> clsKey, Class<V> clsVal, ResultSet rs) throws SQLException {
+		HashMap<K, V> map = new HashMap<>();
+		Class<?> cls = null;
+		K key = null;
+		V val = null;
+		Object obj = null;
+		
+		if (rs.getMetaData().getColumnCount() != 2)
+			throw new SQLException("Error mapping to map. Result set has to has exactly two fields.");
+		
+		while (rs.next())
+			for (int i = 1; i < 3; i++) {
+				if (i == 1) {
+					cls = clsKey;
+				} else {
+					cls = clsVal;
+				}
+				
+				if (cls == Integer.class)
+					obj = cls.cast(rs.getInt(i));
+				else if (cls == String.class)
+					obj = cls.cast(rs.getString(i));
+				else if (cls == Short.class)
+					obj = cls.cast(rs.getShort(i));
+				else if (cls == java.sql.Date.class)
+					obj = cls.cast(rs.getDate(i));
+				else if (cls == java.sql.Time.class)
+					obj = cls.cast(rs.getTime(i));
+				else if (cls == java.sql.Timestamp.class)
+					obj = cls.cast(rs.getTimestamp(i));
+				else if (cls == Float.class)
+					obj = cls.cast(rs.getFloat(i));
+				else if (cls == Long.class)
+					obj = cls.cast(rs.getLong(i));
+				else if (cls == Double.class)
+					obj = cls.cast(rs.getDouble(i));
+				else if (cls == Boolean.class)
+					obj = cls.cast(rs.getBoolean(i));
+				else
+					throw new SQLException(String.format("Error mapping to map. Unsupported %s %s.", (i == 1) ? "key" : "value", cls));
+				
+				if (i == 1) {
+					key = clsKey.cast(obj);
+				} else {
+					val = clsVal.cast(obj);
+					map.put(key, val);
+				}
+			}
+		
+		return map;
 	}
 	
 	private static Hashtable<Integer, String> getSqlTypeNames() {
