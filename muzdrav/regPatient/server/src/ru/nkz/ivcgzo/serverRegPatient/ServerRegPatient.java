@@ -996,6 +996,13 @@ public class ServerRegPatient extends Server implements Iface {
                         false, nambk, NAMBK_TYPES, indexes);
                 sme.setCommit();
             } else {
+                final int[] indexes1 = {1, 2, 3, 4, 5, 6, 0, 3};
+                sme.execPreparedT("UPDATE p_nambk SET "
+                        + "nambk = ?, nuch = ?, cpol = ?, "
+                        + "datapr = ?, dataot = ?, ishod = ? "
+                        + "WHERE npasp = ? AND cpol = ?",
+                        false, nambk, NAMBK_TYPES, indexes1);
+                sme.setCommit();
                 throw new NambkAlreadyExistException();
             }
         } catch (SQLException | InterruptedException e) {
@@ -1889,7 +1896,9 @@ public class ServerRegPatient extends Server implements Iface {
    					}
 					if (uai.getCslu() == 2){
   	   						sqlQuery = "SELECT n.name, n.numstr, n.yn, ot.numline "+
-  	   				                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+//  	   				                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+//  	   				                   "INNER JOIN n_n00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
+  	   				                   "FROM n_anz n INNER JOIN n_ot_str ot ON (n.nstr = ot.nstr) " +
   	   				                   "INNER JOIN n_n00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
   	   				                   "WHERE n.nstr = ?";
    					}
@@ -1925,62 +1934,3 @@ public class ServerRegPatient extends Server implements Iface {
 	}
 
 }
-//public final String printMedCart(final Nambk nambk, final PatientFullInfo pat,
-//        final UserAuthInfo uai, final String docInfo, final String omsOrg,
-//        final String lgot) throws KmiacServerException {
-//    final String path;
-//    try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
-//            path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
-//        AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT c_ogrn "
-//                + "FROM n_m00 WHERE pcod = ?", uai.getClpu());
-//        String ogrn = "";
-//        while (acrs.getResultSet().next()) {
-//            if (acrs.getResultSet().getString(1) != null) {
-//                ogrn = acrs.getResultSet().getString(1);
-//            }
-//        }
-//        acrs.close();
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-//        String gender;
-//        if (pat.getPol() == 1) {
-//            gender = "мужской";
-//        } else if (pat.getPol() == 2) {
-//            gender = "женский";
-//        } else {
-//            gender = "";
-//        }
-//        HtmTemplate htmTemplate = new HtmTemplate(
-//                new File(this.getClass().getProtectionDomain().getCodeSource()
-//                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
-//                + "\\plugin\\reports\\MedCardAmbPriem.htm");
-//        htmTemplate.replaceLabels(true,
-//            uai.getClpu_name(),
-//            ogrn,
-//            nambk.getNambk(),
-//            omsOrg,
-//            pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
-//            pat.getSnils(),
-//            "",
-//            lgot,
-//            pat.getFam(),
-//            pat.getIm(),
-//            pat.getOt(),
-//            gender,
-//            dateFormat.format(new Date(pat.getDatar())),
-//            pat.getAdmAddress().getCity()
-//                + "," + pat.getAdmAddress().getStreet() + " "
-//                + pat.getAdmAddress().getHouse()
-//                + " - " + pat.getAdmAddress().getFlat(),
-//            pat.getAdpAddress().getCity()
-//                + "," + pat.getAdpAddress().getStreet() + " "
-//                + pat.getAdpAddress().getHouse()
-//                + " - " + pat.getAdpAddress().getFlat(),
-//            pat.getTel(),
-//            docInfo
-//        );
-//        osw.write(htmTemplate.getTemplateText());
-//        return path;
-//    } catch (Exception e) {
-//        throw new  KmiacServerException(); // тут должен быть кмиац сервер иксепшн
-//    }
-//}
