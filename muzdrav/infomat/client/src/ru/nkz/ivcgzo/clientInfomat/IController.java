@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.clientInfomat;
 
 import javax.swing.JFrame;
 
+import ru.nkz.ivcgzo.clientInfomat.ui.InfomatFrame;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
@@ -39,4 +40,18 @@ public interface IController {
 
     //FIXME костыль, избавиться от него!
     JFrame getMainFrame();
+
+    void openLpuSelectFrame();
+
+    void openAuthorizationFrame();
+
+    void openDoctorSelectFrame(IntegerClassifier currentPoliclinic);
+
+    void backToMainFrame(InfomatFrame currentFrame);
+
+    void setDoctorList(StringClassifier currentSpeciality);
+
+    void openTalonSelectFrame(IntegerClassifier currentDoctor);
+
+    void openSheduleFrame(IntegerClassifier currentDoctor);
 }

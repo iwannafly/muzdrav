@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.clientInfomat;
 import javax.swing.JFrame;
 
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
+import ru.nkz.ivcgzo.clientInfomat.ui.InfomatFrame;
 import ru.nkz.ivcgzo.clientInfomat.ui.InfomatView;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -87,12 +88,69 @@ public class Controller implements IController {
 
     @Override
     public final void setSelectedTalon(final TTalon talon) {
-        model.setTalon(talon);
+        if (talon != null) {
+            model.setTalon(talon);
+        }
     }
 
     @Override
     public final void setCurrentReservedTalon(final TTalon talon) {
         model.setCurrentReservedTalon(talon);
+    }
+
+    @Override
+    public final void openLpuSelectFrame() {
+        model.setPoliclinics();
+        view.openLpuSelectFrame();
+    }
+
+    @Override
+    public final void openAuthorizationFrame() {
+        view.showAuthorizationFrame();
+    }
+
+    @Override
+    public final void openDoctorSelectFrame(final IntegerClassifier currentPoliclinic) {
+        model.setCurrentPoliclinic(currentPoliclinic);
+        model.setSpecialities(currentPoliclinic.getPcod());
+        view.openDoctorSelectFrame();
+    }
+
+    @Override
+    public final void backToMainFrame(final InfomatFrame currentFrame) {
+        currentFrame.setVisible(false);
+        view.openMainFrame();
+    }
+
+    @Override
+    public final void setDoctorList(final StringClassifier currentSpeciality) {
+        model.setCurrentSpeciality(currentSpeciality);
+        model.setDoctors(model.getCurrentPoliclinic().getPcod(),
+            currentSpeciality.getPcod());
+    }
+
+    @Override
+    public final void openTalonSelectFrame(final IntegerClassifier currentDoctor) {
+        model.setCurrentDoctor(currentDoctor);
+        view.openTalonSelectFrame(
+            model.getTalonTableModel(
+                model.getCurrentPoliclinic().getPcod(),
+                model.getCurrentSpeciality().getPcod(),
+                model.getCurrentDoctor().getPcod()
+            )
+        );
+    }
+
+    @Override
+    public final void openSheduleFrame(final IntegerClassifier currentDoctor) {
+        model.setCurrentDoctor(currentDoctor);
+        view.openSheduleFrame(
+            model.getSheduleTableModel(
+                model.getCurrentDoctor().getPcod(),
+                model.getCurrentPoliclinic().getPcod(),
+                model.getCurrentSpeciality().getPcod()
+            )
+        );
     }
 
 }

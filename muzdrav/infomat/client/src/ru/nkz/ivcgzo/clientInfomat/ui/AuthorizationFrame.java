@@ -88,9 +88,6 @@ public class AuthorizationFrame extends JDialog {
         buildKeyboardPanel();
 
         vsMiddle = Box.createVerticalStrut(VERTICAL_STRUTS_HEIGHT);
-//        vsMiddle.setMaximumSize(new Dimension(Integer.MAX_VALUE, 30));
-//        vsMiddle.setMinimumSize(new Dimension(0, 30));
-//        vsMiddle.setPreferredSize(new Dimension(0, 30));
         pMain.add(vsMiddle);
 
         buildButtonsPanel();
@@ -132,10 +129,6 @@ public class AuthorizationFrame extends JDialog {
         vbOmsTextPanel.add(lblInstruction);
 
         vsOsTextFieldTopGlue = Box.createVerticalStrut(VERTICAL_STRUTS_HEIGHT);
-//        vsOsTextFieldTopGlue.setPreferredSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
-//        vsOsTextFieldTopGlue.setMinimumSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
-//        vsOsTextFieldTopGlue.setMaximumSize(
-//            new Dimension(Integer.MAX_VALUE, VERTICAL_STRUTS_HEIGHT));
         vbOmsTextPanel.add(vsOsTextFieldTopGlue);
 
         tfOmsNumber = new JTextField();
@@ -150,10 +143,6 @@ public class AuthorizationFrame extends JDialog {
         tfOmsNumber.setColumns(10);
 
         vsOmsTextBottomGlue = Box.createVerticalStrut(VERTICAL_STRUTS_HEIGHT);
-//        vsOmsTextBottomGlue.setMinimumSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
-//        vsOmsTextBottomGlue.setMaximumSize(
-//            new Dimension(Integer.MAX_VALUE, VERTICAL_STRUTS_HEIGHT));
-//        vsOmsTextBottomGlue.setPreferredSize(new Dimension(0, VERTICAL_STRUTS_HEIGHT));
         pMain.add(vsOmsTextBottomGlue);
     }
 

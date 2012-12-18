@@ -3734,10 +3734,8 @@ public class MainFrame extends JFrame {
         taZakluch.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spZakluch.setViewportView(taZakluch);
 
-
         lblIshod = new JLabel("Исход заболевания");
         lblResult = new JLabel("Результат лечения");
-
 
         lblZaklDate = new JLabel("Дата выписки");
         cdeZaklDate = new CustomDateEditor();

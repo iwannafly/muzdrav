@@ -243,11 +243,11 @@ public class Model implements IModel {
     public final void reserveTalon(final TPatient pat, final TTalon talon) {
         try {
             ClientInfomat.tcl.reserveTalon(pat, talon);
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
         } catch (ReserveTalonOperationFailedException e) {
             e.printStackTrace();
         } catch (PatientHasSomeReservedTalonsOnThisDay e) {
+            e.printStackTrace();
+        } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
             e.printStackTrace();
@@ -259,9 +259,9 @@ public class Model implements IModel {
     public final void releaseTalon(final TTalon talon) {
         try {
             ClientInfomat.tcl.releaseTalon(talon);
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
         } catch (ReleaseTalonOperationFailedException e) {
+            e.printStackTrace();
+        } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
             e.printStackTrace();
