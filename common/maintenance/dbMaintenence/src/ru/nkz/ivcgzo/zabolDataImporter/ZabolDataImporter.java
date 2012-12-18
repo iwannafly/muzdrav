@@ -687,8 +687,8 @@ public class ZabolDataImporter {
 	
 	private void importPdiag() throws Exception {
 		System.out.println("Importing pdiag.");
-		String[] srcFld = new String[] {"NPASP", "DIAG", "DISP", "DATAD", "XZAB", "STADY", "D_VZ", "D_GRUP", "ISHOD", "DATAG", "DATAISH", "NMVD", "PAT", "PRIZ",  "PRIZI", "PPI"};
-		String[] dstFld = new String[] {"npasp", "diag", "disp", "datad", "xzab", "stady", "d_vz", "d_grup", "ishod", "datag", "dataish", "nmvd", "pat", "prizb", "prizi", "ppi"};
+		String[] srcFld = new String[] {"NPASP", "DIAG", "DISP", "DATAD", "XZAB", "STADY", "D_VZ", "D_GRUP", "ISHOD", "DATAG", "DATAISH", "NMVD", "PAT", "PRIZ",  "PRIZI", "PPI", "NULL"};
+		String[] dstFld = new String[] {"npasp", "diag", "disp", "datad", "xzab", "stady", "d_vz", "d_grup", "ishod", "datag", "dataish", "nmvd", "pat", "prizb", "prizi", "ppi", "named"};
 		
 		boolean hasData;
 		int updCnt = 0;
@@ -699,19 +699,20 @@ public class ZabolDataImporter {
 		try (Statement srcStm = srcCon.createStatement();
 				Statement dstStm = dstCon.createStatement();
 			) {
-			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, PDIAG.PD_PU") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, PDIAG.PD_PU, N_MKB.NAME") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) JOIN N_MKB ON (N_MKB.PCOD = PDIAG.DIAG) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
 			ResultSet dstRs = dstStm.executeQuery(sql = SqlGenerator.genSelect(dstFld, "p_diag", null) + "ORDER BY p_diag.npasp, p_diag.diag ");
 			
 			if (!srcRs.next())
 				return;
 			while (true) {
-				while ((hasData = dstRs.next()) && (dstRs.getInt(1) < srcRs.getInt(17))) {
+				while ((hasData = dstRs.next()) && (dstRs.getInt(1) < srcRs.getInt(18))) {
 				}
 				while (true) {
 					try (Statement dstModStm = dstCon.createStatement()) {
-						boolean write = srcRs.getInt(18) == 1;
+						boolean write = srcRs.getInt(19) == 1;
 						String[] vals = SqlGenerator.getStringValues(srcRs);
-						vals[0] = vals[16];
+						vals[0] = vals[17];
+						vals[16] = vals[19];
 						if (vals[7] != null) {
 							if (vals[7].equals("2А"))
 								vals[7] = "21";
@@ -722,7 +723,7 @@ public class ZabolDataImporter {
 						}
 						if ((srcRs.getInt(3) == 1) && (srcRs.getInt(9) != 0) && (srcRs.getInt(9) != 1) && (srcRs.getInt(9) != 5) && (srcRs.getInt(9) != 12))
 							write = true;
-						if (hasData && write && (dstRs.getInt(1) == srcRs.getInt(17)) && dstRs.getString(2).equals(srcRs.getString(2))) {
+						if (hasData && write && (dstRs.getInt(1) == srcRs.getInt(18)) && dstRs.getString(2).equals(srcRs.getString(2))) {
 							if ((dstRs.getDate(4) != null) && (srcRs.getDate(4) != null))
 								if (dstRs.getDate(4).getTime() < srcRs.getDate(4).getTime()) {
 									dstModStm.executeUpdate(sql = String.format("%s WHERE (%s = %s) AND (%s = '%s') ", SqlGenerator.genUpdate("p_diag", dstFld, vals), dstFld[0], vals[0], dstFld[1], vals[1]));
@@ -731,7 +732,7 @@ public class ZabolDataImporter {
 							prevKey = vals[0] + vals[1];
 							srcRs.next();
 							break;
-						} else if (!hasData || ((srcRs.getInt(17) < dstRs.getInt(1)) || ((srcRs.getInt(17) == dstRs.getInt(1)) && (srcRs.getString(2).compareTo(dstRs.getString(2)) < 0)))) {
+						} else if (!hasData || ((srcRs.getInt(18) < dstRs.getInt(1)) || ((srcRs.getInt(18) == dstRs.getInt(1)) && (srcRs.getString(2).compareTo(dstRs.getString(2)) < 0)))) {
 							if (write && !prevKey.equals(vals[0] + vals[1])) {
 								dstModStm.executeUpdate(sql = SqlGenerator.genInsert("p_diag", dstFld, vals));
 								insCnt++;
