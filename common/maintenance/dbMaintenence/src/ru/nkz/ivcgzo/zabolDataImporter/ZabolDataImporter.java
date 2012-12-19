@@ -699,7 +699,7 @@ public class ZabolDataImporter {
 		try (Statement srcStm = srcCon.createStatement();
 				Statement dstStm = dstCon.createStatement();
 			) {
-			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, PDIAG.PD_PU, N_MKB.NAME") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) JOIN N_MKB ON (N_MKB.PCOD = PDIAG.DIAG) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, PDIAG.PD_PU, N_MKB.NAME") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) JOIN N_MKB ON (N_MKB.PCOD = PDIAG.DIAG) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') AND (NOT PDIAG.DIAG IS NULL) ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
 			ResultSet dstRs = dstStm.executeQuery(sql = SqlGenerator.genSelect(dstFld, "p_diag", null) + "ORDER BY p_diag.npasp, p_diag.diag ");
 			
 			if (!srcRs.next())
@@ -780,7 +780,7 @@ public class ZabolDataImporter {
 			if (!nparsSrcRs.next())
 				throw new Exception("No npars cpol specified.");
 			String npars = nparsSrcRs.getString(1);
-			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, S_VRACH.FAM, S_VRACH.IM, S_VRACH.OT, S_VRACH.DATAR") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) LEFT JOIN S_VRACH ON (S_VRACH.PCOD = PDIAG.D_NVR) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') AND ((PDIAG.DISP = 1) OR (PDIAG.DISP = 2)) ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
+			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "PDIAG", "PATIENT.NPASPG, S_VRACH.FAM, S_VRACH.IM, S_VRACH.OT, S_VRACH.DATAR") + "JOIN PATIENT ON (PATIENT.NPASP = PDIAG.NPASP) LEFT JOIN S_VRACH ON (S_VRACH.PCOD = PDIAG.D_NVR) WHERE (PATIENT.NPASPG > 0) AND (PATIENT.FAM != '') AND (PATIENT.IM != '') AND (PATIENT.OT != '') AND ((PDIAG.DISP = 1) OR (PDIAG.DISP = 2)) AND (NOT PDIAG.DIAG IS NULL) ORDER BY PATIENT.NPASPG, PDIAG.DIAG ");
 			ResultSet dstRs = dstStm.executeQuery(sql = SqlGenerator.genSelect(dstFld, "p_disp", null) + "ORDER BY p_disp.npasp, p_disp.diag ");
 			ResultSet vrRs;
 			
