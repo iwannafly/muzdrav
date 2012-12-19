@@ -209,7 +209,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         resTalonSelectFrame.addReservedTalonTableMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                int dialogResult = new OptionsDialog().showConfirmDialog(resTalonSelectFrame,
+                int dialogResult = new OptionsDialog().showConfirmDialog(null, //resTalonSelectFrame,
                     "Отменить запись?");
                 if (dialogResult == OptionsDialog.ACCEPT) {
                     JTable curTable = (JTable) e.getSource();

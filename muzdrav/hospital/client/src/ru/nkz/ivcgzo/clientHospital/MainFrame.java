@@ -374,13 +374,13 @@ public class MainFrame extends JFrame {
         setMainMenu();
         setToolBar();
         setTabbedPane();
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         addWindowFocusListener(new WindowAdapter() {
             public void windowGainedFocus(final WindowEvent e) {
                 tabbedPane.requestFocusInWindow();
             }
         });
         pack();
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -11,6 +11,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
@@ -31,6 +32,7 @@ import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class Model implements IModel {
+    private List<IInfomatObserver> infomatObservers = new ArrayList<IInfomatObserver> ();
     private List<IDoctorsObserver> doctorsObservers = new ArrayList<IDoctorsObserver>();
     private List<IPoliclinicsObserver> policlinicsObservers =
         new ArrayList<IPoliclinicsObserver>();
@@ -450,5 +452,21 @@ public class Model implements IModel {
     public final void setCurrentReservedTalon(final TTalon talon) {
         this.currentReservedTalon = talon;
         notifyCurrentReservedTalonObservers();
+    }
+
+    @Override
+    public void registerInfomatObserver(IInfomatObserver obs) {
+        infomatObservers.add(obs);
+    }
+
+    @Override
+    public void removeInfomatObserver(IInfomatObserver obs) {
+        infomatObservers.remove(obs);
+    }
+
+    public void notifyInfomatObservers() {
+        for (IInfomatObserver obs: infomatObservers) {
+//            obs
+        }
     }
 }
