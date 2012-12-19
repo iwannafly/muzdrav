@@ -6,6 +6,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
@@ -78,6 +79,10 @@ public interface IModel {
     void reserveTalon(TPatient pat, TTalon talon);
 
     void releaseTalon(TTalon talon);
+
+    void registerInfomatObserver(IInfomatObserver obs);
+
+    void removeInfomatObserver(IInfomatObserver obs);
 
     void registerDoctorsObserver(IDoctorsObserver obs);
 
