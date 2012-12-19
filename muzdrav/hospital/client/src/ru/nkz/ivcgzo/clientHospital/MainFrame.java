@@ -374,13 +374,13 @@ public class MainFrame extends JFrame {
         setMainMenu();
         setToolBar();
         setTabbedPane();
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         addWindowFocusListener(new WindowAdapter() {
             public void windowGainedFocus(final WindowEvent e) {
                 tabbedPane.requestFocusInWindow();
             }
         });
         pack();
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -399,6 +399,14 @@ public class MainFrame extends JFrame {
         setDiagnosisPanel();
  //       setChildbirthPanel();
         setZaklPanel();
+
+        if ((doctorAuth.getClpu() == 62)
+            || (doctorAuth.getClpu() == 63)
+            || (doctorAuth.getClpu() == 64)) {
+        } else {
+            tabbedPane.removeTabAt(4);
+//            pChildbirth.setVisible(false);
+        }
     }
 
     public final void onConnect() {
@@ -3734,10 +3742,8 @@ public class MainFrame extends JFrame {
         taZakluch.setFont(new Font("Tahoma", Font.PLAIN, 11));
         spZakluch.setViewportView(taZakluch);
 
-
         lblIshod = new JLabel("Исход заболевания");
         lblResult = new JLabel("Результат лечения");
-
 
         lblZaklDate = new JLabel("Дата выписки");
         cdeZaklDate = new CustomDateEditor();

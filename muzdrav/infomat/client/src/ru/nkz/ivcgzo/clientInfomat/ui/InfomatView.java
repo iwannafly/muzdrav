@@ -24,6 +24,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
+import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierList;
@@ -104,24 +105,20 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
     private void setMainFrameControls() {
         mainFrame.addAppointmentListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                controller.setPoliclinics();
                 lastFrameSet = FrameSet.appointment;
-                lpuSelectFrame.showAsModal();
-                mainFrame.setVisible(false);
+                controller.openLpuSelectFrame();
             }
         });
         mainFrame.addPersonalInfoListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 lastFrameSet = FrameSet.personalOffice;
-                authFrame.setVisible(true);
+                controller.openAuthorizationFrame();
             }
         });
         mainFrame.addSheduleListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                controller.setPoliclinics();
                 lastFrameSet = FrameSet.shedule;
-                lpuSelectFrame.showAsModal();
-                mainFrame.setVisible(false);
+                controller.openLpuSelectFrame();
             }
         });
     }
@@ -133,18 +130,14 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 if (((ThriftIntegerClassifierList) e.getSource()).getSelectedValue() != null) {
                     IntegerClassifier currentPoliclinic =
                         ((ThriftIntegerClassifierList) e.getSource()).getSelectedValue();
-                    controller.setCurrentPoliclinic(currentPoliclinic);
-                    controller.setSpecialities(currentPoliclinic.getPcod());
-                    doctorFrame.showModal();
-                    lpuSelectFrame.setVisible(false);
+                    controller.openDoctorSelectFrame(currentPoliclinic);
                 }
             }
         });
         lpuSelectFrame.addLpuSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                lpuSelectFrame.setVisible(false);
-                mainFrame.setVisible(true);
+                controller.backToMainFrame(lpuSelectFrame);
             }
         });
     }
@@ -157,9 +150,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 if (((ThriftStringClassifierList) e.getSource()).getSelectedValue() != null) {
                     StringClassifier currentSpeciality =
                         ((ThriftStringClassifierList) e.getSource()).getSelectedValue();
-                    controller.setCurrentSpeciality(currentSpeciality);
-                    controller.setDoctors(model.getCurrentPoliclinic().getPcod(),
-                        currentSpeciality.getPcod());
+                    controller.setDoctorList(currentSpeciality);
                 }
             }
         });
@@ -169,27 +160,10 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 if (((ThriftIntegerClassifierList) e.getSource()).getSelectedValue() != null) {
                     IntegerClassifier currentDoctor =
                             ((ThriftIntegerClassifierList) e.getSource()).getSelectedValue();
-                    controller.setCurrentDoctor(currentDoctor);
                     if (lastFrameSet == FrameSet.appointment) {
-                        talonSelectFrame.showModal(
-                            model.getTalonTableModel(
-                                model.getCurrentPoliclinic().getPcod(),
-                                model.getCurrentSpeciality().getPcod(),
-                                model.getCurrentDoctor().getPcod()
-                            )
-                        );
-                        doctorFrame.setVisible(false);
-                        mainFrame.setVisible(false);
+                        controller.openTalonSelectFrame(currentDoctor);
                     } else if (lastFrameSet == FrameSet.shedule) {
-                        sheduleFrame.showModal(
-                            model.getSheduleTableModel(
-                                model.getCurrentDoctor().getPcod(),
-                                model.getCurrentPoliclinic().getPcod(),
-                                model.getCurrentSpeciality().getPcod()
-                            )
-                        );
-                        doctorFrame.setVisible(false);
-                        mainFrame.setVisible(false);
+                        controller.openSheduleFrame(currentDoctor);
                     }
                 }
             }
@@ -197,8 +171,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         doctorFrame.addDoctorSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                doctorFrame.setVisible(false);
-                mainFrame.setVisible(true);
+                controller.backToMainFrame(doctorFrame);
             }
         });
     }
@@ -212,16 +185,13 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 final int curColumn = curTable.getSelectedColumn();
                 TTalon curTalon = ((TalonTableModel) curTable.getModel()).getTalonList()
                     .getTalonByDay(curRow, curColumn);
-                if (curTalon != null) {
-                    controller.setSelectedTalon(curTalon);
-                }
+                controller.setSelectedTalon(curTalon);
             }
         });
         talonSelectFrame.addTalonSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                talonSelectFrame.setVisible(false);
-                mainFrame.setVisible(true);
+                controller.backToMainFrame(talonSelectFrame);
             }
         });
     }
@@ -230,8 +200,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         sheduleFrame.addShedulerSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                sheduleFrame.setVisible(false);
-                mainFrame.setVisible(true);
+                controller.backToMainFrame(sheduleFrame);
             }
         });
     }
@@ -240,7 +209,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         resTalonSelectFrame.addReservedTalonTableMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                int dialogResult = new OptionsDialog().showConfirmDialog(resTalonSelectFrame,
+                int dialogResult = new OptionsDialog().showConfirmDialog(null, //resTalonSelectFrame,
                     "Отменить запись?");
                 if (dialogResult == OptionsDialog.ACCEPT) {
                     JTable curTable = (JTable) e.getSource();
@@ -268,8 +237,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         resTalonSelectFrame.addReservedSelectBackwardListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                resTalonSelectFrame.setVisible(false);
-                mainFrame.setVisible(true);
+                controller.backToMainFrame(resTalonSelectFrame);
             }
         });
     }
@@ -339,7 +307,6 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         } else if (lastFrameSet == FrameSet.appointment) {
             if ((model.getPatient() != null) && (model.getTalon() != null)) {
                 authFrame.setVisible(false);
-                controller.reserveTalon(model.getPatient(), model.getTalon());
                 String talonText = " Текущее ЛПУ:" + model.getCurrentPoliclinic().getName()
                     + "\n Текущий врач:" + model.getCurrentDoctor().getName()
                     + "\n Текущий пациент : " + model.getPatient().getSurname()
@@ -348,8 +315,15 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                         + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
                     + "\n Время приёма: "
                         + DEFAULT_TIME_FORMAT.format(new Time(model.getTalon().getTimep()));
-                optionsDialog.showPrintDialog(talonSelectFrame, talonText,
+                int optResult = optionsDialog.showPrintDialog(talonSelectFrame, talonText,
                     12, StyleConstants.ALIGN_LEFT);
+                if (optResult == OptionsDialog.PRINT) {
+                    controller.reserveTalon(model.getPatient(), model.getTalon());
+                    optionsDialog.showMessageDialog(talonSelectFrame,
+                        "Вы успешно записаны на приём.");
+                } else {
+                    optionsDialog.showMessageDialog(talonSelectFrame, "Запись отменена.");
+                }
                 talonSelectFrame.refreshTalonTableModel(
                     model.getTalonTableModel(
                         model.getCurrentPoliclinic().getPcod(),
@@ -357,6 +331,9 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                         model.getCurrentDoctor().getPcod()
                     )
                 );
+            } else {
+                optionsDialog.showMessageDialog(talonSelectFrame,
+                    "Введенный номер полиса не найден в БД.");
             }
         }
     }
@@ -374,6 +351,34 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
 //                model.getReservedTalonTableModel(model.getPatient().getId())
 //            );
 //        }
+    }
+
+    public final void openLpuSelectFrame() {
+        lpuSelectFrame.showAsModal();
+        mainFrame.setVisible(false);
+    }
+
+    public final void showAuthorizationFrame() {
+        authFrame.setVisible(true);
+    }
+
+    public final void openDoctorSelectFrame() {
+        doctorFrame.showModal();
+        lpuSelectFrame.setVisible(false);
+    }
+
+    public final void openMainFrame() {
+        mainFrame.setVisible(true);
+    }
+
+    public final void openTalonSelectFrame(final TalonTableModel talonTableModel) {
+        talonSelectFrame.showModal(talonTableModel);
+        doctorFrame.setVisible(false);
+    }
+
+    public final void openSheduleFrame(final SheduleTableModel sheduleTableModel) {
+        sheduleFrame.showModal(sheduleTableModel);
+        doctorFrame.setVisible(false);
     }
 
 }
