@@ -236,14 +236,16 @@ public class ServerInfomat extends Server implements Iface {
         }
     }
 
-    private boolean isPatientAlreadyReserveTalonOnThisDay(final TPatient patient,
-            final TTalon talon) throws SQLException {
+    @Override
+    public final boolean isPatientAlreadyReserveTalonOnThisDay(final TPatient patient,
+            final TTalon talon) throws KmiacServerException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
                 "SELECT id FROM e_talon WHERE npasp = ? AND pcod_sp = ? AND datap = ?",
                 patient.getId(), talon.getPcodSp(), new Date(talon.getDatap()))) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
-            return false;
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 

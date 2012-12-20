@@ -14,10 +14,7 @@ import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
-import ru.nkz.ivcgzo.thriftInfomat.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftInfomat.ReleaseTalonOperationFailedException;
-import ru.nkz.ivcgzo.thriftInfomat.ReserveTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
@@ -184,19 +181,8 @@ public class Model implements IModel {
     }
 
     @Override
-    public final void reserveTalon(final TPatient pat, final TTalon talon) {
-        try {
+    public final void reserveTalon(final TPatient pat, final TTalon talon) throws TException {
             ClientInfomat.tcl.reserveTalon(pat, talon);
-        } catch (ReserveTalonOperationFailedException e) {
-            e.printStackTrace();
-        } catch (PatientHasSomeReservedTalonsOnThisDay e) {
-            e.printStackTrace();
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
     }
 
     @Override
@@ -316,5 +302,11 @@ public class Model implements IModel {
         for (IInfomatObserver obs: infomatObservers) {
             obs.updateReservedTalon();
         }
+    }
+
+    @Override
+    public final boolean isPatientAlreadyReserveTalonOnThisDay(final TPatient pat,
+            final TTalon talon) throws TException {
+        return ClientInfomat.tcl.isPatientAlreadyReserveTalonOnThisDay(pat, talon);
     }
 }

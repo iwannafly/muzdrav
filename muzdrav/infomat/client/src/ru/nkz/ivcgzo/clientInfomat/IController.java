@@ -22,7 +22,7 @@ public interface IController {
 
     void setShedule(int pcod, int cpol, String cdol);
 
-    void reserveTalon(TPatient pat, TTalon talon);
+    void reserveTalon();
 
     void releaseTalon(TTalon talon);
 
@@ -52,4 +52,8 @@ public interface IController {
     void closeAuthorizationFrame();
 
     void checkPatientOms(String omsNumber);
+
+    void refreshTalonTable();
+
+    void openReservedTalonFrame();
 }

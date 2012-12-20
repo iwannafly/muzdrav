@@ -51,7 +51,7 @@ public class OptionsDialog implements ActionListener {
     private final JButton btnSubmit = new JButton("Да");
     private final JButton btnOk = new JButton("Ok");
     private final JButton btnCancel = new JButton("Отмена");
-    private final JButton btnPrint = new JButton("Занять талон");
+    private final JButton btnPrint = new JButton("Выбрать");
     private JPanel pMessage;
     private JPanel pButtons;
     private JTextPane tpMessage;

@@ -71,7 +71,9 @@ public interface IModel {
 
     TTalon getTalon();
 
-    void reserveTalon(TPatient pat, TTalon talon);
+    void reserveTalon(TPatient pat, TTalon talon) throws TException;
+
+    boolean isPatientAlreadyReserveTalonOnThisDay(TPatient pat, TTalon talon) throws TException;
 
     void releaseTalon(TTalon talon);
 

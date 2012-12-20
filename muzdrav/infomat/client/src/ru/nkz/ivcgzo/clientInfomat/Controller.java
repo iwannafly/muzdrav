@@ -1,5 +1,9 @@
 package ru.nkz.ivcgzo.clientInfomat;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.text.SimpleDateFormat;
+
 import javax.swing.JFrame;
 
 import org.apache.thrift.TException;
@@ -12,12 +16,15 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
-import ru.nkz.ivcgzo.thriftInfomat.TPatient;
+import ru.nkz.ivcgzo.thriftInfomat.PatientHasSomeReservedTalonsOnThisDay;
+import ru.nkz.ivcgzo.thriftInfomat.ReserveTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class Controller implements IController {
     private IModel model;
     private InfomatView view;
+    private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
 
     public Controller(final IModel curModel) {
         this.model = curModel;
@@ -62,8 +69,64 @@ public class Controller implements IController {
     }
 
     @Override
-    public final void reserveTalon(final TPatient pat, final TTalon talon) {
-        model.reserveTalon(pat, talon);
+    public final void reserveTalon() {
+        if ((model.getPatient() != null) && (model.getTalon() != null)) {
+            view.closeAuthrizationFrame();
+            try {
+                if (!model.isPatientAlreadyReserveTalonOnThisDay(
+                        model.getPatient(), model.getTalon())) {
+                    String talonText = " ЛПУ: " + model.getCurrentPoliclinic().getName()
+                        + "\n Врач: " + model.getCurrentDoctor().getName()
+                        + "\n Специальность: " + model.getCurrentSpeciality()
+                        + "\n Пациент : " + model.getPatient().getSurname()
+                            + " " + model.getPatient().getName()
+                            + " " + model.getPatient().getMiddlename()
+                        + "\n Дата приёма: "
+                            + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
+                        + "\n Время приёма: "
+                            + DEFAULT_TIME_FORMAT.format(new Time(model.getTalon().getTimep()));
+                    final int dialogResult = view.showPrintDialog(talonText);
+                    if (dialogResult == OptionsDialog.PRINT) {
+                        try {
+                            model.reserveTalon(model.getPatient(), model.getTalon());
+                            view.showMessageDialog("Вы успешно записаны на приём.");
+                        } catch (ReserveTalonOperationFailedException e) {
+                            view.showMessageDialog("Ошибка во время записи. Запись отменена.");
+                            e.printStackTrace();
+                        } catch (PatientHasSomeReservedTalonsOnThisDay e) {
+                            view.showMessageDialog(
+                                "Ошибка! Вы уже записаны на "
+                                + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
+                                + " к выбранному специалисту."
+                            );
+                            e.printStackTrace();
+                        } catch (KmiacServerException e) {
+                            view.showMessageDialog("Ошибка во время записи. Запись отменена.");
+                            e.printStackTrace();
+                        } catch (TException e) {
+                            view.showMessageDialog("Ошибка во время записи. Запись отменена.");
+                            e.printStackTrace();
+                            ClientInfomat.conMan.reconnect(e);
+                        }
+                    } else {
+                        view.showMessageDialog("Запись отменена.");
+                    }
+                } else {
+                    view.showMessageDialog(
+                        "Ошибка! Вы уже записаны на "
+                        + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
+                        + " к выбранному специалисту."
+                    );
+                }
+            } catch (TException e) {
+                view.showMessageDialog("Ошибка во время записи. Запись отменена.");
+                ClientInfomat.conMan.reconnect(e);
+                e.printStackTrace();
+            }
+            refreshTalonTable();
+        } else {
+            view.showMessageDialog("Введенный номер полиса не найден в БД.");
+        }
     }
 
     @Override
@@ -243,19 +306,24 @@ public class Controller implements IController {
     @Override
     public final void checkPatientOms(final String omsNumber) {
         if ((omsNumber == null) || (omsNumber.isEmpty() || (omsNumber.trim().isEmpty()))) {
+            view.closeAuthrizationFrame();
             view.showMessageDialog("Номер полиса не найден в базе данных! "
                 + "Обратитесь к системному администратору!");
         } else {
             try {
                 model.setPatient(omsNumber);
+                view.closeAuthrizationFrame();
             } catch (OmsNotValidException e) {
+                view.closeAuthrizationFrame();
                 view.showMessageDialog("Номер полиса не найден в базе данных! "
                     + "Обратитесь к системному администратору!");
             } catch (KmiacServerException e) {
+                view.closeAuthrizationFrame();
                 view.showMessageDialog("Ошибка проверки полиса в БД! "
                         + "Обратитесь к системному администратору!");
                 e.printStackTrace();
             } catch (TException e) {
+                view.closeAuthrizationFrame();
                 view.showMessageDialog("Ошибка проверки полиса в БД! "
                         + "Обратитесь к системному администратору!");
                 e.printStackTrace();
@@ -263,6 +331,48 @@ public class Controller implements IController {
             }
         }
         view.closeAuthrizationFrame();
+    }
+
+    @Override
+    public final void refreshTalonTable() {
+        try {
+            view.refreshTalonTable(
+                model.getTalonTableModel(
+                    model.getCurrentPoliclinic().getPcod(),
+                    model.getCurrentSpeciality().getPcod(),
+                    model.getCurrentDoctor().getPcod()
+                )
+            );
+        } catch (KmiacServerException e) {
+            view.showMessageDialog("Ошибка загрузки талонов! "
+                + "Обратитесь к системному администратору!");
+            e.printStackTrace();
+        } catch (TException e) {
+            view.showMessageDialog("Ошибка загрузки талонов! "
+                + "Обратитесь к системному администратору!");
+            e.printStackTrace();
+            ClientInfomat.conMan.reconnect(e);
+        }
+    }
+
+    @Override
+    public final void openReservedTalonFrame() {
+        try {
+            view.openReservedTalonFrame(
+                model.getReservedTalonTableModel(
+                    model.getPatient().getId()
+                )
+            );
+        } catch (KmiacServerException e) {
+            view.showMessageDialog("Ошибка загрузки занятых талонов! "
+                + "Обратитесь к системному администратору!");
+            e.printStackTrace();
+        } catch (TException e) {
+            view.showMessageDialog("Ошибка загрузки занятых талонов! "
+                + "Обратитесь к системному администратору!");
+            e.printStackTrace();
+            ClientInfomat.conMan.reconnect(e);
+        }
     }
 
 }

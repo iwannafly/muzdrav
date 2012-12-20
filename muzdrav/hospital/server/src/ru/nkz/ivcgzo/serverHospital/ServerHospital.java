@@ -392,8 +392,8 @@ public class ServerHospital extends Server implements Iface {
     @Override
     public final void updateDiagnosis(final TDiagnosis inDiagnos)
             throws KmiacServerException {
-        final int[] indexes = {3, 5, 0};
-        final String sqlQuery = "UPDATE c_diag SET med_op = ?, prizn = ? "
+        final int[] indexes = {3, 4, 5, 0};
+        final String sqlQuery = "UPDATE c_diag SET med_op = ?, date_ustan = ?, prizn = ? "
                 + "WHERE id = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, inDiagnos, DIAGNOSIS_TYPES, indexes);
