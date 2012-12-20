@@ -8,6 +8,9 @@ include "../../../common/thrift/classifier.thrift"
 	 */
 	exception KovNotFoundException {
 	}
+exception FertNotFoundException {
+	}
+
 
 struct Kontipa{
 	1:i32 bn;
@@ -391,6 +394,37 @@ struct Lgota {
 	11: optional string ndoc;
 }
 
+
+/* Регистр женщин фертильного возраста */
+
+struct Reg {
+        1: optional i32 bn;
+        2: optional i32 kter;
+	3: optional i32 klpu;
+        4: optional string fam;
+        5: optional string im;
+        6: optional string oth;  
+	7: optional i64 dr;
+	8: optional i32 kterp;
+        9: optional string adresp; 
+	10: optional i32 kterf;
+        11: optional string adresf; 
+        12: optional i32 kterl;
+        13: optional i32 klpup;
+        14: optional string osn;
+	15: optional i64 dn;
+	16: optional i64 dk;
+	17: optional i32 kpri;
+}
+struct Diag{
+	1: optional i32 bn;
+        2: optional string dia;
+}
+
+
+
+
+
 /** 
  *пациент не найден
  */
@@ -404,7 +438,7 @@ exception LgkatNotFoundException {
 
 service ThriftVgr extends kmiacServer.KmiacServer {
 	/**
-        * Создает KOB
+        *диспансеризация KOB
 	*/
 	string getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
 
@@ -414,6 +448,11 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         * диспансеризация детей
 	*/
 	string getDetInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+/**
+       Регистр женщин фертильного возраста	*/
+
+	string getFertInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+
 
 
 

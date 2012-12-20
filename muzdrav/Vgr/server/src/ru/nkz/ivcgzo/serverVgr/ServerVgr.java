@@ -33,6 +33,7 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftVgr.Diag;
 import ru.nkz.ivcgzo.thriftVgr.LgkatNotFoundException;
 import ru.nkz.ivcgzo.thriftVgr.Lgota;
 import ru.nkz.ivcgzo.thriftVgr.Patient;
@@ -51,6 +52,7 @@ import ru.nkz.ivcgzo.thriftVgr.Lgot;
 import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
 import ru.nkz.ivcgzo.thriftVgr.RdPatient;
 import ru.nkz.ivcgzo.thriftVgr.RdVizit;
+import ru.nkz.ivcgzo.thriftVgr.Reg;
 import ru.nkz.ivcgzo.thriftVgr.Sv3;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr.Iface;
@@ -84,6 +86,10 @@ public class ServerVgr extends Server implements Iface {
 	private final TResultSetMapper<Sv3, Sv3._Fields> rsmSv3;
 	private final Class<?>[] Sv3Types;
 	
+	private final TResultSetMapper<Reg, Reg._Fields> rsmReg;
+	private final Class<?>[] RegTypes;
+	private final TResultSetMapper<Diag, Diag._Fields> rsmDiag;
+	private final Class<?>[] DiagTypes;
 	
 	public ServerVgr(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -110,12 +116,12 @@ public class ServerVgr extends Server implements Iface {
 		rdConVizitTypes = new Class<?>[]{          Integer.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
 /*1*/		rsmSv3 = new TResultSetMapper<>(Sv3.class, "code","dat_v","uchr","cod_uch","uchrnum",   
-/*2*/      				"uchrname","fio_u","dat_born","pol","nation","vremen","mesto_k",
+/*2*/      		"uchrname","fio_u","dat_born","pol","nation","vremen","mesto_k",
 /*3*/			"mesto_k1","mesto_k2","mesto_k3","mesto_k4","mesto_k5","mesto_k6",
 /*4*/			"gorod_k","street_k","m_v", "where_s1","where_s","p_dou","pos_",   /*25*/
 /*5*/			"u_", "m_uth","m_uth1", "wedom","wedom1","vesgr","ves_kg","rost",
 /*6*/			"f_r","f_r1","massa", "post","intel","em","ps","d_do","k_s1",
-/*7*/                "k_s2","k_s3","k_s4","k_s5","d_po","k_si1",
+/*7*/           "k_s2","k_s3","k_s4","k_s5","d_po","k_si1",
 /*8*/			"p_u_01","n_pu1","f_h_1","k_si2","p_u_02","n_pu2","f_h_2",
 /*9*/			"k_si3","p_u_03","n_pu3","f_h_3","k_si4","p_u_04","n_pu4",    /*62*/
 /*10*/			"f_h_4","k_si5","p_u_05","n_pu5","f_h_5","inv","zab_inv",
@@ -134,7 +140,18 @@ public class ServerVgr extends Server implements Iface {
 /*10*/      Integer.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
 /*11*/      Integer.class,String.class,Integer.class, Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
 /*12*/      String.class,Integer.class,Boolean.class,Integer.class,String.class};
-		
+	
+rsmReg = new TResultSetMapper<>(Reg.class, "bn","kter","klpu",    
+		"fam","im","otch","dr","kterp","adresp",
+		"kterf","adresf","kterf","klpup",
+		"osn","dn","dk","kpri" );
+RegTypes = new Class<?>[] {Integer.class,Integer.class,Integer.class,
+		String.class,String.class,String.class,Date.class,Integer.class,String.class,
+		Integer.class,String.class,Integer.class,Integer.class,
+		String.class,Date.class,Date.class,Integer.class};
+rsmDiag = new TResultSetMapper<>(Diag.class, "bn","dia" );
+DiagTypes = new Class<?>[] {Integer.class,String.class};
+
 		// TODO Auto-generated constructor stub
 	}
 
@@ -1034,5 +1051,63 @@ throw new TException(e);
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public String getFertInfoPol(int cpodr, long dn, long dk)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		String sqlreg;
+		String path = null;
+		int bufRead;
+		byte[] buffer = new byte[8192];
+		
+		try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("FertInfoPol", ".zip").getAbsolutePath());
+	 		ZipOutputStream zos = new ZipOutputStream(fos)) {
+	
+		sqlreg = "SELECT p.npasp::integer AS bn, 907::integer AS kter,null::integer AS klpu,p.fam::char(20) AS fam,p.im::char(15) AS im,p.ot::char(20) AS otch,p.datar AS dr,  "+
+		"(select terp from get_ter(p.adp_gorod::text,p.adm_gorod::text))::integer AS kterp,(select term from get_ter(p.adp_gorod::text,p.adm_gorod::text))::integer AS kterf," +
+		"trim(p.adp_gorod)||' '|| trim(p.adp_ul)||' '||trim(p.adp_dom)||'-'||trim(p.adp_kv):: char(70) AS adresp, "+
+		"trim(p.adm_gorod)||' '|| trim(p.adm_ul)||' '||trim(p.adm_dom)||'-'||trim(p.adm_kv):: char(70) AS adresf, "+
+		"10::integer AS kterl, p.cpol_pr ::integer AS klpup, f.osn :: char(150) AS osn,f.dn AS dn, f.dk AS dk, f.kpri::integer AS kpri  "+
+		"FROM  patient p JOIN p_fert f ON (p.npasp = f.npasp) "+
+		"WHERE  p.cpol_pr = ? AND (f.dataz>? AND f.dataz<?) " ;		
+
+       
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlreg,cpodr, new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("reg.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String sqldiag = "select d.npasp::integer AS bn, d.diag::char(7) AS dia"+
+				"from patient p JOIN p_fert f ON (p.npasp = f.npasp) JOIN p_diag d ON (p.npasp = d.npasp and d.pat=1) "+
+		"WHERE  p.cpol_pr = ? AND (f.dataz>? AND f.dataz<?) " ;	
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqldiag,cpodr, new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("diag.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		return path;	}
 
 }

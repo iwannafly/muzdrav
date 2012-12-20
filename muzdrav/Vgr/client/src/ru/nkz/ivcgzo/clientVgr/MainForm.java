@@ -132,17 +132,19 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		mnNewMenu.add(menuItem_1);
 		
-		JMenuItem menuItem_2 = new JMenuItem("Диспансеризация детей-сирот");
-		mnNewMenu.add(menuItem_2);
-		
 		JMenuItem menuItem_3 = new JMenuItem("Родовой сертификат");
 		mnNewMenu.add(menuItem_3);
 		
 		JMenuItem menuItem_4 = new JMenuItem("Регистр женщин фертильного возраста");
+		menuItem_4.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				per = new Period();
+				per.Cslu = 4;
+				per.showPeriod();
+			}
+		});
 		mnNewMenu.add(menuItem_4);
-		
-		JMenuItem menuItem_5 = new JMenuItem("Регистр больных с орфанными заб-ями");
-		mnNewMenu.add(menuItem_5);
 		
 		JMenuItem menuItem_6 = new JMenuItem("Экспорт карт детей-инвалидов");
 		mnNewMenu.add(menuItem_6);
