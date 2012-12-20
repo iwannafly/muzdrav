@@ -375,4 +375,35 @@ public class Controller implements IController {
         }
     }
 
+    @Override
+    public final void checkPatientOms(final String omsNumber,
+            final IntegerClassifier currentPoliclinic) {
+        if ((omsNumber == null) || (omsNumber.isEmpty() || (omsNumber.trim().isEmpty()))) {
+            view.closeAuthrizationFrame();
+            view.showMessageDialog("Номер полиса не найден в базе данных! "
+                + "Обратитесь к системному администратору!");
+        } else {
+            try {
+                model.setPatient(omsNumber, currentPoliclinic.getPcod());
+                view.closeAuthrizationFrame();
+            } catch (OmsNotValidException e) {
+                view.closeAuthrizationFrame();
+                view.showMessageDialog("Номер полиса не найден в базе данных! "
+                    + "Обратитесь к системному администратору!");
+            } catch (KmiacServerException e) {
+                view.closeAuthrizationFrame();
+                view.showMessageDialog("Ошибка проверки полиса в БД! "
+                        + "Обратитесь к системному администратору!");
+                e.printStackTrace();
+            } catch (TException e) {
+                view.closeAuthrizationFrame();
+                view.showMessageDialog("Ошибка проверки полиса в БД! "
+                        + "Обратитесь к системному администратору!");
+                e.printStackTrace();
+                ClientInfomat.conMan.reconnect(e);
+            }
+        }
+        view.closeAuthrizationFrame();
+    }
+
 }

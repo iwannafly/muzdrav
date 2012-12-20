@@ -4,9 +4,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Date;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 import javax.swing.JTable;
@@ -30,8 +27,8 @@ public class InfomatView implements IInfomatObserver {
         personalOffice,
         shedule
     }
-    private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
+//    private static final SimpleDateFormat DEFAULT_TIME_FORMAT = new SimpleDateFormat("HH:mm");
+//    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("dd-MM-yy");
     private IModel model;
     private IController controller;
     private LpuSelectFrame lpuSelectFrame;
@@ -210,7 +207,12 @@ public class InfomatView implements IInfomatObserver {
     private void setAuthFrameControls() {
         authFrame.addButtonAcceptPatientCheckListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                controller.checkPatientOms(authFrame.getOmsText().trim());
+                if (lastFrameSet == FrameSet.personalOffice) {
+                    controller.checkPatientOms(authFrame.getOmsText().trim());
+                } else if (lastFrameSet == FrameSet.appointment) {
+                    controller.checkPatientOms(
+                        authFrame.getOmsText().trim(), model.getCurrentPoliclinic());
+                }
             }
         });
         authFrame.addButtonCancelPatientCheckListener(new ActionListener()  {

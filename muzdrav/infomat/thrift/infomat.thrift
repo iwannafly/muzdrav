@@ -79,4 +79,7 @@ service ThriftInfomat extends kmiacServer.KmiacServer{
 		throws (1: kmiacServer.KmiacServerException kse);
 	bool isPatientAlreadyReserveTalonOnThisDay(1:TPatient pat, 2:TTalon talon)
 		throws (1: kmiacServer.KmiacServerException kse);
+	TPatient checkOmsAndGetPatientInCurrentPoliclinic(1:string oms, 2: i32 clpu)
+		throws (1: kmiacServer.KmiacServerException kse,
+			2: OmsNotValidException onve);
 }

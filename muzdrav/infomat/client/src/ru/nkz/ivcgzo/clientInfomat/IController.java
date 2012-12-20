@@ -5,7 +5,6 @@ import javax.swing.JFrame;
 import ru.nkz.ivcgzo.clientInfomat.ui.InfomatFrame;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 
@@ -52,6 +51,8 @@ public interface IController {
     void closeAuthorizationFrame();
 
     void checkPatientOms(String omsNumber);
+
+    void checkPatientOms(String omsNumber, IntegerClassifier currentPoliclinic);
 
     void refreshTalonTable();
 
