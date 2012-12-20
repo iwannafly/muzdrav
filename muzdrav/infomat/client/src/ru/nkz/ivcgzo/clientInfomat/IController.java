@@ -10,21 +10,13 @@ import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 
 public interface IController {
-    void setPoliclinics();
-
     void setCurrentPoliclinic(IntegerClassifier currentPoliclinic);
 
     void setCurrentSpeciality(StringClassifier currentSpeciality);
 
     void setCurrentDoctor(IntegerClassifier currentDoctor);
 
-    void setSpecialities(int cpol);
-
-    void setDoctors(int cpol, String cdol);
-
     void setTalons(int cpol, String cdol, int pcod);
-
-    void setPatient(String oms);
 
     void setReservedTalon(int patientId);
 
@@ -54,4 +46,10 @@ public interface IController {
     void openTalonSelectFrame(IntegerClassifier currentDoctor);
 
     void openSheduleFrame(IntegerClassifier currentDoctor);
+
+    void initiateReservedTalonSelect(TTalon curTalon);
+
+    void closeAuthorizationFrame();
+
+    void checkPatientOms(String omsNumber);
 }

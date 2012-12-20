@@ -66,6 +66,8 @@ public class OptionsDialog implements ActionListener {
         btnPrint.addActionListener(this);
     }
 
+
+    //TODO Добавить телескопический вызов, как в методах ниже
     /**
      * Отображает диалоговое окно с печатью в случае подтверждения.
      * @param parent - родительское окно (окно из которого вызывается диалог)

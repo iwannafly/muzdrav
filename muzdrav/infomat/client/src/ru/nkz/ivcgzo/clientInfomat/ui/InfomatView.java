@@ -14,15 +14,7 @@ import javax.swing.text.StyleConstants;
 
 import ru.nkz.ivcgzo.clientInfomat.IController;
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
@@ -32,10 +24,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
-public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
-        IPoliclinicsObserver, ICurrentPoliclinicObserver, ICurrentSpecialityObserver,
-        ICurrentDoctorObserver, IPatientObserver, ISelectedTalonObserver,
-        ICurrentIReservedTalonObserver {
+public class InfomatView implements IInfomatObserver {
     private enum FrameSet {
         appointment,
         personalOffice,
@@ -59,14 +48,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
             final IModel inModel) {
         this.controller = inController;
         this.model = inModel;
-        model.registerDoctorsObserver((IDoctorsObserver) this);
-        model.registerPoliclinicsObserver((IPoliclinicsObserver) this);
-        model.registerSpecialitiesObserver((ISpecialitiesObserver) this);
-        model.registerCurrentDoctorObserver((ICurrentDoctorObserver) this);
-        model.registerCurrentPoliclinicObserver((ICurrentPoliclinicObserver) this);
-        model.registerCurrentSpecialityObserver((ICurrentSpecialityObserver) this);
-        model.registerPatientObserver((IPatientObserver) this);
-        model.registerSelectedTalonObserver((ISelectedTalonObserver) this);
+        model.registerInfomatObserver((IInfomatObserver) this);
     }
 
     public final void createFrames() {
@@ -209,29 +191,12 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         resTalonSelectFrame.addReservedTalonTableMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                int dialogResult = new OptionsDialog().showConfirmDialog(null, //resTalonSelectFrame,
-                    "Отменить запись?");
-                if (dialogResult == OptionsDialog.ACCEPT) {
-                    JTable curTable = (JTable) e.getSource();
-                    final int curRow = curTable.getSelectedRow();
-                    TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
-                        .getReservedTalonList()
-                        .get(curRow);
-                    if (curTalon != null) {
-                        controller.releaseTalon(curTalon);
-                        resTalonSelectFrame.refreshTalonTableModel(
-                            model.getReservedTalonTableModel(
-                                model.getPatient().getId()
-                            )
-                        );
-                    }
-                } else {
-                    resTalonSelectFrame.refreshTalonTableModel(
-                        model.getReservedTalonTableModel(
-                            model.getPatient().getId()
-                        )
-                    );
-                }
+                JTable curTable = (JTable) e.getSource();
+                final int curRow = curTable.getSelectedRow();
+                TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
+                    .getReservedTalonList()
+                    .get(curRow);
+                controller.initiateReservedTalonSelect(curTalon);
             }
         });
         resTalonSelectFrame.addReservedSelectBackwardListener(new ActionListener() {
@@ -245,15 +210,12 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
     private void setAuthFrameControls() {
         authFrame.addButtonAcceptPatientCheckListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                controller.setPatient(authFrame.getOmsText().trim());
-                authFrame.clearOmsText();
-                authFrame.setVisible(false);
+                controller.checkPatientOms(authFrame.getOmsText().trim());
             }
         });
         authFrame.addButtonCancelPatientCheckListener(new ActionListener()  {
             public void actionPerformed(final ActionEvent e) {
-                authFrame.clearOmsText();
-                authFrame.setVisible(false);
+                controller.closeAuthorizationFrame();
             }
         });
     }
@@ -381,4 +343,34 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         doctorFrame.setVisible(false);
     }
 
+    public final void showMessageDialog(final String message) {
+        if (optionsDialog != null) {
+            optionsDialog.showMessageDialog(null, message);
+        }
+    }
+
+    public final int showConfirmDialog(final String message) {
+        if (optionsDialog != null) {
+            return optionsDialog.showConfirmDialog(null, message);
+        } else {
+            return OptionsDialog.DECLINE;
+        }
+    }
+
+    public final int showPrintDialog(final String message) {
+        if (optionsDialog != null) {
+            return optionsDialog.showPrintDialog(null, message, 12, StyleConstants.ALIGN_LEFT);
+        } else {
+            return OptionsDialog.DECLINE;
+        }
+    }
+
+    public final void refreshReservedTalonTable(final ReservedTalonTableModel tableModel) {
+        resTalonSelectFrame.refreshTalonTableModel(tableModel);
+    }
+
+    public final void closeAuthrizationFrame() {
+        authFrame.clearOmsText();
+        authFrame.setVisible(false);
+    }
 }

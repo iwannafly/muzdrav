@@ -11,7 +11,6 @@ import javax.swing.table.TableModel;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 
 public class SheduleTableModel implements TableModel {
@@ -23,15 +22,8 @@ public class SheduleTableModel implements TableModel {
         "Понедельник", "Вторник", "Среда" , "Четверг" , "Пятница", "Суббота", "Воскресенье"
     };
 
-    public SheduleTableModel(final int pcod, final int cpol, final String cdol) {
-        try {
-            sheduleList = ClientInfomat.tcl.getShedule(pcod, cpol, cdol);
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public SheduleTableModel(final int pcod, final int cpol, final String cdol) throws TException {
+        sheduleList = ClientInfomat.tcl.getShedule(pcod, cpol, cdol);
     }
 
     @Override
