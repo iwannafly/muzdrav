@@ -3296,12 +3296,19 @@ public class MainFrame extends JFrame {
                 }
             }
         } else {
-            return false;
+            return true;
+//            правильный вариант этот, в последний момент попросили заменить верхним костылем
+//            return false;
         }
         return true;
     }
 
     private boolean isStageDatesCorrect() {
+        // костыль по заявкам 28, добавленный в последний момент. мне он тоже не нравится.
+        // по уму нужен только нижний ретурн
+        if (tbStages.getData().size() == 0) {
+            return true;
+        }
         return ((tbStages.getData().get(0).getDateStart() == priemInfo.getDatap())
             && (tbStages.getData().get(tbStages.getData().size() - 1).getDateEnd()
                 == cdeZaklDate.getDate().getTime()));
