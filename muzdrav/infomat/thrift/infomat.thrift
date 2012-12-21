@@ -77,4 +77,6 @@ service ThriftInfomat extends kmiacServer.KmiacServer{
 			2: ReleaseTalonOperationFailedException rtofe);
 	list<TSheduleDay> getShedule(1:i32 pcod, 2:i32 cpol, 3: string cdol)
 		throws (1: kmiacServer.KmiacServerException kse);
+	bool isPatientAlreadyReserveTalonOnThisDay(1:TPatient pat, 2:TTalon talon)
+		throws (1: kmiacServer.KmiacServerException kse);
 }

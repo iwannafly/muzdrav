@@ -1603,7 +1603,7 @@ public class MainFrame extends JFrame {
         pnJalob = new JPanel();
         pnJalob.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnJalob.setLayout(new BoxLayout(pnJalob, BoxLayout.Y_AXIS));
-        
+
         spJalob = new JScrollPane();
         pnJalob.add(spJalob);
 
@@ -1622,7 +1622,7 @@ public class MainFrame extends JFrame {
         pnDesiaseHistory = new JPanel();
         pnDesiaseHistory.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnDesiaseHistory.setLayout(new BoxLayout(pnDesiaseHistory, BoxLayout.X_AXIS));
-        
+
         spDesiaseHistory = new JScrollPane();
         pnDesiaseHistory.add(spDesiaseHistory);
 
@@ -1642,7 +1642,7 @@ public class MainFrame extends JFrame {
         pnStatusPraence = new JPanel();
         pnStatusPraence.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusPraence.setLayout(new BoxLayout(pnStatusPraence, BoxLayout.X_AXIS));
-        
+
         spStatusPraence = new JScrollPane();
         pnStatusPraence.add(spStatusPraence);
 
@@ -1662,7 +1662,7 @@ public class MainFrame extends JFrame {
         pnFisicalObs = new JPanel();
         pnFisicalObs.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnFisicalObs.setLayout(new BoxLayout(pnFisicalObs, BoxLayout.X_AXIS));
-        
+
         spFisicalObs = new JScrollPane();
         pnFisicalObs.add(spFisicalObs);
 
@@ -1681,7 +1681,7 @@ public class MainFrame extends JFrame {
         pnStatusLocalis = new JPanel();
         pnStatusLocalis.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnStatusLocalis.setLayout(new BoxLayout(pnStatusLocalis, BoxLayout.X_AXIS));
-        
+
         spStatusLocalis = new JScrollPane();
         pnStatusLocalis.add(spStatusLocalis);
         taStatusLocalis = new JTextArea();
@@ -2835,7 +2835,7 @@ public class MainFrame extends JFrame {
 
     private void addDiagnosisTable() {
         tbDiag = new CustomTable<TDiagnosis, TDiagnosis._Fields>(
-                false, true, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
+                true, true, TDiagnosis.class, 4, "Дата", 2, "Код МКБ", 7, "Наименование диагноза");
         tbDiag.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -2846,6 +2846,8 @@ public class MainFrame extends JFrame {
             }
         });
         tbDiag.setDateField(0);
+        tbDiag.setEditableFields(false, 1);
+        tbDiag.setEditableFields(false, 2);
         spDiag.setViewportView(tbDiag);
     }
 

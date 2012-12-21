@@ -7,49 +7,20 @@ import java.util.List;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftInfomat.OmsNotValidException;
-import ru.nkz.ivcgzo.thriftInfomat.PatientHasSomeReservedTalonsOnThisDay;
 import ru.nkz.ivcgzo.thriftInfomat.ReleaseTalonOperationFailedException;
-import ru.nkz.ivcgzo.thriftInfomat.ReserveTalonOperationFailedException;
 import ru.nkz.ivcgzo.thriftInfomat.TPatient;
 import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class Model implements IModel {
-    private List<IInfomatObserver> infomatObservers = new ArrayList<IInfomatObserver> ();
-    private List<IDoctorsObserver> doctorsObservers = new ArrayList<IDoctorsObserver>();
-    private List<IPoliclinicsObserver> policlinicsObservers =
-        new ArrayList<IPoliclinicsObserver>();
-    private List<ISpecialitiesObserver> specialitiesObservers =
-        new ArrayList<ISpecialitiesObserver>();
-    private List<ICurrentDoctorObserver> currentDoctorsObservers =
-        new ArrayList<ICurrentDoctorObserver>();
-    private List<ICurrentPoliclinicObserver> currentPoliclinicObservers =
-        new ArrayList<ICurrentPoliclinicObserver>();
-    private List<ICurrentSpecialityObserver> currentSpecialityObservers =
-        new ArrayList<ICurrentSpecialityObserver>();
-    private List<IPatientObserver> patientObservers =
-            new ArrayList<IPatientObserver>();
-    private List<ISelectedTalonObserver> selectedTalonObservers =
-            new ArrayList<ISelectedTalonObserver>();
-    private List<ICurrentIReservedTalonObserver> currentReservedTalonObservers =
-            new ArrayList<ICurrentIReservedTalonObserver>();
+    private List<IInfomatObserver> infomatObservers = new ArrayList<IInfomatObserver>();
     private List<IntegerClassifier> policlinics;
     private List<StringClassifier> specialities;
     private List<IntegerClassifier> doctors;
@@ -114,84 +85,52 @@ public class Model implements IModel {
     }
 
     @Override
-    public final void setPoliclinics() {
-        try {
-            policlinics = ClientInfomat.tcl.getPoliclinics();
-            notifyPoliclinicsObservers();
-        } catch (KmiacServerException e1) {
-            policlinics = Collections.<IntegerClassifier>emptyList();
-            e1.printStackTrace();
-        } catch (TException e1) {
-            policlinics = Collections.<IntegerClassifier>emptyList();
-            e1.printStackTrace();
-            ClientInfomat.conMan.reconnect(e1);
-        }
+    public final void setPoliclinics() throws TException {
+        policlinics = ClientInfomat.tcl.getPoliclinics();
+        firePoliclinicsChanged();
     }
 
     @Override
-    public final void setSpecialities(final int cpol) {
-        try {
-            specialities = ClientInfomat.tcl.getSpecialities(cpol);
-            notifySpecialitiesObservers();
-        } catch (KmiacServerException e) {
-            specialities = Collections.<StringClassifier>emptyList();
-            e.printStackTrace();
-        } catch (TException e) {
-            specialities = Collections.<StringClassifier>emptyList();
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public final void setSpecialities(final int cpol) throws TException {
+        specialities = ClientInfomat.tcl.getSpecialities(cpol);
+        fireSpecialitiesChanged();
     }
 
     @Override
-    public final void setDoctors(final int cpol, final String cdol) {
-        try {
-            doctors = ClientInfomat.tcl.getDoctors(cpol, cdol);
-            notifyDoctorsObservers();
-        } catch (KmiacServerException e) {
-            doctors = Collections.<IntegerClassifier>emptyList();
-            e.printStackTrace();
-        } catch (TException e) {
-            doctors = Collections.<IntegerClassifier>emptyList();
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public final void setDoctors(final int cpol, final String cdol) throws TException {
+        doctors = ClientInfomat.tcl.getDoctors(cpol, cdol);
+        fireDoctorsChanged();
     }
 
     @Override
-    public final void setTalons(final int cpol, final String cdol, final int pcod) {
-        try {
-            talons = new TalonList(ClientInfomat.tcl.getTalons(cpol, cdol, pcod));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public final void setTalons(final int cpol, final String cdol, final int pcod)
+            throws TException {
+        talons = new TalonList(ClientInfomat.tcl.getTalons(cpol, cdol, pcod));
     }
 
     @Override
-    public final void setPatient(final String oms) {
-        if ((oms == null) || (oms.isEmpty() || (oms.trim().isEmpty()))) {
-            patient = null;
-            notifyPatientObservers();
-        } else {
-            try {
-                patient = ClientInfomat.tcl.checkOmsAndGetPatient(oms);
-            } catch (KmiacServerException e) {
-                patient = null;
-                e.printStackTrace();
-            } catch (OmsNotValidException e) {
-                patient = null;
-                e.printStackTrace();
-            } catch (TException e) {
-                patient = null;
-                e.printStackTrace();
-                ClientInfomat.conMan.reconnect(e);
-            } finally {
-                notifyPatientObservers();
-            }
-        }
+    public final void setPatient(final String oms) throws TException {
+//        if ((oms == null) || (oms.isEmpty() || (oms.trim().isEmpty()))) {
+//            patient = null;
+//            firePatientChanged();
+//        } else {
+//            try {
+        patient = ClientInfomat.tcl.checkOmsAndGetPatient(oms);
+        firePatientChanged();
+//            } catch (KmiacServerException e) {
+//                patient = null;
+//                e.printStackTrace();
+//            } catch (OmsNotValidException e) {
+//                patient = null;
+//                e.printStackTrace();
+//            } catch (TException e) {
+//                patient = null;
+//                e.printStackTrace();
+//                ClientInfomat.conMan.reconnect(e);
+//            } finally {
+//                firePatientChanged();
+//            }
+//        }
     }
 
     @Override
@@ -225,36 +164,25 @@ public class Model implements IModel {
     @Override
     public final void setCurrentPoliclinic(final IntegerClassifier inCurrentPoliclinic) {
         this.currentPoliclinic = inCurrentPoliclinic;
-        notifyCurrentPoliclinicObservers();
+        fireCurrentPoliclinicChanged();
     }
 
     @Override
     public final void setCurrentSpeciality(final StringClassifier inCurrentSpeciality) {
         this.currentSpeciality = inCurrentSpeciality;
-        notifyCurrentSpecialityObservers();
+        fireCurrentSpeciaityChanged();
     }
 
 
     @Override
     public final void setCurrentDoctor(final IntegerClassifier inCurrentDoctor) {
         this.currentDoctor = inCurrentDoctor;
-        notifyCurrentDoctorObservers();
+        fireCurrentDoctorChanged();
     }
 
     @Override
-    public final void reserveTalon(final TPatient pat, final TTalon talon) {
-        try {
+    public final void reserveTalon(final TPatient pat, final TTalon talon) throws TException {
             ClientInfomat.tcl.reserveTalon(pat, talon);
-        } catch (ReserveTalonOperationFailedException e) {
-            e.printStackTrace();
-        } catch (PatientHasSomeReservedTalonsOnThisDay e) {
-            e.printStackTrace();
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
     }
 
     @Override
@@ -272,175 +200,32 @@ public class Model implements IModel {
     }
 
     @Override
-    public final void registerDoctorsObserver(final IDoctorsObserver obs) {
-        doctorsObservers.add(obs);
-    }
-
-    @Override
-    public final void removeDoctorsObserver(final IDoctorsObserver obs) {
-        doctorsObservers.remove(obs);
-    }
-
-    public final void notifyDoctorsObservers() {
-        for (IDoctorsObserver obs: doctorsObservers) {
-            obs.updateDoctors();
-        }
-    }
-
-    @Override
-    public final void registerPoliclinicsObserver(final IPoliclinicsObserver obs) {
-        policlinicsObservers.add(obs);
-    }
-
-    @Override
-    public final void removePoliclinicsObserver(final IPoliclinicsObserver obs) {
-        policlinicsObservers.remove(obs);
-    }
-
-    public final void notifyPoliclinicsObservers() {
-        for (IPoliclinicsObserver obs: policlinicsObservers) {
-            obs.updatePoliclinics();
-        }
-    }
-
-    @Override
-    public final void registerSpecialitiesObserver(final ISpecialitiesObserver obs) {
-        specialitiesObservers.add(obs);
-    }
-
-    @Override
-    public final void removeSpecialitiesObserver(final ISpecialitiesObserver obs) {
-        specialitiesObservers.remove(obs);
-    }
-
-    public final void notifySpecialitiesObservers() {
-        for (ISpecialitiesObserver obs: specialitiesObservers) {
-            obs.updateSpecialities();
-        }
-    }
-
-    @Override
-    public final void registerCurrentDoctorObserver(final ICurrentDoctorObserver obs) {
-        currentDoctorsObservers.add(obs);
-    }
-
-    @Override
-    public final void removeCurrentDoctorObserver(final ICurrentDoctorObserver obs) {
-        currentDoctorsObservers.remove(obs);
-    }
-
-    public final void notifyCurrentDoctorObservers() {
-        for (ICurrentDoctorObserver obs: currentDoctorsObservers) {
-            obs.updateCurrentDoctor();
-        }
-    }
-
-    @Override
-    public final void registerCurrentPoliclinicObserver(final ICurrentPoliclinicObserver obs) {
-        currentPoliclinicObservers.add(obs);
-    }
-
-    @Override
-    public final void removeCurrentPoliclinicObserver(final ICurrentPoliclinicObserver obs) {
-        currentPoliclinicObservers.remove(obs);
-    }
-
-    public final void notifyCurrentPoliclinicObservers() {
-        for (ICurrentPoliclinicObserver obs: currentPoliclinicObservers) {
-            obs.updateCurrentPoliclinic();
-        }
-    }
-
-    @Override
-    public final void registerCurrentSpecialityObserver(final ICurrentSpecialityObserver obs) {
-        currentSpecialityObservers.add(obs);
-    }
-
-    @Override
-    public final void removeCurrentSpecialityObserver(final ICurrentSpecialityObserver obs) {
-        currentSpecialityObservers.remove(obs);
-    }
-
-    public final void notifyCurrentSpecialityObservers() {
-        for (ICurrentSpecialityObserver obs: currentSpecialityObservers) {
-            obs.updateCurrentSpeciaity();
-        }
-    }
-
-    @Override
     public final TalonTableModel getTalonTableModel(
-            final int cpol, final String cdol, final int pcod) {
+            final int cpol, final String cdol, final int pcod) throws TException {
         return new TalonTableModel(cpol, cdol, pcod);
     }
 
     @Override
     public final SheduleTableModel getSheduleTableModel(final int pcod, final int cpol,
-            final String cdol) {
+            final String cdol) throws TException {
         return new SheduleTableModel(pcod, cpol, cdol);
     }
 
     @Override
-    public final void registerPatientObserver(final IPatientObserver obs) {
-        patientObservers.add(obs);
-    }
-
-    @Override
-    public final void removePatientObserver(final IPatientObserver obs) {
-        patientObservers.remove(obs);
-    }
-
-    public final void notifyPatientObservers() {
-        for (IPatientObserver obs: patientObservers) {
-            obs.updatePatient();
-        }
-    }
-
-    @Override
-    public final ReservedTalonTableModel getReservedTalonTableModel(final int pcod) {
+    public final ReservedTalonTableModel getReservedTalonTableModel(final int pcod)
+            throws TException {
         return new ReservedTalonTableModel(pcod);
     }
 
     @Override
     public final void setTalon(final TTalon talon) {
         this.currentTalon = talon;
-        notifySelectedTalonObservers();
+        fireSelectedTalonChanged();
     }
 
     @Override
     public final TTalon getTalon() {
         return currentTalon;
-    }
-
-    @Override
-    public final void registerSelectedTalonObserver(final ISelectedTalonObserver obs) {
-        selectedTalonObservers.add(obs);
-    }
-
-    @Override
-    public final void removeSelectedTalonObserver(final ISelectedTalonObserver obs) {
-        selectedTalonObservers.remove(obs);
-    }
-
-    public final void notifySelectedTalonObservers() {
-        for (ISelectedTalonObserver obs: selectedTalonObservers) {
-            obs.updateSelectedTalon();
-        }
-    }
-
-    @Override
-    public final void registerReservedTalonObserver(final ICurrentIReservedTalonObserver obs) {
-        currentReservedTalonObservers.add(obs);
-    }
-
-    @Override
-    public final void removeReservedTalonObserver(final ICurrentIReservedTalonObserver obs) {
-        currentReservedTalonObservers.remove(obs);
-    }
-
-    public final void notifyCurrentReservedTalonObservers() {
-        for (ICurrentIReservedTalonObserver obs: currentReservedTalonObservers) {
-            obs.updateReservedTalon();
-        }
     }
 
     @Override
@@ -451,22 +236,77 @@ public class Model implements IModel {
     @Override
     public final void setCurrentReservedTalon(final TTalon talon) {
         this.currentReservedTalon = talon;
-        notifyCurrentReservedTalonObservers();
+        fireReservedTalonChanged();
     }
 
     @Override
-    public void registerInfomatObserver(IInfomatObserver obs) {
+    public final void registerInfomatObserver(final IInfomatObserver obs) {
         infomatObservers.add(obs);
     }
 
     @Override
-    public void removeInfomatObserver(IInfomatObserver obs) {
+    public final void removeInfomatObserver(final IInfomatObserver obs) {
         infomatObservers.remove(obs);
     }
 
-    public void notifyInfomatObservers() {
+    private void fireCurrentPoliclinicChanged() {
         for (IInfomatObserver obs: infomatObservers) {
-//            obs
+            obs.updateCurrentPoliclinic();
         }
+    }
+
+    private void fireCurrentSpeciaityChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updateCurrentSpeciaity();
+        }
+    }
+
+    private void fireCurrentDoctorChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updateCurrentDoctor();
+        }
+    }
+
+    private void firePoliclinicsChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updatePoliclinics();
+        }
+    }
+
+    private void fireSpecialitiesChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updateSpecialities();
+        }
+    }
+
+    private void fireDoctorsChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updateDoctors();
+        }
+    }
+
+    private void firePatientChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updatePatient();
+        }
+    }
+
+    private void fireSelectedTalonChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updateSelectedTalon();
+        }
+    }
+
+
+    private void fireReservedTalonChanged() {
+        for (IInfomatObserver obs: infomatObservers) {
+            obs.updateReservedTalon();
+        }
+    }
+
+    @Override
+    public final boolean isPatientAlreadyReserveTalonOnThisDay(final TPatient pat,
+            final TTalon talon) throws TException {
+        return ClientInfomat.tcl.isPatientAlreadyReserveTalonOnThisDay(pat, talon);
     }
 }

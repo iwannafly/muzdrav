@@ -14,15 +14,7 @@ import javax.swing.text.StyleConstants;
 
 import ru.nkz.ivcgzo.clientInfomat.IController;
 import ru.nkz.ivcgzo.clientInfomat.model.IModel;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
@@ -32,10 +24,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
-public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
-        IPoliclinicsObserver, ICurrentPoliclinicObserver, ICurrentSpecialityObserver,
-        ICurrentDoctorObserver, IPatientObserver, ISelectedTalonObserver,
-        ICurrentIReservedTalonObserver {
+public class InfomatView implements IInfomatObserver {
     private enum FrameSet {
         appointment,
         personalOffice,
@@ -59,14 +48,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
             final IModel inModel) {
         this.controller = inController;
         this.model = inModel;
-        model.registerDoctorsObserver((IDoctorsObserver) this);
-        model.registerPoliclinicsObserver((IPoliclinicsObserver) this);
-        model.registerSpecialitiesObserver((ISpecialitiesObserver) this);
-        model.registerCurrentDoctorObserver((ICurrentDoctorObserver) this);
-        model.registerCurrentPoliclinicObserver((ICurrentPoliclinicObserver) this);
-        model.registerCurrentSpecialityObserver((ICurrentSpecialityObserver) this);
-        model.registerPatientObserver((IPatientObserver) this);
-        model.registerSelectedTalonObserver((ISelectedTalonObserver) this);
+        model.registerInfomatObserver((IInfomatObserver) this);
     }
 
     public final void createFrames() {
@@ -209,29 +191,12 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         resTalonSelectFrame.addReservedTalonTableMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                int dialogResult = new OptionsDialog().showConfirmDialog(null, //resTalonSelectFrame,
-                    "Отменить запись?");
-                if (dialogResult == OptionsDialog.ACCEPT) {
-                    JTable curTable = (JTable) e.getSource();
-                    final int curRow = curTable.getSelectedRow();
-                    TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
-                        .getReservedTalonList()
-                        .get(curRow);
-                    if (curTalon != null) {
-                        controller.releaseTalon(curTalon);
-                        resTalonSelectFrame.refreshTalonTableModel(
-                            model.getReservedTalonTableModel(
-                                model.getPatient().getId()
-                            )
-                        );
-                    }
-                } else {
-                    resTalonSelectFrame.refreshTalonTableModel(
-                        model.getReservedTalonTableModel(
-                            model.getPatient().getId()
-                        )
-                    );
-                }
+                JTable curTable = (JTable) e.getSource();
+                final int curRow = curTable.getSelectedRow();
+                TTalon curTalon = ((ReservedTalonTableModel) curTable.getModel())
+                    .getReservedTalonList()
+                    .get(curRow);
+                controller.initiateReservedTalonSelect(curTalon);
             }
         });
         resTalonSelectFrame.addReservedSelectBackwardListener(new ActionListener() {
@@ -245,15 +210,12 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
     private void setAuthFrameControls() {
         authFrame.addButtonAcceptPatientCheckListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                controller.setPatient(authFrame.getOmsText().trim());
-                authFrame.clearOmsText();
-                authFrame.setVisible(false);
+                controller.checkPatientOms(authFrame.getOmsText().trim());
             }
         });
         authFrame.addButtonCancelPatientCheckListener(new ActionListener()  {
             public void actionPerformed(final ActionEvent e) {
-                authFrame.clearOmsText();
-                authFrame.setVisible(false);
+                controller.closeAuthorizationFrame();
             }
         });
     }
@@ -293,11 +255,7 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
     public final void updatePatient() {
         if (lastFrameSet == FrameSet.personalOffice) {
             if (model.getPatient() != null) {
-                resTalonSelectFrame.showModal(
-                    model.getReservedTalonTableModel(
-                        model.getPatient().getId()
-                    )
-                );
+                controller.openReservedTalonFrame();
                 authFrame.setVisible(false);
                 mainFrame.setVisible(false);
             } else {
@@ -305,36 +263,33 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
                 optionsDialog.showMessageDialog(mainFrame, "Номер ОМС не найден в базе данных!");
             }
         } else if (lastFrameSet == FrameSet.appointment) {
-            if ((model.getPatient() != null) && (model.getTalon() != null)) {
-                authFrame.setVisible(false);
-                String talonText = " Текущее ЛПУ:" + model.getCurrentPoliclinic().getName()
-                    + "\n Текущий врач:" + model.getCurrentDoctor().getName()
-                    + "\n Текущий пациент : " + model.getPatient().getSurname()
-                        + " " + model.getPatient().getName()
-                    + "\n Дата приёма: "
-                        + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
-                    + "\n Время приёма: "
-                        + DEFAULT_TIME_FORMAT.format(new Time(model.getTalon().getTimep()));
-                int optResult = optionsDialog.showPrintDialog(talonSelectFrame, talonText,
-                    12, StyleConstants.ALIGN_LEFT);
-                if (optResult == OptionsDialog.PRINT) {
-                    controller.reserveTalon(model.getPatient(), model.getTalon());
-                    optionsDialog.showMessageDialog(talonSelectFrame,
-                        "Вы успешно записаны на приём.");
-                } else {
-                    optionsDialog.showMessageDialog(talonSelectFrame, "Запись отменена.");
-                }
-                talonSelectFrame.refreshTalonTableModel(
-                    model.getTalonTableModel(
-                        model.getCurrentPoliclinic().getPcod(),
-                        model.getCurrentSpeciality().getPcod(),
-                        model.getCurrentDoctor().getPcod()
-                    )
-                );
-            } else {
-                optionsDialog.showMessageDialog(talonSelectFrame,
-                    "Введенный номер полиса не найден в БД.");
-            }
+//            if ((model.getPatient() != null) && (model.getTalon() != null)) {
+              controller.reserveTalon();
+//                authFrame.setVisible(false);
+//                String talonText = " ЛПУ: " + model.getCurrentPoliclinic().getName()
+//                    + "\n Врач: " + model.getCurrentDoctor().getName()
+//                    + "\n Специальность: " + model.getCurrentSpeciality()
+//                    + "\n Пациент : " + model.getPatient().getSurname()
+//                        + " " + model.getPatient().getName()
+//                        + " " + model.getPatient().getMiddlename()
+//                    + "\n Дата приёма: "
+//                        + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
+//                    + "\n Время приёма: "
+//                        + DEFAULT_TIME_FORMAT.format(new Time(model.getTalon().getTimep()));
+//                int optResult = optionsDialog.showPrintDialog(talonSelectFrame, talonText,
+//                    12, StyleConstants.ALIGN_LEFT);
+//                if (optResult == OptionsDialog.PRINT) {
+//                    controller.reserveTalon(model.getPatient(), model.getTalon());
+//                    optionsDialog.showMessageDialog(talonSelectFrame,
+//                        "Вы успешно записаны на приём.");
+//                } else {
+//                    optionsDialog.showMessageDialog(talonSelectFrame, "Запись отменена.");
+//                }
+//                controller.refreshTalonTable();
+//            } else {
+//                optionsDialog.showMessageDialog(talonSelectFrame,
+//                    "Введенный номер полиса не найден в БД.");
+//            }
         }
     }
 
@@ -376,9 +331,47 @@ public class InfomatView implements IDoctorsObserver, ISpecialitiesObserver,
         doctorFrame.setVisible(false);
     }
 
+    public final void openReservedTalonFrame(final ReservedTalonTableModel resTalonTableModel) {
+        resTalonSelectFrame.showModal(resTalonTableModel);
+    }
+
     public final void openSheduleFrame(final SheduleTableModel sheduleTableModel) {
         sheduleFrame.showModal(sheduleTableModel);
         doctorFrame.setVisible(false);
     }
 
+    public final void showMessageDialog(final String message) {
+        if (optionsDialog != null) {
+            optionsDialog.showMessageDialog(null, message);
+        }
+    }
+
+    public final int showConfirmDialog(final String message) {
+        if (optionsDialog != null) {
+            return optionsDialog.showConfirmDialog(null, message);
+        } else {
+            return OptionsDialog.DECLINE;
+        }
+    }
+
+    public final int showPrintDialog(final String message) {
+        if (optionsDialog != null) {
+            return optionsDialog.showPrintDialog(null, message, 12, StyleConstants.ALIGN_LEFT);
+        } else {
+            return OptionsDialog.DECLINE;
+        }
+    }
+
+    public final void refreshReservedTalonTable(final ReservedTalonTableModel tableModel) {
+        resTalonSelectFrame.refreshTalonTableModel(tableModel);
+    }
+
+    public final void refreshTalonTable(final TalonTableModel tableModel) {
+        talonSelectFrame.refreshTalonTableModel(tableModel);
+    }
+
+    public final void closeAuthrizationFrame() {
+        authFrame.clearOmsText();
+        authFrame.setVisible(false);
+    }
 }
