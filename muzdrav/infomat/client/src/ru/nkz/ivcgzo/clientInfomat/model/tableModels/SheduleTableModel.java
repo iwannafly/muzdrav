@@ -52,8 +52,8 @@ public class SheduleTableModel implements TableModel {
     }
 
     public final int getVidp(final int rowIndex, final int columnIndex) {
-        if (findSheduleDay(columnIndex - 1, rowIndex + 1) != null) {
-            return findSheduleDay(columnIndex - 1, rowIndex + 1).getVidp();
+        if (findSheduleDay(columnIndex + 1, rowIndex + 1) != null) {
+            return findSheduleDay(columnIndex + 1, rowIndex + 1).getVidp();
         } else {
             return 0;
         }
@@ -84,7 +84,7 @@ public class SheduleTableModel implements TableModel {
 
     @Override
     public final Object getValueAt(final int rowIndex, final int columnIndex) {
-        return createCellLabel(findSheduleDay(columnIndex - 1, rowIndex + 1));
+        return createCellLabel(findSheduleDay(columnIndex + 1, rowIndex + 1));
     }
 
     public final List<TSheduleDay> getSheduleTalonList() {

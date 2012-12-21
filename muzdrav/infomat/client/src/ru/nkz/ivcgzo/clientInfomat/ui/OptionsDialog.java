@@ -203,6 +203,7 @@ public class OptionsDialog implements ActionListener {
         dialog.setMinimumSize(new Dimension(400, 150));
         dialog.setPreferredSize(new Dimension(400, 150));
         dialog.setSize(new Dimension(400, 150));
+        dialog.setAlwaysOnTop(true);
         setMessagePanelDefaults(msg, fontSize, align);
         setButtonPanelDefaults();
         addPanelsToDialog();

@@ -25,6 +25,8 @@ public interface IModel {
 
     void setPatient(String oms) throws TException;
 
+    void setPatient(String oms, int clpu) throws TException;
+
     void setReservedTalons(int patientId);
 
     void setShedule(int pcod, int cpol, String cdol);

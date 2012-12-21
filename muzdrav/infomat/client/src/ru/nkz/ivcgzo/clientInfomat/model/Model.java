@@ -309,4 +309,11 @@ public class Model implements IModel {
             final TTalon talon) throws TException {
         return ClientInfomat.tcl.isPatientAlreadyReserveTalonOnThisDay(pat, talon);
     }
+
+    @Override
+    public final void setPatient(final String oms,
+            final int clpu) throws TException {
+        patient = ClientInfomat.tcl.checkOmsAndGetPatientInCurrentPoliclinic(oms, clpu);
+        firePatientChanged();
+    }
 }

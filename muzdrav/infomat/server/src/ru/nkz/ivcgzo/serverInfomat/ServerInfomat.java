@@ -327,6 +327,24 @@ public class ServerInfomat extends Server implements Iface {
         }
     }
 
+    @Override
+    public final TPatient checkOmsAndGetPatientInCurrentPoliclinic(final String oms,
+            final int clpu) throws KmiacServerException, OmsNotValidException {
+        final String sqlQuery = "SELECT npasp, fam, im, ot "
+            + "FROM patient "
+            + "WHERE (((poms_ser || poms_nom) = ?) OR (poms_nom = ?)) AND cpol_pr =?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, oms, oms, clpu)) {
+            if (acrs.getResultSet().next()) {
+                return rsmPatient.map(acrs.getResultSet());
+            } else {
+                throw new OmsNotValidException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
 ///////////////////////       Add Methods    /////////////////////////////////////
 
 
