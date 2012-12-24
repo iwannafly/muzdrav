@@ -265,33 +265,7 @@ public class InfomatView implements IInfomatObserver {
                 optionsDialog.showMessageDialog(mainFrame, "Номер ОМС не найден в базе данных!");
             }
         } else if (lastFrameSet == FrameSet.appointment) {
-//            if ((model.getPatient() != null) && (model.getTalon() != null)) {
-              controller.reserveTalon();
-//                authFrame.setVisible(false);
-//                String talonText = " ЛПУ: " + model.getCurrentPoliclinic().getName()
-//                    + "\n Врач: " + model.getCurrentDoctor().getName()
-//                    + "\n Специальность: " + model.getCurrentSpeciality()
-//                    + "\n Пациент : " + model.getPatient().getSurname()
-//                        + " " + model.getPatient().getName()
-//                        + " " + model.getPatient().getMiddlename()
-//                    + "\n Дата приёма: "
-//                        + DEFAULT_DATE_FORMAT.format(new Date(model.getTalon().getDatap()))
-//                    + "\n Время приёма: "
-//                        + DEFAULT_TIME_FORMAT.format(new Time(model.getTalon().getTimep()));
-//                int optResult = optionsDialog.showPrintDialog(talonSelectFrame, talonText,
-//                    12, StyleConstants.ALIGN_LEFT);
-//                if (optResult == OptionsDialog.PRINT) {
-//                    controller.reserveTalon(model.getPatient(), model.getTalon());
-//                    optionsDialog.showMessageDialog(talonSelectFrame,
-//                        "Вы успешно записаны на приём.");
-//                } else {
-//                    optionsDialog.showMessageDialog(talonSelectFrame, "Запись отменена.");
-//                }
-//                controller.refreshTalonTable();
-//            } else {
-//                optionsDialog.showMessageDialog(talonSelectFrame,
-//                    "Введенный номер полиса не найден в БД.");
-//            }
+            controller.reserveTalon();
         }
     }
 

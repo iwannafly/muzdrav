@@ -393,12 +393,12 @@ public class Controller implements IController {
             } catch (KmiacServerException e) {
                 view.closeAuthrizationFrame();
                 view.showMessageDialog("Ошибка проверки полиса в БД! "
-                        + "Обратитесь к системному администратору!");
+                    + "Обратитесь к системному администратору!");
                 e.printStackTrace();
             } catch (TException e) {
                 view.closeAuthrizationFrame();
                 view.showMessageDialog("Ошибка проверки полиса в БД! "
-                        + "Обратитесь к системному администратору!");
+                    + "Обратитесь к системному администратору!");
                 e.printStackTrace();
                 ClientInfomat.conMan.reconnect(e);
             }
