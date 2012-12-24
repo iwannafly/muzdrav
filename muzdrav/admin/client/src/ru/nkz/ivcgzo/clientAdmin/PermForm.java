@@ -114,7 +114,7 @@ public class PermForm extends JDialog {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					MainForm.tcl.setPermissions(mRab.pcod, mRab.clpu, mRab.cpodr, getPermissions());
+					MainForm.tcl.setPermissions(mRab.user_id, getPermissions());
 					dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
 				} catch (TException e1) {
 					e1.printStackTrace();
@@ -217,7 +217,7 @@ public class PermForm extends JDialog {
 						if (JOptionPane.showConfirmDialog(PermForm.this, "На учетную запись уже заведен пароль. Изменить его?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.YES_OPTION)
 							return;
 					
-					UserIdPassword idPass = MainForm.tcl.setPassword(mRab.pcod, mRab.clpu, mRab.cpodr, tbLog.getText()); 
+					UserIdPassword idPass = MainForm.tcl.setPassword(mRab.id, tbLog.getText()); 
 					tbPass.setText(idPass.getPassword());
 					mRab.setUser_id(idPass.getUser_id());
 					setDelPassPermEnabled(true);
@@ -242,7 +242,7 @@ public class PermForm extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (JOptionPane.showConfirmDialog(PermForm.this, "Снятие пароля приведет к удалению учетной записи. Продолжить?", "Подтверждение", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-						MainForm.tcl.remPassword(mRab.pcod, mRab.clpu, mRab.cpodr);
+						MainForm.tcl.remPassword(mRab.user_id);
 						dispatchEvent(new WindowEvent(PermForm.this, WindowEvent.WINDOW_CLOSING));
 					}
 				} catch (TException e1) {
@@ -312,9 +312,9 @@ public class PermForm extends JDialog {
 					try {
 						tbPass.setText("");
 						setTitle(String.format("%s %s %s %s, код подразделения %d", frameTitle, vInf.fam, vInf.im, vInf.ot, mRab.cpodr));
-						tbLog.setText(MainForm.tcl.getLogin(mRab.pcod, mRab.clpu, mRab.cpodr));
+						tbLog.setText(MainForm.tcl.getLogin(mRab.user_id));
 						hasLog = !tbLog.isEmpty();
-						setPermissions(MainForm.tcl.getPermissions(mRab.pcod, mRab.clpu, mRab.cpodr));
+						setPermissions(MainForm.tcl.getPermissions(mRab.user_id));
 						setDelPassPermEnabled((tbLog.getText().length() == 0) ? false : true);
 					} catch (TException e1) {
 						e1.printStackTrace();

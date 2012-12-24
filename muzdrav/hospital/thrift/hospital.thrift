@@ -178,6 +178,94 @@ struct TRdIshod {
   42: optional i32 vespl; 
   43: optional string detmesto;
 }
+struct RdSlStruct{
+        1: optional  i32 id;
+        2: optional i32 npasp;
+        3: optional i64 datay;
+	4: optional i64 dataosl;
+	5: optional i32 abort;
+	6: optional i32 shet;
+	7: optional i64 dataM;
+	8: optional i32 yavka1;
+	9: optional i32 ishod;
+	10: optional i64 Datasn; 
+	11: optional i64 DataZs;
+        12: optional i32 kolrod;
+	13: optional i32 deti;
+	14: optional bool kont;
+	15: optional double vesd;
+	16: optional i32 dsp;
+	17: optional i32 dsr;
+	18: optional i32 dTroch;
+	19: optional i32 cext;
+	20: optional i32 indsol;
+	21: optional i32 prmen;
+	22: optional i64 dataz;
+	23: optional i64 datasert;
+	24: optional string nsert;
+	25: optional string ssert;
+	26: optional string oslab;
+	27: optional i32 plrod;
+	28: optional string prrod;
+	29: optional i32 vozmen;
+	30: optional i32 oslrod;
+	31: optional i32 polj;
+	32: optional i64 dataab;
+	33: optional i32 srokab;
+	34: optional i32 cdiagt;
+	35: optional i32 cvera;
+	36: optional i32 id_pvizit;
+        37: optional i32 rost;
+        38: optional bool eko;
+        39: optional bool rub;
+        40: optional bool predp;
+        41: optional i32 osp;
+        42: optional i32 cmer;
+}
+struct RdDinStruct{
+	1: optional i32 id_rd_sl;
+	2: optional i32 id_pvizit;
+	3: optional i32 npasp;
+	4: optional i32 srok;
+	5: optional i32 grr;
+	6: optional i32 ball;
+	7: optional i32 oj;
+	8: optional i32 hdm;
+	9: optional string dspos;
+	10: optional i32 art1;
+	11: optional i32 art2;
+	12: optional i32 art3;
+	13: optional i32 art4;
+	14: optional i32 spl;
+	15: optional i32 oteki;
+	16: optional i32 chcc;
+	17: optional i32 polpl;
+	18: optional i32 predpl;
+	19: optional i32 serd;
+	20: optional i32 serd1;
+	21: optional i32 id_pos;
+	22: optional double ves;
+        23: optional i32 ngosp;
+        24: optional i32 pozpl;
+        25: optional i32 vidpl;
+}
+/*. Rd_Inf*/
+struct RdInfStruct{
+	1: optional i32 npasp;
+	2: optional i32 obr;
+	3: optional i32 sem;
+	4: optional i32 vOtec;
+	5: optional string grotec;
+	6: optional string phOtec;
+	7: optional i64 dataz;
+	8: optional string fioOtec;
+	9: optional string mrOtec;
+	10: optional string telOtec;
+	11: optional i32 vredOtec;
+	12: optional i32 osoco;
+	13: optional i32 uslpr;
+        14: optional string zotec;
+}
 
 struct TRd_Novor {
    1: i32 npasp;
@@ -410,9 +498,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
-	list<classifier.IntegerClassifier> getChildBirths(1:i64 BirthDate) throws (1:kmiacServer.KmiacServerException kse);
 	
 /* Новорождённый */
+	list<classifier.IntegerClassifier> getChildBirths(1:i64 BirthDate) throws (1:kmiacServer.KmiacServerException kse);
 	void addChildInfo(1:TRd_Novor Child)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 	TRd_Novor getChildInfo(1:i32 npasp)
@@ -435,4 +523,22 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildDeathDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
+
+/*DispBer*/
+	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
+	void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+ 
+	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+
+	void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdateRdInf(1: RdInfStruct inf) throws (1: kmiacServer.KmiacServerException kse);
+
+	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
+
+	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 }

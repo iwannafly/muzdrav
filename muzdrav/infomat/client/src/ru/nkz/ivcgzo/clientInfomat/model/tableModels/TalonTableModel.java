@@ -11,7 +11,6 @@ import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientInfomat.model.TalonList;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
 public final class TalonTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
@@ -22,19 +21,12 @@ public final class TalonTableModel implements TableModel {
     };
     private TalonList talonList;
 
-    public TalonTableModel(final int cpol, final String cdol, final int pcod) {
+    public TalonTableModel(final int cpol, final String cdol, final int pcod) throws TException {
         setTalonList(cpol, cdol, pcod);
     }
 
-    private void setTalonList(final int cpol, final String cdol, final int pcod) {
-        try {
-            talonList = new TalonList(ClientInfomat.tcl.getTalons(cpol, cdol, pcod));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    private void setTalonList(final int cpol, final String cdol, final int pcod) throws TException {
+        talonList = new TalonList(ClientInfomat.tcl.getTalons(cpol, cdol, pcod));
     }
 
     public TalonList getTalonList() {
@@ -72,7 +64,7 @@ public final class TalonTableModel implements TableModel {
         return String.class;
     }
 
-    @Override 
+    @Override
     public boolean isCellEditable(final int rowIndex, final int columnIndex) {
         return false;
     }

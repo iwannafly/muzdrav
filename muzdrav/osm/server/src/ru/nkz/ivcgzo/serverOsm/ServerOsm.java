@@ -273,13 +273,13 @@ public class ServerOsm extends Server implements Iface {
 	}
 
 	@Override
-	public List<ZapVr> getZapVr(int idvr, String cdol, long datap) throws KmiacServerException, TException {
-		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, NULL AS datap, pn.nuch, FALSE AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL " +
+	public List<ZapVr> getZapVr(int idvr, String cdol, long datap, int cpol) throws KmiacServerException, TException {
+		String sql = "SELECT pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, tal.id_pvizit, NULL AS datap, pn.nuch, FALSE AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp AND pn.cpol = ?) WHERE (tal.pcod_sp = ?) AND (tal.cdol = ?) AND (tal.datap = ?) AND pa.id IS NULL " +
 					 "UNION " +
-					 "(SELECT DISTINCT ON (fam, im, ot) pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.id_obr, pa.datap, pn.nuch, pa.datap = ? AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp) WHERE pv.id IN (SELECT id_pvizit FROM e_talon ital WHERE (ital.pcod_sp = ?) AND (ital.cdol = ?) AND (ital.datap = ?) AND (ital.id_pvizit IS NOT NULL)) AND (pa.id_obr IS NOT NULL) " +
+					 "(SELECT DISTINCT ON (fam, im, ot) pat.npasp, pat.fam, pat.im, pat.ot, pat.poms_ser, pat.poms_nom, pat.datar, pat.pol, pa.id_obr, pa.datap, pn.nuch, pa.datap = ? AS has_pvizit FROM e_talon tal JOIN patient pat ON (pat.npasp = tal.npasp) LEFT JOIN p_vizit pv ON (pv.id = tal.id_pvizit) LEFT JOIN p_vizit_amb pa ON (pa.id_obr = pv.id) LEFT JOIN p_nambk pn ON (pat.npasp = pn.npasp AND pn.cpol = ?) WHERE pv.id IN (SELECT id_pvizit FROM e_talon ital WHERE (ital.pcod_sp = ?) AND (ital.cdol = ?) AND (ital.datap = ?) AND (ital.id_pvizit IS NOT NULL)) AND (pa.id_obr IS NOT NULL) " +
 					 "ORDER BY fam, im, ot, datap DESC) " +
 					 "ORDER BY has_pvizit, fam, im, ot, datap DESC ";
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, idvr, cdol, new Date(datap), new Date(datap), idvr, cdol, new Date(datap))) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, cpol, idvr, cdol, new Date(datap), new Date(datap), cpol, idvr, cdol, new Date(datap))) {
 			return rsmZapVr.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -825,11 +825,15 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPisl(P_isl_ld npisl) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
-			int id = sme.getGeneratedKeys().getInt("nisl");
-			sme.setCommit();
-			return id;
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT nisl FROM p_isl_ld WHERE (npasp = ?) AND (pvizit_id = ?) AND (id_pos = ?) ", npisl.npasp, npisl.pvizit_id, npisl.id_pos)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("nisl");
+			} else {
+				sme.execPreparedT("INSERT INTO p_isl_ld (npasp, cisl, pcisl, napravl, naprotd, datan, vrach, diag, dataz, pvizit_id, prichina, kodotd, vopl, id_pos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, npisl, pislldTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15);
+				sme.setCommit();
+				return sme.getGeneratedKeys().getInt("nisl");
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -841,11 +845,15 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPrezd(Prez_d di) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl) VALUES (?, ?, ?) ", true, di, prezdTypes, 1, 2, 3);
-			int id = sme.getGeneratedKeys().getInt("id");
-			sme.setCommit();
-			return id;
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM p_rez_d WHERE (npasp = ?) AND (nisl = ?) AND (kodisl = ?) ", di.npasp, di.nisl, di.kodisl)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("id");
+			} else {
+				sme.execPreparedT("INSERT INTO p_rez_d (npasp, nisl, kodisl) VALUES (?, ?, ?) ", true, di, prezdTypes, 1, 2, 3);
+				sme.setCommit();
+				return sme.getGeneratedKeys().getInt("id");
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -857,11 +865,15 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public int AddPrezl(Prez_l li) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok) VALUES (?, ?, ?) ", true, li, prezlTypes, 1, 2, 3);
-			int id = sme.getGeneratedKeys().getInt("id");
-			sme.setCommit();
-			return id;
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM p_rez_l WHERE (npasp = ?) AND (nisl = ?) AND (cpok = ?) ", li.npasp, li.nisl, li.cpok)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("id");
+			} else {
+				sme.execPreparedT("INSERT INTO p_rez_l (npasp, nisl, cpok) VALUES (?, ?, ?) ", true, li, prezlTypes, 1, 2, 3);
+				sme.setCommit();
+				return sme.getGeneratedKeys().getInt("id");
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();

@@ -658,7 +658,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	/**
 	 * Получение списка записанных на прием на заданную дату.
 	 */
-	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap) throws (1: kmiacServer.KmiacServerException kse);
+	list<ZapVr> getZapVr(1: i32 idvr, 2: string cdol, 3: i64 datap, 4: i32 cpol) throws (1: kmiacServer.KmiacServerException kse);
 	ZapVr getZapVrSrc(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<VrachInfo> getVrachList(1: i32 clpu, 2: i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	

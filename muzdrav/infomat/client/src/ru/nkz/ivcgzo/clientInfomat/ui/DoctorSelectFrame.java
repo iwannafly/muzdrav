@@ -5,7 +5,6 @@ import java.awt.Component;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,62 +17,47 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.Box;
 
-import org.apache.thrift.TException;
-
-import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierList;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.MouseListener;
 import java.util.Collections;
+import java.util.List;
 
-public class DoctorSelectFrame extends JFrame {
+public class DoctorSelectFrame extends InfomatFrame {
     private static final long serialVersionUID = -7345770092441907375L;
     private JPanel pnLists;
     private JPanel pnMain;
     private JPanel pnButton;
     private JButton btnBackward;
-//    private JButton btnForward;
     private JScrollPane spSpeciality;
     private ThriftStringClassifierList<StringClassifier> lSpeciality;
     private JScrollPane spDoctor;
     private ThriftIntegerClassifierList lDoctor;
     private TalonSelectFrame frmTalonSelect;
     private SheduleFrame frmShedule;
-    private int cpol;
-    private int nextWindowFlag;
 
-
-    public DoctorSelectFrame () {
-        cpol = -1;
+    public DoctorSelectFrame() {
+        super();
         initialization();
     }
 
     private void initialization() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
-        setUndecorated(true);
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-
         createModalFrames();
         addMainPanel();
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
     }
 
     private void createModalFrames() {
         if (frmTalonSelect == null) {
-            frmTalonSelect = new TalonSelectFrame(); 
+            frmTalonSelect = new TalonSelectFrame();
         }
         if (frmShedule == null) {
-            frmShedule = new SheduleFrame(); 
+            frmShedule = new SheduleFrame();
         }
     }
 
@@ -89,19 +73,21 @@ public class DoctorSelectFrame extends JFrame {
             focusedColor = Color.red;
         }
 
-        public InfomatListCellRenderer(Color inUnfocusedColor, Color inFocusedColor) {
+        public InfomatListCellRenderer(
+                final Color inUnfocusedColor, final Color inFocusedColor) {
             setOpaque(true);
             unfocusedColor = inUnfocusedColor;
             focusedColor = inFocusedColor;
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+                final JList list, final Object value, final int index,
+                final boolean isSelected, final boolean cellHasFocus) {
             setText(value.toString());
             setFont(new Font("Courier New", Font.PLAIN, 25));
             setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
             setHorizontalAlignment(JLabel.CENTER);
-            setBackground(isSelected ? focusedColor : unfocusedColor);// Color.white);
+            setBackground(isSelected ? focusedColor : unfocusedColor); // Color.white);
             setForeground(isSelected ? Color.white : Color.black);
             return this;
         }
@@ -122,51 +108,33 @@ public class DoctorSelectFrame extends JFrame {
         pnButton.setBackground(Color.WHITE);
         pnMain.add(pnButton);
         pnButton.setLayout(new BoxLayout(pnButton, BoxLayout.X_AXIS));
-        
+
         addLeftHorizontalDelimiter();
         addBackwardButton();
         addRightHorizontalDelimiter();
-//        addForwardButton();
     }
 
-    private void updateSpecialitiesList(int cpol) {
-        try {
-            lSpeciality.setData(ClientInfomat.tcl.getSpecialities(cpol));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public final void updateSpecialitiesList(final List<StringClassifier> specialities) {
+        lSpeciality.setData(specialities);
     }
 
-    private void updateDoctorsList(int cpol, String cdol) {
-        try {
-            lDoctor.setData(ClientInfomat.tcl.getDoctors(cpol, cdol));
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public final void updateDoctorsList(final List<IntegerClassifier> doctors) {
+        lDoctor.setData(doctors);
     }
 
     private void addBackwardButton() {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
-        btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateSpecialitiesList(cpol);
-                lDoctor.setData(Collections.<IntegerClassifier>emptyList());
-                setVisible(false);
-            }
-        });
         btnBackward.setIcon(new ImageIcon(DoctorSelectFrame.class.getResource(
             "resources/backwardBig.png")));
         btnBackward.setBorder(null);
         btnBackward.setBackground(Color.WHITE);
         btnBackward.setForeground(Color.BLACK);
         pnButton.add(btnBackward);
+    }
+
+    public final void addDoctorSelectBackwardListener(final ActionListener listener) {
+        btnBackward.addActionListener(listener);
     }
 
     private void addLeftHorizontalDelimiter() {
@@ -178,16 +146,6 @@ public class DoctorSelectFrame extends JFrame {
         Component hgRigth = Box.createHorizontalGlue();
         pnButton.add(hgRigth);
     }
-
-//    private void addForwardButton() {
-//        btnForward = new JButton("");
-//        btnForward.setIcon(new ImageIcon(MainFrame.class.getResource(
-//                "resources/forwardButton.png")));
-//        btnForward.setBorder(null);
-//        btnForward.setBackground(Color.WHITE);
-//        btnForward.setForeground(Color.BLACK);
-//        pnButton.add(btnForward);
-//    }
 
     private void addListPanel() {
         pnLists = new JPanel();
@@ -209,20 +167,20 @@ public class DoctorSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addSpecialityList() {
         lSpeciality = new ThriftStringClassifierList<StringClassifier>();
-        lSpeciality.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (lSpeciality.getSelectedValue() != null) {
-                    updateDoctorsList(cpol, lSpeciality.getSelectedPcod());
-                }
-            }
-        });
         lSpeciality.setCellRenderer(new InfomatListCellRenderer(new Color(153, 204, 255),
             Color.red));
         lSpeciality.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lSpeciality.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lSpeciality.setFont(new Font("Courier New", Font.PLAIN, 25));
         spSpeciality.setViewportView(lSpeciality);
+    }
+
+    public final void addSpecialityListClickListener(final MouseListener listener) {
+        lSpeciality.addMouseListener(listener);
+    }
+
+    public final void addDoctorListClickListener(final MouseListener listener) {
+        lDoctor.addMouseListener(listener);
     }
 
     private void addDoctorListScrollPane() {
@@ -236,23 +194,6 @@ public class DoctorSelectFrame extends JFrame {
     @SuppressWarnings("unchecked")
     private void addDoctorList() {
         lDoctor = new ThriftIntegerClassifierList();
-        lDoctor.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if ((lSpeciality.getSelectedValue() != null)
-                        && (lDoctor.getSelectedValue() != null)) {
-                    if (nextWindowFlag == 0) {
-                        frmTalonSelect.showModal(cpol, lSpeciality.getSelectedPcod(),
-                            lDoctor.getSelectedValue().getPcod());
-                    } else if (nextWindowFlag == 1) {
-                        frmShedule.showModal(lDoctor.getSelectedValue().getPcod(),
-                            cpol, lSpeciality.getSelectedPcod());
-                    }
-                    updateSpecialitiesList(cpol);
-                    lDoctor.setData(Collections.<IntegerClassifier>emptyList());
-                }
-            }
-        });
         lDoctor.setCellRenderer(new InfomatListCellRenderer());
         lDoctor.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         lDoctor.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -260,10 +201,8 @@ public class DoctorSelectFrame extends JFrame {
         spDoctor.setViewportView(lDoctor);
     }
 
-    public void showModal(final int flag, final int inCpol) {
-        nextWindowFlag = flag;
-        cpol = inCpol;
-        updateSpecialitiesList(inCpol);
+    public final void showModal() {
+        lDoctor.setData(Collections.<IntegerClassifier>emptyList());
         setVisible(true);
     }
 }
