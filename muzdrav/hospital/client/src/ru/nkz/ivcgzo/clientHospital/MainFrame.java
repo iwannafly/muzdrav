@@ -1,3 +1,5 @@
+//////////////////////////////   АДЪ И ИЗРАИЛЪ /////////////////////////////////
+////////////TODO Рефакторить, рефакторить, рефакторить... /////////////////////
 package ru.nkz.ivcgzo.clientHospital;
 
 import java.awt.event.ActionEvent;
@@ -46,6 +48,7 @@ import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
+import ru.nkz.ivcgzo.clientHospital.Children;
 import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
 
@@ -91,7 +94,6 @@ import java.awt.Dimension;
 
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JToolBar;
@@ -99,9 +101,10 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JSeparator;
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import java.awt.GridLayout;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
@@ -116,6 +119,7 @@ public class MainFrame extends JFrame {
     private JMenuItem mntmSelectPatient;
     private JMenuItem mntmReception;
     private JTabbedPane tabbedPane;
+    private Children pChildren;
     private JSplitPane spPatientInfo;
     private JPanel pPersonalInfo;
     private JPanel pReceptionInfo;
@@ -342,7 +346,8 @@ public class MainFrame extends JFrame {
     private JMenuItem mntmPrintHospitalDeathSummary;
     private JLabel lblZaklDiagStep;
     private JRadioButton rdbtnZaklDiagSrT;
-    private JRadioButton rdbtnZaklDiagTT; 
+    private JRadioButton rdbtnZaklDiagTT;
+    private JPanel pRecButtons;
     private CustomDateEditor Tdatam;
     private CustomDateEditor Tdataosl;
 	private JSpinner Sber;
@@ -396,20 +401,21 @@ public class MainFrame extends JFrame {
         setLifeHistoryPanel();
         setMedicalHistoryPanel();
         setStagePanel();
+        setChildrenPanel();
         setDiagnosisPanel();
- //       setChildbirthPanel();
+//        setChildbirthPanel();
         setZaklPanel();
 
         if ((doctorAuth.getClpu() == 62)
             || (doctorAuth.getClpu() == 63)
             || (doctorAuth.getClpu() == 64)) {
         } else {
-            tabbedPane.removeTabAt(4);
+            tabbedPane.removeTabAt(5);
 //            pChildbirth.setVisible(false);
         }
     }
 
-    public final void onConnect() {
+	public final void onConnect() {
         createModalFrames();
         try {
             System.out.println(ClientHospital.authInfo.getCpodr());
@@ -429,6 +435,7 @@ public class MainFrame extends JFrame {
             CBAkush.setData(ClientHospital.tcl.get_s_vrach());
             CBVrash.setData(ClientHospital.tcl.get_s_vrach());
             CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
+            pChildren.setDoctors(ClientHospital.tcl.get_s_vrach());
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -540,7 +547,18 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
+                    pChildren.SetPatient(patient);
 
+        			try {
+						trdIshod = ClientHospital.tcl.getRdIshodInfo(
+							patient.getPatientId(), patient.gospitalCod);
+						setDefaultValues();
+					} catch (KmiacServerException e) {
+						e.printStackTrace();
+					} catch (TException e) {
+						e.printStackTrace();
+						ClientHospital.conMan.reconnect(e);
+					}
 //        			try {
 //						trdIshod = ClientHospital.tcl.getRdIshodInfo(
 //							patient.getPatientId(), patient.gospitalCod);
@@ -621,7 +639,7 @@ public class MainFrame extends JFrame {
             		} catch (TException e2) {
             			// TODO Auto-generated catch block
             			e2.printStackTrace();
-            		};;;;;
+            		};
                 }
                 }
 //            }
@@ -1980,6 +1998,19 @@ public class MainFrame extends JFrame {
         							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
         								.addComponent(TNash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         								.addComponent(TPoln, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+// тут был header конфликта мерджа
+//        								.addComponent(TKash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+//        					.addPreferredGap(ComponentPlacement.RELATED, 427, Short.MAX_VALUE))
+//        				.addGroup(gl_panel_2.createSequentialGroup()
+//        					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+//        						.addComponent(lblNewLabel_24)
+//        						.addComponent(lblNewLabel_25))
+//        					.addPreferredGap(ComponentPlacement.RELATED)
+//        					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+//        						.addComponent(CBEff, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
+//        						.addComponent(TMed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
+//        				.addComponent(chckbxNewCheckBox))
+//        			.addContainerGap())
         								.addComponent(TKash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
         				.addGroup(gl_panel_2.createSequentialGroup()
         					.addGap(104)
@@ -2010,6 +2041,8 @@ public class MainFrame extends JFrame {
         				.addComponent(TNash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         				.addComponent(lblNewLabel_15))
         			.addPreferredGap(ComponentPlacement.UNRELATED)
+//        			.addComponent(chckbxNewCheckBox)
+        			.addGap(10)
         			.addComponent(btnNewButton)
         			.addPreferredGap(ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
         			.addComponent(ChBpsi)
@@ -2071,12 +2104,15 @@ public class MainFrame extends JFrame {
         lblNewLabel_10.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
         Soj = new JSpinner();
+        Soj.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
         Soj.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         Shdm = new JSpinner();
+        Shdm.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
         Shdm.setFont(new Font("Tahoma", Font.BOLD, 12));
         
 		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
+
 		CBPolpl.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db10);
@@ -3596,6 +3632,7 @@ public class MainFrame extends JFrame {
 //			e2.printStackTrace();
 //		};;;;;
 //    }
+
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
@@ -3620,34 +3657,71 @@ public class MainFrame extends JFrame {
 		TKash.setText(trdIshod.getKashetv());
 		TRod.setText(trdIshod.getDeyat());
 		TMed.setText(trdIshod.getObezb());
+		if (trdIshod.isSetPolpl())
+			CBPolpl.setSelectedPcod(trdIshod.getPolpl());
+		else
+			CBPolpl.setSelectedItem(null);
+		if (trdIshod.isSetPozpl())
+			CBPoz.setSelectedPcod(trdIshod.getPozpl());
+		else
+			CBPoz.setSelectedItem(null);
+		if (trdIshod.isSetVidpl())
+			CBVid.setSelectedPcod(trdIshod.getVidpl());
+		else
+			CBVid.setSelectedItem(null);
+		if (trdIshod.isSetSerd())
+			CBSerd.setSelectedPcod(trdIshod.getSerd());
+		else
+			CBSerd.setSelectedItem(null);
+		if (trdIshod.isSetSerd1())
+			CBSerd1.setSelectedPcod(trdIshod.getSerd1());
+		else
+			CBSerd1.setSelectedItem(null);
+		if (trdIshod.isSetPredpl())
+			CBPred.setSelectedPcod(trdIshod.getPredpl());
+		else
+			CBPred.setSelectedItem(null);
 		ChBpsi.setSelected(trdIshod.isPsih());
 		if (trdIshod.isSetEff())
-		CBEff.setSelectedPcod(trdIshod.getEff());
-		else CBEff.setSelectedItem(null);
+			CBEff.setSelectedPcod(trdIshod.getEff());
+		else
+			CBEff.setSelectedItem(null);
 		if (trdIshod.isSetPosled())
-		CBPosled.setSelectedPcod(trdIshod.getPosled());
-		else CBPosled.setSelectedItem(null);
+			CBPosled.setSelectedPcod(trdIshod.getPosled());
+		else
+			CBPosled.setSelectedItem(null);
 		if (trdIshod.isSetAkush())
-		CBAkush.setSelectedPcod(trdIshod.getAkush());
-		else CBAkush.setSelectedItem(null);
+			CBAkush.setSelectedPcod(trdIshod.getAkush());
+		else
+			CBAkush.setSelectedItem(null);
 		if (trdIshod.isSetVrash())
-		CBVrash.setSelectedPcod(trdIshod.getVrash());
-		else CBVrash.setSelectedItem(null);
+			CBVrash.setSelectedPcod(trdIshod.getVrash());
+		else
+			CBVrash.setSelectedItem(null);
 		if (trdIshod.isSetPrinyl())
-		CBPrinial.setSelectedPcod(trdIshod.getPrinyl());
-		else CBPrinial.setSelectedItem(null);
+			CBPrinial.setSelectedPcod(trdIshod.getPrinyl());
+		else
+			CBPrinial.setSelectedItem(null);
 		if (trdIshod.isSetOsmposl())
-		CBOsmotr.setSelectedPcod(trdIshod.getOsmposl());
-		else CBOsmotr.setSelectedItem(null);
+			CBOsmotr.setSelectedPcod(trdIshod.getOsmposl());
+		else
+			CBOsmotr.setSelectedItem(null);
 	} catch (Exception e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 		JOptionPane.showMessageDialog(MainFrame.this, e.getLocalizedMessage(), "Ошибка создания записи", JOptionPane.ERROR_MESSAGE);
-		
 	}
 	
 	}
 
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////Новорожденный//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setChildrenPanel() {
+    	this.pChildren = new Children(this.doctorAuth, this.patient);
+        tabbedPane.addTab("Новорожденный", new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildren, null);
+	}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Заключение ///////////////////////////////////////////////////
