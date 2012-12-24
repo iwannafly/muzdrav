@@ -24,7 +24,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
@@ -47,6 +46,7 @@ import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.Zakl;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
+import ru.nkz.ivcgzo.clientHospital.Children;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -87,8 +87,6 @@ import javax.swing.Box;
 import java.awt.Dimension;
 
 import javax.swing.SwingConstants;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.JToolBar;
@@ -96,10 +94,10 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 
-import javax.swing.JSeparator;
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
-import javax.swing.JComboBox;
+import javax.swing.SpinnerNumberModel;
+import java.awt.GridLayout;
 
 public class MainFrame extends JFrame {
 
@@ -111,6 +109,7 @@ public class MainFrame extends JFrame {
     private JMenuItem mntmSelectPatient;
     private JMenuItem mntmReception;
     private JTabbedPane tabbedPane;
+    private Children pChildren;
     private JSplitPane spPatientInfo;
     private JPanel pPersonalInfo;
     private JPanel pReceptionInfo;
@@ -340,6 +339,7 @@ public class MainFrame extends JFrame {
     private JLabel lblZaklDiagStep;
     private JRadioButton rdbtnZaklDiagSrT;
     private JRadioButton rdbtnZaklDiagTT; 
+    private JPanel pRecButtons;
 //    private JLabel lblNewLabel_33;
 //    private JTextField textField_1;
 
@@ -379,10 +379,11 @@ public class MainFrame extends JFrame {
         setStagePanel();
         setDiagnosisPanel();
         setChildbirthPanel();
+        setChildrenPanel();
         setZaklPanel();
     }
 
-    public final void onConnect() {
+	public final void onConnect() {
         createModalFrames();
         try {
             System.out.println(ClientHospital.authInfo.getCpodr());
@@ -402,6 +403,7 @@ public class MainFrame extends JFrame {
             CBAkush.setData(ClientHospital.tcl.get_s_vrach());
             CBVrash.setData(ClientHospital.tcl.get_s_vrach());
             CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
+            pChildren.setDoctors(ClientHospital.tcl.get_s_vrach());
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -513,13 +515,13 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
+                    pChildren.SetPatient(patient);
 
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
 							patient.getPatientId(), patient.gospitalCod);
 						setDefaultValues();
 					} catch (KmiacServerException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (TException e) {
 						e.printStackTrace();
@@ -2486,10 +2488,8 @@ public class MainFrame extends JFrame {
 //			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
 //			setDefaultValues();
 //			} catch (KmiacServerException e1) {
-//			// TODO Auto-generated catch block
 //			e1.printStackTrace();
 //		} catch (TException e1) {
-//			// TODO Auto-generated catch block
 //			e1.printStackTrace();
 //		}
         panel_2 = new JPanel();
@@ -2505,44 +2505,49 @@ public class MainFrame extends JFrame {
         panel_4.setBorder(new LineBorder(new Color(0, 0, 0)));
         
         JPanel panel_5 = new JPanel();
+        panel_5.setBorder(new LineBorder(new Color(0, 0, 0)));
+        
+        pRecButtons = new JPanel();
         GroupLayout gl_pChildbirth = new GroupLayout(pChildbirth);
         gl_pChildbirth.setHorizontalGroup(
-        	gl_pChildbirth.createParallelGroup(Alignment.LEADING)
+        	gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
         		.addGroup(gl_pChildbirth.createSequentialGroup()
         			.addContainerGap()
-        			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING)
+        			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
+        				.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1264, Short.MAX_VALUE)
         				.addGroup(gl_pChildbirth.createSequentialGroup()
-        					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 963, GroupLayout.PREFERRED_SIZE)
-        					.addContainerGap())
-        				.addGroup(gl_pChildbirth.createSequentialGroup()
-        					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 279, GroupLayout.PREFERRED_SIZE)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 364, GroupLayout.PREFERRED_SIZE)
-        					.addGap(37))
-        				.addGroup(gl_pChildbirth.createSequentialGroup()
-        					.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 972, Short.MAX_VALUE)
-        					.addGap(37))))
+        					.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
+        						.addComponent(pRecButtons, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
+        						.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))
+        					.addGap(18)
+        					.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING)
+        						.addGroup(gl_pChildbirth.createSequentialGroup()
+        							.addGap(2)
+        							.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 419, GroupLayout.PREFERRED_SIZE)
+        							.addGap(18)
+        							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE))
+        						.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+        			.addGap(160))
         );
         gl_pChildbirth.setVerticalGroup(
         	gl_pChildbirth.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_pChildbirth.createSequentialGroup()
         			.addContainerGap()
-        			.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
-        			.addPreferredGap(ComponentPlacement.UNRELATED)
-        			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING)
-        				.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
-        				.addGroup(gl_pChildbirth.createParallelGroup(Alignment.TRAILING, false)
-        					.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        					.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)))
-        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING, false)
+        				.addComponent(pRecButtons, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(panel_5, GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE))
+        			.addGap(18)
+        			.addGroup(gl_pChildbirth.createParallelGroup(Alignment.LEADING, false)
+        				.addComponent(panel_1, 0, 0, Short.MAX_VALUE)
+        				.addComponent(panel_2, 0, 0, Short.MAX_VALUE)
+        				.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))
+        			.addGap(18)
         			.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 76, GroupLayout.PREFERRED_SIZE)
-        			.addGap(82))
+        			.addContainerGap(207, Short.MAX_VALUE))
         );
         
-        JButton btnNewButton = new JButton("");
-        btnNewButton.addActionListener(new ActionListener() {
+        JButton btnNewRecord = new JButton("");
+        btnNewRecord.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
 				try {
 				trdIshod = new TRdIshod();	
@@ -2557,81 +2562,97 @@ public class MainFrame extends JFrame {
 				}
         	}
         });
-        btnNewButton.setToolTipText("Новая запись");
-        btnNewButton.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
+        btnNewRecord.setToolTipText("Новая запись");
+        btnNewRecord.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1331789242_Add.png")));
         
-        JButton btnNewButton_1 = new JButton("");
-        btnNewButton_1.addActionListener(new ActionListener() {
+        JButton btnSaveRecord = new JButton("");
+        btnSaveRecord.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
           		try {
-        	trdIshod.setChcc( (int) Schcc.getModel().getValue());
-      		trdIshod.setDatarod(TDatarod.getDate().getTime());
-      		trdIshod.setDeyat(TRod.getText());
-			if (CBEff.getSelectedPcod() != null)
-				trdIshod.setEff(CBEff.getSelectedPcod());
-				else trdIshod.unsetEff();
-      		trdIshod.setHdm((int) Shdm.getModel().getValue());
-      		trdIshod.setKashetv(TKash.getText());
-      		trdIshod.setKrov((int) SKrov.getModel().getValue());
-      		trdIshod.setMesto(TDet.getText());
-      		trdIshod.setObezb(TMed.getText());
- 		   	trdIshod.setObol(TObol.getText());
- 		   	trdIshod.setObvit(TObvit.getText());
-      		trdIshod.setOj((double) Soj.getModel().getValue());
-      		trdIshod.setOsobp(TOsob.getText());
-      		trdIshod.setPoln(TPoln.getText());
-			if (CBPolpl.getSelectedPcod() != null)
-				trdIshod.setPolpl(CBPolpl.getSelectedPcod());
-				else trdIshod.unsetPolpl();
-			if (CBPoz.getSelectedPcod() != null)
-				trdIshod.setPozpl(CBPoz.getSelectedPcod());
-				else trdIshod.unsetPozpl();
-			if (CBVid.getSelectedPcod() != null)
-				trdIshod.setVidpl(CBVid.getSelectedPcod());
-				else trdIshod.unsetVidpl();
-			if (CBSerd.getSelectedPcod() != null)
-				trdIshod.setSerd(CBSerd.getSelectedPcod());
-				else trdIshod.unsetSerd();
-			if (CBSerd1.getSelectedPcod() != null)
-				trdIshod.setSerd1(CBSerd1.getSelectedPcod());
-				else trdIshod.unsetSerd1();
-			if (CBPred.getSelectedPcod() != null)
-				trdIshod.setPredpl(CBPred.getSelectedPcod());
-				else trdIshod.unsetPredpl();
-			if (CBPosled.getSelectedPcod() != null)
-				trdIshod.setPosled(CBPosled.getSelectedPcod());
-				else trdIshod.unsetPosled();
-			if (CBAkush.getSelectedPcod() != null)
-				trdIshod.setAkush(CBAkush.getSelectedPcod());
-				else trdIshod.unsetAkush();
-			if (CBPrinial.getSelectedPcod() != null)
-				trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
-			    else trdIshod.unsetPrinyl();
-			if (CBVrash.getSelectedPcod() != null)
-				trdIshod.setVrash(CBVrash.getSelectedPcod());
-			    else trdIshod.unsetVrash();
-			if (CBOsmotr.getSelectedPcod() != null)
-				trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
-			else trdIshod.unsetOsmposl();
-  		trdIshod.setVes((int) SVes.getModel().getValue());
-  		trdIshod.setDetmesto(TDet.getText());
-  		System.out.println(trdIshod);	
-			ClientHospital.tcl.updateRdIshod(trdIshod);
-		} catch (KmiacServerException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (TException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		        	trdIshod.setChcc( (int) Schcc.getModel().getValue());
+		      		trdIshod.setDatarod(TDatarod.getDate().getTime());
+		      		trdIshod.setDeyat(TRod.getText());
+					if (CBEff.getSelectedPcod() != null)
+						trdIshod.setEff(CBEff.getSelectedPcod());
+					else
+						trdIshod.unsetEff();
+		      		trdIshod.setHdm((int) Shdm.getModel().getValue());
+		      		trdIshod.setKashetv(TKash.getText());
+		      		trdIshod.setKrov((int) SKrov.getModel().getValue());
+		      		trdIshod.setMesto(TDet.getText());
+		      		trdIshod.setObezb(TMed.getText());
+		 		   	trdIshod.setObol(TObol.getText());
+		 		   	trdIshod.setObvit(TObvit.getText());
+		      		trdIshod.setOj((double) Soj.getModel().getValue());
+		      		trdIshod.setOsobp(TOsob.getText());
+		      		trdIshod.setPoln(TPoln.getText());
+					if (CBPolpl.getSelectedPcod() != null)
+						trdIshod.setPolpl(CBPolpl.getSelectedPcod());
+					else
+						trdIshod.unsetPolpl();
+					if (CBPoz.getSelectedPcod() != null)
+						trdIshod.setPozpl(CBPoz.getSelectedPcod());
+					else trdIshod.unsetPozpl();
+					if (CBVid.getSelectedPcod() != null)
+						trdIshod.setVidpl(CBVid.getSelectedPcod());
+					else
+						trdIshod.unsetVidpl();
+					if (CBSerd.getSelectedPcod() != null)
+						trdIshod.setSerd(CBSerd.getSelectedPcod());
+					else
+						trdIshod.unsetSerd();
+					if (CBSerd1.getSelectedPcod() != null)
+						trdIshod.setSerd1(CBSerd1.getSelectedPcod());
+					else
+						trdIshod.unsetSerd1();
+					if (CBPred.getSelectedPcod() != null)
+						trdIshod.setPredpl(CBPred.getSelectedPcod());
+					else
+						trdIshod.unsetPredpl();
+					if (CBPosled.getSelectedPcod() != null)
+						trdIshod.setPosled(CBPosled.getSelectedPcod());
+					else
+						trdIshod.unsetPosled();
+					if (CBAkush.getSelectedPcod() != null)
+						trdIshod.setAkush(CBAkush.getSelectedPcod());
+					else
+						trdIshod.unsetAkush();
+					if (CBPrinial.getSelectedPcod() != null)
+						trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
+					else
+						trdIshod.unsetPrinyl();
+					if (CBVrash.getSelectedPcod() != null)
+						trdIshod.setVrash(CBVrash.getSelectedPcod());
+					else
+						trdIshod.unsetVrash();
+					if (CBOsmotr.getSelectedPcod() != null)
+						trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
+					else
+						trdIshod.unsetOsmposl();
+			  		trdIshod.setVes((int) SVes.getModel().getValue());
+			  		trdIshod.setDetmesto(TDet.getText());
+			  		System.out.println(trdIshod);
+			  		ClientHospital.tcl.updateRdIshod(trdIshod);
+				} catch (KmiacServerException e1) {
+					e1.printStackTrace();
+				} catch (TException e1) {
+					e1.printStackTrace();
+				}
         	}
         });
-        btnNewButton_1.setToolTipText("Сохранить");
-        btnNewButton_1.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
+        btnSaveRecord.setToolTipText("Сохранить запись");
+        btnSaveRecord.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
         
-        JButton btnNewButton_2 = new JButton("");
-        btnNewButton_2.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
-        btnNewButton_2.setToolTipText("Удалить");
+        JButton btnDelRecord = new JButton("");
+        btnDelRecord.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		int isDel = JOptionPane.showConfirmDialog(MainFrame.this, "Вы действительно хотите удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION);
+        		//TODO: НАПИСАТЬ УДАЛЕНИЕ!
+        		if (isDel == 0) ;
+        	}
+        });
+        btnDelRecord.setIcon(new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1331789259_Delete.png")));
+        btnDelRecord.setToolTipText("Удалить запись");
         
         JLabel lblNewLabel_32 = new JLabel("Дата родов");
         lblNewLabel_32.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -2650,43 +2671,37 @@ public class MainFrame extends JFrame {
         
         TDatarod = new CustomDateEditor();
         TDatarod.setFont(new Font("Tahoma", Font.BOLD, 12));
-//        TDatarod.setColumns(10);
+        pRecButtons.setLayout(new GridLayout(0, 3, 0, 0));
+        pRecButtons.add(btnNewRecord);
+        pRecButtons.add(btnSaveRecord);
+        pRecButtons.add(btnDelRecord);
+        
         GroupLayout gl_panel_5 = new GroupLayout(panel_5);
         gl_panel_5.setHorizontalGroup(
         	gl_panel_5.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_panel_5.createSequentialGroup()
         			.addContainerGap()
-        			.addComponent(btnNewButton)
-        			.addPreferredGap(ComponentPlacement.UNRELATED)
-        			.addComponent(btnNewButton_1)
-        			.addPreferredGap(ComponentPlacement.UNRELATED)
-        			.addComponent(btnNewButton_2)
-        			.addPreferredGap(ComponentPlacement.UNRELATED)
         			.addComponent(TFam, GroupLayout.PREFERRED_SIZE, 133, GroupLayout.PREFERRED_SIZE)
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addComponent(TIm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addComponent(TOt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        			.addGap(26)
+        			.addGap(51)
         			.addComponent(lblNewLabel_32)
         			.addGap(18)
         			.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        			.addContainerGap(175, Short.MAX_VALUE))
+        			.addContainerGap(257, Short.MAX_VALUE))
         );
         gl_panel_5.setVerticalGroup(
         	gl_panel_5.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_panel_5.createSequentialGroup()
-        			.addContainerGap()
-        			.addGroup(gl_panel_5.createParallelGroup(Alignment.LEADING)
-        				.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-        				.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-        				.addComponent(btnNewButton_2, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-        				.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
-        					.addComponent(TFam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addComponent(TIm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addComponent(TOt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addComponent(lblNewLabel_32)
-        					.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        			.addGap(21)
+        			.addGroup(gl_panel_5.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(TFam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(TIm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(TOt, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(lblNewLabel_32)
+        				.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addContainerGap())
         );
         panel_5.setLayout(gl_panel_5);
@@ -2694,7 +2709,7 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_28 = new JLabel("Принял ребенка");
         lblNewLabel_28.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        JLabel lblNewLabel_29 = new JLabel("Послед осматривал");
+        JLabel lblNewLabel_29 = new JLabel("Последним осматривал");
         lblNewLabel_29.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
         JLabel lblNewLabel_30 = new JLabel("Дежурный врач");
@@ -2709,11 +2724,11 @@ public class MainFrame extends JFrame {
         CBOsmotr = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBOsmotr.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVrash = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
-        CBVrash.setFont(new Font("Tahoma", Font.BOLD, 12));
-        
         CBAkush = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
         CBAkush.setFont(new Font("Tahoma", Font.BOLD, 12));
+        
+        CBVrash = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+        CBVrash.setFont(new Font("Tahoma", Font.BOLD, 12));
         GroupLayout gl_panel_4 = new GroupLayout(panel_4);
         gl_panel_4.setHorizontalGroup(
         	gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -2723,36 +2738,41 @@ public class MainFrame extends JFrame {
         				.addComponent(lblNewLabel_28)
         				.addComponent(lblNewLabel_29))
         			.addGap(21)
-        			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-        				.addComponent(CBOsmotr, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(CBPrinial, 0, 204, Short.MAX_VALUE))
-        			.addGap(78)
+        			.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING, false)
+        				.addComponent(CBPrinial, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(CBOsmotr, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
+        			.addGap(153)
         			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
         				.addComponent(lblNewLabel_30)
         				.addComponent(lblNewLabel_31))
         			.addPreferredGap(ComponentPlacement.UNRELATED)
         			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-        				.addComponent(CBAkush, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(CBVrash, 0, 187, Short.MAX_VALUE))
-        			.addContainerGap(154, Short.MAX_VALUE))
+        				.addComponent(CBVrash, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        				.addComponent(CBAkush, GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE))
+        			.addContainerGap(467, Short.MAX_VALUE))
         );
         gl_panel_4.setVerticalGroup(
         	gl_panel_4.createParallelGroup(Alignment.LEADING)
         		.addGroup(gl_panel_4.createSequentialGroup()
         			.addContainerGap()
-        			.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-        				.addComponent(lblNewLabel_28)
-        				.addComponent(CBPrinial, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        				.addComponent(lblNewLabel_30)
-        				.addComponent(CBVrash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-        				.addComponent(lblNewLabel_29)
-        				.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-        					.addComponent(CBOsmotr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        					.addComponent(lblNewLabel_31))
-        				.addComponent(CBAkush, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        			.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        				.addGroup(gl_panel_4.createSequentialGroup()
+        					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(lblNewLabel_30)
+        						.addComponent(CBVrash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+        						.addComponent(CBAkush, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(lblNewLabel_31)))
+        				.addGroup(gl_panel_4.createSequentialGroup()
+        					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(lblNewLabel_28)
+        						.addComponent(CBPrinial, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        					.addPreferredGap(ComponentPlacement.RELATED)
+        					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+        						.addComponent(lblNewLabel_29)
+        						.addComponent(CBOsmotr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+        			.addContainerGap(15, Short.MAX_VALUE))
         );
         panel_4.setLayout(gl_panel_4);
         
@@ -2774,7 +2794,7 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_21 = new JLabel("Особенности");
         lblNewLabel_21.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        JLabel lblNewLabel_22 = new JLabel("Кровопотеря мл.");
+        JLabel lblNewLabel_22 = new JLabel("Кровопотеря (мл.)");
         lblNewLabel_22.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
         JLabel lblNewLabel_23 = new JLabel("Продолжительность I период");
@@ -2786,8 +2806,8 @@ public class MainFrame extends JFrame {
         JLabel lblNewLabel_27 = new JLabel("III период");
         lblNewLabel_27.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
-        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db12);;
-        CBPosled.setFont(new Font("Tahoma", Font.BOLD, 12));;
+        CBPosled = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db12);
+        CBPosled.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         JLabel LVrem = new JLabel("Через ");
         LVrem.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -2805,9 +2825,11 @@ public class MainFrame extends JFrame {
         TOsob.setColumns(10);
         
         JSpinner SDlina = new JSpinner();
+        SDlina.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
         SDlina.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         JSpinner SKrov = new JSpinner();
+        SKrov.setModel(new SpinnerNumberModel(0, 0, 6000, 1));
         SKrov.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         TPer1 = new JTextField();
@@ -2834,39 +2856,37 @@ public class MainFrame extends JFrame {
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
         				.addComponent(LVrem)
         				.addComponent(lblNewLabel_18)
-        				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        						.addComponent(lblNewLabel_19)
-        						.addComponent(lblNewLabel_22)
-        						.addComponent(lblNewLabel_20)
-        						.addComponent(lblNewLabel_21))
-        					.addGap(18)
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        						.addComponent(TOsob, GroupLayout.PREFERRED_SIZE, 217, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(textField, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE)))
-        				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(lblNewLabel_26)
-        						.addComponent(lblNewLabel_23)
-        						.addComponent(lblNewLabel_27))
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        						.addComponent(TPer3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(TPer2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(TPer1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-        				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        						.addComponent(lblNewLabel_16)
-        						.addComponent(lblNewLabel_17))
-        					.addGap(18)
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-        						.addComponent(TVremp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(CBPosled, GroupLayout.PREFERRED_SIZE, 147, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(TObol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        						.addComponent(TDet, GroupLayout.PREFERRED_SIZE, 161, GroupLayout.PREFERRED_SIZE))))
-        			.addContainerGap(19, Short.MAX_VALUE))
+        				.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        					.addGroup(gl_panel_1.createSequentialGroup()
+        						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        							.addComponent(lblNewLabel_19)
+        							.addComponent(lblNewLabel_22)
+        							.addComponent(lblNewLabel_20)
+        							.addComponent(lblNewLabel_21)
+        							.addComponent(lblNewLabel_16)
+        							.addComponent(lblNewLabel_17))
+        						.addGap(18)
+        						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        							.addComponent(CBPosled, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+        							.addComponent(TDet, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+        							.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
+        							.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
+        							.addComponent(textField, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+        							.addComponent(TOsob, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+        							.addComponent(TObol, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+        							.addComponent(TVremp, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE))
+        						.addPreferredGap(ComponentPlacement.RELATED))
+        					.addGroup(gl_panel_1.createSequentialGroup()
+        						.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+        							.addComponent(lblNewLabel_26)
+        							.addComponent(lblNewLabel_23)
+        							.addComponent(lblNewLabel_27))
+        						.addPreferredGap(ComponentPlacement.UNRELATED)
+        						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+        							.addComponent(TPer3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addComponent(TPer2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        							.addComponent(TPer1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
+        			.addGap(68))
         );
         gl_panel_1.setVerticalGroup(
         	gl_panel_1.createParallelGroup(Alignment.TRAILING)
@@ -2883,31 +2903,30 @@ public class MainFrame extends JFrame {
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
         				.addComponent(lblNewLabel_17)
         				.addComponent(TDet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addGap(12)
+        			.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(lblNewLabel_18)
+        				.addComponent(TObol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addGap(9)
+        			.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+        				.addComponent(lblNewLabel_19)
+        				.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+        				.addComponent(lblNewLabel_22)
         				.addGroup(gl_panel_1.createSequentialGroup()
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(lblNewLabel_18)
-        						.addComponent(TObol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        					.addGap(9)
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(lblNewLabel_19)
-        						.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(lblNewLabel_20)
+        						.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
-        						.addComponent(lblNewLabel_22)
-        						.addGroup(gl_panel_1.createSequentialGroup()
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-        								.addComponent(lblNewLabel_20)
-        								.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        							.addPreferredGap(ComponentPlacement.RELATED)
-        							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-        								.addComponent(TOsob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(lblNewLabel_21))
-        							.addPreferredGap(ComponentPlacement.RELATED)
-        							.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+        						.addComponent(TOsob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(lblNewLabel_21))
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(lblNewLabel_23))
+        					.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        			.addPreferredGap(ComponentPlacement.UNRELATED)
+        			.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING)
+        				.addComponent(lblNewLabel_23)
         				.addComponent(TPer1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
@@ -2917,7 +2936,7 @@ public class MainFrame extends JFrame {
         			.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_27)
         				.addComponent(TPer3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        			.addContainerGap())
+        			.addGap(215))
         );
         panel_1.setLayout(gl_panel_1);
         
@@ -2995,17 +3014,17 @@ public class MainFrame extends JFrame {
         							.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
         								.addComponent(TNash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         								.addComponent(TPoln, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        								.addComponent(TKash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-        						.addComponent(chckbxNewCheckBox))
-        					.addPreferredGap(ComponentPlacement.RELATED, 31, Short.MAX_VALUE))
+        								.addComponent(TKash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
+        					.addPreferredGap(ComponentPlacement.RELATED, 427, Short.MAX_VALUE))
         				.addGroup(gl_panel_2.createSequentialGroup()
-        					.addComponent(lblNewLabel_24)
+        					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+        						.addComponent(lblNewLabel_24)
+        						.addComponent(lblNewLabel_25))
         					.addPreferredGap(ComponentPlacement.RELATED)
-        					.addComponent(TMed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        				.addGroup(gl_panel_2.createSequentialGroup()
-        					.addComponent(lblNewLabel_25)
-        					.addPreferredGap(ComponentPlacement.RELATED, 156, Short.MAX_VALUE)
-        					.addComponent(CBEff, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)))
+        					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+        						.addComponent(CBEff, GroupLayout.PREFERRED_SIZE, 112, GroupLayout.PREFERRED_SIZE)
+        						.addComponent(TMed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+        				.addComponent(chckbxNewCheckBox))
         			.addContainerGap())
         );
         gl_panel_2.setVerticalGroup(
@@ -3031,9 +3050,9 @@ public class MainFrame extends JFrame {
         			.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
         				.addComponent(TNash, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         				.addComponent(lblNewLabel_15))
-        			.addPreferredGap(ComponentPlacement.RELATED)
+        			.addPreferredGap(ComponentPlacement.UNRELATED)
         			.addComponent(chckbxNewCheckBox)
-        			.addGap(15)
+        			.addGap(10)
         			.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
         				.addComponent(lblNewLabel_24)
         				.addComponent(TMed, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -3079,18 +3098,20 @@ public class MainFrame extends JFrame {
         lblNewLabel_10.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
         Soj = new JSpinner();
+        Soj.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
         Soj.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         Shdm = new JSpinner();
+        Shdm.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
         Shdm.setFont(new Font("Tahoma", Font.BOLD, 12));
         
 		CBPolpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db1);
         CBPolpl.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db10);;
+        CBPoz = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db10);
         CBPoz.setFont(new Font("Tahoma", Font.BOLD, 12));
         
-        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db11);;
+        CBVid = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db11);
         CBVid.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         CBSerd = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db3);
@@ -3103,6 +3124,7 @@ public class MainFrame extends JFrame {
         CBPred.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         Schcc = new JSpinner();
+        Schcc.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
         Schcc.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         TVes = new JTextField();
@@ -3113,10 +3135,11 @@ public class MainFrame extends JFrame {
         TGde.setFont(new Font("Tahoma", Font.BOLD, 12));
         TGde.setColumns(10);
         
-        JLabel lblNewLabel_33 = new JLabel("Вес женщины");
+        JLabel lblNewLabel_33 = new JLabel("Вес женщины (кг.)");
         lblNewLabel_33.setFont(new Font("Tahoma", Font.PLAIN, 12));
         
         JSpinner SVes = new JSpinner();
+        SVes.setModel(new SpinnerNumberModel(0, 0, 500, 1));
         SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
         
         TRod = new JTextField();
@@ -3234,6 +3257,7 @@ public class MainFrame extends JFrame {
         panel_3.setLayout(gl_panel_3);
         pChildbirth.setLayout(gl_pChildbirth);
     }
+    
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
@@ -3265,50 +3289,69 @@ public class MainFrame extends JFrame {
 		TRod.setText(trdIshod.getDeyat());
 		TMed.setText(trdIshod.getObezb());
 		if (trdIshod.isSetPolpl())
-		CBPolpl.setSelectedPcod(trdIshod.getPolpl());
-		else CBPolpl.setSelectedItem(null);
+			CBPolpl.setSelectedPcod(trdIshod.getPolpl());
+		else
+			CBPolpl.setSelectedItem(null);
 		if (trdIshod.isSetPozpl())
-		CBPoz.setSelectedPcod(trdIshod.getPozpl());
-		else CBPoz.setSelectedItem(null);
+			CBPoz.setSelectedPcod(trdIshod.getPozpl());
+		else
+			CBPoz.setSelectedItem(null);
 		if (trdIshod.isSetVidpl())
-		CBVid.setSelectedPcod(trdIshod.getVidpl());
-		else CBVid.setSelectedItem(null);
+			CBVid.setSelectedPcod(trdIshod.getVidpl());
+		else
+			CBVid.setSelectedItem(null);
 		if (trdIshod.isSetSerd())
-		CBSerd.setSelectedPcod(trdIshod.getSerd());
-		else CBSerd.setSelectedItem(null);
+			CBSerd.setSelectedPcod(trdIshod.getSerd());
+		else
+			CBSerd.setSelectedItem(null);
 		if (trdIshod.isSetSerd1())
-		CBSerd1.setSelectedPcod(trdIshod.getSerd1());
-		else CBSerd1.setSelectedItem(null);
+			CBSerd1.setSelectedPcod(trdIshod.getSerd1());
+		else
+			CBSerd1.setSelectedItem(null);
 		if (trdIshod.isSetPredpl())
-		CBPred.setSelectedPcod(trdIshod.getPredpl());
-		else CBPred.setSelectedItem(null);
+			CBPred.setSelectedPcod(trdIshod.getPredpl());
+		else
+			CBPred.setSelectedItem(null);
 		if (trdIshod.isSetEff())
-		CBEff.setSelectedPcod(trdIshod.getEff());
-		else CBEff.setSelectedItem(null);
+			CBEff.setSelectedPcod(trdIshod.getEff());
+		else
+			CBEff.setSelectedItem(null);
 		if (trdIshod.isSetPosled())
-		CBPosled.setSelectedPcod(trdIshod.getPosled());
-		else CBPosled.setSelectedItem(null);
+			CBPosled.setSelectedPcod(trdIshod.getPosled());
+		else
+			CBPosled.setSelectedItem(null);
 		if (trdIshod.isSetAkush())
-		CBAkush.setSelectedPcod(trdIshod.getAkush());
-		else CBAkush.setSelectedItem(null);
+			CBAkush.setSelectedPcod(trdIshod.getAkush());
+		else
+			CBAkush.setSelectedItem(null);
 		if (trdIshod.isSetVrash())
-		CBVrash.setSelectedPcod(trdIshod.getVrash());
-		else CBVrash.setSelectedItem(null);
+			CBVrash.setSelectedPcod(trdIshod.getVrash());
+		else
+			CBVrash.setSelectedItem(null);
 		if (trdIshod.isSetPrinyl())
-		CBPrinial.setSelectedPcod(trdIshod.getPrinyl());
-		else CBPrinial.setSelectedItem(null);
+			CBPrinial.setSelectedPcod(trdIshod.getPrinyl());
+		else
+			CBPrinial.setSelectedItem(null);
 		if (trdIshod.isSetOsmposl())
-		CBOsmotr.setSelectedPcod(trdIshod.getOsmposl());
-		else CBOsmotr.setSelectedItem(null);
+			CBOsmotr.setSelectedPcod(trdIshod.getOsmposl());
+		else
+			CBOsmotr.setSelectedItem(null);
 	} catch (Exception e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 		JOptionPane.showMessageDialog(MainFrame.this, e.getLocalizedMessage(), "Ошибка создания записи", JOptionPane.ERROR_MESSAGE);
-		
 	}
 	
 	}
 
+    
+///////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////Новорожденный//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setChildrenPanel() {
+    	this.pChildren = new Children(this.doctorAuth, this.patient);
+        tabbedPane.addTab("Новорожденный", new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildren, null);
+	}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Заключение ///////////////////////////////////////////////////
