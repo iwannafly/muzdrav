@@ -38,6 +38,7 @@ import ru.nkz.ivcgzo.clientMedication.ClientMedication;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.MedPolErrorsForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PaspErrorsForm;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientAnamnezForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientInfoForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientSearchForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ViewIntegerClassifierForm;
@@ -73,6 +74,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ClientMedication medFrm;
 	public PaspErrorsForm paspFrm;
 	public MedPolErrorsForm medPolFrm;
+	public PatientAnamnezForm patAnamFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -265,6 +267,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		recFrm = new ru.nkz.ivcgzo.clientReception.MainForm(conMan, authInfo, 0);
 		paspFrm = new PaspErrorsForm();
 		medPolFrm = new MedPolErrorsForm();
+		patAnamFrm = new PatientAnamnezForm();
 	}
 	
 	@Override
@@ -479,6 +482,20 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					} finally {
 						setFrame(frame);
 						medPolFrm.removeModalityListener();
+						disposeModal();
+					}
+					
+				case 24:
+					setFrame(patAnamFrm);
+					patAnamFrm.ChangePatientAnamnezInfo((int) params[1]);
+					dialog = prepareModal(parent);
+					patAnamFrm.setModalityListener();
+					dialog.setVisible(true);
+					try {
+						return patAnamFrm.getResults();
+					} finally {
+						setFrame(frame);
+						patAnamFrm.removeModalityListener();
 						disposeModal();
 					}
 				}

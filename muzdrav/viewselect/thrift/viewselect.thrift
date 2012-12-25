@@ -483,6 +483,19 @@ struct MedPolErrorInfo {
 	15: optional string err_comm;
 }
 
+struct PatientAnamnez {
+	1: optional i32 npasp;
+	2: optional i64 datap;
+	3: optional i32 numstr;
+	4: optional bool vybor;
+	5: optional string comment;
+	6: optional string name;
+	7: optional string pranz;
+}
+
+exception TipPodrNotFoundException {
+}
+
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
@@ -537,4 +550,7 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<CotdInfo> getCotdInfoList(1: i32 id_gosp) throws (1: kmiacServer.KmiacServerException kse);
 	list<PaspErrorInfo> getPaspErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
 	list<MedPolErrorInfo> getMedPolErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientAnamnez> getAnamnez(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: TipPodrNotFoundException tpfe, 2:kmiacServer.KmiacServerException kse);
+	void deleteAnam(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+	void updateAnam(1: list<PatientAnamnez> patAnam) throws (1: kmiacServer.KmiacServerException kse);
 }
