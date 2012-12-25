@@ -56,7 +56,7 @@ public class SheduleFrame extends InfomatFrame {
         hbBackwardButton.add(hgRight);
 
         addBackwardButton();
-        
+
         hgLeft = Box.createHorizontalGlue();
         hbBackwardButton.add(hgLeft);
     }
@@ -65,7 +65,7 @@ public class SheduleFrame extends InfomatFrame {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
         btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 setVisible(false);
             }
         });
@@ -78,7 +78,7 @@ public class SheduleFrame extends InfomatFrame {
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
     }
 
-    public void addShedulerSelectBackwardListener(ActionListener listener) {
+    public final void addShedulerSelectBackwardListener(final ActionListener listener) {
         btnBackward.addActionListener(listener);
     }
 
@@ -100,11 +100,11 @@ public class SheduleFrame extends InfomatFrame {
         tbTalons.setRowHeight(50);
         spTalon.setViewportView(tbTalons);
     }
-    private void refreshTalonTableModel(SheduleTableModel curSheduleTableModel) {
+    private void refreshTalonTableModel(final SheduleTableModel curSheduleTableModel) {
         tbTalons.setModel(curSheduleTableModel);
     }
 
-    public void showModal(SheduleTableModel curSheduleTableModel) {
+    public final void showModal(final SheduleTableModel curSheduleTableModel) {
         refreshTalonTableModel(curSheduleTableModel);
         setVisible(true);
     }

@@ -99,24 +99,41 @@ public class serverAdmin extends Server implements Iface {
 
 	@Override
 	public int AddVrach(VrachInfo vr) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
-			if (!acrs.getResultSet().next()) {
+		AutoCloseableResultSet acrs = null;
+		boolean found = false;
+		int pcod;
+		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			if (vr.isSetSnils()) {
+				acrs = sme.execPreparedQuery("SELECT pcod FROM s_vrach WHERE (snils = ?) ", vr.snils);
+				found = acrs.getResultSet().next();
+			}
+			if (!found) {
+				acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5);
+				found = acrs.getResultSet().next();
+			}
+			if (!found) {
 				sme.execPreparedT("INSERT INTO s_vrach (fam, im, ot, pol, datar, obr, snils, idv) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8);
-				int pcod = sme.getGeneratedKeys().getInt("pcod");
-				sme.setCommit();
-				return pcod;
-			} else
-				return acrs.getResultSet().getInt(1);
+				pcod = sme.getGeneratedKeys().getInt("pcod");
+			} else {
+				pcod = acrs.getResultSet().getInt(1);
+				vr.setPcod(pcod);
+				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
+			}
+			sme.setCommit();
+			return pcod;
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
+		} finally {
+			if (acrs != null)
+				acrs.close();
 		}
 	}
 
 	@Override
 	public void UpdVrach(VrachInfo vr) throws VrachExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
+				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) AND (obr = ?) AND (snils = ?) AND (idv = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8)) {
 			if (!acrs.getResultSet().next()) {
 				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
 				sme.setCommit();

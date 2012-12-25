@@ -224,6 +224,8 @@ public class Vvod extends JFrame {
 	private JButton btnObrDel;
 	private JButton btnObrSave;
 	private JButton btnObrAdd;
+	private JButton btnNaprPrint;
+	private JButton btnKonsPrint;
 	private CustomTable<PdiagZ, PdiagZ._Fields> tblZaklDiag;
 
 	
@@ -467,15 +469,18 @@ public class Vvod extends JFrame {
 			}
 		});
 		
+		JButton button = new JButton("Контроль");
+		button.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(pnlTalon, GroupLayout.DEFAULT_SIZE, 1260, Short.MAX_VALUE)
-						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 1260, Short.MAX_VALUE)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
+						.addComponent(pnlTalon, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -487,7 +492,9 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnBer, GroupLayout.PREFERRED_SIZE, 225, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnPrint, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(btnPrint, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(button)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -500,13 +507,14 @@ public class Vvod extends JFrame {
 						.addComponent(btnProsm)
 						.addComponent(btnBer)
 						.addComponent(btnPrint)
-						.addComponent(btnSearch))
+						.addComponent(btnSearch)
+						.addComponent(button))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pnlTalon, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
+					.addComponent(pnlTalon, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 685, Short.MAX_VALUE)
+					.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
 					.addGap(4))
 		);
 		
@@ -913,7 +921,9 @@ public class Vvod extends JFrame {
 					if (tblDiag.getSelectedItem() != null)
 						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION) {
 				  			MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
-							tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));
+				  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr());
+				  			tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));
+							tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 						}
 						if (tblDiag.getRowCount() > 0)
 							tblDiag.setRowSelectionInterval(tblDiag.getRowCount() - 1, tblDiag.getRowCount() - 1);
@@ -932,6 +942,18 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 		  		try {
 					if (tblDiag.getSelectedItem() != null) {
+				  		if (tbDiagOpis.getText().length() == 0) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Введите описание диагноза");
+				  			return;
+				  		}
+				  		for (PdiagAmb da : tblDiag.getData()) {
+							if (da != diagamb) {
+								if (da.diag.equals(diagamb.diag)) {
+						  			JOptionPane.showMessageDialog(Vvod.this, String.format("В списке есть одинаковые диангозы: %s", da.diag));
+						  			return;
+								}
+							}
+						}
 				  		diagamb.setDiag(tblDiag.getSelectedItem().getDiag());
 				  		diagamb.setNamed(getTextOrNull(tbDiagOpis.getText()));
 				  		diagamb.setId_pos(pvizitAmb.getId());
@@ -975,10 +997,7 @@ public class Vvod extends JFrame {
 					  		setPdiagz(pdiag);
 				  		}
 				  		
-				  		if (diagamb.isSetNamed())
-				  			MainForm.tcl.UpdatePdiagAmb(diagamb);
-				  		else
-				  			JOptionPane.showMessageDialog(Vvod.this, "Введите описание диагноза");
+			  			MainForm.tcl.UpdatePdiagAmb(diagamb);
 				  		
 				  		for (PdiagAmb pd : tblDiag.getData())
 				  			if (pd.diag_stat == 1) {
@@ -1111,6 +1130,10 @@ public class Vvod extends JFrame {
 				try {
 					if (e.getClickCount() == 2)
 						if ((tblZaklDiag.getSelectedItem().diag != null) && (tblPos.getSelectedItem() != null) && (tblObr.getSelectedItem() != null)) {
+							for (PdiagAmb pa : tblDiag.getData()) {
+								if (tblZaklDiag.getSelectedItem().diag.equals(pa.diag))
+									return;
+							}
 							diagamb = new PdiagAmb();
 		 			  		diagamb.setId_obr(zapVr.getId_pvizit());
 		 			  		diagamb.setId_pos(tblPos.getSelectedItem().id);
@@ -1732,7 +1755,7 @@ public class Vvod extends JFrame {
 		
 		JScrollPane spNaprPokazMet = new JScrollPane();
 		
-		JButton btnNaprPrint = new JButton("Печать");
+		btnNaprPrint = new JButton("Печать");
 		btnNaprPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
@@ -1740,6 +1763,29 @@ public class Vvod extends JFrame {
 						P_isl_ld pisl = new P_isl_ld();
 						Prez_d prezd = new Prez_d();
 						Prez_l prezl = new Prez_l();
+						
+						for (PdiagAmb pd : tblDiag.getData()) {
+							if (pd.diag_stat == 1) {
+								pisl.setDiag(pd.diag);
+								break;
+							}
+						}
+						if (!pisl.isSetDiag()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Запись на исследование не возможна, так как в посещении не выставлено ни одного основного диагноза.");
+				  			return;
+						}
+						
+						for (PokazMet pokazMet : tblNaprPokazMet.getData()) {
+							if (pokazMet.vybor) {
+								prezd.setKodisl(pokazMet.pcod);
+								break;
+							}
+						}
+						if (!prezd.isSetKodisl()) {
+				  			JOptionPane.showMessageDialog(Vvod.this, "Выберите хотя бы одно исследование.");
+				  			return;
+						}
+
 						pisl.setNpasp(Vvod.zapVr.getNpasp());
 						pisl.setPcisl(cmbOrgan.getSelectedPcod());
 						pisl.setNapravl(2);
@@ -2021,6 +2067,7 @@ public class Vvod extends JFrame {
 		  cmbConsVidNapr = new JComboBox<String>();
 		cmbConsVidNapr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tbKonsObosnov.setText("");
 				if (cmbConsVidNapr.getSelectedIndex() != 0){cmbVidStacionar.setVisible(false);lblVidStacionar.setVisible(false);lblKonsMesto.setVisible(true); cmbKonsMesto.setVisible(true);}
 				else {try {
 					cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
@@ -2039,6 +2086,7 @@ public class Vvod extends JFrame {
 		cmbVidStacionar = new ThriftIntegerClassifierCombobox<>(true);
 		cmbVidStacionar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				tbKonsObosnov.setText("");
 				if (cmbVidStacionar.getSelectedItem() != null){
 					if ((cmbVidStacionar.getSelectedPcod()==1)||(cmbVidStacionar.getSelectedPcod()==2)){lblKonsMesto.setVisible(true); cmbKonsMesto.setVisible(true); 
 					try {
@@ -2066,7 +2114,7 @@ public class Vvod extends JFrame {
 		tbKonsObosnov.setLineWrap(true);
 		tbKonsObosnov.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		JButton btnKonsPrint = new JButton("Печать");
+		btnKonsPrint = new JButton("Печать");
 		btnKonsPrint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
@@ -2296,13 +2344,14 @@ public class Vvod extends JFrame {
 		cmbVidOpl = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_opl);
 		cmbVidOpl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		JLabel lblVidOpl = new JLabel("Вид оплаты");
+		JLabel lblVidOpl = new JLabel("Вид опл.");
 		lblVidOpl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		cmbCelObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);
+		cmbCelObr.setMaximumSize(new Dimension(123, 32767));
 		cmbCelObr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		JLabel lblCelObr = new JLabel("Цель посещения");
+		JLabel lblCelObr = new JLabel("Цель пос.");
 		lblCelObr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		JLabel lblRez = new JLabel("Результат");
@@ -2310,7 +2359,7 @@ public class Vvod extends JFrame {
 		
 		cmbRez = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_aq0);
 		
-		JLabel lblMobs = new JLabel("Место обслуж.");
+		JLabel lblMobs = new JLabel("Место обс.");
 		lblMobs.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
 		cmbMobs = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_abs);
@@ -2319,22 +2368,21 @@ public class Vvod extends JFrame {
 			gl_pnlTalon.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlTalon.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(lblCelObr, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblVidOpl, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addComponent(lblVidOpl, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.LEADING)
-						.addComponent(cmbCelObr, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(cmbVidOpl, GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE))
+					.addComponent(cmbVidOpl, GroupLayout.PREFERRED_SIZE, 142, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(lblRez, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblMobs, GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))
+					.addComponent(lblCelObr, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.TRAILING)
-						.addComponent(cmbRez, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(cmbMobs, GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE))
-					.addContainerGap())
+					.addComponent(cmbCelObr, GroupLayout.PREFERRED_SIZE, 277, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addComponent(lblRez, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(cmbRez, GroupLayout.PREFERRED_SIZE, 123, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(lblMobs, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(cmbMobs, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE))
 		);
 		gl_pnlTalon.setVerticalGroup(
 			gl_pnlTalon.createParallelGroup(Alignment.LEADING)
@@ -2342,15 +2390,13 @@ public class Vvod extends JFrame {
 					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblVidOpl)
 						.addComponent(cmbVidOpl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cmbRez, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblRez))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_pnlTalon.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblCelObr)
 						.addComponent(cmbMobs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(cmbCelObr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblMobs))
-					.addGap(24))
+						.addComponent(lblMobs)
+						.addComponent(cmbRez, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblRez)
+						.addComponent(lblCelObr)
+						.addComponent(cmbCelObr, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(50))
 		);
 		pnlTalon.setLayout(gl_pnlTalon);
 		
@@ -2363,6 +2409,11 @@ public class Vvod extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (tblObr.getSelectedItem() == null)
 					return;
+				
+				if (tblObr.getSelectedItem().closed) {
+					JOptionPane.showMessageDialog(Vvod.this, "Добавить посещение не возможно, так как случай обращения закрыт.");
+					return;
+				}
 				
 				pvizitAmb = new PvizitAmb();
 				pvizitAmb.setId_obr(zapVr.id_pvizit);
@@ -2387,6 +2438,9 @@ public class Vvod extends JFrame {
 					e2.printStackTrace();
 				}
 		
+				btnNaprPrint.setEnabled((tblObr.getRowCount() > 0) && (tblPos.getRowCount() > 0));
+				btnKonsPrint.setEnabled(btnNaprPrint.isEnabled());
+				
 				pvizitAmbCopy = new PvizitAmb(pvizitAmb);
 				priemCopy = new Priem(priem);
 				anamZabCopy = new AnamZab(anamZab);
@@ -2869,6 +2923,8 @@ public class Vvod extends JFrame {
 					}
 				}
 			}
+			btnNaprPrint.setEnabled((tblObr.getRowCount() > 0) && (tblPos.getRowCount() > 0));
+			btnKonsPrint.setEnabled(btnNaprPrint.isEnabled());
 			
 			setVisible(true);
 			MainForm.instance.setVisible(false);
@@ -2983,6 +3039,12 @@ public class Vvod extends JFrame {
 	private void addDiag(StringClassifier mkb) {
 		try {
   			if (mkb != null) {
+		  		for (PdiagAmb da : tblDiag.getData()) {
+					if (da.diag.equals(mkb.pcod)) {
+			  			JOptionPane.showMessageDialog(Vvod.this, String.format("Диагноз %s уже есть в списке.", mkb.pcod));
+			  			return;
+					}
+				}
 		  		diagamb = new PdiagAmb();
 		  		diagamb.setId_obr(zapVr.getId_pvizit());
 		  		diagamb.setId_pos(tblPos.getSelectedItem().id);
@@ -2991,10 +3053,6 @@ public class Vvod extends JFrame {
 		  			if (pd.getDiag().equals(mkb.pcod)) 
 		  				{diagamb.setDatad(pd.getDatad());
 		  				diagamb.setPredv(false);}
-//	  				else {
-//	  					diagamb.setDatad(System.currentTimeMillis());
-//	  					diagamb.setPredv(true);
-//	  					}
 	  				}
 
 		  		if (!diagamb.isSetDatad()){
@@ -3220,7 +3278,7 @@ public class Vvod extends JFrame {
 		try {
 			pvizit.setNpasp(zapVr.getNpasp());
 			pvizit.setCpol(MainForm.authInfo.getCpodr());
-			pvizit.setDatao(System.currentTimeMillis());
+			pvizit.setDatao(getDateMills(System.currentTimeMillis()));
 			pvizit.setCod_sp(MainForm.vrPcod);
 			pvizit.setCdol(MainForm.vrCdol);
 			pvizit.setCuser(MainForm.authInfo.getUser_id());

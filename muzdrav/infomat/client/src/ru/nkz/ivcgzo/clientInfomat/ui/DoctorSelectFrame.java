@@ -40,7 +40,7 @@ public class DoctorSelectFrame extends InfomatFrame {
     private TalonSelectFrame frmTalonSelect;
     private SheduleFrame frmShedule;
 
-    public DoctorSelectFrame () {
+    public DoctorSelectFrame() {
         super();
         initialization();
     }
@@ -54,10 +54,10 @@ public class DoctorSelectFrame extends InfomatFrame {
 
     private void createModalFrames() {
         if (frmTalonSelect == null) {
-            frmTalonSelect = new TalonSelectFrame(); 
+            frmTalonSelect = new TalonSelectFrame();
         }
         if (frmShedule == null) {
-            frmShedule = new SheduleFrame(); 
+            frmShedule = new SheduleFrame();
         }
     }
 
@@ -73,19 +73,21 @@ public class DoctorSelectFrame extends InfomatFrame {
             focusedColor = Color.red;
         }
 
-        public InfomatListCellRenderer(Color inUnfocusedColor, Color inFocusedColor) {
+        public InfomatListCellRenderer(
+                final Color inUnfocusedColor, final Color inFocusedColor) {
             setOpaque(true);
             unfocusedColor = inUnfocusedColor;
             focusedColor = inFocusedColor;
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+                final JList list, final Object value, final int index,
+                final boolean isSelected, final boolean cellHasFocus) {
             setText(value.toString());
             setFont(new Font("Courier New", Font.PLAIN, 25));
             setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
             setHorizontalAlignment(JLabel.CENTER);
-            setBackground(isSelected ? focusedColor : unfocusedColor);// Color.white);
+            setBackground(isSelected ? focusedColor : unfocusedColor); // Color.white);
             setForeground(isSelected ? Color.white : Color.black);
             return this;
         }
@@ -106,17 +108,17 @@ public class DoctorSelectFrame extends InfomatFrame {
         pnButton.setBackground(Color.WHITE);
         pnMain.add(pnButton);
         pnButton.setLayout(new BoxLayout(pnButton, BoxLayout.X_AXIS));
-        
+
         addLeftHorizontalDelimiter();
         addBackwardButton();
         addRightHorizontalDelimiter();
     }
 
-    public void updateSpecialitiesList(List<StringClassifier> specialities) {
+    public final void updateSpecialitiesList(final List<StringClassifier> specialities) {
         lSpeciality.setData(specialities);
     }
 
-    public void updateDoctorsList(List<IntegerClassifier> doctors) {
+    public final void updateDoctorsList(final List<IntegerClassifier> doctors) {
         lDoctor.setData(doctors);
     }
 
@@ -131,7 +133,7 @@ public class DoctorSelectFrame extends InfomatFrame {
         pnButton.add(btnBackward);
     }
 
-    public void addDoctorSelectBackwardListener(ActionListener listener) {
+    public final void addDoctorSelectBackwardListener(final ActionListener listener) {
         btnBackward.addActionListener(listener);
     }
 
@@ -173,11 +175,11 @@ public class DoctorSelectFrame extends InfomatFrame {
         spSpeciality.setViewportView(lSpeciality);
     }
 
-    public void addSpecialityListClickListener(MouseListener listener) {
+    public final void addSpecialityListClickListener(final MouseListener listener) {
         lSpeciality.addMouseListener(listener);
     }
 
-    public void addDoctorListClickListener(MouseListener listener) {
+    public final void addDoctorListClickListener(final MouseListener listener) {
         lDoctor.addMouseListener(listener);
     }
 
@@ -199,7 +201,7 @@ public class DoctorSelectFrame extends InfomatFrame {
         spDoctor.setViewportView(lDoctor);
     }
 
-    public void showModal() {
+    public final void showModal() {
         lDoctor.setData(Collections.<IntegerClassifier>emptyList());
         setVisible(true);
     }

@@ -672,8 +672,10 @@ public class CustomTable<T extends TBase<?, F>, F extends TFieldIdEnum> extends 
 				if (editCellAt(selRow, selCol, null))
 					getEditorComponent().requestFocusInWindow();
 			}
-		} else
-			addItem();
+		} else {
+			if (editable)
+				addItem();
+		}
 	}
 
 	/**

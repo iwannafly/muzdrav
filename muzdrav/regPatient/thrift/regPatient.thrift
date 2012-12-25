@@ -124,14 +124,6 @@ struct Lgota{
 	11:i32 obo,
 	12:string ndoc
 }
-/*panamnez*/
-struct Anam{
-	1:i32 npasp,
-	2:optional i64 datap,
-	3:i32 numstr,
-	4:bool selflg,
-	5:optional string comment
-}
 
 /*pkonti*/
 struct Kontingent{
@@ -308,24 +300,47 @@ exception NambkNotFoundException{
 }
 exception PatientGospYesOrNoNotFoundException{
 }
+/*-----anamnez begin-----------------------------------------------------------*/
+/*panamnez*/
+struct Anam{
+	1:i32 npasp,
+	2:optional i64 datap,
+	3:i32 numstr,
+	4:bool vybor,
+	5:optional string comment,
+	6:string name,
+	7:string pranz
+}
 
+struct Pokaz{
+	1:i32 pcod,
+	2:string name
+}
 	exception TipPodrNotFoundException {
 	}
 
+	exception PokazNotFoundException {
+	}
 
 service ThriftRegPatient extends kmiacServer.KmiacServer {
 	
 	/**
-	Возвращает тип подразделения ЛПУ из классификатора
-	*/
-	i32 getTipPodr(1:i32 pcod) throws (1:TipPodrNotFoundException tpnfe,
-		2:kmiacServer.KmiacServerException kse);
-
-	/**
 	Возвращает показатели анамнеза
 	*/
-	list<Anam> getAnam(1:i32 npasp) throws (1: LgotaNotFoundException lnfe,
+	list<Anam> getAnamnez(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: TipPodrNotFoundException tpfe,
 		2:kmiacServer.KmiacServerException kse);
+
+	void deleteAnam(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
+	void updateAnam(1: list<Anam> anam) throws (1: kmiacServer.KmiacServerException kse);
+
+	/**
+	 * Печать анамнеза
+	 */
+	string printAnamnez(1: PatientFullInfo pat, 2: list<Anam> anam, 3: kmiacServer.UserAuthInfo uai)
+		throws (1:kmiacServer.KmiacServerException kse);
+
+	list<classifier.IntegerClassifier> getPokaz() throws (1: kmiacServer.KmiacServerException kse, 2: PokazNotFoundException pnfe);
+/*-----anamnez end-----------------------------------------------------------*/
 
     /**
      * Возвращает краткие сведения

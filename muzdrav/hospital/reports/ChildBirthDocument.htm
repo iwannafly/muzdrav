@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+		<title>Медицинское свидетельство о рождении </title>
+		<style type="text/css">
+			body {
+				font-family:"Times New Roman";
+				font-size:12px;
+			}
+			table.wide {
+				border-collapse:collapse;
+				width: 100%; /* ширина таблицы */
+			}
+			tr {
+				height: 14px;
+			}
+			td {
+				vertical-align: top;
+			}
+			span {
+				border:1px solid black;
+			}
+		        p.serif {
+				font_family:"Times New Roman";
+				font-size:10px;
+			}
+			td.leftcol {
+				text-align: center;
+				border-bottom:1px solid black;
+			}
+			tr.info {
+				heigth:11px;
+				font-size:9px;
+			}
+			td.centr {
+				border-left:1px solid black;
+				border-bottom:1px solid black;
+				border-right:1px solid black;
+			}
+			td.centrlr {
+				border-right:1px solid black;
+				border-left:1px solid black;
+			}
+			td.box {
+				border-left:1px solid black;
+				border-bottom:1px solid black;
+				border-right:1px solid black;
+				border-top:1px solid black;
+			}
+			td.collapse {
+				border-collapse:collapse;
+			}
+			span.znak{
+				border-top:1px solid black;
+				border-bottom:1px solid black;
+			}
+			p.und {
+				border-bottom:2px solid black;
+				width:100%;
+				text-wrap:normal;
+			}
+			p.more {
+				page-break-after: always;
+			}
+		
+		@media print
+			p.more {
+				page-break-after: always;
+			}
+		</style>
+	</head>
+	<body>
+		<table class="wide">
+			<tr class="info">
+				<td width="60%"></td>
+				<td width="40%">Приложение № 1
+					<br/>к приказу Минздравсоцразвития России
+					<br/>от 26.12.2008 г.  № 782н
+				</td>
+			</tr>
+		</table>
+		<h3 align="center">
+			КОРЕШОК МЕДИЦИНСКОГО СВИДЕТЕЛЬСТВА О РОЖДЕНИИ
+			<br/>К УЧЕТНОЙ ФОРМЕ №103/У-108
+			<br/>СЕРИЯ <u>&nbsp;&nbsp; ~seria &nbsp;&nbsp;</u> № <u>&nbsp;&nbsp;  ~ndoc &nbsp;&nbsp;</u>
+		</h3>
+		<p align="center">Дата выдачи «<u>~dateoff_d</u>» <u>~dateoff_m</u> <u>~dateoff_y</u> г.</p>
+		<br/>
+		<b>1.</b>&nbsp;Ребенок родился: число <u>&nbsp;&nbsp; ~datar_d &nbsp;&nbsp;</u>, месяц <u>&nbsp;&nbsp; ~datar_m &nbsp;&nbsp;</u>,
+			год <u>&nbsp;&nbsp; ~datar_y &nbsp;&nbsp;</u>, час <u>&nbsp;&nbsp; ~timeon_h &nbsp;&nbsp;</u>, мин. <u>&nbsp;&nbsp; ~timeon_m &nbsp;&nbsp;</u>
+		<br/><b>2.</b>&nbsp;Фамилия, имя, отчество матери <u>&nbsp;&nbsp; ~fio_mother &nbsp;&nbsp;</u>
+		<br/><b>3.</b>&nbsp;Дата рождения матери: число <u>&nbsp;&nbsp; ~datar_mother_d &nbsp;&nbsp;</u>,
+			месяц <u>&nbsp;&nbsp; ~datar_mother_m &nbsp;&nbsp;</u>, год<u>&nbsp;&nbsp; ~datar_mother_y &nbsp;&nbsp;</u>
+		<br/><b>4.</b>&nbsp;Место постоянного жительства (регистрации) матери ребенка:
+		<table class="wide">
+			<tr>
+				<td width="20%">&nbsp; республика, край область</td>
+				<td class=leftcol width="40%">~adp_obl</td>
+				<td width="6%">&nbsp; район</td>
+				<td class=leftcol width="34%">~kadm_raion</td>
+			</tr>
+		</table>
+		<table class="wide">
+			<tr>
+				<td width="10%">&nbsp; город (село)</td>
+				<td class="leftcol" width="30%">~adp_gorod</td>
+				<td width="6%">&nbsp; улица</td>
+				<td class="leftcol" width="25%">~adp_ul</td>
+				<td width="6%">&nbsp; дом</td>
+				<td class="leftcol" width="10%">~adp_dom</td>
+				<td width="6%">&nbsp; кв.</td>
+				<td class="leftcol" width="10%">~adp_kv</td>
+			</tr>
+		</table>
+		<table width="220">
+			<tr>
+				<td><b>5.</b>&nbsp;Местность:&nbsp; городская</td>
+				<td class="box" width="10" align="center">~town</td>
+				<td>, сельская</td>
+				<td class="box" width="10" align="center">~country</td>
+			</tr>
+		</table>
+		<table width="175">
+			<tr>
+				<td><b>6.</b>&nbsp;Пол:&nbsp; мальчик</td>
+				<td class="box" width="10" align="center">~pol_m</td>
+				<td>, девочка</td>
+				<td class="box" width="10" align="center">~pol_f</td>
+			</tr>
+		</table>
+		<br/><br/>
+		<p class="und" align="center">линия отреза</p>
+		<br/><br/>
+		<table class="wide">
+			<tr class="info">
+				<td class="box" width="45%">Министерство здравоохранения 
+					<br/>Российской Федерации
+				</td>
+				<td width="10%"> </td>
+				<td class="box" width="45%">Код формы по ОКУД______________
+					<br/>Медицинская документация
+				</td>
+			</tr>
+			<tr class="info">
+				<td class="box" width="45%">Наименование медицинской организации
+					<br/><u>~name_lpu</u>
+					<br/>адрес <u>~adres_lpu</u>
+					<br/>Код по ОКПО <u>~kod_okpo</u>
+					<br/>Для врача, занимающегося частной практикой:
+					<br/>номер лицензии на медицинскую деятельность ______________________
+					<br/>адрес _______________________________________________________
+				</td>
+				<td width="10%"> </td>
+				<td class="box" width="45%">Учетная форма № 103/у-08
+					<br/>Утверждена приказом Минздравсоцразвития России
+					<br/><br/>от 26.12.2008 г. №782н
+				</td>
+			</tr>
+		</table>
+		<h3 align=center>
+			МЕДИЦИНСКОЕ СВИДЕТЕЛЬСТВО О РОЖДЕНИИ
+			<br/>СЕРИЯ <u>&nbsp;&nbsp; ~seria &nbsp;&nbsp;</u> № <u>&nbsp;&nbsp;  ~ndoc &nbsp;&nbsp;</u>
+		</h3>
+		<p align="center">Дата выдачи «<u>~dateoff_d</u>» <u>~dateoff_m</u> <u>~dateoff_y</u> г.</p>
+		<br/>
+		<b>1.</b>&nbsp;Ребенок родился: число <u>&nbsp;&nbsp; ~datar_d &nbsp;&nbsp;</u>, месяц <u>&nbsp;&nbsp; ~datar_m &nbsp;&nbsp;</u>,
+			год <u>&nbsp;&nbsp; ~datar_y &nbsp;&nbsp;</u>, час <u>&nbsp;&nbsp; ~timeon_h &nbsp;&nbsp;</u>, мин. <u>&nbsp;&nbsp; ~timeon_m &nbsp;&nbsp;</u>
+		<br/>
+		<br/>
+		<table class="wide">
+			<tr align="center">
+				<td width="50%"><b>Мать</b></td>
+				<td width="50%"><b>Ребенок</b></td>
+			</tr>
+			<tr>
+				<td class="box" width="50%">
+					<b>2.</b>&nbsp;;Фамилия, имя, отчество <u>&nbsp;&nbsp; ~fio_mother &nbsp;&nbsp;</u>
+				</td>
+				<td class="box" width="50%">
+					<b>11.</b>&nbsp;Фамилия ребенка <u>&nbsp;&nbsp; ~fam &nbsp;&nbsp;</u>
+				</td>
+			</tr>
+		</table>
+		<p class="more">&nbsp;</p>
+	</body>
+</html>

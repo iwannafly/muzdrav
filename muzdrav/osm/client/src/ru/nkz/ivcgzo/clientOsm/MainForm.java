@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,7 +40,6 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.VrachInfo;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import javax.swing.JList;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
@@ -58,6 +58,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private ZapVr prevZapvr;
 	private JScrollPane spVrach;
 	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
+	private CustomDateEditor tfDatZap;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -76,6 +77,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setBounds(100, 100, 721, 508);
+		
 		
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -144,21 +146,36 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		
 		spVrach = new JScrollPane();
 		
+		tfDatZap = new CustomDateEditor();
+		tfDatZap.setDate(System.currentTimeMillis());
+		tfDatZap.setColumns(10);
+		
+		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			updateZapList();
+			}
+		});
+		
 		
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(spVrach, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-						.addComponent(spPos, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(spVrach, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+						.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSearch)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnSelect)
 							.addGap(18)
-							.addComponent(btnView)))
+							.addComponent(btnView)
+							.addGap(29)
+							.addComponent(tfDatZap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(btnOk)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -168,11 +185,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSearch)
 						.addComponent(btnSelect)
-						.addComponent(btnView))
+						.addComponent(btnView)
+						.addComponent(tfDatZap, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnOk))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+					.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spVrach, GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+					.addComponent(spVrach, GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
@@ -247,13 +266,14 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	}
 	
 	public void updateZapList() {
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
+//		Calendar calendar = GregorianCalendar.getInstance();
+//		calendar.setTimeInMillis(System.currentTimeMillis());
+//		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
+		frame.setTitle("Записанные на прием на "+DateFormat.getDateInstance().format(new Date(tfDatZap.getDate().getTime()))+" г.");
 		
 		try {
 			prevZapvr = tblPos.getSelectedItem();
-			tblPos.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis(), authInfo.getCpodr()));
+			tblPos.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), tfDatZap.getDate().getTime(), authInfo.getCpodr()));
 			if (prevZapvr != null)
 				for (int i = 0; i < tblPos.getData().size(); i++)
 					if (tblPos.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {
