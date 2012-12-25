@@ -182,7 +182,7 @@ public class Model implements IModel {
 
     @Override
     public final void reserveTalon(final TPatient pat, final TTalon talon) throws TException {
-            ClientInfomat.tcl.reserveTalon(pat, talon);
+        ClientInfomat.tcl.reserveTalon(pat, talon);
     }
 
     @Override
