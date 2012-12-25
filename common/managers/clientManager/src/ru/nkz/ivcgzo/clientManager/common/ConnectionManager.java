@@ -735,6 +735,15 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Вызов формы со списком ошибок в медицинской части поликлиники.
+	 * @return код выбранного пациента, код обращения и код посещения 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public int[] showMedPolErrorsForm() {
+		return (int[]) viewClient.showModal(client, 22);
+	}
+	
+	/**
 	 * Открывает сгенерированный отчет в офисном редакторе.
 	 * @param path - путь к отчету
 	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>

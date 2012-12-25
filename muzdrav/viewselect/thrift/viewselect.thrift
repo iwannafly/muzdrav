@@ -465,6 +465,24 @@ struct PaspErrorInfo {
 	9: optional string err_comm;
 }
 
+struct MedPolErrorInfo {
+	 1: optional i32 id;
+	 2: optional i32 id_obr;
+	 3: optional i32 id_pos;
+	 4: optional i64 dat_obr;
+	 5: optional i64 dat_pos;
+	 6: optional i32 vr_pcod;
+	 7: optional string vr_fio;
+	 8: optional string vr_cdol;
+	 9: optional string vr_cdol_name;
+	10: optional i32 npasp;
+	11: optional string pat_fio;
+	12: optional i64 pat_datar;
+	13: optional i32 kderr;
+	14: optional string err_name;
+	15: optional string err_comm;
+}
+
 service ThriftViewSelect extends kmiacServer.KmiacServer {
 	/**
 	 * Информация из классификатора с pcod типа string
@@ -518,4 +536,5 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<CosmotrInfo> getCosmotrInfoList(1: i32 id_gosp) throws (1: kmiacServer.KmiacServerException kse);
 	list<CotdInfo> getCotdInfoList(1: i32 id_gosp) throws (1: kmiacServer.KmiacServerException kse);
 	list<PaspErrorInfo> getPaspErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
+	list<MedPolErrorInfo> getMedPolErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
 }
