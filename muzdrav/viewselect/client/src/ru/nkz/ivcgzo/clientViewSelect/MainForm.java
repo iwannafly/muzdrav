@@ -487,10 +487,10 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 					
 				case 24:
 					setFrame(patAnamFrm);
-					patAnamFrm.ChangePatientAnamnezInfo((int) params[1]);
 					dialog = prepareModal(parent);
 					patAnamFrm.setModalityListener();
-					dialog.setVisible(true);
+					if (patAnamFrm.ChangePatientAnamnezInfo((int) params[1]))
+						dialog.setVisible(true);
 					try {
 						return patAnamFrm.getResults();
 					} finally {

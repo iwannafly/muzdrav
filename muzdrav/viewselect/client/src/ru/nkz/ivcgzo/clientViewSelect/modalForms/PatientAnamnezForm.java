@@ -34,6 +34,8 @@ public class PatientAnamnezForm extends ModalForm{
 	public PatientAnamnezForm() {
 		super(true);
 		
+		setBounds(100, 100, 1024, 700);
+		
 		JPanel pl_ane = new JPanel();
 		pl_ane.setBorder(new TitledBorder(null, "Эпидемиологический анамнез", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
@@ -169,10 +171,9 @@ public class PatientAnamnezForm extends ModalForm{
 		);
 		pl_ane.setLayout(gl_pl_ane);
 		getContentPane().setLayout(groupLayout);
-	
 	}
 	
-	public void ChangePatientAnamnezInfo(int npasp) {
+	public boolean ChangePatientAnamnezInfo(int npasp) {
 		tblAne.setData(new ArrayList<PatientAnamnez>());
 		tblAnj.setData(new ArrayList<PatientAnamnez>());
 		tblAne.setIntegerClassifierSelector(0, MainForm.conMan.getIntegerClassifier(IntegerClassifiers.n_anz));
@@ -187,13 +188,15 @@ public class PatientAnamnezForm extends ModalForm{
 						tblAnj.addItem(anam.get(i));
 				}
 			}
+			return true;
 		} catch (TipPodrNotFoundException tnfe) {
-            JOptionPane.showMessageDialog(this, "Анамнез отсутствует.");
+            JOptionPane.showMessageDialog(this, "Для данного подразделения анамнез не заполняется.");
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (TException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	@Override
