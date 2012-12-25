@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.clientOsm;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -102,9 +103,6 @@ import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
-import javax.swing.JTextPane;
-import javax.swing.JTextField;
-import java.awt.Dimension;
 
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
@@ -299,7 +297,7 @@ public class Vvod extends JFrame {
 		btnAnam.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		btnAnam.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				sign.showPsign();
+				MainForm.conMan.showPatientAnamnezForm(zapVr.npasp);
 			}
 		});
 		
@@ -491,8 +489,37 @@ public class Vvod extends JFrame {
 			}
 		});
 		
-		JButton button = new JButton("Контроль");
-		button.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		JButton btnControl = new JButton("Контроль");
+		btnControl.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int[] res = MainForm.conMan.showMedPolErrorsForm();
+				
+				if (res != null) {
+					try {
+						showVvod(MainForm.tcl.getZapVrSrc(res[0]));
+						
+						for (int i = 0; i < tblObr.getRowCount(); i++) {
+							if (tblObr.getData().get(i).id == res[1]) {
+								tblObr.setRowSelectionInterval(i, i);
+								for (int j = 0; j < tblPos.getRowCount(); j++) {
+									if (tblPos.getData().get(j).id == res[2]) {
+										tblPos.setRowSelectionInterval(j, j);
+										return;
+									}
+								}
+							}
+						}
+						JOptionPane.showMessageDialog(Vvod.this, "Посещения с такими данными не найдено.");
+					} catch (KmiacServerException e1) {
+						JOptionPane.showMessageDialog(Vvod.this, "Ошибка загрузки списка посещений.");
+					} catch (TException e1) {
+						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
+					}
+				}
+			}
+		});
+		btnControl.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -516,7 +543,7 @@ public class Vvod extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnPrint, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button)))
+							.addComponent(btnControl)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -530,7 +557,7 @@ public class Vvod extends JFrame {
 						.addComponent(btnBer)
 						.addComponent(btnPrint)
 						.addComponent(btnSearch)
-						.addComponent(button))
+						.addComponent(btnControl))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
