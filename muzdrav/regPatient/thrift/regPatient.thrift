@@ -308,7 +308,8 @@ struct Anam{
 	3:i32 numstr,
 	4:bool vybor,
 	5:optional string comment,
-	6:string name
+	6:string name,
+	7:string pranz
 }
 
 struct Pokaz{
