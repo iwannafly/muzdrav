@@ -65,6 +65,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.Agent;
 import ru.nkz.ivcgzo.thriftRegPatient.AgentNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.AllGosp;
 import ru.nkz.ivcgzo.thriftRegPatient.AllLgota;
+import ru.nkz.ivcgzo.thriftRegPatient.Anam;
 import ru.nkz.ivcgzo.thriftRegPatient.Gosp;
 import ru.nkz.ivcgzo.thriftRegPatient.GospNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Info;
@@ -86,6 +87,8 @@ import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmorfNotFoundException;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class PacientInfoFrame extends JFrame {
 
@@ -96,7 +99,6 @@ public class PacientInfoFrame extends JFrame {
     private JTabbedPane tpLgota;
     private JTabbedPane tpKateg;
     private JTabbedPane tpAgent;
-    private JTabbedPane tpSign;
     private JTabbedPane tpPriem;
     public static int curPatientId = 0;
     private int curNgosp = 0;
@@ -149,22 +151,10 @@ public class PacientInfoFrame extends JFrame {
     private JRadioButton rbtn_pol_j;
     private JRadioButton rbtn_pol_pr_m;
     private JRadioButton rbtn_pol_pr_j;
-    private JRadioButton rbtn_vp1;
-    private JRadioButton rbtn_vp2;
-    private JRadioButton rbtn_vp3;
-    private JRadioButton rbtn_rf1;
-    private JRadioButton rbtn_rf2;
-    private JRadioButton rbtn_gk1;
-    private JRadioButton rbtn_gk2;
-    private JRadioButton rbtn_gk3;
-    private JRadioButton rbtn_gk4;
     private JRadioButton rbtn_plan;
     private JRadioButton rbtn_extr;
     private JRadioButton rbtn_vperv;
     private JRadioButton rbtn_povt;
-    private JTextArea ta_allerg;
-    private JTextArea ta_farm;
-    private JTextArea ta_vitae;
     private JTextArea ta_jal_pr;
     private JTextArea ta_diag_p;
     private JTextArea ta_diag_n;
@@ -209,6 +199,7 @@ public class PacientInfoFrame extends JFrame {
     private CustomTable<AllLgota, AllLgota._Fields> tbl_lgota;
     private CustomTable<Kontingent, Kontingent._Fields> tbl_kateg;
     private CustomTable<AllGosp, AllGosp._Fields> tbl_priem;
+    private AnamnezPanel tpSign;
 
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_status;
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_ishod;
@@ -238,7 +229,6 @@ public class PacientInfoFrame extends JFrame {
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_obst;
 //    private PatientBrief newPatBr;
     private AllGosp newPriem;
-	private AnamnezForm azfrm;
 
 //    public void refresh(List<PatientBrief> pat) {
 //        tbl_patient.requestFocus();
@@ -248,6 +238,7 @@ public class PacientInfoFrame extends JFrame {
      * Create the frame.
      */
     public PacientInfoFrame(List<PatientBrief> pat) {
+    	tpSign = new AnamnezPanel();
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -457,7 +448,7 @@ public class PacientInfoFrame extends JFrame {
             e.printStackTrace();
         }
 
-        setBounds(1, 1, 1000, 762); //ширина, высота
+        setBounds(1, 1, 1032, 730); //ширина, высота
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
@@ -481,19 +472,23 @@ public class PacientInfoFrame extends JFrame {
                     changePatientAgentInfo(curPatientId);
                 }
                 if (tbMain.getSelectedIndex() == 4) {
-                    changePatientSignInfo(curPatientId);
+//                    changePatientSignInfo(curPatientId);
+                	tpSign.ChangePatientAnamnezInfo();
                 }
                 if (tbMain.getSelectedIndex() == 5) {
                     selectAllPatientPriemInfo(curPatientId);
-                    try{
-                    	String nameOtd = MainForm.tcl.getNameOtdGosp(curPatientId);
-                        if  (!nameOtd.isEmpty())
-                            JOptionPane.showMessageDialog(tbl_priem, "Пациент: "+tfFam.getText()+" "+tfIm.getText()+" "+tfOt.getText()+"    Д.р. "+tfDr.getText()+"\n\r"+"находится на лечении: "+nameOtd);
-                      } catch (PatientGospYesOrNoNotFoundException pgnfe) {
-                            System.out.println("Госпитализаций нет.");
-                      } catch (Exception e1) {
-                        e1.printStackTrace();
-                      }
+                    changePatientPriemInfo(curPatientId);
+                    if (tbl_priem.getSelectedItem() !=  null) {
+                        try{
+                        	String nameOtd = MainForm.tcl.getNameOtdGosp(curPatientId);
+                            if  (!nameOtd.isEmpty())
+                                JOptionPane.showMessageDialog(tbl_priem, "Пациент: "+tfFam.getText()+" "+tfIm.getText()+" "+tfOt.getText()+"    Д.р. "+tfDr.getText()+"\n\r"+"находится на лечении: "+nameOtd);
+                          } catch (PatientGospYesOrNoNotFoundException pgnfe) {
+                                System.out.println("Госпитализаций нет.");
+                          } catch (Exception e1) {
+                            e1.printStackTrace();
+                          }
+                    }
                 }
             }
         });
@@ -589,12 +584,12 @@ public class PacientInfoFrame extends JFrame {
                     tbMain.setSelectedIndex(0);
                     curPatientId = res[0];
                     changePatientPersonalInfo(curPatientId);
-                    changePatientLgotaInfo(curPatientId);
-                    changePatientKategInfo(curPatientId);
-                    changePatientAgentInfo(curPatientId);
-                    changePatientSignInfo(curPatientId);
-                    selectAllPatientPriemInfo(curPatientId);
-                    changePatientPriemInfo(curPatientId);
+//                    changePatientLgotaInfo(curPatientId);
+//                    changePatientKategInfo(curPatientId);
+//                    changePatientAgentInfo(curPatientId);
+////                    changePatientSignInfo(curPatientId);
+//                    selectAllPatientPriemInfo(curPatientId);
+//                    changePatientPriemInfo(curPatientId);
                     setTitle(String.format("%s %s %s", PersonalInfo.getFam(), PersonalInfo.getIm(), PersonalInfo.getOt()));
 
                   SwingUtilities.invokeLater(new Runnable() {
@@ -783,12 +778,12 @@ public class PacientInfoFrame extends JFrame {
                             tbMain.setSelectedIndex(0);
                             curPatientId = res;
                             changePatientPersonalInfo(curPatientId);
-                            changePatientLgotaInfo(curPatientId);
-                            changePatientKategInfo(curPatientId);
-                            changePatientAgentInfo(curPatientId);
-                            changePatientSignInfo(curPatientId);
-                            selectAllPatientPriemInfo(curPatientId);
-                            changePatientPriemInfo(curPatientId);
+//                            changePatientLgotaInfo(curPatientId);
+//                            changePatientKategInfo(curPatientId);
+//                            changePatientAgentInfo(curPatientId);
+////                            changePatientSignInfo(curPatientId);
+//                            selectAllPatientPriemInfo(curPatientId);
+//                            changePatientPriemInfo(curPatientId);
                             setTitle(String.format("%s %s %s", PersonalInfo.getFam(), PersonalInfo.getIm(), PersonalInfo.getOt()));
 
                           SwingUtilities.invokeLater(new Runnable() {
@@ -867,11 +862,11 @@ public class PacientInfoFrame extends JFrame {
         		.addGroup(gl_contentPane.createSequentialGroup()
         			.addContainerGap()
         			.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-        				.addGroup(Alignment.LEADING, gl_contentPane.createSequentialGroup()
+        				.addComponent(tbMain, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 974, Short.MAX_VALUE)
+        				.addGroup(gl_contentPane.createSequentialGroup()
         					.addComponent(pl_patient, GroupLayout.PREFERRED_SIZE, 669, GroupLayout.PREFERRED_SIZE)
         					.addGap(18)
-        					.addComponent(pl_print, GroupLayout.PREFERRED_SIZE, 287, GroupLayout.PREFERRED_SIZE))
-        				.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 974, Short.MAX_VALUE))
+        					.addComponent(pl_print, GroupLayout.PREFERRED_SIZE, 287, GroupLayout.PREFERRED_SIZE)))
         			.addContainerGap())
         );
         gl_contentPane.setVerticalGroup(
@@ -881,9 +876,10 @@ public class PacientInfoFrame extends JFrame {
         				.addComponent(pl_print, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
         				.addComponent(pl_patient, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 712, GroupLayout.PREFERRED_SIZE)
-        			.addGap(0, 0, Short.MAX_VALUE))
+        			.addComponent(tbMain, GroupLayout.PREFERRED_SIZE, 630, GroupLayout.PREFERRED_SIZE)
+        			.addContainerGap(27, Short.MAX_VALUE))
         );
+        pl_patient.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{btnPoisk, btnSave, btnShowTalonSelectModule, btnShowError, btnNew, btnDel}));
 
         JPanel tpPersonal = new JPanel();
         tpPersonal.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -1708,21 +1704,30 @@ public class PacientInfoFrame extends JFrame {
         JScrollPane scrollPane_1 = new JScrollPane();
         GroupLayout gl_panel_10 = new GroupLayout(panel_10);
         gl_panel_10.setHorizontalGroup(
-            gl_panel_10.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_10.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)
-                    .addGap(291))
+        	gl_panel_10.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_panel_10.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(scrollPane_1, GroupLayout.PREFERRED_SIZE, 711, GroupLayout.PREFERRED_SIZE)
+        			.addContainerGap(228, Short.MAX_VALUE))
         );
         gl_panel_10.setVerticalGroup(
-            gl_panel_10.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_10.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
-                    .addContainerGap())
+        	gl_panel_10.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_panel_10.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(scrollPane_1, GroupLayout.DEFAULT_SIZE, 160, Short.MAX_VALUE)
+        			.addContainerGap())
         );
 
         tbl_lgota =new CustomTable<>(true, true, AllLgota.class, 3,"Дата",2,"Льгота");
+//        tbl_lgota.addMouseListener(new MouseAdapter() {
+//        	@Override
+//        	public void mouseClicked(MouseEvent arg0) {
+//                if (arg0.getClickCount() == 2) {
+//                	IntegerClassifier res = null;
+//                	res = MainForm.conMan.showIntegerClassifierSelector();
+//                }
+//        	}
+//        });
         tbl_lgota.setFont(new Font("Tahoma", Font.PLAIN, 12));
         tbl_lgota.setDateField(0);
         tbl_lgota.setFillsViewportHeight(true);
@@ -1905,22 +1910,22 @@ public class PacientInfoFrame extends JFrame {
         JPanel panel_12 = new JPanel();
         GroupLayout gl_tpKateg = new GroupLayout(tpKateg);
         gl_tpKateg.setHorizontalGroup(
-            gl_tpKateg.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_tpKateg.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(gl_tpKateg.createParallelGroup(Alignment.LEADING)
-                        .addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(panel_12, GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE))
-                    .addGap(291))
+        	gl_tpKateg.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_tpKateg.createSequentialGroup()
+        			.addContainerGap()
+        			.addGroup(gl_tpKateg.createParallelGroup(Alignment.LEADING)
+        				.addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 733, GroupLayout.PREFERRED_SIZE)
+        				.addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 668, GroupLayout.PREFERRED_SIZE))
+        			.addGap(226))
         );
         gl_tpKateg.setVerticalGroup(
-            gl_tpKateg.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_tpKateg.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(389, Short.MAX_VALUE))
+        	gl_tpKateg.createParallelGroup(Alignment.LEADING)
+        		.addGroup(gl_tpKateg.createSequentialGroup()
+        			.addContainerGap()
+        			.addComponent(panel_11, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+        			.addPreferredGap(ComponentPlacement.UNRELATED)
+        			.addComponent(panel_12, GroupLayout.PREFERRED_SIZE, 182, GroupLayout.PREFERRED_SIZE)
+        			.addContainerGap(433, Short.MAX_VALUE))
         );
 
         JScrollPane scrollPane_2 = new JScrollPane();
@@ -2378,293 +2383,7 @@ public class PacientInfoFrame extends JFrame {
         panel_8.setLayout(gl_panel_8);
         tpAgent.setLayout(gl_tpAgent);
 
-        JPanel tpSign = new JPanel();
         tbMain.addTab("Анамнез", null, tpSign, null);
-
-        JPanel panel_13 = new JPanel();
-        panel_13.setBorder(new TitledBorder(null, "\u0413\u0440\u0443\u043F\u043F\u0430 \u043A\u0440\u043E\u0432\u0438", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        JPanel panel_14 = new JPanel();
-        panel_14.setBorder(new TitledBorder(null, "\u0420\u0435\u0437\u0443\u0441 \u0444\u0430\u043A\u0442\u043E\u0440", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        JPanel panel_15 = new JPanel();
-        panel_15.setBorder(new TitledBorder(null, "\u0410\u043B\u043B\u0435\u0440\u0433\u043E-\u0430\u043D\u0430\u043C\u043D\u0435\u0437", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        JPanel panel_16 = new JPanel();
-        panel_16.setBorder(new TitledBorder(null, "\u0424\u0430\u0440\u043C\u0430\u043A\u043E\u043B\u043E\u0433\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u0430\u043D\u0430\u043C\u043D\u0435\u0437", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        JPanel panel_17 = new JPanel();
-        panel_17.setBorder(new TitledBorder(null, "\u0410\u043D\u0430\u043C\u043D\u0435\u0437 \u0436\u0438\u0437\u043D\u0438", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        JPanel panel_18 = new JPanel();
-        panel_18.setBorder(new TitledBorder(null, "\u0412\u0440\u0435\u0434\u043D\u044B\u0435 \u043F\u0440\u0438\u0432\u044B\u0447\u043A\u0438", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-
-        JPanel panel_19 = new JPanel();
-        GroupLayout gl_tpSign = new GroupLayout(tpSign);
-        gl_tpSign.setHorizontalGroup(
-        	gl_tpSign.createParallelGroup(Alignment.LEADING)
-        		.addGroup(gl_tpSign.createSequentialGroup()
-        			.addContainerGap()
-        			.addGroup(gl_tpSign.createParallelGroup(Alignment.LEADING)
-        				.addGroup(gl_tpSign.createSequentialGroup()
-        					.addComponent(panel_13, GroupLayout.PREFERRED_SIZE, 167, GroupLayout.PREFERRED_SIZE)
-        					.addGap(18)
-        					.addComponent(panel_14, GroupLayout.PREFERRED_SIZE, 104, GroupLayout.PREFERRED_SIZE)
-        					.addGap(18)
-        					.addComponent(panel_18, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE))
-        				.addComponent(panel_19, GroupLayout.PREFERRED_SIZE, 677, GroupLayout.PREFERRED_SIZE)
-        				.addGroup(gl_tpSign.createParallelGroup(Alignment.TRAILING, false)
-        					.addComponent(panel_17, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        					.addComponent(panel_16, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-        					.addComponent(panel_15, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 740, GroupLayout.PREFERRED_SIZE)))
-        			.addContainerGap(219, Short.MAX_VALUE))
-        );
-        gl_tpSign.setVerticalGroup(
-        	gl_tpSign.createParallelGroup(Alignment.LEADING)
-        		.addGroup(gl_tpSign.createSequentialGroup()
-        			.addGap(23)
-        			.addGroup(gl_tpSign.createParallelGroup(Alignment.LEADING, false)
-        				.addComponent(panel_14, GroupLayout.PREFERRED_SIZE, 42, Short.MAX_VALUE)
-        				.addComponent(panel_13, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(panel_18, 0, 0, Short.MAX_VALUE))
-        			.addGap(18)
-        			.addComponent(panel_15, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-        			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addComponent(panel_16, GroupLayout.PREFERRED_SIZE, 145, GroupLayout.PREFERRED_SIZE)
-        			.addPreferredGap(ComponentPlacement.UNRELATED)
-        			.addComponent(panel_17, GroupLayout.PREFERRED_SIZE, 140, GroupLayout.PREFERRED_SIZE)
-        			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addComponent(panel_19, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        			.addGap(53))
-        );
-
-        JButton btnSave_Sign = new JButton("Сохранить");
-        btnSave_Sign.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        btnSave_Sign.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                try{
-                    SignInfo = new Sign();
-                    SignInfo.setNpasp(curPatientId);
-                    SignInfo.setVred("");
-                    SignInfo.setGrup("");
-                    SignInfo.setPh("");
-                    if (rbtn_gk1.isSelected()) {
-                        SignInfo.setGrup("1");
-                    }
-                    if (rbtn_gk2.isSelected()) {
-                        SignInfo.setGrup("2");
-                    }
-                    if (rbtn_gk3.isSelected()) {
-                        SignInfo.setGrup("3");
-                    }
-                    if (rbtn_gk4.isSelected()) {
-                        SignInfo.setGrup("4");
-                    }
-                    if (rbtn_rf1.isSelected()) {
-                        SignInfo.setPh("+");
-                    }
-                    if (rbtn_rf2.isSelected()) {
-                        SignInfo.setPh("-");
-                    }
-                    if (rbtn_vp1.isSelected()) {
-                        SignInfo.vred += "1";
-                    }else {
-                        SignInfo.vred += "0";
-                    }
-                    if (rbtn_vp2.isSelected()) {
-                        SignInfo.vred += "1";
-                    }else {
-                        SignInfo.vred += "0";
-                    }
-                    if (rbtn_vp3.isSelected()) {
-                        SignInfo.vred += "1";
-                    }else {
-                        SignInfo.vred += "0";
-                    }
-                    SignInfo.setAllerg(ta_allerg.getText());
-                    SignInfo.setFarmkol(ta_farm.getText());
-                    SignInfo.setVitae(ta_vitae.getText());
-                    MainForm.tcl.addOrUpdateSign(SignInfo);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        JButton btnDel_Sign = new JButton("Удалить");
-        btnDel_Sign.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        btnDel_Sign.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                try{
-                    MainForm.tcl.deleteSign(curPatientId);
-                    NewSign();
-                } catch (Exception e) {
-                    System.out.println("Ошибка при удалении данных.");
-                    e.printStackTrace();
-                }
-            }
-        });
-        GroupLayout gl_panel_19 = new GroupLayout(panel_19);
-        gl_panel_19.setHorizontalGroup(
-            gl_panel_19.createParallelGroup(Alignment.TRAILING)
-                .addGroup(gl_panel_19.createSequentialGroup()
-                    .addContainerGap(474, Short.MAX_VALUE)
-                    .addComponent(btnSave_Sign)
-                    .addGap(18)
-                    .addComponent(btnDel_Sign)
-                    .addGap(21))
-        );
-        gl_panel_19.setVerticalGroup(
-            gl_panel_19.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_19.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(gl_panel_19.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(btnDel_Sign)
-                        .addComponent(btnSave_Sign))
-                    .addContainerGap(14, Short.MAX_VALUE))
-        );
-        panel_19.setLayout(gl_panel_19);
-
-        rbtn_vp1= new JRadioButton("курение");
-        rbtn_vp1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-
-        rbtn_vp2 = new JRadioButton("алкоголь");
-        rbtn_vp2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-
-        rbtn_vp3 = new JRadioButton("наркотики");
-        rbtn_vp3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        GroupLayout gl_panel_18 = new GroupLayout(panel_18);
-        gl_panel_18.setHorizontalGroup(
-            gl_panel_18.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_18.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(rbtn_vp1)
-                    .addPreferredGap(ComponentPlacement.RELATED)
-                    .addComponent(rbtn_vp2)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addComponent(rbtn_vp3)
-                    .addContainerGap(30, Short.MAX_VALUE))
-        );
-        gl_panel_18.setVerticalGroup(
-            gl_panel_18.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_18.createSequentialGroup()
-                    .addGroup(gl_panel_18.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(rbtn_vp1)
-                        .addComponent(rbtn_vp2)
-                        .addComponent(rbtn_vp3))
-                    .addGap(49))
-        );
-        panel_18.setLayout(gl_panel_18);
-
-        ta_allerg = new JTextArea();
-        ta_allerg.setRows(10);
-        ta_allerg.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        GroupLayout gl_panel_15 = new GroupLayout(panel_15);
-        gl_panel_15.setHorizontalGroup(
-            gl_panel_15.createParallelGroup(Alignment.LEADING)
-                .addComponent(ta_allerg, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-        );
-        gl_panel_15.setVerticalGroup(
-            gl_panel_15.createParallelGroup(Alignment.LEADING)
-                .addComponent(ta_allerg, GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
-        );
-        panel_15.setLayout(gl_panel_15);
-
-        ta_farm = new JTextArea();
-        ta_farm.setRows(10);
-        ta_farm.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        GroupLayout gl_panel_16 = new GroupLayout(panel_16);
-        gl_panel_16.setHorizontalGroup(
-        	gl_panel_16.createParallelGroup(Alignment.LEADING)
-        		.addComponent(ta_farm, GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
-        );
-        gl_panel_16.setVerticalGroup(
-        	gl_panel_16.createParallelGroup(Alignment.LEADING)
-        		.addComponent(ta_farm, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
-        );
-        panel_16.setLayout(gl_panel_16);
-
-        ta_vitae = new JTextArea();
-        ta_vitae.setRows(10);
-        ta_vitae.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        GroupLayout gl_panel_17 = new GroupLayout(panel_17);
-        gl_panel_17.setHorizontalGroup(
-            gl_panel_17.createParallelGroup(Alignment.LEADING)
-                .addComponent(ta_vitae, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
-        );
-        gl_panel_17.setVerticalGroup(
-            gl_panel_17.createParallelGroup(Alignment.LEADING)
-                .addComponent(ta_vitae, GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
-        );
-        panel_17.setLayout(gl_panel_17);
-
-        rbtn_rf1 = new JRadioButton("+");
-        rbtn_rf1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        btnGroup_rf.add(rbtn_rf1);
-
-        rbtn_rf2 = new JRadioButton("-");
-        rbtn_rf2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        btnGroup_rf.add(rbtn_rf2);
-        GroupLayout gl_panel_14 = new GroupLayout(panel_14);
-        gl_panel_14.setHorizontalGroup(
-            gl_panel_14.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_14.createSequentialGroup()
-                    .addComponent(rbtn_rf1)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addComponent(rbtn_rf2)
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        gl_panel_14.setVerticalGroup(
-            gl_panel_14.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_14.createSequentialGroup()
-                    .addGroup(gl_panel_14.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(rbtn_rf1)
-                        .addComponent(rbtn_rf2))
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        panel_14.setLayout(gl_panel_14);
-
-        rbtn_gk1 = new JRadioButton("I");
-        rbtn_gk1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        btnGroup_gk.add(rbtn_gk1);
-
-        rbtn_gk2 = new JRadioButton("II");
-        rbtn_gk2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        btnGroup_gk.add(rbtn_gk2);
-
-        rbtn_gk3 = new JRadioButton("III");
-        rbtn_gk3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        btnGroup_gk.add(rbtn_gk3);
-
-        rbtn_gk4 = new JRadioButton("IV");
-        rbtn_gk4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        btnGroup_gk.add(rbtn_gk4);
-
-        GroupLayout gl_panel_13 = new GroupLayout(panel_13);
-        gl_panel_13.setHorizontalGroup(
-            gl_panel_13.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_13.createSequentialGroup()
-                    .addComponent(rbtn_gk1)
-                    .addGap(10)
-                    .addComponent(rbtn_gk2)
-                    .addGap(4)
-                    .addComponent(rbtn_gk3)
-                    .addPreferredGap(ComponentPlacement.UNRELATED)
-                    .addComponent(rbtn_gk4)
-                    .addContainerGap(37, Short.MAX_VALUE))
-        );
-        gl_panel_13.setVerticalGroup(
-            gl_panel_13.createParallelGroup(Alignment.LEADING)
-                .addGroup(gl_panel_13.createSequentialGroup()
-                    .addGroup(gl_panel_13.createParallelGroup(Alignment.BASELINE)
-                        .addComponent(rbtn_gk1)
-                        .addComponent(rbtn_gk2)
-                        .addComponent(rbtn_gk3)
-                        .addComponent(rbtn_gk4))
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        panel_13.setLayout(gl_panel_13);
-        tpSign.setLayout(gl_tpSign);
 
         JPanel tpPriem = new JPanel();
         tbMain.addTab("Приемное отделение", null, tpPriem, null);
@@ -2735,15 +2454,14 @@ public class PacientInfoFrame extends JFrame {
                     }
                 });
         
-        JButton btnAnam = new JButton("Анамнез");
-        //        btnAnam.setVisible(false);
-                btnAnam.addActionListener(new ActionListener() {
-                	public void actionPerformed(ActionEvent e) {
-                		azfrm.showAnamnezForm();
-                	}
-                });
+        JButton btnOsm = new JButton("Первичный осмотр");
+//      btnAnam.addActionListener(new ActionListener() {
+//  	  	public void actionPerformed(ActionEvent e) {
+//     		azfrm.showAnamnezForm();
+//	    	}
+//      });
         
-                JButton btnDel_priem = new JButton("Удалить");
+        JButton btnDel_priem = new JButton("Удалить");
                 btnDel_priem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent arg0) {
                       try{
@@ -2765,7 +2483,7 @@ public class PacientInfoFrame extends JFrame {
         			.addGroup(gl_panel_20.createParallelGroup(Alignment.TRAILING, false)
         				.addComponent(btnNew_priem, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         				.addComponent(btnSave_priem, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        				.addComponent(btnAnam, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        				.addComponent(btnOsm, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         			.addContainerGap(40, Short.MAX_VALUE))
         		.addGroup(Alignment.TRAILING, gl_panel_20.createSequentialGroup()
         			.addGap(77)
@@ -2779,7 +2497,7 @@ public class PacientInfoFrame extends JFrame {
         			.addPreferredGap(ComponentPlacement.RELATED)
         			.addComponent(btnSave_priem)
         			.addPreferredGap(ComponentPlacement.RELATED)
-        			.addComponent(btnAnam)
+        			.addComponent(btnOsm)
         			.addPreferredGap(ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
         			.addComponent(btnDel_priem))
         );
@@ -3583,8 +3301,6 @@ public class PacientInfoFrame extends JFrame {
 //            cmb_ogrn.setData(null);
             tbl_lgota.setIntegerClassifierSelector(1, MainForm.tcl.getLKN());
             tbl_kateg.setIntegerClassifierSelector(1, MainForm.tcl.getLKR());
-    		azfrm = new AnamnezForm();
-    		MainForm.instance.addChildFrame(azfrm);
 
         } catch (KmiacServerException e) {
             e.printStackTrace();
@@ -3625,7 +3341,8 @@ public class PacientInfoFrame extends JFrame {
     //слушатель таб контрола о сигнальн отм
     final ChangeListener  tpSignChangeListener= new ChangeListener() {
         public void stateChanged(ChangeEvent changeEvent) {
-            changePatientSignInfo(curPatientId);
+//            changePatientSignInfo(curPatientId);
+        	tpSign.ChangePatientAnamnezInfo();
         }
     };
 
@@ -3929,49 +3646,49 @@ public class PacientInfoFrame extends JFrame {
 
     // обновление информации сигн отм
     private void changePatientSignInfo(int PatId){
-        try {
+//        try {
             NewSign();
-            SignInfo = MainForm.tcl.getSign(PatId);
-            if (SignInfo.getGrup() != null){
-                rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
-                rbtn_gk2.setSelected(SignInfo.grup.charAt(0) == '2');
-                rbtn_gk3.setSelected(SignInfo.grup.charAt(0) == '3');
-                rbtn_gk4.setSelected(SignInfo.grup.charAt(0) == '4');
-            }
-            if (SignInfo.getPh() != null){
-                rbtn_rf1.setSelected(SignInfo.ph.charAt(0) == '+');
-                rbtn_rf2.setSelected(SignInfo.ph.charAt(0) == '-');
-            }
-            if (SignInfo.getVred() != null){
-                rbtn_vp1.setSelected(SignInfo.vred.charAt(0) == '1');
-                rbtn_vp2.setSelected(SignInfo.vred.charAt(1) == '1');
-                rbtn_vp3.setSelected(SignInfo.vred.charAt(2) == '1');
-            }
-            if (SignInfo.getAllerg() != null){
-                ta_allerg.setText(SignInfo.allerg);
-            }
-            if (SignInfo.getFarmkol() != null){
-                ta_farm.setText(SignInfo.farmkol);
-            }
-            if (SignInfo.getVitae() != null){
-                ta_vitae.setText(SignInfo.vitae);
-            }
-        } catch (SignNotFoundException snfe) {
-            System.out.println("Сигнальной информации нет.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//            SignInfo = MainForm.tcl.getSign(PatId);
+//            if (SignInfo.getGrup() != null){
+////                rbtn_gk1.setSelected(SignInfo.grup.charAt(0) == '1');
+////                rbtn_gk2.setSelected(SignInfo.grup.charAt(0) == '2');
+////                rbtn_gk3.setSelected(SignInfo.grup.charAt(0) == '3');
+////                rbtn_gk4.setSelected(SignInfo.grup.charAt(0) == '4');
+//            }
+//            if (SignInfo.getPh() != null){
+////                rbtn_rf1.setSelected(SignInfo.ph.charAt(0) == '+');
+////                rbtn_rf2.setSelected(SignInfo.ph.charAt(0) == '-');
+//            }
+//            if (SignInfo.getVred() != null){
+////                rbtn_vp1.setSelected(SignInfo.vred.charAt(0) == '1');
+////                rbtn_vp2.setSelected(SignInfo.vred.charAt(1) == '1');
+////                rbtn_vp3.setSelected(SignInfo.vred.charAt(2) == '1');
+//            }
+//            if (SignInfo.getAllerg() != null){
+////                ta_allerg.setText(SignInfo.allerg);
+//            }
+//            if (SignInfo.getFarmkol() != null){
+////                ta_farm.setText(SignInfo.farmkol);
+//            }
+//            if (SignInfo.getVitae() != null){
+////                ta_vitae.setText(SignInfo.vitae);
+//            }
+//        } catch (SignNotFoundException snfe) {
+//            System.out.println("Сигнальной информации нет.");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
     private void NewSign(){
         try {
-            btnGroup_gk.clearSelection();
-            btnGroup_rf.clearSelection();
-            rbtn_vp1.setSelected(false);
-            rbtn_vp2.setSelected(false);
-            rbtn_vp3.setSelected(false);
-            ta_allerg.setText(null);
-            ta_farm.setText(null);
-            ta_vitae.setText(null);
+//            btnGroup_gk.clearSelection();
+//            btnGroup_rf.clearSelection();
+//            rbtn_vp1.setSelected(false);
+//            rbtn_vp2.setSelected(false);
+//            rbtn_vp3.setSelected(false);
+//            ta_allerg.setText(null);
+//            ta_farm.setText(null);
+//            ta_vitae.setText(null);
         } catch (Exception e) {
             e.printStackTrace();
         }

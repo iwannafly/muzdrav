@@ -187,8 +187,8 @@ public class ServerRegPatient extends Server implements Iface {
         Date.class, Integer.class, String.class
     };
     private static final Class<?>[] ANAM_TYPES = new Class<?>[] {
-    //  npasp          datap		numstr			vybor		 comment
-        Integer.class, Date.class, Integer.class, Boolean.class, String.class
+    //  npasp          datap		numstr			vybor		 comment		name			prof_anz
+        Integer.class, Date.class, Integer.class, Boolean.class, String.class, String.class, String.class
     };
 
 //////////////////////////// Field Name Arrays ////////////////////////////
@@ -241,7 +241,7 @@ public class ServerRegPatient extends Server implements Iface {
         "id", "npasp", "lgot", "datal", "name", "gri", "sin", "pp", "drg", "dot", "obo", "ndoc"
     };
     private static final String[] ANAM_FIELD_NAMES = {
-    	"npasp", "datap", "numstr", "vybor", "comment"
+    	"npasp", "datap", "numstr", "vybor", "comment", "name", "prof_anz"
     };
 
 ////////////////////////////////////////////////////////////////////////
@@ -1804,7 +1804,7 @@ public class ServerRegPatient extends Server implements Iface {
         }
 
 		if (cslu == 1){
-			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name "+
+			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name, ot.prof_anz "+
 	                   "FROM p_anamnez p FULL JOIN n_anz n ON p.numstr = n.nstr " +
 	                   "INNER JOIN n_o00 o ON o.pcod = ? " +
 	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
@@ -1812,7 +1812,7 @@ public class ServerRegPatient extends Server implements Iface {
 	                   "ORDER BY n.nstr;";
 		}
 		if (cslu == 2){
-			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name "+
+			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name, ot.prof_anz "+
 	                   "FROM p_anamnez p FULL JOIN n_anz n ON p.numstr = n.nstr " +
 	                   "INNER JOIN n_n00 o ON o.pcod = ? " +
 	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
@@ -1867,6 +1867,7 @@ public class ServerRegPatient extends Server implements Iface {
 	    final String path;
 		String sqlQuery = null;
 		int numline = 0;
+		int prlpu = 0;
 			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("anam", ".htm").getAbsolutePath()), "utf-8")) {
    				StringBuilder sb = new StringBuilder(0x10000);
 	    			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
@@ -1882,7 +1883,24 @@ public class ServerRegPatient extends Server implements Iface {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-      				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+					if (uai.getCslu() == 1){
+   						sqlQuery = "SELECT o.prlpu FROM n_o00 o WHERE o.pcod = ?";
+					}
+					if (uai.getCslu() == 2){
+   						sqlQuery = "SELECT o.prlpu FROM n_n00 o WHERE o.pcod = ?";
+					}
+	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr())) {
+						if (acr.getResultSet().next()){
+		      				prlpu = acr.getResultSet().getInt("prlpu");
+							if (acr.getResultSet().getInt("prlpu") == 5){
+		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+		      				}else{
+		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
+		      				}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
    					sb.append(String.format("Ф.И.О. <b> %s %s %s </b> <br>", pat.getFam(), pat.getIm(), pat.getOt()));
 					sb.append(String.format("Дата рождения  <b> %1$td.%1$tm.%1$tY </b> <br>", pat.getDatar()));
    					sb.append(String.format("Домашний адрес  %s %s %s - %s <br>", pat.getAdmAddress().getCity(), pat.getAdmAddress().getStreet(), pat.getAdmAddress().getHouse(), pat.getAdmAddress().getFlat()));
@@ -1896,14 +1914,12 @@ public class ServerRegPatient extends Server implements Iface {
    					}
 					if (uai.getCslu() == 2){
   	   						sqlQuery = "SELECT n.name, n.numstr, n.yn, ot.numline "+
-//  	   				                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
-//  	   				                   "INNER JOIN n_n00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
   	   				                   "FROM n_anz n INNER JOIN n_ot_str ot ON (n.nstr = ot.nstr) " +
   	   				                   "INNER JOIN n_n00 o ON (ot.prlpu = o.prlpu and o.pcod = ?) " +
   	   				                   "WHERE n.nstr = ?";
    					}
    		            for (Anam elemAnam : anam) {
-   						try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr(),elemAnam.getNumstr())) {
+   		            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, uai.getCpodr(),elemAnam.getNumstr())) {
    							if (acr.getResultSet().next()){
    			      				if (numline != acr.getResultSet().getInt("numstr")){
    			      					sb.append("<br>");
@@ -1922,8 +1938,15 @@ public class ServerRegPatient extends Server implements Iface {
    							e.printStackTrace();
    						}
    		            }
-   					sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
-   					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+   					if (prlpu == 2){
+   	   		            sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
+   	   					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+   					}else{
+   	   					sb.append("Согласие на госпитализацию:   Я, __________________________________________________,<br>");
+   	   					sb.append("как родитель/законный представитель __________________________________________________,<br>");
+   	   		            sb.append(String.format("<br><br>Подпись врача _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
+   	   					sb.append(String.format("Подпись медицинской сестры __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+   					}
 
 					osw.write(sb.toString());
    			} catch (IOException e) {
