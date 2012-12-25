@@ -2,15 +2,9 @@ package ru.nkz.ivcgzo.clientInfomat.model;
 
 import java.util.List;
 
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentDoctorObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentPoliclinicObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentSpecialityObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IDoctorsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPatientObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.IPoliclinicsObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ICurrentIReservedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISelectedTalonObserver;
-import ru.nkz.ivcgzo.clientInfomat.model.observers.ISpecialitiesObserver;
+import org.apache.thrift.TException;
+
+import ru.nkz.ivcgzo.clientInfomat.model.observers.IInfomatObserver;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.ReservedTalonTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.TalonTableModel;
@@ -21,15 +15,17 @@ import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public interface IModel {
-    void setPoliclinics();
+    void setPoliclinics() throws TException;
 
-    void setSpecialities(int cpol);
+    void setSpecialities(int cpol) throws TException;
 
-    void setDoctors(int cpol, String cdol);
+    void setDoctors(int cpol, String cdol) throws TException;
 
-    void setTalons(int cpol, String cdol, int pcod);
+    void setTalons(int cpol, String cdol, int pcod) throws TException;
 
-    void setPatient(String oms);
+    void setPatient(String oms) throws TException;
+
+    void setPatient(String oms, int clpu) throws TException;
 
     void setReservedTalons(int patientId);
 
@@ -59,11 +55,13 @@ public interface IModel {
 
     TalonList getTalons();
 
-    TalonTableModel getTalonTableModel(final int cpol, final String cdol, final int pcod);
+    TalonTableModel getTalonTableModel(
+        final int cpol, final String cdol, final int pcod) throws TException;
 
-    SheduleTableModel getSheduleTableModel(final int pcod, final int cpol, final String cdol);
+    SheduleTableModel getSheduleTableModel(
+        final int pcod, final int cpol, final String cdol) throws TException;
 
-    ReservedTalonTableModel getReservedTalonTableModel(final int pcod);
+    ReservedTalonTableModel getReservedTalonTableModel(final int pcod) throws TException;
 
     TPatient getPatient();
 
@@ -75,43 +73,13 @@ public interface IModel {
 
     TTalon getTalon();
 
-    void reserveTalon(TPatient pat, TTalon talon);
+    void reserveTalon(TPatient pat, TTalon talon) throws TException;
+
+    boolean isPatientAlreadyReserveTalonOnThisDay(TPatient pat, TTalon talon) throws TException;
 
     void releaseTalon(TTalon talon);
 
-    void registerDoctorsObserver(IDoctorsObserver obs);
+    void registerInfomatObserver(IInfomatObserver obs);
 
-    void removeDoctorsObserver(IDoctorsObserver obs);
-
-    void registerPoliclinicsObserver(IPoliclinicsObserver obs);
-
-    void removePoliclinicsObserver(IPoliclinicsObserver obs);
-
-    void registerSpecialitiesObserver(ISpecialitiesObserver obs);
-
-    void removeSpecialitiesObserver(ISpecialitiesObserver obs);
-
-    void registerCurrentDoctorObserver(ICurrentDoctorObserver obs);
-
-    void removeCurrentDoctorObserver(ICurrentDoctorObserver obs);
-
-    void registerCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs);
-
-    void removeCurrentPoliclinicObserver(ICurrentPoliclinicObserver obs);
-
-    void registerCurrentSpecialityObserver(ICurrentSpecialityObserver obs);
-
-    void removeCurrentSpecialityObserver(ICurrentSpecialityObserver obs);
-
-    void registerPatientObserver(IPatientObserver obs);
-
-    void removePatientObserver(IPatientObserver obs);
-
-    void registerSelectedTalonObserver(ISelectedTalonObserver obs);
-
-    void removeSelectedTalonObserver(ISelectedTalonObserver obs);
-
-    void registerReservedTalonObserver(ICurrentIReservedTalonObserver obs);
-
-    void removeReservedTalonObserver(ICurrentIReservedTalonObserver obs);
+    void removeInfomatObserver(IInfomatObserver obs);
 }

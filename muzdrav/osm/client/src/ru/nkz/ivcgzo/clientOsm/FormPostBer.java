@@ -154,8 +154,8 @@ public class FormPostBer extends JFrame {
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
-//				System.out.println("постановка по +");		
-//				System.out.println(Vvod.zapVr.getNpasp());		
+				System.out.println("постановка по +");		
+				System.out.println(Vvod.zapVr.getNpasp());		
 				fam.setText(Vvod.zapVr.getFam());
 				im.setText(Vvod.zapVr.getIm());
 				ot.setText(Vvod.zapVr.getOth());
@@ -167,8 +167,8 @@ public class FormPostBer extends JFrame {
 					rdinf.setNpasp(Vvod.zapVr.getNpasp());
 					rdinf.setDataz(System.currentTimeMillis());
 		            MainForm.tcl.AddRdInf(rdinf);
-//					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
-//					setPostBerData();
+					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
+					setPostBerData();
 				} 
 //				catch (PrdslNotFoundException e1) {
 //					try {
@@ -1627,8 +1627,8 @@ public class FormPostBer extends JFrame {
 	}
 	
 	public void showForm() {
-//		System.out.println("постановка на входе");		
-//		System.out.println(Vvod.zapVr.getNpasp());		
+		System.out.println("постановка на входе");		
+		System.out.println(Vvod.zapVr.getNpasp());		
 		fam.setText(Vvod.zapVr.getFam());
 		im.setText(Vvod.zapVr.getIm());
 		ot.setText(Vvod.zapVr.getOth());

@@ -11,7 +11,6 @@ import javax.swing.table.TableModel;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientInfomat.ClientInfomat;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftInfomat.TTalon;
 
 public class ReservedTalonTableModel implements TableModel {
@@ -23,15 +22,8 @@ public class ReservedTalonTableModel implements TableModel {
         "Дата приёма", "Время приёма", "ЛПУ" , "Специальность" , "Ф.И.О"
     };
 
-    public ReservedTalonTableModel(final int patientId) {
-        try {
-            reservedTalons = ClientInfomat.tcl.getReservedTalon(patientId);
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            e.printStackTrace();
-            ClientInfomat.conMan.reconnect(e);
-        }
+    public ReservedTalonTableModel(final int patientId) throws TException {
+        reservedTalons = ClientInfomat.tcl.getReservedTalon(patientId);
     }
 
     @Override
