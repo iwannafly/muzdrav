@@ -362,6 +362,28 @@ public class Vvod extends JFrame {
 	       		});
 	       		menu.add(mi1);
 	       		
+	       		JMenuItem mi5 = new JMenuItem("Анамнез заболевания");
+	       		mi5.addActionListener(new ActionListener() {
+	       			@Override
+	       			public void actionPerformed(ActionEvent arg0) {
+	       				try{
+							String servPath = MainForm.tcl.printAnamZab(tblPos.getSelectedItem().id_obr);
+							String cliPath = File.createTempFile("anam", ".htm").getAbsolutePath();
+							MainForm.conMan.transferFileFromServer(servPath, cliPath);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
+					}
+	       					
+					catch (TException e1) {
+						e1.printStackTrace();
+						MainForm.conMan.reconnect(e1);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+
+	       			}
+	       		});
+	       		menu.add(mi5);
+	       		
 				JMenuItem mi2 = new JMenuItem("Выписка из карты");
 				mi2.addActionListener(new ActionListener() {
 					@Override

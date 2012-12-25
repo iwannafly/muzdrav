@@ -730,6 +730,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
+	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers

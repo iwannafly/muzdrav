@@ -3211,4 +3211,42 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			throw new KmiacServerException();
 		}		
 	}
+
+	@Override
+	public String printAnamZab(int id_pvizit) throws KmiacServerException,
+			TException {
+		String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("anam", ".htm").getAbsolutePath()), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+				sb.append("<title> История заболевания</title>");
+				sb.append("</head>");
+				sb.append("<body>");
+				
+				acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", id_pvizit); 
+				if (acrs.getResultSet().next()) {
+					if (acrs.getResultSet().getString(1)!=null)
+						{sb.append("<br><b>	Анамнез заболевания</b><br>");
+						sb.append(String.format(" %s.", acrs.getResultSet().getString(1)));
+						sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+						}
+				}				
+			acrs.close();
+			osw.write(sb.toString());
+			return path;
+			}
+		 catch (SQLException e) {
+			 ((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	}
 }
