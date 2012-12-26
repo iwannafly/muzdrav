@@ -21,6 +21,7 @@ import ru.nkz.ivcgzo.serverManager.common.Server;
 import ru.nkz.ivcgzo.serverManager.common.SqlModifyExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.serverMedication.ServerMedication;
+import ru.nkz.ivcgzo.serverOperation.ServerOperation;
 import ru.nkz.ivcgzo.serverReception.ServerReception;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortFields;
 import ru.nkz.ivcgzo.thriftCommon.classifier.ClassifierSortOrder;
@@ -65,6 +66,7 @@ public class ServerViewSelect extends Server implements Iface {
 	private Server labServ;
 	private Server recServ;
 	private Server medServ;
+	private Server operationServ;
 	private final ClassifierManager ccm;
 	private final TResultSetMapper<PatientBriefInfo, PatientBriefInfo._Fields> rsmPatBrief;
 	private final TResultSetMapper<PatientCommonInfo, PatientCommonInfo._Fields> rsmPatComInfo;
@@ -170,6 +172,19 @@ public class ServerViewSelect extends Server implements Iface {
                 }
             }
         }).start();
+
+    	new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    operationServ = new ServerOperation(sse, tse);
+                    operationServ.start();
+                } catch (Exception e) {
+                    System.err.println("Error starting operation server.");
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     	
         ThriftViewSelect.Processor<Iface> proc = new ThriftViewSelect.Processor<Iface>(this);
         thrServ = new TThreadedSelectorServer(new Args(new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
@@ -184,6 +199,8 @@ public class ServerViewSelect extends Server implements Iface {
         	labServ.stop();
         if (recServ != null)
         	recServ.stop();
+        if (operationServ != null)
+            operationServ.stop();
     }
 
 	@Override

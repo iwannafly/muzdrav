@@ -366,6 +366,7 @@ public class MainFrame extends JFrame {
 	private JScrollPane spStatusPraence;
 //    private JLabel lblNewLabel_33;
 //    private JTextField textField_1;
+    private JButton btnOperation;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(950, 700));
@@ -529,6 +530,7 @@ public class MainFrame extends JFrame {
             ticl.setSelectedIndex(-1);
         }
     }
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////// Модульные фреймы ///////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -811,7 +813,6 @@ public class MainFrame extends JFrame {
 
         btnMedication = new JButton();
         btnMedication.setToolTipText("Лекарственные назначения");
-//        btnMedication.setVisible(false);
         toolBar.add(btnMedication);
         btnMedication.setMaximumSize(new Dimension(35, 35));
         btnMedication.setMinimumSize(new Dimension(35, 35));
@@ -829,6 +830,26 @@ public class MainFrame extends JFrame {
         btnMedication.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/medication.png")));
         btnMedication.setRequestFocusEnabled(false);
+
+        btnOperation = new JButton();
+        btnOperation.setToolTipText("Операции");
+        toolBar.add(btnOperation);
+        btnOperation.setMaximumSize(new Dimension(35, 35));
+        btnOperation.setMinimumSize(new Dimension(35, 35));
+        btnOperation.setPreferredSize(new Dimension(35, 35));
+        btnOperation.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    ClientHospital.conMan.showOperationForm(patient.getPatientId(),
+                        patient.getSurname(), patient.getName(), patient.getMiddlename(),
+                        patient.getGospitalCod());
+                }
+            }
+        });
+        btnOperation.setBorder(null);
+        btnOperation.setIcon(new ImageIcon(MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/Skalpell.png")));
+        btnOperation.setRequestFocusEnabled(false);
     }
 
 
