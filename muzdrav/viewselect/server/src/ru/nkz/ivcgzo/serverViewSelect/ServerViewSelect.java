@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.serverViewSelect;
 
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,10 @@ import ru.nkz.ivcgzo.thriftViewSelect.CizmerInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ClekInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CosmotrInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CotdInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.MedPolErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PaspErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamnez;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientBriefInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientDiagAmbInfo;
@@ -52,6 +55,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.RdSlInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
+import ru.nkz.ivcgzo.thriftViewSelect.TipPodrNotFoundException;
 import ru.nkz.ivcgzo.thriftViewSelect.mkb_0;
 import ru.nkz.ivcgzo.thriftViewSelect.mrab_0;
 import ru.nkz.ivcgzo.thriftViewSelect.polp_0;
@@ -83,6 +87,8 @@ public class ServerViewSelect extends Server implements Iface {
 	private final TResultSetMapper<CosmotrInfo, CosmotrInfo._Fields> rsmCosmotr;
 	private final TResultSetMapper<CotdInfo, CotdInfo._Fields> rsmCotd;
 	private final TResultSetMapper<PaspErrorInfo, PaspErrorInfo._Fields> rsmPaspError;
+	private final TResultSetMapper<MedPolErrorInfo, MedPolErrorInfo._Fields> rsmMedPolError;
+    private final TResultSetMapper<PatientAnamnez, PatientAnamnez._Fields> rsmAnam;
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -108,6 +114,8 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmCosmotr = new TResultSetMapper<>(CosmotrInfo.class, "id", "id_gosp", "jalob", "morbi", "status_praesense", "status_localis", "fisical_obs", "pcod_vrach", "dataz", "timez");
 		rsmCotd = new TResultSetMapper<>(CotdInfo.class, "id", "id_gosp", "nist", "sign", "cotd", "cprof", "stt", "dataol", "datazl", "vozrlbl", "pollbl", "ishod", "result", "ukl", "vrach", "npal", "datav", "vremv", "sostv", "recom", "mes", "dataz", "stat_type");
 		rsmPaspError = new TResultSetMapper<>(PaspErrorInfo.class);
+		rsmMedPolError = new TResultSetMapper<>(MedPolErrorInfo.class);
+		rsmAnam = new TResultSetMapper<>(PatientAnamnez.class, "npasp", "datap", "numstr", "vybor", "comment", "name", "prof_anz");
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -552,5 +560,114 @@ public class ServerViewSelect extends Server implements Iface {
 //			throw new KmiacServerException("Could not get pasp errors.");
 //		}
 
+	}
+
+	@Override
+	public List<MedPolErrorInfo> getMedPolErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_med_pol_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.sl_id AS id_obr, e.id_med AS id_pos, v.datao AS dat_obr, a.datap AS dat_pos, a.cod_sp AS vr_pcod, get_short_fio(r.fam, r.im, r.ot) AS vr_fio, a.cdol AS vr_cdol, s.name AS vr_cdol_name, e.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN p_vizit v ON (v.id = e.sl_id) JOIN p_vizit_amb a ON (a.id = e.id_med AND a.id_obr = e.sl_id) JOIN s_vrach r ON (r.pcod = a.cod_sp) JOIN n_s00 s ON (a.cdol = s.pcod) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 2) AND (e.cpodr = ?) AND (a.datap BETWEEN ? AND ?) ORDER BY v.datao DESC, a.datap DESC, p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+			sme.setCommit();
+			return rsmMedPolError.mapToList(acrsq.getResultSet());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not get med pol errors.");
+		}
+	}
+	
+	@Override
+	public List<PatientAnamnez> getAnamnez(int npasp, int cslu, int cpodr) throws TipPodrNotFoundException, KmiacServerException, TException {
+	    String sqlQuery = null;
+
+	    if (cslu == 1){
+			sqlQuery = "SELECT p.npasp, p.datap, n.nstr "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+	                   "INNER JOIN n_o00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "ORDER BY n.nstr;";
+		}
+		if (cslu == 2){
+			sqlQuery = "SELECT p.npasp, p.datap, n.nstr "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON (p.numstr = n.nstr and p.npasp = ?) " +
+	                   "INNER JOIN n_n00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "ORDER BY n.nstr;";
+		}
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp, cpodr)) {
+            ResultSet rs = acrs.getResultSet();
+			try (SqlModifyExecutor sme = tse.startTransaction()) {
+				while (rs.next()){
+					if (rs.getInt("npasp") == 0){
+						sme.execPrepared("INSERT INTO p_anamnez (npasp, numstr, datap) "+
+	                    "VALUES (?, ?, ?);",  false, npasp, rs.getInt("nstr"), new Date(System.currentTimeMillis()));
+					}
+                }
+				sme.setCommit();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new KmiacServerException();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+				throw new KmiacServerException();
+			}
+        } catch (SQLException e) {
+			e.printStackTrace();
+            throw new KmiacServerException();
+        }
+
+		if (cslu == 1){
+			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name, ot.prof_anz "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON p.numstr = n.nstr " +
+	                   "INNER JOIN n_o00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "WHERE p.npasp = ?"+
+	                   "ORDER BY n.nstr;";
+		}
+		if (cslu == 2){
+			sqlQuery = "SELECT p.npasp, p.datap, p.numstr, p.vybor, p.comment, n.name, ot.prof_anz "+
+	                   "FROM p_anamnez p FULL JOIN n_anz n ON p.numstr = n.nstr " +
+	                   "INNER JOIN n_n00 o ON o.pcod = ? " +
+	                   "INNER JOIN n_ot_str ot ON (ot.prlpu = o.prlpu and n.nstr = ot.nstr) "+
+	                   "WHERE p.npasp = ?"+
+	                   "ORDER BY n.nstr;";
+		}
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, cpodr, npasp)) {
+            ResultSet rs = acrs.getResultSet();
+            List<PatientAnamnez> anamList = rsmAnam.mapToList(rs);
+            if (anamList.size() > 0) {
+                return anamList;
+            } else {
+                throw new TipPodrNotFoundException();
+            }
+        } catch (SQLException e) {
+			e.printStackTrace();
+           throw new KmiacServerException();
+        }
+	}
+	
+	@Override
+	public void updateAnam(List<PatientAnamnez> patAnam) throws KmiacServerException, TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            for (PatientAnamnez elemAnam : patAnam) {
+            	sme.execPrepared("UPDATE p_anamnez SET vybor = ?, comment = ? WHERE npasp = ? and numstr = ?;",
+            			false, elemAnam.vybor, elemAnam.getComment(), elemAnam.getNpasp(), elemAnam.getNumstr());
+            }
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+			e.printStackTrace();
+            throw new KmiacServerException("Could not update anam.");
+        }
+	}
+	
+	@Override
+	public void deleteAnam(int npasp, int cslu, int cpodr) throws KmiacServerException, TException {
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared("DELETE FROM p_anamnez p " +
+            		"WHERE p.npasp=?;", false, npasp);
+            sme.setCommit();
+        } catch (SQLException | InterruptedException e) {
+			e.printStackTrace();
+            throw new KmiacServerException("Could not delete anam.");
+        }
 	}
 }

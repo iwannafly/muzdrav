@@ -8,6 +8,9 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftPbol.Pbol;
 import ru.nkz.ivcgzo.thriftPbol.ThriftPbol;
@@ -16,6 +19,9 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
+
+import org.apache.thrift.TException;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -39,7 +45,23 @@ public class MainForm extends Client<ThriftPbol.Client>{
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				pbol = new Pbol();
-			
+				pbol.setNpasp(1003336);
+				pbol.setPcod(MainForm.authInfo.getCpodr());
+				pbol.setId_obr(1958);
+				pbol.setDataz(System.currentTimeMillis());
+				pbol.setCdol(MainForm.authInfo.getCdol());
+				pbol.setCod_sp(MainForm.authInfo.getPcod());
+				try {
+					pbol.setId(MainForm.tcl.AddPbol(pbol));
+				} catch (KmiacServerException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (TException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				tblPbol.addItem(pbol);
+				
 			}
 		});
 		
@@ -103,10 +125,16 @@ public class MainForm extends Client<ThriftPbol.Client>{
 	}
 	
 	public void onTclConnect() {
-//		try {
-//		} catch (TException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+			try {
+				tblPbol.setData(MainForm.tcl.getPbol(1033336));
+			} catch (KmiacServerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	//		tblPbol.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_bl1));
+
 	}
 }
