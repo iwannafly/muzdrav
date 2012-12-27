@@ -42,8 +42,6 @@ struct Operation {
 	12: optional string material;
 	13: optional i32 dlit;
 	14: optional i64  dataz;
-	15: optional list<OperationComplication> complications;
-	16: optional list<OperationPaymentFund> paymentFounds;
 }
 
 /**
@@ -82,8 +80,6 @@ struct Anesthesia {
 	9: optional i64 date;
 	10: optional i64 vrem;
 	11: optional i64 dataz;
-	12: optional list<AnesthesiaComplication> complcations;
-	13: optional list<AnesthesiaPaymentFund> paymentFund;
 }
 
 service ThriftOperation extends kmiacServer.KmiacServer {
@@ -109,6 +105,11 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 		throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
+	 * Возвращает список всех осложнений данной операции
+	 */
+	list<OperationComplication> getOperationComplications(1: i32 idOper)
+		throws (1: kmiacServer.KmiacServerException kse);
+	/**
 	 * Добавляет новое осложнение
 	 */
 	i32 addOperationComplication(1: OperationComplication curCompl)
@@ -124,6 +125,11 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	void deleteOperationComplication(1: i32 id)
 		throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	 * Возвращает список всех источников оплаты данной операции
+	 */
+	list<OperationPaymentFund> getOperationPaymentFunds(1: i32 idOper)
+		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новый источник оплаты
 	 */
@@ -162,6 +168,11 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 		throws (1: kmiacServer.KmiacServerException kse);
 
 	/**
+	 * Возвращает список всех осложнений данной анастезии
+	 */
+	list<AnesthesiaComplication> getAnesthesiaComplications(1: i32 idOper)
+		throws (1: kmiacServer.KmiacServerException kse);
+	/**
 	 * Добавляет новое осложнение после анастезии
 	 */
 	i32 addAnesthesiaComplication(1: AnesthesiaComplication curCompl)
@@ -177,6 +188,11 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	void deleteAnesthesiaComplication(1: i32 id)
 		throws (1: kmiacServer.KmiacServerException kse);
 
+	/**
+	 * Возвращает список всех источников оплаты данной анастезии
+	 */
+	list<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(1: i32 idOper)
+		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новый источник оплаты анастезии
 	 */
