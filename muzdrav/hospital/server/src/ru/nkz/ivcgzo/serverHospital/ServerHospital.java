@@ -1605,8 +1605,8 @@ public class ServerHospital extends Server implements Iface {
 				try (SqlModifyExecutor sme = tse.startTransaction()) {
 					sme.execPrepared("insert into p_rd_din " +
 						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves);
-//					int id = sme.getGeneratedKeys().getInt("id");
-//					sme.setCommit();
+					int id = sme.getGeneratedKeys().getInt("id");
+					sme.setCommit();
 				} catch (InterruptedException e) {
 					throw new KmiacServerException();
 				}
