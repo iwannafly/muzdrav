@@ -29,6 +29,7 @@ public class TableDateEditor extends DefaultCellEditor {
 		super(new CustomDateEditor());
 		
 		txt = (CustomDateEditor) this.getComponent();
+		txt.btnCal.setVisible(false);
 		
 		txt.addFocusListener(new FocusAdapter() {
 			@Override
