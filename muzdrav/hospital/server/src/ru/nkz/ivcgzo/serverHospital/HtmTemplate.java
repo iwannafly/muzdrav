@@ -7,6 +7,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO переписать все строковые операции на stringBuilder
+//TODO дописать прозрачные Exception'ы
+//TODO писать лог
 /**
  * Класс для работы с htm-шаблонами для формирования сводок.
  * Шаблон представляет собой htm файл, где на месте подстановок стоят метки
