@@ -136,6 +136,7 @@ public class MainFrame extends JFrame {
     private JTextField tfSurname;
     private JTextField tfBirthdate;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> tfStatus;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> CBishod;
     private JLabel lblName;
     private JLabel lblOms;
     private JLabel lblWork;
@@ -2448,7 +2449,7 @@ public class MainFrame extends JFrame {
 		        TDatarod = new CustomDateEditor();
 		        TDatarod.setFont(new Font("Tahoma", Font.BOLD, 12));
 		        
-		        JComboBox CBishod = new JComboBox();
+		        CBishod = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_db7);
 		        CBishod.setFont(new Font("Tahoma", Font.BOLD, 12));
 		        
 		        JLabel lblNewLabel_32 = new JLabel("Дата родов");
