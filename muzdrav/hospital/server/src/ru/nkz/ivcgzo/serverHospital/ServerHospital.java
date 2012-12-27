@@ -1548,11 +1548,12 @@ public class ServerHospital extends Server implements Iface {
 			TException {
         AutoCloseableResultSet acrs1;
         Date daterod =  new Date(System.currentTimeMillis()-280);
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
+		Integer ish = 1;
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
 			if (!acrs.getResultSet().next()) {
 				try (SqlModifyExecutor sme = tse.startTransaction()) {
 					sme.execPrepared("insert into p_rd_sl " +
-						"(npasp,datay) VALUES (?,?) ",true, npasp,Date(System.currentTimeMillis()));
+						"(npasp,datay,ishod) VALUES (?,?,?) ",true, npasp,daterod,ish);
 					int id = sme.getGeneratedKeys().getInt("id");
 					sme.setCommit();
 				} catch (InterruptedException e) {
