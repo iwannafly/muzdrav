@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen-java"/>
 	<classpathentry kind="src" path="config"/>
+	<classpathentry excluding="src/|gen-java/|config/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/clientManager"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/libthrift-0.9.0.jar"/>
