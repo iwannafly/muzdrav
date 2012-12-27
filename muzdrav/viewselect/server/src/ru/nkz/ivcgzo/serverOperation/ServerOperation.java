@@ -1,6 +1,7 @@
 package ru.nkz.ivcgzo.serverOperation;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,7 +16,8 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.Server;
-import ru.nkz.ivcgzo.thriftOperation.ThriftOperation;
+import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftOperation.*;
 import ru.nkz.ivcgzo.thriftOperation.ThriftOperation.Iface;
 
 public class ServerOperation extends Server implements Iface {
@@ -56,5 +58,109 @@ public class ServerOperation extends Server implements Iface {
     @Override
     public void saveUserConfig(int id, String config) throws TException {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public List<Operation> getOperations(int idGosp) throws KmiacServerException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int addOperation(Operation curOperation) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int updateOperation(Operation curOperation) throws KmiacServerException{
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deleteOperation(int id) throws KmiacServerException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int addOperationComplication(OperationComplication curCompl)
+            throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int updateOperationComplication(OperationComplication curCompl)
+            throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deleteOperationComplication(int id) throws KmiacServerException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int addOperationPaymentFund(OperationPaymentFund curPaymentFund)
+            throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int updateOperationPaymentFund(OperationPaymentFund curPaymentFund)
+            throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deleteOperationPaymentFund(int id) throws KmiacServerException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<Anesthesia> getAnesthesias(int idGosp) throws KmiacServerException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int addAnesthesia(Anesthesia curAnesthesia) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int updateAnesthesia(Anesthesia curAnesthesia) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deleteAnesthesia(int id) throws KmiacServerException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int addAnesthesiaComplication(AnesthesiaComplication curCompl) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int updateAnesthesiaComplication(AnesthesiaComplication curCompl) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deleteAnesthesiaComplication(int id) throws KmiacServerException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int addAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int updateAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund) throws KmiacServerException {
+        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void deleteAnesthesiaPaymentFund(int id) throws KmiacServerException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }
