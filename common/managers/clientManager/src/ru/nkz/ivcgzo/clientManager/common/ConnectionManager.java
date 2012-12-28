@@ -712,7 +712,19 @@ public class ConnectionManager {
     public void showMedicationForm(int npasp, String fam, String im, String ot, int idGosp) {
         viewClient.showModal(client, 20, npasp, fam, im, ot, idGosp);
     }
-	
+
+    /**
+     * Вызов формы записи пациента на исследование.
+     * @param npasp - уникальный номер пациента
+     * @param fam - фамилия
+     * @param im - имя
+     * @param ot - отчество
+     * @param idGosp - идентификатор госпитализации
+     */
+    public void showOperationForm(int npasp, String fam, String im, String ot, int idGosp) {
+        viewClient.showModal(client, 25, npasp, fam, im, ot, idGosp);
+    }
+
 	/**
 	 * Вызов формы записи пациента на прием к врачу.
 	 * @param npasp - уникальный номер пациента.
