@@ -866,6 +866,7 @@ public class ServerHospital extends Server implements Iface {
         try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 //            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
             HtmTemplate htmTemplate = new HtmTemplate(
                 new File(this.getClass().getProtectionDomain().getCodeSource()
@@ -884,6 +885,7 @@ public class ServerHospital extends Server implements Iface {
                 htmTemplate.replaceLabels(
                     true,
                     dateFormat.format(curDayNotes.getDataz()),
+                    timeFormat.format(curDayNotes.getTimez()),
                     curDayNotes.isSetJalob() ? curDayNotes.getJalob() : " ",
                     curDayNotes.isSetMorbi() ? curDayNotes.getMorbi() : " ",
                     curDayNotes.isSetStatusPraesense() ? curDayNotes.getStatusPraesense() : " ",

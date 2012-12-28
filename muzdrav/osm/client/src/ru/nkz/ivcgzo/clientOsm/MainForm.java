@@ -59,6 +59,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	private JScrollPane spVrach;
 	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
 	private CustomDateEditor tfDatZap;
+	private JButton btnOk;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -93,9 +94,13 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (authInfo.priznd != 7) {
+					tfDatZap.setVisible(true);
+					btnOk.setVisible(true);
 					if (tblPos.getSelectedItem() != null)
 						vvod.showVvod(tblPos.getSelectedItem());
 				} else {
+					tfDatZap.setVisible(false);
+					btnOk.setVisible(false);
 					if (tblVrach.getSelectedItem() != null) {
 						VrachInfo vi = tblVrach.getSelectedItem();
 						vrPcod = vi.pcod;
@@ -150,7 +155,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		tfDatZap.setDate(System.currentTimeMillis());
 		tfDatZap.setColumns(10);
 		
-		JButton btnOk = new JButton("OK");
+		 btnOk = new JButton("OK");
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			updateZapList();
@@ -221,6 +226,8 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		spPos.setViewportView(tblPos);
 		
 		if (authInfo.priznd == 7) {
+			tfDatZap.setVisible(false);
+			btnOk.setVisible(false);
 			spPos.setVisible(false);
 			btnSearch.setVisible(false);
 			frame.setTitle("Режим статистика");
