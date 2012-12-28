@@ -201,7 +201,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Удаляет операцию
      *
-     * @param id  - уникальный идентификатор операции
+     * @param id - уникальный идентификатор операции
      */
     @Override
     public void deleteOperation(int id) throws KmiacServerException {
@@ -218,7 +218,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех осложнений данной операции
      *
-     * @param idOper  - уникальный идентификатор операции
+     * @param idOper - уникальный идентификатор операции
      */
     @Override
     public List<OperationComplication> getOperationComplications(int idOper)
@@ -550,7 +550,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Добавляет новый источник оплаты анастезии
      *
-     * @param curPaymentFund  - текущий метод оплаты
+     * @param curPaymentFund - текущий метод оплаты
      */
     @Override
     public int addAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund)
@@ -572,7 +572,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Обновляет источник оплаты анастезии
      *
-     * @param curPaymentFund  - текущий метод оплаты
+     * @param curPaymentFund - текущий метод оплаты
      */
     @Override
     public void updateAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund)
@@ -594,7 +594,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Удаляет источник оплаты анастезии
      *
-     * @param id- уникальный идентификатор текущего источника оплаты анестезии
+     * @param id - уникальный идентификатор текущего источника оплаты анестезии
      */
     @Override
     public void deleteAnesthesiaPaymentFund(int id) throws KmiacServerException {
