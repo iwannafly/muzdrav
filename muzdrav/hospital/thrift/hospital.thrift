@@ -172,7 +172,7 @@ struct TRdIshod {
   36: optional i32 osmposl;
   37: optional i32 vrash;
   38: optional i32 akush;
-  39: optional i64 datarod;
+  39: optional i64 daterod;
   40: optional i32 srok;
   41: optional i32 ves;
   42: optional i32 vespl; 
