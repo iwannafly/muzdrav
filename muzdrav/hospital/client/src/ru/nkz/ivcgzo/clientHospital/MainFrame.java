@@ -806,7 +806,7 @@ public class MainFrame extends JFrame {
         });
         btnShowPatientAnamnez.setBorder(null);
         btnShowPatientAnamnez.setIcon(new ImageIcon(MainFrame.class.getResource(
-            "/ru/nkz/ivcgzo/clientHospital/resources/patientInfo.png")));
+            "/ru/nkz/ivcgzo/clientHospital/resources/lifeHistory.png")));
         btnShowPatientAnamnez.setRequestFocusEnabled(false);
 
         toolBar.add(new JToolBar.Separator());
@@ -853,6 +853,7 @@ public class MainFrame extends JFrame {
 
         btnOperation = new JButton();
         btnOperation.setToolTipText("Операции");
+        btnOperation.setVisible(false);
         toolBar.add(btnOperation);
         btnOperation.setMaximumSize(new Dimension(35, 35));
         btnOperation.setMinimumSize(new Dimension(35, 35));

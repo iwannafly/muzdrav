@@ -1482,7 +1482,7 @@ public class ServerRegPatient extends Server implements Iface {
                 ogrn,
                 nambk.getNambk(),
                 omsOrg,
-                pat.getPolis_dms().getSer() + pat.getPolis_oms().getNom(),
+                pat.getPolis_oms().getSer() + pat.getPolis_oms().getNom(),
                 pat.getSnils(),
                 "",
                 lgot,
