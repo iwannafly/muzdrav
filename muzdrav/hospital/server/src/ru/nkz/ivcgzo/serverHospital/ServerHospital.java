@@ -116,7 +116,7 @@ public class ServerHospital extends Server implements Iface {
    "vidpl","serd","serd1","serdm","chcc","pozpl","mesto",
    "deyat","shvat","vody","kashetv","poln","potugi",
    "posled","vremp","obol","pupov","obvit","osobp","krov","psih","obezb",
-   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","datarod","srok","ves","vespl","detmesto"
+   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","srok","ves","vespl","detmesto"
    };
     private static final String[] RDNOVOR_FIELD_NAMES = {
 	   "npasp", "nrod", "timeon", "kolchild", "nreb", "massa", "rost",
@@ -134,7 +134,7 @@ public class ServerHospital extends Server implements Iface {
      String.class,String.class,String.class,String.class,String.class,String.class,
 //    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
      Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
-//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "datarod",       "srok",       "ves",   "vespl", "detmesto"
+//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",       "srok",       "ves",   "vespl", "detmesto"
      Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Integer.class,Double.class,Double.class,String.class
     };
     private static final String[] RdSlStruct_Fields_names  = {
@@ -1202,7 +1202,7 @@ public class ServerHospital extends Server implements Iface {
 				}
 				int id = sme.getGeneratedKeys().getInt("id");
 			sme.execPreparedQuery("insert into c_rd_ishod (npasp,ngosp,id_berem,id,oj,hdm,polpl,predpl,serd,serd1,chcc, "+
-   "datarod) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",npasp,ngosp,numr,id,oj,hdm,polpl,predpl,serd,serd1,chcc,datarod);
+   "daterod) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",npasp,ngosp,numr,id,oj,hdm,polpl,predpl,serd,serd1,chcc,datarod);
 //			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return;
@@ -1241,7 +1241,7 @@ public class ServerHospital extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 		sme.execPreparedT("UPDATE c_rd_ishod SET oj = ?,hdm = ?,polpl = ?,predpl = ?,vidpl = ?,serd = ?,serd1 = ?,serdm = ?,chcc = ?,pozpl = ?,mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
 "posled = ?,vremp = ?,obol = ?,pupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
-"datarod = ?  WHERE ngosp = ? and npasp = ?", false,RdIs, RdIshodtipes,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,0,1);
+"daterod = ?  WHERE ngosp = ? and npasp = ?", false,RdIs, RdIshodtipes,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,0,1);
 		sme.setCommit();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
@@ -1423,7 +1423,7 @@ public class ServerHospital extends Server implements Iface {
 	public List<IntegerClassifier> getChildBirths(final long BirthDate) throws KmiacServerException, TException {
 		final String SQLQuery = "SELECT a.id AS pcod, 'Мама - '||b.fam||' '||b.im||' '||b.ot AS name FROM c_rd_ishod a " +
 								"JOIN patient b ON (a.npasp = b.npasp) " +
-								"WHERE a.\"Daterod\" = ?;";
+								"WHERE a.\"daterod\" = ?;";
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(SQLQuery, new java.sql.Date(BirthDate))) {
 	        return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
@@ -1607,7 +1607,7 @@ public class ServerHospital extends Server implements Iface {
 					sme.execPrepared("insert into p_rd_din " +
 						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves);
 //					int id = sme.getGeneratedKeys().getInt("id");
-//					sme.setCommit();
+					sme.setCommit();
 				} catch (InterruptedException e) {
 					throw new KmiacServerException();
 				}

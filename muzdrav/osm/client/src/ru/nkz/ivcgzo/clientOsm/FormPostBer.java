@@ -942,9 +942,7 @@ public class FormPostBer extends JFrame {
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addComponent(LTaz)
-							.addContainerGap(401, Short.MAX_VALUE))
+						.addComponent(LTaz)
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 								.addComponent(LIndSol)
@@ -980,8 +978,8 @@ public class FormPostBer extends JFrame {
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
 								.addComponent(SindSol)
-								.addComponent(SVes))
-							.addGap(264))))
+								.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 70, Short.MAX_VALUE))))
+					.addContainerGap(59, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
