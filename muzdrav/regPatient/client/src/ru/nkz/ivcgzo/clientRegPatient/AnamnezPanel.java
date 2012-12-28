@@ -1,6 +1,5 @@
 package ru.nkz.ivcgzo.clientRegPatient;
 
-import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +27,6 @@ public class AnamnezPanel extends JPanel{
 	private static final long serialVersionUID = -177961285699171152L;
     private CustomTable<Anam, Anam._Fields> tbl_ane;
     private CustomTable<Anam, Anam._Fields> tbl_anj;
-	private int tp = 0;
 	private List<Anam> AnamnezEpidInfo;
 	
 	public AnamnezPanel() {
@@ -84,7 +82,7 @@ public class AnamnezPanel extends JPanel{
 		btn_PrintAn.setVisible(false);
 		btn_PrintAn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                String servPath;
+//                String servPath;
 //                try {
 //                    servPath = MainForm.tcl.printAnamnez(PacientInfoFrame.PersonalInfo, tbl_ane.getData(), MainForm.authInfo);
 //                    String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
