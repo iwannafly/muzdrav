@@ -36,7 +36,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.ChildDocNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.ChildDocNumAlreadyExistException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
@@ -73,6 +72,7 @@ public class Children extends JPanel {
     private JCheckBox chckBxCriteria2;
     private JCheckBox chckBxCriteria4;
     private JCheckBox chckBxCriteria3;
+    private JButton btnPrintBlankDoc;
 
 	/**
 	 * Создание экземпляра панели отображения информации новорождённого
@@ -95,16 +95,16 @@ public class Children extends JPanel {
 	 */
 	public void SetPatient(final TPatient newPatient) {
 		this.patient = newPatient;
-		try {
-			if (this.patient != null)
+		if (this.patient != null)
+			try {
 				this.ticcbChildBirth.setData(	//Загрузка списка родов
-						ClientHospital.tcl.getChildBirths(this.patient.getBirthDate()));
-		} catch (KmiacServerException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-		}
-		this.UpdatePanel();	//Обновление панели
+					ClientHospital.tcl.getChildBirths(this.patient.getBirthDate()));
+				this.UpdatePanel();	//Обновление панели
+			} catch (KmiacServerException e) {
+				e.printStackTrace();
+			} catch (TException e) {
+				e.printStackTrace();
+			}
 	}
 
 	/**
@@ -133,10 +133,10 @@ public class Children extends JPanel {
 
 	/**
 	 * Установка списка врачей в элемент управления
-	 * @param list Список врачей
+	 * @param doctorsList Список врачей
 	 */
-	public void setDoctors(final List<IntegerClassifier> list) {
-		this.ticcbDocGiven.setData(list);
+	public void setDoctors(final List<IntegerClassifier> doctorsList) {
+		this.ticcbDocGiven.setData(doctorsList);
 	}
 	
 	/**
@@ -168,12 +168,7 @@ public class Children extends JPanel {
 		this.cdeDocDate.setDate(date.getTime());
 		this.tfDocName.setText("");
 		this.ticcbDocGiven.setSelectedIndex(-1);
-		try {
-			if (ClientHospital.tcl != null)
-				this.spinnerDocNum.setValue(ClientHospital.tcl.getNextChildDocNum());
-		} catch (TException e) {
-			e.printStackTrace();
-		}
+		this.spinnerDocNum.setValue(0);
 	}
 	
 	/**
@@ -195,7 +190,7 @@ public class Children extends JPanel {
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		//Установка значений поля childInfo:
+		//Установка значений полей childInfo:
 		this.childInfo.setNrod(this.ticcbChildBirth.getSelectedPcod());
 		this.childInfo.setTimeon(this.cteBirthTime.getText());
 		this.childInfo.setMert(this.chckBxDead.isSelected());
@@ -230,14 +225,14 @@ public class Children extends JPanel {
 		if (this.tfDocName.getText().isEmpty())
 		{
 			JOptionPane.showMessageDialog(this,
-					"Поле 'ФИО новорождённого' не может быть пустым",
+					"Поле 'Фамилия новорождённого' не может быть пустым",
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		if (this.tfDocName.getText().length() > 62)
+		if (this.tfDocName.getText().length() > 20)
 		{
 			JOptionPane.showMessageDialog(this,
-					"Поле 'ФИО новорождённого' не может превышать 62 символа",
+					"Поле 'Фамилия новорождённого' не может превышать 20 символов",
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
@@ -248,11 +243,10 @@ public class Children extends JPanel {
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		//Установка значений поля childDoc:
+		//Установка значений полей childDoc:
 		this.childDoc.setDateoff(this.cdeDocDate.getDate().getTime());
-		this.childDoc.setFioreb(this.tfDocName.getText());
+		this.childDoc.setFamreb(this.tfDocName.getText().toUpperCase());
 		this.childDoc.setSvidvrach(this.ticcbDocGiven.getSelectedPcod());
-		this.childDoc.setNdoc((int) this.spinnerDocNum.getValue());
 		return true;
 	}
 	
@@ -291,10 +285,9 @@ public class Children extends JPanel {
 			return;
 		}
 		this.cdeDocDate.setDate(this.childDoc.getDateoff());
-		this.tfDocName.setText(this.childDoc.getFioreb());
+		this.tfDocName.setText(this.childDoc.getFamreb());
 		this.ticcbDocGiven.setSelectedPcod(this.childDoc.getSvidvrach());
 		this.spinnerDocNum.setValue(this.childDoc.getNdoc());
-		this.spinnerDocNum.setEnabled(false);
 	}
 
 	/**
@@ -358,12 +351,13 @@ public class Children extends JPanel {
 	 * @throws TException исключение общего вида
 	 * @throws ChildDocNotFoundException свидетельство о рождении/перинатальной смерти не найдено
 	 * @throws KmiacServerException исключение на стороне сервера
+	 * @return Возвращает <code>true</code>, если информация обновлена; иначе - <code>false</code>
 	 */
-	private void UpdateChildDocument()
+	private boolean UpdateChildDocument()
 			throws KmiacServerException, ChildDocNotFoundException, TException {
 		TRd_Svid oldDoc = this.childDoc.deepCopy();
 		if (!this.LoadChildDocFromPanel())	//Не все данные введены
-			return;
+			return false;
 		if (!oldDoc.equals(this.childDoc)) {	//Данные были изменены
 			int answer = JOptionPane.showConfirmDialog(this,
 					"Вы действительно хотите изменить данные свидетельства",
@@ -371,28 +365,31 @@ public class Children extends JPanel {
 			if (answer == JOptionPane.YES_OPTION)	//Пользователь подвердил изменение данных
 				ClientHospital.tcl.updateChildDocument(this.childDoc);
 		}
+		return true;
 	}
 
 	/**
-	 * Выдача нового свидетельства
+	 * Занесение нового свидетельства в БД
 	 * @throws TException исключение общего вида
 	 * @throws PatientNotFoundException пациент не найден
 	 * @throws ChildDocNumAlreadyExistException такой номер свидетельства о рождении/перинатальной
 	 * смерти уже существует
 	 * @throws KmiacServerException исключение на стороне сервера
+	 * @return Возвращает <code>true</code>, если свидетельство внесено; иначе - <code>false</code>
 	 */
-	private void AddChildDocument()
-			throws KmiacServerException, PatientNotFoundException,
-			ChildDocNumAlreadyExistException, TException {
+	private boolean AddChildDocument()
+			throws KmiacServerException, PatientNotFoundException, TException {
 		this.childDoc = new TRd_Svid();
 		if (!this.LoadChildDocFromPanel())	//Не все данные введены
 		{
 			this.childDoc = null;
-			return;
+			return false;
 		}
 		this.childDoc.setNpasp(this.patient.getPatientId());
-		ClientHospital.tcl.addChildDocument(this.childDoc);
-		this.spinnerDocNum.setEnabled(false);
+		int ndoc = ClientHospital.tcl.addChildDocument(this.childDoc);
+		this.childDoc.setNdoc(ndoc);
+		this.spinnerDocNum.setValue(ndoc);
+		return true;
 	}
 	
 	/**
@@ -404,7 +401,8 @@ public class Children extends JPanel {
 	 * @throws FileNotFoundException ошибка передачи документа с сервера
 	 */
 	private void printChildDocument()
-			throws KmiacServerException, ChildDocNotFoundException, TException, FileNotFoundException, IOException {
+			throws KmiacServerException, ChildDocNotFoundException,
+			FileNotFoundException, IOException, TException {
 		if ((this.childInfo != null) && (this.childDoc != null)) {
 			String servPath;
 			if (!this.childInfo.isMert()) {	//Новорождённый является живорождённым
@@ -431,11 +429,13 @@ public class Children extends JPanel {
 			return;
 		}
 		try {
+			boolean needPrint;
 			if (this.childDoc != null)
-				this.UpdateChildDocument();	//Обновление информации о свидетельстве
+				needPrint = this.UpdateChildDocument();	//Обновление информации о свидетельстве
 			else
-				this.AddChildDocument();	//Выдача нового свидетельства
-			this.printChildDocument();		//Печать свидетельства
+				needPrint = this.AddChildDocument();	//Выдача нового свидетельства
+			if (needPrint)
+				this.printChildDocument();	//Печать свидетельства
 			return;
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
@@ -447,13 +447,32 @@ public class Children extends JPanel {
 			JOptionPane.showMessageDialog(this, "Свидетельство не найдено",
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
-		} catch (ChildDocNumAlreadyExistException e) {
-			JOptionPane.showMessageDialog(this, "Такой номер свидетельства о рождении/перинатальной " +
-					" смерти уже существует. Измените его", "Ошибка", JOptionPane.ERROR_MESSAGE);
-			return;
 		} catch (IOException e) {	//Поглощает FileNotFoundException
 			JOptionPane.showMessageDialog(this, "Сбой во время печати свидетельства о рождении/" +
 					"перинатальной смерти", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			return;
+		} catch (TException e) {
+			e.printStackTrace();
+		}
+		JOptionPane.showMessageDialog(this, "Операция не была выполнена",
+				"Ошибка", JOptionPane.ERROR_MESSAGE);
+	}
+
+	/**
+	 * Печать бланка свидетельства
+	 */
+	private void btnPrintBlankDocClick() {
+		try {
+			String servPath = ClientHospital.tcl.printChildBlankDocument(!this.chckBxDead.isSelected());
+            String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+            ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
+            ClientHospital.conMan.openFileInEditor(cliPath, false);
+			return;
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (IOException e) {	//Поглощает FileNotFoundException
+			JOptionPane.showMessageDialog(this, "Сбой во время печати бланка свидетельства " +
+					"о рождении/перинатальной смерти", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (TException e) {
 			e.printStackTrace();
@@ -494,12 +513,10 @@ public class Children extends JPanel {
 				this.SetDefaultChildValues();
 				this.childDoc = null;
 				this.SetDefaultDocValues();
-				this.spinnerDocNum.setEnabled(true);
 			} catch (ChildDocNotFoundException e) {
 				//Свидетельство ещё не было выдано
 				this.childDoc = null;
 				this.SetDefaultDocValues();
-				this.spinnerDocNum.setEnabled(true);
 			} catch (TException e) {
 				e.printStackTrace();
 			}
@@ -566,9 +583,10 @@ public class Children extends JPanel {
 		
 		this.spinnerDocNum = new JSpinner();
 		spinnerDocNum.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		this.spinnerDocNum.setEnabled(false);
 		lblDocNum.setLabelFor(spinnerDocNum);
 		
-		JLabel lblDocName = new JLabel("ФИО новорождённого:");
+		JLabel lblDocName = new JLabel("Фамилия новорождённого:");
 		
 		this.tfDocName = new JTextField();
 		tfDocName.setHorizontalAlignment(SwingConstants.LEFT);
@@ -590,6 +608,14 @@ public class Children extends JPanel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				btnGiveDocClick();
+			}
+		});
+		
+		this.btnPrintBlankDoc = new JButton("Распечатать бланк");
+		this.btnPrintBlankDoc.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				btnPrintBlankDocClick();
 			}
 		});
 		GroupLayout gl_panelDoc = new GroupLayout(panelDoc);
@@ -615,20 +641,25 @@ public class Children extends JPanel {
 									.addPreferredGap(ComponentPlacement.RELATED)))
 							.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addGap(5)
-									.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
-										.addGroup(gl_panelDoc.createSequentialGroup()
-											.addComponent(separator, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-											.addGap(0, 143, Short.MAX_VALUE))
-										.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
-										.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-										.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-										.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))
-									.addGap(255))
-								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addGap(18)
 									.addComponent(lblDocType)
-									.addContainerGap())))))
+									.addContainerGap())
+								.addGroup(Alignment.TRAILING, gl_panelDoc.createSequentialGroup()
+									.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
+										.addGroup(gl_panelDoc.createSequentialGroup()
+											.addPreferredGap(ComponentPlacement.RELATED)
+											.addComponent(btnPrintBlankDoc))
+										.addGroup(gl_panelDoc.createSequentialGroup()
+											.addGap(5)
+											.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
+												.addGroup(gl_panelDoc.createSequentialGroup()
+													.addComponent(separator, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
+													.addGap(0, 143, Short.MAX_VALUE))
+												.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
+												.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+												.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+												.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE))))
+									.addGap(255))))))
 		);
 		gl_panelDoc.setVerticalGroup(
 			gl_panelDoc.createParallelGroup(Alignment.LEADING)
@@ -656,7 +687,9 @@ public class Children extends JPanel {
 						.addComponent(lblDocGiven)
 						.addComponent(ticcbDocGiven, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
-					.addComponent(btnGiveDoc, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+					.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnPrintBlankDoc, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(btnGiveDoc, GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
 					.addContainerGap(100, Short.MAX_VALUE))
 		);
 		this.panelDoc.setLayout(gl_panelDoc);
