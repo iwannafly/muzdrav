@@ -332,7 +332,7 @@ public class serverAdmin extends Server implements Iface {
 					pass1[i] = (byte) (passBytes[i] - 97 + 224); //a=а, b=б..., z=щ
 				}
 			}
-			return new String(pass1, Charset.forName("cp1251"));
+			return new String(pass1, Charset.forName("cp1251")).replace('б', 'э').replace('з', 'ю').replace('о', 'я');
 		}
 	}
 

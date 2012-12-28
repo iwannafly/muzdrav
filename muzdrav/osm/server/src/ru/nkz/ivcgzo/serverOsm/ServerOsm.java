@@ -1605,20 +1605,22 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><br><b>Назначенные исследования </b><br>");
 						while (acrs.getResultSet().next()) {
-							if (acrs.getResultSet().getString(4) != null) 
+						//	if (acrs.getResultSet().getString(4) != null) 
 								sb.append(String.format("<br>Код показателя  %s <br>  Наименование показателя %s <br> Результат %s <br>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
 						}			
 					}
 					acrs.close();
 					
-					acrs = sse.execPreparedQuery("select p_vizit.recomend,p_vizit.zakl,n_ap0.name from p_vizit left join n_ap0 on (p_vizit.ishod=n_ap0.pcod) where id=?", pk.getPvizit_id()); 
+					acrs = sse.execPreparedQuery("select p_vizit.recomend,p_vizit.zakl,p_vizit.lech, n_ap0.name from p_vizit left join n_ap0 on (p_vizit.ishod=n_ap0.pcod) where id=?", pk.getPvizit_id()); 
 					if (acrs.getResultSet().next()) {
+							if (acrs.getResultSet().getString(3) != null)
+							sb.append(String.format("<br><b> Лечение</b> %s", acrs.getResultSet().getString(3)));
 						if (acrs.getResultSet().getString(1) != null)
 							sb.append(String.format("<br><b> Лечебные и трудовые рекомендации</b> %s", acrs.getResultSet().getString(1)));
 						if (acrs.getResultSet().getString(2) != null)
 							sb.append(String.format("<br><b> Заключение </b> %s", acrs.getResultSet().getString(2)));
-						if (acrs.getResultSet().getString(3) != null)
-							sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(3)));
+						if (acrs.getResultSet().getString(4) != null)
+							sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(4)));
 					}
 					sb.append("<br>");
 				acrs.close();
@@ -2207,11 +2209,11 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<IntegerClassifier> getShOsmPoiskName(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
-		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name, sho.diag || ' ' || substring(din.name from 1 for 1) || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN n_din din ON (din.pcod = sho.cdin) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.diag, sho.diag || ' ' || substring(din.name from 1 for 1) || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN n_din din ON (din.pcod = sho.cdin) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
 		
 		if (srcText != null)
 			sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
-		sql += "ORDER BY sho.name ";
+		sql += "ORDER BY sho.diag ";
 		
 		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText, srcText)) {
 			return rsmIntClas.mapToList(acrs.getResultSet());

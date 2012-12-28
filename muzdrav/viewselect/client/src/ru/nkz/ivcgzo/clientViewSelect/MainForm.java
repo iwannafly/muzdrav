@@ -35,6 +35,7 @@ import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientMedication.ClientMedication;
+import ru.nkz.ivcgzo.clientOperation.ClientOperation;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.MedPolErrorsForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PaspErrorsForm;
@@ -70,6 +71,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public ViewMrabTreeForm mrabFrm;
 	public PatientInfoForm infFrm;
 	public ClientLab labFrm;
+	public ClientOperation operationFrm;
 	public ru.nkz.ivcgzo.clientReception.MainForm recFrm;
 	public ClientMedication medFrm;
 	public PaspErrorsForm paspFrm;
@@ -264,6 +266,7 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		infFrm = new PatientInfoForm();
 		labFrm = new ClientLab(conMan, authInfo, 0);
 		medFrm = new ClientMedication(conMan, authInfo, 0);
+		operationFrm = new ClientOperation(conMan, authInfo, 0);
 		recFrm = new ru.nkz.ivcgzo.clientReception.MainForm(conMan, authInfo, 0);
 		paspFrm = new PaspErrorsForm();
 		medPolFrm = new MedPolErrorsForm();
@@ -498,7 +501,12 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 						patAnamFrm.removeModalityListener();
 						disposeModal();
 					}
-				}
+
+				case 25:
+                    operationFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
+                    break;
+
+                }
 			}
 				
 		return null;
