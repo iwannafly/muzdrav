@@ -3737,8 +3737,8 @@ public class PacientInfoFrame extends JFrame {
                 ta_jal_pr.setText(Id_gosp.getJalob());
             }
             if (Id_gosp.isSetPl_extr()){
-                rbtn_plan.setSelected(Id_gosp.pl_extr == 1);
-                rbtn_extr.setSelected(Id_gosp.pl_extr == 2);
+                rbtn_plan.setSelected(Id_gosp.pl_extr == 2);
+                rbtn_extr.setSelected(Id_gosp.pl_extr == 1);
             }
             if (Id_gosp.isSetNal_z()){
                 cbx_nalz.setSelected(Id_gosp.nal_z);
@@ -3960,8 +3960,8 @@ public class PacientInfoFrame extends JFrame {
             if (!tf_smpn.getText().isEmpty()) Id_gosp.setSmp_num(Integer.valueOf(tf_smpn.getText()));
             if (!tf_ntalon.getText().isEmpty()) Id_gosp.setNtalon(Integer.valueOf(tf_ntalon.getText()));
 
-            if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(1);
-            if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(2);
+            if (rbtn_plan.isSelected()) Id_gosp.setPl_extr(2);
+            if (rbtn_extr.isSelected()) Id_gosp.setPl_extr(1);
 
             Id_gosp.setMessr(cbx_messr.isSelected());
             Id_gosp.setNal_z(cbx_nalz.isSelected());
@@ -4035,7 +4035,7 @@ public class PacientInfoFrame extends JFrame {
             String strerr = "";
             if (Id_gosp.getPl_extr() == 0)
                 strerr += "плановое/экстренное; \n\r";
-//            if (Id_gosp.getPl_extr() == 1 && Id_gosp.getNtalon() == 0)
+//            if (Id_gosp.getPl_extr() == 2 && Id_gosp.getNtalon() == 0)
 //                strerr += "плановый больной без талона; \n\r";
             if (Id_gosp.getNist() == 0 && Id_gosp.getCotd() != 0)
                 strerr += "отсутствует номер истории болезни; \n\r";
