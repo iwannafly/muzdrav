@@ -712,7 +712,19 @@ public class ConnectionManager {
     public void showMedicationForm(int npasp, String fam, String im, String ot, int idGosp) {
         viewClient.showModal(client, 20, npasp, fam, im, ot, idGosp);
     }
-	
+
+    /**
+     * Вызов формы записи пациента на исследование.
+     * @param npasp - уникальный номер пациента
+     * @param fam - фамилия
+     * @param im - имя
+     * @param ot - отчество
+     * @param idGosp - идентификатор госпитализации
+     */
+    public void showOperationForm(int npasp, String fam, String im, String ot, int idGosp) {
+        viewClient.showModal(client, 25, npasp, fam, im, ot, idGosp);
+    }
+
 	/**
 	 * Вызов формы записи пациента на прием к врачу.
 	 * @param npasp - уникальный номер пациента.
@@ -732,6 +744,23 @@ public class ConnectionManager {
 	 */
 	public Integer showPaspErrorsForm() {
 		return (Integer) viewClient.showModal(client, 21);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в медицинской части поликлиники.
+	 * @return код выбранного пациента, код обращения и код посещения 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public int[] showMedPolErrorsForm() {
+		return (int[]) viewClient.showModal(client, 22);
+	}
+	
+	/**
+	 * Вызов формы с редактором анамнеза пациента
+	 * @param npasp - уникальный номер пациента.
+	 */
+	public void showPatientAnamnezForm(int npasp) {
+		viewClient.showModal(client, 24, npasp);
 	}
 	
 	/**
