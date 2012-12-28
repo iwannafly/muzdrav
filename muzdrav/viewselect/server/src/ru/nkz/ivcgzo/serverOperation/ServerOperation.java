@@ -140,7 +140,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех операций для данной записи госпитализации
      *
-     * @param idGosp
+     * @param idGosp - номер госпитализации
      */
     @Override
     public List<Operation> getOperations(int idGosp) throws KmiacServerException {
@@ -157,7 +157,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Добавляет новую операцию
      *
-     * @param curOperation
+     * @param curOperation - выбранная операция
      */
     @Override
     public int addOperation(Operation curOperation) throws KmiacServerException {
@@ -170,11 +170,8 @@ public class ServerOperation extends Server implements Iface {
             int id = sme.getGeneratedKeys().getInt("id");
             sme.setCommit();
             return id;
-        } catch (SQLException e) {
+        } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            throw new KmiacServerException();
-        } catch (InterruptedException e1) {
-            log.log(Level.ERROR, "Exception: ", e1);
             throw new KmiacServerException();
         }
     }
@@ -182,232 +179,432 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Обновляет информацию о выбранной операции
      *
-     * @param curOperation
+     * @param curOperation - выбранная операция
      */
     @Override
-    public int updateOperation(Operation curOperation) throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    public void updateOperation(Operation curOperation) throws KmiacServerException {
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0};
+        final String sqlQuery = "UPDATE p_oper SET vid_st = ?, cotd = ?, id_gosp = ?, "
+                + "npasp = ?, pcod = ?, name_oper = ?, date = ?, vrem = ?, pred_ep = ?, "
+                + "op_oper = ?, material = ?, dlit = ?, dataz = ? "
+                + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, curOperation, OPERATION_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Удаляет операцию
      *
-     * @param id
+     * @param id  - уникальный идентификатор операции
      */
     @Override
     public void deleteOperation(int id) throws KmiacServerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String sqlQuery = "DELETE FROM p_oper WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Возвращает список всех осложнений данной операции
      *
-     * @param idOper
+     * @param idOper  - уникальный идентификатор операции
      */
     @Override
     public List<OperationComplication> getOperationComplications(int idOper)
             throws KmiacServerException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        String sqlQuery = "SELECT * FROM p_oper_osl WHERE p_oper_osl.id_oper = ? "
+                + "ORDER BY p_oper_osl.dataz ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+            return rsmOperationComplication.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Добавляет новое осложнение
      *
-     * @param curCompl
+     * @param curCompl - текущее осложнение операции
      */
     @Override
     public int addOperationComplication(OperationComplication curCompl)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("INSERT INTO p_oper_osl (id_oper, name_osl, pcod, dataz) "
+                    + "VALUES (?, ?, ?, ?);",
+                    true, curCompl, OPERATION_COMPLICATION_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Обновляет информацию об осложнении
      *
-     * @param curCompl
+     * @param curCompl - текущее осложнение операции
      */
     @Override
-    public int updateOperationComplication(OperationComplication curCompl)
+    public void updateOperationComplication(OperationComplication curCompl)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 4, 0};
+        final String sqlQuery = "UPDATE p_oper_osl SET id_oper = ?, name_osl = ?, pcod = ?, "
+                + "dataz = ? WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, curCompl, OPERATION_COMPLICATION_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Удаляет информацию об осложнении
      *
-     * @param id
+     * @param id - уникальный идентификатор осложнения операции
      */
     @Override
     public void deleteOperationComplication(int id) throws KmiacServerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String sqlQuery = "DELETE FROM p_oper_osl WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Возвращает список всех источников оплаты данной операции
      *
-     * @param idOper
+     * @param idOper - уникальный идентийикатор операции
      */
     @Override
     public List<OperationPaymentFund> getOperationPaymentFunds(int idOper)
             throws KmiacServerException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        String sqlQuery = "SELECT * FROM p_oper_opl WHERE p_oper_opl.id_oper = ? "
+                + "ORDER BY p_oper_opl.dataz ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+            return rsmOperationPaymentFund.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Добавляет новый источник оплаты
      *
-     * @param curPaymentFund
+     * @param curPaymentFund - текущий источник оплаты
      */
     @Override
     public int addOperationPaymentFund(OperationPaymentFund curPaymentFund)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("INSERT INTO p_oper_opl (id_oper, pcod, dataz) "
+                    + "VALUES (?, ?, ?);",
+                    true, curPaymentFund, OPERATION_PAYMENT_FUND_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Обновляет источник оплаты
      *
-     * @param curPaymentFund
+     * @param curPaymentFund - текущий источник оплаты
      */
     @Override
-    public int updateOperationPaymentFund(OperationPaymentFund curPaymentFund)
+    public void updateOperationPaymentFund(OperationPaymentFund curPaymentFund)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 0};
+        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, name_osl = ?, pcod = ?, "
+                + "dataz = ? WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, curPaymentFund,
+                    OPERATION_PAYMENT_FUND_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Удаляет источник оплаты
      *
-     * @param id
+     * @param id - уникальный идентификатор метода оплаты операции
      */
     @Override
     public void deleteOperationPaymentFund(int id) throws KmiacServerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String sqlQuery = "DELETE FROM p_oper_opl WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Возвращает список всех назначений анастезии для данной записи госпитализации
      *
-     * @param idGosp
+     * @param idOper - уникальный идентификатор операции
      */
     @Override
-    public List<Anesthesia> getAnesthesias(int idGosp) throws KmiacServerException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public List<Anesthesia> getAnesthesias(int idOper) throws KmiacServerException {
+        String sqlQuery = "SELECT * FROM p_anast WHERE p_anast.id_oper = ? "
+                + "ORDER BY p_anast.date, p_anast.vrem ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+            return rsmAnesthesia.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Добавляет новое назначений анастезии
      *
-     * @param curAnesthesia
+     * @param curAnesthesia - текущая анестезия
      */
     @Override
     public int addAnesthesia(Anesthesia curAnesthesia) throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("INSERT INTO p_anast (vid_st, cotd, id_gosp, npasp, id_oper, pcod, "
+                    + "name_an, date, vrem, dataz) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    true, curAnesthesia, ANESTHESIA_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Обновляет назначений анастезии
      *
-     * @param curAnesthesia
+     * @param curAnesthesia - текущая анестезия
      */
     @Override
-    public int updateAnesthesia(Anesthesia curAnesthesia) throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    public void updateAnesthesia(Anesthesia curAnesthesia) throws KmiacServerException {
+        final int[] indexes = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0};
+        final String sqlQuery = "UPDATE p_anast SET vid_st = ?, cotd = ?, id_gosp = ?, npasp = ?, "
+                + "id_oper = ?, pcod = ?, name_an = ?, date = ?, vrem = ?,  dataz = ? "
+                + "WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, curAnesthesia,
+                    ANESTHESIA_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Удаляет назначений анастезии
      *
-     * @param id
+     * @param id - уникальный идентификатор анестезии
      */
     @Override
     public void deleteAnesthesia(int id) throws KmiacServerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String sqlQuery = "DELETE FROM p_anast WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Возвращает список всех осложнений данной анастезии
      *
-     * @param idOper
+     * @param idOper - уникальный идентификатор анестезии
      */
     @Override
     public List<AnesthesiaComplication> getAnesthesiaComplications(int idOper)
             throws KmiacServerException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        String sqlQuery = "SELECT * FROM p_anast_osl WHERE p_anast_osl.id_anast = ? "
+                + "ORDER BY p_anast_osl.dataz ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+            return rsmAnesthesiaComplication.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Добавляет новое осложнение после анастезии
      *
-     * @param curCompl
+     * @param curCompl - текущая анестезия
      */
     @Override
     public int addAnesthesiaComplication(AnesthesiaComplication curCompl)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 4};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("INSERT INTO p_anast_osl (id_anast, name, pcod, dataz) "
+                    + "VALUES (?, ?, ?, ?);",
+                    true, curCompl, ANESTHESIA_COMPLICATION_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Обновляет осложнение после анастезии
      *
-     * @param curCompl
+     * @param curCompl - текущее осложнение после анестезии
      */
     @Override
-    public int updateAnesthesiaComplication(AnesthesiaComplication curCompl)
+    public void updateAnesthesiaComplication(AnesthesiaComplication curCompl)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 4, 0};
+        final String sqlQuery = "UPDATE p_anast_osl SET id_anast = ?, name = ?, "
+                + "pcod = ?, dataz = ? WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, curCompl,
+                    ANESTHESIA_COMPLICATION_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Удаляет осложнение после анастезии
      *
-     * @param id
+     * @param id - уникальный идентификатор текущего осложнения после анестезии
      */
     @Override
     public void deleteAnesthesiaComplication(int id) throws KmiacServerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String sqlQuery = "DELETE FROM p_anast_osl WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Возвращает список всех источников оплаты данной анастезии
      *
-     * @param idOper
+     * @param idOper - уникальный идентификатор операции
      */
     @Override
     public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idOper)
             throws KmiacServerException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        String sqlQuery = "SELECT * FROM p_anast_opl WHERE p_anast_opl.id_anast = ? "
+                + "ORDER BY p_anast_opl.dataz ";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+            return rsmAnesthesiaPaymentFund.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Добавляет новый источник оплаты анастезии
      *
-     * @param curPaymentFund
+     * @param curPaymentFund  - текущий метод оплаты
      */
     @Override
     public int addAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3};
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT("INSERT INTO p_anast_opl (id_anast, pcod, dataz) "
+                    + "VALUES (?, ?, ?);",
+                    true, curPaymentFund, ANESTHESIA_PAYMENT_FUND_TYPES, indexes);
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Обновляет источник оплаты анастезии
      *
-     * @param curPaymentFund
+     * @param curPaymentFund  - текущий метод оплаты
      */
     @Override
-    public int updateAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund)
+    public void updateAnesthesiaPaymentFund(AnesthesiaPaymentFund curPaymentFund)
             throws KmiacServerException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        final int[] indexes = {1, 2, 3, 0};
+        final String sqlQuery = "UPDATE p_anast_opl SET id_anast = ?, "
+                + "pcod = ?, dataz = ? WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPreparedT(sqlQuery, false, curPaymentFund,
+                    ANESTHESIA_PAYMENT_FUND_TYPES, indexes);
+            sme.setCommit();
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 
     /**
      * Удаляет источник оплаты анастезии
      *
-     * @param id
+     * @param id- уникальный идентификатор текущего источника оплаты анестезии
      */
     @Override
     public void deleteAnesthesiaPaymentFund(int id) throws KmiacServerException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String sqlQuery = "DELETE FROM p_anast_opl WHERE id = ?;";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, false, id);
+            sme.setCommit();
+        } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
+            log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
     }
 }
