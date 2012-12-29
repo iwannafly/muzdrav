@@ -2248,6 +2248,7 @@ public class Vvod extends JFrame {
 						cotd.setCotd(gosp.getCotd());
 						cotd.setDataz(System.currentTimeMillis());
 						cotd.setNist(gosp.getNist());
+						cotd.setStat_type(cmbVidStacionar.getSelectedPcod());
 						cotd.setId(MainForm.tcl.AddCotd(cotd));
 						}
 						if ((cmbVidStacionar.getSelectedPcod()==1)||(cmbVidStacionar.getSelectedPcod()==2)){

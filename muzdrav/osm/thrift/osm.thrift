@@ -616,6 +616,7 @@ struct Cotd{
 	3: optional i32 nist;
 	4: optional i32 cotd;
 	5: optional i64 dataz;
+	6: optional i32 stat_type;
 }
 
 struct VrachInfo {
