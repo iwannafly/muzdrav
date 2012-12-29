@@ -59,7 +59,7 @@ public class HtmTemplate {
     /**
      * Читает htm-файл с определенным именем из папки с шаблонами по умолчанию
      * для данного типа ОС.
-     * @param templateFileName
+     * @param templatePath
      * @return полный текст htm-шаблона
      */
     private String readTemplateFromFile(final String templatePath) {
