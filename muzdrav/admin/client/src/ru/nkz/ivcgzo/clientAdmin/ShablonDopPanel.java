@@ -52,7 +52,6 @@ public class ShablonDopPanel extends JPanel {
 	private JButton btSave;
 	private ShablonDop shDop;
 	private boolean fillingUI;
-	private Font defFont;
 	
 	public ShablonDopPanel() {
 		textListener = new DocumentListener() {
@@ -92,7 +91,6 @@ public class ShablonDopPanel extends JPanel {
 		
 		tbSearch = new CustomTextField(true, true, false);
 		tbSearch.setVisible(false);
-		defFont = tbSearch.getFont();
 		tbSearch.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
@@ -209,7 +207,7 @@ public class ShablonDopPanel extends JPanel {
 		
 		tbText = new JTextArea();
 		tbText.getDocument().addDocumentListener(textListener);
-		tbText.setFont(defFont);
+		tbText.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		new CustomTextComponentWrapper(tbText).setPopupMenu();
 		spText.setViewportView(tbText);
 		gbText.setLayout(gl_gbText);

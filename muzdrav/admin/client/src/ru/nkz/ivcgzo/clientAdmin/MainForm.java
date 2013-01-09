@@ -20,7 +20,6 @@ import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
 import java.awt.Dimension;
 
 public class MainForm extends Client<ThriftServerAdmin.Client> {
-	private final boolean adminMode;
 	public static ThriftServerAdmin.Client tcl;
 	private JFrame frame;
 	private JTabbedPane tabbedPane;
@@ -31,8 +30,6 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftServerAdmin.Client.class, configuration.appId, configuration.thrPort, lncPrm);
-		
-		adminMode = lncPrm == 2;
 		
 		initialize();
 		
@@ -80,7 +77,7 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 					.addContainerGap())
 		);
 		
-		tpUser = new UserPanel(adminMode);
+		tpUser = new UserPanel();
 		tabbedPane.addTab("Пользователи", null, tpUser, null);
 		
 		tpShablonOsm = new ShablonOsmPanel();

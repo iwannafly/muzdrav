@@ -53,12 +53,14 @@ import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.xml.crypto.Data;
 
 import org.apache.thrift.TException;
 
 public class MainForm extends Client<ThriftOutputInfo.Client> {
 
 	private JFrame frame;
+    private String oslname;
 	
 	public static ThriftOutputInfo.Client tcl;
 	//public Input_info inputInfo;
@@ -69,6 +71,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public PlanDisp pPlanDisp;
 	public Uchastok pUchastok;
 
+	static int disp; 
 
 	/**
 	 * Launch the application.
@@ -150,10 +153,15 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenuItem menuItem_4 = new JMenuItem("Посещения врачей поликлиники");
 		menuItem_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Integer cpol = 200;
+//				CustomDateEditor datan = 
+//				CustomDateEditor datak = SvodVed.tfDateF;
 				try{
-					String servPath = MainForm.tcl.printDnevVr();
+					System.out.println("Посещения врачей поликлиники");		
+//					String servPath = MainForm.tcl.printDnevVr();
+					String servPath = MainForm.tcl.nagrvr(cpol);
 					String cliPath;
-					String oslname = "kartl";
+					oslname = "posvr";
 					cliPath = File.createTempFile(oslname, ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);
@@ -175,6 +183,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenuItem menuItem_3 = new JMenuItem("Плановая диспансеризация");
 		menuItem_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				disp = 1;
 				pPlanDisp = new PlanDisp();
 				panel.removeAll();
 				panel.add(pPlanDisp);
@@ -182,6 +191,32 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 			}
 		});
 		menu_6.add(menuItem_3);
+		
+		JMenuItem mntmNewMenuItem = new JMenuItem("Не выполненые запланированные диспансерные мероприятия");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				disp = 2;
+				pPlanDisp = new PlanDisp();
+				panel.removeAll();
+				panel.add(pPlanDisp);
+				panel.revalidate();
+			}
+		});
+		
+		menu_6.add(mntmNewMenuItem);
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Сведения о диспансерном обслуживании");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				disp = 3;
+				pPlanDisp = new PlanDisp();
+				panel.removeAll();
+				panel.add(pPlanDisp);
+				panel.revalidate();
+			}
+		});
+		
+		menu_6.add(mntmNewMenuItem_1);
 		
 		JMenu menu_7 = new JMenu("Отчет по прививкам");
 		menu_2.add(menu_7);

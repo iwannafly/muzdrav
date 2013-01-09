@@ -9,6 +9,10 @@ public class configuration {
     public static final int labAppId = 15;
     public static final int recThrPort = 55010;
     public static final int recAppId = 10;
+    public static final int medThrPort = 55017;
+    public static final int medAppId = 17;
+    public static final int opThrPort = 55020;
+    public static final int opAppId = 20;
     public static final String appName = "Просмотр и выбор из классификатора";
     public static final String appVersion = "0.0.0.0";
     public static final boolean common = true;

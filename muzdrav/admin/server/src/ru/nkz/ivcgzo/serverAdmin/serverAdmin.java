@@ -99,24 +99,41 @@ public class serverAdmin extends Server implements Iface {
 
 	@Override
 	public int AddVrach(VrachInfo vr) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
-			if (!acrs.getResultSet().next()) {
+		AutoCloseableResultSet acrs = null;
+		boolean found = false;
+		int pcod;
+		
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			if (vr.isSetSnils()) {
+				acrs = sme.execPreparedQuery("SELECT pcod FROM s_vrach WHERE (snils = ?) ", vr.snils);
+				found = acrs.getResultSet().next();
+			}
+			if (!found) {
+				acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5);
+				found = acrs.getResultSet().next();
+			}
+			if (!found) {
 				sme.execPreparedT("INSERT INTO s_vrach (fam, im, ot, pol, datar, obr, snils, idv) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8);
-				int pcod = sme.getGeneratedKeys().getInt("pcod");
-				sme.setCommit();
-				return pcod;
-			} else
-				return acrs.getResultSet().getInt(1);
+				pcod = sme.getGeneratedKeys().getInt("pcod");
+			} else {
+				pcod = acrs.getResultSet().getInt(1);
+				vr.setPcod(pcod);
+				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
+			}
+			sme.setCommit();
+			return pcod;
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
+		} finally {
+			if (acrs != null)
+				acrs.close();
 		}
 	}
 
 	@Override
 	public void UpdVrach(VrachInfo vr) throws VrachExistsException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5)) {
+				AutoCloseableResultSet acrs = sme.execPreparedQueryT("SELECT pcod FROM s_vrach WHERE (fam = ?) AND (im = ?) AND (ot = ?) AND (pol = ?) AND (datar = ?) AND (obr = ?) AND (snils = ?) AND (idv = ?) ", vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8)) {
 			if (!acrs.getResultSet().next()) {
 				sme.execPreparedT("UPDATE s_vrach SET fam = ?, im = ?, ot = ?, pol = ?, datar = ?, obr = ?, snils = ?, idv = ? WHERE pcod = ? ", false, vr, vrachTypes, 1, 2, 3, 4, 5, 6, 7, 8, 0);
 				sme.setCommit();
@@ -204,8 +221,8 @@ public class serverAdmin extends Server implements Iface {
 	
 	
 	@Override
-	public String getLogin(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT login FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public String getLogin(int userId) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT login FROM s_users WHERE id = ? ", userId)) {
 			if (acrs.getResultSet().next())
 				return acrs.getResultSet().getString(1);
 			else
@@ -216,21 +233,21 @@ public class serverAdmin extends Server implements Iface {
 	}
 	
 	@Override
-	public UserIdPassword setPassword(int vrachPcod, int lpuPcod, int podrPcod, String login) throws TException {
-		try (SqlModifyExecutor sme = tse.startTransaction(); AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public UserIdPassword setPassword(int mrId, String login) throws TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT u.id FROM s_users u JOIN s_mrab r ON (r.user_id = u.id) WHERE r.id = ? ", mrId)) {
 			while (true) {
 				try {
 					String pass = generatePassword(login);
 					UserIdPassword idPass;
 					if (acrs.getResultSet().next()) {
-						sme.execPrepared("UPDATE s_users SET login = ?, password = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, login, pass, vrachPcod, lpuPcod, podrPcod);
 						idPass = new UserIdPassword(acrs.getResultSet().getInt(1), pass);
-						sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, idPass.getUser_id(), vrachPcod, lpuPcod, podrPcod);
+						sme.execPrepared("UPDATE s_users SET login = ?, password = ? WHERE id = ? ", false, login, pass, idPass.user_id);
 					} else {
-						sme.execPrepared("INSERT INTO s_users (pcod, login, password, clpu, cpodr) VALUES (?, ?, ?, ?, ?) ", true, vrachPcod, login, pass, lpuPcod, podrPcod);
+						sme.execPrepared("INSERT INTO s_users (pcod, clpu, cpodr, login, password) (SELECT pcod, clpu, cpodr, ?, ? FROM s_mrab WHERE id = ?) ", true, login, pass, mrId);
 						idPass = new UserIdPassword(sme.getGeneratedKeys().getInt("id"), pass);
-						sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, idPass.getUser_id(), vrachPcod, lpuPcod, podrPcod);
 					}
+					sme.execPrepared("UPDATE s_mrab SET user_id = ? WHERE id = ? ", false, idPass.user_id, mrId);
 					sme.setCommit();
 					return idPass;
 				} catch (SQLException e) {
@@ -247,9 +264,10 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public void remPassword(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
+	public void remPassword(int userId) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, vrachPcod, lpuPcod, podrPcod);
+			sme.execPrepared("UPDATE s_mrab SET user_id = NULL WHERE user_id = ? ", false, userId);
+			sme.execPrepared("DELETE FROM s_users WHERE id = ? ", false, userId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -257,8 +275,8 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public String getPermissions(int vrachPcod, int lpuPcod, int podrPcod) throws TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pdost FROM s_users WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", vrachPcod, lpuPcod, podrPcod)) {
+	public String getPermissions(int userId) throws TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT pdost FROM s_users WHERE id = ? ", userId)) {
 			if (acrs.getResultSet().next())
 				return acrs.getResultSet().getString(1);
 			else
@@ -269,9 +287,9 @@ public class serverAdmin extends Server implements Iface {
 	}
 
 	@Override
-	public void setPermissions(int vrachPcod, int lpuPcod, int podrPcod, String pdost) throws TException {
+	public void setPermissions(int userId, String pdost) throws TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("UPDATE s_users SET pdost = ? WHERE (pcod = ?) AND (clpu = ?) AND (cpodr = ?) ", false, pdost, vrachPcod, lpuPcod, podrPcod);
+			sme.execPrepared("UPDATE s_users SET pdost = ? WHERE id = ? ", false, pdost, userId);
 			sme.setCommit();
 		} catch (SQLException | InterruptedException e) {
 			throw new TException(e);
@@ -314,7 +332,7 @@ public class serverAdmin extends Server implements Iface {
 					pass1[i] = (byte) (passBytes[i] - 97 + 224); //a=а, b=б..., z=щ
 				}
 			}
-			return new String(pass1, Charset.forName("cp1251"));
+			return new String(pass1, Charset.forName("cp1251")).replace('б', 'э').replace('з', 'ю').replace('о', 'я');
 		}
 	}
 

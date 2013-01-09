@@ -1,8 +1,11 @@
 package ru.nkz.ivcgzo.serverLab;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -145,8 +148,8 @@ public class ServerLab extends Server implements Iface {
     private static final Class<?>[] GOSP_TYPES = {
     //  id_gosp        npasp          cotd           cotd_name
         Integer.class, Integer.class, Integer.class, String.class,
-    //  datap       datav       ishod         result
-        Date.class, Date.class, String.class, String.class,
+    //  datap       datav       ishod          result
+        Date.class, Date.class, Integer.class, Integer.class,
     //  vrach          vrach_fio 
         Integer.class, String.class
     };
@@ -381,7 +384,7 @@ public class ServerLab extends Server implements Iface {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         }
     }
@@ -399,7 +402,7 @@ public class ServerLab extends Server implements Iface {
             return id;
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         } catch (InterruptedException e1) {
             log.log(Level.ERROR, "Exception: ", e1);
@@ -424,7 +427,7 @@ public class ServerLab extends Server implements Iface {
             return rsmGosp.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         }
     }
@@ -446,7 +449,77 @@ public class ServerLab extends Server implements Iface {
        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, gospId, gospId)) {
            return rsmIsl.mapToList(acrs.getResultSet());
        } catch (SQLException e) {
+           log.log(Level.ERROR, "Exception: ", e);
            throw new KmiacServerException(e.getMessage());
        }
+    }
+
+    @Override
+    public String printIssl(int patId, String cabinet, String labName,
+            String lpuNaprName, String vrachName, List<String> issledItems, String diag)
+            throws KmiacServerException {
+        final String path;
+        final AutoCloseableResultSet acrs;
+        String address;
+        String fio;
+        String datar;
+        try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            HtmTemplate htmTemplate = new HtmTemplate(
+                new File(this.getClass().getProtectionDomain().getCodeSource()
+                .getLocation().getPath()).getParentFile().getParentFile().getAbsolutePath()
+                + "\\plugin\\reports\\LabNapr.htm");
+            acrs = sse.execPreparedQuery(
+                "SELECT fam, im, ot, datar, adm_ul, adm_dom FROM patient WHERE npasp = ?", patId);
+            if (!acrs.getResultSet().next()) {
+                throw new KmiacServerException("Logged user info not found.");
+            } else {
+                address = String.format("%s, %s", acrs.getResultSet().getString("adm_ul"),
+                    acrs.getResultSet().getString("adm_dom"));
+                fio = String.format("%s %s %s",  acrs.getResultSet().getString("fam"),
+                    acrs.getResultSet().getString("im"), acrs.getResultSet().getString("ot"));
+                datar = dateFormat.format(acrs.getResultSet().getDate("datar"));
+            }
+            acrs.close();
+            htmTemplate.replaceLabels(
+                true,
+                labName,
+                cabinet,
+                " ", // дата исследования
+                " ", // время исследования
+                lpuNaprName,
+                fio, // фио
+                datar, // дата рождения
+                address, // адрес
+                diag, // диагноз
+                vrachName, 
+                "~issledItems", // исследования
+                dateFormat.format(new Date(System.currentTimeMillis())) // дата направления
+            );
+            htmTemplate.refindLabels();
+            for (String isslItem: issledItems) {
+                htmTemplate.replaceLabel("~issledItems", "<br/>" + isslItem + "~issledItems");
+                htmTemplate.refindLabels();
+            }
+            htmTemplate.replaceLabel("~issledItems", "");
+            osw.write(htmTemplate.getTemplateText());
+            return path;
+        } catch (Exception e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new  KmiacServerException();
+        }
+    }
+
+    @Override
+    public List<IntegerClassifier> getParaotdLpu() throws KmiacServerException {
+        final String sqlQuery = "SELECT DISTINCT n_m00.pcod, n_m00.name_s as name "
+            + "FROM n_m00 JOIN n_lds ON (n_m00.pcod = n_lds.clpu);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery)) {
+            return rsmIntClass.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
     }
 }

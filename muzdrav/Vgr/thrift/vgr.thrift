@@ -4,7 +4,7 @@ include "../../../common/thrift/kmiacServer.thrift"
 include "../../../common/thrift/classifier.thrift"
 
 /**
-	 * Ошибка формирования KOB
+	 * формирование KOB
 	 */
 	exception KovNotFoundException {
 	}
@@ -71,9 +71,107 @@ struct Kontios{
 struct Lgot{
 	1:i32 bn;
         2:i32 klg;
+}
+/*Диспансеризация детей   */
 
+struct Sv3{
+	1:string code;
+        2:i64 dat_v;
+        3:i32 uchr;  
+        4:i32 cod_uch;  
+        5:string uchrnum;
+        6:string uchrname;
+        7:string fio_u;
+        8:i64 dat_born;
+        9:i32 pol; 
+        10:i32 nation;
+
+        11:i32 vremen;
+        12:i32 mesto_k; 
+        13:string mesto_k1; 
+        14:string mesto_k2;
+        15:string mesto_k3;
+        16:i32 mesto_k4;
+        17:i32 mesto_k5;
+        18:i32 mesto_k6;
+        19:i32 gorod_k;
+        20:string street_k;
+
+        21:bool m_v;
+        22:string where_s1;
+        23:i32 where_s;
+        24:bool p_dou;
+        25:i32 pos_; 
+        26:bool u_;
+        27:string m_uth;
+        28:i32 m_uth1;
+        29:i32 Wedom;
+        30:string Wedom1;
+
+        31:i32 vesgr;
+        32:i32 ves_kg;
+        33:i32 rost;
+        34:i32 f_r;
+        35:i32 f_r1;
+        36:i32 massa;
+        37:i32 post;
+        38:i32 intel;
+        39:i32 em;
+        40:i32 ps;
+
+        41:i32 d_do;
+        42:string k_s1;
+        43:string k_s2;
+        44:string k_s3;
+        45:string k_s4;
+        46:string k_s5;
+        47:i32 d_po; 
+        48:string k_si1;
+        49:i32 p_u_01;
+        50:i32 n_pu1;
+
+        51:i32 f_h_1; 
+        52:string k_si2;
+        53:i32 p_u_02;
+        54:i32 n_pu2;
+        55:i32 f_h_2;
+        56:string k_si3;
+        57:i32 p_u_03;
+        58:i32 n_pu3;
+        59:i32 f_h_3;
+        60:string k_si4;
+
+        61:i32 p_u_04;
+        62:i32 n_pu4;
+        63:i32 f_h_4;
+        64:string k_si5;
+        65:i32 p_u_05;
+        66:i32 n_pu5;
+        67:i32 f_h_5;
+        68:i32 inv;
+        69:i32 zab_inv;
+        70:i32 ch_b;
+
+        71:string gr_z;
+        72:i32 l_o_d;  
+        73:i32 l_o_a;
+        74:i32 l_k_s;
+        75:i32 l_o_s;
+        76:i32 m_p_z;
+        77:i32 prov;
+        78:string vrach;
+        79:i32 cod_reg;
+        80:bool err_;
+        81:i32 postpone;
+        82:string id_fio;
 
 }
+
+
+
+ 
+ 
+
 
 /*Выгрузка для Кемерово по диспансеризации беременных*/
 struct RdPatient{
@@ -85,7 +183,7 @@ struct RdPatient{
          6: optional i64    datar;
          7: optional string docser;
          8: optional string docnum;
-         9: optional i32    tawn;
+         9: optional string    tawn;
         10: optional string street;
         11: optional string house;  
         12: optional string flat;
@@ -95,7 +193,7 @@ struct RdPatient{
         16: optional i32    stat;
         17: optional i32    lpup;
         18: optional i32    terp;
-        19: optional i32    ftawn; 
+        19: optional string ftawn; 
         20: optional string fstreet;
         21: optional string fhouse;
         22: optional string fflat;
@@ -130,7 +228,7 @@ struct RdPatient{
         51: optional i32 oslrod;
         52: optional i32 sem;
         53: optional i32 rost;
-        54: optional i32 vesd; 
+        54: optional double vesd; 
         55: optional i32 osoco;
         56: optional i32 uslpr;
         57: optional i64 dataz;
@@ -158,10 +256,10 @@ struct RdPatient{
 struct RdVizit{
          1: optional i32    uid;
          2: optional i64    dv;
-         3: optional string sp;
-         4: optional string famwr;
-         5: optional string imwr;
-         6: optional string otwr;
+         3: optional i32 sp;
+         4: optional string famvr;
+         5: optional string imvr;
+         6: optional string otvr;
          7: optional string diag;
          8: optional i32    mso;
          9: optional i32    rzp;
@@ -172,46 +270,46 @@ struct RdVizit{
 struct RdConVizit{
          1: optional i32    uiv;
          2: optional i32    uid;
-         3: optional double ves;
+         3: optional i32    npasp;
          4: optional i32    ned;
-         5: optional i32    lcad;
-         6: optional i32    ldad; 
-         7: optional i32    rcad;
-         8: optional i32    rdad;
-         9: optional i32    rost;
-        10: optional i64    datar;
-        11: optional i32    obr;
-        12: optional i32    sem;
-        13: optional i32    osoco;
-        14: optional string vrpr;
-        15: optional i32 npasp;
-        16: optional i32 hdm;
-        17: optional i32 spl; 
-        18: optional i32 oj;
-        19: optional i32 chcc;
-        20: optional i32 polpl;
-        21: optional i32 predpl;
-        22: optional i32 serd;
-        23: optional i32 serd1;
-        24: optional i32 oteki;
+         5: optional double ves;
+         6: optional i32    lcad;
+         7: optional i32    ldad; 
+         8: optional i32    rcad;
+         9: optional i32    rdad;
+        10: optional i32    ball;
+        11: optional i32 hdm;
+        12: optional i32 spl; 
+        13: optional i32 oj;
+        14: optional i32 chcc;
+        15: optional i32 polpl;
+        16: optional i32 predpl;
+        17: optional i32 serd;
+        18: optional i32 serd1;
+        19: optional i32 oteki;
 }
+
 struct KartaBer {
 	1: optional i32 npasp;
 	2: optional i32 id_pvizit;
 	3: optional i32 id_pos;
 	4: optional i32 id_rd_sl;
 }
-struct ServerVgr{
-        1: optional i32 cpol;
-        2: optional i64 datan;
-        3: optional i64 datak;  
-}
 
 service ThriftVgr extends kmiacServer.KmiacServer {
 	/**
         * Создает KOB
 	*/
-	void getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk,  4:i32 clpu) throws (1:kmiacServer.KmiacServerException kse, 2:KovNotFoundException rnfe);
+	string getKovInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+
+
+
+/**
+        * диспансеризация детей
+	*/
+	string getDetInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+
+
 
 
 /**
@@ -230,5 +328,12 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdVizit> getRdVizit() throws (1: kmiacServer.KmiacServerException kse);
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv() throws (1: kmiacServer.KmiacServerException kse);
+
+/**
+ * информация, необходимая для формирования порций для АСУ "Горздрав"
+ * дата начала и конца периода, номер порции, код формы
+*/
+	string dataSelection(1:i64 dbegin, 2:i64 dend, 3:i32 porc, 4:string cform, 5:i32 cpodr, 6:i64 dclose) throws (1:kmiacServer.KmiacServerException kse);
+
 }
 

@@ -8,6 +8,10 @@
 	<property name="lib.dir" value="../../../../lib" />
 	<property name="bin_client_manager.dir" location="../../../common/managers/clientManager/bin" />
 	<property name="build.dir" location="bin" />
+    <property name="com_resources.dir" location="../../../common/resources" />
+    <property name="medication_bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientMedication/resources" />
+	<property name="lab_bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientLab/resources" />
+    <property name="operation_bin_resources.dir" location="bin/ru/nkz/ivcgzo/clientOperation/resources" />
 	<property name="export.jar" location="../../auth/client/plugin/clientViewSelect.jar" />
 	<property name="export.copy.dir" location="../../manager/client" />
 	
@@ -35,6 +39,9 @@
 		<javac includeantruntime="false" srcdir="${src_client.dir}; ${src_config.dir}; ${src_thrift.dir}" destdir="${build.dir}" encoding="utf-8" debug="${debug.build}">
 			<classpath refid="build.classpath"/>
 		</javac>
+	    <copy file="${com_resources.dir}/medication.png" todir="${medication_bin_resources.dir}" />
+		<copy file="${com_resources.dir}/issled.png" todir="${lab_bin_resources.dir}" />
+        <copy file="${com_resources.dir}/Skalpell.png" todir="${operation_bin_resources.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->

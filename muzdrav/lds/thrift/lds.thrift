@@ -22,6 +22,8 @@ struct ObInfIsl {
 	16: i32 kodvr;
 	17: i64 dataz;
 	18: i32 cuser;
+	19: i32 id_gosp;	
+	20: i32 id_pos;
 }
 
 struct DiagIsl {
@@ -37,6 +39,7 @@ struct DiagIsl {
         10: string rez_name;
 	11: optional double stoim;
 	12: string pcod_m;
+	13: i32 id;
 }
 
 struct LabIsl {
@@ -68,6 +71,15 @@ struct Patient {
 	5: i64 datar;
 	6: string poms_ser;
 	7: string poms_nom;
+	8: string adp_gorod;
+	9: string adp_ul;
+	10:string adp_dom;
+	11:string adp_kv;
+	12:string adm_gorod;
+	13:string adm_ul;
+	14:string adm_dom;
+	15:string adm_kv;
+	16:i32 ter_liv;
 }
 
 
@@ -89,6 +101,13 @@ struct N_ldi {
 	5: string norma;
 	6: i32 c_p0e1;
 	7: bool vibor;
+	8: i32 id;
+}
+
+
+struct S_ldi{
+	1: i32 id;
+	2: string name; 
 }
 
 
@@ -171,6 +190,15 @@ exception LdiNotFoundException {
 }
 
 
+
+/**
+ * Наименование исследования ненайдено
+ */
+exception SLdiNotFoundException {
+}
+
+
+
 /*
 * Исследование уже существует
 */
@@ -200,13 +228,14 @@ service LDSThrift extends kmiacServer.KmiacServer {
 
 	list<DiagIsl> GetDiagIsl(1: i32 nisl);
 	DiagIsl GetDIsl(1: i32 nisl)throws (1: DIslNotFoundException dine);
+	DiagIsl GetDIslPos(1: string kodisl; 2: i64 datav; 3: i32 npasp; 4: i32 kodotd)throws (1: DIslNotFoundException dine);
 	void AddDIsl(1: DiagIsl di)throws (1: DIslExistsException diee);
 	void UpdDIsl(1: DiagIsl di)throws (1: DIslExistsException diee);
 	void DelDIsl(1: i32 nisl, 2: string kodisl);
 	void DelDIslP(1: i32 nisl);
 
-	list<LabIsl> GetLabIsl(1: i32 nisl);
-	LabIsl GetLIsl(1: i32 nisl)throws (1: LIslNotFoundException line);
+	list<LabIsl> GetLabIsl(1: i32 nisl; 2: string c_nz1);
+	LabIsl GetLIsl(1: i32 nisl; 2: string c_nz1)throws (1: LIslNotFoundException line);
 	void AddLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void UpdLIsl(1: LabIsl li)throws (1: LIslExistsException liee);
 	void DelLIsl(1: i32 nisl, 2: string cpok);
@@ -223,14 +252,19 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	
 
     	list<Patient> getPatient(1: string npasp) throws (1: PatientNotFoundException pnfe);
-    	list<Patient> getPatDat(1: i64 datan 2: i32 kodotd) throws (1: PatientNotFoundException pnfe);
+    	list<Patient> getPatDat(1: i32 kodotd) throws (1: PatientNotFoundException pnfe);
 	
 	list<Metod> getMetod(1: i32 c_p0e1; 2: string pcod; 3: string pcod_m) throws (1: MetodNotFoundException mnfe);
 	list<Metod> GetStoim(1: string pcod, 2: string c_obst, 3: i32 kodotd);
 	list<Metod> GetLabStoim(1: string pcisl, 2: i32 kodotd);
 	
 	list<N_ldi> getN_ldi(1: string c_nz1; 2: i32 c_p0e1) throws (1: LdiNotFoundException lnfe);
+	list<N_ldi> getAllN_ldi();
 	void UpdN_ldi (1: N_ldi nldi) throws (1: LdiNotFoundException lnfe);
+
+	list<S_ldi> getAllS_ldi();
+	void InsS_ldi (1: S_ldi s_ldi);
+	void UpdS_ldi (1: S_ldi s_ldi) throws (1: SLdiNotFoundException s_lnfe);
 	
 	list<N_lds> getN_lds (1: i32 pcod);
 
@@ -251,6 +285,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 	list <classifier.IntegerClassifier> GetKlasP0e1(1: i32 grupp);
 	list <classifier.IntegerClassifier> GetKlasNoLabP0e1(1: i32 grupp);
 	list <classifier.IntegerClassifier> GetKlasSvrach(1: i32 cpodr);
+	list <classifier.IntegerClassifier> GetKlasAllSvrach(1: i32 cpodr);
 	list <classifier.StringClassifier>  GetKlasNz1();
 	list <classifier.StringClassifier>  GetShab_lds(1: string c_lds);
 }

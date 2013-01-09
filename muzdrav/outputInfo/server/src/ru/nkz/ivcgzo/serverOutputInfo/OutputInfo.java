@@ -2007,4 +2007,21 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 			e.printStackTrace();
 		}			
 	}
+
+
+
+	@Override
+	public String printOtDetPol(InputPlanDisp ipd) throws KmiacServerException,
+			TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public String nagrvr(int cpol) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

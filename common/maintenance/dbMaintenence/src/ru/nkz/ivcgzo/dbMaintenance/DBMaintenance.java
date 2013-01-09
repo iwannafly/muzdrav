@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.dbMaintenance;
 import ru.nkz.ivcgzo.classifierImporter.ClassifierImporter;
 import ru.nkz.ivcgzo.libsMd5Updater.LibsMd5Updater;
 import ru.nkz.ivcgzo.shablonImporter.ShablonImporter;
+import ru.nkz.ivcgzo.zabolDataImporter.ZabolDataImporter;
 
 public class DBMaintenance {
 
@@ -11,7 +12,9 @@ public class DBMaintenance {
 	 */
 	public static void main(String[] args) {
 		System.out.println("This program does some suportive shit.");
-
+		
+//		args = new String[] {"--impZabol", "10.0.0.242/zabol", "postgres", "postgres", "10.37.11.40/C:\\Program Files\\ASUPOL\\DB\\zabol.gdb", "sysdba", "masterkey"};
+		
 		if (args.length < 1)
 			usage();
 		
@@ -25,6 +28,9 @@ public class DBMaintenance {
 				break;
 			case "--impShab":
 				importShablon(args);
+				break;
+			case "--impZabol":
+				importZabol(args);
 				break;
 			default:
 				usage();
@@ -63,5 +69,10 @@ public class DBMaintenance {
 	private static void importShablon(String[] args) throws Exception {
 		ShablonImporter shImp = new ShablonImporter(args[1]);
 		shImp.importShablonOsm();
+	}
+	
+	private static void importZabol(String[] args) throws Exception {
+		ZabolDataImporter zdi = new ZabolDataImporter();
+		zdi.importData(args);
 	}
 }

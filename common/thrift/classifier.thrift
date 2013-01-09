@@ -110,7 +110,27 @@ enum IntegerClassifiers {
 	n_v0p = 92,
 	n_v0r = 93,
 	n_v0s = 94,
-	n_v0t = 95
+	n_v0t = 95,
+	n_az51 = 96,
+	n_bz5 = 97,
+	n_def = 98,
+	n_etp = 99,
+	n_kderr = 100,
+	n_nsilpu = 101,
+	n_ppl = 102,
+	n_shablon = 103,
+	n_smorf = 104,
+	n_svl = 105,
+	n_tip = 106,
+	n_vp1 = 107,
+	n_vr_doc = 108,
+	n_z43_gr = 109, 
+	n_period = 110,
+	n_db10 = 111,
+	n_db11 = 112,
+	n_db12 = 113,
+	n_db13 = 114,
+	n_anz = 115
 }
 
 enum StringClassifiers {
@@ -127,7 +147,11 @@ enum StringClassifiers {
 	n_r0z = 12,
 	n_s00 = 13,
 	n_spr = 14,
-	n_db6 = 15
+	n_db6 = 15,
+	n_messtet = 16,
+	n_nsi_obst = 17,
+	n_nz2 = 18,
+	n_s0m = 19
 }
 
 enum ClassifierSortOrder {

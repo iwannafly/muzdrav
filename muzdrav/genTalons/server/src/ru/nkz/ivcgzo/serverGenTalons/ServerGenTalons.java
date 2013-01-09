@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.log4j.Level;
@@ -138,7 +139,7 @@ public class ServerGenTalons extends Server implements Iface {
     //  cdol          cdol_kem       vidp           timepn
         String.class, Integer.class, Integer.class, Time.class,
     //  timepk      datapt      datap       timep
-        Time.class, Date.class, Date.class, Time.class,
+        Time.class, Timestamp.class, Date.class, Time.class,
     //  cpol
         Integer.class
     };

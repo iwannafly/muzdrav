@@ -33,7 +33,19 @@
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>
+<<<<<<< HEAD
 	<logger name="ru.nkz.ivcgzo.serverOutputInfo.OutputInfo">
+=======
+	<logger name="ru.nkz.ivcgzo.serverMedication.ServerMedication">
+        <level value="INFO"/>
+        <appender-ref ref="muzdrav"/>
+    </logger>
+	<logger name="ru.nkz.ivcgzo.serverInfomat.ServerInfomat">
+        <level value="INFO"/>
+        <appender-ref ref="muzdrav"/>
+    </logger>
+	<logger name="ru.nkz.ivcgzo.serverOperation.ServerOperation">
+>>>>>>> 617a49239fdc60999a38350acae81d4292a7fe44
         <level value="INFO"/>
         <appender-ref ref="muzdrav"/>
     </logger>

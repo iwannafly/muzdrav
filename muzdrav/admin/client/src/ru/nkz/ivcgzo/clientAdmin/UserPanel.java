@@ -45,7 +45,7 @@ public class UserPanel extends JPanel {
 	private JButton btnMrAdd;
 	private JButton btnMrDel;
 	
-	public UserPanel(boolean adminMode) {
+	public UserPanel() {
 		super();
 		
 		JScrollPane spVrach = new JScrollPane();
@@ -211,7 +211,7 @@ public class UserPanel extends JPanel {
 				try {
 					MainForm.tcl.testConnection();
 					permForm.setLocationRelativeTo(UserPanel.this);
-					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem(), ((tblVrach.getSelectedItem().pcod == MainForm.authInfo.pcod) && (tblMrab.getSelectedItem().cpodr == MainForm.authInfo.cpodr) && (tblMrab.getSelectedItem().clpu == MainForm.authInfo.clpu)));
+					permForm.showWindow(tblVrach.getSelectedItem(), tblMrab.getSelectedItem(), tblMrab.getSelectedItem().user_id == MainForm.authInfo.user_id);
 				} catch (TTransportException e1) {
 					MainForm.conMan.reconnect(e1);
 				} catch (TException e1) {
@@ -284,8 +284,6 @@ public class UserPanel extends JPanel {
 						.addComponent(spMrab, GroupLayout.PREFERRED_SIZE, 204, GroupLayout.PREFERRED_SIZE))
 					.addGap(10))
 		);
-		if (!adminMode)
-			btnVrPerm.setVisible(false);
 		
 		spMrab.setViewportView(tblMrab);
 		spVrach.setViewportView(tblVrach);

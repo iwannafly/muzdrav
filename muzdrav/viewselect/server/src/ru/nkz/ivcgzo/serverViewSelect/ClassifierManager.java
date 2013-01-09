@@ -73,8 +73,23 @@ public class ClassifierManager {
 		String sql;
 		
 		switch (cls) {
+		case n_anz:
+			fldPcod = "nstr";
+			break;
+		case n_kderr:
+			fldPcod = "kderr";
+			break;
 		case n_l02:
 			fldPcod = "c_ffomc";
+			break;
+		case n_smorf:
+			fldName = "nam_smop";
+			break;
+		case n_n00:
+			fldName = "name_u";
+			break;
+		case n_o00:
+			fldName = "name_u";
 			break;
 		case n_z00:
 			fldPcod = "pcod_s";
@@ -101,6 +116,10 @@ public class ClassifierManager {
 		String sql;
 		
 		switch (cls) {
+		case n_nsi_obst:
+			fldPcod = "obst";
+			fldName = "nameobst";
+			break;
 		default:
 			break;
 		}
