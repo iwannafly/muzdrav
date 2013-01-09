@@ -63,9 +63,11 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public static ThriftOutputInfo.Client tcl;
 	//public Input_info inputInfo;
 	public SvodVed pSvodVed;
+	public StructPos pStructPos;
 	public FacZd pFacZd;
 	public tableVrach pTableVrach;
 	public PlanDisp pPlanDisp;
+	public Uchastok pUchastok;
 
 
 	/**
@@ -128,6 +130,23 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		menu_2.add(menu_4);
 		menu_3.add(menuItem);
 		
+		final JMenuItem StructPos = new JMenuItem("Сведения о структуре посещений");
+		StructPos.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pStructPos = new StructPos();
+				panel.removeAll();
+				panel.add(pStructPos);
+				panel.revalidate();
+			}
+		});
+		menu_4.add(StructPos);
+		
+		JMenuItem OtDPol = new JMenuItem("Отчет о деятельности поликлиники");
+		menu_4.add(OtDPol);
+		
+		JMenuItem RaspVr = new JMenuItem("Распределение рабочего времени");
+		menu_4.add(RaspVr);
+		
 		JMenuItem menuItem_4 = new JMenuItem("Посещения врачей поликлиники");
 		menuItem_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -184,6 +203,17 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		});
 		mnNewMenu.add(menuItem_2);
 		
+		JMenuItem menuUch = new JMenuItem("Справочник участков");
+		menuUch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pUchastok = new Uchastok();
+				panel.removeAll();
+				panel.add(pUchastok);
+				panel.revalidate();
+			}
+		});
+		mnNewMenu.add(menuUch);
+		
 		JMenu menu = new JMenu("Стационар");
 		menuBar.add(menu);
 		
@@ -197,7 +227,13 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		panel.add(pSvodVed);
 		panel.revalidate();
 		
-	
+		/**
+		scrollPane.setViewportView(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		pStructPos = new StructPos();
+		panel.add(pStructPos);
+		panel.revalidate();
+		*/
 		//tpReg.addTab("Паспорт участка", pFacZd);
 	}
 
@@ -211,7 +247,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setTitle("Статистика");
+		frame.setTitle("Сводная ведомость");
 		frame.setBounds(100, 100, 821, 651);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
