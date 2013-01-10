@@ -194,7 +194,7 @@ public class ServerInfomat extends Server implements Iface {
         final String sqlQuery = "SELECT id, vidp, timep, datap, npasp, pcod_sp "
                 + "FROM e_talon WHERE cpol = ? AND cdol = ? AND pcod_sp = ? "
                 + "AND ((datap > ?) OR (datap = ? AND timep >= ?)) AND prv = ? "
-                + "ORDER BY datap, timep;";
+                + "AND vidp = 1 ORDER BY datap, timep;";
         try (AutoCloseableResultSet acrs =
                 sse.execPreparedQuery(sqlQuery, cpol, cdol, pcod, new Date(todayMillisec),
                         new Date(todayMillisec), new Time(System.currentTimeMillis()), prv)) {

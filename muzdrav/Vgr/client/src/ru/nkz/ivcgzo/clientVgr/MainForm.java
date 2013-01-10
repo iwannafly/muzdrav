@@ -41,7 +41,7 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 	private DopClas dopCl;
 	public static MainForm instance;
 	public static ThriftVgr.Client tcl;
-	String titleString ="";
+	String titleString ="", stForm = "";
 	/**
 	 * Launch the application.
 	 */
@@ -147,6 +147,14 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		mnNewMenu.add(menuItem_4);
 		
 		JMenuItem menuItem_6 = new JMenuItem("Экспорт карт детей-инвалидов");
+		menuItem_6.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				per = new Period();
+				per.Cslu = 6;
+				per.showPeriod();
+			}
+		});
 		mnNewMenu.add(menuItem_6);
 		
 		JMenuItem menuItem_7 = new JMenuItem("Экспорт данных о флюоороосмотрах");
@@ -174,7 +182,7 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		mnNewMenu.add(menuItem_8);
 		
-		JMenu menu = new JMenu("Подгрузка данных");
+		JMenu menu = new JMenu("Выгрузка информации в АСУ \"Горздрав\"");
 		menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
@@ -182,18 +190,41 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		});
 		menuBar.add(menu);
 		
-		JMenuItem mntmNewMenuItem = new JMenuItem("Подгрузка информации из ПФ");
+		JMenuItem mntmNewMenuItem = new JMenuItem("1. Статистический талон (форма 025)");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
-			titleString = "Подгрузка информации из ПФ";
+			titleString = "1. Статистический талон (форма 025)";
+			stForm = "F25";
 			dopCl = new DopClas();	
-			dopCl.OpenWindowFileChooser(titleString); 
+			dopCl.setTitle(titleString);
+			dopCl.DopClas(titleString,stForm); 
 			}
 		});
 		menu.add(mntmNewMenuItem);
 		
-		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Подгрузка информации об областных льготниках");
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("2. Учет работы врача (форма 039)");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1){
+			titleString = "2. Учет работы врача (форма 039)";
+			stForm = "F39";
+			dopCl = new DopClas();
+			dopCl.setTitle(titleString);
+			dopCl.DopClas(titleString, stForm);
+			}
+		});
 		menu.add(mntmNewMenuItem_1);
+		
+		JMenuItem mntmNewMenuItem_2 = new JMenuItem("3. Диспансеризация (форма 030)");
+		menu.add(mntmNewMenuItem_2);
+		
+		JMenuItem mntmNewMenuItem_3 = new JMenuItem("4. Дневной стационар (форма 003)");
+		menu.add(mntmNewMenuItem_3);
+		
+		JMenuItem mntmNewMenuItem_4 = new JMenuItem("5. Стационар круглосуточного пребывания (форма 066)");
+		menu.add(mntmNewMenuItem_4);
+		
+		JMenuItem mntmNewMenuItem_5 = new JMenuItem("6. Свидетельство о смерти (форма 028)");
+		menu.add(mntmNewMenuItem_5);
 		
 //		JMenuBar menuBar_1 = new JMenuBar();
 //		menuBar.add(menuBar_1);

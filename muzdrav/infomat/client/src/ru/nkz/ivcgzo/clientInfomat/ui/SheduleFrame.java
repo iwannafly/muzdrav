@@ -10,7 +10,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -18,7 +17,7 @@ import javax.swing.JTable;
 import ru.nkz.ivcgzo.clientInfomat.SheduleTableCellRenderer;
 import ru.nkz.ivcgzo.clientInfomat.model.tableModels.SheduleTableModel;
 
-public class SheduleFrame extends JFrame {
+public class SheduleFrame extends InfomatFrame {
 
     private static final long serialVersionUID = 9214019994911833185L;
     private JPanel pMain;
@@ -27,28 +26,16 @@ public class SheduleFrame extends JFrame {
     private JButton btnBackward;
     private Component hgLeft = Box.createHorizontalGlue();
     private JScrollPane spTalon;
-//    private LpuListModel llm;
     private JTable tbTalons;
-//    private DoctorSelectFrame frmDoctorSelect;
 
     public SheduleFrame() {
         initialization();
     }
 
     private void initialization() {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setAlwaysOnTop(true);
-        setUndecorated(true);
-        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
-
-        createModalFrames();
         addMainPanel();
 
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
         pack();
-    }
-
-    private void createModalFrames() {  
     }
 
     private void addMainPanel() {
@@ -69,7 +56,7 @@ public class SheduleFrame extends JFrame {
         hbBackwardButton.add(hgRight);
 
         addBackwardButton();
-        
+
         hgLeft = Box.createHorizontalGlue();
         hbBackwardButton.add(hgLeft);
     }
@@ -78,7 +65,7 @@ public class SheduleFrame extends JFrame {
         btnBackward = new JButton("");
         btnBackward.setRequestFocusEnabled(false);
         btnBackward.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 setVisible(false);
             }
         });
@@ -89,6 +76,10 @@ public class SheduleFrame extends JFrame {
         btnBackward.setForeground(Color.BLACK);
         hbBackwardButton.add(btnBackward);
         btnBackward.setAlignmentX(Component.CENTER_ALIGNMENT);
+    }
+
+    public final void addShedulerSelectBackwardListener(final ActionListener listener) {
+        btnBackward.addActionListener(listener);
     }
 
     private void addTalonTablePanel() {
@@ -109,13 +100,12 @@ public class SheduleFrame extends JFrame {
         tbTalons.setRowHeight(50);
         spTalon.setViewportView(tbTalons);
     }
-    private void refreshTalonTableModel(int pcod, int cpol, String cdol) {
-        SheduleTableModel tbtModel = new SheduleTableModel(pcod, cpol, cdol);
-        tbTalons.setModel(tbtModel);
+    private void refreshTalonTableModel(final SheduleTableModel curSheduleTableModel) {
+        tbTalons.setModel(curSheduleTableModel);
     }
 
-    public void showModal(int pcod, int cpol, String cdol) {
-        refreshTalonTableModel(pcod, cpol, cdol);
+    public final void showModal(final SheduleTableModel curSheduleTableModel) {
+        refreshTalonTableModel(curSheduleTableModel);
         setVisible(true);
     }
 

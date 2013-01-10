@@ -298,6 +298,7 @@ struct KartaBer {
 	3: optional i32 id_pos;
 	4: optional i32 id_rd_sl;
 }
+
 /*Инфорация о льготниках из пенсионного фонда*/
 struct Rr_pl {
 	1: optional i32 id_lg;
@@ -453,6 +454,11 @@ service ThriftVgr extends kmiacServer.KmiacServer {
 
 	string getFertInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
 
+/**
+       Выгрузка Карт детей инвалидов	*/
+
+	string getInvInfoPol(1:i32 cpodr, 2:i64 dn, 3:i64 dk) throws (1:kmiacServer.KmiacServerException kse);
+
 
 
 
@@ -474,24 +480,11 @@ service ThriftVgr extends kmiacServer.KmiacServer {
         list<RdConVizit>  getRdConVizit() throws (1: kmiacServer.KmiacServerException kse);
 	string formfilecsv() throws (1: kmiacServer.KmiacServerException kse);
 
-
 /**
- * поиск льготника в таблице Patient
- */
-	Patient getPatientInfo(1:i32 npasp) throws (1: PatientNotFoundException le); 
+ * информация, необходимая для формирования порций для АСУ "Горздрав"
+ * дата начала и конца периода, номер порции, код формы
+*/
+	string dataSelection(1:i64 dbegin, 2:i64 dend, 3:i32 porc, 4:string cform, 5:i32 cpodr, 6:i64 dclose) throws (1:kmiacServer.KmiacServerException kse);
 
-/**
- * корректировка информации (снилса) пациента
- */
-	i32 setPatientInfo(1: Patient npasp);
-
-/**
- * поиск льготы в таблице P_kov
- */ 
-	list<Lgota> getLgotaInfo(1:i32 npasp) throws (1: LgkatNotFoundException le);
-
-/**
- * добавление льготы 
- */
-	i32 addLgotaInfo(1:Lgota npasp);
 }
+
