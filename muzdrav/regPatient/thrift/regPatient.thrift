@@ -304,6 +304,24 @@ exception NambkNotFoundException{
 }
 exception PatientGospYesOrNoNotFoundException{
 }
+
+/*----------shablon----------------------------*/
+struct ShablonText {
+	1: i32 grupId,
+	2: string grupName,
+	3: string text
+}
+
+struct Shablon {
+	1: i32 id,
+	2: string diag,
+	3: string din,
+	4: string name,
+	5: list<ShablonText> textList
+}
+/*----------shablon end----------------------------*/
+
+
 /*-----anamnez begin-----------------------------------------------------------*/
 /*panamnez*/
 struct Anam{
@@ -345,6 +363,14 @@ service ThriftRegPatient extends kmiacServer.KmiacServer {
 
 	list<classifier.IntegerClassifier> getPokaz() throws (1: kmiacServer.KmiacServerException kse, 2: PokazNotFoundException pnfe);
 /*-----anamnez end-----------------------------------------------------------*/
+
+/*Shablon*/
+	list<classifier.StringClassifier> getShOsmPoiskDiag(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOsmPoiskName(1: i32 cspec, 2: i32 cslu, 3: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOsmByDiag(1: i32 cspec, 2: i32 cslu, 3: string diag, 4: string srcText) throws (1: kmiacServer.KmiacServerException kse);
+	Shablon getShOsm(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShDopNames(1: i32 idRazd) throws (1: kmiacServer.KmiacServerException kse);
+	classifier.IntegerClassifier getShDop(1: i32 id_sh) throws (1: kmiacServer.KmiacServerException kse);
 
     /**
      * Возвращает краткие сведения
