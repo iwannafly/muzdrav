@@ -79,7 +79,7 @@ public class ServerPbol extends Server implements Iface {
 	@Override
 	public int AddPbol(Pbol pbol) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("insert into p_bol (id_obr, npasp, cod_sp, cdol, pcod, dataz) values (?, ?, ?, ?, ?, ?) ", true, pbol, pbolTypes, 1, 3, 10, 11, 12, 13);
+			sme.execPreparedT("insert into p_bol (id_obr, id_gosp, npasp, cod_sp, cdol, pcod, dataz) values (?, ?, ?, ?, ?, ?, ?) ", true, pbol, pbolTypes, 1, 2, 3, 10, 11, 12, 13);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
@@ -95,7 +95,7 @@ public class ServerPbol extends Server implements Iface {
 	@Override
 	public void UpdatePbol(Pbol pbol) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("update p_bol set bol_l = ?, s_bl = ?, po_bl = ?, pol = ?, vozr = ?, nombl = ? where id = ? ", false, pbol, pbolTypes, 4, 5, 6, 7, 8, 9);
+			sme.execPreparedT("update p_bol set bol_l = ?, s_bl = ?, po_bl = ?, pol = ?, vozr = ?, nombl = ? where id = ? ", false, pbol, pbolTypes, 4, 5, 6, 7, 8, 9, 0);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

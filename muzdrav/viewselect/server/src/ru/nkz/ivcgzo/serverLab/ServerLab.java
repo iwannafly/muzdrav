@@ -384,7 +384,7 @@ public class ServerLab extends Server implements Iface {
             return rsmIntClass.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         }
     }
@@ -402,7 +402,7 @@ public class ServerLab extends Server implements Iface {
             return id;
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         } catch (InterruptedException e1) {
             log.log(Level.ERROR, "Exception: ", e1);
@@ -427,7 +427,7 @@ public class ServerLab extends Server implements Iface {
             return rsmGosp.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
-            ((SQLException) e.getCause()).printStackTrace();
+            e.getCause().printStackTrace();
             throw new KmiacServerException();
         }
     }

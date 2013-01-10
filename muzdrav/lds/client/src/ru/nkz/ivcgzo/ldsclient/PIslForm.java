@@ -1433,7 +1433,7 @@ public class PIslForm {
 								}
 						
 								spDIsl = MainForm.ltc.GetDIsl(tn_ldi.getSelectedItem().nisl);
-					
+								
 					
 							}
 					
@@ -1464,6 +1464,19 @@ public class PIslForm {
 							cBkodisl.setSelectedPcod(tFkodisl.getText());
 						}
 				}
+				
+				List<DiagIsl> spDisl;
+				try {
+					spDisl = MainForm.ltc.GetDiagIsl(tn_ldi.getSelectedItem().nisl);
+					upDisl.setId(spDisl.get(0).id);
+					
+				} catch (TException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				
+				
+				
 				upDisl.setNisl(tn_ldi.getSelectedItem().nisl);
 				upDisl.setOp_name(tPop_name.getText());
 				upDisl.setRez_name(tFrez_name.getText());
@@ -1496,8 +1509,112 @@ public class PIslForm {
 					e.printStackTrace();
 				}
 								
+			
+				List<S_ot01> PosKod;
+			
+				try {
+				
+					PosKod = MainForm.ltc.GetS_ot01(tn_ldi.getSelectedItem().kodotd, "51");
+				
+				
+					if (PosKod.size()>0){	
+						
+						//System.out.println("pcod = "+PosKod.get(0).pcod+"; datav = "+tn_ldi.getSelectedItem().datav+"; npasp = "+tn_ldi.getSelectedItem().npasp+ "; kodotd = "+tn_ldi.getSelectedItem().kodotd);
+						
+						
+						DiagIsl Digisp = MainForm.ltc.GetDIslPos(PosKod.get(0).pcod, tn_ldi.getSelectedItem().datav, tn_ldi.getSelectedItem().npasp, tn_ldi.getSelectedItem().kodotd);
+				
+						if (!Digisp.isSetKodisl()){
+							
+							DiagIsl spDIsl;
+							try {
+								spDIsl = MainForm.ltc.GetDIsl(tn_ldi.getSelectedItem().nisl);
+															
+									DiagIsl inDisl = new DiagIsl();
+							
+									try {
+								
+										inDisl.setNpasp(tn_ldi.getSelectedItem().npasp);
+										inDisl.setNisl(tn_ldi.getSelectedItem().nisl);
+										inDisl.setKol(1);
+										spkol.setValue(1);
+										
+										inDisl.setKodisl(PosKod.get(0).pcod);
+										
+										
+ 
+										
+										if (tpatient.getSelectedItem().ter_liv > 0 ){
+												
+												inDisl.setPcod_m(PosKod.get(0).c_obst);
+												
+												List<Metod> Cena;
+
+												try {
+													Cena = MainForm.ltc.GetStoim(PosKod.get(0).pcod, PosKod.get(0).c_obst, MainForm.authInfo.cpodr);
+													if (Cena.size() !=0){
+														inDisl.setStoim(Cena.get(0).stoim);
+													}
+												} catch (TException e) {
+													// TODO Auto-generated catch block
+											 		e.printStackTrace();
+												}												
+											
+										}else{
+											inDisl.setPcod_m(PosKod.get(1).c_obst);
+											
+											List<Metod> Cena;
+
+											try {
+												Cena = MainForm.ltc.GetStoim(PosKod.get(1).pcod, PosKod.get(1).c_obst, MainForm.authInfo.cpodr);
+												if (Cena.size() !=0){
+													inDisl.setStoim(Cena.get(0).stoim);
+												}
+											} catch (TException e) {
+												// TODO Auto-generated catch block
+										 		e.printStackTrace();
+											}												
+											
+										}
+											
+										
+										//System.out.print(inDisl);
+								
+										MainForm.ltc.AddDIsl(inDisl);
+									} catch (DIslExistsException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+							
+									spDIsl = MainForm.ltc.GetDIsl(tn_ldi.getSelectedItem().nisl);
 									
-					 			
+						
+								
+						
+						
+							} catch (DIslNotFoundException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (TException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+						}
+					
+					}else{
+						JOptionPane.showMessageDialog(frame, "В настройках не выбрано посещение на " + MainForm.authInfo.cpodr_name);
+					}
+				
+				
+				} catch (TException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			
+				
+				
 			}
 		});
 		
@@ -1698,7 +1815,8 @@ public class PIslForm {
 						
 					}*/
 					}else{
-						if ((String.valueOf(tn_ldi.getSelectedItem().id_gosp)==null)&&(String.valueOf(tn_ldi.getSelectedItem().id_pos)==null)){
+						if (((String.valueOf(tn_ldi.getSelectedItem().id_gosp)==null)||(tn_ldi.getSelectedItem().id_gosp==0))
+								&&(String.valueOf(tn_ldi.getSelectedItem().id_pos)==null)||(tn_ldi.getSelectedItem().id_pos==0)){
 							try {
 								MainForm.ltc.DelLIsl(tn_ldi.getSelectedItem().nisl, tlab_isl.getData().get(i).cpok);
 							} catch (TException e) {

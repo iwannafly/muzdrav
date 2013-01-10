@@ -236,14 +236,16 @@ public class ServerInfomat extends Server implements Iface {
         }
     }
 
-    private boolean isPatientAlreadyReserveTalonOnThisDay(final TPatient patient,
-            final TTalon talon) throws SQLException {
+    @Override
+    public final boolean isPatientAlreadyReserveTalonOnThisDay(final TPatient patient,
+            final TTalon talon) throws KmiacServerException {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
                 "SELECT id FROM e_talon WHERE npasp = ? AND pcod_sp = ? AND datap = ?",
                 patient.getId(), talon.getPcodSp(), new Date(talon.getDatap()))) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
-            return false;
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 
@@ -322,6 +324,24 @@ public class ServerInfomat extends Server implements Iface {
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQL Exception: ", e);
             throw new KmiacServerException(e.getMessage());
+        }
+    }
+
+    @Override
+    public final TPatient checkOmsAndGetPatientInCurrentPoliclinic(final String oms,
+            final int clpu) throws KmiacServerException, OmsNotValidException {
+        final String sqlQuery = "SELECT npasp, fam, im, ot "
+            + "FROM patient "
+            + "WHERE (((poms_ser || poms_nom) = ?) OR (poms_nom = ?)) AND cpol_pr =?";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, oms, oms, clpu)) {
+            if (acrs.getResultSet().next()) {
+                return rsmPatient.map(acrs.getResultSet());
+            } else {
+                throw new OmsNotValidException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "SQL Exception: ", e);
+            throw new KmiacServerException();
         }
     }
 

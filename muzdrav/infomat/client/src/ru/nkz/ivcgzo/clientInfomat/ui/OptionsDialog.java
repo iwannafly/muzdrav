@@ -51,7 +51,7 @@ public class OptionsDialog implements ActionListener {
     private final JButton btnSubmit = new JButton("Да");
     private final JButton btnOk = new JButton("Ok");
     private final JButton btnCancel = new JButton("Отмена");
-    private final JButton btnPrint = new JButton("Занять талон");
+    private final JButton btnPrint = new JButton("Выбрать");
     private JPanel pMessage;
     private JPanel pButtons;
     private JTextPane tpMessage;
@@ -66,6 +66,8 @@ public class OptionsDialog implements ActionListener {
         btnPrint.addActionListener(this);
     }
 
+
+    //TODO Добавить телескопический вызов, как в методах ниже
     /**
      * Отображает диалоговое окно с печатью в случае подтверждения.
      * @param parent - родительское окно (окно из которого вызывается диалог)
@@ -201,6 +203,7 @@ public class OptionsDialog implements ActionListener {
         dialog.setMinimumSize(new Dimension(400, 150));
         dialog.setPreferredSize(new Dimension(400, 150));
         dialog.setSize(new Dimension(400, 150));
+        dialog.setAlwaysOnTop(true);
         setMessagePanelDefaults(msg, fontSize, align);
         setButtonPanelDefaults();
         addPanelsToDialog();
