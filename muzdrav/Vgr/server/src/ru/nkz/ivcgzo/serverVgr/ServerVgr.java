@@ -1408,7 +1408,7 @@ throw new TException(e);
 
 	@Override
 	public String getInvInfoPol(int cpodr, long dn, long dk)
-			throws KmiacServerException, TException {
+			throws KmiacServerException, TException, SqlExecutorException {
 		String fpath = "", sqlo = "",sBuf, pl, nmed_reab ="", nps_reab="",nprof_reab="",nsoc_reab="";
 		String id_fio="",  name_bk="", name_pr="",d_inv="",d_invp="",pasp="";
 		 int med_reab=0, ps_reab=0, prof_reab=0,   soc_reab=0;

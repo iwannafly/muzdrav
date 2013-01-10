@@ -33,12 +33,12 @@ struct Polis{
 /*p_nambk*/
 struct Nambk{
 	1:i32 npasp,
-	2:string nambk,
-	3:i32 nuch,
-	4:i32 cpol,
+	2:optional string nambk,
+	3:optional i32 nuch,
+	4:optional i32 cpol,
 	5:optional i64 datapr,
 	6:optional i64 dataot,
-	7:i32 ishod
+	7:optional i32 ishod
 }
 
 /*patient*/
@@ -71,10 +71,11 @@ struct PatientFullInfo{
 	26:optional i32 region_liv,
 	27:optional string birthplace,
 	28:optional string ogrn_smo,
-	29:optional Address adpAddress,
-	30:optional Address admAddress,
-	31:optional Polis polis_oms,
-	32:optional Polis polis_dms
+	29:optional i32 obraz,
+	30:optional Address adpAddress,
+	31:optional Address admAddress,
+	32:optional Polis polis_oms,
+	33:optional Polis polis_dms
 }
 
 /*сведени о представителе табл. p_preds*/
@@ -90,7 +91,10 @@ struct Agent{
 	9:optional i32 vpolis,
 	10:optional string spolis,
 	11:optional string npolis,
-	12:optional string birthplace
+	12:optional string birthplace,
+	13:optional i32 tdoc,
+	14:optional string docser,
+	15:optional string docnum
 }
 
 /*pkov*/
@@ -308,7 +312,8 @@ struct Anam{
 	3:i32 numstr,
 	4:bool vybor,
 	5:optional string comment,
-	6:string name
+	6:string name,
+	7:string pranz
 }
 
 struct Pokaz{
