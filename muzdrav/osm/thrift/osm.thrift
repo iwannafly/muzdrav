@@ -616,6 +616,7 @@ struct Cotd{
 	3: optional i32 nist;
 	4: optional i32 cotd;
 	5: optional i64 dataz;
+	6: optional i32 stat_type;
 }
 
 struct VrachInfo {
@@ -698,6 +699,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PdiagZ getPdiagZ(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 	list<PdiagZ> getPdiagZInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getPdiagInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	void deleteDiag(1: i32 npasp, 2: string diag, 3: i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 npasp, 2: string diag, 3: i32 cpol) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
@@ -729,6 +731,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printKek(1: i32 npasp, 2: i32 pvizitId) throws (1: kmiacServer.KmiacServerException kse);
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
+	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers

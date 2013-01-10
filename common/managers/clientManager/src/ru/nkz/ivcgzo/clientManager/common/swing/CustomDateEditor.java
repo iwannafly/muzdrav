@@ -1,20 +1,39 @@
 package ru.nkz.ivcgzo.clientManager.common.swing;
 
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+
+import com.toedter.calendar.JCalendar;
 
 /**
  * Текстовое поле для ввода дат, обернутое в {@link CustomTextComponentWrapper}.
@@ -24,6 +43,12 @@ public class CustomDateEditor extends JFormattedTextField {
 	private static final long serialVersionUID = -817488987418629780L;
 	private CustomTextComponentWrapper ctcWrapper;
 	private JFormattedTextField txt;
+	private static JCalendar calendar;
+	private static JPopupMenu popCal;
+	private static JComboBox<?> cmbCal;
+	private static boolean dateSelected;
+	private static CustomDateEditor calCaller;
+	protected JButton btnCal;
 	protected SimpleDateFormat dateFormatter;
 	protected char dateSeparator;
 	protected char placeHolderChar = '_';
@@ -35,6 +60,9 @@ public class CustomDateEditor extends JFormattedTextField {
 	
 	public CustomDateEditor(boolean selectOnFocus, boolean popupMenu) {
 		super();
+		
+		initCalendar();
+		insertCalendarButton();
 		
 		ctcWrapper = new CustomTextComponentWrapper(this);
 		
@@ -58,6 +86,80 @@ public class CustomDateEditor extends JFormattedTextField {
 		dateFormatter.setLenient(false);
 		
 		this.addCaretListener(new TableDateSelector());
+	}
+	
+	private void insertCalendarButton() {
+		btnCal = new JButton(new ImageIcon(CustomDateEditor.class.getResource("/com/toedter/calendar/images/JCalendarColor16.gif")));
+		btnCal.setCursor(Cursor.getDefaultCursor());
+		btnCal.setFocusable(false);
+		btnCal.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				calCaller = CustomDateEditor.this;
+				if (CustomDateEditor.this.getDate() != null)
+					calendar.setDate(CustomDateEditor.this.getDate());
+				popCal.show(CustomDateEditor.this, CustomDateEditor.this.getWidth() - (int) popCal.getPreferredSize().getWidth(), CustomDateEditor.this.getHeight());
+				dateSelected = false;
+			}
+		});
+		add(btnCal);
+		
+		setLayout(new CustomDateEditorLayoutManager());
+	}
+	
+	private static void initCalendar() {
+		if (calendar != null)
+			return;
+		
+		calendar = new JCalendar();
+		calendar.setTodayButtonVisible(true);
+		calendar.getDayChooser().setDayBordersVisible(true);
+		calendar.getDayChooser().setAlwaysFireDayProperty(true);
+		cmbCal = (JComboBox<?>) calendar.getMonthChooser().getComboBox();
+		calendar.getDayChooser().addPropertyChangeListener("day", new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				 if (evt.getPropertyName().equals("day")) {
+					 calCaller.setDate(calendar.getDate());
+					dateSelected = true;
+					popCal.setVisible(false);
+					calCaller.requestFocusInWindow();
+				 }
+			}
+		});
+		
+		popCal = new JPopupMenu() {
+			private static final long serialVersionUID = -6078272560337577761L;
+
+			public void setVisible(boolean b) {
+				Boolean isCanceled = (Boolean) getClientProperty("JPopupMenu.firePopupMenuCanceled");
+				if (b || (!b && dateSelected) || ((isCanceled != null) && !b && isCanceled.booleanValue())) {
+					super.setVisible(b);
+				}
+			}
+		};
+		popCal.add(calendar);
+		
+		MenuSelectionManager.defaultManager().addChangeListener(new ChangeListener() {
+			boolean hasListened = false;
+
+			public void stateChanged(ChangeEvent e) {
+				if (hasListened) {
+					hasListened = false;
+					return;
+				}
+				if (popCal.isVisible() && cmbCal.hasFocus()) {
+					MenuElement[] me = MenuSelectionManager.defaultManager().getSelectedPath();
+					MenuElement[] newMe = new MenuElement[me.length + 1];
+					newMe[0] = popCal;
+					for (int i = 0; i < me.length; i++) {
+						newMe[i + 1] = me[i];
+					}
+					hasListened = true;
+					MenuSelectionManager.defaultManager().setSelectedPath(newMe);
+				}
+			}
+		});
 	}
 	
 	public CustomDateEditor(Date date) {
@@ -174,6 +276,33 @@ public class CustomDateEditor extends JFormattedTextField {
 					});
 				}
 		}
+	}
+	
+	class CustomDateEditorLayoutManager implements LayoutManager {
+
+		@Override
+		public void addLayoutComponent(String name, Component comp) {
+		}
+
+		@Override
+		public void removeLayoutComponent(Component comp) {
+		}
+
+		@Override
+		public Dimension preferredLayoutSize(Container parent) {
+			return null;
+		}
+
+		@Override
+		public Dimension minimumLayoutSize(Container parent) {
+			return null;
+		}
+
+		@Override
+		public void layoutContainer(Container parent) {
+			btnCal.setBounds(parent.getWidth() - parent.getHeight(), 0, parent.getHeight(), parent.getHeight());
+		}
+		
 	}
 	
 	public Date getDate() {

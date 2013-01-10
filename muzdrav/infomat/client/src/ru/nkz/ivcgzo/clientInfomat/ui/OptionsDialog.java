@@ -51,10 +51,10 @@ public class OptionsDialog implements ActionListener {
     private final JButton btnSubmit = new JButton("Да");
     private final JButton btnOk = new JButton("Ok");
     private final JButton btnCancel = new JButton("Отмена");
-    private final JButton btnPrint = new JButton("Занять талон");
+    private final JButton btnPrint = new JButton("Выбрать");
     private JPanel pMessage;
     private JPanel pButtons;
-    private JTextPane message;
+    private JTextPane tpMessage;
 
     /**
      * Конструктор по умолчанию. Регистрирует класс слушателем на все виды кнопок.
@@ -66,6 +66,18 @@ public class OptionsDialog implements ActionListener {
         btnPrint.addActionListener(this);
     }
 
+
+    //TODO Добавить телескопический вызов, как в методах ниже
+    /**
+     * Отображает диалоговое окно с печатью в случае подтверждения.
+     * @param parent - родительское окно (окно из которого вызывается диалог)
+     * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @param align - выравнивание
+     * @return int представление выбора пользователя
+     * @see PRINT
+     * @see DECLINE
+     */
     public final int showPrintDialog(final Window parent,
             final String msg, final int fontSize, final int align) {
         dialog = createEmptyDialog(parent);
@@ -74,6 +86,7 @@ public class OptionsDialog implements ActionListener {
         dialog.setVisible(true);
         return value;
     }
+
     /**
      * Отображает диалоговое окно с подтверждением.
      * @param parent - родительское окно (окно из которого вызывается диалог)
@@ -86,11 +99,30 @@ public class OptionsDialog implements ActionListener {
         return showConfirmDialog(parent, msg, DEFAULT_FONT_SIZE);
     }
 
+    /**
+     * Отображает диалоговое окно с подтверждением.
+     * @param parent - родительское окно (окно из которого вызывается диалог)
+     * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @return int представление выбора пользователя
+     * @see ACCEPT
+     * @see DECLINE
+     */
     public final int showConfirmDialog(final Window parent,
             final String msg, final int fontSize) {
         return showConfirmDialog(parent, msg, fontSize, DEFAULT_ALIGN);
     }
 
+    /**
+     * Отображает диалоговое окно с подтверждением.
+     * @param parent - родительское окно (окно из которого вызывается диалог)
+     * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @param align - выравнивание
+     * @return int представление выбора пользователя
+     * @see ACCEPT
+     * @see DECLINE
+     */
     public final int showConfirmDialog(final Window parent,
             final String msg, final int fontSize, final int align) {
         dialog = createEmptyDialog(parent);
@@ -110,11 +142,26 @@ public class OptionsDialog implements ActionListener {
         showMessageDialog(parent, msg, DEFAULT_FONT_SIZE);
     }
 
+    /**
+     * Отображает диалоговое окно с сообщением.
+     * @param parent - родительское окно (окно из которого вызывается диалог)
+     * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @see OK
+     */
     public final void showMessageDialog(final Window parent, final String msg,
             final int fontSize) {
         showMessageDialog(parent, msg, fontSize, DEFAULT_ALIGN);
     }
 
+    /**
+     * Отображает диалоговое окно с сообщением.
+     * @param parent - родительское окно (окно из которого вызывается диалог)
+     * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @param align - выравнивание
+     * @see OK
+     */
     public final void showMessageDialog(final Window parent, final String msg,
             final int fontSize, final int align) {
         dialog = createEmptyDialog(parent);
@@ -128,6 +175,8 @@ public class OptionsDialog implements ActionListener {
      * Создает диалоговое окно.
      * @param parent - родительское окно (окно из которого вызывается диалог)
      * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @param align - выравнивание
      * @see JDialog
      */
     private JDialog createEmptyDialog(final Window parent) {
@@ -141,6 +190,8 @@ public class OptionsDialog implements ActionListener {
     /**
      * Задает параметры диалогового окна
      * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @param align - выравнивание
      */
     private void buildDialogDefaults(final String msg, final int fontSize, final int align) {
         dialog.setCursor(dialog.getToolkit().createCustomCursor(
@@ -152,6 +203,7 @@ public class OptionsDialog implements ActionListener {
         dialog.setMinimumSize(new Dimension(400, 150));
         dialog.setPreferredSize(new Dimension(400, 150));
         dialog.setSize(new Dimension(400, 150));
+        dialog.setAlwaysOnTop(true);
         setMessagePanelDefaults(msg, fontSize, align);
         setButtonPanelDefaults();
         addPanelsToDialog();
@@ -161,6 +213,8 @@ public class OptionsDialog implements ActionListener {
     /**
      * Задает параметры панели сообщения диалогового окна
      * @param msg - сообщение отображаемое в диалоговом окне
+     * @param fontSize - размер шрифта
+     * @param align - выравнивание
      */
     private void setMessagePanelDefaults(final String msg, final int fontSize, final int align) {
         pMessage = new JPanel();
@@ -172,24 +226,22 @@ public class OptionsDialog implements ActionListener {
         pMessage.setLayout(new BoxLayout(pMessage, BoxLayout.X_AXIS));
         pMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
         pMessage.setAlignmentY(Component.CENTER_ALIGNMENT);
-//        JLabel label = new JLabel(msg);
         StyledDocument document = new DefaultStyledDocument();
         Style defaultStyle = document.getStyle(StyleContext.DEFAULT_STYLE);
         StyleConstants.setAlignment(defaultStyle, align);
         StyleConstants.setFontSize(defaultStyle, fontSize);
-        message = new JTextPane(document);
-        message.setFont(new Font("Courier New", Font.PLAIN, fontSize));
-        message.setText(msg);
-        message.setAlignmentX(Component.CENTER_ALIGNMENT);
-        message.setAlignmentY(Component.CENTER_ALIGNMENT);
-        message.setEditable(false);
-        pMessage.add(message);
+        tpMessage = new JTextPane(document);
+        tpMessage.setFont(new Font("Courier New", Font.PLAIN, fontSize));
+        tpMessage.setText(msg);
+        tpMessage.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tpMessage.setAlignmentY(Component.CENTER_ALIGNMENT);
+        tpMessage.setEditable(false);
+        pMessage.add(tpMessage);
         pMessage.setBorder(new MatteBorder(1, 1, 0, 1, Color.black));
     }
 
     /**
      * Задает параметры панели кнопок диалогового окна
-     * @param msg - сообщение отображаемое в диалоговом окне
      */
     private void setButtonPanelDefaults() {
         pButtons = new JPanel();
@@ -227,6 +279,9 @@ public class OptionsDialog implements ActionListener {
         pButtons.add(hsThird);
     }
 
+    /**
+     * Размещает компоненты в диалоговом окне распечатки
+     */
     private void buildPrintDialog() {
         Component hsFirst = Box.createHorizontalGlue();
         pButtons.add(hsFirst);
@@ -256,8 +311,18 @@ public class OptionsDialog implements ActionListener {
      * Размещает компоненты в диалоговом окне сообщения
      */
     private void buildMessageDialog() {
+        Component hsFirst = Box.createHorizontalGlue();
+        pButtons.add(hsFirst);
+
         btnOk.setMinimumSize(new Dimension(100, 50));
+        btnOk.setPreferredSize(new Dimension(100, 50));
+        btnOk.setSize(new Dimension(100, 50));
+        btnOk.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnOk.setAlignmentY(Component.CENTER_ALIGNMENT);
         pButtons.add(btnOk);
+
+        Component hsThird = Box.createHorizontalGlue();
+        pButtons.add(hsThird);
     }
 
     /**
@@ -301,7 +366,7 @@ public class OptionsDialog implements ActionListener {
             value = PRINT;
             dialog.setVisible(false);
             try {
-                message.print(null, null, false, null, null, false);
+                tpMessage.print(null, null, false, null, null, false);
             } catch (PrinterException e1) {
                 e1.printStackTrace();
             }

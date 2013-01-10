@@ -47,4 +47,19 @@ public class CustomTextField extends JTextField {
 	public void setDefaultLanguage(CustomTextComponentWrapper.DefaultLanguage defLang) {
 		ctcWrapper.setDefaultLanguage(defLang);
 	}
+	
+	@Override
+	public void selectAll() {
+		if (!isEmpty()) {
+			setCaretPosition(getText().length());
+			moveCaretPosition(0);
+		}
+	}
+	
+	@Override
+	public void setText(String t) {
+		super.setText(t);
+		if (!isEmpty())
+			moveCaretPosition(0);
+	}
 }

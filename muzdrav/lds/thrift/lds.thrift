@@ -39,6 +39,7 @@ struct DiagIsl {
         10: string rez_name;
 	11: optional double stoim;
 	12: string pcod_m;
+	13: i32 id;
 }
 
 struct LabIsl {
@@ -78,6 +79,7 @@ struct Patient {
 	13:string adm_ul;
 	14:string adm_dom;
 	15:string adm_kv;
+	16:i32 ter_liv;
 }
 
 
@@ -226,6 +228,7 @@ service LDSThrift extends kmiacServer.KmiacServer {
 
 	list<DiagIsl> GetDiagIsl(1: i32 nisl);
 	DiagIsl GetDIsl(1: i32 nisl)throws (1: DIslNotFoundException dine);
+	DiagIsl GetDIslPos(1: string kodisl; 2: i64 datav; 3: i32 npasp; 4: i32 kodotd)throws (1: DIslNotFoundException dine);
 	void AddDIsl(1: DiagIsl di)throws (1: DIslExistsException diee);
 	void UpdDIsl(1: DiagIsl di)throws (1: DIslExistsException diee);
 	void DelDIsl(1: i32 nisl, 2: string kodisl);

@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
 //    private JScrollPane spMedicationTable;
     private JPanel pButtons;
     private JButton btnAdd;
-    private JButton btnUpdate;
+//    private JButton btnUpdate;
     private JButton btnDelete;
     private MedicationCatalogFrame frmMedicationCatalog;
     private ThriftIntegerClassifierList lMedication;
@@ -165,74 +165,74 @@ public class MainFrame extends JFrame {
         pInfo.setMaximumSize(new Dimension(32767, 250));
         pMedicationInfo.add(pInfo);
         pInfo.setLayout(new GridLayout(9, 2, 0, 0));
-        
+
         lblFormLek = new JLabel("  Форма выпуска");
         pInfo.add(lblFormLek);
-        
+
         tfFormLek = new JTextField();
         tfFormLek.setEditable(false);
         pInfo.add(tfFormLek);
         tfFormLek.setColumns(10);
-        
+
         lblDose = new JLabel("  Доза");
         pInfo.add(lblDose);
-        
+
         tfDose = new JTextField();
         tfDose.setEditable(false);
         pInfo.add(tfDose);
         tfDose.setColumns(10);
-        
+
         lblInputMethod = new JLabel("  Способ ввода");
         pInfo.add(lblInputMethod);
-        
+
         cbxInputMethod =
             new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_svl);
         cbxInputMethod.setEditable(false);
         pInfo.add(cbxInputMethod);
-        
+
         lblPeriod = new JLabel("  Периодичность приёма");
         pInfo.add(lblPeriod);
-        
+
         cbxPeriod =
             new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_period);
         cbxPeriod.setEditable(false);
         pInfo.add(cbxPeriod);
-        
+
         lblCountInDay = new JLabel("  Раз в день");
         pInfo.add(lblCountInDay);
-        
+
         tfCountInDay = new JTextField();
         tfCountInDay.setEditable(false);
         pInfo.add(tfCountInDay);
         tfCountInDay.setColumns(10);
-        
+
         lblDateFrom = new JLabel("  Дата назначения");
         pInfo.add(lblDateFrom);
-        
+
         cdeDateFrom = new CustomDateEditor();
         cdeDateFrom.setEditable(false);
         pInfo.add(cdeDateFrom);
         cdeDateFrom.setColumns(10);
-        
+
         lblVrachFrom = new JLabel("  Назначивший врач");
         pInfo.add(lblVrachFrom);
-        
+
         tfVrachFrom = new JTextField();
         tfVrachFrom.setEditable(false);
         pInfo.add(tfVrachFrom);
         tfVrachFrom.setColumns(10);
-        
+
         lblDateTo = new JLabel("  Дата отмены");
         pInfo.add(lblDateTo);
-        
+
         cdeDateTo = new CustomDateEditor();
         cdeDateTo.setEditable(false);
         pInfo.add(cdeDateTo);
         cdeDateTo.setColumns(10);
-        
+
         lblVrachTo = new JLabel("  Отменивший врач");
         pInfo.add(lblVrachTo);
-        
+
         tfVrachTo = new JTextField();
         tfVrachTo.setEditable(false);
         pInfo.add(tfVrachTo);
