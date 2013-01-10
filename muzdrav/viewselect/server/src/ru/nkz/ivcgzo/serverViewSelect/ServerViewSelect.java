@@ -53,6 +53,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.PatientSearchParams;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientSignInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitAmbInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientVizitInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.Pbol;
 import ru.nkz.ivcgzo.thriftViewSelect.RdSlInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect;
 import ru.nkz.ivcgzo.thriftViewSelect.ThriftViewSelect.Iface;
@@ -91,6 +92,8 @@ public class ServerViewSelect extends Server implements Iface {
 	private final TResultSetMapper<PaspErrorInfo, PaspErrorInfo._Fields> rsmPaspError;
 	private final TResultSetMapper<MedPolErrorInfo, MedPolErrorInfo._Fields> rsmMedPolError;
     private final TResultSetMapper<PatientAnamnez, PatientAnamnez._Fields> rsmAnam;
+	private final TResultSetMapper<Pbol, Pbol._Fields> rsmPbol;
+	private final Class<?>[] pbolTypes; 
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -118,6 +121,8 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmPaspError = new TResultSetMapper<>(PaspErrorInfo.class);
 		rsmMedPolError = new TResultSetMapper<>(MedPolErrorInfo.class);
 		rsmAnam = new TResultSetMapper<>(PatientAnamnez.class, "npasp", "datap", "numstr", "vybor", "comment", "name", "prof_anz");
+		rsmPbol = new TResultSetMapper<>(Pbol.class, "id",          "id_obr",      "id_gosp",     "npasp",       "bol_l",       "s_bl", 	"po_bl",    "pol",         "vozr",        "nombl", 	    "cod_sp",      "cdol",       "pcod",        "dataz");
+		pbolTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Integer.class, Date.class};
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -686,5 +691,50 @@ public class ServerViewSelect extends Server implements Iface {
 			e.printStackTrace();
             throw new KmiacServerException("Could not delete anam.");
         }
+	}
+
+	@Override
+	public List<Pbol> getPbol(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_bol WHERE npasp = ? ", npasp)) {
+			return rsmPbol.mapToList(acrs.getResultSet());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not get pbol list.");
+		}
+	}
+
+	@Override
+	public int AddPbol(Pbol pbol) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("INSERT INTO p_bol (id_obr, id_gosp, npasp, cod_sp, cdol, pcod, dataz) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, pbol, pbolTypes, 1, 2, 3, 10, 11, 12, 13);
+			int id = sme.getGeneratedKeys().getInt("id");
+			sme.setCommit();
+			return id;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not add pbol.");
+		}
+	}
+
+	@Override
+	public void UpdatePbol(Pbol pbol) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPreparedT("UPDATE p_bol SET bol_l = ?, s_bl = ?, po_bl = ?, pol = ?, vozr = ?, nombl = ? WHERE id = ? ", false, pbol, pbolTypes, 4, 5, 6, 7, 8, 9, 0);
+			sme.setCommit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not update pbol.");
+		}
+	}
+
+	@Override
+	public void DeletePbol(int id) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM p_bol WHERE id = ? ", false, id);
+			sme.setCommit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not delete pbol.");
+		}
 	}
 }
