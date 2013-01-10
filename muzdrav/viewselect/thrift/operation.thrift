@@ -96,7 +96,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Обновляет информацию о выбранной операции
 	 */
-	i32 updateOperation(1: Operation curOperation)
+	void updateOperation(1: Operation curOperation)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Удаляет операцию
@@ -117,7 +117,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Обновляет информацию об осложнении
 	 */
-	i32 updateOperationComplication(1: OperationComplication curCompl)
+	void updateOperationComplication(1: OperationComplication curCompl)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Удаляет информацию об осложнении
@@ -138,7 +138,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Обновляет источник оплаты
 	 */
-	i32 updateOperationPaymentFund(1: OperationPaymentFund curPaymentFund)
+	void updateOperationPaymentFund(1: OperationPaymentFund curPaymentFund)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Удаляет источник оплаты
@@ -149,7 +149,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Возвращает список всех назначений анастезии для данной записи госпитализации
 	 */
-	list<Anesthesia> getAnesthesias(1: i32 idGosp)
+	list<Anesthesia> getAnesthesias(1: i32 idOper)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новое назначений анастезии
@@ -159,7 +159,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Обновляет назначений анастезии
 	 */
-	i32 updateAnesthesia(1: Anesthesia curAnesthesia)
+	void updateAnesthesia(1: Anesthesia curAnesthesia)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Удаляет назначений анастезии
@@ -180,7 +180,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Обновляет осложнение после анастезии
 	 */
-	i32 updateAnesthesiaComplication(1: AnesthesiaComplication curCompl)
+	void updateAnesthesiaComplication(1: AnesthesiaComplication curCompl)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Удаляет осложнение после анастезии
@@ -201,7 +201,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Обновляет источник оплаты анастезии
 	 */
-	i32 updateAnesthesiaPaymentFund(1: AnesthesiaPaymentFund curPaymentFund)
+	void updateAnesthesiaPaymentFund(1: AnesthesiaPaymentFund curPaymentFund)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Удаляет источник оплаты анастезии

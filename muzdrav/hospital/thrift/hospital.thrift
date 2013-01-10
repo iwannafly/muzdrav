@@ -172,7 +172,7 @@ struct TRdIshod {
   36: optional i32 osmposl;
   37: optional i32 vrash;
   38: optional i32 akush;
-  39: optional i64 datarod;
+  39: optional i64 daterod;
   40: optional i32 srok;
   41: optional i32 ves;
   42: optional i32 vespl; 
@@ -268,30 +268,43 @@ struct RdInfStruct{
 }
 
 struct TRd_Novor {
-   1: i32 npasp;
-   2: i32 nrod;
-   3: optional string timeon;
-   4: optional i32 kolchild;
-   5: optional i32 nreb;
-   6: i32 massa;
-   7: i32 rost;
-   8: optional i32 apgar1;
-   9: optional i32 apgar5;
-  10: optional bool krit1;
-  11: optional bool krit2;
-  12: optional bool krit3;
-  13: optional bool krit4;
-  14: optional bool mert;
-  15: optional bool donosh;
-  16: i64 datazap;
+	 1: i32 npasp;
+	 2: i32 nrod;
+	 3: optional string timeon;
+	 4: optional i32 kolchild;
+	 5: optional i32 nreb;
+	 6: i32 massa;
+	 7: i32 rost;
+	 8: optional i32 apgar1;
+	 9: optional i32 apgar5;
+	10: optional bool krit1;
+	11: optional bool krit2;
+	12: optional bool krit3;
+	13: optional bool krit4;
+	14: optional bool mert;
+	15: optional bool donosh;
+	16: i64 datazap;
 }
 
 struct TRd_Svid {
-  1: i32 npasp;
-  2: i32 ndoc;
-  3: i64 dateoff;
-  4: string fioreb;
-  5: i32 svidvrach;
+	1: i32 npasp;
+	2: i32 ndoc;
+	3: i64 dateoff;
+	4: string famreb;
+	5: i32 svidvrach;
+}
+
+struct TPatientCommonInfo {
+	 1: i32 npasp;
+	 2: string full_name;
+	 3: i64 datar;
+	 4: string pol;
+	 5: string jitel;
+	 6: string adp_obl;
+	 7: string adp_gorod;
+	 8: string adp_ul;
+	 9: string adp_dom;
+	10: string adp_kv;
 }
 
 struct TRd_SMPK {
@@ -392,12 +405,6 @@ exception PrdIshodNotFoundException{
  * Свидетельство о рождении/перинатальной смерти не найдено
  */
 exception ChildDocNotFoundException{
-}
-
-/**
- * Такой номер свидетельства о рождении/перинатальной смерти уже существует
- */
-exception ChildDocNumAlreadyExistException{
 }
 
 service ThriftHospital extends kmiacServer.KmiacServer{
@@ -513,9 +520,15 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @return Возвращает номер свидетельства о рождении/перинатальной смерти
 	 */
     i32 getNextChildDocNum();
-	void addChildDocument(1:TRd_Svid ChildDocument)
-		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe, 3:ChildDocNumAlreadyExistException cdnaee);
+    /**
+	 * Добавление в БД свидетельства о рождении/перинатальной смерти новорождённого
+	 * @return Возвращает номер свидетельства
+	 */
+	i32 addChildDocument(1:TRd_Svid ChildDocument)
+		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     TRd_Svid getChildDocument(1:i32 npasp)
+    	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
+    TRd_Svid getChildDocumentByDoc(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     void updateChildDocument(1:TRd_Svid ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
@@ -523,6 +536,10 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildDeathDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
+    string printChildBlankDocument(1:bool isLiveChild)
+    	throws (1:kmiacServer.KmiacServerException kse);
+    TPatientCommonInfo getPatientCommonInfo(1:i32 npasp)
+    	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
