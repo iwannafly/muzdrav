@@ -13,5 +13,10 @@
 	<classpathentry kind="var" path="EXTERNAL_LIB/log4j-1.2.17.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.7.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/clientPbol">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="clientPbol"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

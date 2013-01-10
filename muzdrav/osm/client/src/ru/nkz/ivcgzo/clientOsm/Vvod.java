@@ -104,6 +104,7 @@ import ru.nkz.ivcgzo.thriftOsm.ShablonText;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
 
+
 public class Vvod extends JFrame {
 	private static final long serialVersionUID = 4761424994673488103L;
 	private JTabbedPane tabbedPane;
@@ -225,6 +226,7 @@ public class Vvod extends JFrame {
 	private JButton btnNaprPrint;
 	private JButton btnKonsPrint;
 	private CustomTable<PdiagZ, PdiagZ._Fields> tblZaklDiag;
+
 
 	
 	/**
@@ -521,29 +523,39 @@ public class Vvod extends JFrame {
 		});
 		btnControl.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
+		JButton btnBolList = new JButton("Бол.лист");
+		btnBolList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			//
+			}
+		});
+		btnBolList.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
-						.addComponent(pnlTalon, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 1004, Short.MAX_VALUE)
+						.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 1005, Short.MAX_VALUE)
+						.addComponent(pnlTalon, GroupLayout.DEFAULT_SIZE, 1005, Short.MAX_VALUE)
+						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 1005, Short.MAX_VALUE)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnSearch, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(btnRecPriem, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnAnam, GroupLayout.PREFERRED_SIZE, 136, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnAnam)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnProsm, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnProsm)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnBer, GroupLayout.PREFERRED_SIZE, 225, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnBer)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnPrint, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnControl)))
+							.addComponent(btnPrint)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnControl)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnBolList)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -551,13 +563,14 @@ public class Vvod extends JFrame {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnSearch)
 						.addComponent(btnRecPriem)
 						.addComponent(btnAnam)
 						.addComponent(btnProsm)
 						.addComponent(btnBer)
 						.addComponent(btnPrint)
-						.addComponent(btnSearch)
-						.addComponent(btnControl))
+						.addComponent(btnControl)
+						.addComponent(btnBolList))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
