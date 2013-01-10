@@ -1559,7 +1559,8 @@ public class ServerHospital extends Server implements Iface {
 		public RdSlStruct getRdSlInfo(int npasp) throws KmiacServerException,
 			TException {
         AutoCloseableResultSet acrs1;
-        Date daterod =  new Date(System.currentTimeMillis()-280);
+        Date daterod =  new Date(System.currentTimeMillis()-280*24*60*60*1000);
+//         daterod =  new Date(System.currentTimeMillis()-24192000000);
 		Integer ish = 1;
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
 			if (!acrs.getResultSet().next()) {
