@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -25,7 +26,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class Launcher {
-	private static final String clientAuthType = "unspecified";
+	private static String clientAuthType = "unspecified";
+	private static String appServerIp = "localhost";
+	private static boolean hasLoginParams;
+	private static String paramLogin;
+	private static String paramPassword;
+	private static int paramModuleIndex;
 	private static final String libDir = "lib";
 	private final String rootPath;
 	private class LibraryInfo {
@@ -36,13 +42,63 @@ public class Launcher {
 	}
 	
 	public static void main(String[] args) {
+		Pattern ipPattern = Pattern.compile("(^[2][5][0-5].|^[2][0-4][0-9].|^[1][0-9][0-9].|^[0-9][0-9].|^[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5].|[2][0-4][0-9].|[1][0-9][0-9].|[0-9][0-9].|[0-9].)([2][0-5][0-5]|[2][0-4][0-9]|[1][0-9][0-9]|[0-9][0-9]|[0-9])$");
+		int prmStart;
+		
+		if (clientAuthType.equals("unspecified")) {
+			prmStart = 1;
+			if (args.length == 0) {
+				System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
+				appServerIp = "localhost";
+			} else {
+				if (args[0].equals("tst")) {
+					System.out.println("Using test application server.");
+					clientAuthType = "tst";
+					appServerIp = "10.0.0.248";
+				} else if (args[0].equals("int")) {
+					System.out.println("Using internal application server.");
+					clientAuthType = "int";
+					appServerIp = "10.0.0.243";
+				} else if (args[0].equals("ext")) {
+					System.out.println("Using external application server.");
+					clientAuthType = "ext";
+					appServerIp = "10.1.1.8";
+				} else if (ipPattern.matcher(args[0]).matches()) {
+					appServerIp = args[0];
+					clientAuthType = appServerIp;
+					System.out.println(String.format("Using %s application server.", appServerIp));
+				} else {
+					System.out.println("No valid application server alias (tst, int, ext) or ip address specified. Using dev server.");
+					appServerIp = "localhost";
+				}
+			}
+		} else {
+			prmStart = 0;
+		}
+		if (args.length > prmStart)
+			if (args.length > prmStart + 2) {
+				paramLogin = args[prmStart];
+				paramPassword = args[prmStart + 1];
+				try {
+					paramModuleIndex = Integer.parseInt(args[prmStart + 2]);
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Неверно задан индекс запускаемого модуля. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+					System.exit(2);
+				}
+				hasLoginParams = true;
+			} else {
+				JOptionPane.showMessageDialog(null, "Недостаточное количество параметров для задания логина, пароля и индекса запускаемого модуля. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+				System.exit(2);
+			}
+
+		
 		Launcher lnc;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			lnc = new Launcher();
 			lnc.checkAndUpdate();
 			
-			Runtime.getRuntime().exec("java -jar auth.jar " + clientAuthType);
+			Runtime.getRuntime().exec("java -jar auth.jar " + clientAuthType + (hasLoginParams ? String.format(" \"%s\" \"%s\" \"%d\"", paramLogin, paramPassword, paramModuleIndex) : ""));
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, "Не удалось обновить системные модули. Программа будет закрыта.", "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -55,23 +111,18 @@ public class Launcher {
 	}
 	
 	public void checkAndUpdate() throws Exception {
-		String ip;
-		
 		switch (clientAuthType) {
 		case "tst":
-			ip = "10.0.0.248";
+			appServerIp = "10.0.0.248";
 			break;
 		case "int":
-			ip = "10.0.0.243";
+			appServerIp = "10.0.0.243";
 			break;
 		case "ext":
-			ip = "10.1.1.8";
-			break;
-		default:
-			ip = "localhost";
+			appServerIp = "10.1.1.8";
 			break;
 		}
-		try (Socket servSct = new Socket(ip, 55201)) {
+		try (Socket servSct = new Socket(appServerIp, 55201)) {
 			handShake(servSct);
 			Document domLibList = getLibrariesList(servSct);
 			List<LibraryInfo> updList = getUpdateList(domLibList);

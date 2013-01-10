@@ -37,18 +37,27 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
+import ru.nkz.ivcgzo.thriftOsm.VrachInfo;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
+import javax.swing.JList;
 
 public class MainForm extends Client<ThriftOsm.Client> {
 	public static ThriftOsm.Client tcl;
+	public static int vrPcod;
+	public static String vrCdol;
+	public static String vrCdolName;
+	public static String vrFio;
 	public static MainForm instance;
 	private static String [] month = {"Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"};
 	private JFrame frame;
 	private JButton btnSelect;
-	private CustomTable<ZapVr, ZapVr._Fields> table;
+	private JScrollPane spPos;
+	private CustomTable<ZapVr, ZapVr._Fields> tblPos;
 	private Vvod vvod;
 	private Timer timer;
 	private ZapVr prevZapvr;
+	private JScrollPane spVrach;
+	private CustomTable<VrachInfo, VrachInfo._Fields> tblVrach;
 	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, ThriftOsm.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -75,14 +84,25 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			}
 		});
 		
-		JScrollPane scrollPane = new JScrollPane();
+		spPos = new JScrollPane();
 		
 		btnSelect = new JButton("Выбор");
 		btnSelect.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (table.getSelectedItem() != null)
-					vvod.showVvod(table.getSelectedItem());
+				if (authInfo.priznd != 7) {
+					if (tblPos.getSelectedItem() != null)
+						vvod.showVvod(tblPos.getSelectedItem());
+				} else {
+					if (tblVrach.getSelectedItem() != null) {
+						VrachInfo vi = tblVrach.getSelectedItem();
+						vrPcod = vi.pcod;
+						vrCdol = vi.cdol;
+						vrCdolName = vi.cdolName;
+						vrFio = String.format("%s %s %s", vi.fam, vi.im, vi.ot);
+						vvod.showVvod(new ZapVr());
+					}
+				}
 			}
 		});
 		JButton btnSearch = new JButton("Поиск");
@@ -117,20 +137,23 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		btnView.setVisible(false);
 		btnView.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (table.getSelectedItem() != null)
-				MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", table.getSelectedItem().fam, table.getSelectedItem().im, table.getSelectedItem().oth), table.getSelectedItem().npasp);
+				if (tblPos.getSelectedItem() != null)
+					MainForm.conMan.showPatientInfoForm(String.format("Просмотр информации на пациента %s %s %s", tblPos.getSelectedItem().fam, tblPos.getSelectedItem().im, tblPos.getSelectedItem().oth), tblPos.getSelectedItem().npasp);
 			}
 		});
+		
+		spVrach = new JScrollPane();
 		
 		
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
+			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
-						.addGroup(groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(spVrach, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+						.addComponent(spPos, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addComponent(btnSearch)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnSelect)
@@ -141,19 +164,31 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSearch)
 						.addComponent(btnSelect)
 						.addComponent(btnView))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(18))
+					.addComponent(spPos, GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(spVrach, GroupLayout.DEFAULT_SIZE, 235, Short.MAX_VALUE)
+					.addContainerGap())
 		);
 		
-		table = new CustomTable<>(false, true, ZapVr.class, 9, "Посл. посещение", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Серия полиса", 5 ,"Номер полиса");
-		table.setDateField(0);
-		table.addMouseListener(new MouseAdapter() {
+		tblVrach = new CustomTable<>(false, true, VrachInfo.class, 3, "Фамилия", 4, "Имя", 5, "Отчество", 2, "Должность");
+		tblVrach.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2)
+					btnSelect.doClick();
+			}
+		});
+		spVrach.setViewportView(tblVrach);
+		
+		tblPos = new CustomTable<>(false, true, ZapVr.class, 9, "Посл. посещение", 1, "Фамилия", 2, "Имя", 3, "Отчество", 4, "Серия полиса", 5 ,"Номер полиса");
+		tblPos.setDateField(0);
+		tblPos.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2)
@@ -161,10 +196,20 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			}
 		});
 		ZapVrCellRenderer zcr = new ZapVrCellRenderer();
-		table.setDefaultRenderer(String.class, zcr);
-		table.setDefaultRenderer(Date.class, zcr);
-			table.setFillsViewportHeight(true);
-		scrollPane.setViewportView(table);
+		tblPos.setDefaultRenderer(String.class, zcr);
+		tblPos.setDefaultRenderer(Date.class, zcr);
+			tblPos.setFillsViewportHeight(true);
+		spPos.setViewportView(tblPos);
+		
+		if (authInfo.priznd == 7) {
+			spPos.setVisible(false);
+			btnSearch.setVisible(false);
+			frame.setTitle("Режим статистика");
+		} else {
+			spVrach.setVisible(false);
+			vrPcod = authInfo.pcod;
+			vrCdol = authInfo.cdol;
+		}
 		frame.getContentPane().setLayout(groupLayout);
 	}
 
@@ -178,12 +223,26 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		super.onConnect(conn);
 		if (conn instanceof ThriftOsm.Client) {
 			tcl = thrClient;
-			updateZapList();
+			if (authInfo.priznd != 7)
+				updateZapList();
+			else
+				showVrachList();
 			if (vvod == null) {
-				vvod = new Vvod();
+				vvod = new Vvod(authInfo.priznd == 7);
 				addChildFrame(vvod);
 			}
 			vvod.onConnect();
+		}
+	}
+	
+	public void showVrachList() {
+		try {
+			tblVrach.setData(tcl.getVrachList(authInfo.clpu, authInfo.cpodr));
+		} catch (KmiacServerException e) {
+			e.printStackTrace();
+		} catch (TException e) {
+			e.printStackTrace();
+			conMan.reconnect(e);
 		}
 	}
 	
@@ -193,12 +252,12 @@ public class MainForm extends Client<ThriftOsm.Client> {
 		frame.setTitle("Записанные на прием на "+calendar.get(Calendar.DATE)+" "+month[calendar.get(Calendar.MONTH)]+" "+calendar.get(Calendar.YEAR)+" г.");
 		
 		try {
-			prevZapvr = table.getSelectedItem();
-			table.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis()));
+			prevZapvr = tblPos.getSelectedItem();
+			tblPos.setData(tcl.getZapVr(authInfo.getPcod(), authInfo.getCdol(), System.currentTimeMillis(), authInfo.getCpodr()));
 			if (prevZapvr != null)
-				for (int i = 0; i < table.getData().size(); i++)
-					if (table.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {
-						table.changeSelection(i, 0, false, false);
+				for (int i = 0; i < tblPos.getData().size(); i++)
+					if (tblPos.getData().get(i).id_pvizit == prevZapvr.id_pvizit) {
+						tblPos.changeSelection(i, 0, false, false);
 						break;
 					}
 		} catch (KmiacServerException e) {
@@ -211,7 +270,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 	}
 	
 	public void setVisible(boolean value) {
-		if (value)
+		if (value && (authInfo.priznd != 7))
 			timer.restart();
 		else
 			timer.stop();
@@ -232,7 +291,7 @@ public class MainForm extends Client<ThriftOsm.Client> {
 			if (cmp instanceof JLabel) {
 				JLabel lbl = (JLabel) cmp;
 				
-				if (MainForm.this.table.getData().get(row).hasPvizit) {
+				if (MainForm.this.tblPos.getData().get(row).hasPvizit) {
 					if (isSelected)
 						lbl.setBackground(selCol.darker());
 					else

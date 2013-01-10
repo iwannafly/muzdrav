@@ -150,7 +150,7 @@ public class ServerReception extends Server implements Iface {
 
     @Override
     public final Patient getPatient(final String omsSer, final String omsNum)
-            throws KmiacServerException, PatientNotFoundException, TException {
+            throws KmiacServerException, PatientNotFoundException {
         final String sqlQuery = "SELECT npasp, fam, im, ot, datar, poms_ser, poms_nom "
                 + "FROM patient WHERE poms_ser = ? AND poms_nom = ?;";
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, omsSer, omsNum)) {
@@ -167,7 +167,7 @@ public class ServerReception extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getPoliclinic() throws KmiacServerException,
-            PoliclinicNotFoundException, TException {
+            PoliclinicNotFoundException {
         final String sqlQuery = "SELECT DISTINCT n_n00.pcod, "
                 + "(n_m00.name_s || ', ' || n_n00.name) as name "
                 + "FROM n_n00 INNER JOIN n_m00 ON n_m00.pcod = n_n00.clpu "
@@ -187,7 +187,7 @@ public class ServerReception extends Server implements Iface {
 
     @Override
     public final List<StringClassifier> getSpec(final int cpol) throws KmiacServerException,
-            SpecNotFoundException, TException {
+            SpecNotFoundException {
         final String sqlQuery = "SELECT DISTINCT n_s00.pcod, n_s00.name FROM n_s00 "
                 + "INNER JOIN e_talon ON n_s00.pcod = e_talon.cdol "
                 + "WHERE e_talon.cpol = ? AND e_talon.prv = ?;";
@@ -206,7 +206,7 @@ public class ServerReception extends Server implements Iface {
 
     @Override
     public final List<IntegerClassifier> getVrach(final int cpol, final String cdol)
-            throws KmiacServerException, VrachNotFoundException, TException {
+            throws KmiacServerException, VrachNotFoundException {
         final String sqlQuery = "SELECT DISTINCT s_vrach.pcod, s_vrach.fam, s_vrach.im, s_vrach.ot "
                 + "FROM s_vrach INNER JOIN e_talon ON s_vrach.pcod = e_talon.pcod_sp "
                 + "WHERE e_talon.cpol = ? AND e_talon.cdol = ?;";
@@ -234,7 +234,7 @@ public class ServerReception extends Server implements Iface {
 
     @Override
     public final List<Vidp> getVidp() throws KmiacServerException,
-            VidpNotFoundException, TException {
+            VidpNotFoundException {
         final String sqlQuery = "SELECT pcod, name, vcolor FROM e_vidp";
         try (AutoCloseableResultSet acrs = sse.execQuery(sqlQuery)) {
             List<Vidp> tmpList = rsmVidp.mapToList(acrs.getResultSet());
@@ -251,7 +251,7 @@ public class ServerReception extends Server implements Iface {
 
     @Override
     public final List<Talon> getTalon(final int cpol, final String cdol, final int pcod)
-            throws KmiacServerException, TalonNotFoundException, TException {
+            throws KmiacServerException, TalonNotFoundException {
         final int prv = 0;
         // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
@@ -278,7 +278,7 @@ public class ServerReception extends Server implements Iface {
     @Override
     public final List<Talon> getReservedTalons(final int cpol, final String cdol,
             final int doctorId, final int patientId) throws KmiacServerException,
-            TalonNotFoundException, TException {
+            TalonNotFoundException {
         // java.sql.Date не имеет нулевого конструктора, а preparedQuery() не работает с
         // java.util.Date. Поэтому для передачи сегодняшней даты требуется такой велосипед.
         final long todayMillisec = new java.util.Date().getTime();
@@ -323,9 +323,9 @@ public class ServerReception extends Server implements Iface {
                         pat.getIdPvizit(), talon.getId());
                 } else {
                     numUpdated = sme.execPreparedUpdate("UPDATE e_talon SET npasp = ?, dataz = ?, "
-                            + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
-                            + "WHERE  id = ?;",
-                            false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
+                        + "prv = ?, id_pvizit = nextval('p_vizit_id_seq') "
+                        + "WHERE  id = ?;",
+                        false, pat.getId(), new Date(todayMillisec), prv, talon.getId());
                 }
                 if (numUpdated == 1) {
                     sme.setCommit();

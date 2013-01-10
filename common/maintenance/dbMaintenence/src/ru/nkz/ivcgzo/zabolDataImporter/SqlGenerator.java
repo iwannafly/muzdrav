@@ -10,8 +10,8 @@ public class SqlGenerator {
 		if ((fld != null) && (fld.length > 0)) {
 			fldStr = "";
 			for (int i = 0; i < fld.length - 1; i++)
-				fldStr += String.format("%s.%s, ", tbl, fld[i]);
-			fldStr += String.format("%s.%s", tbl, fld[fld.length - 1]);
+				fldStr += String.format("%s%s, ", (!fld[i].toLowerCase().equals("null")) ? tbl + '.' : "", fld[i]);
+			fldStr += String.format("%s%s", (!fld[fld.length - 1].toLowerCase().equals("null")) ? tbl + '.' : "", fld[fld.length - 1]);
 		} else {
 			fldStr = "*";
 		}
