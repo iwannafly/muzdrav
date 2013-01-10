@@ -182,6 +182,7 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		
 		JMenuItem mntmNewMenuItem = new JMenuItem("1. Статистический талон (форма 025)");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e1) {
 			titleString = "1. Статистический талон (форма 025)";
 			stForm = "F25";
@@ -193,10 +194,12 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		menu.add(mntmNewMenuItem);
 		
 		JMenuItem mntmNewMenuItem_1 = new JMenuItem("2. Учет работы врача (форма 039)");
-		mntmNewMenuItem.addActionListener(new ActionListener() {
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e1){
 			titleString = "2. Учет работы врача (форма 039)";
 			stForm = "F39";
+			System.out.println(stForm);
 			dopCl = new DopClas();
 			dopCl.setTitle(titleString);
 			dopCl.DopClas(titleString, stForm);
@@ -208,6 +211,19 @@ public class MainForm extends Client<ThriftVgr.Client>  {
 		menu.add(mntmNewMenuItem_2);
 		
 		JMenuItem mntmNewMenuItem_3 = new JMenuItem("4. Дневной стационар (форма 003)");
+		mntmNewMenuItem_3.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				titleString = "4. Дневной стационар (форма 003)";
+				stForm = "F03";
+				System.out.println(stForm);
+				dopCl = new DopClas();
+				dopCl.setTitle(titleString);
+				dopCl.DopClas(titleString, stForm);
+				
+			}
+		});
 		menu.add(mntmNewMenuItem_3);
 		
 		JMenuItem mntmNewMenuItem_4 = new JMenuItem("5. Стационар круглосуточного пребывания (форма 066)");
