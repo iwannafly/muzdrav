@@ -48,8 +48,12 @@ public class ClientOperation extends Client<ThriftOperation.Client> {
 
      @Override
     public final Object showModal(final IClient parent, final Object... params) {
-        operationFrame.setTitle("Операции");
+        operationFrame.setTitle(String.format("%s %s %s",
+                (String) params[1], (String) params[2], (String) params[3]));
+//        operationFrame.setTitle("Операции");
         JDialog dialog = prepareModal(parent);
+        operationFrame.fillPatient((int) params[0], (String) params[1],
+                (String) params[2], (String) params[3], (int) params[4]);
         dialog.setVisible(true);
         disposeModal();
         return null;

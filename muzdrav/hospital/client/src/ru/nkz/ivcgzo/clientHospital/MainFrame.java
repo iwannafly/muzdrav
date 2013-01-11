@@ -853,7 +853,7 @@ public class MainFrame extends JFrame {
 
         btnOperation = new JButton();
         btnOperation.setToolTipText("Операции");
-        btnOperation.setVisible(false);
+//        btnOperation.setVisible(false);
         toolBar.add(btnOperation);
         btnOperation.setMaximumSize(new Dimension(35, 35));
         btnOperation.setMinimumSize(new Dimension(35, 35));
