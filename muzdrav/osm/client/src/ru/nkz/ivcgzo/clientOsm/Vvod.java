@@ -347,6 +347,7 @@ public class Vvod extends JFrame {
        						protokol.setPvizit_id(tblPos.getSelectedItem().id_obr);
        						protokol.setPvizit_ambId(tblPos.getSelectedItem().id);
        						protokol.setCpol(MainForm.authInfo.getCpodr());
+       						protokol.setNstr(tblPos.getSortedRowIndex());
        						String servPath = MainForm.tcl.printProtokol(protokol);
        						String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -526,7 +527,7 @@ public class Vvod extends JFrame {
 		JButton btnBolList = new JButton("Бол.лист");
 		btnBolList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			//
+				 MainForm.conMan.showBolListForm(zapVr.npasp, zapVr.id_pvizit, 0);
 			}
 		});
 		btnBolList.setFont(new Font("Tahoma", Font.PLAIN, 12));

@@ -121,6 +121,10 @@ public class BolListForm extends ModalForm {
 		btnUpd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					if (!DatComp()) {
+						JOptionPane.showMessageDialog(BolListForm.this, "Дата начала больничного не может быть больше даты конца больничного", "Предупреждение", JOptionPane.ERROR_MESSAGE);
+							return;
+					}
 					if (tblPbol.getSelectedItem() != null)
 						MainForm.tcl.UpdatePbol(tblPbol.getSelectedItem());
 				} catch (KmiacServerException e1) {
@@ -148,7 +152,7 @@ public class BolListForm extends ModalForm {
 		this.idGosp = idGosp;
 		
 		try {
-//			tblPbol.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_bl1));
+			tblPbol.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_bl1));
 			tblPbol.setIntegerClassifierSelector(3, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z30));
 			tblPbol.setData(MainForm.tcl.getPbol(npasp));
 			btnAdd.setEnabled(modEnabled);
@@ -163,5 +167,12 @@ public class BolListForm extends ModalForm {
 			MainForm.conMan.reconnect(e);
 			throw new Exception();
 		}
+	}
+	
+	public boolean DatComp() throws TException{
+		if (tblPbol.getData().size() > 0){
+			if ((tblPbol.getSelectedItem().getS_bl()>tblPbol.getSelectedItem().getPo_bl())&&(tblPbol.getSelectedItem().getPo_bl()!=0)) return false;
+		}
+		return true;
 	}
 }

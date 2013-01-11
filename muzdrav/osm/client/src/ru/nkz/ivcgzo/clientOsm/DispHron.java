@@ -398,9 +398,9 @@ public class DispHron extends JFrame{
 	}
 	
 	public boolean Dsph() throws TException{
-		if (tblDispHron.getData().size() > 0){
-			if ((tblDispHron.getSelectedItem().getPdat()>tblDispHron.getSelectedItem().getFdat())&&(tblDispHron.getSelectedItem().getFdat()!=0)) return false;
-		}
+//		if (tblDispHron.getData().size() > 0){
+//			if ((tblDispHron.getSelectedItem().getPdat()>tblDispHron.getSelectedItem().getFdat())&&(tblDispHron.getSelectedItem().getFdat()!=0)) return false;
+//		}
 		return true;
 	}
 }
