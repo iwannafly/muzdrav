@@ -130,7 +130,8 @@ enum IntegerClassifiers {
 	n_db11 = 112,
 	n_db12 = 113,
 	n_db13 = 114,
-	n_anz = 115
+	n_anz = 115,
+	n_bl1 = 116
 }
 
 enum StringClassifiers {
