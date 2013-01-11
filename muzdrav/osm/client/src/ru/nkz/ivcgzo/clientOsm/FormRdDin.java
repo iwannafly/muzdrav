@@ -75,9 +75,6 @@ public class FormRdDin extends JFrame {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBPredPl;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBCerd;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBSerd1;
-	private JTextField fam;
-	private JTextField im;
-	private JTextField ot;
 	private int mes;
 	private int br;
 	private int rost;
@@ -112,9 +109,9 @@ public class FormRdDin extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
- 			    fam.setText(Vvod.zapVr.getFam());
-				im.setText(Vvod.zapVr.getIm());
-				ot.setText(Vvod.zapVr.getOth());
+// 			    fam.setText(Vvod.zapVr.getFam());
+//				im.setText(Vvod.zapVr.getIm());
+//				ot.setText(Vvod.zapVr.getOth());
 //				RdDinStruct rddin = new RdDinStruct();
 //				setDefaultValues();
 //				System.out.println(rddin);
@@ -136,6 +133,7 @@ public class FormRdDin extends JFrame {
 			}
 		});
 		setTitle("Динамика диспансерного наблюдения за беременной");
+		setTitle(String.format(" %s - %d, %s %s %s, %6$td.%6$tm.%6$tY ", getTitle(), Vvod.zapVr.getNpasp(), Vvod.zapVr.getFam(), Vvod.zapVr.getIm(), Vvod.zapVr.getOth(),  Vvod.zapVr.getDatar()));
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent arg0) {
@@ -559,20 +557,6 @@ try {
 				
 			}
 		});
-		
-		fam = new JTextField();
-		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-		fam.setColumns(10);
-//		fam.setText(Vvod.zapVr.fam);
-		
-		im = new JTextField();
-		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-		im.setColumns(10);
-//		im.setText(Vvod.zapVr.im);
-		
-		ot = new JTextField();
-		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-		ot.setColumns(10);
 //		ot.setText(Vvod.zapVr.oth);
 		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 		gl_panel_1.setHorizontalGroup(
@@ -580,9 +564,9 @@ try {
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_1.createSequentialGroup()
-							.addGap(26)
+							.addGap(142)
 							.addComponent(Nbutton)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(SButton))
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addContainerGap()
@@ -610,13 +594,6 @@ try {
 											.addComponent(SPsad, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE))))
 								.addComponent(LVes)
 								.addComponent(LSrok)
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
-									.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addComponent(LDataPos)
 								.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING, false)
 									.addGroup(gl_panel_1.createSequentialGroup()
 										.addComponent(LVdm)
@@ -624,37 +601,33 @@ try {
 										.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
 										.addGap(9))
 									.addGroup(gl_panel_1.createSequentialGroup()
-										.addComponent(LOkrJ)
+										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+											.addComponent(LOkrJ)
+											.addComponent(LDataPos))
 										.addGap(18)
 										.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-											.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-											.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
-											.addComponent(SOkrj, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
-											.addComponent(SDataPos, GroupLayout.DEFAULT_SIZE, 78, Short.MAX_VALUE))))
+											.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
+											.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
+												.addComponent(SVes, GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+												.addComponent(SSrok, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+												.addComponent(SOkrj, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)))))
 								.addGroup(gl_panel_1.createSequentialGroup()
 									.addComponent(LtolPlac)
 									.addGap(29)
 									.addComponent(STolP, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)))))
-					.addContainerGap(22, Short.MAX_VALUE))
+					.addContainerGap(28, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel_1.createSequentialGroup()
-					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
-						.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(21)
+					.addContainerGap()
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 						.addComponent(Nbutton)
 						.addComponent(SButton))
+					.addGap(18)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addGap(24)
-							.addComponent(LDataPos))
-						.addGroup(gl_panel_1.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+						.addComponent(LDataPos)
+						.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(LSrok)
@@ -674,7 +647,7 @@ try {
 						.addGroup(gl_panel_1.createSequentialGroup()
 							.addGap(5)
 							.addComponent(SVdm, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addPreferredGap(ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.TRAILING, false)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 							.addComponent(LPdad)
@@ -829,8 +802,8 @@ try {
 //	rddin.setDatap(Vvod.zapVr.datap);
 	}
 	public void onConnect() throws PatientNotFoundException {
-		fam.setText(Vvod.zapVr.fam);
-		im.setText(Vvod.zapVr.im);
-		ot.setText(Vvod.zapVr.oth);
+//		fam.setText(Vvod.zapVr.fam);
+//		im.setText(Vvod.zapVr.im);
+//		ot.setText(Vvod.zapVr.oth);
 	}
 }

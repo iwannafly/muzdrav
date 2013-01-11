@@ -106,12 +106,14 @@ public class DopClas extends JDialog{
 				int kodpol = MainForm.authInfo.cpodr;
 				try {
 					servpath = null;
-//					if (tfdataclose.isEnabled()) dclose
+					if (tfdataclose.getDate() == null) tfdataclose.setDate(tfdatak.getDate());
 					servpath = MainForm.tcl.dataSelection(tfdatan.getDate().getTime(), tfdatak.getDate().getTime(), Integer.valueOf(tfnporc.getText()), cform, kodpol, tfdataclose.getDate().getTime());
 					if (cform.equals("F25"))
 					cliPath ="C:\\f025\\p_"+tfnporc.getText().trim()+".txt";
 					if (cform.equals("F39"))
 					cliPath = "C:\\f039\\p_"+tfnporc.getText().trim()+".txt";
+					if (cform.equals("F03"))
+						cliPath = "C:\\f003\\p_"+tfnporc.getText().trim()+".txt";
 					MainForm.conMan.transferFileFromServer(servpath, cliPath);
                     MainForm.conMan.openFileInEditor(cliPath, false);
 
@@ -270,7 +272,7 @@ public class DopClas extends JDialog{
 			chckbDin.setEnabled(false);
 			chckbIz.setEnabled(false);
 		}
-		if (frm.equals("F25")){
+		if (frm.equals("F25")||frm.equals("F03")){
 			cform = frm;
 			tfdataclose.setEnabled(false);
 			lblNewLabel.setEnabled(false);
