@@ -33,7 +33,7 @@ struct Operation {
 	3: optional i32 cotd;
 	4: optional i32 idGosp;
 	5: optional i32 npasp;
-	6: optional i32 pcod;
+	6: optional string pcod;
 	7: optional string nameOper;
 	8: optional i64 date;
 	9: optional i64 vrem;

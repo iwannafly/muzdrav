@@ -60,8 +60,8 @@ public class ServerOperation extends Server implements Iface {
     private static final Class<?>[] OPERATION_TYPES ={
 //          id             vid_st         cotd           id_gosp        npasp
             Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
-//          pcod           name_oper     date        vrem        pred_ep       op_oper
-            Integer.class, String.class, Date.class, Time.class, String.class, String.class,
+//          pcod          name_oper     date        vrem        pred_ep       op_oper
+            String.class, String.class, Date.class, Time.class, String.class, String.class,
 //          material      dlit           dataz
             String.class, Integer.class, Date.class
     };
@@ -296,7 +296,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех источников оплаты данной операции
      *
-     * @param idOper - уникальный идентийикатор операции
+     * @param idOper - уникальный идентификатор операции
      */
     @Override
     public List<OperationPaymentFund> getOperationPaymentFunds(int idOper)
