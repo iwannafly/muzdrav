@@ -570,6 +570,7 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<PatientAnamnez> getAnamnez(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: TipPodrNotFoundException tpfe, 2:kmiacServer.KmiacServerException kse);
 	void deleteAnam(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	void updateAnam(1: list<PatientAnamnez> patAnam) throws (1: kmiacServer.KmiacServerException kse);
+	string printAnamnez(1: i32 npasp, 2: i32 cpodr, 3: i32 cslu) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<Pbol> getPbol (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);

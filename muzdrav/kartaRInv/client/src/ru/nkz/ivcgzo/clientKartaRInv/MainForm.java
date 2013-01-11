@@ -1,61 +1,48 @@
 package ru.nkz.ivcgzo.clientKartaRInv;
 
-import java.awt.EventQueue;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.ButtonGroup;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.border.TitledBorder;
+
+import org.apache.thrift.TException;
+
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
-import ru.nkz.ivcgzo.clientManager.common.swing.ThriftStringClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
-
 import ru.nkz.ivcgzo.thriftKartaRInv.PatientCommonInfo;
 import ru.nkz.ivcgzo.thriftKartaRInv.Pinvk;
 import ru.nkz.ivcgzo.thriftKartaRInv.PinvkNotFoundException;
 import ru.nkz.ivcgzo.thriftKartaRInv.thriftKartaRInv;
-
-import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
-import java.text.SimpleDateFormat;
-import javax.swing.ButtonGroup;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JPanel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import java.awt.Color;
-import java.awt.Font;
-import javax.swing.JComboBox;
-import javax.swing.border.TitledBorder;
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
-import javax.swing.JButton;
-import javax.swing.JRadioButton;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.JCheckBox;
-import javax.swing.SwingConstants;
-
-import org.apache.thrift.TException;
-
-import java.awt.ComponentOrientation;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public  class MainForm extends Client<thriftKartaRInv.Client> {
 	public static thriftKartaRInv.Client tcl;
@@ -260,15 +247,7 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_pr15v;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> cb_pr16v;
 	private int searchedNpasp;
-	private int inv_id;
-	private String nameLpu;
-	/**
-	 * Launch the application.
-	 */
-
-	/**
-	 * Create the application.
-	 */
+	
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		super(conMan, authInfo, thriftKartaRInv.Client.class, configuration.appId, configuration.thrPort, lncPrm);
 	
@@ -338,11 +317,6 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-		}
-
-		private String getTextOrNull(String text) {
-			// TODO Auto-generated method stub
-			return null;
 		}
 		});
 		final JButton btnSave = new JButton("Сохранить");
@@ -581,256 +555,6 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 			}
 		});
 		
-		JButton btnSearch = new JButton("Поиск");
-		btnSearch.setToolTipText("Поиск и выбор пациента");
-		btnSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int[] res = conMan.showPatientSearchForm("Поиск пациентов", true, true);
-				
-				if (res != null) {
-				    try {
-				    	searchedNpasp = res[0];	
-						nameLpu = MainForm.authInfo.getClpu_name();
-						pinvk = new Pinvk();
-						patInf = new PatientCommonInfo();	
-						patInf = MainForm.tcl.getPatientCommonInfo(res[0]);
-						
-						lblpatient.setText(patInf.fam+" "+patInf.im+" "+patInf.ot);
-						
-						pinvk = MainForm.tcl.getPinvk(patInf.npasp);
-						//} catch (KmiacServerException e1) {
-						// TODO Auto-generated catch block
-					//	e1.printStackTrace();
-					
-				//	} catch (TException e1) {
-						// TODO Auto-generated catch block
-				//		e1.printStackTrace();
-				//	}
-				//	try {
-						//pinvk = MainForm.tcl.getPinvk(searchedNpasp);
-										
-						bg_psih.clearSelection();
-						radioButtonP.setSelected(pinvk.getNar1() == 0);
-						radioButtonP_1.setSelected(pinvk.getNar1() == 1);
-						radioButtonP_2.setSelected(pinvk.getNar1() == 2);
-						radioButtonP_3.setSelected(pinvk.getNar1() == 3);
-						radioButtonP_4.setSelected(pinvk.getNar1() == 4);
-						bg_rech.clearSelection();
-						radioButtonR.setSelected(pinvk.getNar2() == 0);
-						radioButtonR_1.setSelected(pinvk.getNar2() == 1);
-						radioButtonR_2.setSelected(pinvk.getNar2() == 2);
-						radioButtonR_3.setSelected(pinvk.getNar2() == 3);
-						radioButtonR_4.setSelected(pinvk.getNar2() == 4);
-						bg_sens.clearSelection();
-						radioButtonS.setSelected(pinvk.getNar3() == 0);
-						radioButtonS_1.setSelected(pinvk.getNar3() == 1);
-						radioButtonS_2.setSelected(pinvk.getNar3() == 2);
-						radioButtonS_3.setSelected(pinvk.getNar3() == 3);
-						radioButtonS_4.setSelected(pinvk.getNar3() == 4);
-						bg_dinam.clearSelection();
-						radioButtonD.setSelected(pinvk.getNar4() == 0);
-						radioButtonD_1.setSelected(pinvk.getNar4() == 1);
-						radioButtonD_2.setSelected(pinvk.getNar4() == 2);
-						radioButtonD_3.setSelected(pinvk.getNar4() == 3);
-						radioButtonD_4.setSelected(pinvk.getNar4() == 4);
-						bg_zab.clearSelection();
-						radioButtonZ.setSelected(pinvk.getNar5() == 0);
-						radioButtonZ_1.setSelected(pinvk.getNar5() == 1);
-						radioButtonZ_2.setSelected(pinvk.getNar5() == 2);
-						radioButtonZ_3.setSelected(pinvk.getNar5() == 3);
-						radioButtonZ_4.setSelected(pinvk.getNar5() == 4);
-						bg_urod.clearSelection();
-						radioButtonU.setSelected(pinvk.getNar6() == 0);
-						radioButtonU_1.setSelected(pinvk.getNar6() == 1);
-						radioButtonU_2.setSelected(pinvk.getNar6() == 2);
-						radioButtonU_3.setSelected(pinvk.getNar6() == 3);
-						radioButtonU_4.setSelected(pinvk.getNar6() == 4);
-						bg_samob.clearSelection();
-						radioButtonSo.setSelected(pinvk.getOgr1() == 0);
-						radioButtonSo_1.setSelected(pinvk.getOgr1() == 1);
-						radioButtonSo_2.setSelected(pinvk.getOgr1() == 2);
-						radioButtonSo_3.setSelected(pinvk.getOgr1() == 3);
-						radioButtonSo_4.setSelected(pinvk.getOgr1() == 4);
-						bg_dvig.clearSelection();
-						radioButtonSd.setSelected(pinvk.getOgr2() == 0);
-						radioButtonSd_1.setSelected(pinvk.getOgr2() == 1);
-						radioButtonSd_2.setSelected(pinvk.getOgr2() == 2);
-						radioButtonSd_3.setSelected(pinvk.getOgr2() == 3);
-						radioButtonSd_4.setSelected(pinvk.getOgr2() == 4);
-						bg_orient.clearSelection();
-						radioButtonOr.setSelected(pinvk.getOgr3() == 0);
-						radioButtonOr_1.setSelected(pinvk.getOgr3() == 1);
-						radioButtonOr_2.setSelected(pinvk.getOgr3() == 2);
-						radioButtonOr_3.setSelected(pinvk.getOgr3() == 3);
-						radioButtonOr_4.setSelected(pinvk.getOgr3() == 4);
-						bg_obsh.clearSelection();
-						radioButtonO.setSelected(pinvk.getOgr4() == 0);
-						radioButtonO_1.setSelected(pinvk.getOgr4() == 1);
-						radioButtonO_2.setSelected(pinvk.getOgr4() == 2);
-						radioButtonO_3.setSelected(pinvk.getOgr4() == 3);
-						radioButtonO_4.setSelected(pinvk.getOgr4() == 4);
-						bg_poved.clearSelection();
-						radioButtonK.setSelected(pinvk.getOgr5() == 0);
-						radioButtonK_1.setSelected(pinvk.getOgr5() == 1);
-						radioButtonK_2.setSelected(pinvk.getOgr5() == 2);
-						radioButtonK_3.setSelected(pinvk.getOgr5() == 3);
-						radioButtonK_4.setSelected(pinvk.getOgr5() == 4);
-						bg_obuch.clearSelection();
-						radioButtonOb.setSelected(pinvk.getOgr6() == 0);
-						radioButtonOb_1.setSelected(pinvk.getOgr6() == 1);
-						radioButtonOb_2.setSelected(pinvk.getOgr6() == 2);
-						radioButtonOb_3.setSelected(pinvk.getOgr6() == 3);
-						radioButtonOb_4.setSelected(pinvk.getOgr6() == 4);
-						bg_trud.clearSelection();
-						radioButtonT.setSelected(pinvk.getOgr7() == 0);
-						radioButtonT_1.setSelected(pinvk.getOgr7() == 1);
-						radioButtonT_2.setSelected(pinvk.getOgr7() == 2);
-						radioButtonT_3.setSelected(pinvk.getOgr7() == 3);
-						radioButtonT_4.setSelected(pinvk.getOgr7() == 4);
-						
-						
-						//t_vrach.setText(String.valueOf(pinvk.getVrach()));
-						t_vrach.setText(pinvk.getVrach());
-						t_uchr.setText(pinvk.getUchr());
-						t_nom_mse.setText(pinvk.getNom_mse());
-						t_ruk_mse.setText(pinvk.getRuk_mse());
-						t_diag.setText(pinvk.getDiag());
-						t_diag_s1.setText(pinvk.getDiag_s1());
-						t_diag_s2.setText(pinvk.getDiag_s2());
-						t_diag_s3.setText(pinvk.getDiag_s3());
-						t_oslog.setText(pinvk.getOslog());
-						t_zakl_name.setText(pinvk.getZakl_name());
-						t_mr1d.setText(pinvk.getMr1d());
-						t_mr2d.setText(pinvk.getMr2d());
-						t_mr3d.setText(pinvk.getMr3d());
-						t_mr4d.setText(pinvk.getMr4d());
-						t_pr1d.setText(pinvk.getPr1d());
-						
-						if (pinvk.isSetDatav()) t_datav.setDate(pinvk.getDatav());
-						if (pinvk.isSetDataz()) t_dataz.setDate(pinvk.getDataz());
-						if (pinvk.isSetD_osv()) t_d_osv.setDate(pinvk.getD_osv());
-						if (pinvk.isSetD_otpr()) t_d_otpr.setDate(pinvk.getD_otpr());
-						if (pinvk.isSetD_inv()) t_d_inv.setDate(pinvk.getD_inv());
-						if (pinvk.isSetD_invp()) t_d_invp.setDate(pinvk.getD_invp());
-						if (pinvk.isSetD_srok()) t_d_srok.setDate(pinvk.getD_srok());
-						
-						if (pinvk.getMesto1() != 0) cb_mesto1.setSelectedPcod(pinvk.mesto1);
-						if (pinvk.getPreds() != 0) cb_preds.setSelectedPcod(pinvk.preds);
-						if (pinvk.getRez_mse() != 0) cb_rez_mse.setSelectedPcod(pinvk.rez_mse);
-						if (pinvk.getSrok_inv() != 0) cb_srok_inv.setSelectedPcod(pinvk.srok_inv);
-						if (pinvk.getFactor() != 0) cb_factor.setSelectedPcod(pinvk.factor);
-						if (pinvk.getFact1() != 0) cb_fact1.setSelectedPcod(pinvk.fact1);
-						if (pinvk.getFact2() != 0) cb_fact2.setSelectedPcod(pinvk.fact2);
-						if (pinvk.getFact3() != 0) cb_fact3.setSelectedPcod(pinvk.fact3);
-						if (pinvk.getFact4() != 0) cb_fact4.setSelectedPcod(pinvk.fact4);
-						if (pinvk.getPrognoz() != 0) cb_prognoz.setSelectedPcod(pinvk.prognoz);
-						if (pinvk.getPotencial() != 0) cb_potencial.setSelectedPcod(pinvk.potencial);
-						if (pinvk.getMed_reab() != 0) cb_med_reab.setSelectedPcod(pinvk.med_reab);
-						if (pinvk.getPs_reab() != 0) cb_ps_reab.setSelectedPcod(pinvk.ps_reab);
-						if (pinvk.getProf_reab() != 0) cb_prof_reab.setSelectedPcod(pinvk.prof_reab);
-						if (pinvk.getSoc_reab() != 0) cb_soc_reab.setSelectedPcod(pinvk.soc_reab);
-						if (pinvk.getKlin_prognoz() != 0) cb_klin_prognoz.setSelectedPcod(pinvk.klin_prognoz);		
-						if (pinvk.getZakl() != 0) cb_zakl.setSelectedPcod(pinvk.zakl);
-						if (pinvk.getMr1v() != 0) cb_mr1v.setSelectedPcod(pinvk.mr1v);
-						if (pinvk.getMr2v() != 0) cb_mr2v.setSelectedPcod(pinvk.mr2v);							
-						if (pinvk.getMr3v() != 0) cb_mr3v.setSelectedPcod(pinvk.mr3v);
-						if (pinvk.getMr4v() != 0) cb_mr4v.setSelectedPcod(pinvk.mr4v);
-						if (pinvk.getMr5v() != 0) cb_mr5v.setSelectedPcod(pinvk.mr5v);
-						if (pinvk.getMr6v() != 0) cb_mr6v.setSelectedPcod(pinvk.mr6v);
-						if (pinvk.getMr7v() != 0) cb_mr7v.setSelectedPcod(pinvk.mr7v);
-						if (pinvk.getMr8v() != 0) cb_mr8v.setSelectedPcod(pinvk.mr8v);
-						if (pinvk.getMr9v() != 0) cb_mr9v.setSelectedPcod(pinvk.mr9v);
-						if (pinvk.getMr10v() != 0) cb_mr10v.setSelectedPcod(pinvk.mr10v);
-						if (pinvk.getMr11v() != 0) cb_mr11v.setSelectedPcod(pinvk.mr11v);
-						if (pinvk.getMr12v() != 0) cb_mr12v.setSelectedPcod(pinvk.mr12v);
-						if (pinvk.getMr13v() != 0) cb_mr13v.setSelectedPcod(pinvk.mr13v);
-						if (pinvk.getMr14v() != 0) cb_mr14v.setSelectedPcod(pinvk.mr14v);
-						if (pinvk.getMr15v() != 0) cb_mr15v.setSelectedPcod(pinvk.mr15v);
-						if (pinvk.getMr16v() != 0) cb_mr16v.setSelectedPcod(pinvk.mr16v);
-						if (pinvk.getMr17v() != 0) cb_mr17v.setSelectedPcod(pinvk.mr17v);
-						if (pinvk.getMr18v() != 0) cb_mr18v.setSelectedPcod(pinvk.mr18v);
-						if (pinvk.getMr19v() != 0) cb_mr19v.setSelectedPcod(pinvk.mr19v);
-						if (pinvk.getMr20v() != 0) cb_mr20v.setSelectedPcod(pinvk.mr20v);
-						if (pinvk.getMr21v() != 0) cb_mr21v.setSelectedPcod(pinvk.mr21v);
-						if (pinvk.getMr22v() != 0) cb_mr22v.setSelectedPcod(pinvk.mr22v);
-						if (pinvk.getMr23v() != 0) cb_mr23v.setSelectedPcod(pinvk.mr23v);
-						if (pinvk.getPr1v() != 0) cb_pr1v.setSelectedPcod(pinvk.pr1v);
-						if (pinvk.getPr2v() != 0) cb_pr2v.setSelectedPcod(pinvk.pr2v);
-						if (pinvk.getPr3v() != 0) cb_pr3v.setSelectedPcod(pinvk.pr3v);
-						if (pinvk.getPr4v() != 0) cb_pr4v.setSelectedPcod(pinvk.pr4v);
-						if (pinvk.getPr5v() != 0) cb_pr5v.setSelectedPcod(pinvk.pr5v);
-						if (pinvk.getPr6v() != 0) cb_pr6v.setSelectedPcod(pinvk.pr6v);
-						if (pinvk.getPr7v() != 0) cb_pr7v.setSelectedPcod(pinvk.pr7v);
-						if (pinvk.getPr8v() != 0) cb_pr8v.setSelectedPcod(pinvk.pr8v);
-						if (pinvk.getPr9v() != 0) cb_pr9v.setSelectedPcod(pinvk.pr9v);
-						if (pinvk.getPr10v() != 0) cb_pr10v.setSelectedPcod(pinvk.pr10v);
-						if (pinvk.getPr11v() != 0) cb_pr11v.setSelectedPcod(pinvk.pr11v);
-						if (pinvk.getPr12v() != 0) cb_pr12v.setSelectedPcod(pinvk.pr12v);
-						if (pinvk.getPr13v() != 0) cb_pr13v.setSelectedPcod(pinvk.pr13v);
-						if (pinvk.getPr14v() != 0) cb_pr14v.setSelectedPcod(pinvk.pr14v);
-						if (pinvk.getPr15v() != 0) cb_pr15v.setSelectedPcod(pinvk.pr15v);
-						if (pinvk.getPr16v() != 0) cb_pr16v.setSelectedPcod(pinvk.pr16v);
-						
-						ch_mr1n.setSelected(pinvk.getMr1n() == 1);
-						ch_mr2n.setSelected(pinvk.getMr2n() == 1);
-						ch_mr3n.setSelected(pinvk.getMr3n() == 1);
-						ch_mr4n.setSelected(pinvk.getMr4n() == 1);
-						ch_mr5n.setSelected(pinvk.getMr5n() == 1);
-						ch_mr6n.setSelected(pinvk.getMr6n() == 1);
-						ch_mr7n.setSelected(pinvk.getMr7n() == 1);
-						ch_mr8n.setSelected(pinvk.getMr8n() == 1);
-						ch_mr9n.setSelected(pinvk.getMr9n() == 1);
-						ch_mr10n.setSelected(pinvk.getMr10n() == 1);
-						ch_mr11n.setSelected(pinvk.getMr11n() == 1);
-						ch_mr12n.setSelected(pinvk.getMr12n() == 1);
-						ch_mr13n.setSelected(pinvk.getMr13n() == 1);
-						ch_mr14n.setSelected(pinvk.getMr14n() == 1);
-						ch_mr15n.setSelected(pinvk.getMr15n() == 1);
-						ch_mr16n.setSelected(pinvk.getMr16n() == 1);
-						ch_mr17n.setSelected(pinvk.getMr17n() == 1);
-						ch_mr18n.setSelected(pinvk.getMr18n() == 1);
-						ch_mr19n.setSelected(pinvk.getMr19n() == 1);
-						ch_mr20n.setSelected(pinvk.getMr20n() == 1);
-						ch_mr21n.setSelected(pinvk.getMr21n() == 1);
-						ch_mr22n.setSelected(pinvk.getMr22n() == 1);
-						ch_mr23n.setSelected(pinvk.getMr23n() == 1);
-						ch_pr1n.setSelected(pinvk.getPr1n() == 1);
-						ch_pr2n.setSelected(pinvk.getPr2n() == 1);
-						ch_pr3n.setSelected(pinvk.getPr3n() == 1);
-						ch_pr4n.setSelected(pinvk.getPr4n() == 1);
-						ch_pr5n.setSelected(pinvk.getPr5n() == 1);
-						ch_pr6n.setSelected(pinvk.getPr6n() == 1);
-						ch_pr7n.setSelected(pinvk.getPr7n() == 1);
-						ch_pr8n.setSelected(pinvk.getPr8n() == 1);
-						ch_pr9n.setSelected(pinvk.getPr9n() == 1);
-						ch_pr10n.setSelected(pinvk.getPr10n() == 1);
-						ch_pr11n.setSelected(pinvk.getPr11n() == 1);
-						ch_pr12n.setSelected(pinvk.getPr12n() == 1);
-						ch_pr13n.setSelected(pinvk.getPr13n() == 1);
-						ch_pr14n.setSelected(pinvk.getPr14n() == 1);
-						ch_pr15n.setSelected(pinvk.getPr15n() == 1);
-						ch_pr16n.setSelected(pinvk.getPr16n() == 1);
-						
-					} catch (KmiacServerException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-						} catch (PinvkNotFoundException e1) {
-						//	t_dataz.setText(System.currentTimeMillis());
-						lblpatient.setText(patInf.fam+" "+patInf.im+" "+patInf.ot);
-						pinvk.setNpasp(patInf.npasp);
-						pinvk.getNinv();
-						pinvk.setDatav(System.currentTimeMillis());
-						pinvk.setDataz(System.currentTimeMillis());
-											
-					} catch (TException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}			
-				
-				}
-			}
-		});
-		
 		 lblpatient = new JLabel("Пациент:");
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
@@ -841,9 +565,7 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(lblpatient)
-					.addPreferredGap(ComponentPlacement.RELATED, 257, Short.MAX_VALUE)
-					.addComponent(btnSearch)
-					.addGap(18)
+					.addPreferredGap(ComponentPlacement.RELATED, 338, Short.MAX_VALUE)
 					.addComponent(btnAdd)
 					.addGap(18)
 					.addComponent(btnSave)
@@ -859,7 +581,6 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 						.addComponent(btnDelete)
 						.addComponent(btnSave)
 						.addComponent(btnAdd)
-						.addComponent(btnSearch)
 						.addComponent(lblpatient))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 619, GroupLayout.PREFERRED_SIZE)
@@ -3060,19 +2781,256 @@ public  class MainForm extends Client<thriftKartaRInv.Client> {
 		super.onConnect(conn);
 		if (conn instanceof thriftKartaRInv.Client) {
 			tcl = thrClient;
-			onTclConnect();
 		}
-		
 	}
 	
-	public void onTclConnect() {
-//		try {
-////			cmbProfil.setData(MainForm.tcl.get_n_prf());
-//		} catch (TException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
+	@Override
+	public Object showModal(IClient parent, Object... params) {
+		JDialog dialog = prepareModal(parent);
+		showKart((int) params[0]);
+		dialog.setVisible(true);
+		disposeModal();
+		return null;
+	}
+	
+	private void showKart(int npasp) {
+		try {
+			searchedNpasp = npasp;	
+			pinvk = new Pinvk();
+			patInf = new PatientCommonInfo();	
+			patInf = MainForm.tcl.getPatientCommonInfo(npasp);
+			
+			lblpatient.setText(patInf.fam+" "+patInf.im+" "+patInf.ot);
+			
+			pinvk = MainForm.tcl.getPinvk(patInf.npasp);
+			//} catch (KmiacServerException e1) {
+			// TODO Auto-generated catch block
+		//	e1.printStackTrace();
+		
+//	} catch (TException e1) {
+			// TODO Auto-generated catch block
+//		e1.printStackTrace();
+//	}
+//	try {
+			//pinvk = MainForm.tcl.getPinvk(searchedNpasp);
+							
+			bg_psih.clearSelection();
+			radioButtonP.setSelected(pinvk.getNar1() == 0);
+			radioButtonP_1.setSelected(pinvk.getNar1() == 1);
+			radioButtonP_2.setSelected(pinvk.getNar1() == 2);
+			radioButtonP_3.setSelected(pinvk.getNar1() == 3);
+			radioButtonP_4.setSelected(pinvk.getNar1() == 4);
+			bg_rech.clearSelection();
+			radioButtonR.setSelected(pinvk.getNar2() == 0);
+			radioButtonR_1.setSelected(pinvk.getNar2() == 1);
+			radioButtonR_2.setSelected(pinvk.getNar2() == 2);
+			radioButtonR_3.setSelected(pinvk.getNar2() == 3);
+			radioButtonR_4.setSelected(pinvk.getNar2() == 4);
+			bg_sens.clearSelection();
+			radioButtonS.setSelected(pinvk.getNar3() == 0);
+			radioButtonS_1.setSelected(pinvk.getNar3() == 1);
+			radioButtonS_2.setSelected(pinvk.getNar3() == 2);
+			radioButtonS_3.setSelected(pinvk.getNar3() == 3);
+			radioButtonS_4.setSelected(pinvk.getNar3() == 4);
+			bg_dinam.clearSelection();
+			radioButtonD.setSelected(pinvk.getNar4() == 0);
+			radioButtonD_1.setSelected(pinvk.getNar4() == 1);
+			radioButtonD_2.setSelected(pinvk.getNar4() == 2);
+			radioButtonD_3.setSelected(pinvk.getNar4() == 3);
+			radioButtonD_4.setSelected(pinvk.getNar4() == 4);
+			bg_zab.clearSelection();
+			radioButtonZ.setSelected(pinvk.getNar5() == 0);
+			radioButtonZ_1.setSelected(pinvk.getNar5() == 1);
+			radioButtonZ_2.setSelected(pinvk.getNar5() == 2);
+			radioButtonZ_3.setSelected(pinvk.getNar5() == 3);
+			radioButtonZ_4.setSelected(pinvk.getNar5() == 4);
+			bg_urod.clearSelection();
+			radioButtonU.setSelected(pinvk.getNar6() == 0);
+			radioButtonU_1.setSelected(pinvk.getNar6() == 1);
+			radioButtonU_2.setSelected(pinvk.getNar6() == 2);
+			radioButtonU_3.setSelected(pinvk.getNar6() == 3);
+			radioButtonU_4.setSelected(pinvk.getNar6() == 4);
+			bg_samob.clearSelection();
+			radioButtonSo.setSelected(pinvk.getOgr1() == 0);
+			radioButtonSo_1.setSelected(pinvk.getOgr1() == 1);
+			radioButtonSo_2.setSelected(pinvk.getOgr1() == 2);
+			radioButtonSo_3.setSelected(pinvk.getOgr1() == 3);
+			radioButtonSo_4.setSelected(pinvk.getOgr1() == 4);
+			bg_dvig.clearSelection();
+			radioButtonSd.setSelected(pinvk.getOgr2() == 0);
+			radioButtonSd_1.setSelected(pinvk.getOgr2() == 1);
+			radioButtonSd_2.setSelected(pinvk.getOgr2() == 2);
+			radioButtonSd_3.setSelected(pinvk.getOgr2() == 3);
+			radioButtonSd_4.setSelected(pinvk.getOgr2() == 4);
+			bg_orient.clearSelection();
+			radioButtonOr.setSelected(pinvk.getOgr3() == 0);
+			radioButtonOr_1.setSelected(pinvk.getOgr3() == 1);
+			radioButtonOr_2.setSelected(pinvk.getOgr3() == 2);
+			radioButtonOr_3.setSelected(pinvk.getOgr3() == 3);
+			radioButtonOr_4.setSelected(pinvk.getOgr3() == 4);
+			bg_obsh.clearSelection();
+			radioButtonO.setSelected(pinvk.getOgr4() == 0);
+			radioButtonO_1.setSelected(pinvk.getOgr4() == 1);
+			radioButtonO_2.setSelected(pinvk.getOgr4() == 2);
+			radioButtonO_3.setSelected(pinvk.getOgr4() == 3);
+			radioButtonO_4.setSelected(pinvk.getOgr4() == 4);
+			bg_poved.clearSelection();
+			radioButtonK.setSelected(pinvk.getOgr5() == 0);
+			radioButtonK_1.setSelected(pinvk.getOgr5() == 1);
+			radioButtonK_2.setSelected(pinvk.getOgr5() == 2);
+			radioButtonK_3.setSelected(pinvk.getOgr5() == 3);
+			radioButtonK_4.setSelected(pinvk.getOgr5() == 4);
+			bg_obuch.clearSelection();
+			radioButtonOb.setSelected(pinvk.getOgr6() == 0);
+			radioButtonOb_1.setSelected(pinvk.getOgr6() == 1);
+			radioButtonOb_2.setSelected(pinvk.getOgr6() == 2);
+			radioButtonOb_3.setSelected(pinvk.getOgr6() == 3);
+			radioButtonOb_4.setSelected(pinvk.getOgr6() == 4);
+			bg_trud.clearSelection();
+			radioButtonT.setSelected(pinvk.getOgr7() == 0);
+			radioButtonT_1.setSelected(pinvk.getOgr7() == 1);
+			radioButtonT_2.setSelected(pinvk.getOgr7() == 2);
+			radioButtonT_3.setSelected(pinvk.getOgr7() == 3);
+			radioButtonT_4.setSelected(pinvk.getOgr7() == 4);
+			
+			
+			//t_vrach.setText(String.valueOf(pinvk.getVrach()));
+			t_vrach.setText(pinvk.getVrach());
+			t_uchr.setText(pinvk.getUchr());
+			t_nom_mse.setText(pinvk.getNom_mse());
+			t_ruk_mse.setText(pinvk.getRuk_mse());
+			t_diag.setText(pinvk.getDiag());
+			t_diag_s1.setText(pinvk.getDiag_s1());
+			t_diag_s2.setText(pinvk.getDiag_s2());
+			t_diag_s3.setText(pinvk.getDiag_s3());
+			t_oslog.setText(pinvk.getOslog());
+			t_zakl_name.setText(pinvk.getZakl_name());
+			t_mr1d.setText(pinvk.getMr1d());
+			t_mr2d.setText(pinvk.getMr2d());
+			t_mr3d.setText(pinvk.getMr3d());
+			t_mr4d.setText(pinvk.getMr4d());
+			t_pr1d.setText(pinvk.getPr1d());
+			
+			if (pinvk.isSetDatav()) t_datav.setDate(pinvk.getDatav());
+			if (pinvk.isSetDataz()) t_dataz.setDate(pinvk.getDataz());
+			if (pinvk.isSetD_osv()) t_d_osv.setDate(pinvk.getD_osv());
+			if (pinvk.isSetD_otpr()) t_d_otpr.setDate(pinvk.getD_otpr());
+			if (pinvk.isSetD_inv()) t_d_inv.setDate(pinvk.getD_inv());
+			if (pinvk.isSetD_invp()) t_d_invp.setDate(pinvk.getD_invp());
+			if (pinvk.isSetD_srok()) t_d_srok.setDate(pinvk.getD_srok());
+			
+			if (pinvk.getMesto1() != 0) cb_mesto1.setSelectedPcod(pinvk.mesto1);
+			if (pinvk.getPreds() != 0) cb_preds.setSelectedPcod(pinvk.preds);
+			if (pinvk.getRez_mse() != 0) cb_rez_mse.setSelectedPcod(pinvk.rez_mse);
+			if (pinvk.getSrok_inv() != 0) cb_srok_inv.setSelectedPcod(pinvk.srok_inv);
+			if (pinvk.getFactor() != 0) cb_factor.setSelectedPcod(pinvk.factor);
+			if (pinvk.getFact1() != 0) cb_fact1.setSelectedPcod(pinvk.fact1);
+			if (pinvk.getFact2() != 0) cb_fact2.setSelectedPcod(pinvk.fact2);
+			if (pinvk.getFact3() != 0) cb_fact3.setSelectedPcod(pinvk.fact3);
+			if (pinvk.getFact4() != 0) cb_fact4.setSelectedPcod(pinvk.fact4);
+			if (pinvk.getPrognoz() != 0) cb_prognoz.setSelectedPcod(pinvk.prognoz);
+			if (pinvk.getPotencial() != 0) cb_potencial.setSelectedPcod(pinvk.potencial);
+			if (pinvk.getMed_reab() != 0) cb_med_reab.setSelectedPcod(pinvk.med_reab);
+			if (pinvk.getPs_reab() != 0) cb_ps_reab.setSelectedPcod(pinvk.ps_reab);
+			if (pinvk.getProf_reab() != 0) cb_prof_reab.setSelectedPcod(pinvk.prof_reab);
+			if (pinvk.getSoc_reab() != 0) cb_soc_reab.setSelectedPcod(pinvk.soc_reab);
+			if (pinvk.getKlin_prognoz() != 0) cb_klin_prognoz.setSelectedPcod(pinvk.klin_prognoz);		
+			if (pinvk.getZakl() != 0) cb_zakl.setSelectedPcod(pinvk.zakl);
+			if (pinvk.getMr1v() != 0) cb_mr1v.setSelectedPcod(pinvk.mr1v);
+			if (pinvk.getMr2v() != 0) cb_mr2v.setSelectedPcod(pinvk.mr2v);							
+			if (pinvk.getMr3v() != 0) cb_mr3v.setSelectedPcod(pinvk.mr3v);
+			if (pinvk.getMr4v() != 0) cb_mr4v.setSelectedPcod(pinvk.mr4v);
+			if (pinvk.getMr5v() != 0) cb_mr5v.setSelectedPcod(pinvk.mr5v);
+			if (pinvk.getMr6v() != 0) cb_mr6v.setSelectedPcod(pinvk.mr6v);
+			if (pinvk.getMr7v() != 0) cb_mr7v.setSelectedPcod(pinvk.mr7v);
+			if (pinvk.getMr8v() != 0) cb_mr8v.setSelectedPcod(pinvk.mr8v);
+			if (pinvk.getMr9v() != 0) cb_mr9v.setSelectedPcod(pinvk.mr9v);
+			if (pinvk.getMr10v() != 0) cb_mr10v.setSelectedPcod(pinvk.mr10v);
+			if (pinvk.getMr11v() != 0) cb_mr11v.setSelectedPcod(pinvk.mr11v);
+			if (pinvk.getMr12v() != 0) cb_mr12v.setSelectedPcod(pinvk.mr12v);
+			if (pinvk.getMr13v() != 0) cb_mr13v.setSelectedPcod(pinvk.mr13v);
+			if (pinvk.getMr14v() != 0) cb_mr14v.setSelectedPcod(pinvk.mr14v);
+			if (pinvk.getMr15v() != 0) cb_mr15v.setSelectedPcod(pinvk.mr15v);
+			if (pinvk.getMr16v() != 0) cb_mr16v.setSelectedPcod(pinvk.mr16v);
+			if (pinvk.getMr17v() != 0) cb_mr17v.setSelectedPcod(pinvk.mr17v);
+			if (pinvk.getMr18v() != 0) cb_mr18v.setSelectedPcod(pinvk.mr18v);
+			if (pinvk.getMr19v() != 0) cb_mr19v.setSelectedPcod(pinvk.mr19v);
+			if (pinvk.getMr20v() != 0) cb_mr20v.setSelectedPcod(pinvk.mr20v);
+			if (pinvk.getMr21v() != 0) cb_mr21v.setSelectedPcod(pinvk.mr21v);
+			if (pinvk.getMr22v() != 0) cb_mr22v.setSelectedPcod(pinvk.mr22v);
+			if (pinvk.getMr23v() != 0) cb_mr23v.setSelectedPcod(pinvk.mr23v);
+			if (pinvk.getPr1v() != 0) cb_pr1v.setSelectedPcod(pinvk.pr1v);
+			if (pinvk.getPr2v() != 0) cb_pr2v.setSelectedPcod(pinvk.pr2v);
+			if (pinvk.getPr3v() != 0) cb_pr3v.setSelectedPcod(pinvk.pr3v);
+			if (pinvk.getPr4v() != 0) cb_pr4v.setSelectedPcod(pinvk.pr4v);
+			if (pinvk.getPr5v() != 0) cb_pr5v.setSelectedPcod(pinvk.pr5v);
+			if (pinvk.getPr6v() != 0) cb_pr6v.setSelectedPcod(pinvk.pr6v);
+			if (pinvk.getPr7v() != 0) cb_pr7v.setSelectedPcod(pinvk.pr7v);
+			if (pinvk.getPr8v() != 0) cb_pr8v.setSelectedPcod(pinvk.pr8v);
+			if (pinvk.getPr9v() != 0) cb_pr9v.setSelectedPcod(pinvk.pr9v);
+			if (pinvk.getPr10v() != 0) cb_pr10v.setSelectedPcod(pinvk.pr10v);
+			if (pinvk.getPr11v() != 0) cb_pr11v.setSelectedPcod(pinvk.pr11v);
+			if (pinvk.getPr12v() != 0) cb_pr12v.setSelectedPcod(pinvk.pr12v);
+			if (pinvk.getPr13v() != 0) cb_pr13v.setSelectedPcod(pinvk.pr13v);
+			if (pinvk.getPr14v() != 0) cb_pr14v.setSelectedPcod(pinvk.pr14v);
+			if (pinvk.getPr15v() != 0) cb_pr15v.setSelectedPcod(pinvk.pr15v);
+			if (pinvk.getPr16v() != 0) cb_pr16v.setSelectedPcod(pinvk.pr16v);
+			
+			ch_mr1n.setSelected(pinvk.getMr1n() == 1);
+			ch_mr2n.setSelected(pinvk.getMr2n() == 1);
+			ch_mr3n.setSelected(pinvk.getMr3n() == 1);
+			ch_mr4n.setSelected(pinvk.getMr4n() == 1);
+			ch_mr5n.setSelected(pinvk.getMr5n() == 1);
+			ch_mr6n.setSelected(pinvk.getMr6n() == 1);
+			ch_mr7n.setSelected(pinvk.getMr7n() == 1);
+			ch_mr8n.setSelected(pinvk.getMr8n() == 1);
+			ch_mr9n.setSelected(pinvk.getMr9n() == 1);
+			ch_mr10n.setSelected(pinvk.getMr10n() == 1);
+			ch_mr11n.setSelected(pinvk.getMr11n() == 1);
+			ch_mr12n.setSelected(pinvk.getMr12n() == 1);
+			ch_mr13n.setSelected(pinvk.getMr13n() == 1);
+			ch_mr14n.setSelected(pinvk.getMr14n() == 1);
+			ch_mr15n.setSelected(pinvk.getMr15n() == 1);
+			ch_mr16n.setSelected(pinvk.getMr16n() == 1);
+			ch_mr17n.setSelected(pinvk.getMr17n() == 1);
+			ch_mr18n.setSelected(pinvk.getMr18n() == 1);
+			ch_mr19n.setSelected(pinvk.getMr19n() == 1);
+			ch_mr20n.setSelected(pinvk.getMr20n() == 1);
+			ch_mr21n.setSelected(pinvk.getMr21n() == 1);
+			ch_mr22n.setSelected(pinvk.getMr22n() == 1);
+			ch_mr23n.setSelected(pinvk.getMr23n() == 1);
+			ch_pr1n.setSelected(pinvk.getPr1n() == 1);
+			ch_pr2n.setSelected(pinvk.getPr2n() == 1);
+			ch_pr3n.setSelected(pinvk.getPr3n() == 1);
+			ch_pr4n.setSelected(pinvk.getPr4n() == 1);
+			ch_pr5n.setSelected(pinvk.getPr5n() == 1);
+			ch_pr6n.setSelected(pinvk.getPr6n() == 1);
+			ch_pr7n.setSelected(pinvk.getPr7n() == 1);
+			ch_pr8n.setSelected(pinvk.getPr8n() == 1);
+			ch_pr9n.setSelected(pinvk.getPr9n() == 1);
+			ch_pr10n.setSelected(pinvk.getPr10n() == 1);
+			ch_pr11n.setSelected(pinvk.getPr11n() == 1);
+			ch_pr12n.setSelected(pinvk.getPr12n() == 1);
+			ch_pr13n.setSelected(pinvk.getPr13n() == 1);
+			ch_pr14n.setSelected(pinvk.getPr14n() == 1);
+			ch_pr15n.setSelected(pinvk.getPr15n() == 1);
+			ch_pr16n.setSelected(pinvk.getPr16n() == 1);
+			
+		} catch (KmiacServerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			} catch (PinvkNotFoundException e1) {
+			//	t_dataz.setText(System.currentTimeMillis());
+			lblpatient.setText(patInf.fam+" "+patInf.im+" "+patInf.ot);
+			pinvk.setNpasp(patInf.npasp);
+			pinvk.getNinv();
+			pinvk.setDatav(System.currentTimeMillis());
+			pinvk.setDataz(System.currentTimeMillis());
+								
+		} catch (TException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 }
 	

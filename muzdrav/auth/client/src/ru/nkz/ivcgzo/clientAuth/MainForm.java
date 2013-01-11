@@ -318,6 +318,7 @@ public class MainForm {
 					} catch (Exception e1) {
 						e1.printStackTrace();
 						JOptionPane.showMessageDialog(frame, e1.getLocalizedMessage(), "Ошибка загрузки модуля", JOptionPane.ERROR_MESSAGE);
+						btnLaunch.setEnabled(true);
 					}
 			}
 		});

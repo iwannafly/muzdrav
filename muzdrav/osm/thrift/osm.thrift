@@ -512,6 +512,7 @@ struct Protokol{
 	5: optional i32 cpol;
 	6: optional string cpodr_name;
 	7: optional string clpu_name;
+	8: optional i32 nstr;
 }
 
 struct Vypis {

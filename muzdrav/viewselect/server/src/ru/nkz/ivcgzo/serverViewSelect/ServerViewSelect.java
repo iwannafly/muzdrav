@@ -1,5 +1,9 @@
 package ru.nkz.ivcgzo.serverViewSelect;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -693,6 +697,89 @@ public class ServerViewSelect extends Server implements Iface {
         }
 	}
 
+	@Override
+	public String printAnamnez(int npasp, int cpodr, int cslu)
+			throws KmiacServerException, TException {
+		final String path;
+		String sqlQuery = null;
+		int numline = 0;
+		int prlpu = 0;
+			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("anam", ".htm").getAbsolutePath()), "utf-8")) {
+   				StringBuilder sb = new StringBuilder(0x10000);
+	    			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+	    			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+	    			sb.append("<head>");
+	       			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+	   				sb.append("<title>Эпидемиологический анамнез</title>");
+	   				sb.append("</head>");
+	   				sb.append("<body>");
+					try (AutoCloseableResultSet acr = sse.execPreparedQuery("select name from n_m00 where pcod = ?", cpodr)) {
+						if (acr.getResultSet().next())
+		      				sb.append(String.format("<h4 align=center> %s </h4>", acr.getResultSet().getString("name")));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					if (cslu == 1){
+   						sqlQuery = "SELECT o.prlpu FROM n_o00 o WHERE o.pcod = ?";
+					}
+					if (cslu == 2){
+   						sqlQuery = "SELECT o.prlpu FROM n_n00 o WHERE o.pcod = ?";
+					}
+	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, cpodr)) {
+						if (acr.getResultSet().next()){
+		      				prlpu = acr.getResultSet().getInt("prlpu");
+							if (acr.getResultSet().getInt("prlpu") == 5){
+		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
+		      				}else{
+		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
+		      				}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+   				    
+
+					
+  	   						/*acrs = sse.execPreparedQuery("select p_diag_amb.diag,n_vdi.name,p_diag_amb.named  from p_vizit_amb join p_diag_amb on (p_diag_amb.id_pos=p_vizit_amb.id) left join n_vdi on(p_diag_amb.diag_stat=n_vdi.pcod) where p_vizit_amb.id=? order by p_vizit_amb.id ", pk.getPvizit_ambId());
+				if (acrs.getResultSet().next()) {
+					do {
+						sb.append(String.format("<i>Код диагноза МКБ </i> %s <br>", acrs.getResultSet().getString(1)));
+						if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Статус диагноза</i> %s <br>", acrs.getResultSet().getString(2)));
+						if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>Медицинское описание диагноза </i> %s <br>", acrs.getResultSet().getString(3)));
+
+						} while (acrs.getResultSet().next());
+				}
+				acrs.close();*/
+   					try {
+  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select * from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) where npasp=? and comment is not null ", npasp); 
+   							
+								if (acr.getResultSet().next()){
+									do {
+									sb.append(String.format("%s %s",acr.getResultSet().getString(7), acr.getResultSet().getString(5)));
+									sb.append("<br>");
+									}
+									while (acr.getResultSet().next());
+								}
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+   						
+   						
+ 
+
+   	   		            sb.append(String.format("<br><br>Подпись  _______________________________________________    %1$td.%1$tm.%1$tY г. <br><br>", new Date(System.currentTimeMillis())));
+   	   					sb.append(String.format("Подпись врача __________________________________________    %1$td.%1$tm.%1$tY г.<br>", new Date(System.currentTimeMillis())));
+ 
+
+					osw.write(sb.toString());
+   			} catch (IOException e) {
+   				e.printStackTrace();
+   				throw new KmiacServerException();
+   			}
+			return path;
+	}
+			
 	@Override
 	public List<Pbol> getPbol(int npasp) throws KmiacServerException, TException {
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_bol WHERE npasp = ? ", npasp)) {
