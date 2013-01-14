@@ -1619,8 +1619,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							sb.append(String.format("<br><b> Лечебные и трудовые рекомендации</b> %s", acrs.getResultSet().getString(1)));
 						if (acrs.getResultSet().getString(2) != null)
 							sb.append(String.format("<br><b> Заключение </b> %s", acrs.getResultSet().getString(2)));
-						if (acrs.getResultSet().getString(4) != null)
-							sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(4)));
+						if (pk.nstr != 0){
+						}
+						else{
+							if (acrs.getResultSet().getString(4) != null)
+								sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(4)));
+						}
 					}
 					sb.append("<br>");
 				acrs.close();
