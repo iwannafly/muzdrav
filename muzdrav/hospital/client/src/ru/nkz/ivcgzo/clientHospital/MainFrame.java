@@ -554,6 +554,8 @@ public class MainFrame extends JFrame {
                     pChildren.SetPatient(patient);
 
         			try {
+	          	 		System.out.println(patient.getPatientId());	
+	          	 		System.out.println(patient.gospitalCod);	
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
 							patient.getPatientId(), patient.gospitalCod);
 						setDefaultValues();
