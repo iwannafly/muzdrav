@@ -3,7 +3,9 @@ package ru.nkz.ivcgzo.clientDisp;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
@@ -33,6 +35,7 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomNumberEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
@@ -606,6 +609,23 @@ public class MainForm extends Client<ThriftDisp.Client>{
 
 			}
 		});
+		
+		JButton btnRkart = new JButton("Карта ребенка-инвалида");
+		btnRkart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if (pat != null) {
+						IClient cli = MainForm.conMan.getPluginLoader().loadPluginByAppId(11);
+						cli.showModal(MainForm.this, pat.npasp);
+					} else {
+						JOptionPane.showMessageDialog(frame, "Выберите пациента.");
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+					JOptionPane.showMessageDialog(frame, "Не удалось отобразить форму.");
+				}
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -616,7 +636,9 @@ public class MainForm extends Client<ThriftDisp.Client>{
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(btnSrc)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(button))
+							.addComponent(button)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(btnRkart))
 						.addComponent(lblPatient))
 					.addContainerGap())
 		);
@@ -628,7 +650,8 @@ public class MainForm extends Client<ThriftDisp.Client>{
 					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnSrc)
-						.addComponent(button))
+						.addComponent(button)
+						.addComponent(btnRkart))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 643, GroupLayout.PREFERRED_SIZE))
 		);

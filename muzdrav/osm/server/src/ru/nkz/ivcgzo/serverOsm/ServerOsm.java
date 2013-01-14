@@ -902,8 +902,8 @@ public class ServerOsm extends Server implements Iface {
 			
 			sb.append("<table cellpadding=\"5\" cellspacing=\"0\">");
 			sb.append("<tr valign=\"top\">");
-				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px;\" width=\"40%\">");
-					sb.append("<h3>Информация для пациента:</h3>");
+				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 11px times new roman;\" width=\"150px\">");
+					sb.append("<b>Информация для пациента:</b><br><br>");
 					acrs = sse.execPreparedQuery("select substr(adres,8), name_s from n_m00 where pcod = ? ", im.getClpu());
 					if (acrs.getResultSet().next()) {
 						sb.append(String.format("<b>ЛПУ: </b>%s<br />", acrs.getResultSet().getString(2)));
@@ -918,15 +918,15 @@ public class ServerOsm extends Server implements Iface {
 				acrs.close();
 				acrs = sse.execPreparedQuery("SELECT v.fam, v.im, v.ot FROM s_users u JOIN s_vrach v ON (v.pcod = u.pcod) WHERE u.id = ? ", im.getUserId());
 				if (acrs.getResultSet().next()) {
-					sb.append("<td style=\"border: 1px solid black; padding: 5px;\" width=\"60%\">");
-					sb.append(String.format("<h3>%s<br />", im.getClpu_name()));
-					sb.append(String.format("%s<br />", im.getCpodr_name()));
+					sb.append("<td style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\" width=\"250px\">");
+					sb.append(String.format("<b>%s</b><br /><br>", im.getClpu_name()));
+					sb.append(String.format("<b>%s</b><br><br />", im.getCpodr_name()));
 				}
 				String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3));
 				acrs.close();
 				acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", im.getKodVidIssl());
 				if (acrs.getResultSet().next())
-					sb.append(String.format("Направление на: %s</h3>", acrs.getResultSet().getString(1)));
+					sb.append(String.format("<b>Направление на: %s</b><br>", acrs.getResultSet().getString(1)));
 				acrs.close();
 				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 				if (acrs.getResultSet().next()) {
@@ -936,14 +936,14 @@ public class ServerOsm extends Server implements Iface {
 					if (acrs.getResultSet().getString(5)!=null)
 					sb.append(String.format("<b>Адрес:</b> %s, %s<br />", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6)));
 				}
-				sb.append("<b>Диагноз:</b><br />");
+				sb.append("<b>Диагноз: </b>");
 				acrs.close();
 				acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 order by p_vizit_amb.datap", im.getPvizitId());
 				if (acrs.getResultSet().next()) 
 					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
 				acrs.close();
-				sb.append(String.format("<b>Врач:</b> %s<br />", vrInfo));
-				sb.append("<h3>Наименование исследований:</h3>");
+				sb.append(String.format("<b>Врач:</b> %s<br /><br>", vrInfo));
+				sb.append("<b>Наименование исследований:</b>");
 				sb.append("<ol>");
 				for (String str : im.getPokaz()) {
 					acrs.close();
@@ -1619,8 +1619,12 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 							sb.append(String.format("<br><b> Лечебные и трудовые рекомендации</b> %s", acrs.getResultSet().getString(1)));
 						if (acrs.getResultSet().getString(2) != null)
 							sb.append(String.format("<br><b> Заключение </b> %s", acrs.getResultSet().getString(2)));
-						if (acrs.getResultSet().getString(4) != null)
-							sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(4)));
+						if (pk.nstr != 0){
+						}
+						else{
+							if (acrs.getResultSet().getString(4) != null)
+								sb.append(String.format("<br><b> Исход </b> %s", acrs.getResultSet().getString(4)));
+						}
 					}
 					sb.append("<br>");
 				acrs.close();
