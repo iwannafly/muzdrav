@@ -28,6 +28,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
+import java.awt.Font;
 
 
 public class ReestrForm extends JFrame {
@@ -46,13 +47,17 @@ public class ReestrForm extends JFrame {
 		setJMenuBar(menuBar);
 		
 		JMenu RunMenu = new JMenu("Выполнить");
+		RunMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		menuBar.add(RunMenu);
 		JMenu menu2 = new JMenu("Выгрузка файлов для контроля в ТФ ОМС");
+		menu2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JMenu menu3 = new JMenu ("Загрузка файла контроля/оплаты реестров");
+		menu3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		RunMenu.add(menu2);
 		RunMenu.add(menu3);
 		
 		JMenuItem ReestrPolMenu = new JMenuItem ("Реестры поликлиники");
+		ReestrPolMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		ReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sfrm = new SettingsForm();
@@ -62,6 +67,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem ReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
+		ReestrLDSMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		ReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sfrm = new SettingsForm();
@@ -71,6 +77,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem ReestrStMenu = new JMenuItem ("Реестры стационара");
+		ReestrStMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		ReestrStMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				sfrm = new SettingsForm();
@@ -80,6 +87,7 @@ public class ReestrForm extends JFrame {
 		});
 		
 		JMenuItem LoadReestrPolMenu = new JMenuItem ("Реестры поликлиники");
+		LoadReestrPolMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrPolMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 		        OpenWindowFileChooser();
@@ -102,6 +110,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem LoadReestrLDSMenu = new JMenuItem ("Реестры ЛДС");
+		LoadReestrLDSMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrLDSMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		        OpenWindowFileChooser();
@@ -123,6 +132,7 @@ public class ReestrForm extends JFrame {
 		});
 
 		JMenuItem LoadReestrStMenu = new JMenuItem ("Реестры стационара");
+		LoadReestrStMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrStMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		        OpenWindowFileChooser();
