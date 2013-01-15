@@ -551,7 +551,7 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
-                    pChildren.SetPatient(patient);
+                    pChildren.setPatient(patient);
 
         			try {
 	          	 		System.out.println(patient.getPatientId());	

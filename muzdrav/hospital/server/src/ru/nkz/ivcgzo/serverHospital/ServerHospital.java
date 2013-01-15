@@ -1841,13 +1841,13 @@ public class ServerHospital extends Server implements Iface {
         final String path;
         final String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
-        //TODO: при изменении региона или серии в регионе - поменять:
-        final String childBirthDocSeries = "32";
         if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
         	throw new ChildDocNotFoundException();
         Formatter f = new Formatter();
         final String childBirthNumber = f.format("%6d", ndoc).toString();
+        f.close();
         TRd_Svid childDoc = getChildDocumentByDoc(ndoc);
+        TRd_Novor childBirthInfo = getChildInfo(childDoc.getNpasp());
         TPatientCommonInfo childInfo = getPatientCommonInfo(childDoc.getNpasp());
         TPatientCommonInfo motherInfo = getPatientCommonInfo(getMotherId(childDoc.getNpasp()));
         try (OutputStreamWriter osw = new OutputStreamWriter(
@@ -1898,61 +1898,63 @@ public class ServerHospital extends Server implements Iface {
             String motherFullName = motherInfo.getFull_name();
             //Фамилия матери:
             int firstSpace = motherFullName.indexOf(' ');
-            String motherSurname = motherFullName.substring(0, firstSpace);
+            final String motherSurname = motherFullName.substring(0, firstSpace);
             //Имя и отчество матери:
-            String motherFirstName = motherFullName.substring(firstSpace + 1, motherFullName.length());
+            final String motherFirstName = motherFullName.substring(firstSpace + 1, motherFullName.length());
+            //Время рождения:
+            final String childBirthTime = childBirthInfo.getTimeon();
+            final String childBirthHour = childBirthTime.substring(0, 2);
+            final String childBirthMinute = childBirthTime.substring(3, 5);
             htmTemplate.replaceLabels(false,
-            		ServerHospital.childBirthDocSeries, childBirthNumber,
-            		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
-            		sdfYear.format(childDoc.getDateoff()),
-            		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
-            		sdfYear.format(childInfo.getDatar()),
-            		//TODO: ЗАПИСАТЬ ВРЕМЯ РОЖДЕНИЯ:
-            		"", "",
-            		motherFullName,
-            		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
-            		sdfYear.format(motherInfo.getDatar()),
-            		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
-            		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
-            		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
-            		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
-            		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
-            		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
-            		city1, city2, country1, country2,
-            		boy1, boy2, girl1, girl2,
-            		//TODO: ЗАПИСАТЬ ШАПКУ:
-            		"", "", "", "",
-            		childBirthDocSeries, childBirthNumber,
-            		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
-            		sdfYear.format(childDoc.getDateoff()),
-            		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
-            		sdfYear.format(childInfo.getDatar()),
-            		//TODO: ЗАПИСАТЬ ВРЕМЯ РОЖДЕНИЯ:
-            		"", "",
-            		motherSurname, motherFirstName, childDoc.getFamreb().toUpperCase(),
-            		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
-            		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
-            		sdfMonthShort.format(motherInfo.getDatar()).substring(0, 1),
-            		sdfMonthShort.format(motherInfo.getDatar()).substring(1, 2),
-            		sdfYear.format(motherInfo.getDatar()).substring(0, 1),
-            		sdfYear.format(motherInfo.getDatar()).substring(1, 2),
-            		sdfYear.format(motherInfo.getDatar()).substring(2, 3),
-            		sdfYear.format(motherInfo.getDatar()).substring(3, 4),
-            		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
-            		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
-            		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
-            		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
-            		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
-            		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
-            		city1, city2, country1, country2,
-            		//МЕСТО РОЖДЕНИЯ:
-        			"", "", "",
-            		//МЕСТНОСТЬ РОЖДЕНИЯ:
-        			"", "",
-        			"", "",
-            		boy1, boy2, girl1, girl2);
+        		ServerHospital.childBirthDocSeries, childBirthNumber,
+        		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
+        		sdfYear.format(childDoc.getDateoff()),
+        		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfYear.format(childInfo.getDatar()),
+        		childBirthHour, childBirthMinute,
+        		motherFullName,
+        		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
+        		sdfYear.format(motherInfo.getDatar()),
+        		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
+        		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
+        		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
+        		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
+        		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
+        		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+        		city1, city2, country1, country2,
+        		boy1, boy2, girl1, girl2,
+        		//TODO: ЗАПИСАТЬ ШАПКУ:
+        		"", "", "", "",
+        		childBirthDocSeries, childBirthNumber,
+        		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
+        		sdfYear.format(childDoc.getDateoff()),
+        		sdfDay.format(childInfo.getDatar()),
+        		sdfMonth.format(childInfo.getDatar()).toUpperCase(),
+        		sdfYear.format(childInfo.getDatar()),
+        		childBirthHour, childBirthMinute,
+        		motherSurname, motherFirstName, childDoc.getFamreb().toUpperCase(),
+        		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
+        		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
+        		sdfMonthShort.format(motherInfo.getDatar()).substring(0, 1),
+        		sdfMonthShort.format(motherInfo.getDatar()).substring(1, 2),
+        		sdfYear.format(motherInfo.getDatar()).substring(0, 1),
+        		sdfYear.format(motherInfo.getDatar()).substring(1, 2),
+        		sdfYear.format(motherInfo.getDatar()).substring(2, 3),
+        		sdfYear.format(motherInfo.getDatar()).substring(3, 4),
+        		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
+        		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
+        		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
+        		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
+        		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
+        		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+        		city1, city2, country1, country2,
+        		//МЕСТО РОЖДЕНИЯ:
+    			"", "", "",
+        		//МЕСТНОСТЬ РОЖДЕНИЯ:
+    			"", "",
+    			"", "",
+        		boy1, boy2, girl1, girl2);
             osw.write(htmTemplate.getTemplateText());
-            f.close();
             return path;
         } catch (Exception e) {
             throw new KmiacServerException();
@@ -1962,7 +1964,7 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public String printChildDeathDocument(final int ndoc)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
+        if (isChildDocUnique(ndoc))	//Свидетельства с таким номером не существует
         	throw new ChildDocNotFoundException();
 		return null;
 	}
