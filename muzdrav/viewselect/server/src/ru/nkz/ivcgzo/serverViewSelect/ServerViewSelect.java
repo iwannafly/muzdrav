@@ -739,24 +739,33 @@ public class ServerViewSelect extends Server implements Iface {
 					}
    				    
 
-					
-  	   						/*acrs = sse.execPreparedQuery("select p_diag_amb.diag,n_vdi.name,p_diag_amb.named  from p_vizit_amb join p_diag_amb on (p_diag_amb.id_pos=p_vizit_amb.id) left join n_vdi on(p_diag_amb.diag_stat=n_vdi.pcod) where p_vizit_amb.id=? order by p_vizit_amb.id ", pk.getPvizit_ambId());
-				if (acrs.getResultSet().next()) {
-					do {
-						sb.append(String.format("<i>Код диагноза МКБ </i> %s <br>", acrs.getResultSet().getString(1)));
-						if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Статус диагноза</i> %s <br>", acrs.getResultSet().getString(2)));
-						if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>Медицинское описание диагноза </i> %s <br>", acrs.getResultSet().getString(3)));
-
-						} while (acrs.getResultSet().next());
-				}
-				acrs.close();*/
    					try {
-  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select * from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) where npasp=? and comment is not null ", npasp); 
+  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.nstr) where n_ot_str.prlpu=? and npasp=? " , cslu, npasp); 
    							
 								if (acr.getResultSet().next()){
 									do {
-									sb.append(String.format("%s %s",acr.getResultSet().getString(7), acr.getResultSet().getString(5)));
-									sb.append("<br>");
+										if (acr.getResultSet().getBoolean(7)==true){
+												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) == null)){
+													sb.append(String.format("%s да",acr.getResultSet().getString(4)));
+													sb.append("<br>");
+												}
+												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) != null)){
+													sb.append(String.format("%s да, %s",acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													sb.append("<br>");
+												}
+												if (acr.getResultSet().getBoolean(5)==false){
+													sb.append(String.format("%s нет",acr.getResultSet().getString(4)));
+													sb.append("<br>");
+												}
+												
+										}
+										if (acr.getResultSet().getBoolean(7)==false){
+											if (acr.getResultSet().getString(6) != null)
+												sb.append(String.format("%s %s",acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+											sb.append("<br>");
+									}
+										
+
 									}
 									while (acr.getResultSet().next());
 								}
@@ -780,16 +789,7 @@ public class ServerViewSelect extends Server implements Iface {
 			return path;
 	}
 			
-	@Override
-	public List<Pbol> getPbol(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_bol WHERE npasp = ? ", npasp)) {
-			return rsmPbol.mapToList(acrs.getResultSet());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new KmiacServerException("Could not get pbol list.");
-		}
-	}
-
+	
 	@Override
 	public int AddPbol(Pbol pbol) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -822,6 +822,27 @@ public class ServerViewSelect extends Server implements Iface {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new KmiacServerException("Could not delete pbol.");
+		}
+	}
+
+	@Override
+	public List<Pbol> getPbol(int id_obr, int id_gosp, int id_bol)
+			throws KmiacServerException, TException {
+		String sqlQuery = null;
+		if (id_gosp == 0){
+			id_bol = id_obr;
+			sqlQuery = "select * from p_bol where id_obr = ?";
+		}
+		if (id_obr == 0){
+			id_bol = id_gosp;
+			sqlQuery = "select * from p_bol where id_gosp = ?";
+		}
+		
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery(sqlQuery, id_bol)) {
+					return rsmPbol.mapToList(acrs.getResultSet());
+				} catch (Exception e) {
+				e.printStackTrace();
+			throw new KmiacServerException("Could not get pbol list.");
 		}
 	}
 }
