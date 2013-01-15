@@ -174,8 +174,8 @@ struct TRdIshod {
   38: optional i32 akush;
   39: optional i64 daterod;
   40: optional i32 srok;
-  41: optional i32 ves;
-  42: optional i32 vespl; 
+  41: optional double ves;
+  42: optional double vespl; 
   43: optional string detmesto;
 }
 struct RdSlStruct{
@@ -538,7 +538,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
-	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:PrdIshodNotFoundException pinfe, 	2:kmiacServer.KmiacServerException kse);
     void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);

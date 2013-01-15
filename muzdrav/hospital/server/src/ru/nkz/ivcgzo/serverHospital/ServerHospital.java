@@ -136,7 +136,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",         "oj",        "hdm",     "polpl",     "predpl",
-     Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
+     Integer.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,
 //    	   "vidpl",       "serd",     "serd1",      "serdm",        "chcc",     "pozpl",      "mesto",
      Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
 //    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
@@ -146,7 +146,7 @@ public class ServerHospital extends Server implements Iface {
 //    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",       "srok",       "ves",   "vespl", "detmesto"
      Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Integer.class,Double.class,Double.class,String.class
     };
-    private static final String[] RdSlStruct_Fields_names  = {
+     private static final String[] RdSlStruct_Fields_names  = {
     "id","npasp","datay","dataosl","abort","shet","datam","yavka1","ishod",
     "datasn","datazs","kolrod","deti","kont","vesd","dsp","dsr","dtroch","cext",        
     "indsol","prmen","dataz","datasert","nsert","ssert","oslab","plrod","prrod",      
@@ -1164,8 +1164,8 @@ public class ServerHospital extends Server implements Iface {
     }
 
 	@Override
-    public final TRdIshod getRdIshodInfo(final int npasp, final int ngosp)
-			throws KmiacServerException, PrdIshodNotFoundException{
+    public TRdIshod getRdIshodInfo(int npasp,int ngosp)
+			throws PrdIshodNotFoundException, KmiacServerException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
 		        "select * from c_rd_ishod where npasp = ? and ngosp = ? ", npasp, ngosp)) {
 			if (acrs.getResultSet().next()) {
@@ -1174,14 +1174,14 @@ public class ServerHospital extends Server implements Iface {
                 throw new PrdIshodNotFoundException();
             }
 
-			} catch (SQLException e) {
+		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
+			log.log(Level.ERROR, "SqlException", e);
 			throw new KmiacServerException();
 		}
 	}
-
 	@Override
-    public final void addRdIshod(final int npasp, final int ngosp) throws KmiacServerException,
+    public final void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
 			TException {
 		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
 		Integer id1 = 0; Integer numr = 0;Integer srok = 40;Integer numdin = 0;
@@ -1233,7 +1233,7 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-    public final void deleteRdIshod(final int npasp, final int ngosp)
+    public final void deleteRdIshod(int npasp, final int ngosp)
 			throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			sme.execPrepared("DELETE FROM c_rd_ishod WHERE npasp = ? and ngosp = ? ", false, npasp,ngosp);
@@ -1248,7 +1248,7 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-    public final void updateRdIshod(final TRdIshod RdIs) throws KmiacServerException,
+    public final void updateRdIshod(TRdIshod RdIs) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 		sme.execPreparedT("UPDATE c_rd_ishod SET oj = ?,hdm = ?,polpl = ?,predpl = ?,vidpl = ?,serd = ?,serd1 = ?,serdm = ?,chcc = ?,pozpl = ?,mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
