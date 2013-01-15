@@ -164,8 +164,7 @@ public class Children extends JPanel {
 	 * Установка начальных значений элементов панели информации о свидетельстве
 	 */
 	private void SetDefaultDocValues() {
-		Date date = new Date();
-		this.cdeDocDate.setDate(date.getTime());
+		this.cdeDocDate.setDate(new Date().getTime());
 		this.tfDocName.setText("");
 		this.ticcbDocGiven.setSelectedIndex(-1);
 		this.spinnerDocNum.setValue(0);
@@ -596,6 +595,7 @@ public class Children extends JPanel {
 		JLabel lblDocDate = new JLabel("Дата выдачи свидетельства:");
 		
 		cdeDocDate = new CustomDateEditor();
+		cdeDocDate.setText("");
 		lblDocDate.setLabelFor(cdeDocDate);
 		
 		JLabel lblDocGiven = new JLabel("Кем выдано:");
@@ -639,11 +639,7 @@ public class Children extends JPanel {
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addComponent(lblDocTypeText)
 									.addPreferredGap(ComponentPlacement.RELATED)))
-							.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addGap(18)
-									.addComponent(lblDocType)
-									.addContainerGap())
+							.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
 										.addGroup(gl_panelDoc.createSequentialGroup()
@@ -657,9 +653,13 @@ public class Children extends JPanel {
 													.addGap(0, 143, Short.MAX_VALUE))
 												.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
 												.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-												.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-												.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE))))
-									.addGap(255))))))
+												.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
+												.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))))
+									.addGap(255))
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(lblDocType)
+									.addContainerGap())))))
 		);
 		gl_panelDoc.setVerticalGroup(
 			gl_panelDoc.createParallelGroup(Alignment.LEADING)
