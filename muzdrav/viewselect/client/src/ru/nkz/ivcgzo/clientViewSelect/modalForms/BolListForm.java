@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 public class BolListForm extends ModalForm {
 	private static final long serialVersionUID = 4909914531060012030L;
 	private CustomTable<Pbol, Pbol._Fields> tblPbol;
+	private Pbol pbol;
 	private JButton btnAdd;
 	private JButton btnDel;
 	private JButton btnUpd;
@@ -62,7 +63,7 @@ public class BolListForm extends ModalForm {
 		btnAdd.setIcon(new ImageIcon(BolListForm.class.getResource("/ru/nkz/ivcgzo/clientViewSelect/resources/1331789242_Add.png")));
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Pbol pbol = new Pbol();
+				 pbol = new Pbol();
 				pbol.setNpasp(npasp);
 				pbol.setPcod(MainForm.authInfo.getCpodr());
 				pbol.setId_obr(idObr);
@@ -121,11 +122,19 @@ public class BolListForm extends ModalForm {
 		btnUpd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					if (!DatComp()) {
+					if (!DatCompBol()) {
 						JOptionPane.showMessageDialog(BolListForm.this, "Дата начала больничного не может быть больше даты конца больничного", "Предупреждение", JOptionPane.ERROR_MESSAGE);
 							return;
 					}
+	
 					if (tblPbol.getSelectedItem() != null)
+						for (Pbol pb: tblPbol.getData())
+							if (pb != pbol)
+								if (pb.getNombl() == pbol.getNombl()){
+									JOptionPane.showMessageDialog(BolListForm.this, "Больничный с таким номером уже существует");
+									pbol = tblPbol.getSelectedItem();
+									return;
+								}
 						MainForm.tcl.UpdatePbol(tblPbol.getSelectedItem());
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -169,10 +178,12 @@ public class BolListForm extends ModalForm {
 		}
 	}
 	
-	public boolean DatComp() throws TException{
+	public boolean DatCompBol() throws TException{
 		if (tblPbol.getData().size() > 0){
 			if ((tblPbol.getSelectedItem().getS_bl()>tblPbol.getSelectedItem().getPo_bl())&&(tblPbol.getSelectedItem().getPo_bl()!=0)) return false;
 		}
 		return true;
 	}
+	
+	
 }
