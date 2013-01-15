@@ -500,10 +500,6 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		throws (1:kmiacServer.KmiacServerException kse);
 		
 /* Родовспоможение */
-	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-    void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-    void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
-    void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
 	
 /* Новорождённый */
@@ -542,6 +538,10 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
+	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
+    void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
 	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);

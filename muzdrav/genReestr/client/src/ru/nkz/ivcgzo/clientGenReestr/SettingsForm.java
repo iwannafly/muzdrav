@@ -31,6 +31,7 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
+import java.awt.Font;
 
 public class SettingsForm extends JDialog {
 	private static final long serialVersionUID = -48586555281952961L;
@@ -154,9 +155,13 @@ public class SettingsForm extends JDialog {
 		panel_3.setLayout(gl_panel_3);
 		
 		rbtn1 = new JRadioButton("новые посещения");
+		rbtn1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rbtn2 = new JRadioButton("новые посещения + ошибки контроля");
+		rbtn2.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rbtn3 = new JRadioButton("ошибки контроля");
+		rbtn3.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rbtn4 = new JRadioButton("все случаи лечения");
+		rbtn4.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		rbtn4.setVisible(false);
 		bgrp.add(rbtn1);
 		bgrp.add(rbtn2);
@@ -188,7 +193,9 @@ public class SettingsForm extends JDialog {
 		panel_2.setLayout(gl_panel_2);
 		
 		JLabel lblNewLabel = new JLabel("с");
+		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		JLabel lblNewLabel_1 = new JLabel("по");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		tfDk = new CustomDateEditor();
 		tfDn = new CustomDateEditor();
@@ -199,12 +206,12 @@ public class SettingsForm extends JDialog {
 				.addGroup(gl_panel_1.createSequentialGroup()
 					.addComponent(lblNewLabel)
 					.addGap(13)
-					.addComponent(tfDn, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tfDn, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(lblNewLabel_1)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(tfDk, GroupLayout.PREFERRED_SIZE, 74, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(60, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(tfDk, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(78, Short.MAX_VALUE))
 		);
 		gl_panel_1.setVerticalGroup(
 			gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -212,8 +219,8 @@ public class SettingsForm extends JDialog {
 					.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
 						.addComponent(tfDn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel_1)
-						.addComponent(tfDk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tfDk, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_1))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel_1.setLayout(gl_panel_1);

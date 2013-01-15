@@ -59,6 +59,7 @@ import ru.nkz.ivcgzo.thriftRegPatient.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.PokazNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.Polis;
 import ru.nkz.ivcgzo.thriftRegPatient.RegionLiveNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
 import ru.nkz.ivcgzo.thriftRegPatient.Sign;
 import ru.nkz.ivcgzo.thriftRegPatient.SignNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.SmocodNotFoundException;
@@ -67,6 +68,8 @@ import ru.nkz.ivcgzo.thriftRegPatient.TerLiveNotFoundException;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient;
 import ru.nkz.ivcgzo.thriftRegPatient.ThriftRegPatient.Iface;
 import ru.nkz.ivcgzo.thriftRegPatient.TipPodrNotFoundException;
+import ru.nkz.ivcgzo.thriftRegPatient.ShablonText;
+import ru.nkz.ivcgzo.thriftRegPatient.Shablon;
 
 /**
  * Класс, имплементирующий трифтовый интерфейс для связи с клиентом.
@@ -100,6 +103,12 @@ public class ServerRegPatient extends Server implements Iface {
     private TResultSetMapper<Gosp, Gosp._Fields> rsmGosp;
     private QueryGenerator<PatientBrief> qgPatientBrief;
     private TResultSetMapper<Anam, Anam._Fields> rsmAnam;
+	private final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] intClasTypes; 
+	private final TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
+	@SuppressWarnings("unused")
+	private final Class<?>[] strClasTypes; 
 
 //////////////////////////////// Type Arrays /////////////////////////////////
 
@@ -284,6 +293,11 @@ public class ServerRegPatient extends Server implements Iface {
         rsmAllLgota = new TResultSetMapper<>(AllLgota.class, LGOTA_FIELD_NAMES);
         rsmLgota = new TResultSetMapper<>(Lgota.class, LGOTA_FIELD_NAMES);
         rsmAnam = new TResultSetMapper<>(Anam.class, ANAM_FIELD_NAMES);
+		rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, "pcod",        "name");
+		intClasTypes = new Class<?>[] {                              Integer.class, String.class};
+		
+		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod",        "name");
+		strClasTypes = new Class<?>[] {                              String.class, String.class};
     }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1954,6 +1968,99 @@ public class ServerRegPatient extends Server implements Iface {
    				throw new KmiacServerException();
    			}
 			return path;
+	}
+
+	@Override
+	public List<StringClassifier> getShOsmPoiskDiag(int cspec, int cslu, String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.diag AS pcod, c00.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.diag ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText)) {
+			return rsmStrClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShOsmPoiskName(int cspec, int cslu,
+			String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.diag, sho.diag || ' ' || substring(din.name from 1 for 1) || ' ' || sho.name AS name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN n_din din ON (din.pcod = sho.cdin) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.diag LIKE ?) OR (sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.diag ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu) : sse.execPreparedQuery(sql, cspec, cslu, cslu, srcText, srcText, srcText, srcText)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShOsmByDiag(int cspec, int cslu,
+			String diag, String srcText) throws KmiacServerException, TException {
+		String sql = "SELECT DISTINCT sho.id AS pcod, sho.name FROM sh_osm sho JOIN sh_ot_spec shp ON (shp.id_sh_osm = sho.id) JOIN n_c00 c00 ON (c00.pcod = sho.diag) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) WHERE (shp.cspec = ?) AND (sho.cslu & ? = ?) AND (sho.diag = ?) ";
+		
+		if (srcText != null)
+			sql += "AND ((sho.name LIKE ?) OR (c00.name LIKE ?) OR (sht.sh_text LIKE ?)) ";
+		sql += "ORDER BY sho.name ";
+		
+		try (AutoCloseableResultSet	acrs = (srcText == null) ? sse.execPreparedQuery(sql, cspec, cslu, cslu, diag) : sse.execPreparedQuery(sql, cspec, cslu, cslu, diag, srcText, srcText, srcText)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error searching template");
+		}
+	}
+
+	@Override
+	public Shablon getShOsm(int id_sh) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT sho.id, sho.diag, nd.name, sho.name, nsh.pcod, nsh.name, sht.sh_text FROM sh_osm sho JOIN n_din nd ON (nd.pcod = sho.cdin) JOIN sh_osm_text sht ON (sht.id_sh_osm = sho.id) JOIN n_shablon nsh ON (nsh.pcod = sht.id_n_shablon) WHERE sho.id = ? ORDER BY nsh.pcod ", id_sh)) {
+			if (acrs.getResultSet().next()) {
+				Shablon sho = new Shablon(acrs.getResultSet().getInt(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4), new ArrayList<ShablonText>());
+				do {
+					sho.textList.add(new ShablonText(acrs.getResultSet().getInt(5), acrs.getResultSet().getString(6), acrs.getResultSet().getString(7)));
+				} while (acrs.getResultSet().next());
+				return sho;
+			} else {
+				throw new SQLException("No templates with this id");
+			}
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template by its id");
+		}
+	}
+
+	@Override
+	public List<IntegerClassifier> getShDopNames(int idRazd)
+			throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, name FROM sh_dop WHERE id_n_shablon = ? ", idRazd)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template names by razd id");
+		}
+	}
+
+	@Override
+	public IntegerClassifier getShDop(int id_sh) throws KmiacServerException,
+			TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id AS pcod, text AS name FROM sh_dop WHERE id = ? ", id_sh)) {
+			if (acrs.getResultSet().next())
+				return rsmIntClas.map(acrs.getResultSet());
+			else
+				throw new SQLException("No templates with this id");
+		} catch (SQLException e) {
+			((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException("Error loading template by its id");
+		}
 	}
 
 }

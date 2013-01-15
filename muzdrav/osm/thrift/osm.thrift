@@ -512,6 +512,7 @@ struct Protokol{
 	5: optional i32 cpol;
 	6: optional string cpodr_name;
 	7: optional string clpu_name;
+	8: optional i32 nstr;
 }
 
 struct Vypis {
@@ -616,6 +617,7 @@ struct Cotd{
 	3: optional i32 nist;
 	4: optional i32 cotd;
 	5: optional i64 dataz;
+	6: optional i32 stat_type;
 }
 
 struct VrachInfo {

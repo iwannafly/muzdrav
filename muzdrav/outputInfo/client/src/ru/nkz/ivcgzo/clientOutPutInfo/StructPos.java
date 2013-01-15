@@ -1,36 +1,39 @@
 package ru.nkz.ivcgzo.clientOutPutInfo;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-
-import java.awt.Frame;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
 import java.awt.Font;
+import java.io.File;
 import java.text.SimpleDateFormat;
 
-import javax.swing.JRadioButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ButtonGroup;
-import javax.swing.JTable;
-import javax.swing.JSeparator;
-import javax.swing.JSlider;
-import javax.swing.JScrollBar;
-import javax.swing.JFormattedTextField;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputAuthInfo;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputStructPos;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputStructPosAuth;
+import ru.nkz.ivcgzo.thriftOutputInfo.InputSvodVed;
 
-public class Ot039 extends JPanel {
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+
+public class StructPos extends JPanel {
+	
 	private CustomDateEditor Date1;
 	private CustomDateEditor Date2;
 	private final ButtonGroup butGroup = new ButtonGroup();
 	
-	public Ot039() {
-
+	public StructPos() {
 		JLabel label = new JLabel("Сведения о структуре посещений и использования рабочего времени");
 		
 		JLabel label_1 = new JLabel("Период формирования:");
@@ -41,20 +44,44 @@ public class Ot039 extends JPanel {
 		butGroup.add(rbutP);
 		butGroup.add(rbutB);
 		rbutP.setSelected(true);
-		
+				
 		final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Date1 = new CustomDateEditor();
-		Date1.setText("01012012");
+		Date1.setText("19092012");
 		Date2 = new CustomDateEditor();
-		Date2.setText("25122012");
+		Date2.setText("11102012");
 		
 		JLabel label_2 = new JLabel("С");
 		JLabel label_3 = new JLabel("По");
 		
 		JButton button = new JButton("Выполнить");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+				InputStructPos isp = new InputStructPos();	
+			
+				isp.setDate1(sdf.format(Date1.getDate()));
+				isp.setDate2(sdf.format(Date2.getDate()));
+				
+					InputStructPosAuth ispa = new InputStructPosAuth();
+					ispa.setUserId(MainForm.authInfo.getUser_id());
+					ispa.setCpodr_name(MainForm.authInfo.getCpodr_name());
+					ispa.setClpu_name(MainForm.authInfo.getClpu_name());
+									
+				
+					String servPath = MainForm.tcl.printStructPos(ispa,isp);
+					String cliPath = File.createTempFile("test", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			
+			}
+		});
 		
 		JButton button_1 = new JButton("Закрыть");
-		
+
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -111,5 +138,4 @@ public class Ot039 extends JPanel {
 		
 		JScrollPane scrollPane = new JScrollPane();
 	}
-
 }
