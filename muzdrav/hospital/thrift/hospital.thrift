@@ -236,8 +236,8 @@ struct RdDinStruct{
 	11: optional i32 art2;
 	12: optional i32 art3;
 	13: optional i32 art4;
-	14: optional i32 spl;
-	15: optional i32 oteki;
+	14: optional i32 oteki;
+	15: optional i32 spl;
 	16: optional i32 chcc;
 	17: optional i32 polpl;
 	18: optional i32 predpl;
@@ -248,23 +248,6 @@ struct RdDinStruct{
         23: optional i32 ngosp;
         24: optional i32 pozpl;
         25: optional i32 vidpl;
-}
-/*. Rd_Inf*/
-struct RdInfStruct{
-	1: optional i32 npasp;
-	2: optional i32 obr;
-	3: optional i32 sem;
-	4: optional i32 vOtec;
-	5: optional string grotec;
-	6: optional string phOtec;
-	7: optional i64 dataz;
-	8: optional string fioOtec;
-	9: optional string mrOtec;
-	10: optional string telOtec;
-	11: optional i32 vredOtec;
-	12: optional i32 osoco;
-	13: optional i32 uslpr;
-        14: optional string zotec;
 }
 
 struct TRd_Novor {
@@ -399,6 +382,10 @@ exception MesNotFoundException {
 }
 
 exception PrdIshodNotFoundException{
+}
+exception PrdDinNotFoundException{
+}
+exception PrdSlNotFoundException{
 }
 
 /**
@@ -542,20 +529,12 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
-	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
-	void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
- 
-	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
-
-	void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdateRdInf(1: RdInfStruct inf) throws (1: kmiacServer.KmiacServerException kse);
-
-	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
-
-	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1:PrdSlNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+    void AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
+    void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+    void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
+	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1:PrdDinNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+    void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+    void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+    void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
 }

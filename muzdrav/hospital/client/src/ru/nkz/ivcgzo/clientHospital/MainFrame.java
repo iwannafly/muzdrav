@@ -2460,6 +2460,7 @@ public class MainFrame extends JFrame {
 		        btnNewButton.addActionListener(new ActionListener() {
 		        	public void actionPerformed(ActionEvent e) {
 		    			try {
+//  внести случай и динамику		    				
 							ClientHospital.tcl.addRdIshod(patient.getPatientId(), patient.gospitalCod);
 						} catch (KmiacServerException e1) {
 							// TODO Auto-generated catch block
