@@ -938,7 +938,7 @@ public class ServerOsm extends Server implements Iface {
 				}
 				sb.append("<b>Диагноз: </b>");
 				acrs.close();
-				acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 order by p_vizit_amb.datap", im.getPvizitId());
+				acrs = sse.execPreparedQuery("select diag from p_isl_ld  where id_pos=? ", im.getPvizitambId());
 				if (acrs.getResultSet().next()) 
 					sb.append(String.format("%s <br>", acrs.getResultSet().getString(1)));
 				acrs.close();
