@@ -116,6 +116,13 @@ public class ConnectionManager {
 		return client;
 	}
 	
+	/**
+	 * Получение главной формы клиента.
+	 */
+	public JFrame getMainForm() {
+		return mainForm;
+	}
+	
 	private void addToCommon(int port) {
 		commonTransports.put(port, transports.get(port));
 		commonConnections.put(port, connections.get(port));

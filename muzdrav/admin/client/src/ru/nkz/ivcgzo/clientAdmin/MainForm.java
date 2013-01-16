@@ -15,13 +15,14 @@ import org.apache.thrift.TException;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.Client;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
+import ru.nkz.ivcgzo.clientManager.common.customFrame.CustomFrame;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
 import java.awt.Dimension;
 
 public class MainForm extends Client<ThriftServerAdmin.Client> {
 	public static ThriftServerAdmin.Client tcl;
-	private JFrame frame;
+	private CustomFrame frame;
 	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
 	private ShablonOsmPanel tpShablonOsm;
@@ -40,7 +41,7 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
+		frame = new CustomFrame();
 		frame.setMinimumSize(new Dimension(896, 128));
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(PermForm.class.getResource("/ru/nkz/ivcgzo/clientAdmin/resources/icon_2_32x32.png")));
 		frame.setTitle(configuration.appName);

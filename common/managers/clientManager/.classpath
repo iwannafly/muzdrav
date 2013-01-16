@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="JSON-java"/>
 	<classpathentry kind="src" path="gen-java">
 		<attributes>
 			<attribute name="ignore_optional_problems" value="true"/>
@@ -12,5 +13,9 @@
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/slf4j-log4j12-1.7.2.jar"/>
 	<classpathentry kind="var" path="EXTERNAL_LIB/jcalendar-1.4.jar"/>
+	<classpathentry kind="var" path="EXTERNAL_LIB/redmine-java-api-1.16.jar"/>
+	<classpathentry kind="var" path="EXTERNAL_LIB/httpclient-4.2.jar" sourcepath="/EXTERNAL_LIB/httpcomponents-client-4.2-src.zip"/>
+	<classpathentry kind="var" path="EXTERNAL_LIB/httpcore-4.2.jar" sourcepath="/EXTERNAL_LIB/httpcomponents-core-4.2-src.zip"/>
+	<classpathentry kind="var" path="EXTERNAL_LIB/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
