@@ -264,26 +264,26 @@ struct RdInfStruct{
 	11: optional i32 vredOtec;
 	12: optional i32 osoco;
 	13: optional i32 uslpr;
-        14: optional string zotec;
+	14: optional string zotec;
 }
 
 struct TRd_Novor {
-	 1: i32 npasp;
-	 2: i32 nrod;
-	 3: optional string timeon;
-	 4: optional i32 kolchild;
-	 5: optional i32 nreb;
-	 6: i32 massa;
-	 7: i32 rost;
-	 8: optional i32 apgar1;
-	 9: optional i32 apgar5;
+	1: i32 npasp;
+	2: i32 nrod;
+	3: optional string timeon;
+	4: optional i32 kolchild;
+	5: optional i32 nreb;
+	6: optional i32 massa;
+	7: optional i32 rost;
+	8: optional i32 apgar1;
+	9: optional i32 apgar5;
 	10: optional bool krit1;
 	11: optional bool krit2;
 	12: optional bool krit3;
 	13: optional bool krit4;
 	14: optional bool mert;
 	15: optional bool donosh;
-	16: i64 datazap;
+	16: optional i64 datazap;
 }
 
 struct TRd_Svid {
@@ -296,71 +296,71 @@ struct TRd_Svid {
 }
 
 struct TPatientCommonInfo {
-	 1: i32 npasp;
-	 2: string full_name;
-	 3: i64 datar;
-	 4: string pol;
-	 5: string jitel;
-	 6: string adp_obl;
-	 7: string adp_gorod;
-	 8: string adp_ul;
-	 9: string adp_dom;
+	1: i32 npasp;
+	2: string full_name;
+	3: i64 datar;
+	4: string pol;
+	5: string jitel;
+	6: string adp_obl;
+	7: string adp_gorod;
+	8: string adp_ul;
+	9: string adp_dom;
 	10: string adp_kv;
 }
 
 struct TRd_SMPK {
-   1: i32 npasp;
-   2: i32 nrod;
-   3: i32 nnov;
-   4: optional i32 ndoc;
-   5: optional i64 dateoff;
-   6: optional i32 prvid;
-   7: optional i32 sm1;
-   8: optional i64 datas;
-   9: optional string times;
-  10: optional i32 kodmest;
-  11: optional i32 kolchild;
-  12: optional i32 b1;
-  13: optional i32 b2;
-  14: optional i32 b3;
-  15: optional i32 b4;
-  16: optional i32 b5;
-  17: optional i32 nreb;
-  18: optional string dsbasic;
-  19: optional i32 sostp;
-  20: optional i32 sm2;
-  21: optional i32 sm3;
-  22: optional string psm1;
-  23: optional string psm2;
-  24: optional string psm3;
-  25: optional string psm4;
-  26: optional string psm5;
-  27: optional string fioreb;
-  28: optional string fiozap;
-  29: optional i32 sm4;
-  30: optional i32 sm5;
-  31: optional i64 datazap;
+	1: i32 npasp;
+	2: i32 nrod;
+	3: i32 nnov;
+	4: optional i32 ndoc;
+	5: optional i64 dateoff;
+	6: optional i32 prvid;
+	7: optional i32 sm1;
+	8: optional i64 datas;
+	9: optional string times;
+	10: optional i32 kodmest;
+	11: optional i32 kolchild;
+	12: optional i32 b1;
+	13: optional i32 b2;
+	14: optional i32 b3;
+	15: optional i32 b4;
+	16: optional i32 b5;
+	17: optional i32 nreb;
+	18: optional string dsbasic;
+	19: optional i32 sostp;
+	20: optional i32 sm2;
+	21: optional i32 sm3;
+	22: optional string psm1;
+	23: optional string psm2;
+	24: optional string psm3;
+	25: optional string psm4;
+	26: optional string psm5;
+	27: optional string fioreb;
+	28: optional string fiozap;
+	29: optional i32 sm4;
+	30: optional i32 sm5;
+	31: optional i64 datazap;
 }
 
 struct TRd_ACCOMP {
-   1: i32 nnov;
-   2: i32 naccomp;
-   3: string accomp;
-   4: optional i32 priz;
+	1: i32 nnov;
+	2: i32 naccomp;
+	3: string accomp;
+	4: optional i32 priz;
 }
 
 struct TRd_PAT {
-   1: i32 nnov;
-   2: i32 npat;
-   3: string pat;
-   4: optional i32 priz;
+	1: i32 nnov;
+	2: i32 npat;
+	3: string pat;
+	4: optional i32 priz;
 }
 
 struct TRd_DIAGnr {
-   1: i32 nnov;
-   2: i32 ndiag;
-   3: string diag;
-   4: optional i32 priz;
+	1: i32 nnov;
+	2: i32 ndiag;
+	3: string diag;
+	4: optional i32 priz;
 }
 
 /**

@@ -55,7 +55,6 @@ public class Children extends JPanel {
     private TRd_Svid childDoc = null;
     private JPanel panelChildEdit, panelDoc;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbDocGiven;
-    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbChildBirth;
     private JButton btnSaveChild, btnGiveDoc;
     private JTextField tfDocName;
     private CustomDateEditor cdeDocDate;
@@ -68,7 +67,6 @@ public class Children extends JPanel {
     private JSpinner spinnerChildNumGlobal;
     private JSpinner spinnerChildNumLocal;
     private CustomTimeEditor cteBirthTime;
-    private JLabel lblChildBirth;
     private JCheckBox chckBxCriteria1;
     private JCheckBox chckBxCriteria2;
     private JCheckBox chckBxCriteria4;
@@ -98,15 +96,7 @@ public class Children extends JPanel {
 	public void setPatient(final TPatient newPatient) {
 		this.patient = newPatient;
 		if (this.patient != null)
-			try {
-				this.ticcbChildBirth.setData(	//Загрузка списка родов
-					ClientHospital.tcl.getChildBirths(this.patient.getBirthDate()));
-				this.updatePanel();	//Обновление панели
-			} catch (KmiacServerException e) {
-				e.printStackTrace();
-			} catch (TException e) {
-				e.printStackTrace();
-			}
+			this.updatePanel();	//Обновление панели
 	}
 
 	/**
@@ -145,7 +135,6 @@ public class Children extends JPanel {
 	 * Установка начальных значений элементов панели информации о новорождённом
 	 */
 	private void setDefaultChildValues() {
-		this.ticcbChildBirth.setSelectedIndex(-1);
 		this.cteBirthTime.setText("__:__");
 		this.chckBxDead.setSelected(false);
 		this.chckBxFull.setSelected(true);
@@ -183,14 +172,7 @@ public class Children extends JPanel {
 	private boolean loadChildInfoFromPanel() {
 		if (this.childInfo == null)
 			return false;
-		if (this.ticcbChildBirth.getSelectedItem() == null)
-		{
-			JOptionPane.showMessageDialog(this, "Не выбраны роды",
-					"Ошибка", JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
 		//Установка значений полей childInfo:
-		this.childInfo.setNrod(this.ticcbChildBirth.getSelectedPcod());
 		this.childInfo.setMert(this.chckBxDead.isSelected());
 		this.childInfo.setDonosh(this.chckBxFull.isSelected());
 		this.childInfo.setApgar1((int) this.spinnerApgar1.getValue());
@@ -263,25 +245,35 @@ public class Children extends JPanel {
 	 * Загрузка показателей о новорождённом в интерфейс
 	 */
 	private void loadChildInfoIntoPanel() {
+		this.setDefaultChildValues();
 		if (this.childInfo == null)
-		{
-			this.setDefaultChildValues();
 			return;
-		}
-		this.ticcbChildBirth.setSelectedPcod(this.childInfo.getNrod());
-		this.cteBirthTime.setText(this.childInfo.getTimeon());
-		this.chckBxDead.setSelected(this.childInfo.isMert());
-		this.chckBxFull.setSelected(this.childInfo.isDonosh());
-		this.chckBxCriteria1.setSelected(this.childInfo.isKrit1());
-		this.chckBxCriteria2.setSelected(this.childInfo.isKrit2());
-		this.chckBxCriteria3.setSelected(this.childInfo.isKrit3());
-		this.chckBxCriteria4.setSelected(this.childInfo.isKrit4());
-		this.spinnerApgar1.setValue(this.childInfo.getApgar1());
-		this.spinnerApgar5.setValue(this.childInfo.getApgar5());
-		this.spinnerHeight.setValue(this.childInfo.getRost());
-		this.spinnerWeight.setValue(this.childInfo.getMassa());
-		this.spinnerChildNumGlobal.setValue(this.childInfo.getKolchild());
-		this.spinnerChildNumLocal.setValue(this.childInfo.getNreb());
+		if (this.childInfo.isSetTimeon())
+			this.cteBirthTime.setText(this.childInfo.getTimeon());
+		if (this.childInfo.isSetMert())
+			this.chckBxDead.setSelected(this.childInfo.isMert());
+		if (this.childInfo.isSetDonosh())
+			this.chckBxFull.setSelected(this.childInfo.isDonosh());
+		if (this.childInfo.isSetKrit1())
+			this.chckBxCriteria1.setSelected(this.childInfo.isKrit1());
+		if (this.childInfo.isSetKrit2())
+			this.chckBxCriteria2.setSelected(this.childInfo.isKrit2());
+		if (this.childInfo.isSetKrit3())
+			this.chckBxCriteria3.setSelected(this.childInfo.isKrit3());
+		if (this.childInfo.isSetKrit4())
+			this.chckBxCriteria4.setSelected(this.childInfo.isKrit4());
+		if (this.childInfo.isSetApgar1())
+			this.spinnerApgar1.setValue(this.childInfo.getApgar1());
+		if (this.childInfo.isSetApgar5())
+			this.spinnerApgar5.setValue(this.childInfo.getApgar5());
+		if (this.childInfo.isSetRost())
+			this.spinnerHeight.setValue(this.childInfo.getRost());
+		if (this.childInfo.isSetMassa())
+			this.spinnerWeight.setValue(this.childInfo.getMassa());
+		if (this.childInfo.isSetKolchild())
+			this.spinnerChildNumGlobal.setValue(this.childInfo.getKolchild());
+		if (this.childInfo.isSetNreb())
+			this.spinnerChildNumLocal.setValue(this.childInfo.getNreb());
 	}
 	
 	/**
@@ -761,11 +753,6 @@ public class Children extends JPanel {
 		
 		JLabel lblBirthTime = new JLabel("Время рождения:");
 		
-		lblChildBirth = new JLabel("Выберите роды:");
-		
-		ticcbChildBirth = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
-		lblChildBirth.setLabelFor(ticcbChildBirth);
-		
 		JPanel panelCriteria = new JPanel();
 		panelCriteria.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		
@@ -779,19 +766,15 @@ public class Children extends JPanel {
 		
 		GroupLayout gl_panelChildEdit = new GroupLayout(this.panelChildEdit);
 		gl_panelChildEdit.setHorizontalGroup(
-			gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_panelChildEdit.createSequentialGroup()
+			gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelChildEdit.createSequentialGroup()
 					.addGap(61)
 					.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
 					.addGap(75)
 					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
-						.addComponent(panelCriteria, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
-						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addComponent(lblChildBirth)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ticcbChildBirth, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE))
-						.addComponent(panelChildNumber, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
-						.addComponent(panelApgar, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+						.addComponent(panelCriteria, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+						.addComponent(panelChildNumber, GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+						.addComponent(panelApgar, GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
 						.addGroup(gl_panelChildEdit.createSequentialGroup()
 							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panelChildEdit.createSequentialGroup()
@@ -801,7 +784,7 @@ public class Children extends JPanel {
 								.addComponent(lblHeight))
 							.addGap(4)
 							.addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
 							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING, false)
 								.addGroup(gl_panelChildEdit.createSequentialGroup()
 									.addComponent(lblWeight)
@@ -814,17 +797,12 @@ public class Children extends JPanel {
 					.addGap(122))
 		);
 		gl_panelChildEdit.setVerticalGroup(
-			gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_panelChildEdit.createSequentialGroup()
+			gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelChildEdit.createSequentialGroup()
 					.addGap(31)
 					.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-				.addGroup(Alignment.LEADING, gl_panelChildEdit.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panelChildEdit.createSequentialGroup()
-						.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE, false)
-							.addComponent(lblChildBirth)
-							.addComponent(ticcbChildBirth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGap(18))
+				.addGroup(gl_panelChildEdit.createSequentialGroup()
+					.addGap(43)
 					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
 						.addComponent(chckBxFull)
 						.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE)
