@@ -128,7 +128,7 @@ public class ServerHospital extends Server implements Iface {
 	   "apgar1", "apgar5", "krit1", "krit2", "krit3", "krit4", "mert", "donosh", "datazap"
    };
     private static final String[] RDSVID_FIELD_NAMES = {
-    	"npasp", "ndoc", "dateoff", "famreb", "svidvrach"
+    	"npasp", "ndoc", "doctype", "dateoff", "famreb", "svidvrach"
    };
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
@@ -193,8 +193,8 @@ public class ServerHospital extends Server implements Iface {
     	Boolean.class,	Date.class
     };
     private static final Class<?>[] CHILD_DOC_TYPES = new Class<?>[] {
-	//	npasp,			ndoc,   		dateoff,	famreb,			svidvrach
-    	Integer.class,	Integer.class,	Date.class,	String.class,	Integer.class
+	//	npasp,			ndoc,   		doctype,		dateoff,	famreb,			svidvrach
+    	Integer.class,	Integer.class,	Boolean.class,	Date.class,	String.class,	Integer.class
     };
 
     /**
@@ -1481,7 +1481,7 @@ public class ServerHospital extends Server implements Iface {
 	 */
 	private boolean isChildDocExist(final int npasp) {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT * FROM c_rd_svid WHERE npasp = ?;", npasp)) {
+                "SELECT * FROM c_rd_svid WHERE (npasp = ?);", npasp)) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -1490,36 +1490,21 @@ public class ServerHospital extends Server implements Iface {
     }
 
 	/**
-	 * Проверка уникальности номера свидетельства о рождении/перинатальной смерти новорождённого
+	 * Проверка уникальности номера свидетельства заданного типа
 	 * @param ndoc - номер свидетельства
+	 * @param doctype - тип свидетельства (<code>true</code>, если свидетельство о рождении;
+	 * <code>false</code> - о перинатальной смерти новорождённого)
 	 * @return Возвращает <code>true</code>, если номер свидетельства уникален; иначе - <code>false</code>
 	 */
-	private boolean isChildDocUnique(final int ndoc) {
+	private boolean isChildDocUnique(final int ndoc, final boolean doctype) {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT * FROM c_rd_svid WHERE ndoc = ?;", ndoc)) {
+                "SELECT * FROM c_rd_svid WHERE (ndoc = ?) AND (doctype = ?);", ndoc, doctype)) {
             return !acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             return false;
         }
 	}
-
-	/**
-	 * Получение следующего доступного номера свидетельства о рождении/перинатальной смерти новорождённого
-	 * @return Возвращает номер свидетельства о рождении/перинатальной смерти
-	 */
-	@Override
-	public int getNextChildDocNum() {
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT MAX(ndoc)+1 FROM c_rd_svid;")) {
-        	ResultSet rs = acrs.getResultSet();
-        	rs.next();
-            return rs.getInt(1);
-        } catch (SQLException e) {
-            log.log(Level.ERROR, "Exception: ", e);
-            return 0;
-        }
-    }
 
 	@Override
 	public void addChildInfo(final TRd_Novor Child)
@@ -1719,17 +1704,19 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public int addChildDocument(final TRd_Svid ChildDocument)
 			throws KmiacServerException, PatientNotFoundException, TException {
-        final int[] indexes = {0, 2, 3, 4};
-        final String sqlQuery = "INSERT INTO c_rd_svid (npasp, dateoff, famreb, svidvrach) " +
-        						"VALUES (?, ?, ?, ?);";
+        final int[] indexes = {0, 2, 3, 4, 5};
+        final String sqlQuery = "INSERT INTO c_rd_svid (npasp, doctype, dateoff, famreb, svidvrach) " +
+        						"VALUES (?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildExist(ChildDocument.getNpasp())) {
                 sme.execPreparedT(sqlQuery, true, ChildDocument, CHILD_DOC_TYPES, indexes);
                 int ndoc = sme.getGeneratedKeys().getInt("ndoc");
                 sme.setCommit();
                 return ndoc;
-            } else
+            } else {
+            	sme.rollbackTransaction();
             	throw new PatientNotFoundException();
+            }
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
@@ -1740,7 +1727,7 @@ public class ServerHospital extends Server implements Iface {
 	public TRd_Svid getChildDocument(final int npasp)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "SELECT * FROM c_rd_svid WHERE npasp = ?;", npasp)) {
+		        "SELECT * FROM c_rd_svid WHERE (npasp = ?);", npasp)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdSvid.map(acrs.getResultSet());
             } else
@@ -1751,11 +1738,10 @@ public class ServerHospital extends Server implements Iface {
 		}
 	}
 
-	@Override
-	public TRd_Svid getChildDocumentByDoc(final int ndoc)
+	private TRd_Svid getChildDocumentByDoc(final int ndoc, final boolean doctype)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "SELECT * FROM c_rd_svid WHERE ndoc = ?;", ndoc)) {
+		        "SELECT * FROM c_rd_svid WHERE (ndoc = ?) AND (doctype = ?);", ndoc, doctype)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdSvid.map(acrs.getResultSet());
             } else
@@ -1769,10 +1755,11 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public void updateChildDocument(final TRd_Svid ChildDocument)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        final int[] indexes = {1, 2, 3, 4, 0};
+        final int[] indexes = {3, 4, 5, 0};
+        //Поля ndoc и doctype изменять нельзя (в списке параметров не присутствуют):
         final String sqlQuery = "UPDATE c_rd_svid " +
-        						"SET ndoc = ?, dateoff = ?, famreb = ?, svidvrach = ? " +
-        						"WHERE npasp = ?;";
+        						"SET dateoff = ?, famreb = ?, svidvrach = ? " +
+        						"WHERE (npasp = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildDocExist(ChildDocument.getNpasp())) {
                 sme.execPreparedT(sqlQuery, false, ChildDocument, CHILD_DOC_TYPES, indexes);
@@ -1841,12 +1828,12 @@ public class ServerHospital extends Server implements Iface {
         final String path;
         final String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
-        if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
+        if (isChildDocUnique(ndoc, true))	//Свидетельство с таким номером не существует
         	throw new ChildDocNotFoundException();
         Formatter f = new Formatter();
         final String childBirthNumber = f.format("%6d", ndoc).toString();
         f.close();
-        TRd_Svid childDoc = getChildDocumentByDoc(ndoc);
+        TRd_Svid childDoc = getChildDocumentByDoc(ndoc, true);
         TRd_Novor childBirthInfo = getChildInfo(childDoc.getNpasp());
         TPatientCommonInfo childInfo = getPatientCommonInfo(childDoc.getNpasp());
         TPatientCommonInfo motherInfo = getPatientCommonInfo(getMotherId(childDoc.getNpasp()));
@@ -1964,7 +1951,7 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public String printChildDeathDocument(final int ndoc)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        if (isChildDocUnique(ndoc))	//Свидетельства с таким номером не существует
+        if (isChildDocUnique(ndoc, false))	//Свидетельства с таким номером не существует
         	throw new ChildDocNotFoundException();
 		return null;
 	}
