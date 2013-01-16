@@ -67,7 +67,7 @@ public class ServerOperation extends Server implements Iface {
     };
     private static final Class<?>[] OPERATION_COMPLICATION_TYPES ={
 //          id           id_oper          name_osl      pcod           dataz
-            Integer.class, Integer.class, String.class, Integer.class, Date.class
+            Integer.class, Integer.class, String.class, String.class, Date.class
     };
     private static final Class<?>[] OPERATION_PAYMENT_FUND_TYPES ={
 //          id             id_oper        pcod           dataz
@@ -81,7 +81,7 @@ public class ServerOperation extends Server implements Iface {
     };
     private static final Class<?>[] ANESTHESIA_COMPLICATION_TYPES ={
 //          id             id_anast       name          pcod           dataz
-            Integer.class, Integer.class, String.class, Integer.class, Date.class
+            Integer.class, Integer.class, String.class, String.class, Date.class
     };
 
     private static final Class<?>[] ANESTHESIA_PAYMENT_FUND_TYPES ={
@@ -342,7 +342,7 @@ public class ServerOperation extends Server implements Iface {
     public void updateOperationPaymentFund(OperationPaymentFund curPaymentFund)
             throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 0};
-        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, name_osl = ?, pcod = ?, "
+        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, pcod = ?, "
                 + "dataz = ? WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, curPaymentFund,

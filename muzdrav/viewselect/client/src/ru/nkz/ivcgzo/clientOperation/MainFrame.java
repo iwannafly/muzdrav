@@ -39,6 +39,9 @@ import javax.swing.JTextArea;
 import org.apache.thrift.TException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.Font;
 
 public class MainFrame extends JFrame implements IOperationObserver {
 
@@ -108,6 +111,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         this.model = inModel;
         model.registerOperationObserver((IOperationObserver) this);
         setDefaults();
+        initialization();
     }
 
     public void createFrame() {
@@ -146,6 +150,9 @@ public class MainFrame extends JFrame implements IOperationObserver {
                     if (tbOperation.getSelectedItem() != null) {
                         System.out.println("опа-опа");
                         controller.setCurrentOperation(tbOperation.getSelectedItem());
+                        taOperationDescription.setText(tbOperation.getSelectedItem().getOpOper());
+                        taOperationEpicris.setText(tbOperation.getSelectedItem().getPredP());
+                        taOperationMaterial.setText(tbOperation.getSelectedItem().getMaterial());
                     }
                 }
             }
@@ -252,6 +259,26 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnOperationUpdate.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnOperationUpdate.setMaximumSize(new Dimension(50, 50));
         btnOperationUpdate.setPreferredSize(new Dimension(50, 50));
+        btnOperationUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbOperation.getSelectedItem() != null) {
+                        tbOperation.getSelectedItem().setOpOper(taOperationDescription.getText());
+                        tbOperation.getSelectedItem().setPredP(taOperationEpicris.getText());
+                        tbOperation.getSelectedItem().setMaterial(taOperationMaterial.getText());
+                        ClientOperation.tcl.updateOperation(
+                            tbOperation.getSelectedItem());
+                        tbOperation.setData(
+                            ClientOperation.tcl.getOperations((patient.getIdGosp())));
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         btnOperationUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         vbOperationTableControls.add(btnOperationUpdate);
@@ -268,6 +295,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         verticalBox.add(spOperationDescription);
         
         taOperationDescription = new JTextArea();
+        taOperationDescription.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spOperationDescription.setViewportView(taOperationDescription);
         
         lblOperationEpicris = new JLabel("Предоперационный эпикриз");
@@ -278,6 +306,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         verticalBox.add(spOperationEpicris);
         
         taOperationEpicris = new JTextArea();
+        taOperationEpicris.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spOperationEpicris.setViewportView(taOperationEpicris);
         
         lblOperationMaterial = new JLabel("Шовный материал");
@@ -288,6 +317,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         verticalBox.add(spOperationMaterial);
         
         taOperationMaterial = new JTextArea();
+        taOperationMaterial.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spOperationMaterial.setViewportView(taOperationMaterial);
         
         hbOperationComlicationControls = Box.createHorizontalBox();
@@ -383,6 +413,24 @@ public class MainFrame extends JFrame implements IOperationObserver {
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         btnOperationComplicationUpdate.setPreferredSize(new Dimension(50, 50));
         btnOperationComplicationUpdate.setMaximumSize(new Dimension(50, 50));
+        btnOperationComplicationUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbOperationComplications.getSelectedItem() != null) {
+                        ClientOperation.tcl.updateOperationComplication(
+                            tbOperationComplications.getSelectedItem());
+                        tbOperationComplications.setData(
+                                ClientOperation.tcl.getOperationComplications(
+                                        tbOperation.getSelectedItem().getId()));
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         vbOperationComplicationTableControls.add(btnOperationComplicationUpdate);
         
         hbOperationPaymentFundsControls = Box.createHorizontalBox();
@@ -475,6 +523,24 @@ public class MainFrame extends JFrame implements IOperationObserver {
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         btnOperationPaymentFundsUpdate.setPreferredSize(new Dimension(50, 50));
         btnOperationPaymentFundsUpdate.setMaximumSize(new Dimension(50, 50));
+        btnOperationPaymentFundsUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbOperationPaymentFunds.getSelectedItem() != null) {
+                        ClientOperation.tcl.updateOperationPaymentFund(
+                            tbOperationPaymentFunds.getSelectedItem());
+                        tbOperationPaymentFunds.setData(
+                                ClientOperation.tcl.getOperationPaymentFunds(
+                                        tbOperation.getSelectedItem().getId()));
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         vbOperationPaymentFundsTableControls.add(btnOperationPaymentFundsUpdate);
         
         pAnesthesia = new JPanel();
@@ -502,6 +568,28 @@ public class MainFrame extends JFrame implements IOperationObserver {
         vbAnesthesiaTableControls.setAlignmentX(Component.CENTER_ALIGNMENT);
         hbAnesthesiaControl.add(vbAnesthesiaTableControls);
 
+        tbAnesthesia.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+              if (tbAnesthesia.getSelectedItem() != null) {
+                  try {
+                      tbAnesthesiaComplications.setData(
+                              ClientOperation.tcl.getAnesthesiaComplications(
+                                      tbAnesthesia.getSelectedItem().getId())
+                      );
+                      tbAnesthesiaPaymentFunds.setData(
+                              ClientOperation.tcl.getAnesthesiaPaymentFunds(
+                                      tbAnesthesia.getSelectedItem().getId())
+                      );
+                  } catch (KmiacServerException e1) {
+                      e1.printStackTrace();
+                  } catch (TException e1) {
+                      e1.printStackTrace();
+                      ClientOperation.conMan.reconnect(e1);
+                  }
+              }
+          }
+        });
         btnAnesthesiaAdd = new JButton("");
         btnAnesthesiaAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -576,6 +664,24 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnAnesthesiaUpdate.setPreferredSize(new Dimension(50, 50));
         btnAnesthesiaUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
+        btnAnesthesiaUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbAnesthesia.getSelectedItem() != null) {
+                        ClientOperation.tcl.updateAnesthesia(
+                            tbAnesthesia.getSelectedItem());
+                        tbAnesthesia.setData(
+                                ClientOperation.tcl.getAnesthesias(
+                                        tbOperation.getSelectedItem().getId()));
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         vbAnesthesiaTableControls.add(btnAnesthesiaUpdate);
 
         hbAnesthesiaComlicationControls = Box.createHorizontalBox();
@@ -672,6 +778,24 @@ public class MainFrame extends JFrame implements IOperationObserver {
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         btnAnesthesiaComplicationUpdate.setPreferredSize(new Dimension(50, 50));
         btnAnesthesiaComplicationUpdate.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaComplicationUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbAnesthesiaComplications.getSelectedItem() != null) {
+                        ClientOperation.tcl.updateAnesthesiaComplication(
+                            tbAnesthesiaComplications.getSelectedItem());
+                        tbAnesthesiaComplications.setData(
+                                ClientOperation.tcl.getAnesthesiaComplications(
+                                        tbAnesthesia.getSelectedItem().getId()));
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         vbAnesthesiaComplicationTableControls.add(btnAnesthesiaComplicationUpdate);
 
         hbAnesthesiaPaymentFundsControls = Box.createHorizontalBox();
@@ -730,6 +854,35 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnAnesthesiaPaymentFundsDelete = new JButton("");
         btnAnesthesiaPaymentFundsDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
+        btnAnesthesiaPaymentFundsDelete.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbAnesthesiaPaymentFunds.getSelectedItem() != null) {
+                        int opResult = JOptionPane.showConfirmDialog(
+                            MainFrame.this, "Удалить запись?",
+                            "Удаление записи", JOptionPane.YES_NO_OPTION);
+                        if (opResult == JOptionPane.YES_OPTION) {
+                            ClientOperation.tcl.deleteAnesthesiaPaymentFund(
+                                tbAnesthesiaPaymentFunds.getSelectedItem().getId());
+                            tbAnesthesiaPaymentFunds.setData(
+                                ClientOperation.tcl.getAnesthesiaPaymentFunds(
+                                        tbAnesthesia.getSelectedItem().getId())
+                            );
+                        }
+                        if (tbAnesthesiaPaymentFunds.getRowCount() > 0) {
+                            tbAnesthesiaPaymentFunds.setRowSelectionInterval(
+                                    tbAnesthesiaPaymentFunds.getRowCount() - 1,
+                                    tbAnesthesiaPaymentFunds.getRowCount() - 1);
+                        }
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         btnAnesthesiaPaymentFundsDelete.setPreferredSize(new Dimension(50, 50));
         btnAnesthesiaPaymentFundsDelete.setMaximumSize(new Dimension(50, 50));
         vbAnesthesiaPaymentFundsTableControls.add(btnAnesthesiaPaymentFundsDelete);
@@ -739,6 +892,24 @@ public class MainFrame extends JFrame implements IOperationObserver {
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         btnAnesthesiaPaymentFundsUpdate.setPreferredSize(new Dimension(50, 50));
         btnAnesthesiaPaymentFundsUpdate.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaPaymentFundsUpdate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (tbAnesthesiaPaymentFunds.getSelectedItem() != null) {
+                        ClientOperation.tcl.updateAnesthesiaPaymentFund(
+                            tbAnesthesiaPaymentFunds.getSelectedItem());
+                        tbAnesthesiaPaymentFunds.setData(
+                                ClientOperation.tcl.getAnesthesiaPaymentFunds(
+                                        tbAnesthesia.getSelectedItem().getId()));
+//                        clearMedicalHistoryTextAreas();
+                    }
+                } catch (KmiacServerException e1) {
+                    e1.printStackTrace();
+                } catch (TException e1) {
+                    ClientOperation.conMan.reconnect(e1);
+                }
+            }
+        });
         vbAnesthesiaPaymentFundsTableControls.add(btnAnesthesiaPaymentFundsUpdate);
     }
 
@@ -771,6 +942,9 @@ public class MainFrame extends JFrame implements IOperationObserver {
         controller.setOperationComplicationsList();
         controller.setOperationPaymentFundsList();
         controller.setAnesthesiasList();
+        
+        controller.setAnesthesiaComplicationsList();
+        controller.setAnesthesiaPaymentFundsList();
     }
 
     @Override

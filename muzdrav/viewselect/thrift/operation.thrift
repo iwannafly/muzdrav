@@ -10,7 +10,7 @@ struct OperationComplication {
 	1: optional i32 id;
 	2: optional i32 idOper;
 	3: optional string nameOsl;
-	4: optional i32 pcod;
+	4: optional string pcod;
 	5: optional i64 dataz;
 }
 
@@ -51,7 +51,7 @@ struct AnesthesiaComplication {
 	1: optional i32 id;
 	2: optional i32 idAnast;
 	3: optional string name;
-	4: optional i32 pcod;
+	4: optional string pcod;
 	5: optional i64 dataz;
 }
 
