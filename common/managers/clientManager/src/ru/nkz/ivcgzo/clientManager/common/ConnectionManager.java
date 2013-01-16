@@ -771,6 +771,16 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Вызов формы с редактором больничного листа пациента.
+	 * @param npasp - уникальный номер пациента.
+	 * @param idObr - уникальный номер обращения.
+	 * @param idGosp - уникальный номер госпитализации.
+	 */
+	public void showBolListForm(int npasp, int idObr, int idGosp) {
+		viewClient.showModal(client, 26, npasp, idObr, idGosp);
+	}
+	
+	/**
 	 * Открывает сгенерированный отчет в офисном редакторе.
 	 * @param path - путь к отчету
 	 * @param print - печатать ли файл на <b>принтере по умолчанию</b>

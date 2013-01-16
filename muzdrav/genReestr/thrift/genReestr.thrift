@@ -3,49 +3,76 @@ namespace java ru.nkz.ivcgzo.thriftGenReestr
 include "../../../common/thrift/kmiacServer.thrift"
 include "../../../common/thrift/classifier.thrift"
 
+struct PaspErrorInfo {	
+	1: optional i32 id;
+	2: optional i32 npasp;
+	3: optional string fam;
+	4: optional string im;
+	5: optional string ot;
+	6: optional i64 datar;
+	7: optional i32 kderr;
+	8: optional string err_name;
+	9: optional string err_comm;
+}
+
+struct MedPolErrorInfo {
+	 1: optional i32 id;
+	 2: optional i32 id_obr;
+	 3: optional i32 id_pos;
+	 4: optional i64 dat_obr;
+	 5: optional i64 dat_pos;
+	 6: optional i32 vr_pcod;
+	 7: optional string vr_fio;
+	 8: optional string vr_cdol;
+	 9: optional string vr_cdol_name;
+	10: optional i32 npasp;
+	11: optional string pat_fio;
+	12: optional i64 pat_datar;
+	13: optional i32 kderr;
+	14: optional string err_name;
+	15: optional string err_comm;
+}
+
 struct Pasp{
 	1:i32 sl_id;
 	2:i32 vid_rstr;
 	3:i32 str_org;
-	4:string name_str;
-	5:i32 ter_mu;
-	6:i32 kod_mu;
-	7:i64 df_per;
-	8:string fam;
-	9:string im;
-	10:string otch;
-	11:i64 dr;
-	12:string sex;
-	13:string fam_rp;
-	14:string im_rp;
-	15:string otch_rp;
-	16:i64 dr_pr;
-	17:string sex_pr;
-	18:string spolis_pr;
-	19:string polis_pr;
-	20:i32 vpolis;
-	21:string spolis;
-	22:string polis;
-	23:i32 type_doc;
-	24:string docser;
-	25:string docnum;
-	26:i32 region;
-	27:i32 ter_liv;
-	28:i32 status;
-	29:string kob;
-	30:string ist_bol;
-	31:i32 vid_hosp;
-	32:string talon;
+	4:i32 ter_mu;
+	5:i32 kod_mu;
+	6:i64 df_per;
+	7:string fam;
+	8:string im;
+	9:string otch;
+	10:i64 dr;
+	11:string sex;
+	12:string ssp;
+	13:i32 vpolis;
+	14:string spolis;
+	15:string polis;
+	16:i32 type_doc;
+	17:string docser;
+	18:string docnum;
+	19:string fam_pr;
+	20:string im_pr;
+	21:string otch_pr;
+	22:i64 dr_pr;
+	23:string sex_pr;
+	24:i32 vpolis_pr;
+	25:string spolis_pr;
+	26:string polis_pr;
+	27:i32 type_docpr;
+	28:string docser_pr;
+	29:string docnum_pr;
+	30:i32 region;
+	31:string ist_bol;
+	32:i32 vid_hosp;
 	33:i32 ter_pol;
 	34:i32 pol;
 	35:string n_mk;
 	36:i32 id_lpu;
-	37:i32 id_smo;
-	38:i32 region_liv;
-	39:string ogrn_str;
-	40:string birthplace;
-	41:i32 ter_mu_dir;
-	42:i32 kod_mu_dir;
+	37:string birthplace;
+	38:i32 ter_mu_dir;
+	39:i32 kod_mu_dir;
 }
 
 struct Med{
@@ -57,36 +84,31 @@ struct Med{
 	6:i64 d_end;
 	7:i32 kl_usl;
 	8:i32 pr_exp;
-	9:i32 etap;
-	10:i32 pl_extr;
-	11:string usl;
-	12:double kol_usl;
-	13:i32 c_mu;
-	14:string diag;
-	15:string ds_s;
-	16:string pa_diag;
-	17:i32 pr_out;
-	18:i32 res_l;
-	19:i32 prof_fn;
-	20:double stoim;
-	21:double st_acpt;
-	22:i32 cases;
-	23:i32 place;
-	24:i32 spec;
-	25:i32 prvd;
-	26:i32 v_mu;
-	27:i32 res_g;
-	28:string ssd;
-	29:i32 id_med_smo;
-	30:i32 id_med_tf;
-	31:i32 psv;
-	32:i32 pk_mc;
-	33:i32 pr_pv;
-	34:string obst;
-	35:string n_schet;
-	36:i64 d_schet;
-	37:i32 v_sch;
-	38:string talon_omt;
+	9:i32 pl_extr;
+	10:string usl;
+	11:double kol_usl;
+	12:i32 c_mu;
+	13:string diag;
+	14:string ds_s;
+	15:string pa_diag;
+	16:i32 pr_out;
+	17:i32 res_l;
+	18:i32 profil;
+	19:double stoim;
+	20:i32 cases;
+	21:i32 place;
+	22:i32 spec;
+	23:i32 prvd;
+	24:i32 res_g;
+	25:string ssd;
+	26:i32 id_med_tf;
+	27:i32 psv;
+	28:i32 pr_pv;
+	29:string obst;
+	30:string n_schet;
+	31:i64 d_schet;
+	32:i32 v_sch;
+	33:string talon_omt;
 }
 
 struct Err{
@@ -106,6 +128,8 @@ struct Err{
 
 service ThriftGenReestr extends kmiacServer.KmiacServer {
 
+	list<PaspErrorInfo> getPaspErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
+	list<MedPolErrorInfo> getMedPolErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
 	/**
         * Создает реестр поликлиники и возвращает протокол проверок реестра
 	*/

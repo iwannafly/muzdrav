@@ -8,7 +8,6 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEvent;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTableItemChangeEventListener;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftOutputInfo.VINotFoundException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTDuplException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VTException;
 import ru.nkz.ivcgzo.thriftOutputInfo.VrachInfo;
@@ -41,7 +40,7 @@ public class tableVrach extends JPanel {
 	private int id = 0;
 
 /**public static void main(String[] args) {
-	EventQueue.invokeLater(new Runnable() {
+	EventQueue.invokeLater(new Runnable() { 
 		public void run() {
 			try {
 				//tableVrach window = new tableVrach();

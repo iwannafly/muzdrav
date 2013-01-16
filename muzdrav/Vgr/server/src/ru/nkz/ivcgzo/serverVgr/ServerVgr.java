@@ -6,8 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
@@ -33,26 +32,20 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor.SqlExecutorException
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftVgr.RdPatient;
-import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
-import ru.nkz.ivcgzo.thriftVgr.RdVizit;
-import ru.nkz.ivcgzo.thriftVgr.KartaBer;
+import ru.nkz.ivcgzo.thriftVgr.Diag;
 import ru.nkz.ivcgzo.thriftVgr.Kontidi;
 import ru.nkz.ivcgzo.thriftVgr.Kontiis;
 import ru.nkz.ivcgzo.thriftVgr.Kontilo;
 import ru.nkz.ivcgzo.thriftVgr.Kontios;
 import ru.nkz.ivcgzo.thriftVgr.Kontipa;
-import ru.nkz.ivcgzo.thriftVgr.KovNotFoundException;
 import ru.nkz.ivcgzo.thriftVgr.Lgot;
 import ru.nkz.ivcgzo.thriftVgr.RdConVizit;
 import ru.nkz.ivcgzo.thriftVgr.RdPatient;
 import ru.nkz.ivcgzo.thriftVgr.RdVizit;
+import ru.nkz.ivcgzo.thriftVgr.Reg;
 import ru.nkz.ivcgzo.thriftVgr.Sv3;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
 import ru.nkz.ivcgzo.thriftVgr.ThriftVgr.Iface;
-import ru.nkz.ivcgzo.thriftVgr.ThriftVgr;
-import ru.nkz.ivcgzo.thriftVgr.ThriftVgr.Iface;
-import sun.security.util.Length;
 
 
 public class ServerVgr extends Server implements Iface {
@@ -81,6 +74,10 @@ public class ServerVgr extends Server implements Iface {
 	private final TResultSetMapper<Sv3, Sv3._Fields> rsmSv3;
 	private final Class<?>[] Sv3Types;
 	
+	private final TResultSetMapper<Reg, Reg._Fields> rsmReg;
+	private final Class<?>[] RegTypes;
+	private final TResultSetMapper<Diag, Diag._Fields> rsmDiag;
+	private final Class<?>[] DiagTypes;
 	
 	public ServerVgr(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -107,12 +104,12 @@ public class ServerVgr extends Server implements Iface {
 		rdConVizitTypes = new Class<?>[]{          Integer.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class };
 		
 /*1*/		rsmSv3 = new TResultSetMapper<>(Sv3.class, "code","dat_v","uchr","cod_uch","uchrnum",   
-/*2*/      				"uchrname","fio_u","dat_born","pol","nation","vremen","mesto_k",
+/*2*/      		"uchrname","fio_u","dat_born","pol","nation","vremen","mesto_k",
 /*3*/			"mesto_k1","mesto_k2","mesto_k3","mesto_k4","mesto_k5","mesto_k6",
 /*4*/			"gorod_k","street_k","m_v", "where_s1","where_s","p_dou","pos_",   /*25*/
 /*5*/			"u_", "m_uth","m_uth1", "wedom","wedom1","vesgr","ves_kg","rost",
 /*6*/			"f_r","f_r1","massa", "post","intel","em","ps","d_do","k_s1",
-/*7*/                "k_s2","k_s3","k_s4","k_s5","d_po","k_si1",
+/*7*/           "k_s2","k_s3","k_s4","k_s5","d_po","k_si1",
 /*8*/			"p_u_01","n_pu1","f_h_1","k_si2","p_u_02","n_pu2","f_h_2",
 /*9*/			"k_si3","p_u_03","n_pu3","f_h_3","k_si4","p_u_04","n_pu4",    /*62*/
 /*10*/			"f_h_4","k_si5","p_u_05","n_pu5","f_h_5","inv","zab_inv",
@@ -131,7 +128,18 @@ public class ServerVgr extends Server implements Iface {
 /*10*/      Integer.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
 /*11*/      Integer.class,String.class,Integer.class, Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,
 /*12*/      String.class,Integer.class,Boolean.class,Integer.class,String.class};
-		
+	
+rsmReg = new TResultSetMapper<>(Reg.class, "bn","kter","klpu",    
+		"fam","im","otch","dr","kterp","adresp",
+		"kterf","adresf","kterf","klpup",
+		"osn","dn","dk","kpri" );
+RegTypes = new Class<?>[] {Integer.class,Integer.class,Integer.class,
+		String.class,String.class,String.class,Date.class,Integer.class,String.class,
+		Integer.class,String.class,Integer.class,Integer.class,
+		String.class,Date.class,Date.class,Integer.class};
+rsmDiag = new TResultSetMapper<>(Diag.class, "bn","dia" );
+DiagTypes = new Class<?>[] {Integer.class,String.class};
+
 		// TODO Auto-generated constructor stub
 	}
 
@@ -812,7 +820,8 @@ throw new TException(e);
 			throws KmiacServerException, TException {
 		String servpath = "";
 		if (cform.equals("F25")) servpath = f025Selection(dbegin, dend, porc, cpodr);
-		if (cform.equals("F39")) servpath = f039Selection(dbegin, dend, porc, cpodr);
+		if (cform.equals("F39")) servpath = f039Selection(dbegin, dend, porc, cpodr, dclose);
+		if (cform.equals("F03")) servpath = f003Selection(dbegin, dend, porc, cpodr);
 		return servpath;
 	}
 
@@ -1049,7 +1058,7 @@ throw new TException(e);
     						sBuf = System.lineSeparator();
     						sb.append(sBuf);
      						porc = porc+1;
-    		   				sBuf = "*"+Integer.toString(cpodr)+","+Integer.toString(porc)+",1"+System.lineSeparator();
+    		   				sBuf = "*"+Integer.toString(cpodr)+","+Integer.toString(porc)+","+Integer.toString(ndok)+System.lineSeparator();
     		   			  	sb.append(sBuf);
     		   			  	ndok = 1;
     					}
@@ -1146,7 +1155,7 @@ throw new TException(e);
     				//    System.out.println(sBuf);
     				}
     				};	
-				} else {sBuf = "Отсутствует информация для выгрузки за заданный период с "+dbegin +" по "+dend;
+				} else {sBuf = "Отсутствует информация для выгрузки за заданный период с "+sdf.format(dbegin) +" по "+sdf.format(dend);
 					sb.append(sBuf);
 				}
 				sBuf = "!.ABIJEMLM,CC2E.JOBLIB,P="+String.valueOf(porc).trim()+",K"+System.lineSeparator();
@@ -1164,37 +1173,47 @@ throw new TException(e);
 
    	}
 
-	private String f039Selection(long dbegin, long dend, int porc, int cpodr) throws KmiacServerException, TException {
+	private String f039Selection(long dbegin, long dend, int porc, int cpodr, long dclose) throws KmiacServerException, TException {
 		String fpath = "", sqlo = "", sBuf, sc, sc0, kodvr;
 		String[] mas = {"","",""};
 		int ndok = 0, hp = 0, mp = 0, hd = 0, md = 0, hda = 0, mda = 0, hprf = 0, mprf = 0, hpr = 0, mpr = 0, kodspec = 0;
-		int kodpol = cpodr;
+		int kodpol = cpodr, sdok = 0, h0 = 0;
 		int p0 = 0, ps = 0, pi = 0, p0_0 = 0, p0_14 = 0, p15_17 = 0, p60 = 0;
 		int pz0 = 0, pz0_0 = 0, pz0_14 = 0, pz15_17 = 0, pz60 = 0;
 		int pp0 = 0, pps = 0, pd0 = 0, perv_p = 0, perv_d = 0;
 		int pzd0 = 0, pzd0_0 = 0, pzd0_14 = 0, pzd15_17 = 0, pzd60 = 0;
 		int pp0_14 = 0, pp0_0 = 0, pp15_17 = 0, pbud = 0, poms = 0, pdms = 0, pplat = 0;
 		float h; 
-		long d1, d2;
+		long d1, d2, dper;
+		//Date dper = null;
+		SimpleDateFormat sdfp = new SimpleDateFormat("dd.MM.yyyy");
 		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
 		SimpleDateFormat sdfr = new SimpleDateFormat("yyMMdd");
+		SimpleDateFormat syear = new SimpleDateFormat("yyyy");
+		SimpleDateFormat sday = new SimpleDateFormat("dd");
+		hp = Integer.valueOf(syear.format(new Date(dclose)))-1;
+		mp = Integer.valueOf(sday.format(dclose));
+		sc = sday.format(new Date(dclose))+".12."+String.valueOf(hp);
+		dper = Date.UTC(hp, 12, mp, 0, 0, 0);
     	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
                 fpath = File.createTempFile("p_"+String.valueOf(porc).trim(), ".txt").getAbsolutePath()), "Cp866")) {
     		StringBuilder sb = new StringBuilder();
-    		sqlo = "SELECT distinct(t.pcod,t.cdol), "+ 
+    		sqlo = "SELECT distinct(t.pcod,t.cdol), t.pcod, t.cdol,"+ 
                    "v.fam, v.im, v.ot, v.pol, v.datar ,v.obr from s_tabel t, s_vrach v "+
-                   "where t.pcod = v.pcod and (t.datav >= ? and v.datav <= ?) and t.cpodr = ? "+
+                   "where t.pcod = v.pcod and (t.datav >= ? and t.datav <= ?) and t.cpodr = ? "+
                    "order by t.pcod, t.cdol";
     		try (AutoCloseableResultSet acrp = sse.execPreparedQuery(sqlo, new Date(dbegin), new Date(dend),kodpol)){
 				ResultSet rs = acrp.getResultSet();
-    			if (rs.next()) {
+//    			if (rs.next()) {
     				while (rs.next()) {
     				ndok = ndok+1;
+    				sdok = sdok+1;
+//    				System.out.println(ndok);
     				if (ndok > 99){
 						sBuf = System.lineSeparator();
 						sb.append(sBuf);
  						porc = porc+1;
-		   				sBuf = "*"+Integer.toString(cpodr)+","+Integer.toString(porc)+",1"+System.lineSeparator();
+		   				sBuf = "*"+Integer.toString(cpodr)+","+Integer.toString(porc)+","+Integer.toString(ndok)+System.lineSeparator();
 		   			  	sb.append(sBuf);
 		   			  	ndok = 1;
 					}
@@ -1204,23 +1223,29 @@ throw new TException(e);
 					else 
 						sBuf += Integer.toString(ndok);
     	    		kodspec = rs.getInt("pcod");
-    	    		kodvr = rs.getString("kodvr");
-    				sBuf += Integer.toString(kodpol).trim()+","+rs.getString("fam").trim()+","+rs.getString("im").trim()+","+
+    	    		kodvr = rs.getString("cdol");
+    				sBuf += ","+Integer.toString(kodpol).trim()+","+rs.getString("fam").trim()+","+rs.getString("im").trim()+","+
     						rs.getString("ot").trim()+","+Integer.toString(rs.getInt("pol")).trim()+","+sdfr.format(rs.getDate("datar")).trim()+","+
-    						rs.getString("im").substring(0,1)+rs.getString("ot").substring(0,1)+","+kodvr+","+
-    						rs.getString("obr")+","+sdf.format(dend);
+    						rs.getString("im").substring(0,1)+rs.getString("ot").substring(0,1)+","+kodvr;
+    				if (rs.getString("obr") == null)
+    				sBuf += ",";
+    				else
+    					sBuf += ","+rs.getString("obr").trim();
+    				sBuf += ","+sdf.format(dclose);
+					System.out.println(sBuf);
     				
     				sqlo = "SELECT timep, timed, timeda, timeprf, timepr "+ 
     	                    "from s_tabel "+
-    	                    "where pcod = ? and cdol = ? and (t.datav >= ? and v.datav <= ?) and t.cpodr = ? "+
-    	                    "order by t.pcod, t.cdol";
+    	                    "where pcod = ? and cdol = ? and (datav >= ? and datav <= ?) and cpodr = ? "+
+    	                    "order by pcod, cdol";
+//    				System.out.println(sqlo);
     				try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlo, kodspec, kodvr, new Date(dbegin), new Date(dend), kodpol)){
     					ResultSet rst = acrs.getResultSet();
     				   	hp = 0; hd = 0; hda = 0; hprf = 0; hpr = 0;
     				   	mp = 0; md = 0; mda = 0; mprf = 0; mpr = 0;
         				while (rst.next()) {
         					hp = hp+(int)rst.getFloat("timep");
-        					mp = mp+ (int)((rst.getFloat("timep")-(int)rst.getFloat("timep"))*100);
+        					mp = mp+(int)((rst.getFloat("timep")-(int)rst.getFloat("timep"))*100);
         					hd = hd+(int)rst.getFloat("timed");
         					md = md+ (int)((rst.getFloat("timed")-(int)rst.getFloat("timed"))*100);
         					hda = hda+(int)rst.getFloat("timeda");
@@ -1230,21 +1255,29 @@ throw new TException(e);
         					hpr = hpr+(int)rst.getFloat("timepr");
         					mpr = mpr+ (int)((rst.getFloat("timepr")-(int)rst.getFloat("timepr"))*100);
         				}
-    				h = (hp+hd+hda+hprf+hpr+(mp+md+mda+mprf+mpr)/60);
-    				sBuf += ","+String.valueOf(h).trim();
-    				h = (hp+mp/60);
-    				sBuf += ","+String.valueOf(h);
-    				h = (hprf+mprf/60);
-    				sBuf += ","+String.valueOf(h);
-    				h = (hd+hda+(md+mda)/60);
-    				sBuf += ","+String.valueOf(h);
+        				System.out.println(mp);
+    				h0 = hp+hd+hprf+hpr+(int)((mp+md+mprf+mpr)/60);
+    				sBuf += ","+String.valueOf(h0).trim();
+    				if ((mp+md+mprf+mpr)%60 > 0) 
+    					sBuf += "."+String.valueOf((mp+md+mprf+mpr)%60);
+    				h0 = hp+(int)mp/60;
+    				sBuf += ","+String.valueOf(h0);
+    				if (mp%60 > 0)
+    					sBuf += "."+String.valueOf(mp%60);
+    				h0 = hprf+(int)mprf/60;
+    				sBuf += ","+String.valueOf(h0);
+    				if (mprf%60 > 0)
+    					sBuf += "."+String.valueOf(mprf%60);
+    				h0 = hd+(int)md/60;
+    				sBuf += ","+String.valueOf(h0);
+    				if (md%60 > 0)
+    					sBuf += "."+String.valueOf(md%60);
     				}
-    				sqlo = "SELECT distinct(v.npasp,v.datap), v.diag, v.mobs, v.cpos, v.opl, v.id_obr, "+ 
-    						"p.datar, p.ter_liv,(select sel_xzab(v.npasp,v.diag)::int(1) AS xzab), "+
-    						"(select sel_diag_god(v.npasp,v.diag,?,?)::int(1) AS perv"+
-    	                    "from p_vizit_amb v, patient p, "+
+    				sqlo = "SELECT  v.npasp, v.datap, v.diag, v.mobs, v.cpos, v.opl, v.id_obr, "+ 
+    						"(select sel_xzab(v.npasp,v.diag)::integer AS xzab), (select sel_diag_perv(v.npasp,v.diag,v.datap,?)::integer AS perv), "+
+    						"p.datar, p.ter_liv from p_vizit_amb v, patient p  " +
     	                    "where v.npasp = p.npasp and (v.datap >= ? and v.datap <= ?) and v.cpol = ? and v.cod_sp = ? and v.cdol = ?";
-    				try (AutoCloseableResultSet acrv = sse.execPreparedQuery(sqlo, new Date(dbegin), new Date(dbegin), new Date(dend), kodpol,kodspec,kodvr)){
+    				try (AutoCloseableResultSet acrv = sse.execPreparedQuery(sqlo, new Date(dper), new Date(dbegin), new Date(dend), kodpol,kodspec,kodvr)){
     				  	ResultSet rsv = acrv.getResultSet();
     					while (rsv.next()) {
     			   		p0 = p0+1;
@@ -1252,7 +1285,7 @@ throw new TException(e);
     			   		if (rsv.getInt("ter_liv")!=10) pi = pi+1;
     					d1 = rsv.getDate("datap").getTime();
     					d2 = rsv.getDate("datar").getTime() ;
-    					if (rsv.getInt("mobs") == 2 || rsv.getInt("mobs") == 3) pd0 =pd0 + 1;
+    					if (rsv.getInt("mobs") >= 2 && rsv.getInt("mobs") < 4) pd0 =pd0 + 1;
     					if (rsv.getInt("opl") == 1) pbud = pbud+1;
     					if (rsv.getInt("opl") == 2) poms = poms+1;
     					if (rsv.getInt("opl") == 3) pdms = pdms+1;
@@ -1262,7 +1295,8 @@ throw new TException(e);
     					if (h < 15) p0_14 = p0_14+1;
     					if (h >= 15 && h < 18) p15_17 = p15_17+1;
     					if (h >= 60) p60 = p60+1;
-    					if (rsv.getString("diag").substring(0, 1).equals("Z")){
+   
+    					if (rsv.getString("diag") != null && rsv.getString("diag").substring(0, 1).equals("Z")){
     						pp0 = pp0+1;
     						if (rsv.getInt("cpos")==2) pps = pps+1;
     						if (h < 1) pp0_0 = pp0_0 +1;
@@ -1303,28 +1337,345 @@ throw new TException(e);
     							","+String.valueOf(pp15_17).trim()+","+String.valueOf(pbud).trim()+
     							","+String.valueOf(poms).trim()+","+String.valueOf(pdms).trim()+
     							","+String.valueOf(pplat).trim()+","+String.valueOf(perv_p).trim()+
-    							","+String.valueOf(perv_d).trim();
+    							","+String.valueOf(perv_d).trim()+System.lineSeparator();
     				
     				}
+    				sb.append(sBuf);
     				}
-    			}
-    			else {sBuf = "Отсутствует информация для выгрузки за заданный период с "+dbegin +" по "+dend;
+    			if (ndok == 0) {sBuf = "Отсутствует информация для выгрузки за заданный период с "+sdf.format(dbegin) +" по "+sdf.format(dend);
 				sb.append(sBuf);
+				System.out.println(sBuf);
 			}
     		}
-						 
+			sBuf = "!.ABBJEMLM,CC2M.JOBLIB,P="+String.valueOf(porc).trim()+",K"+System.lineSeparator();
+			sBuf += "!.U039,"+String.valueOf(sdok)+","+System.lineSeparator();
+			osw.write(sBuf);
+			osw.write(sb.toString());	
+				 
     					} catch (Exception e) {
     						e.printStackTrace();
     					}
     				
     				
+  	
+
+		return fpath;
+	}	
+	
+	private String f003Selection(long dbegin, long dend, int porc, int cpodr) {
+		String fpath = "", sqlo = "", sBuf, sc, sc0, kodvr;
+		String[] mas = {"","",""};
+		int ndok = 0, hp = 0, mp = 0, hd = 0, md = 0, hda = 0, mda = 0, hprf = 0, mprf = 0, hpr = 0, mpr = 0, kodspec = 0;
+		int kodpol = cpodr, sdok = 0, h0 = 0;
+		int p0 = 0, ps = 0, pi = 0, p0_0 = 0, p0_14 = 0, p15_17 = 0, p60 = 0;
+		int pz0 = 0, pz0_0 = 0, pz0_14 = 0, pz15_17 = 0, pz60 = 0;
+		int pp0 = 0, pps = 0, pd0 = 0, perv_p = 0, perv_d = 0;
+		int pzd0 = 0, pzd0_0 = 0, pzd0_14 = 0, pzd15_17 = 0, pzd60 = 0;
+		int pp0_14 = 0, pp0_0 = 0, pp15_17 = 0, pbud = 0, poms = 0, pdms = 0, pplat = 0;
+		float h; 
+		long d1, d2, dper;
+		
+		SimpleDateFormat sdfp = new SimpleDateFormat("dd.MM.yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+		SimpleDateFormat sdfr = new SimpleDateFormat("ddMMyyyy");
+		SimpleDateFormat syear = new SimpleDateFormat("yyyy");
+		SimpleDateFormat sday = new SimpleDateFormat("dd");
+    	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                fpath = File.createTempFile("p_"+String.valueOf(porc).trim(), ".txt").getAbsolutePath()), "Cp866")) {
+    		StringBuilder sb = new StringBuilder();
+    		sqlo = "SELECT c.id, c.cotd, c.npasp, c.nist, c.naprav, c.n_org, c.diag_n, c.datap, c.ntalon,"+ 
+                   "p.fam, p.im, p.ot, p.pol, p.datar ,p.sgrp, p.jitel, p.adm_gorod,"+
+                   "p.adm_ul, p.adm_dom,p.adm_korp,p.adm_kv, p.mrab, p.ter_liv,p.poms_ser, p.poms_nom,"+
+                   "o.datav, o.ishod, o.rezult, o.cdol, o.vrach, o.vid_opl, (select sel_gosp_perv(c.id,c.datap,c.npasp)::integer AS perv), "+
+                   "(select sel_gosp_diag(c.id)::char(30) AS diag), (select sel_gosp_oper(c.id)::char(30) AS oper)"+
+                   " (select sel_lds(c.id)::char(10) AS lds"+
+                   "(select sel_gosp_boll(c.id)::char(30) AS boll "+
+                   " from c_gosp c, patient p, c_otd o "+
+                   "where c.npasp = p.npasp and c.id = o.id_gosp and (c.datap >= ? and o.datav <= ?) and c.cotd = c.cotdp and c.cotd = ? "+
+                   "order by c.ngosp";
+    		try (AutoCloseableResultSet acrp = sse.execPreparedQuery(sqlo, new Date(dbegin), new Date(dend),kodpol)){
+				ResultSet rs = acrp.getResultSet();
+    			if (rs.next()) {
+    				while (rs.next()) {
+    				ndok = ndok+1;
+    				sdok = sdok+1;
+//    				System.out.println(ndok);
+    				if (ndok > 99){
+						sBuf = System.lineSeparator();
+						sb.append(sBuf);
+ 						porc = porc+1;
+		   				sBuf = "*"+Integer.toString(cpodr)+","+Integer.toString(porc)+","+Integer.toString(ndok)+System.lineSeparator();
+		   			  	sb.append(sBuf);
+		   			  	ndok = 1;
+					}
+					sBuf=";";
+					if (ndok < 10) 
+						sBuf += "0"+Integer.toString(ndok);
+					else 
+						sBuf += Integer.toString(ndok);
+    	    		sBuf += ","+rs.getString("cdol");
+    	    		sBuf += ","+String.valueOf(rs.getInt("stac_type"));
+    	    		sBuf += ","+String.valueOf(rs.getInt("vid_opl"));
+    	    		sBuf += ","+String.valueOf(rs.getInt("nist"));
+    	    		sBuf += ","+rs.getString("poms_nom").trim()+","+rs.getString("poms_nom").trim();
+    	    		sBuf += ":"+rs.getString("fam").trim()+" "+rs.getString("im").trim()+" "+
+    						rs.getString("ot").trim()+","+Integer.toString(rs.getInt("pol")).trim()+","+
+    	    				sdfr.format(rs.getDate("datar")).trim()+","+String.valueOf(rs.getInt("sgrp"))+":"+
+    						String.valueOf(rs.getInt("jitel"));
+    				if (rs.getInt("jitel") == 1){
+    					sBuf += ","+rs.getString("adm_ul").trim()+","+rs.getString("adm_doml").trim()+","+
+    							rs.getString("adm_korp").trim()+","+rs.getString("adm_kvart").trim();
+    				}
+    				else {
+    					sBuf += ","+rs.getString("adm_gorod").trim()+",,,";
+    				}
+    				sBuf += ":"+String.valueOf(rs.getInt("mrab")).trim();
+    				sBuf += ","+rs.getString("napravl").trim()+String.valueOf(rs.getInt("n_org")).trim()+","+rs.getString("diag_n").trim();
+    				sBuf += ":"+sdfr.format(rs.getDate("datap"))+","+sdfr.format(rs.getDate("datav"));
+    				sBuf += ","+String.valueOf(rs.getInt("ishod")).trim();
+    				sBuf += ","+String.valueOf(rs.getInt("rezult")).trim();
+                    sBuf += ","+String.valueOf(rs.getInt("perv")).trim();
+                    if (rs.getInt("n_org") != rs.getInt("cotdp"))
+                    	sBuf += ",1";
+                    else
+                    	sBuf += ",2";
+                    sBuf += ":"+rs.getString("diag").trim();
+                    sBuf += ":"+rs.getString("oper").trim();
+                    sBuf += ":"+rs.getString("lds").trim();
+                    sBuf += ":"+String.valueOf(rs.getInt("ntalon")).trim();
+                    sBuf += ","+rs.getString("boll").trim();
+                    sBuf += ":Фамилия ИО,инд,обр::"+String.valueOf(rs.getInt("ter_liv")).trim()+";";
+					System.out.println(sBuf);
+ 				
+
+
+    				sb.append(sBuf);
+    				}
+    			}
+    			if (ndok == 0) {sBuf = "Отсутствует информация для выгрузки за заданный период с "+sdf.format(dbegin) +" по "+sdf.format(dend);
+				sb.append(sBuf);
+				System.out.println(sBuf);
+			}
+    		}
+			sBuf = "!.DSCJFMLM,CC2E.JOBLIB,P="+String.valueOf(porc).trim()+",K"+System.lineSeparator();
+			sBuf += "!.U003,"+String.valueOf(sdok)+","+System.lineSeparator();
+			osw.write(sBuf);
+			osw.write(sb.toString());	
+				 
+    					} catch (Exception e) {
+    						e.printStackTrace();
+    					}
+    				
 				sBuf = "!.ABBJEMLM,CC2M.JOBLIB,P=2319,K"+System.lineSeparator();
 				sBuf += "!.U025,393,"+System.lineSeparator();
 //				osw.write(sBuf);
 //				osw.write(sb.toString());	
-  	
+				return fpath;
+	}
 
-		return fpath;
-	}		
-}
+	@Override
+	public String getFertInfoPol(int cpodr, long dn, long dk)
+			throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		String sqlreg;
+		String path = null;
+		int bufRead;
+		byte[] buffer = new byte[8192];
+		
+		try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("FertInfoPol", ".zip").getAbsolutePath());
+	 		ZipOutputStream zos = new ZipOutputStream(fos)) {
 	
+		sqlreg = "SELECT p.npasp::integer AS bn, 907::integer AS kter,null::integer AS klpu,p.fam::char(20) AS fam,p.im::char(15) AS im,p.ot::char(20) AS otch,p.datar AS dr,  "+
+		"(select terp from get_ter(p.adp_gorod::text,p.adm_gorod::text))::integer AS kterp,(select term from get_ter(p.adp_gorod::text,p.adm_gorod::text))::integer AS kterf," +
+		"trim(p.adp_gorod)||' '|| trim(p.adp_ul)||' '||trim(p.adp_dom)||'-'||trim(p.adp_kv):: char(70) AS adresp, "+
+		"trim(p.adm_gorod)||' '|| trim(p.adm_ul)||' '||trim(p.adm_dom)||'-'||trim(p.adm_kv):: char(70) AS adresf, "+
+		"10::integer AS kterl, p.cpol_pr ::integer AS klpup, f.osn :: char(150) AS osn,f.dn AS dn, f.dk AS dk, f.kpri::integer AS kpri  "+
+		"FROM  patient p JOIN p_fert f ON (p.npasp = f.npasp) "+
+		"WHERE  p.cpol_pr = ? AND (f.dataz>? AND f.dataz<?) " ;		
+
+       
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlreg,cpodr, new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("reg.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		String sqldiag = "select d.npasp::integer AS bn, d.diag::char(7) AS dia"+
+				"from patient p JOIN p_fert f ON (p.npasp = f.npasp) JOIN p_diag d ON (p.npasp = d.npasp and d.pat=1) "+
+		"WHERE  p.cpol_pr = ? AND (f.dataz>? AND f.dataz<?) " ;	
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqldiag,cpodr, new Date(dn), new Date(dk)) ;
+				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+			zos.putNextEntry(new ZipEntry("diag.dbf"));
+			while ((bufRead = dbfStr.read(buffer)) > 0)
+				zos.write(buffer, 0, bufRead);
+		} catch (SQLException e) {
+	        log.log(Level.ERROR, "SQl Exception: ", e);
+			throw new KmiacServerException();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		return path;	}
+
+	@Override
+	public String getInvInfoPol(int cpodr, long dn, long dk)
+			throws KmiacServerException, TException {
+		String fpath = "", sqlo = "",sBuf, pl, nmed_reab ="", nps_reab="",nprof_reab="",nsoc_reab="";
+		String id_fio="",  name_bk="", name_pr="",d_inv="",d_invp="",pasp="";
+		 int med_reab=0, ps_reab=0, prof_reab=0,   soc_reab=0;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+		SimpleDateFormat sdfr = new SimpleDateFormat("dd.mm.yyyy");
+    	try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(
+                fpath = File.createTempFile("Invalid_Main",".dat").getAbsolutePath()), "Cp866")) {
+    		StringBuilder sb = new StringBuilder();
+    		sqlo =  "select p.fam,p.im,p.ot,p.datar,p.pol,p.npasp,p.sgrp,p.adm_gorod,p.adm_ul,p.adm_dom,p.adm_kv,p.poms_ser,p.poms_nom,p.poms_strg,"+
+    		   "i.dataz,i.datav,i.mesto1,i.rez_mse,i.preds,i.uchr,i.diag,i.oslog,i.factor,i.fact2,i.fact4,i.prognoz,i.vrach,i.ninv,"+
+    		   "i.diag_s1,i.diag_s2,i.diag_s3,i.d_inv,i.d_invp,i.srok_inv,i.zakl,i.med_reab,i.ps_reab,i.prof_reab,i.soc_reab,i.potencial,i.nom_mse,i.name_mse,i.ruk_mse,i.d_otpr,i.d_srok,i.zakl_name,i.d_osv,"+
+    		   "klin_prognoz,nar1,nar2,nar3,nar4,nar5,nar6,ogr1,ogr2,ogr3,ogr4,ogr5,ogr6,ogr7,mr1n,mr2n,mr3n,mr4n,mr5n,mr6n,mr7n,mr8n,mr9n,mr10n,mr11n,mr12n,mr13n,mr14n,mr15n,mr16n,mr17n,"+
+    		   "mr18n,mr19n,mr20n,mr21n,mr22n,mr23n,pr1n,pr2n,pr3n,pr4n,pr5n,pr6n,pr7n,pr8n,pr9n,pr10n,pr11n,pr12n,pr13n,pr14n,pr15n,pr16n,mr1v,mr2v,mr3v,mr4v,mr5v,mr6v,mr7v,mr8v,mr9v,"+
+    		   "mr10v,mr11v,mr12v,mr13v,mr14v,mr15v,mr16v,mr17v,mr18v,mr19v,mr20v,mr21v,mr22v,mr23v,pr1v,pr2v,pr3v,pr4v,pr5v,pr6v,pr7v,pr8v,pr9v,pr10v,pr11v,pr12v,pr13v,pr14v,pr15v,pr16v,mr1d,mr2d,mr3d,mr4d,pr1d"+
+    		   "k.name_s, v.name,id.nidv,n.name,v0a.name,v0m.name,v0p.name,v0c.name,v0e.name,v0f.name,v0g.name"+
+    		   "from patient p JOIN p_invk i ON (p.npasp = i.npasp) LEFT JOIN p_kas k ON (p.poms_strg = k.pcod) LEFT JOIN n_v0f v ON (p.poms_strg = v.klin_prognoz) "+
+    		   "LEFT JOIN n_idv id ON (p.cpol_pr = id.cpol) LEFT JOIN n_n00 n ON (p.cpol_pr = n.pcod)"+
+               "LEFT JOIN n_v0a v0a ON (i.factor = v0a.pcod) LEFT JOIN n_v0m v0m ON (mesto1 = v0m.pcod)"+
+    		   "LEFT JOIN n_v0p v0p ON (preds = v0p.pcod) LEFT JOIN n_v0c v0c ON (fact2 = v0c.pcod) LEFT JOIN n_v0e v0e ON (fact4 = v0e.pcod)"+
+               "LEFT JOIN n_v0f v0f ON (prognoz = v0f.pcod) LEFT JOIN n_v0g v0g ON (potencial = v0g.pcod)"+
+    		   "where  p.cpol_pr = ? and (i.datav >= ? and i.datav <= ?)";
+                                     
+    		try (AutoCloseableResultSet acrp = sse.execPreparedQuery(sqlo, cpodr,new Date(dk), new Date(dn))){
+				ResultSet rs = acrp.getResultSet();
+    			if (rs.next()) {
+    				while (rs.next()) {
+    				
+    				id_fio=rs.getString("id.nidv").trim().substring(1,rs.getString("id.nidv").trim().length()-rs.getString("npasp").trim().length()-1)+rs.getString("npasp").trim()+rs.getString("npasp").trim().length();
+    				name_bk= rs.getString("k.name_s").trim();   
+    				name_pr= rs.getString("v.name").trim();  
+    				
+    			    if (rs.getString("d_inv").trim() == null)  d_inv=""; else d_inv=sdf.format(rs.getDate("d_inv"))+" 00:00:00";
+    			    if (rs.getString("d_invp").trim() == null)  d_invp=""; else d_invp=sdf.format(rs.getDate("d_invp"))+" 00:00:00";
+    			    
+    		//	    if Fields[43].IsNull then d_otp:=#9#9 else d_otp:=FormatDateTime('dd',Fields[43].AsDateTime)+#9+FormatDateTime('mm',Fields[43].AsDateTime)+#9+FormatDateTime('yyyy',Fields[43].AsDateTime);
+    		//	    if Fields[44].IsNull then d_srok:=#9#9 else d_srok:=FormatDateTime('dd',Fields[44].AsDateTime)+#9+FormatDateTime('mm',Fields[44].AsDateTime)+#9+FormatDateTime('yyyy',Fields[44].AsDateTime);
+
+					// TODO Auto-generated method stub
+    				 if (rs.getInt("p.pol")==1)  pl = "Мужской"; else pl = "Женский";
+    				
+					if (rs.getInt("mr1n")>0 || rs.getInt("mr2n")>0 || rs.getInt("mr3n")>0 || rs.getInt("mr4n")>0 || rs.getInt("mr5n")>0 || rs.getInt("mr6n")>0 || rs.getInt("mr7n")>0 || rs.getInt("mr8n")>0 || rs.getInt("mr9n")>0 ||
+    				 rs.getInt("mr10n")>0 || rs.getInt("mr11n")>0 || rs.getInt("mr12n")>0 || rs.getInt("mr13n")>0 || rs.getInt("mr14n")>0 || rs.getInt("mr15n")>0 || rs.getInt("mr16n")>0 || rs.getInt("mr17n")>0 || rs.getInt("mr18n")>0 ||
+    				 rs.getInt("mr19n")>0 || rs.getInt("mr20n")>0 || rs.getInt("mr21n")>0 || rs.getInt("mr22n")>0 || rs.getInt("mr23n")>0) med_reab=1;
+    					  
+				if (rs.getInt("pr1n")>0 || rs.getInt("pr2n")>0 || rs.getInt("pr3n")>0)  ps_reab=1;
+    			    
+				if (rs.getInt("pr4n")>0 || rs.getInt("pr5n")>0)  prof_reab=1;
+    				   
+				if (rs.getInt("pr6n")>0 || rs.getInt("pr7n")>0)  soc_reab=1;
+				
+				 if (med_reab==1)   nmed_reab = rs.getString("med_reab").trim();  else nmed_reab="";
+				 if (ps_reab==1)   nps_reab = rs.getString("ps_reab").trim(); else nps_reab="";
+				 if (prof_reab==1) nprof_reab=rs.getString("prof_reab").trim(); else nprof_reab="";
+  			     if (soc_reab==1)  nsoc_reab=rs.getString("soc_reab").trim(); else nsoc_reab="";
+				  
+  			     
+  				pasp+=id_fio+"\u0009"+sdf.format(rs.getDate("i.dataz"))+" 12:01:30.000"+"\u0009"+"1"+"\u0009"+"1"+"\u0009"+
+  					"\u0009"+sdf.format(rs.getDate("i.datav"))+" 00:00:00"+"\u0009"+"Детская поликлиника"+"\u0009"+rs.getString("n.name").trim()+
+  					"\u0009"+"32"+"\u0009"+"231"+rs.getString("fam").trim()+"\u0009"+rs.getString("im").trim()+"\u0009"+rs.getString("ot").trim()+"\u0009"+pl+
+  					"\u0009"+rs.getString("p.poms_ser").trim()+rs.getString("p.poms_nom").trim()+"\u0009"+rs.getString("name_bk").trim()+"\u0009"+
+  					sdf.format(rs.getDate("datar"))+" 00:00:00"+"\u0009"+rs.getString("mesto1").trim()+"\u0009"+rs.getString("rez_mse").trim()+"\u0009"+
+  					rs.getString("adm_dom").trim()+"-"+rs.getString("adm_kv").trim()+"\u0009"+rs.getString("adm_gorod").trim()+"\u0009"+
+  					rs.getString("adm_ul").trim()+"\u0009"+rs.getString("v0p.name").trim()+"\u0009"+rs.getString("uchr").trim()+"\u0009"+
+  					rs.getString("i.diag").trim()+"\u0009"+rs.getString("oslog").trim()+"\u0009"+rs.getString("v0a.name").trim()+"\u0009"+"\u0009"+"\u0009"+
+  					rs.getString("v0c.name").trim()+"\u0009"+rs.getString("v0e.name").trim()+"\u0009"+
+  					rs.getString("v0f.name").trim()+"\u0009"+
+  					rs.getString("mr1n").trim()+"\u0009"+rs.getString("mr1d").trim()+"\u0009"+get_v0t(rs.getInt("mr1v"))+"\u0009"+
+  					rs.getString("mr2n").trim()+"\u0009"+rs.getString("mr2d").trim()+"\u0009"+get_v0t(rs.getInt("mr2v"))+"\u0009"+
+  					rs.getString("mr3n").trim()+"\u0009"+get_v0t(rs.getInt("mr3v"))+"\u0009"+
+  					rs.getString("mr4n").trim()+"\u0009"+get_v0t(rs.getInt("mr4v"))+"\u0009"+
+  					rs.getString("mr5n").trim()+"\u0009"+get_v0t(rs.getInt("mr5v"))+"\u0009"+
+  					rs.getString("mr6n").trim()+"\u0009"+get_v0t(rs.getInt("mr6v"))+"\u0009"+
+  					rs.getString("mr7n").trim()+"\u0009"+get_v0t(rs.getInt("mr7v"))+"\u0009"+
+  					rs.getString("mr3d").trim()+"\u0009"+
+  					rs.getString("mr8n").trim()+"\u0009"+get_v0t(rs.getInt("mr8v"))+"\u0009"+
+  					rs.getString("mr9n").trim()+"\u0009"+get_v0t(rs.getInt("mr9v"))+"\u0009"+
+  					rs.getString("mr10n").trim()+"\u0009"+get_v0t(rs.getInt("mr10v"))+"\u0009"+
+  					rs.getString("mr11n").trim()+"\u0009"+get_v0t(rs.getInt("mr11v"))+"\u0009"+
+  					rs.getString("mr12n").trim()+"\u0009"+get_v0t(rs.getInt("mr12v"))+"\u0009"+
+  					rs.getString("mr13n").trim()+"\u0009"+get_v0t(rs.getInt("mr13v"))+"\u0009"+
+  					rs.getString("mr14n").trim()+"\u0009"+get_v0t(rs.getInt("mr14v"))+"\u0009"+
+  					rs.getString("mr15n").trim()+"\u0009"+get_v0t(rs.getInt("mr15v"))+"\u0009"+
+  					rs.getString("mr16n").trim()+"\u0009"+get_v0t(rs.getInt("mr16v"))+"\u0009"+
+  					rs.getString("mr17n").trim()+"\u0009"+get_v0t(rs.getInt("mr17v"))+"\u0009"+
+  					rs.getString("mr18n").trim()+"\u0009"+get_v0t(rs.getInt("mr18v"))+"\u0009"+
+  					rs.getString("mr19n").trim()+"\u0009"+get_v0t(rs.getInt("mr19v"))+"\u0009"+
+  					rs.getString("mr21n").trim()+"\u0009"+get_v0t(rs.getInt("mr21v"))+"\u0009"+
+  					rs.getString("mr22n").trim()+"\u0009"+get_v0t(rs.getInt("mr22v"))+"\u0009"+
+  					rs.getString("mr23n").trim()+"\u0009"+get_v0t(rs.getInt("mr23v"))+"\u0009"+
+  					rs.getString("mr20n").trim()+"\u0009"+get_v0t(rs.getInt("mr20v"))+"\u0009"+
+  					String.valueOf(med_reab).trim()+
+  					rs.getString("pr1n").trim()+"\u0009"+get_v0t(rs.getInt("pr1v"))+"\u0009"+
+  					rs.getString("pr2n").trim()+"\u0009"+get_v0t(rs.getInt("pr2v"))+"\u0009"+
+  					rs.getString("pr3n").trim()+"\u0009"+get_v0t(rs.getInt("pr3v"))+"\u0009"+
+  					String.valueOf(ps_reab).trim()+
+  					rs.getString("pr4n").trim()+"\u0009"+get_v0t(rs.getInt("pr4v"))+"\u0009"+
+  					rs.getString("pr5n").trim()+"\u0009"+get_v0t(rs.getInt("pr5v"))+"\u0009"+
+  					String.valueOf(prof_reab).trim()+
+  					rs.getString("pr6n").trim()+"\u0009"+get_v0t(rs.getInt("pr6v"))+"\u0009"+
+  					rs.getString("pr7n").trim()+"\u0009"+get_v0t(rs.getInt("pr7v"))+"\u0009"+
+  					String.valueOf(soc_reab).trim()+
+  					rs.getString("pr8n").trim()+"\u0009"+get_v0t(rs.getInt("pr8v"))+"\u0009"+
+  					rs.getString("pr9n").trim()+"\u0009"+get_v0t(rs.getInt("pr9v"))+"\u0009"+
+  					rs.getString("pr10n").trim()+"\u0009"+get_v0t(rs.getInt("pr10v"))+"\u0009"+
+  					rs.getString("pr11n").trim()+"\u0009"+get_v0t(rs.getInt("pr11v"))+"\u0009"+
+  					rs.getString("pr12n").trim()+"\u0009"+get_v0t(rs.getInt("pr12v"))+"\u0009"+
+  					rs.getString("pr13n").trim()+"\u0009"+get_v0t(rs.getInt("pr13v"))+"\u0009"+
+  					rs.getString("pr14n").trim()+"\u0009"+get_v0t(rs.getInt("pr14v"))+"\u0009"+
+  					rs.getString("pr15n").trim()+"\u0009"+get_v0t(rs.getInt("pr15v"))+"\u0009"+
+  					rs.getString("pr16n").trim()+"\u0009"+
+  					rs.getString("pr1d").trim()+"\u0009"+get_v0t(rs.getInt("pr16v"))+"\u0009"+
+  					d_inv+"\u0009"+d_invp+"\u0009"+
+  					rs.getString("srok_inv").trim()+"\u0009"+rs.getString("zakl").trim()+"\u0009"+
+  					nmed_reab+"\u0009"+nps_reab+"\u0009"+nprof_reab+"\u0009"+nsoc_reab+"\u0009"+
+  					"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"\u0009"+"\u0009"+"\u0009"+"\u0009"+"\u0009"+"\u0009"+"\u0009"+
+  					"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"\u0009"+
+  					"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"0"+"\u0009"+"\u0009"+
+  					rs.getString("v0g.name").trim()+"\u0009"+rs.getString("nom_mse").trim()+"\u0009"+
+  					rs.getString("nar1").trim()+"\u0009"+rs.getString("nar2").trim()+"\u0009"+rs.getString("nar3").trim()+"\u0009"+rs.getString("nar4").trim()+"\u0009"+rs.getString("nar5").trim()+"\u0009"+rs.getString("nar6").trim()+"\u0009"+"\u0009"+
+  					rs.getString("ogr1").trim()+"\u0009"+rs.getString("ogr2").trim()+"\u0009"+rs.getString("ogr3").trim()+"\u0009"+rs.getString("ogr4").trim()+"\u0009"+rs.getString("ogr5").trim()+"\u0009"+rs.getString("ogr6").trim()+"\u0009"+rs.getString("ogr7").trim()+"\u0009"+
+  					"~~~";
+    				}}
+			else {sBuf = "Отсутствует информация для выгрузки за заданный период с "+dn +" по "+dk;
+			}
+  			sb.append(pasp);  
+  					}}
+    		catch (Exception e) {
+				e.printStackTrace();
+			
+    		}
+		return fpath ;
+	    		
+
+    		}
+
+	private String get_v0t(int int1) throws SQLException {
+		// TODO Auto-generated method stub
+	
+		String sql = "select name from n_v0t  where pcod=?";
+		AutoCloseableResultSet acrs = sse.execPreparedQuery(sql,int1) ;
+		ResultSet nam1 = acrs.getResultSet();
+
+		return nam1.getString("name").trim() ;
+	}
+}		
