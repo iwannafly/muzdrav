@@ -33,6 +33,8 @@ import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
+import ru.nkz.ivcgzo.thriftGenReestr.MedPolErrorInfo;
+import ru.nkz.ivcgzo.thriftGenReestr.PaspErrorInfo;
 import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
 import ru.nkz.ivcgzo.thriftGenReestr.ThriftGenReestr;
 import ru.nkz.ivcgzo.thriftGenReestr.ThriftGenReestr.Iface;
@@ -1908,6 +1910,19 @@ public class GenReestr extends Server implements Iface {
 		return null;
 	}
 
+	@Override
+	public List<PaspErrorInfo> getPaspErrors(int cpodrz, long datazf,
+			long datazt) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<MedPolErrorInfo> getMedPolErrors(int cpodrz, long datazf,
+			long datazt) throws KmiacServerException, TException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 }
-

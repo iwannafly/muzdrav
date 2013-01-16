@@ -18,8 +18,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +39,8 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid;
 import java.awt.Font;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
@@ -57,7 +57,6 @@ public class Children extends JPanel {
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbDocGiven;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbChildBirth;
     private JButton btnSaveChild, btnGiveDoc;
-    private JLabel lblDocType;
     private JTextField tfDocName;
     private CustomDateEditor cdeDocDate;
     private JCheckBox chckBxDead, chckBxFull;
@@ -76,6 +75,7 @@ public class Children extends JPanel {
     private JCheckBox chckBxCriteria3;
     private JButton btnPrintBlankDoc;
     private JLabel lblDocStatus;
+    private JComboBox<Object> cbDocType;
 
 	/**
 	 * Создание экземпляра панели отображения информации новорождённого
@@ -89,7 +89,6 @@ public class Children extends JPanel {
 		this.setInterface();
 		this.setDefaultChildValues();
 		this.setDefaultDocValues();
-		this.chckBxDead();
 	}
 	
 	/**
@@ -172,6 +171,8 @@ public class Children extends JPanel {
 		this.ticcbDocGiven.setText(this.userAuth.getName());
 		this.spinnerDocNum.setValue(0);
 		this.lblDocStatus.setText("Не выдано");
+		this.cbDocType.setSelectedIndex(0);
+		this.cbDocType.setEnabled(true);
 	}
 	
 	/**
@@ -236,8 +237,8 @@ public class Children extends JPanel {
 		if (this.tfDocName.getText().length() > 20)
 		{
 			JOptionPane.showMessageDialog(this,
-					"Поле 'Фамилия новорождённого' не может превышать 20 символов",
-					"Ошибка", JOptionPane.WARNING_MESSAGE);
+					"Длина поля 'Фамилия новорождённого' не может превышать " +
+					"20 символов", "Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
 		if (this.ticcbDocGiven.getSelectedItem() == null)
@@ -252,6 +253,7 @@ public class Children extends JPanel {
 		this.childDoc.setFamreb(this.tfDocName.getText().toUpperCase());
 		this.childDoc.setSvidvrach(this.ticcbDocGiven.getSelectedPcod());
 		this.childDoc.setNdoc((int) this.spinnerDocNum.getValue());
+		this.childDoc.setDoctype(this.cbDocType.getSelectedIndex() == 0);
 		//Загрузка фамилии ребёнка в интерфейс в верхнем регистре:
 		this.tfDocName.setText(this.childDoc.getFamreb());
 		return true;
@@ -296,6 +298,7 @@ public class Children extends JPanel {
 		this.ticcbDocGiven.setSelectedPcod(this.childDoc.getSvidvrach());
 		this.spinnerDocNum.setValue(this.childDoc.getNdoc());
 		this.lblDocStatus.setText("Выдано");
+		this.cbDocType.setSelectedIndex(this.childDoc.isDoctype() ? 0 : 1);
 	}
 
 	/**
@@ -437,9 +440,9 @@ public class Children extends JPanel {
 		if ((this.childInfo != null) && (this.childDoc != null)) {
 			String serverPath, clientPath;
 			final int ndoc = this.childDoc.getNdoc();
-			if (!this.childInfo.isMert()) {	//Новорождённый живорождённый
+			if (this.childDoc.isDoctype()) {	//Свидетельство о рождении
 				serverPath = ClientHospital.tcl.printChildBirthDocument(ndoc);
-			} else {						//Случай мертворождения
+			} else {							//Свидетельство о перинатальной смерти
 				serverPath = ClientHospital.tcl.printChildDeathDocument(ndoc);
 			}
 			clientPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
@@ -500,7 +503,7 @@ public class Children extends JPanel {
 	 * Печать бланка свидетельства
 	 */
 	private void btnPrintBlankDocClick() {
-		final boolean isLiveChild = !this.chckBxDead.isSelected();
+		final boolean isLiveChild = (this.cbDocType.getSelectedIndex() == 0);
 		try {
 			String serverPath, clientPath;
 			serverPath = ClientHospital.tcl.printChildBlankDocument(isLiveChild);
@@ -523,15 +526,6 @@ public class Children extends JPanel {
 	}
 	
 	/**
-	 * Изменение состояния чекбокса "Мертворождённый"
-	 */
-	private void chckBxDead() {
-		final boolean isLiveChild = !this.chckBxDead.isSelected();
-		lblDocType.setText(isLiveChild ? "Свидетельство о рождении" :
-			"Свидетельство о перинатальной смерти");
-	}
-	
-	/**
 	 * Обновление пользователського интерфейса панели
 	 */
 	private void updatePanel() {
@@ -548,6 +542,7 @@ public class Children extends JPanel {
 				this.btnSaveChild.setToolTipText("Записать изменения");
 				this.childDoc = ClientHospital.tcl.getChildDocument(childId);
 				this.loadChildDocIntoPanel();
+				this.cbDocType.setEnabled(false);
 			} catch (KmiacServerException kse) {
 				kse.printStackTrace();
 			} catch (PatientNotFoundException e) {
@@ -586,42 +581,36 @@ public class Children extends JPanel {
 		this.btnSaveChild.setToolTipText("Сохранить изменения");
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE))
+							.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 816, Short.MAX_VALUE))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(19)
+							.addGap(23)
 							.addComponent(btnSaveChild)
 							.addGap(27)
-							.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, 727, Short.MAX_VALUE)))
+							.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, 723, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(panelChildEdit, GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
-							.addGap(18))
+							.addGap(171)
+							.addComponent(btnSaveChild, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(160)
-							.addComponent(btnSaveChild, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-							.addGap(163)))
-					.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+							.addContainerGap()
+							.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, 337, Short.MAX_VALUE)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
 		JLabel lblDocTypeText = new JLabel("Тип свидетельства:");
 		lblDocTypeText.setFont(new Font("Tahoma", Font.BOLD, 11));
-		
-		this.lblDocType = new JLabel("New label");
-		lblDocTypeText.setLabelFor(lblDocType);
-		
-		JSeparator separator = new JSeparator();
 		
 		JLabel lblDocNum = new JLabel("Номер свидетельства:");
 		
@@ -669,6 +658,10 @@ public class Children extends JPanel {
 		
 		lblDocStatus = new JLabel("Не выдано");
 		lblDocStatusText.setLabelFor(lblDocStatus);
+		
+		cbDocType = new JComboBox<Object>();
+		cbDocType.setModel(new DefaultComboBoxModel<Object>(new String[] {"Свидетельство о рождении", "Свидетельство о перинатальной смерти"}));
+		cbDocType.setSelectedIndex(0);
 		GroupLayout gl_panelDoc = new GroupLayout(panelDoc);
 		gl_panelDoc.setHorizontalGroup(
 			gl_panelDoc.createParallelGroup(Alignment.LEADING)
@@ -680,47 +673,44 @@ public class Children extends JPanel {
 							.addContainerGap())
 						.addGroup(gl_panelDoc.createSequentialGroup()
 							.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblDocName)
-								.addComponent(lblDocNum)
-								.addComponent(lblDocGiven)
-								.addComponent(btnGiveDoc))
-							.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
 								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addGap(70)
-									.addComponent(separator, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-									.addGap(255, 398, Short.MAX_VALUE))
+									.addComponent(btnGiveDoc)
+									.addPreferredGap(ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+									.addComponent(btnPrintBlankDoc))
 								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblDocNum)
+										.addGroup(gl_panelDoc.createSequentialGroup()
+											.addComponent(lblDocTypeText)
+											.addPreferredGap(ComponentPlacement.RELATED)
+											.addComponent(cbDocType, 0, 160, Short.MAX_VALUE)))
+									.addGap(89)
 									.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
-										.addComponent(btnPrintBlankDoc)
-										.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
 										.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
-										.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
-										.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
 										.addGroup(gl_panelDoc.createSequentialGroup()
 											.addComponent(lblDocStatusText)
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(lblDocStatus)))
-									.addGap(128))))
-						.addGroup(gl_panelDoc.createSequentialGroup()
-							.addComponent(lblDocTypeText)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblDocType))))
+											.addComponent(lblDocStatus))
+										.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)))
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addComponent(lblDocGiven)
+									.addGap(76)
+									.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addComponent(lblDocName)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)))
+							.addGap(146))))
 		);
 		gl_panelDoc.setVerticalGroup(
 			gl_panelDoc.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelDoc.createSequentialGroup()
-					.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panelDoc.createSequentialGroup()
-							.addGap(25)
-							.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panelDoc.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblDocTypeText)
-								.addComponent(lblDocType)
-								.addComponent(lblDocStatus)
-								.addComponent(lblDocStatusText))))
+					.addContainerGap()
+					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblDocTypeText)
+						.addComponent(cbDocType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblDocStatusText)
+						.addComponent(lblDocStatus))
 					.addGap(29)
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblDocNum)
@@ -738,19 +728,14 @@ public class Children extends JPanel {
 						.addComponent(lblDocGiven)
 						.addComponent(ticcbDocGiven, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
-					.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING, false)
 						.addComponent(btnPrintBlankDoc, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(btnGiveDoc, GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
-					.addContainerGap(98, Short.MAX_VALUE))
+					.addContainerGap(118, Short.MAX_VALUE))
 		);
 		this.panelDoc.setLayout(gl_panelDoc);
 		
 		chckBxDead = new JCheckBox("Мертворождённый");
-		chckBxDead.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				chckBxDead();
-			}
-		});
 		chckBxFull = new JCheckBox("Доношенный");
 		JSeparator separatorCB = new JSeparator();
 		
@@ -795,19 +780,18 @@ public class Children extends JPanel {
 		GroupLayout gl_panelChildEdit = new GroupLayout(this.panelChildEdit);
 		gl_panelChildEdit.setHorizontalGroup(
 			gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panelChildEdit.createSequentialGroup()
+				.addGroup(Alignment.LEADING, gl_panelChildEdit.createSequentialGroup()
 					.addGap(61)
 					.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-					.addGap(76)
+					.addGap(75)
 					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
 						.addComponent(panelCriteria, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
 						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(lblChildBirth)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ticcbChildBirth, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE))
-						.addComponent(panelChildNumber, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-						.addComponent(panelApgar, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+							.addComponent(ticcbChildBirth, GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE))
+						.addComponent(panelChildNumber, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
+						.addComponent(panelApgar, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
 						.addGroup(gl_panelChildEdit.createSequentialGroup()
 							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panelChildEdit.createSequentialGroup()
@@ -817,7 +801,7 @@ public class Children extends JPanel {
 								.addComponent(lblHeight))
 							.addGap(4)
 							.addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING, false)
 								.addGroup(gl_panelChildEdit.createSequentialGroup()
 									.addComponent(lblWeight)
@@ -827,22 +811,20 @@ public class Children extends JPanel {
 									.addComponent(chckBxDead, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
 									.addComponent(chckBxFull)))))
-					.addGap(162))
+					.addGap(122))
 		);
 		gl_panelChildEdit.setVerticalGroup(
 			gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panelChildEdit.createSequentialGroup()
-					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addGap(31)
-							.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 28, Short.MAX_VALUE))
-						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addGap(23)
-							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE, false)
-								.addComponent(lblChildBirth)
-								.addComponent(ticcbChildBirth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(18)))
+				.addGroup(Alignment.LEADING, gl_panelChildEdit.createSequentialGroup()
+					.addGap(31)
+					.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addGroup(Alignment.LEADING, gl_panelChildEdit.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panelChildEdit.createSequentialGroup()
+						.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE, false)
+							.addComponent(lblChildBirth)
+							.addComponent(ticcbChildBirth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addGap(18))
 					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
 						.addComponent(chckBxFull)
 						.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE)
@@ -860,18 +842,13 @@ public class Children extends JPanel {
 					.addGap(18)
 					.addComponent(panelChildNumber, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(panelCriteria, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addComponent(panelCriteria, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		);
 		
 		JLabel lblCriteria = new JLabel("Критерии живорождения:");
-		
 		chckBxCriteria1 = new JCheckBox("дыхание");
-		
 		chckBxCriteria2 = new JCheckBox("сердцебиение");
-		
 		chckBxCriteria3 = new JCheckBox("мышечная деятельность");
-		
 		chckBxCriteria4 = new JCheckBox("пульсация пуповины");
 		GroupLayout gl_panelCriteria = new GroupLayout(panelCriteria);
 		gl_panelCriteria.setHorizontalGroup(

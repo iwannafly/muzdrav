@@ -288,10 +288,11 @@ struct TRd_Novor {
 
 struct TRd_Svid {
 	1: i32 npasp;
-	2: i32 ndoc;
-	3: i64 dateoff;
-	4: string famreb;
-	5: i32 svidvrach;
+	2: optional i32 ndoc;
+	3: bool doctype;
+	4: i64 dateoff;
+	5: string famreb;
+	6: i32 svidvrach;
 }
 
 struct TPatientCommonInfo {
@@ -511,11 +512,6 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void updateChildInfo(1:TRd_Novor Child)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     
-	/**
-	 * Получение следующего доступного номера свидетельства о рождении/перинатальной смерти новорождённого
-	 * @return Возвращает номер свидетельства о рождении/перинатальной смерти
-	 */
-    i32 getNextChildDocNum();
     /**
 	 * Добавление в БД свидетельства о рождении/перинатальной смерти новорождённого
 	 * @return Возвращает номер свидетельства
@@ -523,8 +519,6 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	i32 addChildDocument(1:TRd_Svid ChildDocument)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     TRd_Svid getChildDocument(1:i32 npasp)
-    	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
-    TRd_Svid getChildDocumentByDoc(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     void updateChildDocument(1:TRd_Svid ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
