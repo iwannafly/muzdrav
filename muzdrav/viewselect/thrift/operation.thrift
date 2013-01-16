@@ -170,7 +170,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Возвращает список всех осложнений данной анастезии
 	 */
-	list<AnesthesiaComplication> getAnesthesiaComplications(1: i32 idOper)
+	list<AnesthesiaComplication> getAnesthesiaComplications(1: i32 idAnest)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новое осложнение после анастезии
@@ -191,7 +191,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Возвращает список всех источников оплаты данной анастезии
 	 */
-	list<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(1: i32 idOper)
+	list<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(1: i32 idAnest)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новый источник оплаты анастезии

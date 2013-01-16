@@ -14,6 +14,9 @@ import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientOperation.model.IOperationModel;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
+import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftMedication.Patient;
 import ru.nkz.ivcgzo.thriftOperation.Anesthesia;
@@ -26,6 +29,8 @@ import ru.nkz.ivcgzo.thriftOperation.OperationPaymentFund;
 import java.awt.Component;
 import javax.swing.JScrollPane;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import java.awt.Color;
 import javax.swing.JLabel;
@@ -34,13 +39,12 @@ import javax.swing.JTextArea;
 import org.apache.thrift.TException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements IOperationObserver {
 
     private static final long serialVersionUID = -3201408430800941030L;
+    private IController controller;
+    private IOperationModel model;
     private JPanel pAnesthesia;
     private JPanel pOperation;
     private JTabbedPane tbMain;
@@ -98,15 +102,26 @@ public class MainFrame extends JFrame {
     private JScrollPane spOperationMaterial;
     private Patient patient;
 
-    public MainFrame() {
+    public MainFrame(final IController inController,
+            final IOperationModel inModel) {
+        this.controller = inController;
+        this.model = inModel;
+        model.registerOperationObserver((IOperationObserver) this);
+        setDefaults();
+    }
+
+    public void createFrame() {
         initialization();
     }
 
-    private void initialization() {
+    private void setDefaults() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setPreferredSize(new Dimension(980, 600));
+        setSize(new Dimension(980, 600));
         getContentPane().setLayout(new BorderLayout(0, 0));
-        
+    }
+
+    private void initialization() {
         tbMain = new JTabbedPane(JTabbedPane.TOP);
         getContentPane().add(tbMain, BorderLayout.CENTER);
         
@@ -123,34 +138,46 @@ public class MainFrame extends JFrame {
         hbOperationControl.add(spOperation);
         
         tbOperation = new CustomTable<Operation, Operation._Fields>(true, true, Operation.class,
-                1, "Вид стационара", 5, "Код операции", 6, "Наименование операции",
+                1, "Вид стационара", 5, "Наименование операции",
                 7, "Дата операции", 8, "Время операции");
-        tbOperation.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (tbOperation.getSelectedItem() != null) {
-                    try {
-                        tbOperationComplications.setData(
-                                ClientOperation.tcl.getOperationComplications(
-                                        tbOperation.getSelectedItem().getId())
-                        );
-                        tbOperationPaymentFunds.setData(
-                                ClientOperation.tcl.getOperationPaymentFunds(
-                                        tbOperation.getSelectedItem().getId())
-                        );
-                        tbAnesthesia.setData(ClientOperation.tcl.getAnesthesias(
-                                tbOperation.getSelectedItem().getId()));
-                    } catch (KmiacServerException e1) {
-                        e1.printStackTrace();
-                    } catch (TException e1) {
-                        e1.printStackTrace();
-                        ClientOperation.conMan.reconnect(e1);
+        tbOperation.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    if (tbOperation.getSelectedItem() != null) {
+                        System.out.println("опа-опа");
+                        controller.setCurrentOperation(tbOperation.getSelectedItem());
                     }
                 }
             }
         });
-        tbOperation.setDateField(3);
-        tbOperation.setTimeField(4);
+//        tbOperation.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (tbOperation.getSelectedItem() != null) {
+//                    try {
+//                        tbOperationComplications.setData(
+//                                ClientOperation.tcl.getOperationComplications(
+//                                        tbOperation.getSelectedItem().getId())
+//                        );
+//                        tbOperationPaymentFunds.setData(
+//                                ClientOperation.tcl.getOperationPaymentFunds(
+//                                        tbOperation.getSelectedItem().getId())
+//                        );
+//                        tbAnesthesia.setData(ClientOperation.tcl.getAnesthesias(
+//                                tbOperation.getSelectedItem().getId()));
+//                    } catch (KmiacServerException e1) {
+//                        e1.printStackTrace();
+//                    } catch (TException e1) {
+//                        e1.printStackTrace();
+//                        ClientOperation.conMan.reconnect(e1);
+//                    }
+//                }
+//            }
+//        });
+        tbOperation.setDateField(2);
+        tbOperation.setTimeField(3);
+        tbOperation.setIntegerClassifierSelector(0, IntegerClassifiers.n_tip);
+        tbOperation.setStringClassifierSelector(1, StringClassifiers.n_ak2);
         spOperation.setViewportView(tbOperation);
         vbOperationTableControls = Box.createVerticalBox();
         vbOperationTableControls.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -274,9 +301,10 @@ public class MainFrame extends JFrame {
         tbOperationComplications =
                 new CustomTable<OperationComplication, OperationComplication._Fields>(
                         true, true, OperationComplication.class,
-                        3, "Код осложнения", 2, "Имя осложнения", 4, "Дата"
+                        3, "Имя осложнения", 4, "Дата"
                 );
-        tbOperationComplications.setDateField(2);
+        tbOperationComplications.setStringClassifierSelector(0, StringClassifiers.n_c00);
+        tbOperationComplications.setDateField(1);
         spOperationComplications.setViewportView(tbOperationComplications);
         
         vbOperationComplicationTableControls = Box.createVerticalBox();
@@ -370,6 +398,7 @@ public class MainFrame extends JFrame {
                         true, true, OperationPaymentFund.class,
                         2, "Наименование источника оплаты",  3, "Дата"
                 );
+        tbOperationPaymentFunds.setIntegerClassifierSelector(0, IntegerClassifiers.n_opl);
         tbOperationPaymentFunds.setDateField(1);
         spOperationPaymentFunds.setViewportView(tbOperationPaymentFunds);
         
@@ -462,10 +491,12 @@ public class MainFrame extends JFrame {
         hbAnesthesiaControl.add(spAnesthesia);
 
         tbAnesthesia = new CustomTable<Anesthesia, Anesthesia._Fields>(true, true, Anesthesia.class,
-                1, "Вид стационара", 6, "Код анастезии", 7, "Наименование анастезии",
+                1, "Вид стационара", 6, "Наименование анестезии",
                 8, "Дата операции", 9, "Время операции");
-        tbAnesthesia.setDateField(3);
-        tbAnesthesia.setTimeField(4);
+        tbAnesthesia.setIntegerClassifierSelector(0, IntegerClassifiers.n_tip);
+        tbAnesthesia.setIntegerClassifierSelector(1, IntegerClassifiers.n_aj0);
+        tbAnesthesia.setDateField(2);
+        tbAnesthesia.setTimeField(3);
         spAnesthesia.setViewportView(tbAnesthesia);
         vbAnesthesiaTableControls = Box.createVerticalBox();
         vbAnesthesiaTableControls.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -559,9 +590,11 @@ public class MainFrame extends JFrame {
         tbAnesthesiaComplications =
                 new CustomTable<AnesthesiaComplication, AnesthesiaComplication._Fields>(
                         true, true, AnesthesiaComplication.class,
-                        3, "Код осложнения", 2, "Имя осложнения", 4, "Дата"
+                        3, "Имя осложнения", 4, "Дата"
                 );
         spAnesthesiaComplications.setViewportView(tbAnesthesiaComplications);
+        tbAnesthesiaComplications.setDateField(1);
+        tbAnesthesiaComplications.setStringClassifierSelector(0, StringClassifiers.n_c00);
 
         vbAnesthesiaComplicationTableControls = Box.createVerticalBox();
         vbAnesthesiaComplicationTableControls.setAlignmentX(0.5f);
@@ -655,6 +688,7 @@ public class MainFrame extends JFrame {
                         true, true, AnesthesiaPaymentFund.class,
                         2, "Наименование источника оплаты",  3, "Дата"
                 );
+        tbAnesthesiaPaymentFunds.setIntegerClassifierSelector(0, IntegerClassifiers.n_opl);
         tbAnesthesiaPaymentFunds.setDateField(1);
         spAnesthesiaPaymentFunds.setViewportView(tbAnesthesiaPaymentFunds);
 
@@ -729,5 +763,52 @@ public class MainFrame extends JFrame {
             // TODO Auto-generated catch block
             ClientOperation.conMan.reconnect(e);
         }
+    }
+
+    @Override
+    public void currentOperationChanged() {
+//        tbOperation.setData(model.getOperationsList());
+        controller.setOperationComplicationsList();
+        controller.setOperationPaymentFundsList();
+        controller.setAnesthesiasList();
+    }
+
+    @Override
+    public void operationComplicationChanged() {
+        tbOperationComplications.setData(model.getOperationComplicationsList());
+    }
+
+    @Override
+    public void operationPaymentFundChanged() {
+        tbOperationPaymentFunds.setData(model.getOperationPaymentFundsList());
+    }
+
+    @Override
+    public void currentAnesthesiaChanged() {
+        tbAnesthesia.setData(model.getAnesthesiasList());
+        controller.setAnesthesiaComplicationsList();
+        controller.setAnesthesiaPaymentFundsList();
+    }
+
+    @Override
+    public void anesthesiaComplicationChanged() {
+        tbAnesthesiaComplications.setData(model.getAnesthesiaComplicationsList());
+    }
+
+    @Override
+    public void anesthesiaPaymentFundChanged() {
+        tbAnesthesiaPaymentFunds.setData(model.getAnesthesiaPaymentFundsList());
+    }
+
+    public JFrame getMainFrame() {
+        return this;
+    }
+
+    public void removeOperationTableSelection() {
+        tbOperation.getSelectionModel().clearSelection();
+    }
+
+    public void updateOperationTable() {
+        tbOperation.setData(model.getOperationsList());
     }
 }

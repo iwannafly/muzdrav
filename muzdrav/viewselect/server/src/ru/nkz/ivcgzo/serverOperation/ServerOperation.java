@@ -453,14 +453,14 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех осложнений данной анастезии
      *
-     * @param idOper - уникальный идентификатор анестезии
+     * @param idAnest - уникальный идентификатор анестезии
      */
     @Override
-    public List<AnesthesiaComplication> getAnesthesiaComplications(int idOper)
+    public List<AnesthesiaComplication> getAnesthesiaComplications(int idAnest)
             throws KmiacServerException {
         String sqlQuery = "SELECT * FROM p_anast_osl WHERE p_anast_osl.id_anast = ? "
                 + "ORDER BY p_anast_osl.dataz ";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idAnest)) {
             return rsmAnesthesiaComplication.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -532,14 +532,14 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех источников оплаты данной анастезии
      *
-     * @param idOper - уникальный идентификатор операции
+     * @param idAnest - уникальный идентификатор операции
      */
     @Override
-    public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idOper)
+    public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idAnest)
             throws KmiacServerException {
         String sqlQuery = "SELECT * FROM p_anast_opl WHERE p_anast_opl.id_anast = ? "
                 + "ORDER BY p_anast_opl.dataz ";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idAnest)) {
             return rsmAnesthesiaPaymentFund.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
