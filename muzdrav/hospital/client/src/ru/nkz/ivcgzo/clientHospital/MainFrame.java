@@ -370,6 +370,7 @@ public class MainFrame extends JFrame {
 //    private JTextField textField_1;
     private JButton btnOperation;
     private JButton btnShowPatientAnamnez;
+    private JButton btnShowPatientBolList;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(950, 700));
@@ -402,7 +403,7 @@ public class MainFrame extends JFrame {
         tabbedPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
         setPatientInfoPanel();
-        setLifeHistoryPanel();
+//        setLifeHistoryPanel();
         setMedicalHistoryPanel();
         setStagePanel();
         setChildrenPanel();
@@ -414,7 +415,7 @@ public class MainFrame extends JFrame {
             || (doctorAuth.getClpu() == 63)
             || (doctorAuth.getClpu() == 64)) {
         } else {
-            tabbedPane.removeTabAt(5);
+            tabbedPane.removeTabAt(4);
 //            pChildbirth.setVisible(false);
         }
     }
@@ -425,8 +426,8 @@ public class MainFrame extends JFrame {
             System.out.println(ClientHospital.authInfo.getCpodr());
             lMedicalHistoryShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
-            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
-                3, null));
+//            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
+//                3, null));
             lDiagShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
@@ -453,7 +454,7 @@ public class MainFrame extends JFrame {
         priemInfo = null;
         clearPriemInfoText();
         lifeHistory = null;
-        clearLifeHistoryText();
+//        clearLifeHistoryText();
         clearMedicalHistory();
         clearDiagnosisText();
         clearZaklText();
@@ -548,7 +549,7 @@ public class MainFrame extends JFrame {
                     clearAllComponentsAndObjects();
                     fillPersonalInfoTextFields();
                     fillReceptionPanel();
-                    fillLifeHistoryPanel();
+//                    fillLifeHistoryPanel();
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
@@ -811,6 +812,25 @@ public class MainFrame extends JFrame {
         btnShowPatientAnamnez.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/lifeHistory.png")));
         btnShowPatientAnamnez.setRequestFocusEnabled(false);
+
+        btnShowPatientBolList = new JButton();
+        btnShowPatientBolList.setToolTipText("Больничный лист");
+        toolBar.add(btnShowPatientBolList);
+        btnShowPatientBolList.setMaximumSize(new Dimension(35, 35));
+        btnShowPatientBolList.setMinimumSize(new Dimension(35, 35));
+        btnShowPatientBolList.setPreferredSize(new Dimension(35, 35));
+        btnShowPatientBolList.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                if (patient != null) {
+                    ClientHospital.conMan.showBolListForm(
+                            patient.getPatientId(), 0, patient.getGospitalCod());
+                }
+            }
+        });
+        btnShowPatientBolList.setBorder(null);
+        btnShowPatientBolList.setIcon(new ImageIcon(MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/diary.png")));
+        btnShowPatientBolList.setRequestFocusEnabled(false);
 
         toolBar.add(new JToolBar.Separator());
 

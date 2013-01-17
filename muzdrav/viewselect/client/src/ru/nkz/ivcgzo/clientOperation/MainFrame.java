@@ -142,7 +142,8 @@ public class MainFrame extends JFrame implements IOperationObserver {
         hbOperationControl.add(spOperation);
         
         tbOperation = new CustomTable<Operation, Operation._Fields>(true, true, Operation.class,
-                1, "Вид стационара", 5, "Наименование операции",
+//                1, "Вид стационара",
+                5, "Наименование операции",
                 7, "Дата операции", 8, "Время операции");
         tbOperation.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
@@ -181,10 +182,10 @@ public class MainFrame extends JFrame implements IOperationObserver {
 //                }
 //            }
 //        });
-        tbOperation.setDateField(2);
-        tbOperation.setTimeField(3);
-        tbOperation.setIntegerClassifierSelector(0, IntegerClassifiers.n_tip);
-        tbOperation.setStringClassifierSelector(1, StringClassifiers.n_ak2);
+        tbOperation.setDateField(1);
+        tbOperation.setTimeField(2);
+//        tbOperation.setIntegerClassifierSelector(0, IntegerClassifiers.n_tip);
+        tbOperation.setStringClassifierSelector(0, StringClassifiers.n_ak2);
         spOperation.setViewportView(tbOperation);
         vbOperationTableControls = Box.createVerticalBox();
         vbOperationTableControls.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -544,7 +545,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         vbOperationPaymentFundsTableControls.add(btnOperationPaymentFundsUpdate);
         
         pAnesthesia = new JPanel();
-        tbMain.addTab("Анастезия", null, pAnesthesia, null);
+        tbMain.addTab("Анестезия", null, pAnesthesia, null);
         pAnesthesia.setLayout(new BoxLayout(pAnesthesia, BoxLayout.Y_AXIS));
 
         hbAnesthesiaControl = Box.createHorizontalBox();
@@ -557,12 +558,13 @@ public class MainFrame extends JFrame implements IOperationObserver {
         hbAnesthesiaControl.add(spAnesthesia);
 
         tbAnesthesia = new CustomTable<Anesthesia, Anesthesia._Fields>(true, true, Anesthesia.class,
-                1, "Вид стационара", 6, "Наименование анестезии",
+//                1, "Вид стационара",
+                6, "Наименование анестезии",
                 8, "Дата операции", 9, "Время операции");
-        tbAnesthesia.setIntegerClassifierSelector(0, IntegerClassifiers.n_tip);
-        tbAnesthesia.setIntegerClassifierSelector(1, IntegerClassifiers.n_aj0);
-        tbAnesthesia.setDateField(2);
-        tbAnesthesia.setTimeField(3);
+//        tbAnesthesia.setIntegerClassifierSelector(0, IntegerClassifiers.n_tip);
+        tbAnesthesia.setIntegerClassifierSelector(0, IntegerClassifiers.n_aj0);
+        tbAnesthesia.setDateField(1);
+        tbAnesthesia.setTimeField(2);
         spAnesthesia.setViewportView(tbAnesthesia);
         vbAnesthesiaTableControls = Box.createVerticalBox();
         vbAnesthesiaTableControls.setAlignmentX(Component.CENTER_ALIGNMENT);
