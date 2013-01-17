@@ -1849,7 +1849,7 @@ public class Vvod extends JFrame {
 						Prez_l prezl = new Prez_l();
 						
 						for (PdiagAmb pd : tblDiag.getData()) {
-							if (pd.diag_stat == 1) {
+							if ((pd.diag_stat == 1) || (pd.diag_stat == 3)) {
 								pisl.setDiag(pd.diag);
 								break;
 							}
@@ -1907,6 +1907,7 @@ public class Vvod extends JFrame {
 						if (selItems.size() != 0) {
 							IsslMet isslmet = new IsslMet();
 							isslmet.setPvizitId(tblPos.getSelectedItem().getId_obr());
+							isslmet.setPvizitambId(tblPos.getSelectedItem().getId());
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
 							isslmet.setNpasp(Vvod.zapVr.getNpasp());
 							isslmet.setPokaz(selItems);
