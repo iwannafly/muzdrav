@@ -1850,7 +1850,7 @@ public class ServerHospital extends Server implements Iface {
             SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
             GregorianCalendar dateOff = new GregorianCalendar();
             GregorianCalendar curDate = new GregorianCalendar();
-            dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи свид-ва
+            dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи мед.свид-ва
             //Местность регистрации матери:
             String city1 = "", city2 = "";
             String country1 = "", country2 = "";
@@ -1895,16 +1895,20 @@ public class ServerHospital extends Server implements Iface {
 	            childBirthHour = childBirthTime.substring(0, 2);
 	            childBirthMinute = childBirthTime.substring(3, 5);
             }
+            //Который по счёту:
             String nChildren = "  ";
             if (childBirthInfo.isSetKolchild())
             	nChildren = f.format("%2d", childBirthInfo.getKolchild()).toString();
+            //Вес:
             String weight = "    ";
             if (childBirthInfo.isSetMassa())
             	weight = f.format("%4d", childBirthInfo.getMassa()).toString();
+            //Рост:
             String height = "  ";
             if (childBirthInfo.isSetRost())
             	height = f.format("%2d", childBirthInfo.getRost()).toString();
-            String only = "", nreb = "", nreb_all = "";
+            //Одноплодные\многоплодные роды:
+            String only = "", nreb = "", nreb_all = "";	//TODO: nreb_all - продумать!
             if (childBirthInfo.isSetNreb())
             {
             	if (childBirthInfo.getNreb() == 0)
@@ -1987,9 +1991,9 @@ public class ServerHospital extends Server implements Iface {
 	public String printChildBlankDocument(boolean isLiveChild)
 			throws KmiacServerException, TException {
         final String path, patternPath, dblSpace = "&nbsp;&nbsp;", spaceBar = "&nbsp;&nbsp;&nbsp;&nbsp;";
-        if (isLiveChild)	//Печать бланка свидетельства о рождении
+        if (isLiveChild)	//Печать бланка мед.свидетельства о рождении
         	patternPath = "\\plugin\\reports\\ChildBirthDocument.htm";
-        else				//Печать бланка свидетельства о перинатальной смерти
+        else				//Печать бланка мед.свидетельства о перинатальной смерти
         	patternPath = "\\plugin\\reports\\ChildDeathDocument.htm";
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(

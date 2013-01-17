@@ -365,9 +365,9 @@ public class Children extends JPanel {
 	}
 
 	/**
-	 * Обновление информации о свидетельстве
+	 * Обновление информации о мед.свидетельстве
 	 * @throws TException исключение общего вида
-	 * @throws ChildDocNotFoundException свидетельство
+	 * @throws ChildDocNotFoundException мед.свидетельство
 	 * о рождении/перинатальной смерти не найдено
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @return Возвращает <code>true</code>, если информация обновлена;
@@ -392,7 +392,7 @@ public class Children extends JPanel {
 	}
 
 	/**
-	 * Занесение нового свидетельства в БД
+	 * Занесение нового мед.свидетельства в БД
 	 * @throws TException исключение общего вида
 	 * @throws PatientNotFoundException пациент не найден
 	 * @throws ChildDocNumAlreadyExistException такой номер свидетельства
@@ -428,9 +428,9 @@ public class Children extends JPanel {
 	}
 	
 	/**
-	 * Печать свидетельства о рождении/перинатальной смерти
+	 * Печать мед.свидетельства о рождении/перинатальной смерти
 	 * @throws TException исключение общего вида
-	 * @throws ChildDocNotFoundException свидетельство
+	 * @throws ChildDocNotFoundException мед.свидетельство
 	 * о рождении/перинатальной смерти не найдено
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @throws IOException ошибка создания документа
@@ -457,7 +457,7 @@ public class Children extends JPanel {
 	}
 	
 	/**
-	 * Выдача свидетельства
+	 * Нажатие на кнопку выдачи мед.свидетельства
 	 */
 	private void btnGiveDocClick() {
 		if (this.patient == null)
@@ -474,12 +474,12 @@ public class Children extends JPanel {
 		}
 		try {
 			boolean needPrint;
-			if (this.childDoc != null)	//Обновление информации о свидетельстве
+			if (this.childDoc != null)	//Обновление информации о мед.свидетельстве
 				needPrint = this.updateChildDocument();
-			else						//Выдача нового свидетельства
+			else						//Выдача нового мед.свидетельства
 				needPrint = this.addChildDocument();
 			if (needPrint)
-				this.printChildDocument();	//Печать свидетельства
+				this.printChildDocument();	//Печать мед.свидетельства
 			return;
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
@@ -497,7 +497,7 @@ public class Children extends JPanel {
 			return;
 		} catch (IOException e) {	//Поглощает FileNotFoundException
 			JOptionPane.showMessageDialog(this, "Сбой во время загрузки " +
-					"свидетельства о рождении/перинатальной смерти",
+					"мед.свидетельства о рождении/перинатальной смерти",
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (TException e) {
@@ -508,7 +508,7 @@ public class Children extends JPanel {
 	}
 
 	/**
-	 * Печать бланка свидетельства
+	 * Печать бланка мед.свидетельства
 	 */
 	private void btnPrintBlankDocClick() {
 		final boolean isLiveChild = (this.cbDocType.getSelectedIndex() == 0);
@@ -523,7 +523,7 @@ public class Children extends JPanel {
 			e.printStackTrace();
 		} catch (IOException e) {	//Поглощает FileNotFoundException
 			JOptionPane.showMessageDialog(this, "Сбой во время печати бланка " +
-					"свидетельства о рождении/перинатальной смерти",
+					"мед.свидетельства о рождении/перинатальной смерти",
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (TException e) {
