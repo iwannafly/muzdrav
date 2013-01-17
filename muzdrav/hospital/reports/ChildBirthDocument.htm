@@ -13,6 +13,10 @@
 				border-collapse:collapse;
 				width:100%; /* ширина таблицы */
 			}
+			
+			table.coll{
+				border-collapse:collapse;
+			}
 
 			table.half{
 				border-collapse:collapse;
@@ -21,6 +25,10 @@
 
 			tr{
 				height:12px;
+			}
+			
+			tr.smallrow{
+				height:3px;
 			}
 
 			tr.info{
@@ -40,6 +48,16 @@
 
 			td.rightcol{
 				border-right:1px solid black;
+			}
+
+			td.leftfooter{
+				border-right:1px solid black;
+				border-bottom:1px solid black;
+			}
+
+			td.rightfooter{
+				border-left:1px solid black;
+				border-bottom:1px solid black;
 			}
 
 			td.centr{
@@ -75,7 +93,7 @@
 
 			p.serif{
 				font_family:"Times New Roman";
-				font-size:10px;
+				font-size:11px;
 			}
 
 			p.und{
@@ -166,17 +184,11 @@
 			<tr class="info">
 				<td class="box" width="45%">Министерство здравоохранения 
 					<br />Российской Федерации
-					<br />
-					<br />
-					<br />
 				</td>
 				<td width="10%"></td>
 				<td class="box" width="45%">
 					<table class="wide">
 						<tr class="info">
-						!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						ТЭГ td закрывается!
 							<td width="33%">Код формы по ОКУД</td>
 							<td class="leftcol" width="65%">~kod_okud</td>
 							<td width="2%">&nbsp;</td>
@@ -416,6 +428,351 @@
 				</td>
 			</tr>
 		</table>
-		<p class="more"></p>
+		<p class="more" align="center">2</p>
+		<p align="right">Оборотная сторона</p>
+		<table width="70%">
+			<tr>
+				<td><b>7.</b>&nbsp;Роды произошли:&nbsp;в стационаре</td>
+				<td class="box" width="15" align="center">1</td>
+				<td>, дома</td>
+				<td class="box" width="15" align="center">2</td>
+				<td>, в другом месте</td>
+				<td class="box" width="15" align="center">3</td>
+				<td>, неизвестно</td>
+				<td class="box" width="15" align="center">4</td>
+			</tr>
+		</table>
+		<br />
+		<table class="wide">
+			<tr>
+				<td width="3%">8.&nbsp;</td>
+				<td class="leftcol" width="36%"></td>
+				<td width="3%">&nbsp;</td>
+				<td class="leftcol" width="20%"></td>
+				<td width="3%">&nbsp;</td>
+				<td class="leftcol" width="35%"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">
+					(должность врача (фельдшера, акушерки),
+					<br />выдавшего медицинское свидетельство)
+				</td>
+				<td></td>
+				<td align="center">(подпись)</td>
+				<td></td>
+				<td align="center">(фамилия, имя, отчество)</td>
+			</tr>
+		</table>
+		<br />
+		9. Получатель
+		<table class="wide">
+			<tr>
+				<td class="leftcol" width="100%"></td>
+			</tr>
+			<tr>
+				<td align="center">(фамилия, имя, отчество и отношение к ребёнку)</td>
+			</tr>
+			<tr>
+				<td class="leftcol"></td>
+			</tr>
+			<tr>
+				<td align="center">(документ, удостоверяющий личность получателя, серия, номер, кем выдан)</td>
+			</tr>
+		</table>
+		<br />
+		<table class="wide">
+			<tr>
+				<td>«<u>~curdate_d</u>» <u>~curdate_m</u> <u>~curdate_y</u> г.</td>
+				<td width="5%"></td>
+				<td>Подпись получателя &nbsp;</td>
+				<td class="leftcol" width="35%"></td>
+				<td width="10%"></td>
+			</tr>
+		</table>
+		<br />
+		<br />
+		<p class="und" align="center">линия отреза</p>
+		<table class="wide">
+			<tr>
+				<td class="leftfooter" width="60%">
+					<b>7.</b>&nbsp;Образование:
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td><i>профессиональное</i>: высшее &nbsp;</td>
+							<td class="box" width="15" align="center">1</td>
+							<td>, неполное высшее &nbsp;</td>
+							<td class="box" width="15" align="center">2</td>
+							<td>,</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>среднее &nbsp;</td>
+							<td class="box" width="15" align="center">3</td>
+							<td>, начальное &nbsp;</td>
+							<td class="box" width="15" align="center">4</td>
+							<td>;</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td><i>общее</i>: среднее (полное) &nbsp;</td>
+							<td class="box" width="15" align="center">5</td>
+							<td>, основное &nbsp;</td>
+							<td class="box" width="15" align="center">6</td>
+							<td>, начальное &nbsp;</td>
+							<td class="box" width="15" align="center">7</td>
+							<td>;</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>не имеет начального образования &nbsp;</td>
+							<td class="box" width="15" align="center">8</td>
+							<td>; неизвестно &nbsp;</td>
+							<td class="box" width="15" align="center">9</td>
+							<td>,</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<b>8.</b>&nbsp;Занятость: <i>была занята в экономике</i>: руководители и специалисты
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>высшего уровня квалификации &nbsp;</td>
+							<td class="box" width="15" align="center">1</td>
+							<td>, прочие специалисты &nbsp;</td>
+							<td class="box" width="15" align="center">2</td>
+							<td>,</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>квалифицированные рабочие &nbsp;</td>
+							<td class="box" width="15" align="center">3</td>
+							<td>, неквалифицированные рабочие &nbsp;</td>
+							<td class="box" width="15" align="center">4</td>
+							<td>,</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>занятые на военной службе &nbsp;</td>
+							<td class="box" width="15" align="center">5</td>
+							<td>; <i>не была занята в экономике &nbsp;</i>:</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>пенсионеры &nbsp;</td>
+							<td class="box" width="15" align="center">6</td>
+							<td>, студенты и учащиеся &nbsp;</td>
+							<td class="box" width="15" align="center">7</td>
+							<td>, работавшие в личном &nbsp;</td>
+							<td></td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td width="5px"></td>
+							<td>подсобном хозяйстве &nbsp;</td>
+							<td class="box" width="15" align="center">8</td>
+							<td>, безработные &nbsp;</td>
+							<td class="box" width="15" align="center">9</td>
+							<td>, прочие &nbsp;</td>
+							<td class="box" width="15" align="center">10</td>
+							<td>.</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td><b>9.</b>&nbsp;Срок первой явки к врачу (фельдшеру, акушерке) &nbsp;</td>
+							<td class="box" width="15" align="center"></td>
+							<td class="box" width="15" align="center"></td>
+							<td>&nbsp;недель</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td><b>10.</b>&nbsp;Которым по счету ребенок был рожден у матери &nbsp;</td>
+							<td class="box" width="15" align="center">~kolchild1</td>
+							<td class="box" width="15" align="center">~kolchild2</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+				</td>
+				<td class="rightfooter" width="40%">
+					<table class="coll">
+						<tr>
+							<td><b>16.</b>&nbsp;Масса тела при рождении &nbsp;</td>
+							<td class="box" width="15" align="center">~massa1</td>
+							<td class="box" width="15" align="center">~massa2</td>
+							<td class="box" width="15" align="center">~massa3</td>
+							<td class="box" width="15" align="center">~massa4</td>
+							<td>&nbsp;г</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="coll">
+						<tr>
+							<td><b>17.</b>&nbsp;Длина  тела при рождении &nbsp;</td>
+							<td class="box" width="15" align="center">~rost1</td>
+							<td class="box" width="15" align="center">~rost2</td>
+							<td>&nbsp;см</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<b>18.</b>&nbsp;Ребенок родился:
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="wide">
+						<tr>
+							<td align="left">&nbsp;&nbsp;&nbsp;при одноплодных родах &nbsp;</td>
+							<td class="box" width="15" align="center">~only</td>
+						</tr>
+						<tr>
+							<td align="left" colspan="2">&nbsp;&nbsp;&nbsp;при многоплодных родах:</td>
+						</tr>
+						<tr>
+							<td align="right">которым по счету &nbsp;</td>
+							<td class="box" width="15" align="center">~nreb</td>
+						</tr>
+					</table>
+					<table class="wide">
+						<tr class="smallrow"></tr>
+					</table>
+					<table class="wide">
+						<tr>
+							<td align="right">число родившихся &nbsp;</td>
+							<td class="box" width="15" align="center">~nreb_all</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<br />
+		<b>19.</b>&nbsp;Лицо, принимавшее роды:
+		<table class="wide">
+			<tr class="smallrow"></tr>
+		</table>
+		<table class="coll">
+			<tr>
+				<td>&nbsp;&nbsp;&nbsp;врач-акушер-гинеколог &nbsp;</td>
+				<td class="box" width="15" align="center">1</td>
+				<td>, фельдшер, акушерка &nbsp;</td>
+				<td class="box" width="15" align="center">2</td>
+				<td>, другое лицо &nbsp;</td>
+				<td class="box" width="15" align="center">3</td>
+			</tr>
+		</table>
+		<br />
+		<table class="wide">
+			<tr>
+				<td width="3%"><b>20.</b>&nbsp;</td>
+				<td class="leftcol" width="36%"></td>
+				<td width="3%">&nbsp;</td>
+				<td class="leftcol" width="20%"></td>
+				<td width="3%">&nbsp;</td>
+				<td class="leftcol" width="35%"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">
+					(должность врача (фельдшера, акушерки),
+					<br />заполнившего медицинское свидетельство)
+				</td>
+				<td></td>
+				<td align="center">(подпись)</td>
+				<td></td>
+				<td align="center">(фамилия, имя, отчество)</td>
+			</tr>
+		</table>
+		<br />
+		<table class="wide">
+			<tr>
+				<td width="3%"></td>
+				<td width="36%"><u>Руководитель медицинской организации</u>,
+					<br />врач, занимающийся частной практикой
+				</td>
+				<td width="3%">&nbsp;</td>
+				<td class="leftcol" width="20%"></td>
+				<td width="3%">&nbsp;</td>
+				<td class="leftcol" width="35%"></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td align="center">(нужное подчеркнуть)</td>
+				<td></td>
+				<td align="center">(подпись)</td>
+				<td></td>
+				<td align="center">(фамилия, имя, отчество)</td>
+			</tr>
+		</table>
+		<br />
+		<br />
+		<br />
+		Печать
+		<br />
+		<p align="center" class="serif">
+			<b>
+			К сведению родителей!
+			<br />
+			В соответствии с пунктом 6 статьи 16 Федерального закона от 15.11.1997 № 143-ФЗ «Об актах гражданского состояния»
+			<br />
+			регистрация рождения ребенка в органе записи актов гражданского состояния (ЗАГС)
+			<br />
+			должна быть произведена в месячный срок
+			</b>
+		</p>
 	</body>
 </html>
