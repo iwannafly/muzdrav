@@ -37,6 +37,7 @@ import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.PrdIshodNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
@@ -551,14 +552,14 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
-                    pChildren.SetPatient(patient);
+                    pChildren.setPatient(patient);
 
         			try {
-	          	 		System.out.println(patient.getPatientId());	
-	          	 		System.out.println(patient.gospitalCod);	
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
 							patient.getPatientId(), patient.gospitalCod);
 						setDefaultValues();
+					} catch(PrdIshodNotFoundException e) {
+//						e.printStackTrace();
 					} catch (KmiacServerException e) {
 						e.printStackTrace();
 					} catch (TException e) {

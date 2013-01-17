@@ -18,8 +18,6 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,9 +38,12 @@ import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid;
+import java.awt.Font;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 /**
- * Панель ввода\редактирования\отображения новорождённого
+ * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич
  */
 public class Children extends JPanel {
@@ -53,9 +54,8 @@ public class Children extends JPanel {
     private TRd_Novor childInfo = null;
     private TRd_Svid childDoc = null;
     private JPanel panelChildEdit, panelDoc;
-    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbDocGiven, ticcbChildBirth;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbDocGiven;
     private JButton btnSaveChild, btnGiveDoc;
-    private JLabel lblDocType;
     private JTextField tfDocName;
     private CustomDateEditor cdeDocDate;
     private JCheckBox chckBxDead, chckBxFull;
@@ -67,12 +67,13 @@ public class Children extends JPanel {
     private JSpinner spinnerChildNumGlobal;
     private JSpinner spinnerChildNumLocal;
     private CustomTimeEditor cteBirthTime;
-    private JLabel lblChildBirth;
     private JCheckBox chckBxCriteria1;
     private JCheckBox chckBxCriteria2;
     private JCheckBox chckBxCriteria4;
     private JCheckBox chckBxCriteria3;
     private JButton btnPrintBlankDoc;
+    private JLabel lblDocStatus;
+    private JComboBox<Object> cbDocType;
 
 	/**
 	 * Создание экземпляра панели отображения информации новорождённого
@@ -83,35 +84,26 @@ public class Children extends JPanel {
 		this.userAuth = authInfo;
 		this.patient = patientInfo;
 		//Инициализация интерфейса:
-		this.SetInterface();
-		this.SetDefaultChildValues();
-		this.SetDefaultDocValues();
-		this.chckBxDead();
+		this.setInterface();
+		this.setDefaultChildValues();
+		this.setDefaultDocValues();
 	}
 	
 	/**
 	 * Смена пациента
 	 * @param newPatient Информация о пациенте
 	 */
-	public void SetPatient(final TPatient newPatient) {
+	public void setPatient(final TPatient newPatient) {
 		this.patient = newPatient;
 		if (this.patient != null)
-			try {
-				this.ticcbChildBirth.setData(	//Загрузка списка родов
-					ClientHospital.tcl.getChildBirths(this.patient.getBirthDate()));
-				this.UpdatePanel();	//Обновление панели
-			} catch (KmiacServerException e) {
-				e.printStackTrace();
-			} catch (TException e) {
-				e.printStackTrace();
-			}
+			this.updatePanel();	//Обновление панели
 	}
 
 	/**
 	 * Получение информации о пациенте
 	 * @return Информация о пациенте
 	 */
-	public TPatient GetPatient() {
+	public TPatient getPatient() {
 		return (this.patient != null) ? this.patient.deepCopy() : null;
 	}
 	
@@ -142,9 +134,8 @@ public class Children extends JPanel {
 	/**
 	 * Установка начальных значений элементов панели информации о новорождённом
 	 */
-	private void SetDefaultChildValues() {
-		this.ticcbChildBirth.setSelectedIndex(-1);
-		this.cteBirthTime.setText("12:00");
+	private void setDefaultChildValues() {
+		this.cteBirthTime.setText("__:__");
 		this.chckBxDead.setSelected(false);
 		this.chckBxFull.setSelected(true);
 		this.chckBxCriteria1.setSelected(true);
@@ -163,36 +154,25 @@ public class Children extends JPanel {
 	/**
 	 * Установка начальных значений элементов панели информации о свидетельстве
 	 */
-	private void SetDefaultDocValues() {
-		Date date = new Date();
-		this.cdeDocDate.setDate(date.getTime());
+	private void setDefaultDocValues() {
+		this.cdeDocDate.setDate(new Date().getTime());
 		this.tfDocName.setText("");
-		this.ticcbDocGiven.setSelectedIndex(-1);
+		this.ticcbDocGiven.setText(this.userAuth.getName());
 		this.spinnerDocNum.setValue(0);
+		this.lblDocStatus.setText("Не выдано");
+		this.cbDocType.setSelectedIndex(0);
+		this.cbDocType.setEnabled(true);
 	}
 	
 	/**
 	 * Загрузка показателей о новорождённом из интерфейса
-	 * @return Возвращает <code>true</code>, если поля заполнены корректно; иначе - <code>false</code>
+	 * @return Возвращает <code>true</code>, если поля заполнены корректно;
+	 * иначе - <code>false</code>
 	 */
-	private boolean LoadChildInfoFromPanel() {
+	private boolean loadChildInfoFromPanel() {
 		if (this.childInfo == null)
 			return false;
-		if (this.ticcbChildBirth.getSelectedItem() == null)
-		{
-			JOptionPane.showMessageDialog(this, "Не выбраны роды",
-					"Ошибка", JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
-		if (this.cteBirthTime.getText().equals("__:__"))
-		{
-			JOptionPane.showMessageDialog(this, "Не выбрано время рождения",
-					"Ошибка", JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
 		//Установка значений полей childInfo:
-		this.childInfo.setNrod(this.ticcbChildBirth.getSelectedPcod());
-		this.childInfo.setTimeon(this.cteBirthTime.getText());
 		this.childInfo.setMert(this.chckBxDead.isSelected());
 		this.childInfo.setDonosh(this.chckBxFull.isSelected());
 		this.childInfo.setApgar1((int) this.spinnerApgar1.getValue());
@@ -205,14 +185,21 @@ public class Children extends JPanel {
 		this.childInfo.setKrit2(this.chckBxCriteria2.isSelected());
 		this.childInfo.setKrit3(this.chckBxCriteria3.isSelected());
 		this.childInfo.setKrit4(this.chckBxCriteria4.isSelected());
+		//Время рождения:
+		final String childBirthTime = this.cteBirthTime.getText();
+		if (!childBirthTime.equals("__:__"))
+			this.childInfo.setTimeon(childBirthTime);
+		else	//Время рождения не установлено
+			this.childInfo.unsetTimeon();
 		return true;
 	}
 	
 	/**
 	 * Загрузка информации о свидетельстве из интерфейса
-	 * @return Возвращает <code>true</code>, если поля заполнены корректно; иначе - <code>false</code>
+	 * @return Возвращает <code>true</code>, если поля заполнены корректно;
+	 * иначе - <code>false</code>
 	 */
-	private boolean LoadChildDocFromPanel() {
+	private boolean loadChildDocFromPanel() {
 		if (this.childDoc == null)
 			return false;
 		if (this.cdeDocDate.getDate() == null)
@@ -232,8 +219,8 @@ public class Children extends JPanel {
 		if (this.tfDocName.getText().length() > 20)
 		{
 			JOptionPane.showMessageDialog(this,
-					"Поле 'Фамилия новорождённого' не может превышать 20 символов",
-					"Ошибка", JOptionPane.WARNING_MESSAGE);
+					"Длина поля 'Фамилия новорождённого' не может превышать " +
+					"20 символов", "Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
 		if (this.ticcbDocGiven.getSelectedItem() == null)
@@ -247,47 +234,63 @@ public class Children extends JPanel {
 		this.childDoc.setDateoff(this.cdeDocDate.getDate().getTime());
 		this.childDoc.setFamreb(this.tfDocName.getText().toUpperCase());
 		this.childDoc.setSvidvrach(this.ticcbDocGiven.getSelectedPcod());
+		this.childDoc.setNdoc((int) this.spinnerDocNum.getValue());
+		this.childDoc.setDoctype(this.cbDocType.getSelectedIndex() == 0);
+		//Загрузка фамилии ребёнка в интерфейс в верхнем регистре:
+		this.tfDocName.setText(this.childDoc.getFamreb());
 		return true;
 	}
 	
 	/**
 	 * Загрузка показателей о новорождённом в интерфейс
 	 */
-	private void LoadChildInfoIntoPanel() {
+	private void loadChildInfoIntoPanel() {
+		this.setDefaultChildValues();
 		if (this.childInfo == null)
-		{
-			this.SetDefaultChildValues();
 			return;
-		}
-		this.ticcbChildBirth.setSelectedPcod(this.childInfo.getNrod());
-		this.cteBirthTime.setText(this.childInfo.getTimeon());
-		this.chckBxDead.setSelected(this.childInfo.isMert());
-		this.chckBxFull.setSelected(this.childInfo.isDonosh());
-		this.chckBxCriteria1.setSelected(this.childInfo.isKrit1());
-		this.chckBxCriteria2.setSelected(this.childInfo.isKrit2());
-		this.chckBxCriteria3.setSelected(this.childInfo.isKrit3());
-		this.chckBxCriteria4.setSelected(this.childInfo.isKrit4());
-		this.spinnerApgar1.setValue(this.childInfo.getApgar1());
-		this.spinnerApgar5.setValue(this.childInfo.getApgar5());
-		this.spinnerHeight.setValue(this.childInfo.getRost());
-		this.spinnerWeight.setValue(this.childInfo.getMassa());
-		this.spinnerChildNumGlobal.setValue(this.childInfo.getKolchild());
-		this.spinnerChildNumLocal.setValue(this.childInfo.getNreb());
+		if (this.childInfo.isSetTimeon())
+			this.cteBirthTime.setText(this.childInfo.getTimeon());
+		if (this.childInfo.isSetMert())
+			this.chckBxDead.setSelected(this.childInfo.isMert());
+		if (this.childInfo.isSetDonosh())
+			this.chckBxFull.setSelected(this.childInfo.isDonosh());
+		if (this.childInfo.isSetKrit1())
+			this.chckBxCriteria1.setSelected(this.childInfo.isKrit1());
+		if (this.childInfo.isSetKrit2())
+			this.chckBxCriteria2.setSelected(this.childInfo.isKrit2());
+		if (this.childInfo.isSetKrit3())
+			this.chckBxCriteria3.setSelected(this.childInfo.isKrit3());
+		if (this.childInfo.isSetKrit4())
+			this.chckBxCriteria4.setSelected(this.childInfo.isKrit4());
+		if (this.childInfo.isSetApgar1())
+			this.spinnerApgar1.setValue(this.childInfo.getApgar1());
+		if (this.childInfo.isSetApgar5())
+			this.spinnerApgar5.setValue(this.childInfo.getApgar5());
+		if (this.childInfo.isSetRost())
+			this.spinnerHeight.setValue(this.childInfo.getRost());
+		if (this.childInfo.isSetMassa())
+			this.spinnerWeight.setValue(this.childInfo.getMassa());
+		if (this.childInfo.isSetKolchild())
+			this.spinnerChildNumGlobal.setValue(this.childInfo.getKolchild());
+		if (this.childInfo.isSetNreb())
+			this.spinnerChildNumLocal.setValue(this.childInfo.getNreb());
 	}
 	
 	/**
 	 * Загрузка информации о свидетельстве в интерфейс
 	 */
-	private void LoadChildDocIntoPanel() {
+	private void loadChildDocIntoPanel() {
 		if (this.childDoc == null)
 		{
-			this.SetDefaultDocValues();
+			this.setDefaultDocValues();
 			return;
 		}
 		this.cdeDocDate.setDate(this.childDoc.getDateoff());
 		this.tfDocName.setText(this.childDoc.getFamreb());
 		this.ticcbDocGiven.setSelectedPcod(this.childDoc.getSvidvrach());
 		this.spinnerDocNum.setValue(this.childDoc.getNdoc());
+		this.lblDocStatus.setText("Выдано");
+		this.cbDocType.setSelectedIndex(this.childDoc.isDoctype() ? 0 : 1);
 	}
 
 	/**
@@ -296,11 +299,12 @@ public class Children extends JPanel {
 	 * @throws PatientNotFoundException пациент не найден
 	 * @throws KmiacServerException исключение на стороне сервера
 	 */
-	private void UpdateChild()
+	private void updateChildInfo()
 			throws KmiacServerException, PatientNotFoundException, TException {
-		if (!this.LoadChildInfoFromPanel())	//Не все данные введены
+		if (!this.loadChildInfoFromPanel())	//Не все данные введены
 			return;
-		ClientHospital.tcl.updateChildInfo(this.childInfo);	//Вызов функции сервера
+		//Вызов функции сервера на обновление информации:
+		ClientHospital.tcl.updateChildInfo(this.childInfo);
 	}
 
 	/**
@@ -309,21 +313,25 @@ public class Children extends JPanel {
 	 * @throws PatientNotFoundException пациент не найден
 	 * @throws KmiacServerException исключение на стороне сервера
 	 */
-	private void AddChildInfo()
+	private void addChildInfo()
 			throws KmiacServerException, PatientNotFoundException, TException {
 		this.childInfo = new TRd_Novor();
-		if (!this.LoadChildInfoFromPanel())	//Не все данные введены
+		if (!this.loadChildInfoFromPanel())	//Не все данные введены
 		{
 			this.childInfo = null;
 			return;
 		}
 		this.childInfo.setNpasp(this.patient.getPatientId());
-		this.childInfo.setDatazap(new Date().getTime());	//Дата первой записи - текущее время
+		//Дата первой записи - текущая дата:
+		this.childInfo.setDatazap(new Date().getTime());
 		//Небольшие танцы с бубном:
-		TRd_Novor tmp = this.childInfo;
+		TRd_Novor tmpInfo = this.childInfo;
+		//Поле childInfo останется null, если сервер вернёт исключение:
 		this.childInfo = null;
-		ClientHospital.tcl.addChildInfo(tmp);	//Вызов функции сервера
-		this.childInfo = tmp;	//Поле будет равно null, если сервер вернёт исключение
+		//Вызов функции сервера на добавление информации:
+		ClientHospital.tcl.addChildInfo(tmpInfo);
+		//Выполняется в случае успешного добавления:
+		this.childInfo = tmpInfo;
 	}
 	
 	/**
@@ -332,9 +340,9 @@ public class Children extends JPanel {
 	private void btnSaveChildClick() {
 		try {
 			if (this.childInfo != null)
-				this.UpdateChild();		//Обновление информации о новорождённом
+				this.updateChildInfo();	//Обновление информации о новорождённом
 			else
-				this.AddChildInfo();	//Добавление информации о новорождённом
+				this.addChildInfo();	//Добавление информации о новорождённом
 			this.btnSaveChild.setToolTipText("Записать изменения");
 			return;
 		} catch (KmiacServerException|PatientNotFoundException e) {
@@ -349,21 +357,26 @@ public class Children extends JPanel {
 	/**
 	 * Обновление информации о свидетельстве
 	 * @throws TException исключение общего вида
-	 * @throws ChildDocNotFoundException свидетельство о рождении/перинатальной смерти не найдено
+	 * @throws ChildDocNotFoundException свидетельство
+	 * о рождении/перинатальной смерти не найдено
 	 * @throws KmiacServerException исключение на стороне сервера
-	 * @return Возвращает <code>true</code>, если информация обновлена; иначе - <code>false</code>
+	 * @return Возвращает <code>true</code>, если информация обновлена;
+	 * иначе - <code>false</code>
 	 */
-	private boolean UpdateChildDocument()
+	private boolean updateChildDocument()
 			throws KmiacServerException, ChildDocNotFoundException, TException {
 		TRd_Svid oldDoc = this.childDoc.deepCopy();
-		if (!this.LoadChildDocFromPanel())	//Не все данные введены
+		if (!this.loadChildDocFromPanel())	//Не все данные введены
 			return false;
 		if (!oldDoc.equals(this.childDoc)) {	//Данные были изменены
 			int answer = JOptionPane.showConfirmDialog(this,
 					"Вы действительно хотите изменить данные свидетельства",
 					"Подтверждение изменения", JOptionPane.YES_NO_OPTION);
-			if (answer == JOptionPane.YES_OPTION)	//Пользователь подвердил изменение данных
+			//Пользователь подтвердил изменение данных:
+			if (answer == JOptionPane.YES_OPTION)
 				ClientHospital.tcl.updateChildDocument(this.childDoc);
+		} else {
+			//Данные не изменены - ничего не происходит
 		}
 		return true;
 	}
@@ -372,22 +385,34 @@ public class Children extends JPanel {
 	 * Занесение нового свидетельства в БД
 	 * @throws TException исключение общего вида
 	 * @throws PatientNotFoundException пациент не найден
-	 * @throws ChildDocNumAlreadyExistException такой номер свидетельства о рождении/перинатальной
+	 * @throws ChildDocNumAlreadyExistException такой номер свидетельства
+	 * о рождении/перинатальной
 	 * смерти уже существует
 	 * @throws KmiacServerException исключение на стороне сервера
-	 * @return Возвращает <code>true</code>, если свидетельство внесено; иначе - <code>false</code>
+	 * @return Возвращает <code>true</code>, если свидетельство внесено;
+	 * иначе - <code>false</code>
 	 */
-	private boolean AddChildDocument()
+	private boolean addChildDocument()
 			throws KmiacServerException, PatientNotFoundException, TException {
 		this.childDoc = new TRd_Svid();
-		if (!this.LoadChildDocFromPanel())	//Не все данные введены
+		if (!this.loadChildDocFromPanel())	//Не все данные введены
 		{
 			this.childDoc = null;
 			return false;
 		}
 		this.childDoc.setNpasp(this.patient.getPatientId());
-		int ndoc = ClientHospital.tcl.addChildDocument(this.childDoc);
+		//Небольшие танцы с бубном:
+		TRd_Svid tmpDoc = this.childDoc;
+		//Поле childDoc останется null, если сервер вернёт исключение:
+		this.childDoc = null;
+		//Вызов функции сервера на добавление информации о свидетельстве:
+		final int ndoc = ClientHospital.tcl.addChildDocument(tmpDoc);
+		//Выполняется в случае успешного добавления:
+		this.lblDocStatus.setText("Выдано");
+		this.childDoc = tmpDoc;
+		//Установка номера выданного свидетельства в поле экземпляра:
 		this.childDoc.setNdoc(ndoc);
+		//Загрузка номера выданного свидетельства в интерфейс:
 		this.spinnerDocNum.setValue(ndoc);
 		return true;
 	}
@@ -395,7 +420,8 @@ public class Children extends JPanel {
 	/**
 	 * Печать свидетельства о рождении/перинатальной смерти
 	 * @throws TException исключение общего вида
-	 * @throws ChildDocNotFoundException свидетельство о рождении/перинатальной смерти не найдено
+	 * @throws ChildDocNotFoundException свидетельство
+	 * о рождении/перинатальной смерти не найдено
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @throws IOException ошибка создания документа
 	 * @throws FileNotFoundException ошибка передачи документа с сервера
@@ -404,17 +430,19 @@ public class Children extends JPanel {
 			throws KmiacServerException, ChildDocNotFoundException,
 			FileNotFoundException, IOException, TException {
 		if ((this.childInfo != null) && (this.childDoc != null)) {
-			String servPath;
-			if (!this.childInfo.isMert()) {	//Новорождённый является живорождённым
-				servPath = ClientHospital.tcl.printChildBirthDocument(this.childDoc.getNdoc());
-			} else {						//Случай мертворождения
-				servPath = ClientHospital.tcl.printChildDeathDocument(this.childDoc.getNdoc());
+			String serverPath, clientPath;
+			final int ndoc = this.childDoc.getNdoc();
+			if (this.childDoc.isDoctype()) {	//Свидетельство о рождении
+				serverPath = ClientHospital.tcl.printChildBirthDocument(ndoc);
+			} else {							//Свидетельство о перинатальной смерти
+				serverPath = ClientHospital.tcl.printChildDeathDocument(ndoc);
 			}
-            String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-            ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
-            ClientHospital.conMan.openFileInEditor(cliPath, false);
+			clientPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+            ClientHospital.conMan.transferFileFromServer(serverPath, clientPath);
+            ClientHospital.conMan.openFileInEditor(clientPath, false);
 		} else
-			JOptionPane.showMessageDialog(this, "Информация о новорождённом отсутствует",
+			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
+					"отсутствует или свидетельство не найдено",
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
 	}
 	
@@ -424,32 +452,37 @@ public class Children extends JPanel {
 	private void btnGiveDocClick() {
 		if (this.childInfo == null)
 		{
-			JOptionPane.showMessageDialog(this, "Информация о новорождённом отсутствует",
-					"Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
+					"отсутствует", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		try {
 			boolean needPrint;
-			if (this.childDoc != null)
-				needPrint = this.UpdateChildDocument();	//Обновление информации о свидетельстве
-			else
-				needPrint = this.AddChildDocument();	//Выдача нового свидетельства
+			if (this.childDoc != null)	//Обновление информации о свидетельстве
+				needPrint = this.updateChildDocument();
+			else						//Выдача нового свидетельства
+				needPrint = this.addChildDocument();
 			if (needPrint)
 				this.printChildDocument();	//Печать свидетельства
 			return;
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (PatientNotFoundException e) {
-			JOptionPane.showMessageDialog(this, "Информация о новорождённом отсутствует",
-					"Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
+					"отсутствует", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			this.childInfo = null;
+			this.lblDocStatus.setText("Не выдано");
 			return;
 		} catch (ChildDocNotFoundException e) {
 			JOptionPane.showMessageDialog(this, "Свидетельство не найдено",
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
+			this.childDoc = null;
+			this.lblDocStatus.setText("Не выдано");
 			return;
 		} catch (IOException e) {	//Поглощает FileNotFoundException
-			JOptionPane.showMessageDialog(this, "Сбой во время печати свидетельства о рождении/" +
-					"перинатальной смерти", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Сбой во время загрузки " +
+					"свидетельства о рождении/перинатальной смерти",
+					"Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (TException e) {
 			e.printStackTrace();
@@ -462,17 +495,20 @@ public class Children extends JPanel {
 	 * Печать бланка свидетельства
 	 */
 	private void btnPrintBlankDocClick() {
+		final boolean isLiveChild = (this.cbDocType.getSelectedIndex() == 0);
 		try {
-			String servPath = ClientHospital.tcl.printChildBlankDocument(!this.chckBxDead.isSelected());
-            String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
-            ClientHospital.conMan.transferFileFromServer(servPath, cliPath);
-            ClientHospital.conMan.openFileInEditor(cliPath, false);
+			String serverPath, clientPath;
+			serverPath = ClientHospital.tcl.printChildBlankDocument(isLiveChild);
+			clientPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+            ClientHospital.conMan.transferFileFromServer(serverPath, clientPath);
+            ClientHospital.conMan.openFileInEditor(clientPath, false);
 			return;
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 		} catch (IOException e) {	//Поглощает FileNotFoundException
-			JOptionPane.showMessageDialog(this, "Сбой во время печати бланка свидетельства " +
-					"о рождении/перинатальной смерти", "Ошибка", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Сбой во время печати бланка " +
+					"свидетельства о рождении/перинатальной смерти",
+					"Ошибка", JOptionPane.ERROR_MESSAGE);
 			return;
 		} catch (TException e) {
 			e.printStackTrace();
@@ -482,41 +518,35 @@ public class Children extends JPanel {
 	}
 	
 	/**
-	 * Изменение состояния чекбокса "Мертворождённый"
-	 */
-	private void chckBxDead() {
-		lblDocType.setText(this.chckBxDead.isSelected() ? "Свидетельство о перинатальной смерти" :
-															"Свидетельство о рождении");
-	}
-	
-	/**
 	 * Обновление пользователського интерфейса панели
 	 */
-	private void UpdatePanel() {
-		boolean isPatientSet = (this.patient != null);
+	private void updatePanel() {
+		final boolean isPatientSet = (this.patient != null);
 		this.panelChildEdit.setVisible(isPatientSet);
 		this.panelDoc.setVisible(isPatientSet);
 		this.btnSaveChild.setToolTipText("Занести информацию");
 		if (isPatientSet)
 		{
+			final int childId = this.patient.getPatientId();
 			try {
-				this.childInfo = ClientHospital.tcl.getChildInfo(this.patient.getPatientId());
-				this.LoadChildInfoIntoPanel();
+				this.childInfo = ClientHospital.tcl.getChildInfo(childId);
+				this.loadChildInfoIntoPanel();
 				this.btnSaveChild.setToolTipText("Записать изменения");
-				this.childDoc = ClientHospital.tcl.getChildDocument(this.patient.getPatientId());
-				this.LoadChildDocIntoPanel();
+				this.childDoc = ClientHospital.tcl.getChildDocument(childId);
+				this.loadChildDocIntoPanel();
+				this.cbDocType.setEnabled(false);
 			} catch (KmiacServerException kse) {
 				kse.printStackTrace();
 			} catch (PatientNotFoundException e) {
-				//Новорождённый не найден, его нужно добавить в таблицу
+				//Новорождённый не найден, его нужно добавить в таблицу:
 				this.childInfo = null;
-				this.SetDefaultChildValues();
+				this.setDefaultChildValues();
 				this.childDoc = null;
-				this.SetDefaultDocValues();
+				this.setDefaultDocValues();
 			} catch (ChildDocNotFoundException e) {
-				//Свидетельство ещё не было выдано
+				//Свидетельство ещё не было выдано:
 				this.childDoc = null;
-				this.SetDefaultDocValues();
+				this.setDefaultDocValues();
 			} catch (TException e) {
 				e.printStackTrace();
 			}
@@ -526,7 +556,7 @@ public class Children extends JPanel {
 	/**
 	 * Инициализация пользовательского интерфейса панели
 	 */
-	private void SetInterface() {
+	private void setInterface() {
 		this.panelChildEdit = new JPanel();
 		this.panelChildEdit.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		this.panelDoc = new JPanel();
@@ -543,41 +573,36 @@ public class Children extends JPanel {
 		this.btnSaveChild.setToolTipText("Сохранить изменения");
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createSequentialGroup()
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE))
+							.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 816, Short.MAX_VALUE))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(19)
+							.addGap(23)
 							.addComponent(btnSaveChild)
 							.addGap(27)
-							.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, 727, Short.MAX_VALUE)))
+							.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, 723, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(panelChildEdit, GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
-							.addGap(18))
+							.addGap(171)
+							.addComponent(btnSaveChild, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE))
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGap(160)
-							.addComponent(btnSaveChild, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-							.addGap(163)))
-					.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+							.addContainerGap()
+							.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, 337, Short.MAX_VALUE)))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		
 		JLabel lblDocTypeText = new JLabel("Тип свидетельства:");
-		
-		this.lblDocType = new JLabel("New label");
-		lblDocTypeText.setLabelFor(lblDocType);
-		
-		JSeparator separator = new JSeparator();
+		lblDocTypeText.setFont(new Font("Tahoma", Font.BOLD, 11));
 		
 		JLabel lblDocNum = new JLabel("Номер свидетельства:");
 		
@@ -596,6 +621,7 @@ public class Children extends JPanel {
 		JLabel lblDocDate = new JLabel("Дата выдачи свидетельства:");
 		
 		cdeDocDate = new CustomDateEditor();
+		cdeDocDate.setText("");
 		lblDocDate.setLabelFor(cdeDocDate);
 		
 		JLabel lblDocGiven = new JLabel("Кем выдано:");
@@ -618,6 +644,16 @@ public class Children extends JPanel {
 				btnPrintBlankDocClick();
 			}
 		});
+		
+		JLabel lblDocStatusText = new JLabel("Статус:");
+		lblDocStatusText.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		lblDocStatus = new JLabel("Не выдано");
+		lblDocStatusText.setLabelFor(lblDocStatus);
+		
+		cbDocType = new JComboBox<Object>();
+		cbDocType.setModel(new DefaultComboBoxModel<Object>(new String[] {"Свидетельство о рождении", "Свидетельство о перинатальной смерти"}));
+		cbDocType.setSelectedIndex(0);
 		GroupLayout gl_panelDoc = new GroupLayout(panelDoc);
 		gl_panelDoc.setHorizontalGroup(
 			gl_panelDoc.createParallelGroup(Alignment.LEADING)
@@ -628,52 +664,49 @@ public class Children extends JPanel {
 							.addComponent(lblDocDate, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
 							.addContainerGap())
 						.addGroup(gl_panelDoc.createSequentialGroup()
-							.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
+							.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addComponent(btnGiveDoc)
+									.addPreferredGap(ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+									.addComponent(btnPrintBlankDoc))
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblDocName)
 										.addComponent(lblDocNum)
-										.addComponent(lblDocGiven)
-										.addComponent(btnGiveDoc))
-									.addGap(65))
-								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addComponent(lblDocTypeText)
-									.addPreferredGap(ComponentPlacement.RELATED)))
-							.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
-								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addGap(18)
-									.addComponent(lblDocType)
-									.addContainerGap())
-								.addGroup(gl_panelDoc.createSequentialGroup()
-									.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
 										.addGroup(gl_panelDoc.createSequentialGroup()
+											.addComponent(lblDocTypeText)
 											.addPreferredGap(ComponentPlacement.RELATED)
-											.addComponent(btnPrintBlankDoc))
+											.addComponent(cbDocType, 0, 160, Short.MAX_VALUE)))
+									.addGap(89)
+									.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
+										.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)
 										.addGroup(gl_panelDoc.createSequentialGroup()
-											.addGap(5)
-											.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING)
-												.addGroup(gl_panelDoc.createSequentialGroup()
-													.addComponent(separator, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-													.addGap(0, 143, Short.MAX_VALUE))
-												.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-												.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
-												.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-												.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE))))
-									.addGap(255))))))
+											.addComponent(lblDocStatusText)
+											.addPreferredGap(ComponentPlacement.RELATED)
+											.addComponent(lblDocStatus))
+										.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE)))
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addComponent(lblDocGiven)
+									.addGap(76)
+									.addComponent(ticcbDocGiven, GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addComponent(lblDocName)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)))
+							.addGap(146))))
 		);
 		gl_panelDoc.setVerticalGroup(
 			gl_panelDoc.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelDoc.createSequentialGroup()
-					.addGap(5)
+					.addContainerGap()
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblDocTypeText)
-						.addComponent(lblDocType))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(separator, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addGap(27)
+						.addComponent(cbDocType, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblDocStatusText)
+						.addComponent(lblDocStatus))
+					.addGap(29)
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
-						.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblDocNum))
+						.addComponent(lblDocNum)
+						.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblDocName)
@@ -687,19 +720,14 @@ public class Children extends JPanel {
 						.addComponent(lblDocGiven)
 						.addComponent(ticcbDocGiven, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
-					.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING, false)
+					.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING, false)
 						.addComponent(btnPrintBlankDoc, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(btnGiveDoc, GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
-					.addContainerGap(100, Short.MAX_VALUE))
+					.addContainerGap(118, Short.MAX_VALUE))
 		);
 		this.panelDoc.setLayout(gl_panelDoc);
 		
 		chckBxDead = new JCheckBox("Мертворождённый");
-		chckBxDead.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				chckBxDead();
-			}
-		});
 		chckBxFull = new JCheckBox("Доношенный");
 		JSeparator separatorCB = new JSeparator();
 		
@@ -725,11 +753,6 @@ public class Children extends JPanel {
 		
 		JLabel lblBirthTime = new JLabel("Время рождения:");
 		
-		lblChildBirth = new JLabel("Выберите роды:");
-		
-		ticcbChildBirth = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
-		lblChildBirth.setLabelFor(ticcbChildBirth);
-		
 		JPanel panelCriteria = new JPanel();
 		panelCriteria.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		
@@ -743,20 +766,15 @@ public class Children extends JPanel {
 		
 		GroupLayout gl_panelChildEdit = new GroupLayout(this.panelChildEdit);
 		gl_panelChildEdit.setHorizontalGroup(
-			gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
+			gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelChildEdit.createSequentialGroup()
 					.addGap(61)
 					.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, 1, GroupLayout.PREFERRED_SIZE)
-					.addGap(76)
+					.addGap(75)
 					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
-						.addComponent(panelCriteria, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 462, Short.MAX_VALUE)
-						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(lblChildBirth)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ticcbChildBirth, GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE))
-						.addComponent(panelChildNumber, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
-						.addComponent(panelApgar, GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
+						.addComponent(panelCriteria, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+						.addComponent(panelChildNumber, GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+						.addComponent(panelApgar, GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
 						.addGroup(gl_panelChildEdit.createSequentialGroup()
 							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_panelChildEdit.createSequentialGroup()
@@ -766,7 +784,7 @@ public class Children extends JPanel {
 								.addComponent(lblHeight))
 							.addGap(4)
 							.addComponent(spinnerHeight, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
 							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING, false)
 								.addGroup(gl_panelChildEdit.createSequentialGroup()
 									.addComponent(lblWeight)
@@ -776,22 +794,15 @@ public class Children extends JPanel {
 									.addComponent(chckBxDead, GroupLayout.PREFERRED_SIZE, 124, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
 									.addComponent(chckBxFull)))))
-					.addGap(162))
+					.addGap(122))
 		);
 		gl_panelChildEdit.setVerticalGroup(
-			gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
+			gl_panelChildEdit.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelChildEdit.createSequentialGroup()
-					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
-						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addGap(31)
-							.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 28, Short.MAX_VALUE))
-						.addGroup(gl_panelChildEdit.createSequentialGroup()
-							.addGap(23)
-							.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE, false)
-								.addComponent(lblChildBirth)
-								.addComponent(ticcbChildBirth, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-							.addGap(18)))
+					.addGap(31)
+					.addComponent(separatorCB, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panelChildEdit.createSequentialGroup()
+					.addGap(43)
 					.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.TRAILING)
 						.addComponent(chckBxFull)
 						.addGroup(gl_panelChildEdit.createParallelGroup(Alignment.BASELINE)
@@ -809,18 +820,13 @@ public class Children extends JPanel {
 					.addGap(18)
 					.addComponent(panelChildNumber, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(panelCriteria, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addComponent(panelCriteria, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		);
 		
 		JLabel lblCriteria = new JLabel("Критерии живорождения:");
-		
 		chckBxCriteria1 = new JCheckBox("дыхание");
-		
 		chckBxCriteria2 = new JCheckBox("сердцебиение");
-		
 		chckBxCriteria3 = new JCheckBox("мышечная деятельность");
-		
 		chckBxCriteria4 = new JCheckBox("пульсация пуповины");
 		GroupLayout gl_panelCriteria = new GroupLayout(panelCriteria);
 		gl_panelCriteria.setHorizontalGroup(

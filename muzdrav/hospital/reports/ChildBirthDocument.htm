@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+		<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 		<title>Медицинское свидетельство о рождении </title>
 		<style type="text/css">
 			body{
@@ -11,16 +11,16 @@
 
 			table.wide{
 				border-collapse:collapse;
-				width: 100%; /* ширина таблицы */
+				width:100%; /* ширина таблицы */
 			}
 
 			table.half{
 				border-collapse:collapse;
-				width: 50%; /* ширина таблицы */
+				width:50%; /* ширина таблицы */
 			}
 
 			tr{
-				height: 12px;
+				height:12px;
 			}
 
 			tr.info{
@@ -29,12 +29,12 @@
 			}
 
 			td{
-				vertical-align: top;
+				vertical-align:top;
 			}
 
 			td.leftcol{
-				text-align: center;
-				vertical-align: bottom;
+				text-align:center;
+				vertical-align:bottom;
 				border-bottom:1px solid black;
 			}
 
@@ -73,7 +73,7 @@
 				border-bottom:1px solid black;
 			}
 
-		        p.serif{
+			p.serif{
 				font_family:"Times New Roman";
 				font-size:10px;
 			}
@@ -85,12 +85,12 @@
 			}
 
 			p.more{
-				page-break-after: always;
+				page-break-after:always;
 			}
 		
 		@media print
 			p.more{
-				page-break-after: always;
+				page-break-after:always;
 			}
 		</style>
 	</head>
@@ -99,18 +99,18 @@
 			<tr class="info">
 				<td width="60%"></td>
 				<td width="40%">Приложение № 1
-					<br/>к приказу Минздравсоцразвития России
-					<br/>от 26.12.2008 г.  № 782н
+					<br />к приказу Минздравсоцразвития России
+					<br />от 26.12.2008 г.  № 782н
 				</td>
 			</tr>
 		</table>
 		<h3 align="center">
 			КОРЕШОК МЕДИЦИНСКОГО СВИДЕТЕЛЬСТВА О РОЖДЕНИИ
-			<br/>К УЧЕТНОЙ ФОРМЕ №103/У-108
-			<br/>СЕРИЯ <u>&nbsp; ~seria &nbsp;</u> № <u>&nbsp;&nbsp;  ~ndoc &nbsp;&nbsp;</u>
+			<br />К УЧЕТНОЙ ФОРМЕ №103/У-108
+			<br />СЕРИЯ <u>&nbsp; ~seria &nbsp;</u> № <u>&nbsp;&nbsp;  ~ndoc &nbsp;&nbsp;</u>
 		</h3>
 		<p align="center">Дата выдачи «<u>~dateoff_d</u>» <u>~dateoff_m</u> <u>~dateoff_y</u> г.</p>
-		<br/>
+		<br />
 		<b>1.</b>&nbsp;Ребенок родился: число <u>&nbsp;&nbsp; ~datar_d &nbsp;&nbsp;</u>, месяц <u>&nbsp;&nbsp; ~datar_m &nbsp;&nbsp;</u>,
 			год <u>&nbsp;&nbsp; ~datar_y &nbsp;&nbsp;</u>, час <u>&nbsp;&nbsp; ~timeon_h &nbsp;&nbsp;</u>, мин. <u>&nbsp;&nbsp; ~timeon_m &nbsp;&nbsp;</u>
 		<table class="wide">
@@ -121,7 +121,7 @@
 		</table>
 		<b>3.</b>&nbsp;Дата рождения матери: число <u>&nbsp;&nbsp; ~datar_mother_d &nbsp;&nbsp;</u>,
 			месяц <u>&nbsp;&nbsp; ~datar_mother_m &nbsp;&nbsp;</u>, год<u>&nbsp;&nbsp; ~datar_mother_y &nbsp;&nbsp;</u>
-		<br/><b>4.</b>&nbsp;Место постоянного жительства (регистрации) матери ребенка:
+		<br /><b>4.</b>&nbsp;Место постоянного жительства (регистрации) матери ребенка:
 		<table class="wide">
 			<tr>
 				<td width="23%">&nbsp;республика, край, область</td>
@@ -158,21 +158,28 @@
 				<td class="box" width="15" align="center">2</td>
 			</tr>
 		</table>
-		<br/>
+		<br />
 		<p class="und" align="center">линия отреза</p>
-		<br/><br/>
+		<br />
+		<br />
 		<table class="wide">
 			<tr class="info">
 				<td class="box" width="45%">Министерство здравоохранения 
-					<br/>Российской Федерации
+					<br />Российской Федерации
+					<br />
+					<br />
+					<br />
 				</td>
-				<td width="10%"> </td>
+				<td width="10%"></td>
 				<td class="box" width="45%">
 					<table class="wide">
 						<tr class="info">
+						!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+						!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+						ТЭГ td закрывается!
 							<td width="33%">Код формы по ОКУД</td>
 							<td class="leftcol" width="65%">~kod_okud</td>
-							<td width="2%"&nbsp;</td>
+							<td width="2%">&nbsp;</td>
 						</tr>
 					</table>
 					Медицинская документация
@@ -198,7 +205,7 @@
 						</tr>
 					</table>
 					Для врача, занимающегося частной практикой:
-					<br/>номер лицензии на медицинскую
+					<br />номер лицензии на медицинскую
 					<table class="wide">
 						<tr class="info">
 							<td width="10%">деятельность</td>
@@ -214,9 +221,9 @@
 				</td>
 				<td width="10%"></td>
 				<td class="box" width="45%">Учетная форма № 103/у-08
-					<br/>Утверждена приказом Минздравсоцразвития России
-					<br/>
-					<br/>от 26.12.2008 г. №782н
+					<br />Утверждена приказом Минздравсоцразвития России
+					<br />
+					<br />от 26.12.2008 г. №782н
 				</td>
 			</tr>
 		</table>
@@ -410,6 +417,5 @@
 			</tr>
 		</table>
 		<p class="more"></p>
-		
 	</body>
 </html>

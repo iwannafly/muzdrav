@@ -118,12 +118,12 @@ struct PatientCommonInfo {
 
 struct PatientSignInfo {
 	1: optional i32 npasp;
-	2: optional string grup;
-	3: optional string ph;
-	4: optional string allerg;
-	5: optional string farmkol;
-	6: optional string vitae;
-	7: optional string vred;
+	2: optional i64 datap;
+	3: optional i32 numstr;
+	4: optional string name;
+	5: optional bool vybor;
+	6: optional string comment;
+	7: optional string yn;
 }
 
 struct PatientVizitInfo {
@@ -547,7 +547,7 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<mrab_0> getMrab_0() throws (1: kmiacServer.KmiacServerException kse);
 
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	PatientSignInfo getPatientSignInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientSignInfo> getPatientSignInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<PatientVizitInfo> getPatientVizitInfoList(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
 	list<RdSlInfo> getRdSlInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<PatientDiagZInfo> getPatientDiagZInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
@@ -572,7 +572,7 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	void updateAnam(1: list<PatientAnamnez> patAnam) throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamnez(1: i32 npasp, 2: i32 cpodr, 3: i32 cslu) throws (1:kmiacServer.KmiacServerException kse);
 
-	list<Pbol> getPbol (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<Pbol> getPbol (1: i32 id_obr, 2: i32 id_gosp, 3: i32 id_bol) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
 	void UpdatePbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
 	void DeletePbol(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
