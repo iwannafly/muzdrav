@@ -147,8 +147,8 @@ public class Children extends JPanel {
 		this.spinnerApgar5.setValue(0);
 		this.spinnerHeight.setValue(0);
 		this.spinnerWeight.setValue(0);
-		this.spinnerChildNumGlobal.setValue(1);
-		this.spinnerChildNumLocal.setValue(1);
+		this.spinnerChildNumGlobal.setValue(0);
+		this.spinnerChildNumLocal.setValue(0);
 	}
 	
 	/**
@@ -175,16 +175,22 @@ public class Children extends JPanel {
 		//Установка значений полей childInfo:
 		this.childInfo.setMert(this.chckBxDead.isSelected());
 		this.childInfo.setDonosh(this.chckBxFull.isSelected());
-		this.childInfo.setApgar1((int) this.spinnerApgar1.getValue());
-		this.childInfo.setApgar5((int) this.spinnerApgar5.getValue());
-		this.childInfo.setRost((int) this.spinnerHeight.getValue());
-		this.childInfo.setMassa((int) this.spinnerWeight.getValue());
-		this.childInfo.setKolchild((int) this.spinnerChildNumGlobal.getValue());
-		this.childInfo.setNreb((int) this.spinnerChildNumLocal.getValue());
 		this.childInfo.setKrit1(this.chckBxCriteria1.isSelected());
 		this.childInfo.setKrit2(this.chckBxCriteria2.isSelected());
 		this.childInfo.setKrit3(this.chckBxCriteria3.isSelected());
 		this.childInfo.setKrit4(this.chckBxCriteria4.isSelected());
+		if ((int) this.spinnerApgar1.getValue() > 0)
+			this.childInfo.setApgar1((int) this.spinnerApgar1.getValue());
+		if ((int) this.spinnerApgar5.getValue() > 0)
+			this.childInfo.setApgar5((int) this.spinnerApgar5.getValue());
+		if ((int) this.spinnerHeight.getValue() > 0)
+			this.childInfo.setRost((int) this.spinnerHeight.getValue());
+		if ((int) this.spinnerWeight.getValue() > 0)
+			this.childInfo.setMassa((int) this.spinnerWeight.getValue());
+		if ((int) this.spinnerChildNumGlobal.getValue() > 0)
+			this.childInfo.setKolchild((int) this.spinnerChildNumGlobal.getValue());
+		if ((int) this.spinnerChildNumLocal.getValue() > 0)
+			this.childInfo.setNreb((int) this.spinnerChildNumLocal.getValue());
 		//Время рождения:
 		final String childBirthTime = this.cteBirthTime.getText();
 		if (!childBirthTime.equals("__:__"))
@@ -338,20 +344,24 @@ public class Children extends JPanel {
 	 * Сохранение изменений о новорождённом
 	 */
 	private void btnSaveChildClick() {
-		try {
-			if (this.childInfo != null)
-				this.updateChildInfo();	//Обновление информации о новорождённом
-			else
-				this.addChildInfo();	//Добавление информации о новорождённом
-			this.btnSaveChild.setToolTipText("Записать изменения");
-			return;
-		} catch (KmiacServerException|PatientNotFoundException e) {
-			e.printStackTrace();
-		} catch (TException e) {
-			e.printStackTrace();
-		}
-		JOptionPane.showMessageDialog(this, "Операция не была выполнена",
-				"Ошибка", JOptionPane.ERROR_MESSAGE);
+		if (this.patient != null) {
+			try {
+				if (this.childInfo != null)
+					this.updateChildInfo();	//Обновление информации о новорождённом
+				else
+					this.addChildInfo();	//Добавление информации о новорождённом
+				this.btnSaveChild.setToolTipText("Записать изменения");
+				return;
+			} catch (KmiacServerException|PatientNotFoundException e) {
+				e.printStackTrace();
+			} catch (TException e) {
+				e.printStackTrace();
+			}
+			JOptionPane.showMessageDialog(this, "Операция не была выполнена",
+					"Ошибка", JOptionPane.ERROR_MESSAGE);
+		} else
+			JOptionPane.showMessageDialog(this, "Пациент не выбран",
+					"Предупреждение", JOptionPane.WARNING_MESSAGE);
 	}
 
 	/**
@@ -450,6 +460,12 @@ public class Children extends JPanel {
 	 * Выдача свидетельства
 	 */
 	private void btnGiveDocClick() {
+		if (this.patient == null)
+		{
+			JOptionPane.showMessageDialog(this, "Пациент не выбран",
+					"Предупреждение", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
 		if (this.childInfo == null)
 		{
 			JOptionPane.showMessageDialog(this, "Информация о новорождённом " +
@@ -732,23 +748,28 @@ public class Children extends JPanel {
 		JSeparator separatorCB = new JSeparator();
 		
 		spinnerWeight = new JSpinner();
+		spinnerWeight.setToolTipText("При значении 0 поле игнорируется");
 		spinnerWeight.setModel(new SpinnerNumberModel(0, 0, 9999, 1));
 		
 		JLabel lblWeight = new JLabel("Вес при рождении (г):");
+		lblWeight.setToolTipText("При значении 0 поле игнорируется");
 		lblWeight.setLabelFor(spinnerWeight);
 		
 		JLabel lblHeight = new JLabel("Рост при рождении (см):");
+		lblHeight.setToolTipText("При значении 0 поле игнорируется");
 		
 		JPanel panelApgar = new JPanel();
 		panelApgar.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		
 		JLabel lblApgar = new JLabel("Оценка по шкале Апгар:");
+		lblApgar.setToolTipText("При значении 0 поле игнорируется");
 		panelApgar.add(lblApgar);
 		
 		JPanel panelChildNumber = new JPanel();
 		panelChildNumber.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		
 		JLabel lblChildNumGlobal = new JLabel("По счёту новорождённый у матери:");
+		lblChildNumGlobal.setToolTipText("При значении 0 поле игнорируется");
 		lblChildNumGlobal.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		JLabel lblBirthTime = new JLabel("Время рождения:");
@@ -761,6 +782,7 @@ public class Children extends JPanel {
 		lblBirthTime.setLabelFor(cteBirthTime);
 		
 		spinnerHeight = new JSpinner();
+		spinnerHeight.setToolTipText("При значении 0 поле игнорируется");
 		spinnerHeight.setModel(new SpinnerNumberModel(0, 0, 99, 1));
 		lblHeight.setLabelFor(spinnerHeight);
 		
@@ -869,15 +891,18 @@ public class Children extends JPanel {
 		panelCriteria.setLayout(gl_panelCriteria);
 		
 		spinnerChildNumGlobal = new JSpinner();
+		spinnerChildNumGlobal.setToolTipText("При значении 0 поле игнорируется");
 		lblChildNumGlobal.setLabelFor(spinnerChildNumGlobal);
-		spinnerChildNumGlobal.setModel(new SpinnerNumberModel(1, 1, 999, 1));
+		spinnerChildNumGlobal.setModel(new SpinnerNumberModel(1, 0, 999, 1));
 		
 		JLabel lblChildNumLocal = new JLabel("Номер новорождённого в многоплодных родах:");
+		lblChildNumLocal.setToolTipText("При одноплодных родах следует указать 0");
 		lblChildNumLocal.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		spinnerChildNumLocal = new JSpinner();
+		spinnerChildNumLocal.setToolTipText("При одноплодных родах следует указать 0");
 		lblChildNumLocal.setLabelFor(spinnerChildNumLocal);
-		spinnerChildNumLocal.setModel(new SpinnerNumberModel(1, 1, 9, 1));
+		spinnerChildNumLocal.setModel(new SpinnerNumberModel(1, 0, 9, 1));
 		GroupLayout gl_panelChildNumber = new GroupLayout(panelChildNumber);
 		gl_panelChildNumber.setHorizontalGroup(
 			gl_panelChildNumber.createParallelGroup(Alignment.LEADING)
@@ -914,17 +939,21 @@ public class Children extends JPanel {
 		panelChildNumber.setLayout(gl_panelChildNumber);
 		
 		JLabel lblApgar1 = new JLabel("на 1 минуте");
+		lblApgar1.setToolTipText("При значении 0 поле игнорируется");
 		panelApgar.add(lblApgar1);
 		
 		spinnerApgar1 = new JSpinner();
+		spinnerApgar1.setToolTipText("При значении 0 поле игнорируется");
 		lblApgar1.setLabelFor(spinnerApgar1);
 		spinnerApgar1.setModel(new SpinnerNumberModel(0, 0, 10, 1));
 		panelApgar.add(spinnerApgar1);
 		
 		JLabel lblApgar5 = new JLabel(";  через 5 минут");
+		lblApgar5.setToolTipText("При значении 0 поле игнорируется");
 		panelApgar.add(lblApgar5);
 		
 		spinnerApgar5 = new JSpinner();
+		spinnerApgar5.setToolTipText("При значении 0 поле игнорируется");
 		lblApgar5.setLabelFor(spinnerApgar5);
 		spinnerApgar5.setModel(new SpinnerNumberModel(0, 0, 10, 1));
 		panelApgar.add(spinnerApgar5);
