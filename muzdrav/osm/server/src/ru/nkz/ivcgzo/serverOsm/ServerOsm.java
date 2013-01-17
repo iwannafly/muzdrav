@@ -154,13 +154,13 @@ public class ServerOsm extends Server implements Iface {
 		rsmZapVr = new TResultSetMapper<>(ZapVr.class, "npasp",       "fam",        "im",         "ot",         "poms_ser",   "poms_nom",   "id_pvizit",  "pol",          "datar",    "datap",    "nuch",        "has_pvizit",  "id_pvizit_amb");
 		zapVrTypes = new Class<?>[] {                  Integer.class, String.class, String.class, String.class, String.class, String.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Boolean.class, Integer.class};
 		
-		rsmVrachInfo = new TResultSetMapper<>(VrachInfo.class, "mrab_id", "cdol", "cdol_name", "fam", "im", "ot", "pcod");
+		rsmVrachInfo = new TResultSetMapper<>(VrachInfo.class);
 		
 		rsmPvizit = new TResultSetMapper<>(Pvizit.class, "id",          "npasp",       "cpol",        "datao",    "ishod",       "rezult",      "talon",       "cod_sp",      "cdol",       "cuser",       "zakl",       "dataz",    "recomend",   "lech",       "cobr",        "idzab",       "vrach_fio",  "closed");
 		pvizitTypes = new Class<?>[] {                   Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Date.class, String.class, String.class, Integer.class, Integer.class, String.class, Boolean.class};
 		
-		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz",    "cpos",        "cpol",        "kod_ter");
-		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class};
+		rsmPvizitAmb = new TResultSetMapper<>(PvizitAmb.class, "id",          "id_obr",      "npasp",       "datap",    "cod_sp",      "cdol",       "diag",       "mobs",        "rezult",      "opl",         "stoim",      "uet",         "datak",    "kod_rez",     "k_lr",        "n_sp",        "pr_opl",      "pl_extr",     "vpom",        "fio_vr",    "dataz",    "cpos",        "cpol",        "kod_ter",      "cdol_name");
+		pvizitAmbTypes = new Class<?>[] {                      Integer.class, Integer.class, Integer.class, Date.class, Integer.class, String.class, String.class, Integer.class, Integer.class, Integer.class, Double.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, Integer.class, String.class};
 		
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr",     "id_pos");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class};
@@ -301,7 +301,7 @@ public class ServerOsm extends Server implements Iface {
 	
 	@Override
 	public List<VrachInfo> getVrachList(int clpu, int cpodr) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT mr.id AS mrab_id, mr.cdol, s00.name AS cdol_name, vr.fam, vr.im, vr.ot, vr.pcod FROM s_mrab mr JOIN s_vrach vr ON (vr.pcod = mr.pcod) JOIN n_s00 s00 ON (s00.pcod = mr.cdol) JOIN n_priznd np ON (np.pcod = mr.priznd) WHERE (mr.clpu = ?) AND (mr.cpodr = ?) AND (mr.priznd = 1) ORDER BY vr.fam, vr.im, vr.ot, s00.name ", clpu, cpodr)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT mr.id AS mrab_id, mr.cdol, s00.name AS cdol_name, vr.pcod, get_short_fio(vr.fam, vr.im, vr.ot) AS short_fio FROM s_mrab mr JOIN s_vrach vr ON (vr.pcod = mr.pcod) JOIN n_s00 s00 ON (s00.pcod = mr.cdol) JOIN n_priznd np ON (np.pcod = mr.priznd) WHERE (mr.clpu = ?) AND (mr.cpodr = ?) AND (mr.priznd = 1) ORDER BY vr.fam, vr.im, vr.ot, s00.name ", clpu, cpodr)) {
 			return rsmVrachInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -427,7 +427,7 @@ public class ServerOsm extends Server implements Iface {
 
 	@Override
 	public List<PvizitAmb> getPvizitAmb(int obrId) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) WHERE id_obr = ? ORDER BY pva.datap DESC", obrId)) {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT pva.*, get_short_fio(svr.fam, svr.im, svr.ot) AS fio_vr, s00.name AS cdol_name FROM p_vizit_amb pva JOIN s_vrach svr ON (svr.pcod = pva.cod_sp) JOIN n_s00 s00 ON (s00.pcod = pva.cdol) WHERE id_obr = ? ORDER BY pva.datap DESC", obrId)) {
 			return rsmPvizitAmb.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

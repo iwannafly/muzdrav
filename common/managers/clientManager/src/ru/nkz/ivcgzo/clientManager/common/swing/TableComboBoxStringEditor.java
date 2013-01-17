@@ -127,6 +127,10 @@ public class TableComboBoxStringEditor extends ThriftStringClassifierCombobox<St
 		return -1;
 	}
 	
+	public void setParentTable(CustomTable<?, ?> tbl) {
+		ctb = tbl;
+	}
+	
 	public TableComboBoxIntegerRender getRender() {
 		return rnd;
 	}
