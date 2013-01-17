@@ -104,7 +104,7 @@ public class ServerViewSelect extends Server implements Iface {
 		
 		rsmPatBrief = new TResultSetMapper<>(PatientBriefInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom");
 		rsmPatComInfo = new TResultSetMapper<>(PatientCommonInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom", "pol", "jitel", "sgrp", "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_korp", "adp_kv", "adm_obl", "adm_gorod", "adm_ul", "adm_dom", "adm_korp", "adm_kv", "name_mr", "ncex", "poms_strg", "poms_tdoc", "poms_ndog", "pdms_strg", "pdms_ser", "pdms_nom", "pdms_ndog", "cpol_pr", "terp", "datapr", "tdoc", "docser", "docnum", "datadoc", "odoc", "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv", "mrab");
-		rsmPsign = new TResultSetMapper<>(PatientSignInfo.class, "npasp", "grup", "ph", "allerg", "farmkol", "vitae", "vred");
+		rsmPsign = new TResultSetMapper<>(PatientSignInfo.class, "npasp", "datap", "numstr", "name", "vybor", "comment", "yn");
 		rsmPvizit = new TResultSetMapper<>(PatientVizitInfo.class, "id", "npasp", "cpol", "datao", "ishod", "rezult", "talon", "cod_sp", "cdol", "cuser", "zakl", "dataz", "recomend", "lech", "cobr");
 		rsmRdSl = new TResultSetMapper<>(RdSlInfo.class, "id", "npasp", "datay", "dataosl", "abort", "shet", "datam", "yavka1", "ishod", "datasn", "datazs", "kolrod", "deti", "kont", "vesd", "dsp", "dsr", "dtroch", "cext", "indsol", "prmen", "dataz", "datasert", "nsert", "ssert", "oslab", "plrod", "prrod", "vozmen", "oslrod", "polj", "dataab", "srokab", "cdiagt", "cvera", "id_pvizit", "rost");
 		rsmPdiagZ = new TResultSetMapper<>(PatientDiagZInfo.class, "id", "id_diag_amb", "npasp", "diag", "cpodr", "d_vz", "d_grup", "ishod", "dataish", "datag", "datad", "cod_sp", "cdol_ot", "nmvd", "xzab", "stady", "disp", "pat", "prizb", "prizi", "named", "fio_vr");
@@ -369,15 +369,15 @@ public class ServerViewSelect extends Server implements Iface {
 			else
 				throw new SQLException("Patient common info not found");
 		} catch (SQLException e) {
-			throw new KmiacServerException(e.getMessage());
+			throw new KmiacServerException(e.getMessage());	
 		}
 	}
 
 	@Override
-	public PatientSignInfo getPatientSignInfo(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_sign WHERE npasp = ? ", npasp)) {
+	public List<PatientSignInfo> getPatientSignInfo(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) where npasp=? order by numstr", npasp)) {
 			if (acrs.getResultSet().next())
-				return rsmPsign.map(acrs.getResultSet());
+				return rsmPsign.mapToList(acrs.getResultSet());
 			else
 				throw new SQLException("Patient sign info not found");
 		} catch (SQLException e) {
