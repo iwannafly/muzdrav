@@ -138,45 +138,34 @@ struct TRdIshod {
    2: optional i32 ngosp;
    3: optional i32 id_berem;
    4: optional i32 id;
-   5: optional double oj;
-   6: optional i32 hdm;
-   7: optional i32 polpl;
-   8: optional i32 predpl;
-   9: optional i32 vidpl;
-  10: optional i32 serd;
-  11: optional i32 serd1;
-  12: optional i32 serdm;
-  13: optional i32 chcc;
-  14: optional i32 pozpl;
-  15: optional string mesto;
-  16: optional string deyat;
-  17: optional string shvat;
-  18: optional string vody;
-  19: optional string kashetv;
-  20: optional string poln;
-  21: optional string potugi;
-  22: optional i32 posled;
-  23: optional string vremp;
-  24: optional string obol;
-  25: optional i32 pupov;
-  26: optional string obvit;
-  27: optional string osobp;
-  28: optional i32 krov;
-  29: optional bool psih;
-  30: optional string obezb;
-  31: optional i32 eff;
-  32: optional string prr1;
-  33: optional string prr2;
-  34: optional string prr3;
-  35: optional i32 prinyl;
-  36: optional i32 osmposl;
-  37: optional i32 vrash;
-  38: optional i32 akush;
-  39: optional i64 daterod;
-  40: optional i32 srok;
-  41: optional double ves;
-  42: optional double vespl; 
-  43: optional string detmesto;
+   5: optional i32 serdm;
+   6: optional string mesto;
+   7: optional string deyat;
+   8: optional string shvat;
+   9: optional string vody;
+  10: optional string kashetv;
+  11: optional string poln;
+  12: optional string potugi;
+  13: optional i32 posled;
+  14: optional string vremp;
+  15: optional string obol;
+  16: optional i32 pupov;
+  17: optional string obvit;
+  18: optional string osobp;
+  19: optional i32 krov;
+  20: optional bool psih;
+  21: optional string obezb;
+  22: optional i32 eff;
+  23: optional string prr1;
+  24: optional string prr2;
+  25: optional string prr3;
+  26: optional i32 prinyl;
+  27: optional i32 osmposl;
+  28: optional i32 vrash;
+  29: optional i32 akush;
+  30: optional i64 daterod;
+  31: optional double vespl; 
+  32: optional string detmesto;
 }
 struct RdSlStruct{
         1: optional  i32 id;
@@ -249,100 +238,118 @@ struct RdDinStruct{
         24: optional i32 pozpl;
         25: optional i32 vidpl;
 }
+/*. Rd_Inf*/
+struct RdInfStruct{
+	1: optional i32 npasp;
+	2: optional i32 obr;
+	3: optional i32 sem;
+	4: optional i32 vOtec;
+	5: optional string grotec;
+	6: optional string phOtec;
+	7: optional i64 dataz;
+	8: optional string fioOtec;
+	9: optional string mrOtec;
+	10: optional string telOtec;
+	11: optional i32 vredOtec;
+	12: optional i32 osoco;
+	13: optional i32 uslpr;
+	14: optional string zotec;
+}
 
 struct TRd_Novor {
-	 1: i32 npasp;
-	 2: i32 nrod;
-	 3: optional string timeon;
-	 4: optional i32 kolchild;
-	 5: optional i32 nreb;
-	 6: i32 massa;
-	 7: i32 rost;
-	 8: optional i32 apgar1;
-	 9: optional i32 apgar5;
+	1: i32 npasp;
+	2: i32 nrod;
+	3: optional string timeon;
+	4: optional i32 kolchild;
+	5: optional i32 nreb;
+	6: optional i32 massa;
+	7: optional i32 rost;
+	8: optional i32 apgar1;
+	9: optional i32 apgar5;
 	10: optional bool krit1;
 	11: optional bool krit2;
 	12: optional bool krit3;
 	13: optional bool krit4;
 	14: optional bool mert;
 	15: optional bool donosh;
-	16: i64 datazap;
+	16: optional i64 datazap;
 }
 
 struct TRd_Svid {
 	1: i32 npasp;
-	2: i32 ndoc;
-	3: i64 dateoff;
-	4: string famreb;
-	5: i32 svidvrach;
+	2: optional i32 ndoc;
+	3: bool doctype;
+	4: i64 dateoff;
+	5: string famreb;
+	6: i32 svidvrach;
 }
 
 struct TPatientCommonInfo {
-	 1: i32 npasp;
-	 2: string full_name;
-	 3: i64 datar;
-	 4: string pol;
-	 5: string jitel;
-	 6: string adp_obl;
-	 7: string adp_gorod;
-	 8: string adp_ul;
-	 9: string adp_dom;
+	1: i32 npasp;
+	2: string full_name;
+	3: i64 datar;
+	4: string pol;
+	5: string jitel;
+	6: string adp_obl;
+	7: string adp_gorod;
+	8: string adp_ul;
+	9: string adp_dom;
 	10: string adp_kv;
 }
 
 struct TRd_SMPK {
-   1: i32 npasp;
-   2: i32 nrod;
-   3: i32 nnov;
-   4: optional i32 ndoc;
-   5: optional i64 dateoff;
-   6: optional i32 prvid;
-   7: optional i32 sm1;
-   8: optional i64 datas;
-   9: optional string times;
-  10: optional i32 kodmest;
-  11: optional i32 kolchild;
-  12: optional i32 b1;
-  13: optional i32 b2;
-  14: optional i32 b3;
-  15: optional i32 b4;
-  16: optional i32 b5;
-  17: optional i32 nreb;
-  18: optional string dsbasic;
-  19: optional i32 sostp;
-  20: optional i32 sm2;
-  21: optional i32 sm3;
-  22: optional string psm1;
-  23: optional string psm2;
-  24: optional string psm3;
-  25: optional string psm4;
-  26: optional string psm5;
-  27: optional string fioreb;
-  28: optional string fiozap;
-  29: optional i32 sm4;
-  30: optional i32 sm5;
-  31: optional i64 datazap;
+	1: i32 npasp;
+	2: i32 nrod;
+	3: i32 nnov;
+	4: optional i32 ndoc;
+	5: optional i64 dateoff;
+	6: optional i32 prvid;
+	7: optional i32 sm1;
+	8: optional i64 datas;
+	9: optional string times;
+	10: optional i32 kodmest;
+	11: optional i32 kolchild;
+	12: optional i32 b1;
+	13: optional i32 b2;
+	14: optional i32 b3;
+	15: optional i32 b4;
+	16: optional i32 b5;
+	17: optional i32 nreb;
+	18: optional string dsbasic;
+	19: optional i32 sostp;
+	20: optional i32 sm2;
+	21: optional i32 sm3;
+	22: optional string psm1;
+	23: optional string psm2;
+	24: optional string psm3;
+	25: optional string psm4;
+	26: optional string psm5;
+	27: optional string fioreb;
+	28: optional string fiozap;
+	29: optional i32 sm4;
+	30: optional i32 sm5;
+	31: optional i64 datazap;
 }
 
 struct TRd_ACCOMP {
-   1: i32 nnov;
-   2: i32 naccomp;
-   3: string accomp;
-   4: optional i32 priz;
+	1: i32 nnov;
+	2: i32 naccomp;
+	3: string accomp;
+	4: optional i32 priz;
 }
 
 struct TRd_PAT {
-   1: i32 nnov;
-   2: i32 npat;
-   3: string pat;
-   4: optional i32 priz;
+	1: i32 nnov;
+	2: i32 npat;
+	3: string pat;
+	4: optional i32 priz;
 }
 
 struct TRd_DIAGnr {
-   1: i32 nnov;
-   2: i32 ndiag;
-   3: string diag;
-   4: optional i32 priz;
+	1: i32 nnov;
+	2: i32 ndiag;
+	3: string diag;
+	4: optional i32 priz;
 }
 
 /**
@@ -498,11 +505,6 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void updateChildInfo(1:TRd_Novor Child)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     
-	/**
-	 * Получение следующего доступного номера свидетельства о рождении/перинатальной смерти новорождённого
-	 * @return Возвращает номер свидетельства о рождении/перинатальной смерти
-	 */
-    i32 getNextChildDocNum();
     /**
 	 * Добавление в БД свидетельства о рождении/перинатальной смерти новорождённого
 	 * @return Возвращает номер свидетельства
@@ -510,8 +512,6 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	i32 addChildDocument(1:TRd_Svid ChildDocument)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     TRd_Svid getChildDocument(1:i32 npasp)
-    	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
-    TRd_Svid getChildDocumentByDoc(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     void updateChildDocument(1:TRd_Svid ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
@@ -526,7 +526,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 
 /*DispBer*/
 	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:PrdIshodNotFoundException pinfe, 	2:kmiacServer.KmiacServerException kse);
-    void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    i32 addRdIshod(1:TRdIshod rdIs) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
 	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1:PrdSlNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);

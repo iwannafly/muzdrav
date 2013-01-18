@@ -344,7 +344,7 @@ public class MainFrame extends JFrame {
 	private JTextField TObvit;
 	private JTextField TRod;
 	private JTextField TMed;
-	private JTextField textField;
+	private JTextField Obvit;
     private JMenuItem mntmPrintHospitalDeathSummary;
     private JLabel lblZaklDiagStep;
     private JRadioButton rdbtnZaklDiagSrT;
@@ -557,6 +557,8 @@ public class MainFrame extends JFrame {
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
 							patient.getPatientId(), patient.gospitalCod);
+						System.out.println("начальные значения");		
+						System.out.println(trdIshod);		
 						setDefaultValues();
 					} catch(PrdIshodNotFoundException e) {
 //						e.printStackTrace();
@@ -615,7 +617,8 @@ public class MainFrame extends JFrame {
             		trdIshod = new TRdIshod();
             		try {
             			trdIshod = ClientHospital.tcl.getRdIshodInfo(patient.getPatientId(), patient.gospitalCod);
-            			setDefaultValues();
+            			System.out.println("начальные значения 11");		
+           			setDefaultValues();
             			} catch (KmiacServerException e1) {
             			// TODO Auto-generated catch block
             			e1.printStackTrace();
@@ -2354,7 +2357,7 @@ public class MainFrame extends JFrame {
 		        
 		        JButton btnNewButton_1 = new JButton("");
 		        btnNewButton_1.addActionListener(new ActionListener() {
-		        	public void actionPerformed(ActionEvent e) {
+		        	public void actionPerformed(final ActionEvent e) {
 		          		try {
 		          	 		System.out.println(patient.getPatientId());	
 		          	trdIshod.setNpasp(patient.getPatientId());
@@ -2458,10 +2461,48 @@ public class MainFrame extends JFrame {
 		        
 		        JButton btnNewButton = new JButton("");
 		        btnNewButton.addActionListener(new ActionListener() {
-		        	public void actionPerformed(ActionEvent e) {
+		        	public void actionPerformed(final ActionEvent e) {
 		    			try {
-//  внести случай и динамику		    				
-							ClientHospital.tcl.addRdIshod(patient.getPatientId(), patient.gospitalCod);
+		    				Integer id1 = 0; Integer numr = 0;Integer srok = 40;Integer numdin = 0;
+		    				Integer oj = 100; Integer hdm = 30; Integer polpl = 1;Integer predpl = 1;
+		    				Integer chcc = 110; Integer serd = 1; Integer serd1 = 1; double ves = 70.0;double vespl = 3.00;
+		    			//  внести случай и динамику присвоить значения структуре TRdIshod	
+//		    				patient.getPatientId(), patient.gospitalCod	  
+//		    				Date datarod = Date(System.currentTimeMillis());
+		    	trdIshod.setNpasp(patient.getPatientId());
+		    	trdIshod.setNgosp(patient.gospitalCod);
+	 			if (TDatarod.getDate() != null)
+	            trdIshod.setDaterod(TDatarod.getDate().getTime());
+	 			else trdIshod.setDaterod(System.currentTimeMillis());
+  		trdIshod.setDeyat(TRod.getText());
+		if (CBEff.getSelectedPcod() != null)
+			trdIshod.setEff(CBEff.getSelectedPcod());
+			else trdIshod.unsetEff();
+  		trdIshod.setKashetv(TKash.getText());
+  		trdIshod.setKrov((int) SKrov.getModel().getValue());
+  		trdIshod.setMesto(TDet.getText());
+  		trdIshod.setObezb(TMed.getText());
+		   	trdIshod.setObol(TObol.getText());
+		   	trdIshod.setObvit(TObvit.getText());
+  		trdIshod.setOsobp(TOsob.getText());
+  		trdIshod.setPoln(TPoln.getText());
+		if (CBPosled.getSelectedPcod() != null)
+			trdIshod.setPosled(CBPosled.getSelectedPcod());
+			else trdIshod.unsetPosled();
+		if (CBAkush.getSelectedPcod() != null)
+			trdIshod.setAkush(CBAkush.getSelectedPcod());
+			else trdIshod.unsetAkush();
+		if (CBPrinial.getSelectedPcod() != null)
+			trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
+		    else trdIshod.unsetPrinyl();
+		if (CBVrash.getSelectedPcod() != null)
+			trdIshod.setVrash(CBVrash.getSelectedPcod());
+		    else trdIshod.unsetVrash();
+		if (CBOsmotr.getSelectedPcod() != null)
+			trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
+		else trdIshod.unsetOsmposl();
+		trdIshod.setDetmesto(TDet.getText());
+		    	trdIshod.setId(ClientHospital.tcl.addRdIshod(trdIshod));
 						} catch (KmiacServerException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -2593,9 +2634,9 @@ public class MainFrame extends JFrame {
 		        JLabel lblNewLabel_20 = new JLabel("Обвитие вокруг");
 		        lblNewLabel_20.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		        
-		        textField = new JTextField();
-		        textField.setFont(new Font("Tahoma", Font.BOLD, 12));
-		        textField.setColumns(10);
+		        Obvit = new JTextField();
+		        Obvit.setFont(new Font("Tahoma", Font.BOLD, 12));
+		        Obvit.setColumns(10);
 		        
 		        JLabel lblNewLabel_21 = new JLabel("Особенности");
 		        lblNewLabel_21.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -2716,7 +2757,7 @@ public class MainFrame extends JFrame {
 		        							.addGap(18)
 		        							.addComponent(lblNewLabel_20)
 		        							.addPreferredGap(ComponentPlacement.RELATED)
-		        							.addComponent(textField, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
+		        							.addComponent(Obvit, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
 		        						.addGroup(gl_panel_3.createSequentialGroup()
 		        							.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
 		        								.addComponent(lblNewLabel_17)
@@ -2862,7 +2903,7 @@ public class MainFrame extends JFrame {
 		        				.addComponent(lblNewLabel_19)
 		        				.addComponent(SDlina_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 		        				.addComponent(lblNewLabel_20)
-		        				.addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		        				.addComponent(Obvit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addPreferredGap(ComponentPlacement.RELATED)
 		        			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 		        				.addComponent(lblNewLabel_21)
@@ -3693,13 +3734,12 @@ public class MainFrame extends JFrame {
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
-//	System.out.println(Vvod.zapVr.id_pvizit);		
 		TDatarod.setDate(trdIshod.getDaterod());
 		if (trdIshod.getDaterod() == 0)
 		TDatarod.setText(null);
 		TPoln.setText(trdIshod.getPoln());
 		TDet.setText(trdIshod.getDetmesto());
-		TNash.setText(trdIshod.getDeyat());
+		TNash.setText(trdIshod.getPotugi());
 		TVremp.setText(trdIshod.getVremp());
 		TObol.setText(trdIshod.getObol()); 
 		SDlina.setValue(trdIshod.getPupov());
@@ -3714,28 +3754,29 @@ public class MainFrame extends JFrame {
 		TKash.setText(trdIshod.getKashetv());
 		TRod.setText(trdIshod.getDeyat());
 		TMed.setText(trdIshod.getObezb());
-		if (trdIshod.isSetPolpl())
-			CBPolpl.setSelectedPcod(trdIshod.getPolpl());
+		TObvit.setText(trdIshod.getObvit());
+		if (rddin.isSetPolpl())
+			CBPolpl.setSelectedPcod(rddin.getPolpl());
 		else
 			CBPolpl.setSelectedItem(null);
-		if (trdIshod.isSetPozpl())
-			CBPoz.setSelectedPcod(trdIshod.getPozpl());
+		if (rddin.isSetPozpl())
+			CBPoz.setSelectedPcod(rddin.getPozpl());
 		else
 			CBPoz.setSelectedItem(null);
-		if (trdIshod.isSetVidpl())
-			CBVid.setSelectedPcod(trdIshod.getVidpl());
+		if (rddin.isSetVidpl())
+			CBVid.setSelectedPcod(rddin.getVidpl());
 		else
 			CBVid.setSelectedItem(null);
-		if (trdIshod.isSetSerd())
-			CBSerd.setSelectedPcod(trdIshod.getSerd());
+		if (rddin.isSetSerd())
+			CBSerd.setSelectedPcod(rddin.getSerd());
 		else
 			CBSerd.setSelectedItem(null);
-		if (trdIshod.isSetSerd1())
-			CBSerd1.setSelectedPcod(trdIshod.getSerd1());
+		if (rddin.isSetSerd1())
+			CBSerd1.setSelectedPcod(rddin.getSerd1());
 		else
 			CBSerd1.setSelectedItem(null);
-		if (trdIshod.isSetPredpl())
-			CBPred.setSelectedPcod(trdIshod.getPredpl());
+		if (rddin.isSetPredpl())
+			CBPred.setSelectedPcod(rddin.getPredpl());
 		else
 			CBPred.setSelectedItem(null);
 		ChBpsi.setSelected(trdIshod.isPsih());

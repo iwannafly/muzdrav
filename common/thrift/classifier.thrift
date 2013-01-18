@@ -132,7 +132,8 @@ enum IntegerClassifiers {
 	n_db13 = 114,
 	n_anz = 115,
 	n_bl1 = 116,
-	n_akd = 117
+	n_akd = 117,
+	n_aj0 = 118
 }
 
 enum StringClassifiers {

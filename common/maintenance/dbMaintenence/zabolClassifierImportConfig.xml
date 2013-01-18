@@ -15,6 +15,7 @@
 		<table srcName="ABY" dstName="n_aby" />
 		<table srcName="AF0" dstName="n_af0" />
 		<table srcName="AI0" dstName="n_ai0" />
+		<table srcName="AJ0" dstName="n_aj0" />
 		<table srcName="AK2" dstName="n_ak2" />
 		<table srcName="AKD" dstName="n_akd" />
 		<table srcName="AL0" dstName="n_al0" />
