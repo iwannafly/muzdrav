@@ -165,8 +165,8 @@ public class ServerOsm extends Server implements Iface {
 		rsmPdiagAmb = new TResultSetMapper<>(PdiagAmb.class, "id",          "id_obr",      "npasp",       "diag",       "named",      "diag_stat",   "predv",       "datad",    "obstreg",     "cod_sp",      "cdol",       "dataot",   "obstot",      "cod_spot",    "cdol_ot",    "vid_tr",     "id_pos");
 		pdiagAmbTypes = new Class<?>[] {                     Integer.class, Integer.class, Integer.class, String.class, String.class, Integer.class, Boolean.class, Date.class, Integer.class, Integer.class, String.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class};
 		
-		rsmPdiagZ = new TResultSetMapper<>(PdiagZ.class, "id",           "npasp",       "diag",       "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "nmvd",        "xzab",        "stady",       "disp",        "pat",         "prizb",       "prizi",       "named",      "ppi",         "nameC00");
-		pdiagZTypes = new Class<?>[] {                   Integer.class,  Integer.class, String.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class};
+		rsmPdiagZ = new TResultSetMapper<>(PdiagZ.class, "id",           "npasp",       "diag",       "d_vz",     "d_grup",      "ishod",       "dataish",  "datag",    "datad",    "nmvd",        "xzab",        "stady",       "disp",        "pat",         "prizb",       "prizi",       "named",      "ppi",         "nameC00",    "id_diag_amb");
+		pdiagZTypes = new Class<?>[] {                   Integer.class,  Integer.class, String.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Integer.class};
 		
 		
 		rsmPsign = new TResultSetMapper<>(Psign.class, "npasp",       "grup",       "ph",         "allerg",     "farmkol",    "vitae",      "vred"       );
@@ -1454,7 +1454,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sme.setCommit();
 				return diag.getId();
 			} catch (PdiagNotFoundException e) {
-				sme.execPreparedT("INSERT INTO p_diag (npasp, diag, d_vz, d_grup, ishod, dataish, datag, datad, nmvd, xzab, stady, disp, pat, prizb, prizi, named, ppi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, diag, pdiagZTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+				sme.execPreparedT("INSERT INTO p_diag (npasp, diag, d_vz, d_grup, ishod, dataish, datag, datad, nmvd, xzab, stady, disp, pat, prizb, prizi, named, ppi, id_diag_amb) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, diag, pdiagZTypes, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19);
 				int id = sme.getGeneratedKeys().getInt("id");
 				sme.setCommit();
 				return id;
@@ -3203,10 +3203,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	}
 
 	@Override
-	public void deleteDiag(int npasp, String diag, int pcod)
-			throws KmiacServerException, TException {
+	public void deleteDiag(int npasp, String diag, int pcod, int idDiagAmb) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM p_diag WHERE npasp = ? AND diag = ? ", false, npasp, diag);
+			sme.execPrepared("DELETE FROM p_diag WHERE id_diag_amb = ? AND datad = CURRENT_DATE ", false, idDiagAmb);
 			sme.execPrepared("DELETE FROM p_disp WHERE npasp = ? AND diag = ? AND pcod = ?", false, npasp, diag, pcod);
 			sme.setCommit();
 		} catch (SQLException e) {
