@@ -34,10 +34,11 @@ import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.PrdDinNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PrdIshodNotFoundException;
+import ru.nkz.ivcgzo.thriftHospital.PrdSlNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PriemInfoNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
-import ru.nkz.ivcgzo.thriftHospital.RdInfStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
@@ -117,11 +118,10 @@ public class ServerHospital extends Server implements Iface {
         "ukl", "ishod", "result", "time_start", "time_end"
     };
     private static final String[] RDISHOD_FIELD_NAMES = {
-   "npasp","ngosp","id_berem","id","oj","hdm","polpl","predpl",
-   "vidpl","serd","serd1","serdm","chcc","pozpl","mesto",
+   "npasp","ngosp","id_berem","id","serdm","mesto",
    "deyat","shvat","vody","kashetv","poln","potugi",
    "posled","vremp","obol","pupov","obvit","osobp","krov","psih","obezb",
-   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","srok","ves","vespl","detmesto"
+   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","vespl","detmesto"
    };
     private static final String[] RDNOVOR_FIELD_NAMES = {
 	   "npasp", "nrod", "timeon", "kolchild", "nreb", "massa", "rost",
@@ -135,16 +135,14 @@ public class ServerHospital extends Server implements Iface {
         "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_kv"
     };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
-//    	   "npasp",      "ngosp",   "id_berem",         "id",         "oj",        "hdm",     "polpl",     "predpl",
-     Integer.class,Integer.class,Integer.class,Integer.class,Double.class,Integer.class,Integer.class,Integer.class,
-//    	   "vidpl",       "serd",     "serd1",      "serdm",        "chcc",     "pozpl",      "mesto",
-     Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
+//    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 
+     Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
 //    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
      String.class,String.class,String.class,String.class,String.class,String.class,
 //    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
      Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
-//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",       "srok",       "ves",   "vespl", "detmesto"
-     Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Integer.class,Double.class,Double.class,String.class
+//    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",        "vespl", "detmesto"
+     Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Double.class,String.class
     };
      private static final String[] RdSlStruct_Fields_names  = {
     "id","npasp","datay","dataosl","abort","shet","datam","yavka1","ishod",
@@ -156,9 +154,20 @@ public class ServerHospital extends Server implements Iface {
     private static final Class<?>[] rdSlTypes = new Class<?>[] {Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, Boolean.class, Double.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, String.class, String.class, String.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Date.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,Boolean.class,Boolean.class,Boolean.class,Integer.class,Integer.class};
     private static final String[] RdDinStruct_Fields_names  = {"id_rd_sl",
     "id_pvizit","npasp","srok","grr","ball","oj","hdm","dspos","art1","art2",        
-    "art3","art4","spl","oteki","chcc","polpl","predpl","serd","serd1","id_pos",      
+    "art3","art4","oteki","spl","chcc","polpl","predpl","serd","serd1","id_pos",      
     "ves" ,"ngosp","pozpl","vidpl"};
-    private static final Class<?>[] rdDinTypes = new Class<?>[] {Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, String.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Double.class,Integer.class, Integer.class, Integer.class};
+    private static final Class<?>[] rdDinTypes = new Class<?>[] {Integer.class,
+//                                                              	"id_rd_sl",
+    Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
+//    "id_pvizit",       "npasp",        "srok",         "grr",        "ball", 
+    Integer.class, Integer.class, String.class, Integer.class, Integer.class,
+//           "oj",         "hdm",      "dspos",        "art1",        "art2",  
+    Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
+//         "art3",        "art4",       "oteki",         "spl",        "chcc",
+    Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, 
+//        "polpl",      "predpl",        "serd",       "serd1",      "id_pos",  
+    Double.class,Integer.class, Integer.class, Integer.class};
+//        "ves" ,      "ngosp",       "pozpl",       "vidpl"};
 
     private static final Class<?>[] DIAGNOSIS_TYPES = new Class<?>[] {
     //  id             id_gosp         cod           med_op        date_ustan
@@ -1181,43 +1190,44 @@ public class ServerHospital extends Server implements Iface {
 		}
 	}
 	@Override
-    public final void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
+	public int addRdIshod(TRdIshod rdIs) throws KmiacServerException,
 			TException {
-		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
-		Integer id1 = 0; Integer numr = 0;Integer srok = 40;Integer numdin = 0;
-		Integer oj = 100; Integer hdm = 30; Integer polpl = 1;Integer predpl = 1;
-		Integer chcc = 110; Integer serd = 1; Integer serd1 = 1; double ves = 70.0;double vespl = 3.00;
+        System.out.println("Добавление случая родов");
+ 		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
+		Integer id1 = 0; Integer numr = 0;Integer numdin = 0;
 		Date datarod = Date(System.currentTimeMillis());
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			 acrs = sse.execPreparedQuery("select max(id) from p_rd_sl where npasp= ? ", npasp);
-				if (acrs.getResultSet().next()) {id1 = acrs.getResultSet().getInt(1);
+			 acrs = sse.execPreparedQuery("select max(id) from p_rd_sl where npasp= ? ", 1);
+			 if (acrs.getResultSet().next()) {id1 = acrs.getResultSet().getInt(1);     System.out.println(id1);
 				 acrs1 = sse.execPreparedQuery("select (current_date-datay)/7+yavka1,id_pvizit from p_rd_sl where id= ? ", id1);
 				 if (acrs1.getResultSet().next()){
 				 numr = acrs1.getResultSet().getInt(2);
-				 srok = acrs1.getResultSet().getInt(1);
 				 }
 				 acrs1.close();
 				 acrs1 = sse.execPreparedQuery("select max(id_pos) from p_rd_din where id_pvizit = ? ", numr);
 				 if (acrs1.getResultSet().next()) {
                     numdin = acrs1.getResultSet().getInt(1);
                 }
-				 acrs1.close();
-				 acrs1 = sse.execPreparedQuery("select (current_date-datap)/7+srok,oj,hdm,polpl,predpl,chcc,serd,serd1,ves from p_rd_din,p_vizit_amb where p_rd_din.id_pos=p_vizit_amb.id and p_rd_din.id_pos= ? ", numdin);
-				 if (acrs1.getResultSet().next()){
-					 srok = acrs1.getResultSet().getInt(1);oj = acrs1.getResultSet().getInt(2); 
-					 hdm = acrs1.getResultSet().getInt(3); polpl = acrs1.getResultSet().getInt(4);
-					 predpl = acrs1.getResultSet().getInt(5);chcc = acrs1.getResultSet().getInt(6); 
-					 serd = acrs1.getResultSet().getInt(7); serd1 = acrs1.getResultSet().getInt(8); 
-					 ves = acrs1.getResultSet().getDouble(9);
-					 vespl = ((oj*hdm)/4*100+oj*hdm+(hdm-11)*155+ves/20)/4;
-					}
+//				 acrs1.close();
+//				 acrs1 = sse.execPreparedQuery("select (current_date-datap)/7+srok,oj,hdm,polpl,predpl,chcc,serd,serd1,ves from p_rd_din,p_vizit_amb where p_rd_din.id_pos=p_vizit_amb.id and p_rd_din.id_pos= ? ", numdin);
+//				 if (acrs1.getResultSet().next()){
+//					 srok = acrs1.getResultSet().getInt(1);oj = acrs1.getResultSet().getInt(2); 
+//					 hdm = acrs1.getResultSet().getInt(3); polpl = acrs1.getResultSet().getInt(4);
+//					 predpl = acrs1.getResultSet().getInt(5);chcc = acrs1.getResultSet().getInt(6); 
+//					 serd = acrs1.getResultSet().getInt(7); serd1 = acrs1.getResultSet().getInt(8); 
+//					 ves = acrs1.getResultSet().getDouble(9);
+//					 vespl = ((oj*hdm)/4*100+oj*hdm+(hdm-11)*155+ves/20)/4;
+//					}
 				}
-				int id = sme.getGeneratedKeys().getInt("id");
-			sme.execPreparedQuery("insert into c_rd_ishod (npasp,ngosp,id_berem,id,oj,hdm,polpl,predpl,serd,serd1,chcc, "+
-   "daterod) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",npasp,ngosp,numr,id,oj,hdm,polpl,predpl,serd,serd1,chcc,datarod);
-//			int id = sme.getGeneratedKeys().getInt("id");
+//				int id = sme.getGeneratedKeys().getInt("id");
+			sme.execPrepared("insert into c_rd_ishod (npasp,ngosp,id_berem,serdm,mesto,deyat,shvat,vody,kashetv, "+
+   "poln,potugi,posled,vremp,obol,pupov,obvit,osobp,krov,psih,obezb,eff, "+
+	"prr1,prr2,prr3,prinyl,osmposl,vrash,akush,daterod,vespl,detmesto) "+				
+   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ", true,1,2,numr,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32);
+			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
-			return;
+	        System.out.println("Добавление случая родов готово");
+			return id;
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
@@ -1541,51 +1551,71 @@ public class ServerHospital extends Server implements Iface {
 	}
 	    
 		@Override
-		public RdSlStruct getRdSlInfo(int npasp) throws KmiacServerException,
-			TException {
+		public RdSlStruct getRdSlInfo(int npasp) 
+				throws PrdSlNotFoundException, KmiacServerException {
         AutoCloseableResultSet acrs1;
         Date daterod =  new Date(System.currentTimeMillis()-280*24*60*60*1000);
 //         daterod =  new Date(System.currentTimeMillis()-24192000000);
 		Integer ish = 1;
+        System.out.println("случай родов");
+        System.out.println(npasp);
+        System.out.println(daterod);
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
-			if (!acrs.getResultSet().next()) {
-				try (SqlModifyExecutor sme = tse.startTransaction()) {
-					sme.execPrepared("insert into p_rd_sl " +
-						"(npasp,datay,ishod) VALUES (?,?,?) ",true, npasp,daterod,ish);
-					int id = sme.getGeneratedKeys().getInt("id");
-					sme.setCommit();
-				} catch (InterruptedException e) {
-					throw new KmiacServerException();
-				}
-			}
+			if (acrs.getResultSet().next()) {
+                return rsmRdSl.map(acrs.getResultSet());
+            } else {
+                throw new PrdSlNotFoundException();
+            }
+
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
+			log.log(Level.ERROR, "SqlException", e);
 			throw new KmiacServerException();
 		}
-		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery(
-				"select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
-			if (acrs2.getResultSet().next())
-				return rsmRdSl.map(acrs2.getResultSet());
-			else
-				throw new KmiacServerException("rd sl not found");
-		} catch (SQLException e) {
-			throw new KmiacServerException();
-		}	
 	}
+//			if (!acrs.getResultSet().next()) {
+//				try (SqlModifyExecutor sme = tse.startTransaction()) {
+//					sme.execPrepared("insert into p_rd_sl " +
+//						"(npasp,datay,ishod) VALUES (?,?,?) ",true, npasp,daterod,ish);
+//					int id = sme.getGeneratedKeys().getInt("id");
+//					sme.setCommit();
+//				} catch (InterruptedException e) {
+//					throw new KmiacServerException();
+//				}
+//			}
+//		} catch (SQLException e) {
+//			((SQLException) e.getCause()).printStackTrace();
+//			throw new KmiacServerException();
+//		}
+//		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery(
+//				"select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
+//			if (acrs2.getResultSet().next())
+//				return rsmRdSl.map(acrs2.getResultSet());
+//			else
+//				throw new KmiacServerException("rd sl not found");
+//		} catch (SQLException e) {
+//			throw new KmiacServerException();
+//		}	
+//	}
 
 	@Override
 	public RdDinStruct getRdDinInfo(int npasp,int ngosp)
-			throws KmiacServerException, TException {
+			throws PrdDinNotFoundException, KmiacServerException {
 	    Integer srok = 0;
 	    Integer oj = 0;
 	    Integer hdm = 0;
 	    Integer spl = 0;Integer chcc = 0;Integer polpl =0 ;Integer predpl =0;
-	    Integer serd =0 ;Integer serd1 =0 ;
+	    Integer serd =0 ;Integer serd1 =0 ; Integer idpos = 0;
 	    Double ves = 0.0; 
+        System.out.println("динамика");
+        System.out.println(npasp);
+        System.out.println(ngosp);
   		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_din where npasp = ? and ngosp= ? ", npasp,ngosp)) {
-			if (!acrs.getResultSet().next()) {
+			if (acrs.getResultSet().next()) {
+                return rsmRdDin.map(acrs.getResultSet());
+            } else {
 				AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select srok,oj, "+
-		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves "+	
+		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos "+	
 			    " from p_rd_din where npasp = ? order by id_pos", npasp);
 				if (acrs1.getResultSet().next()) {
 //присваиваем значения из динамики, в итоге из-за сортировки имеем последние 
@@ -1600,42 +1630,86 @@ public class ServerHospital extends Server implements Iface {
 				predpl = acrs1.getResultSet().getInt(7);
 				serd = acrs1.getResultSet().getInt(8);
 				serd1 = acrs1.getResultSet().getInt(9);
+				idpos = acrs1.getResultSet().getInt(11);
 				}
+				idpos = idpos+1;
 				try (SqlModifyExecutor sme = tse.startTransaction()) {
 					sme.execPrepared("insert into p_rd_din " +
-						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves);
-//					int id = sme.getGeneratedKeys().getInt("id");
+						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos);
+					int id = sme.getGeneratedKeys().getInt("id");
 					sme.setCommit();
+			        System.out.println("динамика добавлена");
 				} catch (InterruptedException e) {
 					throw new KmiacServerException();
 				}
-			}
+ //          	
+		  		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery("select * from p_rd_din where npasp = ? and ngosp= ? ", npasp,ngosp)) {
+					if (acrs2.getResultSet().next()) {
+		                return rsmRdDin.map(acrs2.getResultSet());
+		            } else {
+		                throw new PrdDinNotFoundException();
+		            }
+
+				} catch (SQLException e) {
+					((SQLException) e.getCause()).printStackTrace();
+					log.log(Level.ERROR, "SqlException", e);
+					throw new KmiacServerException();
+				}
+            }
+//
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
+			log.log(Level.ERROR, "SqlException", e);
 			throw new KmiacServerException();
 		}
-		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery(
-				"select * from p_rd_din where npasp = ? and ngosp= ? ", npasp,ngosp)) {
-			if (acrs2.getResultSet().next())
-				return rsmRdDin.map(acrs2.getResultSet());
-			else
-				throw new KmiacServerException("rd sl not found");
-		} catch (SQLException e) {
-			throw new KmiacServerException();
-		}	
 	}
+//			if (!acrs.getResultSet().next()) {
+//				AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select srok,oj, "+
+//		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves "+	
+//			    " from p_rd_din where npasp = ? order by id_pos", npasp);
+//				if (acrs1.getResultSet().next()) {
+////присваиваем значения из динамики, в итоге из-за сортировки имеем последние 
+//// значения, если в поликлинике не было записей - значения будут нулевыми					
+//				srok = acrs1.getResultSet().getInt(1);
+//				oj = acrs1.getResultSet().getInt(2);
+//				ves = acrs1.getResultSet().getDouble(10);
+//				hdm = acrs1.getResultSet().getInt(3);
+//				spl = acrs1.getResultSet().getInt(4);
+//				chcc = acrs1.getResultSet().getInt(5);
+//				polpl = acrs1.getResultSet().getInt(6);
+//				predpl = acrs1.getResultSet().getInt(7);
+//				serd = acrs1.getResultSet().getInt(8);
+//				serd1 = acrs1.getResultSet().getInt(9);
+//				}
+//				try (SqlModifyExecutor sme = tse.startTransaction()) {
+//					sme.execPrepared("insert into p_rd_din " +
+//						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves);
+////					int id = sme.getGeneratedKeys().getInt("id");
+//					sme.setCommit();
+//			        System.out.println("динамика добавлена");
+//				} catch (InterruptedException e) {
+//					throw new KmiacServerException();
+//				}
+//			}
+//		} catch (SQLException e) {
+//			((SQLException) e.getCause()).printStackTrace();
+//			throw new KmiacServerException();
+//		}
+//		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery(
+//				"select * from p_rd_din where npasp = ? and ngosp= ? ", npasp,ngosp)) {
+//			if (acrs2.getResultSet().next())
+//				return rsmRdDin.map(acrs2.getResultSet());
+//			else
+//				throw new KmiacServerException("rd sl not found");
+//		} catch (SQLException e) {
+//			throw new KmiacServerException();
+//		}	
+//	}
 
 	@Override
-	public RdInfStruct getRdInfInfo(int npasp) throws KmiacServerException,
-			TException {
+	public void AddRdSl(RdSlStruct rdSl) throws KmiacServerException, TException {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int AddRdSl(RdSlStruct rdSl) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return 0;
+		return ;
 	}
 
 	@Override
@@ -2021,26 +2095,6 @@ public class ServerHospital extends Server implements Iface {
 	}
 	
 	@Override
-	public void UpdateRdInf(RdInfStruct inf) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void AddRdInf(RdInfStruct rdInf) throws KmiacServerException,
-			TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void DeleteRdInf(int npasp) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void AddRdDin(int npasp, int ngosp) throws KmiacServerException,
 			TException {
 		// TODO Auto-generated method stub
@@ -2061,4 +2115,11 @@ public class ServerHospital extends Server implements Iface {
 		throw new KmiacServerException();
 	}
 	}
+
+//	public void addRdIshod(int npasp, int ngosp) throws KmiacServerException,
+//			TException {
+//		// TODO Auto-generated method stub
+//		
+//	}
+
 }

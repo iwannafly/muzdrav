@@ -148,17 +148,6 @@ public class FormPostBer extends JFrame {
 					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 					setPostBerData();
 				} 
-//				catch (PrdslNotFoundException e1) {
-//					try {
-//						rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-//						setPostBerData();
-//					} catch (KmiacServerException e2) {
-//						JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
-//					} catch (TException e2) {
-//						e2.printStackTrace();
-//						MainForm.conMan.reconnect(e2);
-//					}
-//				} 
 				catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
