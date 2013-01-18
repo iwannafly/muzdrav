@@ -212,25 +212,24 @@ public class PatientInfoForm extends ModalForm {
 //		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTer_liv(), info.getTer_liv()));
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath.toString() ==  "Анамнез жизни"){
-		 				try {
-	 						PatientSignInfo psign = MainForm.tcl.getPatientSignInfo(info.npasp);
-							addLineToDetailInfo("Группа крови", psign.getGrup());
-							addLineToDetailInfo("Резус-фактор", psign.getPh());
-							addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
-							addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
-							addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-							addBoldFont("Вредные привычки");
-							if (psign.getVred().charAt(0) == '1') addHeader("курение");
-							if (psign.getVred().charAt(1) == '1') addHeader("злоупотребление алкоголем");
-							if (psign.getVred().charAt(2) == '1') addHeader("алкоголизм");
-							if (psign.getVred().charAt(3) == '1') addHeader("наркотики");
-							if (psign.getVred() == "0000") addHeader("-");
-						} catch (KmiacServerException e1) {
-							System.err.println(e1.getMessage());
-							eptxt.setText("");
-						} catch (TException e1) {
-							MainForm.conMan.reconnect(e1);
-						}
+		 			//for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+		 				for (PatientSignInfo sign : MainForm.tcl.getPatientSignInfo(info.npasp)){
+		 					if ((sign.getYn().equals("T") && (sign.isVybor() == true) && (sign.getComment() != null)))
+		 						addLineSignInfo(sign.getName()+": да, "+sign.getComment(), sign.isSetName());
+		 					if ((sign.getYn().equals("T") && (sign.isVybor() == true) && (sign.getComment() == null)))
+		 						addLineSignInfo(sign.getName()+": да", sign.isSetName());
+		 					if ((sign.getYn().equals("T") && (sign.isVybor() == false)))
+		 						addLineSignInfo( sign.getName()+": нет", sign.isSetName());
+		 					if ((sign.getYn().equals("F") && (sign.getComment() != null)))
+		 						addLineToDetailInfo(sign.getName()+" ", sign.isSetComment(), sign.getComment());
+
+		 				}
+//						} catch (KmiacServerException e1) {
+//							System.err.println(e1.getMessage());
+//							eptxt.setText("");
+//						} catch (TException e1) {
+//							MainForm.conMan.reconnect(e1);
+//						}
 						eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PdiagTreeNode) {
 			 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
@@ -766,6 +765,12 @@ public class PatientInfoForm extends ModalForm {
 					if (value.equals("Т"))
 						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), isSet, valueCls), lineSep));
 				}
+	}
+	
+	private void addLineSignInfo(String txt, boolean isSet){
+		if (isSet)
+				if (txt.toString().length() > 0)
+					sb.append(String.format("%s<br>", txt));
 	}
 	
 	@Override

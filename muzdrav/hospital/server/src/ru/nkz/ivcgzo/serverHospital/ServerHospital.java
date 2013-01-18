@@ -1906,7 +1906,6 @@ public class ServerHospital extends Server implements Iface {
         	throw new ChildDocNotFoundException();
         Formatter f = new Formatter();
         final String childBirthNumber = f.format("%6d", ndoc).toString();
-        f.close();
         TRd_Svid childDoc = getChildDocumentByDoc(ndoc, true);
         TRd_Novor childBirthInfo = getChildInfo(childDoc.getNpasp());
         TPatientCommonInfo childInfo = getPatientCommonInfo(childDoc.getNpasp());
@@ -1924,7 +1923,8 @@ public class ServerHospital extends Server implements Iface {
             SimpleDateFormat sdfMonthShort = new SimpleDateFormat("MM");
             SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
             GregorianCalendar dateOff = new GregorianCalendar();
-            dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи свид-ва
+            GregorianCalendar curDate = new GregorianCalendar();
+            dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи мед.свид-ва
             //Местность регистрации матери:
             String city1 = "", city2 = "";
             String country1 = "", country2 = "";
@@ -1963,9 +1963,34 @@ public class ServerHospital extends Server implements Iface {
             //Имя и отчество матери:
             final String motherFirstName = motherFullName.substring(firstSpace + 1, motherFullName.length());
             //Время рождения:
-            final String childBirthTime = childBirthInfo.getTimeon();
-            final String childBirthHour = childBirthTime.substring(0, 2);
-            final String childBirthMinute = childBirthTime.substring(3, 5);
+            final String childBirthTime = (childBirthInfo.isSetTimeon()) ? childBirthInfo.getTimeon() : "";
+            String childBirthHour = "", childBirthMinute = "";
+            if (childBirthInfo.isSetTimeon()) {
+	            childBirthHour = childBirthTime.substring(0, 2);
+	            childBirthMinute = childBirthTime.substring(3, 5);
+            }
+            //Который по счёту:
+            String nChildren = "  ";
+            if (childBirthInfo.isSetKolchild())
+            	nChildren = f.format("%2d", childBirthInfo.getKolchild()).toString();
+            //Вес:
+            String weight = "    ";
+            if (childBirthInfo.isSetMassa())
+            	weight = f.format("%4d", childBirthInfo.getMassa()).toString();
+            //Рост:
+            String height = "  ";
+            if (childBirthInfo.isSetRost())
+            	height = f.format("%2d", childBirthInfo.getRost()).toString();
+            //Одноплодные\многоплодные роды:
+            String only = "", nreb = "", nreb_all = "";	//TODO: nreb_all - продумать!
+            if (childBirthInfo.isSetNreb())
+            {
+            	if (childBirthInfo.getNreb() == 0)
+            		only = "V";
+            	else
+            		nreb = f.format("%d", childBirthInfo.getNreb()).toString();
+            }
+            f.close();
             htmTemplate.replaceLabels(false,
         		ServerHospital.childBirthDocSeries, childBirthNumber,
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
@@ -2014,7 +2039,13 @@ public class ServerHospital extends Server implements Iface {
         		//МЕСТНОСТЬ РОЖДЕНИЯ:
     			"", "",
     			"", "",
-        		boy1, boy2, girl1, girl2);
+        		boy1, boy2, girl1, girl2,
+        		sdfDay.format(curDate.getTimeInMillis()), months[curDate.get(GregorianCalendar.MONTH)],
+        		sdfYear.format(curDate.getTimeInMillis()),
+        		nChildren.substring(0, 1), nChildren.substring(1, 2),
+        		weight.substring(0, 1), weight.substring(1, 2), weight.substring(2, 3), weight.substring(3, 4),
+        		height.substring(0, 1), height.substring(1, 2),
+        		only, nreb, nreb_all);
             osw.write(htmTemplate.getTemplateText());
             return path;
         } catch (Exception e) {
@@ -2034,9 +2065,9 @@ public class ServerHospital extends Server implements Iface {
 	public String printChildBlankDocument(boolean isLiveChild)
 			throws KmiacServerException, TException {
         final String path, patternPath, dblSpace = "&nbsp;&nbsp;", spaceBar = "&nbsp;&nbsp;&nbsp;&nbsp;";
-        if (isLiveChild)	//Печать бланка свидетельства о рождении
+        if (isLiveChild)	//Печать бланка мед.свидетельства о рождении
         	patternPath = "\\plugin\\reports\\ChildBirthDocument.htm";
-        else				//Печать бланка свидетельства о перинатальной смерти
+        else				//Печать бланка мед.свидетельства о перинатальной смерти
         	patternPath = "\\plugin\\reports\\ChildDeathDocument.htm";
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(

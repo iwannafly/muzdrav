@@ -68,6 +68,7 @@ struct PvizitAmb {
 	22: optional i32 cpos;
 	23: optional i32 cpol;
 	24: optional i32 kod_ter;
+	25: optional string cdol_name;
 }
 
 struct PdiagAmb {
@@ -148,6 +149,7 @@ struct PdiagZ{
 	17: optional string named;
 	18: optional i32 ppi;
 	19: optional string nameC00;
+	20: optional i32 id_diag_amb;
 
 }
 
@@ -432,6 +434,7 @@ struct IsslMet {
 	9: optional string cpodr_name;
 	10: optional string clpu_name;
 	11: optional i32 clpu;
+	12: optional i32 pvizitambId;
 }
 
 struct IsslPokaz {
@@ -621,13 +624,11 @@ struct Cotd{
 }
 
 struct VrachInfo {
-	1: optional i32 mrabId;
+	1: optional i32 mrab_id;
 	2: optional string cdol;
-	3: optional string cdolName;
-	4: optional string fam;
-	5: optional string im;
-	6: optional string ot;
-	7: optional i32 pcod;
+	3: optional string cdol_name;
+	4: optional i32 pcod;
+	5: optional string short_fio;
 }
 
 exception PvizitNotFoundException {
@@ -700,7 +701,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	PdiagZ getPdiagZ(1: i32 npasp, 2: string diag) throws (1: kmiacServer.KmiacServerException kse, 2: PdiagNotFoundException pnf);
 	list<PdiagZ> getPdiagZInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getPdiagInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void deleteDiag(1: i32 npasp, 2: string diag, 3: i32 pcod) throws (1: kmiacServer.KmiacServerException kse);
+	void deleteDiag(1: i32 npasp, 2: string diag, 3: i32 pcod, 4: i32 idDiagAmb) throws (1: kmiacServer.KmiacServerException kse);
 
 	i32 setPdisp(1: Pdisp disp) throws (1: kmiacServer.KmiacServerException kse);
 	Pdisp getPdisp(1: i32 npasp, 2: string diag, 3: i32 cpol) throws (1: kmiacServer.KmiacServerException kse, 2: PdispNotFoundException pnf);
