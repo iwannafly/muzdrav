@@ -62,6 +62,7 @@ public class OperationModel implements IOperationModel{
     @Override
     public void setCurrentAnesthesia(Anesthesia inAnesthesia) {
         currentAnesthesia = inAnesthesia;
+        fireAnesthesiaChanged();
     }
 
     @Override

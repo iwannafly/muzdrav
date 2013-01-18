@@ -23,6 +23,7 @@ public class Controller implements IController{
         this.model = curModel;
         this.view = new MainFrame(this, model);
         view.createFrame();
+        view.setControls();
 //        view.createControls();
     }
 
@@ -53,8 +54,7 @@ public class Controller implements IController{
 
     @Override
     public void setCurrentAnesthesia(Anesthesia inAnesthesia) {
-        // TODO Auto-generated method stub
-        
+        model.setCurrentAnesthesia(inAnesthesia);
     }
 
     @Override
@@ -156,123 +156,377 @@ public class Controller implements IController{
     }
 
     @Override
-    public void addOperation(Operation operation) {
-        // TODO Auto-generated method stub
-        
+    public void addOperation() {
+        try {
+            Operation curOper = new Operation();
+            curOper.setIdGosp(model.getPatient().getIdGosp());
+            curOper.setCotd(ClientOperation.authInfo.getCpodr());
+            curOper.setDataz(System.currentTimeMillis());
+            curOper.setVrem(System.currentTimeMillis());
+            curOper.setDate(System.currentTimeMillis());
+            curOper.setNpasp(model.getPatient().getPcod());
+            curOper.setId(model.addOperation(curOper));
+            model.setOperationsList(model.getPatient().getIdGosp());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении операции");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении операции");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void deleteOperation(Operation operation) {
-        // TODO Auto-generated method stub
-        
+    public void deleteOperation() {
+        int opResult = JOptionPane.showConfirmDialog(
+                null, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+        if (opResult == JOptionPane.YES_OPTION) {
+            try {
+                model.deleteOperation(model.getCurrentOperation());
+                model.setOperationsList(model.getPatient().getIdGosp());
+            } catch (KmiacServerException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении выбранной операции");
+                e1.printStackTrace();
+            } catch (TException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении выбранной операции");
+                e1.printStackTrace();
+                ClientOperation.conMan.reconnect(e1);
+            }
+        }
     }
 
     @Override
     public void updateOperation(Operation operation) {
-        // TODO Auto-generated method stub
-        
+        try {
+            model.updateOperation(operation);
+            model.setOperationsList(model.getPatient().getIdGosp());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении выбранной операции");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении выбранной операции");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void addOperationComplication(
-            OperationComplication operationComplication) {
-        // TODO Auto-generated method stub
-        
+    public void addOperationComplication() {
+        try {
+            OperationComplication curOperComplication = new OperationComplication();
+            curOperComplication.setDataz(System.currentTimeMillis());
+            curOperComplication.setIdOper(model.getCurrentOperation().getId());
+            curOperComplication.setId(
+                    model.addOperationComplication(curOperComplication));
+            model.setOperationsList(model.getCurrentOperation().getIdGosp());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении осложнения выбранной операции");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении осложнения выбранной операции");
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
     public void deleteOperationComplication(
             OperationComplication operationComplication) {
-        // TODO Auto-generated method stub
-        
+        int opResult = JOptionPane.showConfirmDialog(null, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+        if (opResult == JOptionPane.YES_OPTION) {
+            try {
+                model.deleteOperationComplication(operationComplication);
+                model.setOperationComplicationsList(model.getCurrentOperation().getId());
+            } catch (KmiacServerException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении осложнения выбранной операции");
+                e1.printStackTrace();
+            } catch (TException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении осложнения выбранной операции");
+                e1.printStackTrace();
+                ClientOperation.conMan.reconnect(e1);
+            }
+        }
     }
 
     @Override
     public void updateOperationComplication(
             OperationComplication operationComplication) {
-        // TODO Auto-generated method stub
-        
+        try {
+            model.updateOperationComplication(operationComplication);
+            model.setOperationComplicationsList(model.getCurrentOperation().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении осложнения выбранной операции");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении осложнения выбранной операции");
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void addOperationPaymentFund(
-            OperationPaymentFund operationPaymentFund) {
-        // TODO Auto-generated method stub
-        
+    public void addOperationPaymentFund() {
+        try {
+            OperationPaymentFund curOperPaymentFunds = new OperationPaymentFund();
+            curOperPaymentFunds.setDataz(System.currentTimeMillis());
+            curOperPaymentFunds.setIdOper(model.getCurrentOperation().getId());
+            curOperPaymentFunds.setId(
+                    model.addOperationPaymentFund(curOperPaymentFunds));
+            model.setOperationPaymentFundsList(model.getCurrentOperation().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении фонда оплаты выбранной операции");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении фонда оплаты выбранной операции");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
     public void deleteOperationPaymentFund(
             OperationPaymentFund operationPaymentFund) {
-        // TODO Auto-generated method stub
-        
+        int opResult = JOptionPane.showConfirmDialog(null, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+        if (opResult == JOptionPane.YES_OPTION) {
+            try {
+                model.deleteOperationPaymentFund(operationPaymentFund);
+                model.setOperationPaymentFundsList(model.getCurrentOperation().getId());
+            } catch (KmiacServerException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении фонда оплаты выбранной операции");
+                e1.printStackTrace();
+            } catch (TException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении фонда оплаты выбранной операции");
+                e1.printStackTrace();
+                ClientOperation.conMan.reconnect(e1);
+            }
+        }
     }
 
     @Override
     public void updateOperationPaymentFund(
             OperationPaymentFund operationPaymentFund) {
-        // TODO Auto-generated method stub
-        
+        try {
+            model.updateOperationPaymentFund(operationPaymentFund);
+            model.setOperationPaymentFundsList(model.getCurrentOperation().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении фонда оплаты выбранной операции");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении фонда оплаты выбранной операции");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void addAnesthesia(Anesthesia anesthesia) {
-        // TODO Auto-generated method stub
-        
+    public void addAnesthesia() {
+        try {
+            Anesthesia curAnesthesia = new Anesthesia();
+            curAnesthesia.setDataz(System.currentTimeMillis());
+            curAnesthesia.setIdOper(model.getCurrentOperation().getId());
+            curAnesthesia.setCotd(ClientOperation.authInfo.getCpodr());
+            curAnesthesia.setDate(System.currentTimeMillis());
+            curAnesthesia.setIdGosp(model.getPatient().getIdGosp());
+            curAnesthesia.setVrem(System.currentTimeMillis());
+            curAnesthesia.setNpasp(model.getPatient().getPcod());
+            curAnesthesia.setId(model.addAnesthesia(curAnesthesia));
+            model.setAnesthesiasList(model.getCurrentOperation().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении анестезии");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении анестезии");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void deleteAnesthesia(Anesthesia anesthesia) {
-        // TODO Auto-generated method stub
-        
+    public void deleteAnesthesia() {
+        int opResult = JOptionPane.showConfirmDialog(null, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+        if (opResult == JOptionPane.YES_OPTION) {
+            try {
+                model.deleteAnesthesia(model.getCurrentAnesthesia());
+                model.setAnesthesiasList(model.getCurrentAnesthesia().getId());
+            } catch (KmiacServerException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении анестезии");
+                e1.printStackTrace();
+            } catch (TException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении анестезии");
+                e1.printStackTrace();
+                ClientOperation.conMan.reconnect(e1);
+            }
+        }
     }
 
     @Override
-    public void updateAnesthesia(Anesthesia anesthesia) {
-        // TODO Auto-generated method stub
-        
+    public void updateAnesthesia() {
+        try {
+            model.updateAnesthesia(model.getCurrentAnesthesia());
+            model.setAnesthesiasList(model.getCurrentAnesthesia().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении анестезии");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении анестезии");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void addAnesthesiaComplication(
-            AnesthesiaComplication anesthesiaComplication) {
-        // TODO Auto-generated method stub
-        
+    public void addAnesthesiaComplication() {
+        try {
+            AnesthesiaComplication curAnesthesiaComplication =
+                    new AnesthesiaComplication();
+            curAnesthesiaComplication.setDataz(System.currentTimeMillis());
+            curAnesthesiaComplication.setIdAnast(model.getCurrentAnesthesia().getId());
+            curAnesthesiaComplication.setId(
+                    model.addAnesthesiaComplication(curAnesthesiaComplication)
+            );
+            model.setAnesthesiaComplicationsList(model.getCurrentAnesthesia().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении осложнения анестезии");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении осложнения анестезии");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
     public void deleteAnesthesiaComplication(
             AnesthesiaComplication anesthesiaComplication) {
-        // TODO Auto-generated method stub
-        
+        int opResult = JOptionPane.showConfirmDialog(
+                null, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+        if (opResult == JOptionPane.YES_OPTION) {
+            try {
+                model.deleteAnesthesiaComplication(anesthesiaComplication);
+                model.setAnesthesiaComplicationsList(model.getCurrentAnesthesia().getId());
+            } catch (KmiacServerException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении осложнения анестезии");
+                e1.printStackTrace();
+            } catch (TException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении осложнения анестезии");
+                e1.printStackTrace();
+                ClientOperation.conMan.reconnect(e1);
+            }
+        }
     }
 
     @Override
     public void updateAnesthesiaComplication(
             AnesthesiaComplication anesthesiaComplication) {
-        // TODO Auto-generated method stub
-        
+        try {
+            model.updateAnesthesiaComplication(anesthesiaComplication);
+            model.setAnesthesiaComplicationsList(model.getCurrentAnesthesia().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении осложнения анестезии");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении осложнения анестезии");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
-    public void addAnesthesiaPaymentFund(
-            AnesthesiaPaymentFund anesthesiaPaymentFund) {
-        // TODO Auto-generated method stub
-        
+    public void addAnesthesiaPaymentFund() {
+        try {
+            AnesthesiaPaymentFund curAnesthesiaPaymentFund =
+                    new AnesthesiaPaymentFund();
+            curAnesthesiaPaymentFund.setDataz(System.currentTimeMillis());
+            curAnesthesiaPaymentFund.setIdAnast(model.getCurrentAnesthesia().getId());
+            curAnesthesiaPaymentFund.setId(
+                    model.addAnesthesiaPaymentFund(curAnesthesiaPaymentFund)
+            );
+            model.setAnesthesiaPaymentFundsList(model.getCurrentAnesthesia().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении фонда оплаты анестезии");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при добавлении фонда оплаты анестезии");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
     public void deleteAnesthesiaPaymentFund(
             AnesthesiaPaymentFund anesthesiaPaymentFund) {
-        // TODO Auto-generated method stub
-        
+        int opResult = JOptionPane.showConfirmDialog(null, "Удалить запись?",
+                "Удаление записи", JOptionPane.YES_NO_OPTION);
+        if (opResult == JOptionPane.YES_OPTION) {
+            try {
+                model.deleteAnesthesiaPaymentFund(anesthesiaPaymentFund);
+                model.setAnesthesiaPaymentFundsList(model.getCurrentAnesthesia().getId());
+            } catch (KmiacServerException e1) {
+
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении фонда оплаты анестезии");
+                e1.printStackTrace();
+            } catch (TException e1) {
+                JOptionPane.showMessageDialog(null,
+                        "Ошибка при удалении фонда оплаты анестезии");
+                e1.printStackTrace();
+                ClientOperation.conMan.reconnect(e1);
+            }
+        }
     }
 
     @Override
     public void updateAnesthesiaPaymentFund(
             AnesthesiaPaymentFund anesthesiaPaymentFund) {
-        // TODO Auto-generated method stub
-
+        try {
+            model.updateAnesthesiaPaymentFund(anesthesiaPaymentFund);
+            model.setAnesthesiaPaymentFundsList(model.getCurrentAnesthesia().getId());
+        } catch (KmiacServerException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении фонда оплаты анестезии");
+            e1.printStackTrace();
+        } catch (TException e1) {
+            JOptionPane.showMessageDialog(null,
+                    "Ошибка при обновлении фонда оплаты анестезии");
+            e1.printStackTrace();
+            ClientOperation.conMan.reconnect(e1);
+        }
     }
 
     @Override
@@ -293,10 +547,8 @@ public class Controller implements IController{
     public void fillPatient(int id, String surname, String name,
             String middlename, int idGosp) {
         model.setPatient(new Patient(id,surname, name, middlename, idGosp));
-        view.fillPatient(id, surname, name, middlename, idGosp);
         this.setOperationsList();
         view.updateOperationTable();
-//        view.removeOperationTableSelection();
     }
 
 }

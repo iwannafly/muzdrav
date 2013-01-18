@@ -38,37 +38,37 @@ public interface IController {
 
     void setAnesthesiaPaymentFundsList();
 
-    void addOperation(Operation operation);
+    void addOperation();
 
-    void deleteOperation(Operation operation);
+    void deleteOperation();
 
     void updateOperation(Operation operation);
 
-    void addOperationComplication(OperationComplication operationComplication);
+    void addOperationComplication();
 
     void deleteOperationComplication(OperationComplication operationComplication);
 
     void updateOperationComplication(OperationComplication operationComplication);
 
-    void addOperationPaymentFund(OperationPaymentFund operationPaymentFund);
+    void addOperationPaymentFund();
 
     void deleteOperationPaymentFund(OperationPaymentFund operationPaymentFund);
 
     void updateOperationPaymentFund(OperationPaymentFund operationPaymentFund);
 
-    void addAnesthesia(Anesthesia anesthesia);
+    void addAnesthesia();
 
-    void deleteAnesthesia(Anesthesia anesthesia);
+    void deleteAnesthesia();
 
-    void updateAnesthesia(Anesthesia anesthesia);
+    void updateAnesthesia();
 
-    void addAnesthesiaComplication(AnesthesiaComplication anesthesiaComplication);
+    void addAnesthesiaComplication();
 
     void deleteAnesthesiaComplication(AnesthesiaComplication anesthesiaComplication);
 
     void updateAnesthesiaComplication(AnesthesiaComplication anesthesiaComplication);
 
-    void addAnesthesiaPaymentFund(AnesthesiaPaymentFund anesthesiaPaymentFund);
+    void addAnesthesiaPaymentFund();
 
     void deleteAnesthesiaPaymentFund(AnesthesiaPaymentFund anesthesiaPaymentFund);
 
