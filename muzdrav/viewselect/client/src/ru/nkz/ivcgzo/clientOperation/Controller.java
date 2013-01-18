@@ -24,7 +24,6 @@ public class Controller implements IController{
         this.view = new MainFrame(this, model);
         view.createFrame();
         view.setControls();
-//        view.createControls();
     }
 
     @Override
