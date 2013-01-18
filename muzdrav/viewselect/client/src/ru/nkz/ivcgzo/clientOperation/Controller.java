@@ -79,6 +79,7 @@ public class Controller implements IController{
             JOptionPane.showMessageDialog(null, "Ошибка при загрузке списка операций");
         } catch (TException e) {
             JOptionPane.showMessageDialog(null, "Ошибка при загрузке списка операций");
+            ClientOperation.conMan.reconnect(e);
         }
     }
 
@@ -93,6 +94,7 @@ public class Controller implements IController{
             } catch (TException e) {
                 JOptionPane.showMessageDialog(null,
                         "Ошибка при загрузке списка осложнений выбранной операции");
+                ClientOperation.conMan.reconnect(e);
             }
         }
     }
@@ -108,6 +110,7 @@ public class Controller implements IController{
             } catch (TException e) {
                 JOptionPane.showMessageDialog(null,
                         "Ошибка при загрузке списка фондов оплаты выбранной операции");
+                ClientOperation.conMan.reconnect(e);
             }
         }
     }
@@ -121,6 +124,7 @@ public class Controller implements IController{
                 JOptionPane.showMessageDialog(null, "Ошибка при загрузке списка анестезии");
             } catch (TException e) {
                 JOptionPane.showMessageDialog(null, "Ошибка при загрузке списка анестезии");
+                ClientOperation.conMan.reconnect(e);
             }
         }
     }
@@ -136,6 +140,7 @@ public class Controller implements IController{
             } catch (TException e) {
                 JOptionPane.showMessageDialog(null,
                         "Ошибка при загрузке списка осложнений выбранной анестезии");
+                ClientOperation.conMan.reconnect(e);
             }
         }
     }
@@ -151,6 +156,7 @@ public class Controller implements IController{
             } catch (TException e) {
                 JOptionPane.showMessageDialog(null,
                         "Ошибка при загрузке списка фондов оплаты выбранной анестезии");
+                ClientOperation.conMan.reconnect(e);
             } 
         }
     }
