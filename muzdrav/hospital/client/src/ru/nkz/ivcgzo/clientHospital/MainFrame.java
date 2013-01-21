@@ -81,8 +81,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -105,10 +103,6 @@ import java.io.IOException;
 import javax.swing.JCheckBox;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import java.awt.GridLayout;
-import javax.swing.JComboBox;
-import javax.swing.JTable;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 public class MainFrame extends JFrame {
 
@@ -349,7 +343,6 @@ public class MainFrame extends JFrame {
     private JLabel lblZaklDiagStep;
     private JRadioButton rdbtnZaklDiagSrT;
     private JRadioButton rdbtnZaklDiagTT;
-    private JPanel pRecButtons;
     private CustomDateEditor Tdatam;
     private CustomDateEditor Tdataosl;
 	private JSpinner Sber;
