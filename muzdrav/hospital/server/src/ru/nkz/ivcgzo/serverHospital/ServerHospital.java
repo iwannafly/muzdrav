@@ -1946,7 +1946,6 @@ public class ServerHospital extends Server implements Iface {
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
         if (isChildDocUnique(ndoc, true))	//Свидетельство с таким номером не существует
         	throw new ChildDocNotFoundException();
-        final String childBirthNumber = String.format("%6d", ndoc);
         TRd_Svid childDoc = getChildDocumentByDoc(ndoc, true);
         TRd_Novor childBirthInfo = getChildInfo(childDoc.getNpasp());
         TPatientCommonInfo childInfo = getPatientCommonInfo(childDoc.getNpasp());
@@ -1959,6 +1958,8 @@ public class ServerHospital extends Server implements Iface {
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().getAbsolutePath()
                     + "\\plugin\\reports\\ChildBirthDocument.htm");
+            String childBirthNumber = String.format("%6d", ndoc);
+            childBirthNumber = childBirthNumber.replaceAll(" ", "0");
             SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
             SimpleDateFormat sdfMonth = new SimpleDateFormat("MMMMMMM");
             SimpleDateFormat sdfMonthShort = new SimpleDateFormat("MM");
@@ -2110,7 +2111,7 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public String printChildBlankDocument(boolean isLiveChild)
 			throws KmiacServerException, TException {
-        final String path, patternPath, dblSpace = "&nbsp;&nbsp;", spaceBar = "&nbsp;&nbsp;&nbsp;&nbsp;";
+        final String path, patternPath;
         if (isLiveChild)	//Печать бланка мед.свидетельства о рождении
         	patternPath = "\\plugin\\reports\\ChildBirthDocument.htm";
         else				//Печать бланка мед.свидетельства о перинатальной смерти
@@ -2123,16 +2124,11 @@ public class ServerHospital extends Server implements Iface {
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().
             		getAbsolutePath() + patternPath);
-            htmTemplate.replaceLabels(true,
-            		ServerHospital.childBirthDocSeries,
-            		spaceBar + dblSpace, spaceBar + dblSpace, spaceBar + spaceBar + spaceBar + dblSpace,
-            		spaceBar + spaceBar + "&nbsp;", "", spaceBar + spaceBar + spaceBar,
-            		spaceBar, "", "", "", "", spaceBar + spaceBar + spaceBar,
-            		spaceBar, "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-            		"", "", "", "", ServerHospital.childBirthDocSeries,
-            		spaceBar + dblSpace, spaceBar + dblSpace, spaceBar + spaceBar + spaceBar + dblSpace,
-            		spaceBar + spaceBar + "&nbsp;", "", spaceBar + spaceBar + spaceBar,
-            		spaceBar, "", "");
+            htmTemplate.replaceLabel("~seria", ServerHospital.childBirthDocSeries);
+            htmTemplate.replaceLabel("~seria", ServerHospital.childBirthDocSeries);
+            htmTemplate.replaceLabel("~ndoc", "______");
+            htmTemplate.replaceLabel("~ndoc", "______");
+            htmTemplate.replaceLabels(true);
 	        osw.write(htmTemplate.getTemplateText());
 	        return path;
 	    } catch (Exception e) {
