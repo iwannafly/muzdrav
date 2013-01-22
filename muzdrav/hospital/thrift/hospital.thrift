@@ -275,13 +275,15 @@ struct TRd_Novor {
 	16: optional i64 datazap;
 }
 
-struct TRd_Svid {
+struct TRd_Svid_Rojd {
 	1: i32 npasp;
 	2: optional i32 ndoc;
-	3: bool doctype;
-	4: i64 dateoff;
-	5: string famreb;
-	6: i32 svidvrach;
+	3: i64 dateoff;
+	4: string famreb;
+	5: i32 m_rojd;
+	6: i32 zan;
+	7: i32 r_proiz;
+	8: i32 svidvrach;
 }
 
 struct TPatientCommonInfo {
@@ -549,7 +551,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-	i32 addChildDocument(1:TRd_Svid ChildDocument)
+	i32 addChildDocument(1:TRd_Svid_Rojd ChildDocument)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 	/**
 	 * Получение информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
@@ -559,7 +561,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-    TRd_Svid getChildDocument(1:i32 npasp)
+    TRd_Svid_Rojd getChildDocument(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     /**
 	 * Обновление информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
@@ -568,7 +570,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-    void updateChildDocument(1:TRd_Svid ChildDocument)
+    void updateChildDocument(1:TRd_Svid_Rojd ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildBirthDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
