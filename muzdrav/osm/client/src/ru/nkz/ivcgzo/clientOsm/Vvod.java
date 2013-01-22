@@ -995,7 +995,7 @@ public class Vvod extends JFrame {
 					if (tblDiag.getSelectedItem() != null)
 						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION) {
 				  			MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
-				  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr());
+				  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr(), tblDiag.getSelectedItem().id);
 				  			tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));
 							tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 						}
@@ -1039,6 +1039,7 @@ public class Vvod extends JFrame {
 				  		
 				  		pdiag = new PdiagZ();
 				  		pdisp = new Pdisp();
+			  			pdiag.setId_diag_amb(diagamb.id);
 				  		if (rbtDiagPredv.isSelected())
 				  			diagamb.setPredv(true);
 				  		if (rbtDiagZakl.isSelected()) {
@@ -1652,12 +1653,12 @@ public class Vvod extends JFrame {
 						.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 							.addComponent(lblDiagDispDatVz)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tbDiagDispDatVz, GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
-							.addGap(20)
+							.addComponent(tbDiagDispDatVz, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblDiagDispGrup)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(cmbDiagDispGrup, GroupLayout.PREFERRED_SIZE, 300, GroupLayout.PREFERRED_SIZE)
-							.addGap(0, 0, Short.MAX_VALUE))
+							.addGap(0, 41, Short.MAX_VALUE))
 						.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.LEADING, false)
 								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
@@ -1678,12 +1679,13 @@ public class Vvod extends JFrame {
 									.addComponent(lblDataIzmNewDs)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(tfDataIzmNewDs, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(gl_pnlDiagDisp.createParallelGroup(Alignment.TRAILING)
-								.addComponent(tbDiagDispDatIsh, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
 									.addGap(1)
-									.addComponent(btnDispHron, GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)))))
+									.addComponent(btnDispHron, GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+								.addGroup(gl_pnlDiagDisp.createSequentialGroup()
+									.addGap(18)
+									.addComponent(tbDiagDispDatIsh, GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)))))
 					.addGap(0))
 		);
 		gl_pnlDiagDisp.setVerticalGroup(
@@ -3455,6 +3457,7 @@ public class Vvod extends JFrame {
 		for (PdiagZ d : tblZaklDiag.getData())
 			if (d.isSetDiag() && (d.diag.equals(pdz.diag)))
 				return;
+		
 		MainForm.tcl.setPdiag(pdz);
 	}
 	
