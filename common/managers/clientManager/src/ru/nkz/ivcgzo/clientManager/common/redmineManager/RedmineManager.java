@@ -12,13 +12,16 @@ import org.json.JSONWriter;
 
 public class RedmineManager {
 	private Transport conn;
-	private SimpleDateFormat sdf;
+	private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
 	public RedmineManager(String serverUrl, String apiKey) {
 		conn = new Transport(serverUrl, apiKey);
-		sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 	
+	public static SimpleDateFormat getDateFormatter() {
+		return RedmineManager.sdf;
+	}
+
 	public List<Tracker> getTrackerList() throws Exception {
 		JSONObject obj = new JSONObject(conn.get("trackers.json"));
 		JSONArray arr = obj.getJSONArray("trackers");
@@ -50,31 +53,13 @@ public class RedmineManager {
 		JSONArray arr = obj.getJSONArray("issues");
 		List<Issue> lst = new ArrayList<>();
 		
-		for (int i = 0; i < arr.length(); i++) {
-			JSONObject o = arr.getJSONObject(i);
-			JSONObject io;
-			Issue iss = new Issue();
-			
-			iss.setId(o.getInt("id"));
-			io = o.getJSONObject("tracker");
-			iss.setTracker(new Tracker(io.getInt("id"), io.getString("name")));
-			io = o.getJSONObject("status");
-			iss.setStatus(new IssueStatus(io.getInt("id"), io.getString("name")));
-			io = o.getJSONObject("priority");
-			iss.setPriority(new Priority(io.getInt("id"), io.getString("name")));
-			iss.setSubject(o.getString("subject"));
-			iss.setDescription(o.getString("description"));
-			iss.setDoneRatio(o.getInt("done_ratio"));
-			iss.setCreatedOn(sdf.parse(o.getString("created_on")));
-			iss.setUpdatedOn(sdf.parse(o.getString("updated_on")));
-			
-			lst.add(iss);
-		}
+		for (int i = 0; i < arr.length(); i++)
+			lst.add(Issue.fromJsonObject(arr.getJSONObject(i)));
 		
 		return lst;
 	}
 	
-	public void addIssue(String projectId, Tracker tracker, String subject, String description) throws Exception {
+	public Issue addIssue(String projectId, Tracker tracker, String subject, String description) throws Exception {
 		try (StringWriter sw = new StringWriter();) {
 			JSONWriter jw = new JSONWriter(sw);
 			
@@ -93,10 +78,12 @@ public class RedmineManager {
 					jw.value(subject);
 					jw.key("description");
 					jw.value(description);
+				jw.endObject();
 			jw.endObject();
 			
-//			conn.post("application/json", "{\"issue\":{\"subject\":\"1\",\"project_id\":\"auth\",\"start_date\":null,\"tracker_id\":1,\"description\":\"2\rЗаявитель: ИВАНОВ И. И.\",\"updated_on\":\"2013/01/15 09:28:45 +0700\",\"status_id\":1,\"custom_field_values\":{\"1\":\"2\"}}}", "issues.json");
-			conn.post("application/json", sw.toString(), "issues.json");
+			;
+			
+			return Issue.fromJsonObject(new JSONObject(conn.post("application/json", sw.toString(), "issues.json")).getJSONObject("issue"));
 		}
 	}
 }

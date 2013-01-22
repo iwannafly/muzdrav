@@ -217,40 +217,9 @@ public class RedmineForm extends JDialog {
 	}
 	
 	private void addIssue() throws Exception {
-		rmg.addIssue(prKey, (Tracker) cmbTracker.getSelectedItem(), "subj", "desc");
-		com.taskadapter.redmineapi.bean.Issue iss;
-		com.taskadapter.redmineapi.bean.Tracker trc;
-		List<com.taskadapter.redmineapi.bean.CustomField> cfLst;
-		
-		trc = new com.taskadapter.redmineapi.bean.Tracker();
-		trc.setId(((Tracker) cmbTracker.getSelectedItem()).getId());
-		trc.setName(cmbTracker.getSelectedItem().toString());
-		
-		cfLst = new ArrayList<>();
-		cfLst.add(new com.taskadapter.redmineapi.bean.CustomField(1, "submitter_user_id", String.valueOf(CustomFrame.authInfo.getUser_id())));
-//		cfLst.add(new com.taskadapter.redmineapi.bean.CustomField(2, "submitter_name", CustomFrame.authInfo.getName_short()));
-		
-		iss = new com.taskadapter.redmineapi.bean.Issue();
-		iss.setTracker(trc);
-		iss.setStatusId(staLst.get(0).getId());
-		iss.setStatusName(staLst.get(0).getName());
-		iss.setSubject(tbSubject.getText());
-		iss.setDescription(String.format("%s\rЗаявитель: %s", tbDesc.getText(), CustomFrame.authInfo.getName_short()));
-		iss.setUpdatedOn(new Date(System.currentTimeMillis()));
-		
-		//TODO need albert
-		iss.setCustomFields(cfLst);
-		
-		try {
-//			uploadScreenShot();
-			rmg1.createIssue(prKey, iss);
-//			issLst.add(iss);
-			setTableModel();
-			clearFields();
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(this, "Не удалось добавить ошибку.");
-		}
+		issLst.add(0, rmg.addIssue(prKey, (Tracker) cmbTracker.getSelectedItem(), tbSubject.getText(), tbDesc.getText()));
+		setTableModel();
+		clearFields();
 	}
 	
 	private com.taskadapter.redmineapi.bean.Attachment uploadScreenShot() {

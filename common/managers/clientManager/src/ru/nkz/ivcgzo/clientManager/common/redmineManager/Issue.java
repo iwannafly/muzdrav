@@ -1,6 +1,10 @@
 package ru.nkz.ivcgzo.clientManager.common.redmineManager;
 
+import java.text.ParseException;
 import java.util.Date;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Issue {
 	private int id;
@@ -12,6 +16,26 @@ public class Issue {
 	private int doneRatio;
 	private Date createdOn;
 	private Date updatedOn;
+	
+	public static Issue fromJsonObject(JSONObject obj) throws JSONException, ParseException {
+		JSONObject io;
+		Issue iss = new Issue();
+		
+		iss.setId(obj.getInt("id"));
+		io = obj.getJSONObject("tracker");
+		iss.setTracker(new Tracker(io.getInt("id"), io.getString("name")));
+		io = obj.getJSONObject("status");
+		iss.setStatus(new IssueStatus(io.getInt("id"), io.getString("name")));
+		io = obj.getJSONObject("priority");
+		iss.setPriority(new Priority(io.getInt("id"), io.getString("name")));
+		iss.setSubject(obj.getString("subject"));
+		iss.setDescription(obj.getString("description"));
+		iss.setDoneRatio(obj.getInt("done_ratio"));
+		iss.setCreatedOn(RedmineManager.getDateFormatter().parse(obj.getString("created_on")));
+		iss.setUpdatedOn(RedmineManager.getDateFormatter().parse(obj.getString("updated_on")));
+		
+		return iss;
+	}
 	
 	public int getId() {
 		return id;

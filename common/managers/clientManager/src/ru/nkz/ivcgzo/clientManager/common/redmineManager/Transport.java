@@ -1,7 +1,5 @@
 package ru.nkz.ivcgzo.clientManager.common.redmineManager;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,28 +62,20 @@ public class Transport {
 	}
 	
 	public String post(String contentType, Object data, String supplementaryAddress, String... keyValuePairs) throws Exception {
+		String response = "";
 		String keyValueString = getKeyValueString(keyValuePairs);
 		conn = (HttpURLConnection) new URL(baseAddress + supplementaryAddress + ((keyValueString.length() > 0) ? "?" + keyValueString : "")).openConnection();
 		conn.setDoOutput(true);
-		conn.setRequestMethod("POST");
-		conn.setRequestProperty("Accept-Encoding", "gzip");
-		conn.addRequestProperty("Content-Length", "113");
 		conn.addRequestProperty("Content-Type", String.format("%s; charset=%s", contentType, charsetName));
-//		conn.setRequestProperty("Content-Type", contentType);
-		String response = "";
-//		conn.getPermission();
-//		conn.getHeaderFields();
-//		conn.getRequestProperties();
 		
 		try {
 			OutputStream os = conn.getOutputStream();
 			if (contentType.equals("application/json")) {
+				os.write(((String) data).getBytes(charsetName));
 			} else {
 				
 			}
-			os.write(((String) data).getBytes(charsetName));
-//			os.write(new byte [] {0,1,2,3});
-//			os.close();
+			os.flush();
 			
 			InputStream is = conn.getInputStream();
 			response = streamToString(is, true);
