@@ -16,6 +16,9 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.EtchedBorder;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Color;
@@ -87,6 +90,7 @@ public class Children extends JPanel {
 		this.setInterface();
 		this.setDefaultChildValues();
 		this.setDefaultDocValues();
+		this.updatePanel();	//Обновление панели
 	}
 	
 	/**
@@ -95,8 +99,7 @@ public class Children extends JPanel {
 	 */
 	public void setPatient(final TPatient newPatient) {
 		this.patient = newPatient;
-		if (this.patient != null)
-			this.updatePanel();	//Обновление панели
+		this.updatePanel();	//Обновление панели
 	}
 
 	/**
@@ -149,6 +152,7 @@ public class Children extends JPanel {
 		this.spinnerWeight.setValue(0);
 		this.spinnerChildNumGlobal.setValue(0);
 		this.spinnerChildNumLocal.setValue(0);
+		this.chckBxDead();
 	}
 	
 	/**
@@ -175,22 +179,41 @@ public class Children extends JPanel {
 		//Установка значений полей childInfo:
 		this.childInfo.setMert(this.chckBxDead.isSelected());
 		this.childInfo.setDonosh(this.chckBxFull.isSelected());
-		this.childInfo.setKrit1(this.chckBxCriteria1.isSelected());
-		this.childInfo.setKrit2(this.chckBxCriteria2.isSelected());
-		this.childInfo.setKrit3(this.chckBxCriteria3.isSelected());
-		this.childInfo.setKrit4(this.chckBxCriteria4.isSelected());
+		if (!this.chckBxDead.isSelected()) {	//Живорождённый:
+			this.childInfo.setKrit1(this.chckBxCriteria1.isSelected());
+			this.childInfo.setKrit2(this.chckBxCriteria2.isSelected());
+			this.childInfo.setKrit3(this.chckBxCriteria3.isSelected());
+			this.childInfo.setKrit4(this.chckBxCriteria4.isSelected());
+		} else {								//Мертворождённый:
+			this.childInfo.unsetKrit1();
+			this.childInfo.unsetKrit2();
+			this.childInfo.unsetKrit3();
+			this.childInfo.unsetKrit4();
+		}
+		//В случае, если числовое значение равно нулю, то оно игнорируется:
 		if ((int) this.spinnerApgar1.getValue() > 0)
 			this.childInfo.setApgar1((int) this.spinnerApgar1.getValue());
+		else
+			this.childInfo.unsetApgar1();
 		if ((int) this.spinnerApgar5.getValue() > 0)
 			this.childInfo.setApgar5((int) this.spinnerApgar5.getValue());
+		else
+			this.childInfo.unsetApgar5();
 		if ((int) this.spinnerHeight.getValue() > 0)
 			this.childInfo.setRost((int) this.spinnerHeight.getValue());
+		else
+			this.childInfo.unsetRost();
 		if ((int) this.spinnerWeight.getValue() > 0)
 			this.childInfo.setMassa((int) this.spinnerWeight.getValue());
+		else
+			this.childInfo.unsetMassa();
 		if ((int) this.spinnerChildNumGlobal.getValue() > 0)
 			this.childInfo.setKolchild((int) this.spinnerChildNumGlobal.getValue());
-		if ((int) this.spinnerChildNumLocal.getValue() > 0)
-			this.childInfo.setNreb((int) this.spinnerChildNumLocal.getValue());
+		else
+			this.childInfo.unsetKolchild();
+		//Если номер новорождённого в многоплодных родах равен 0, то
+		//роды считаются одноплодными (параметр не игнорируется):
+		this.childInfo.setNreb((int) this.spinnerChildNumLocal.getValue());
 		//Время рождения:
 		final String childBirthTime = this.cteBirthTime.getText();
 		if (!childBirthTime.equals("__:__"))
@@ -208,29 +231,25 @@ public class Children extends JPanel {
 	private boolean loadChildDocFromPanel() {
 		if (this.childDoc == null)
 			return false;
-		if (this.cdeDocDate.getDate() == null)
-		{
+		if (this.cdeDocDate.getDate() == null) {
 			JOptionPane.showMessageDialog(this,
 					"Поле 'Дата выдачи свидетельства' не может быть пустым",
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		if (this.tfDocName.getText().isEmpty())
-		{
+		if (this.tfDocName.getText().isEmpty()) {
 			JOptionPane.showMessageDialog(this,
 					"Поле 'Фамилия новорождённого' не может быть пустым",
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		if (this.tfDocName.getText().length() > 20)
-		{
+		if (this.tfDocName.getText().length() > 20) {
 			JOptionPane.showMessageDialog(this,
 					"Длина поля 'Фамилия новорождённого' не может превышать " +
 					"20 символов", "Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		if (this.ticcbDocGiven.getSelectedItem() == null)
-		{
+		if (this.ticcbDocGiven.getSelectedItem() == null) {
 			JOptionPane.showMessageDialog(this,
 					"Поле 'Кем выдано' не может быть пустым",
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
@@ -280,14 +299,14 @@ public class Children extends JPanel {
 			this.spinnerChildNumGlobal.setValue(this.childInfo.getKolchild());
 		if (this.childInfo.isSetNreb())
 			this.spinnerChildNumLocal.setValue(this.childInfo.getNreb());
+		this.chckBxDead();
 	}
 	
 	/**
 	 * Загрузка информации о свидетельстве в интерфейс
 	 */
 	private void loadChildDocIntoPanel() {
-		if (this.childDoc == null)
-		{
+		if (this.childDoc == null) {
 			this.setDefaultDocValues();
 			return;
 		}
@@ -322,8 +341,7 @@ public class Children extends JPanel {
 	private void addChildInfo()
 			throws KmiacServerException, PatientNotFoundException, TException {
 		this.childInfo = new TRd_Novor();
-		if (!this.loadChildInfoFromPanel())	//Не все данные введены
-		{
+		if (!this.loadChildInfoFromPanel()) {	//Не все данные введены
 			this.childInfo = null;
 			return;
 		}
@@ -534,16 +552,30 @@ public class Children extends JPanel {
 	}
 	
 	/**
+	 * Событие, вызываемое при изменении состояния чекбокса "Мертворождённый"
+	 */
+	private void chckBxDead() {
+		final boolean isLiveChild = !this.chckBxDead.isSelected();
+		this.chckBxCriteria1.setEnabled(isLiveChild);
+		this.chckBxCriteria2.setEnabled(isLiveChild);
+		this.chckBxCriteria3.setEnabled(isLiveChild);
+		this.chckBxCriteria4.setEnabled(isLiveChild);
+	}
+	
+	/**
 	 * Обновление пользователського интерфейса панели
 	 */
 	private void updatePanel() {
 		final boolean isPatientSet = (this.patient != null);
 		this.panelChildEdit.setVisible(isPatientSet);
 		this.panelDoc.setVisible(isPatientSet);
-		this.btnSaveChild.setToolTipText("Занести информацию");
+		this.btnSaveChild.setVisible(isPatientSet);
 		if (isPatientSet)
 		{
+			this.btnSaveChild.setToolTipText("Занести информацию");
 			final int childId = this.patient.getPatientId();
+			this.childInfo = null;
+			this.childDoc = null;
 			try {
 				this.childInfo = ClientHospital.tcl.getChildInfo(childId);
 				this.loadChildInfoIntoPanel();
@@ -555,13 +587,10 @@ public class Children extends JPanel {
 				kse.printStackTrace();
 			} catch (PatientNotFoundException e) {
 				//Новорождённый не найден, его нужно добавить в таблицу:
-				this.childInfo = null;
 				this.setDefaultChildValues();
-				this.childDoc = null;
 				this.setDefaultDocValues();
 			} catch (ChildDocNotFoundException e) {
 				//Свидетельство ещё не было выдано:
-				this.childDoc = null;
 				this.setDefaultDocValues();
 			} catch (TException e) {
 				e.printStackTrace();
@@ -744,6 +773,11 @@ public class Children extends JPanel {
 		this.panelDoc.setLayout(gl_panelDoc);
 		
 		chckBxDead = new JCheckBox("Мертворождённый");
+		chckBxDead.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				chckBxDead();
+			}
+		});
 		chckBxFull = new JCheckBox("Доношенный");
 		JSeparator separatorCB = new JSeparator();
 		
