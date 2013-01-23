@@ -719,50 +719,61 @@ public class ServerViewSelect extends Server implements Iface {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (cslu == 1){
-   						sqlQuery = "SELECT o.prlpu FROM n_o00 o WHERE o.pcod = ?";
-					}
-					if (cslu == 2){
-   						sqlQuery = "SELECT o.prlpu FROM n_n00 o WHERE o.pcod = ?";
-					}
-	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, cpodr)) {
-						if (acr.getResultSet().next()){
-		      				prlpu = acr.getResultSet().getInt("prlpu");
-							if (acr.getResultSet().getInt("prlpu") == 5){
-		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
-		      				}else{
-		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
-		      				}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				
    				    
 
    					try {
-  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.nstr) where n_ot_str.prlpu=? and npasp=? " , cslu, npasp); 
+  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.numstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.numstr) where n_ot_str.prlpu=? and npasp=? order by n_anz.numstr" , cslu, npasp); 
    							
 								if (acr.getResultSet().next()){
 									do {
 										if (acr.getResultSet().getBoolean(7)==true){
 												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) == null)){
-													sb.append(String.format("%s да",acr.getResultSet().getString(4)));
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s да", numline, acr.getResultSet().getString(4)));
+														}
+													else {
+														sb.append(String.format("%s да", acr.getResultSet().getString(4)));
+														}
+													
 													sb.append("<br>");
+													
 												}
 												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) != null)){
-													sb.append(String.format("%s да, %s",acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s да, %s", numline,acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													}
+													else{
+														sb.append(String.format("%s да, %s", acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													}
 													sb.append("<br>");
 												}
 												if (acr.getResultSet().getBoolean(5)==false){
-													sb.append(String.format("%s нет",acr.getResultSet().getString(4)));
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s нет", numline, acr.getResultSet().getString(4)));
+													}
+													else {
+														sb.append(String.format("%s нет", acr.getResultSet().getString(4)));
+													}
 													sb.append("<br>");
 												}
 												
 										}
+										
 										if (acr.getResultSet().getBoolean(7)==false){
-											if (acr.getResultSet().getString(6) != null)
-												sb.append(String.format("%s %s",acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
-											sb.append("<br>");
+											if (acr.getResultSet().getString(6) != null){
+												if (acr.getResultSet().getString(4).charAt(0) != '-') {
+													++numline;
+													sb.append(String.format("%d. %s %s", numline, acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+												}
+												else {
+													sb.append(String.format("%s %s", acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+												}
+												sb.append("<br>");
+											}
 									}
 										
 

@@ -212,7 +212,6 @@ public class PatientInfoForm extends ModalForm {
 //		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTer_liv(), info.getTer_liv()));
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath.toString() ==  "Анамнез жизни"){
-		 			//for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
 		 				for (PatientSignInfo sign : MainForm.tcl.getPatientSignInfo(info.npasp)){
 		 					if ((sign.getYn().equals("T") && (sign.isVybor() == true) && (sign.getComment() != null)))
 		 						addLineSignInfo(sign.getName()+": да, "+sign.getComment(), sign.isSetName());
@@ -221,8 +220,7 @@ public class PatientInfoForm extends ModalForm {
 		 					if ((sign.getYn().equals("T") && (sign.isVybor() == false)))
 		 						addLineSignInfo( sign.getName()+": нет", sign.isSetName());
 		 					if ((sign.getYn().equals("F") && (sign.getComment() != null)))
-		 						addLineToDetailInfo(sign.getName()+" ", sign.isSetComment(), sign.getComment());
-
+		 						addLineToDetailInfo(sign.getName(), sign.isSetComment(), sign.getComment());
 		 				}
 //						} catch (KmiacServerException e1) {
 //							System.err.println(e1.getMessage());
