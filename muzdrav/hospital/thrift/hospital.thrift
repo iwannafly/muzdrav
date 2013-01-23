@@ -138,45 +138,34 @@ struct TRdIshod {
    2: optional i32 ngosp;
    3: optional i32 id_berem;
    4: optional i32 id;
-   5: optional double oj;
-   6: optional i32 hdm;
-   7: optional i32 polpl;
-   8: optional i32 predpl;
-   9: optional i32 vidpl;
-  10: optional i32 serd;
-  11: optional i32 serd1;
-  12: optional i32 serdm;
-  13: optional i32 chcc;
-  14: optional i32 pozpl;
-  15: optional string mesto;
-  16: optional string deyat;
-  17: optional string shvat;
-  18: optional string vody;
-  19: optional string kashetv;
-  20: optional string poln;
-  21: optional string potugi;
-  22: optional i32 posled;
-  23: optional string vremp;
-  24: optional string obol;
-  25: optional i32 pupov;
-  26: optional string obvit;
-  27: optional string osobp;
-  28: optional i32 krov;
-  29: optional bool psih;
-  30: optional string obezb;
-  31: optional i32 eff;
-  32: optional string prr1;
-  33: optional string prr2;
-  34: optional string prr3;
-  35: optional i32 prinyl;
-  36: optional i32 osmposl;
-  37: optional i32 vrash;
-  38: optional i32 akush;
-  39: optional i64 daterod;
-  40: optional i32 srok;
-  41: optional double ves;
-  42: optional double vespl; 
-  43: optional string detmesto;
+   5: optional i32 serdm;
+   6: optional string mesto;
+   7: optional string deyat;
+   8: optional string shvat;
+   9: optional string vody;
+  10: optional string kashetv;
+  11: optional string poln;
+  12: optional string potugi;
+  13: optional i32 posled;
+  14: optional string vremp;
+  15: optional string obol;
+  16: optional i32 pupov;
+  17: optional string obvit;
+  18: optional string osobp;
+  19: optional i32 krov;
+  20: optional bool psih;
+  21: optional string obezb;
+  22: optional i32 eff;
+  23: optional string prr1;
+  24: optional string prr2;
+  25: optional string prr3;
+  26: optional i32 prinyl;
+  27: optional i32 osmposl;
+  28: optional i32 vrash;
+  29: optional i32 akush;
+  30: optional i64 daterod;
+  31: optional double vespl; 
+  32: optional string detmesto;
 }
 struct RdSlStruct{
         1: optional  i32 id;
@@ -236,8 +225,8 @@ struct RdDinStruct{
 	11: optional i32 art2;
 	12: optional i32 art3;
 	13: optional i32 art4;
-	14: optional i32 spl;
-	15: optional i32 oteki;
+	14: optional i32 oteki;
+	15: optional i32 spl;
 	16: optional i32 chcc;
 	17: optional i32 polpl;
 	18: optional i32 predpl;
@@ -286,13 +275,15 @@ struct TRd_Novor {
 	16: optional i64 datazap;
 }
 
-struct TRd_Svid {
+struct TRd_Svid_Rojd {
 	1: i32 npasp;
 	2: optional i32 ndoc;
-	3: bool doctype;
-	4: i64 dateoff;
-	5: string famreb;
-	6: i32 svidvrach;
+	3: i64 dateoff;
+	4: string famreb;
+	5: i32 m_rojd;
+	6: i32 zan;
+	7: i32 r_proiz;
+	8: i32 svidvrach;
 }
 
 struct TPatientCommonInfo {
@@ -401,11 +392,21 @@ exception MesNotFoundException {
 
 exception PrdIshodNotFoundException{
 }
+exception PrdDinNotFoundException{
+}
+exception PrdSlNotFoundException{
+}
 
 /**
  * Свидетельство о рождении/перинатальной смерти не найдено
  */
 exception ChildDocNotFoundException{
+}
+
+/**
+ * Роды не найдены
+ */
+exception ChildbirthNotFoundException{
 }
 
 service ThriftHospital extends kmiacServer.KmiacServer{
@@ -504,23 +505,72 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
 	
 /* Новорождённый */
-	list<classifier.IntegerClassifier> getChildBirths(1:i64 BirthDate) throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Получение списка родов, произошедших в заданный день
+	 * @param BirthDate Требуемая дата родов
+	 * @return Возвращает список родов, классифицируемых целым числом - идентификатором родов
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	list<classifier.IntegerClassifier> getChildBirths(1:i64 BirthDate)
+		throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Добавление информации о новорождённом
+	 * @param Child Информация о новорождённом
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
 	void addChildInfo(1:TRd_Novor Child)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
+	/**
+	 * Получение информации о новорождённом
+	 * @param npasp Идентификатор новорождённого
+	 * @return Возвращает информацию о новорождённом
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
 	TRd_Novor getChildInfo(1:i32 npasp)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
+	/**
+	 * Обновление информации о новорождённом
+	 * @param Child Информация о новорождённом
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
     void updateChildInfo(1:TRd_Novor Child)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     
     /**
-	 * Добавление в БД свидетельства о рождении/перинатальной смерти новорождённого
+	 * Добавление информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
+	 * @param ChildDocument Информация о свидетельстве
 	 * @return Возвращает номер свидетельства
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
 	 */
-	i32 addChildDocument(1:TRd_Svid ChildDocument)
+	i32 addChildDocument(1:TRd_Svid_Rojd ChildDocument)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
-    TRd_Svid getChildDocument(1:i32 npasp)
+	/**
+	 * Получение информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
+	 * @param npasp Идентификатор новорождённого
+	 * @return Возвращает информацию о свидетельстве
+	 * @throws ChildDocNotFoundException свидетельство не найдено
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    TRd_Svid_Rojd getChildDocument(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
-    void updateChildDocument(1:TRd_Svid ChildDocument)
+    /**
+	 * Обновление информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
+	 * @param ChildDocument Информация о свидетельстве
+	 * @throws ChildDocNotFoundException свидетельство не найдено
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    void updateChildDocument(1:TRd_Svid_Rojd ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildBirthDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
@@ -528,28 +578,28 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildBlankDocument(1:bool isLiveChild)
     	throws (1:kmiacServer.KmiacServerException kse);
+    /**
+	 * Получение информации о пациенте
+	 * @param npasp Идентификатор пациента
+	 * @return Возвращает информацию о пациенте
+	 * @throws PatientNotFoundException пациент не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
     TPatientCommonInfo getPatientCommonInfo(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
 	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:PrdIshodNotFoundException pinfe, 	2:kmiacServer.KmiacServerException kse);
-    void addRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
+    i32 addRdIshod(1:TRdIshod rdIs) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
-	RdInfStruct getRdInfInfo (1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	i32 AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
-	void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
- 
-	void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
-
-	void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
-	void UpdateRdInf(1: RdInfStruct inf) throws (1: kmiacServer.KmiacServerException kse);
-
-	void AddRdInf(1:RdInfStruct rdInf) throws (1: kmiacServer.KmiacServerException kse);
-
-	void DeleteRdInf(1:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1:PrdSlNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+    void AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
+    void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+    void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
+	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1:PrdDinNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+    void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+    void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
+    void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
 }

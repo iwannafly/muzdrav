@@ -995,7 +995,7 @@ public class Vvod extends JFrame {
 					if (tblDiag.getSelectedItem() != null)
 						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION) {
 				  			MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
-				  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr());
+				  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr(), tblDiag.getSelectedItem().id);
 				  			tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));
 							tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 						}
@@ -1039,6 +1039,7 @@ public class Vvod extends JFrame {
 				  		
 				  		pdiag = new PdiagZ();
 				  		pdisp = new Pdisp();
+			  			pdiag.setId_diag_amb(diagamb.id);
 				  		if (rbtDiagPredv.isSelected())
 				  			diagamb.setPredv(true);
 				  		if (rbtDiagZakl.isSelected()) {
@@ -3453,11 +3454,11 @@ public class Vvod extends JFrame {
 	}
 	
 	private void setPdiagz(PdiagZ pdz) throws KmiacServerException, TException {
-		MainForm.tcl.setPdiag(pdz);
 		for (PdiagZ d : tblZaklDiag.getData())
 			if (d.isSetDiag() && (d.diag.equals(pdz.diag)))
 				return;
 		
+		MainForm.tcl.setPdiag(pdz);
 	}
 	
 	private void setTblPosToStatMode() {

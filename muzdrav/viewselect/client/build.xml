@@ -46,6 +46,9 @@
 	    <copy file="${com_resources.dir}/medication.png" todir="${medication_bin_resources.dir}" />
 		<copy file="${com_resources.dir}/issled.png" todir="${lab_bin_resources.dir}" />
         <copy file="${com_resources.dir}/Skalpell.png" todir="${operation_bin_resources.dir}" />
+		<copy file="${com_resources.dir}/1331789242_Add.png" todir="${operation_bin_resources.dir}" />
+		<copy file="${com_resources.dir}/1331789259_Delete.png" todir="${operation_bin_resources.dir}" />
+		<copy file="${com_resources.dir}/1341981970_Accept.png" todir="${operation_bin_resources.dir}" />
 	</target>
 	
 	<!-- Создание jar файла -->
