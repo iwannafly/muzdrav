@@ -341,10 +341,9 @@ public class MainFrame extends JFrame {
 	private JTextField TGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
 	private JTextField TDet;
-	private JTextField TObvit;
+	private JTextField Obvit;
 	private JTextField TRod;
 	private JTextField TMed;
-	private JTextField Obvit;
     private JMenuItem mntmPrintHospitalDeathSummary;
     private JLabel lblZaklDiagStep;
     private JRadioButton rdbtnZaklDiagSrT;
@@ -583,26 +582,29 @@ public class MainFrame extends JFrame {
             		rddin = new RdDinStruct();
             		try {
             			rddin = ClientHospital.tcl.getRdDinInfo(patient.getPatientId(), patient.gospitalCod);
-            			SVes.setValue(rddin.getVes());
+
+						System.out.println(rddin);		
+         			SVes.setValue(rddin.getVes());
             			Soj.setValue(rddin.getOj());
             			Shdm.setValue(rddin.getHdm());
                         Schcc.setValue(rddin.getChcc());
-            			if (rddin.isSetPozpl())
+ //           			if ((rddin.isSetPozpl())||(rddin.getPozpl() != 0))
+                   		if (rddin.getPozpl() != 0)
             			CBPoz.setSelectedPcod(rddin.getPozpl());
             			else CBPoz.setSelectedItem(null);
-            			if (rddin.isSetPolpl())
+            			if (rddin.getPolpl() != 0)
             			CBPolpl.setSelectedPcod(rddin.getPolpl());
             			else CBPolpl.setSelectedItem(null);
-            			if (rddin.isSetVidpl())
+            			if (rddin.getVidpl() != 0)
             			CBVid.setSelectedPcod(rddin.getVidpl());
             			else CBVid.setSelectedItem(null);
-            			if (rddin.isSetSerd())
+            			if (rddin.getSerd() != 0)
             			CBSerd.setSelectedPcod(rddin.getSerd());
             			else CBSerd.setSelectedItem(null);
-            			if (rddin.isSetSerd1())
+            			if (rddin.getSerd1() != 0)
             			CBSerd1.setSelectedPcod(rddin.getSerd1());
             			else CBSerd1.setSelectedItem(null);
-            			if (rddin.isSetPredpl())
+            			if (rddin.getPredpl() != 0)
             			CBPred.setSelectedPcod(rddin.getPredpl());
             			else CBPred.setSelectedItem(null);
             			TVes.setText(String.valueOf(rddin.getOj()*rddin.getHdm()));
@@ -2167,8 +2169,8 @@ public class MainFrame extends JFrame {
 		JLabel lblNewLabel_33 = new JLabel("Вес женщины");
 		lblNewLabel_33.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
-		JSpinner SVes_1 = new JSpinner();
-		SVes_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		SVes = new JSpinner();
+		SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		TRod = new JTextField();
 		TRod.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -2373,9 +2375,10 @@ public class MainFrame extends JFrame {
       		trdIshod.setMesto(TDet.getText());
       		trdIshod.setObezb(TMed.getText());
  		   	trdIshod.setObol(TObol.getText());
- 		   	trdIshod.setObvit(TObvit.getText());
+ 		   	trdIshod.setObvit(Obvit.getText());
       		trdIshod.setOsobp(TOsob.getText());
       		trdIshod.setPoln(TPoln.getText());
+      		trdIshod.setPupov((int) SDlina.getModel().getValue());
 			if (CBPosled.getSelectedPcod() != null)
 				trdIshod.setPosled(CBPosled.getSelectedPcod());
 				else trdIshod.unsetPosled();
@@ -2483,7 +2486,7 @@ public class MainFrame extends JFrame {
   		trdIshod.setMesto(TDet.getText());
   		trdIshod.setObezb(TMed.getText());
 		   	trdIshod.setObol(TObol.getText());
-		   	trdIshod.setObvit(TObvit.getText());
+		   	trdIshod.setObvit(Obvit.getText());
   		trdIshod.setOsobp(TOsob.getText());
   		trdIshod.setPoln(TPoln.getText());
 		if (CBPosled.getSelectedPcod() != null)
@@ -2628,8 +2631,8 @@ public class MainFrame extends JFrame {
 		        			.addContainerGap())
 		        );
 		        
-		        JSpinner SDlina_1 = new JSpinner();
-		        SDlina_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		        SDlina = new JSpinner();
+		        SDlina.setFont(new Font("Tahoma", Font.BOLD, 12));
 		        
 		        JLabel lblNewLabel_20 = new JLabel("Обвитие вокруг");
 		        lblNewLabel_20.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -2648,8 +2651,8 @@ public class MainFrame extends JFrame {
 		        JLabel lblNewLabel_22 = new JLabel("Кровопотеря мл.");
 		        lblNewLabel_22.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		        
-		        JSpinner SKrov_1 = new JSpinner();
-		        SKrov_1.setFont(new Font("Tahoma", Font.BOLD, 12));
+		        SKrov = new JSpinner();
+		        SKrov.setFont(new Font("Tahoma", Font.BOLD, 12));
 		        GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		        gl_panel_3.setHorizontalGroup(
 		        	gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -2703,7 +2706,7 @@ public class MainFrame extends JFrame {
 		        						.addGroup(gl_panel_3.createSequentialGroup()
 		        							.addComponent(lblNewLabel_33)
 		        							.addGap(10)
-		        							.addComponent(SVes_1, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
+		        							.addComponent(SVes, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
 		        							.addGap(18)
 		        							.addComponent(lblNewLabel)
 		        							.addGap(10)
@@ -2753,7 +2756,7 @@ public class MainFrame extends JFrame {
 		        						.addGroup(gl_panel_3.createSequentialGroup()
 		        							.addComponent(lblNewLabel_19)
 		        							.addPreferredGap(ComponentPlacement.UNRELATED)
-		        							.addComponent(SDlina_1, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
+		        							.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
 		        							.addGap(18)
 		        							.addComponent(lblNewLabel_20)
 		        							.addPreferredGap(ComponentPlacement.RELATED)
@@ -2774,7 +2777,7 @@ public class MainFrame extends JFrame {
 		        								.addGroup(gl_panel_3.createSequentialGroup()
 		        									.addComponent(lblNewLabel_22)
 		        									.addGap(27)
-		        									.addComponent(SKrov_1, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
+		        									.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
 		        								.addGroup(gl_panel_3.createSequentialGroup()
 		        									.addComponent(lblNewLabel_21)
 		        									.addGap(49)
@@ -2816,7 +2819,7 @@ public class MainFrame extends JFrame {
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(2)
 		        					.addComponent(lblNewLabel_33))
-		        				.addComponent(SVes_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        				.addComponent(SVes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(1)
 		        					.addComponent(lblNewLabel))
@@ -2901,7 +2904,7 @@ public class MainFrame extends JFrame {
 		        			.addGap(10)
 		        			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 		        				.addComponent(lblNewLabel_19)
-		        				.addComponent(SDlina_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        				.addComponent(SDlina, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 		        				.addComponent(lblNewLabel_20)
 		        				.addComponent(Obvit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addPreferredGap(ComponentPlacement.RELATED)
@@ -2911,7 +2914,7 @@ public class MainFrame extends JFrame {
 		        			.addPreferredGap(ComponentPlacement.RELATED)
 		        			.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
 		        				.addComponent(lblNewLabel_22)
-		        				.addComponent(SKrov_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		        				.addComponent(SKrov, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addGap(109))
 		        );
 		        panel_3.setLayout(gl_panel_3);
@@ -3734,51 +3737,60 @@ public class MainFrame extends JFrame {
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
+		SDlina.setValue(trdIshod.getPupov());
+		SKrov.setValue(trdIshod.getKrov());
+		if (trdIshod.getObvit() == null)
+		Obvit.setText(""); else
+		Obvit.setText(trdIshod.getObvit());
 		TDatarod.setDate(trdIshod.getDaterod());
 		if (trdIshod.getDaterod() == 0)
 		TDatarod.setText(null);
+		if (trdIshod.getPoln() == null)
+		TPoln.setText(""); else
 		TPoln.setText(trdIshod.getPoln());
+		if (trdIshod.getDetmesto() == null)
+		TDet.setText(""); else	
 		TDet.setText(trdIshod.getDetmesto());
+		if (trdIshod.getPotugi() == null)
+		TNash.setText(""); else	
 		TNash.setText(trdIshod.getPotugi());
+		if (trdIshod.getVremp() == null)
+		TVremp.setText(""); else	
 		TVremp.setText(trdIshod.getVremp());
+		if (trdIshod.getObol() == null)
+		TObol.setText(""); else	
 		TObol.setText(trdIshod.getObol()); 
-		SDlina.setValue(trdIshod.getPupov());
+		if (trdIshod.getOsobp() == null)
+		TOsob.setText("");	else
 		TOsob.setText(trdIshod.getOsobp());
-		SKrov.setValue(trdIshod.getKrov());
+		if (trdIshod.getPrr1()== null)
+		TPer1.setText(""); else
 		TPer1.setText(trdIshod.getPrr1());
+		if (trdIshod.getPrr2()== null)
+		TPer2.setText(""); else
 		TPer2.setText(trdIshod.getPrr2());
+		if (trdIshod.getPrr3()== null)
+		TPer3.setText(""); else
 		TPer3.setText(trdIshod.getPrr3());
+		if (trdIshod.getMesto() == null)
+		TGde.setText(""); else
 		TGde.setText(trdIshod.getMesto());
+		if (trdIshod.getShvat() == null)
+		TShvat.setText("");	else
 		TShvat.setText(trdIshod.getShvat());
+		if (trdIshod.getVody() == null)
+		TVod.setText(""); else
 		TVod.setText(trdIshod.getVody());
+		if (trdIshod.getKashetv() == null)
+		TKash.setText(""); else
 		TKash.setText(trdIshod.getKashetv());
+		if (trdIshod.getDeyat() == null)
+		TRod.setText(""); else
 		TRod.setText(trdIshod.getDeyat());
+		if (trdIshod.getObezb() == null)
+		TMed.setText(""); else
 		TMed.setText(trdIshod.getObezb());
-		TObvit.setText(trdIshod.getObvit());
-		if (rddin.isSetPolpl())
-			CBPolpl.setSelectedPcod(rddin.getPolpl());
-		else
-			CBPolpl.setSelectedItem(null);
-		if (rddin.isSetPozpl())
-			CBPoz.setSelectedPcod(rddin.getPozpl());
-		else
-			CBPoz.setSelectedItem(null);
-		if (rddin.isSetVidpl())
-			CBVid.setSelectedPcod(rddin.getVidpl());
-		else
-			CBVid.setSelectedItem(null);
-		if (rddin.isSetSerd())
-			CBSerd.setSelectedPcod(rddin.getSerd());
-		else
-			CBSerd.setSelectedItem(null);
-		if (rddin.isSetSerd1())
-			CBSerd1.setSelectedPcod(rddin.getSerd1());
-		else
-			CBSerd1.setSelectedItem(null);
-		if (rddin.isSetPredpl())
-			CBPred.setSelectedPcod(rddin.getPredpl());
-		else
-			CBPred.setSelectedItem(null);
+		
 		ChBpsi.setSelected(trdIshod.isPsih());
 		if (trdIshod.isSetEff())
 			CBEff.setSelectedPcod(trdIshod.getEff());

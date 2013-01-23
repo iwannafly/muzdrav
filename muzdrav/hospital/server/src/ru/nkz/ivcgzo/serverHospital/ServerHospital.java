@@ -230,6 +230,8 @@ public class ServerHospital extends Server implements Iface {
         rsmStrClas = new TResultSetMapper<>(StringClassifier.class, STR_CLAS_FIELD_NAMES);
         rsmStage = new TResultSetMapper<>(TStage.class, STAGE_FIELD_NAMES);
         rsmRdIshod = new TResultSetMapper<>(TRdIshod.class, RDISHOD_FIELD_NAMES);
+        rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, RdDinStruct_Fields_names);
+        rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, RdSlStruct_Fields_names);
         rsmRdNovor = new TResultSetMapper<>(TRd_Novor.class, RDNOVOR_FIELD_NAMES);
         rsmRdSvid = new TResultSetMapper<>(TRd_Svid.class, RDSVID_FIELD_NAMES);
         rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class, COMMON_PATIENT_FIELD_NAMES);
@@ -1606,7 +1608,7 @@ public class ServerHospital extends Server implements Iface {
 	    Integer hdm = 0;
 	    Integer spl = 0;Integer chcc = 0;Integer polpl =0 ;Integer predpl =0;
 	    Integer serd =0 ;Integer serd1 =0 ; Integer idpos = 0;
-	    Double ves = 0.0; 
+	    Double ves = 0.0; Integer pozpl = 0; Integer vidpl = 0;
         System.out.println("динамика");
         System.out.println(npasp);
         System.out.println(ngosp);
@@ -1615,7 +1617,7 @@ public class ServerHospital extends Server implements Iface {
                 return rsmRdDin.map(acrs.getResultSet());
             } else {
 				AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select srok,oj, "+
-		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos "+	
+		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos,pozpl,vidpl "+	
 			    " from p_rd_din where npasp = ? order by id_pos", npasp);
 				if (acrs1.getResultSet().next()) {
 //присваиваем значения из динамики, в итоге из-за сортировки имеем последние 
@@ -1631,12 +1633,14 @@ public class ServerHospital extends Server implements Iface {
 				serd = acrs1.getResultSet().getInt(8);
 				serd1 = acrs1.getResultSet().getInt(9);
 				idpos = acrs1.getResultSet().getInt(11);
+				pozpl = acrs1.getResultSet().getInt(12);
+				vidpl = acrs1.getResultSet().getInt(13);
 				}
 				idpos = idpos+1;
 				try (SqlModifyExecutor sme = tse.startTransaction()) {
 					sme.execPrepared("insert into p_rd_din " +
-						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos);
-					int id = sme.getGeneratedKeys().getInt("id");
+						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos,pozpl,vidpl) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos,pozpl,vidpl);
+//					int id = sme.getGeneratedKeys().getInt("id");
 					sme.setCommit();
 			        System.out.println("динамика добавлена");
 				} catch (InterruptedException e) {
@@ -1657,8 +1661,8 @@ public class ServerHospital extends Server implements Iface {
 				}
             }
 //
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			log.log(Level.ERROR, "SqlException", e);
 			throw new KmiacServerException();
 		}
