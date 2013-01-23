@@ -1099,19 +1099,18 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("<title>Направление</title>");
 				sb.append("</head>");
 				sb.append("<body>");
-				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения <br> Российской Федерации<br>");
-				sb.append("<br>");
-				sb.append(String.format("%s, %s", na.getCpodr_name(), na.getClpu_name()));
+				sb.append("<div align=\"right\"><font size=2 color=black>Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</font></div>");
+				sb.append("<br>	<div style=\"width:220px; float:left;\"><font size=2 color=black>Министерство здравоохранения <br> Российской Федерации</font><br>");
+				sb.append(String.format("<br><font size=2 color=black>%s, %s</font>", na.getCpodr_name(), na.getClpu_name()));
 				sb.append("</div>"); 
-				sb.append("<div  style=\"width:150px; float:right;\">Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</div>");
-				sb.append("<br><br><br><br><br><br><br><br><br><br><br>");
-				sb.append("<h2 align=center>Направление </h2>");
-				sb.append(String.format("<p align=\"center\"><b>на госпитализацию</b></p>"));
-				if (na.getClpu()!=null) sb.append(String.format("<br> Куда: %s", na.getClpu()));
-			 	else sb.append("<br> Куда: _________________________________________________________" );
-			 	sb.append("<br><br>");
-			 	sb.append("1. Номер страхового полиса ОМС: " );
+				sb.append("<div  style=\"width:150px; float:right;\"><font size=2 color=black>Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</font></div>");
+				sb.append("<br><br><br><br><br><br><br><br>");
+				sb.append("<h4 align=center>Направление <br>");
+				sb.append("на госпитализацию</h4>");
+				if (na.getClpu()!=null) sb.append(String.format("<font size=2 color=black> Куда: %s</font>", na.getClpu()));
+			 	else sb.append("<font size=2 color=black>  Куда: _________________________________________________________</font>" );
+			 	sb.append("<br>");
+			 	sb.append("<font size=2 color=black>1. Номер страхового полиса ОМС: " );
 				acrs = sse.execPreparedQuery("SELECT poms_nom FROM patient WHERE npasp = ? ", na.getNpasp());
 				if (acrs.getResultSet().next())
 				sb.append(String.format(" %s ", acrs.getResultSet().getString(1)));
@@ -1126,7 +1125,7 @@ public class ServerOsm extends Server implements Iface {
 				if (acrs.getResultSet().next()){
 					sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
 					sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
-					sb.append("5. Адрес: "); if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
+					if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
 					sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
 			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));
 			}
@@ -1148,7 +1147,7 @@ public class ServerOsm extends Server implements Iface {
 			sb.append(" Подпись_______________");
 			sb.append("<br>Заведующий отделением_____________________________________________________________________________");
 			sb.append(String.format("<p align=\"left\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-			sb.append("<br>МП");
+			sb.append("<br>МП</font>");
 			acrs.close();
 							osw.write(sb.toString());
 							return path;
@@ -1177,19 +1176,18 @@ public class ServerOsm extends Server implements Iface {
 				sb.append("<title>Направление</title>");
 				sb.append("</head>");
 				sb.append("<body>");
-				sb.append("<div align=\"right\">Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</div>");
-				sb.append("<br>	<div style=\"width:240px; float:left;\">Министерство здравоохранения <br> Российской Федерации<br>");
-				sb.append("<br>");
-				sb.append(String.format("%s, %s", nk.getCpodr_name(), nk.getClpu_name()));
+				sb.append("<div align=\"right\"><font size=2 color=black>Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</font></div>");
+				sb.append("<br>	<div style=\"width:220px; float:left;\"><font size=2 color=black>Министерство здравоохранения <br> Российской Федерации</font><br>");
+				sb.append(String.format("<br><font size=2 color=black>%s, %s</font>", nk.getCpodr_name(), nk.getClpu_name()));
 				sb.append("</div>"); 
-				sb.append("<div  style=\"width:150px; float:right;\">Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</div>");
-				sb.append("<br><br><br><br><br><br><br><br><br><br><br>");
-				sb.append("<h2 align=center>Направление </h2>");
-				sb.append(String.format("<p align=\"center\"><b>на %s</b></p>",nk.getNazv()));
-			 	if (nk.getCpol()!=null) sb.append(String.format("<br> Куда: %s", nk.getCpol()));
-			 	else sb.append("<br> Куда: _________________________________________________________" );
-			 	sb.append("<br><br>");
-			 	sb.append("1. Номер страхового полиса ОМС: " );
+				sb.append("<div  style=\"width:150px; float:right;\"><font size=2 color=black>Медицинская документация<br>Форма № 057/у-04<br> Утверждена приказом Минсоцздравразвития России<br>от 22 ноября 2004 г. №255</font></div>");
+				sb.append("<br><br><br><br><br><br><br><br>");
+				sb.append("<h4 align=center>Направление <br>");
+				sb.append("на консультацию</h4>");
+				if (nk.getCpol()!=null) sb.append(String.format("<font size=2 color=black> Куда: %s</font>", nk.getCpol()));
+			 	else sb.append("<font size=2 color=black>  Куда: _________________________________________________________</font>" );
+			 	sb.append("<br>");
+			 	sb.append("<font size=2 color=black>1. Номер страхового полиса ОМС: " );
 				acrs = sse.execPreparedQuery("SELECT poms_nom FROM patient WHERE npasp = ? ", nk.getNpasp());
 				if (acrs.getResultSet().next())
 				sb.append(String.format(" %s ", acrs.getResultSet().getString(1)));
@@ -1200,13 +1198,14 @@ public class ServerOsm extends Server implements Iface {
 				if (acrs.getResultSet().next())
 				sb.append(String.format(" %s ", acrs.getResultSet().getString(1)));
 			 	acrs.close();
-				acrs = sse.execPreparedQuery("SELECT patient.fam, patient.im, patient.ot, patient.datar, patient.adm_ul, patient.adm_dom, patient.adm_kv, n_z43.name, patient.prof FROM patient join n_z43 on (patient.mrab=n_z43.pcod) where patient.npasp = ?", nk.getNpasp());
+				acrs = sse.execPreparedQuery("SELECT patient.fam, patient.im, patient.ot, patient.datar, patient.adm_ul, patient.adm_dom, patient.adm_kv, n_z43.name, patient.prof FROM patient join n_z43 on (patient.mrab=n_z43.pcod) where patient.npasp= ? ", nk.getNpasp());
 				if (acrs.getResultSet().next()){
-			sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
-			sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
-			sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
-			sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
-			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));}
+					sb.append(String.format("<br>3. Фамилия, имя, отчество: %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
+					sb.append(String.format("4. Дата рождения: %1$td.%1$tm.%1$tY<br />", acrs.getResultSet().getDate(4)));
+					if (acrs.getResultSet().getString(5)!=null) sb.append(String.format("5. Адрес: %s %s - %s", acrs.getResultSet().getString(5), acrs.getResultSet().getString(6),acrs.getResultSet().getString(7)));
+					sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
+			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));
+			}
 			sb.append("<br>7. Код диагноза по МКБ: ");
 			acrs.close();
 			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", nk.getPvizitId());
@@ -1220,12 +1219,12 @@ public class ServerOsm extends Server implements Iface {
   "join n_s00 on(s_mrab.cdol=n_s00.pcod)  join s_vrach on "+ 
   "(s_vrach.pcod=s_mrab.pcod) WHERE s_mrab.user_id = ? ",nk.getUserId());
 			if (acrs.getResultSet().next())
-			sb.append(String.format("%s", acrs.getResultSet().getString(4)));
-			sb.append(String.format("<br>ФИО врача: %s %s %s", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
-			sb.append("<br>Подпись_______________");
-			sb.append("<br>Заведующий отделением _____________________________________________________________________________");
+			sb.append(String.format("%s ", acrs.getResultSet().getString(4)));
+			sb.append(String.format("<br>ФИО: %s %s %s", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
+			sb.append(" Подпись_______________");
+			sb.append("<br>Заведующий отделением_____________________________________________________________________________");
 			sb.append(String.format("<p align=\"left\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-			sb.append("<br>МП");
+			sb.append("<br>МП</font>");
 			acrs.close();
 							osw.write(sb.toString());
 							return path;
