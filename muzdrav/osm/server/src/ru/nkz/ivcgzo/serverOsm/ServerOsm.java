@@ -2251,7 +2251,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 	
 	@Override
 	public List<Pmer> getPmer(int npasp, String diag) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_mer where p_mer.npasp = ? and diag = ?", npasp, diag)) {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_mer where p_mer.npasp = ? and diag = ? order by pdat", npasp, diag)) {
 			return rsmPmer.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -2846,14 +2846,23 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public List<Integer> AddCGosp(Cgosp cgsp) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
+		try (SqlModifyExecutor sme = tse.startTransaction(); 
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("select ngosp, id from c_gosp where (npasp = ?) and (n_org = ?) and (diag_n = ?) and (dataz = ?) ", cgsp.npasp, cgsp.n_org, cgsp.diag_n, cgsp.dataz)) {
+			if (acrs.getResultSet().next()) {
+				List<Integer> ret = new ArrayList<>();
+				ret.add(acrs.getResultSet().getInt(1));
+				ret.add(acrs.getResultSet().getInt(2));
+				return ret;
+			} else {
 			sme.execPreparedT("insert into c_gosp (npasp, nist, naprav, diag_n, named_n, dataz, vid_st, n_org, pl_extr, datap, vremp, cotd, diag_p, named_p, cotd_p, dataosm, vremosm) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", true, cgsp, cgospTypes, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
 			List<Integer> ret = new ArrayList<>();
 			ret.add(sme.getGeneratedKeys().getInt("id"));
 			ret.add(sme.getGeneratedKeys().getInt("ngosp"));
 			sme.setCommit();
 			return ret;
-		} catch (SQLException e) {
+			}
+			}
+		 catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
 		} catch (InterruptedException e1) {
@@ -2864,11 +2873,16 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public int AddCotd(Cotd cotd) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
+		try (SqlModifyExecutor sme = tse.startTransaction(); 
+		AutoCloseableResultSet acrs = sse.execPreparedQuery("select id from c_otd where id_gosp = ? ", cotd.id_gosp)) {
+			if (acrs.getResultSet().next()) {
+				return acrs.getResultSet().getInt("id");
+			} else {
 			sme.execPreparedT("insert into c_otd (id_gosp, nist, cotd, dataz, stat_type) VALUES (?, ?, ?, ?, ?) ", true, cotd, cotdTypes, 1, 2, 3, 4, 5);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 			return id;
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();
