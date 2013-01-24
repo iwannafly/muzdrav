@@ -410,6 +410,7 @@ public class MainFrame extends JFrame {
             || (doctorAuth.getClpu() == 64)) {
         } else {
             tabbedPane.removeTabAt(4);
+            tabbedPane.removeTabAt(3);
 //            pChildbirth.setVisible(false);
         }
     }
