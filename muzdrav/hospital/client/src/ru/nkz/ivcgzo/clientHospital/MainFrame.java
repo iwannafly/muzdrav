@@ -407,7 +407,13 @@ public class MainFrame extends JFrame {
 
         if ((doctorAuth.getClpu() == 62)
             || (doctorAuth.getClpu() == 63)
-            || (doctorAuth.getClpu() == 64)) {
+            || (doctorAuth.getClpu() == 64)
+            || (doctorAuth.getCpodr() == 2407)
+            || (doctorAuth.getCpodr() == 2409)
+            || (doctorAuth.getCpodr() == 2411)
+            || (doctorAuth.getCpodr() == 2412)
+            || (doctorAuth.getCpodr() == 8301)
+            || (doctorAuth.getCpodr() == 8305)) {
         } else {
             tabbedPane.removeTabAt(4);
             tabbedPane.removeTabAt(3);
