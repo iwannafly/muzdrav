@@ -32,6 +32,7 @@ import javax.swing.event.ListSelectionListener;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
+import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper.DefaultLanguage;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
@@ -63,6 +64,8 @@ public class ShablonOperPanel extends JPanel {
 	private boolean fillingUI;
 	private CustomTextField tbOperCode;
 	private CustomTextField tbOperName;
+	private CustomTextField tbDiagCode;
+	private CustomTextField tbDiagName;
 	private CustomTimeEditor tbDur;
 	private CustomTextField tbMat;
 	
@@ -215,6 +218,7 @@ public class ShablonOperPanel extends JPanel {
 		JLabel lbOper = new JLabel("Код операци");
 		
 		tbOperCode = new CustomTextField();
+		tbOperCode.setDefaultLanguage(DefaultLanguage.English);
 		tbOperCode.setColumns(10);
 		tbOperCode.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
@@ -290,16 +294,69 @@ public class ShablonOperPanel extends JPanel {
 		
 		JLabel lblMat = new JLabel("Шовный материал");
 		
-		tbMat = new CustomTextField();
+		tbMat = new CustomTextField(true, true, false);
 		tbMat.getDocument().addDocumentListener(textListener);
 		tbMat.setColumns(10);
+		
+		tbDiagCode = new CustomTextField();
+		tbOperCode.setDefaultLanguage(DefaultLanguage.English);
+		tbDiagCode.setColumns(10);
+		tbDiagCode.getDocument().addDocumentListener(textListener);
+		tbDiagCode.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				fillDiagName();
+			}
+			
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				fillDiagName();
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				fillDiagName();
+			};
+			
+			private void fillDiagName() {
+				String diagName = null;
+				
+				try {
+					diagName = MainForm.conMan.getNameFromPcodString(StringClassifiers.n_c00, tbDiagCode.getText());
+				} catch (Exception e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(ShablonOperPanel.this, "Какая-то ошибка, которой быть не должно.");
+				}
+				
+				tbDiagName.setText(diagName);
+			}
+		});
+		tbDiagCode.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					StringClassifier res = MainForm.conMan.showMkbTreeForm("Выбор диагноза для шаблона", tbDiagCode.getText());
+					
+					if (res != null)
+						tbDiagCode.setText(res.pcod);
+				}
+			}
+		});
+		
+		tbDiagName = new CustomTextField();
+		tbDiagName.getDocument().addDocumentListener(textListener);
+		tbDiagName.setFocusable(false);
+		tbDiagName.setEditable(false);
+		tbDiagName.setColumns(10);
+		
+		JLabel lbDiag = new JLabel("Код диагноза");
 		GroupLayout gl_gbEdit = new GroupLayout(gbEdit);
 		gl_gbEdit.setHorizontalGroup(
 			gl_gbEdit.createParallelGroup(Alignment.TRAILING)
-				.addComponent(btSave, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+				.addComponent(btSave, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
 				.addGroup(gl_gbEdit.createSequentialGroup()
 					.addGroup(gl_gbEdit.createParallelGroup(Alignment.TRAILING)
-						.addComponent(gbText, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+						.addComponent(gbText, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
 						.addGroup(Alignment.LEADING, gl_gbEdit.createSequentialGroup()
 							.addComponent(lblDur, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -307,9 +364,10 @@ public class ShablonOperPanel extends JPanel {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(lblMat, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(tbMat, GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
+							.addComponent(tbMat, GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
 						.addGroup(Alignment.LEADING, gl_gbEdit.createSequentialGroup()
 							.addGroup(gl_gbEdit.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(lbDiag, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(lbOper, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(lbName, GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)
@@ -317,8 +375,12 @@ public class ShablonOperPanel extends JPanel {
 								.addGroup(gl_gbEdit.createSequentialGroup()
 									.addComponent(tbOperCode, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tbOperName, GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE))
-								.addComponent(tbName, GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE))))
+									.addComponent(tbOperName, GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE))
+								.addComponent(tbName, GroupLayout.DEFAULT_SIZE, 298, Short.MAX_VALUE)
+								.addGroup(gl_gbEdit.createSequentialGroup()
+									.addComponent(tbDiagCode, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(tbDiagName, GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)))))
 					.addGap(0))
 		);
 		gl_gbEdit.setVerticalGroup(
@@ -332,14 +394,19 @@ public class ShablonOperPanel extends JPanel {
 						.addComponent(lbOper)
 						.addComponent(tbOperName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tbOperCode, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_gbEdit.createParallelGroup(Alignment.BASELINE)
+						.addComponent(tbDiagCode, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(tbDiagName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbDiag))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_gbEdit.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblDur)
 						.addComponent(tbDur, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblMat)
 						.addComponent(tbMat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+					.addComponent(gbText, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btSave))
 		);
@@ -394,6 +461,7 @@ public class ShablonOperPanel extends JPanel {
 	private void clearFields() {
 		tbName.clear();
 		tbOperCode.clear();
+		tbDiagCode.clear();
 		tbDur.setText(null);
 		tbMat.setText(null);
 		tbText.setText(null);
@@ -422,6 +490,9 @@ public class ShablonOperPanel extends JPanel {
 		shOper.setStat_tip((rbStat.isSelected()) ? statList.get(0).pcod : statList.get(1).pcod);
 		shOper.setName(tbName.getText());
 		shOper.setOper_pcod(tbOperCode.getText());
+		shOper.setOper_name(tbOperName.getText());
+		shOper.setDiag_pcod(tbDiagCode.getText());
+		shOper.setDiag_name(tbDiagName.getText());
 		shOper.setOper_dlit(tbDur.getTime().getTime());
 		shOper.setMat(tbMat.getText());
 		shOper.setText(tbText.getText());
@@ -436,6 +507,7 @@ public class ShablonOperPanel extends JPanel {
 		enb &= !tbName.isEmpty();
 		enb &= !tbOperCode.isEmpty();
 		enb &= !tbOperName.isEmpty();
+		enb &= !(!tbDiagCode.isEmpty() && tbDiagName.isEmpty());
 		enb &= tbDur.getTime() != null;
 		enb &= !(tbText.getText().length() == 0);
 		enb &= lbSearch.getSelectedIndex() > -1;
@@ -461,6 +533,7 @@ public class ShablonOperPanel extends JPanel {
 			tbName.setText(shOper.name);
 			tbName.setCaretPosition(0);
 			tbOperCode.setText(shOper.oper_pcod);
+			tbDiagCode.setText(shOper.diag_pcod);
 			tbDur.setTime(shOper.oper_dlit);
 			tbMat.setText(shOper.mat);
 			tbMat.setCaretPosition(0);
@@ -545,7 +618,7 @@ public class ShablonOperPanel extends JPanel {
 			if (srcStr.length() < 3)
 				srcStr = null;
 			else
-				srcStr = '%' + srcStr + '%';
+				srcStr = '%' + srcStr.toLowerCase() + '%';
 			
 			try {
 				setData(MainForm.tcl.getShOperList(statType, srcStr));
