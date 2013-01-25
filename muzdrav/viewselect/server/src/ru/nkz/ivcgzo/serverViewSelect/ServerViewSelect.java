@@ -848,6 +848,9 @@ public class ServerViewSelect extends Server implements Iface {
 			id_bol = id_gosp;
 			sqlQuery = "select * from p_bol where id_gosp = ?";
 		}
+		if (id_bol == 0){
+			sqlQuery = "select * from p_bol where id_gosp = 0 and id_obr = ?";
+		}
 		
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery(sqlQuery, id_bol)) {
 					return rsmPbol.mapToList(acrs.getResultSet());
