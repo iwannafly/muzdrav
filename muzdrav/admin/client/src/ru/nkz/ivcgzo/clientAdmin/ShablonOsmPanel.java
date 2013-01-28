@@ -485,7 +485,7 @@ public class ShablonOsmPanel extends JPanel {
 		try {
 			shOsm.setId(MainForm.tcl.saveShablonOsm(shOsm));
 			trSearch.updateSavedNode(saveAsNew);
-		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
+		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TemplateExistsException e) {
 			JOptionPane.showMessageDialog(ShablonOsmPanel.this, "Шаблон с таким названием, диагнозом и динамикой уже существует.", "Ошибка", JOptionPane.ERROR_MESSAGE);

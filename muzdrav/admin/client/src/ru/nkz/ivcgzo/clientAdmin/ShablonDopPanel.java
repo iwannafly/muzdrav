@@ -239,7 +239,7 @@ public class ShablonDopPanel extends JPanel {
 		} catch (TemplateExistsException e) {
 			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Шаблон с таким именем уже существует для данного раздела.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 			tbName.requestFocusInWindow();
-		} catch (KmiacServerException e) { //FIXME исключение не пробрасывается из-за ошибки в трифте. Если функция возвращает простой тип, то проверка на успешность выполнения проходится раньше, чем на исключение.
+		} catch (KmiacServerException e) {
 			JOptionPane.showMessageDialog(ShablonDopPanel.this, "Ошибка сохранения шаблона.", "Ошибка", JOptionPane.ERROR_MESSAGE);
 		} catch (TException e) {
 			MainForm.conMan.reconnect(e);

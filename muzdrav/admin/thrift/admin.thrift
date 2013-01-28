@@ -60,13 +60,16 @@ struct ShablonLds {
 }
 
 struct ShablonOper {
-	1: i32 id;
-	2: i32 stat_tip;
-	3: string name;
-	4: string oper_pcod;
-	5: i64 oper_dlit;
-	6: string mat;
-	7: string text;
+	 1: i32 id;
+	 2: i32 stat_tip;
+	 3: string name;
+	 4: string oper_pcod;
+	 5: string oper_name;
+	 6: string diag_pcod;
+	 7: string diag_name;
+	 8: i64 oper_dlit;
+	 9: string mat;
+	10: string text;
 }
 
 /**
