@@ -21,7 +21,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
 public class ThriftStringClassifierList<T extends StringClassifier> extends JList<StringClassifier> {
 	private static final long serialVersionUID = 677069909690689690L;
 	private List<StringClassifier> items;
-	private StringListModel model;
 	private StringClassifiers classifier;
 	private boolean classifierLoaded;
 	
@@ -29,7 +28,6 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 	 * Конструктор списка.
 	 */
 	public ThriftStringClassifierList() {
-		setModel();
 		setData(null);
 	}
 	
@@ -51,11 +49,6 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 		this.classifier = classifierName;
 	}
 	
-	private void setModel() {
-		model = new StringListModel();
-		this.setModel(model);
-	}
-	
 	/**
 	 * Устанавливает список для отображения. 
 	 */
@@ -68,8 +61,8 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 		for (StringClassifier item : list) {
 			items.add(new StringClassifierItem(item));
 		}
+		setModel(new StringListModel());
 		selectFirstItem();
-		model.fireContentsChanged();
 	}
 	
 	/**
@@ -154,8 +147,36 @@ public class ThriftStringClassifierList<T extends StringClassifier> extends JLis
 			return items.size();
 		}
 		
-		public void fireContentsChanged() {
-			super.fireContentsChanged(ThriftStringClassifierList.this, 0, getSize() - 1);
+		@Override
+		public StringClassifier remove(int index) {
+			StringClassifier element = items.get(index);
+			
+			items.remove(index);
+	        fireIntervalRemoved(this, index, index);
+			
+			return element;
+		}
+		
+		@Override
+		public void add(int index, StringClassifier element) {
+			items.add(new StringClassifierItem(element));
+			fireIntervalAdded(this, index, index);
+		}
+		
+		@Override
+		public void addElement(StringClassifier element) {
+			add(getSize(), element);
+			
+		}
+		
+		@Override
+		public StringClassifier set(int index, StringClassifier element) {
+			StringClassifier prevElement = items.get(index);
+			
+			items.set(index, new StringClassifierItem(element));
+			fireContentsChanged(this, index, index);
+			
+			return prevElement;
 		}
 	}
 	

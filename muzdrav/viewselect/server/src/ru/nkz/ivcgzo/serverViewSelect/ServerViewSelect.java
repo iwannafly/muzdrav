@@ -571,7 +571,7 @@ public class ServerViewSelect extends Server implements Iface {
 	public List<PaspErrorInfo> getPaspErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
 				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_pasp_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
-				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (e.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (p.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
 			sme.setCommit();
 			return rsmPaspError.mapToList(acrsq.getResultSet());
 		} catch (Exception e) {
@@ -592,7 +592,7 @@ public class ServerViewSelect extends Server implements Iface {
 	public List<MedPolErrorInfo> getMedPolErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
 				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_med_pol_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
-				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.sl_id AS id_obr, e.id_med AS id_pos, v.datao AS dat_obr, a.datap AS dat_pos, a.cod_sp AS vr_pcod, get_short_fio(r.fam, r.im, r.ot) AS vr_fio, a.cdol AS vr_cdol, s.name AS vr_cdol_name, e.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN p_vizit v ON (v.id = e.sl_id) JOIN p_vizit_amb a ON (a.id = e.id_med AND a.id_obr = e.sl_id) JOIN s_vrach r ON (r.pcod = a.cod_sp) JOIN n_s00 s ON (a.cdol = s.pcod) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 2) AND (e.cpodr = ?) AND (a.datap BETWEEN ? AND ?) ORDER BY v.datao DESC, a.datap DESC, p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, a.id_obr, a.id AS id_pos, v.datao AS dat_obr, a.datap AS dat_pos, a.cod_sp AS vr_pcod, get_short_fio(r.fam, r.im, r.ot) AS vr_fio, a.cdol AS vr_cdol, s.name AS vr_cdol_name, e.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN p_vizit_amb a ON (a.id = e.id_med) JOIN p_vizit v ON (v.id = a.id_obr) JOIN s_vrach r ON (r.pcod = a.cod_sp) JOIN n_s00 s ON (a.cdol = s.pcod) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 2) AND (e.cpodr = ?) AND (a.datap BETWEEN ? AND ?) ORDER BY v.datao DESC, a.datap DESC, p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
 			sme.setCommit();
 			return rsmMedPolError.mapToList(acrsq.getResultSet());
 		} catch (Exception e) {
@@ -719,50 +719,61 @@ public class ServerViewSelect extends Server implements Iface {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (cslu == 1){
-   						sqlQuery = "SELECT o.prlpu FROM n_o00 o WHERE o.pcod = ?";
-					}
-					if (cslu == 2){
-   						sqlQuery = "SELECT o.prlpu FROM n_n00 o WHERE o.pcod = ?";
-					}
-	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, cpodr)) {
-						if (acr.getResultSet().next()){
-		      				prlpu = acr.getResultSet().getInt("prlpu");
-							if (acr.getResultSet().getInt("prlpu") == 5){
-		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
-		      				}else{
-		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
-		      				}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				
    				    
 
    					try {
-  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.nstr) where n_ot_str.prlpu=? and npasp=? " , cslu, npasp); 
+  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.numstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.numstr) where n_ot_str.prlpu=? and npasp=? order by n_anz.numstr" , cslu, npasp); 
    							
 								if (acr.getResultSet().next()){
 									do {
 										if (acr.getResultSet().getBoolean(7)==true){
 												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) == null)){
-													sb.append(String.format("%s да",acr.getResultSet().getString(4)));
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s да", numline, acr.getResultSet().getString(4)));
+														}
+													else {
+														sb.append(String.format("%s да", acr.getResultSet().getString(4)));
+														}
+													
 													sb.append("<br>");
+													
 												}
 												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) != null)){
-													sb.append(String.format("%s да, %s",acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s да, %s", numline,acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													}
+													else{
+														sb.append(String.format("%s да, %s", acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													}
 													sb.append("<br>");
 												}
 												if (acr.getResultSet().getBoolean(5)==false){
-													sb.append(String.format("%s нет",acr.getResultSet().getString(4)));
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s нет", numline, acr.getResultSet().getString(4)));
+													}
+													else {
+														sb.append(String.format("%s нет", acr.getResultSet().getString(4)));
+													}
 													sb.append("<br>");
 												}
 												
 										}
+										
 										if (acr.getResultSet().getBoolean(7)==false){
-											if (acr.getResultSet().getString(6) != null)
-												sb.append(String.format("%s %s",acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
-											sb.append("<br>");
+											if (acr.getResultSet().getString(6) != null){
+												if (acr.getResultSet().getString(4).charAt(0) != '-') {
+													++numline;
+													sb.append(String.format("%d. %s %s", numline, acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+												}
+												else {
+													sb.append(String.format("%s %s", acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+												}
+												sb.append("<br>");
+											}
 									}
 										
 
@@ -836,6 +847,9 @@ public class ServerViewSelect extends Server implements Iface {
 		if (id_obr == 0){
 			id_bol = id_gosp;
 			sqlQuery = "select * from p_bol where id_gosp = ?";
+		}
+		if (id_bol == 0){
+			sqlQuery = "select * from p_bol where id_gosp = 0 and id_obr = ?";
 		}
 		
 		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery(sqlQuery, id_bol)) {

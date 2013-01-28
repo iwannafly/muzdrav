@@ -275,13 +275,15 @@ struct TRd_Novor {
 	16: optional i64 datazap;
 }
 
-struct TRd_Svid {
+struct TRd_Svid_Rojd {
 	1: i32 npasp;
 	2: optional i32 ndoc;
-	3: bool doctype;
-	4: i64 dateoff;
-	5: string famreb;
-	6: i32 svidvrach;
+	3: i64 dateoff;
+	4: string famreb;
+	5: i32 m_rojd;
+	6: i32 zan;
+	7: i32 r_proiz;
+	8: i32 svidvrach;
 }
 
 struct TPatientCommonInfo {
@@ -295,6 +297,8 @@ struct TPatientCommonInfo {
 	8: string adp_ul;
 	9: string adp_dom;
 	10: string adp_kv;
+	11: i32 obraz;
+	12: i32 status;
 }
 
 struct TRd_SMPK {
@@ -401,6 +405,12 @@ exception PrdSlNotFoundException{
 exception ChildDocNotFoundException{
 }
 
+/**
+ * Роды не найдены
+ */
+exception ChildbirthNotFoundException{
+}
+
 service ThriftHospital extends kmiacServer.KmiacServer{
 	list<TSimplePatient> getAllPatientForDoctor(1:i32 doctorId, 2:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -497,23 +507,72 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
 	
 /* Новорождённый */
-	list<classifier.IntegerClassifier> getChildBirths(1:i64 BirthDate) throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Получение списка родов, произошедших в заданный день
+	 * @param BirthDate Требуемая дата родов
+	 * @return Возвращает список родов, классифицируемых целым числом - идентификатором родов
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	list<classifier.IntegerClassifier> getChildBirths(1:i64 BirthDate)
+		throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Добавление информации о новорождённом
+	 * @param Child Информация о новорождённом
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
 	void addChildInfo(1:TRd_Novor Child)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
+	/**
+	 * Получение информации о новорождённом
+	 * @param npasp Идентификатор новорождённого
+	 * @return Возвращает информацию о новорождённом
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
 	TRd_Novor getChildInfo(1:i32 npasp)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
+	/**
+	 * Обновление информации о новорождённом
+	 * @param Child Информация о новорождённом
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
     void updateChildInfo(1:TRd_Novor Child)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
     
     /**
-	 * Добавление в БД свидетельства о рождении/перинатальной смерти новорождённого
+	 * Добавление информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
+	 * @param ChildDocument Информация о свидетельстве
 	 * @return Возвращает номер свидетельства
+	 * @throws PatientNotFoundException новорождённый не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
 	 */
-	i32 addChildDocument(1:TRd_Svid ChildDocument)
+	i32 addChildDocument(1:TRd_Svid_Rojd ChildDocument)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
-    TRd_Svid getChildDocument(1:i32 npasp)
+	/**
+	 * Получение информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
+	 * @param npasp Идентификатор новорождённого
+	 * @return Возвращает информацию о свидетельстве
+	 * @throws ChildDocNotFoundException свидетельство не найдено
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    TRd_Svid_Rojd getChildDocument(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
-    void updateChildDocument(1:TRd_Svid ChildDocument)
+    /**
+	 * Обновление информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
+	 * @param ChildDocument Информация о свидетельстве
+	 * @throws ChildDocNotFoundException свидетельство не найдено
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    void updateChildDocument(1:TRd_Svid_Rojd ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildBirthDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
@@ -521,6 +580,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildBlankDocument(1:bool isLiveChild)
     	throws (1:kmiacServer.KmiacServerException kse);
+    /**
+	 * Получение информации о пациенте
+	 * @param npasp Идентификатор пациента
+	 * @return Возвращает информацию о пациенте
+	 * @throws PatientNotFoundException пациент не найден
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
     TPatientCommonInfo getPatientCommonInfo(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
