@@ -458,6 +458,7 @@ struct Napr{
 	5: optional i32 pvizitId; 
 	6: optional string cpodr_name;
 	7: optional string clpu_name;
+	8: optional string diag;
 }
 
 struct NaprKons{
@@ -470,6 +471,7 @@ struct NaprKons{
 	7: optional i32 pvizitId;
 	8: optional string cpodr_name;
 	9: optional string clpu_name;
+	10: optional string diag;
 }
 
 struct IsslInfo{

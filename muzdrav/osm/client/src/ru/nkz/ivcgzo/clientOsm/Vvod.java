@@ -538,7 +538,9 @@ public class Vvod extends JFrame {
 		btnBolList = new JButton("Бол.лист");
 		btnBolList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if (tblObr.getRowCount() !=0)
 				 MainForm.conMan.showBolListForm(zapVr.npasp, zapVr.id_pvizit, 0);
+				else JOptionPane.showMessageDialog(Vvod.this, "Таблица случаев обращений не заполнена");
 			}
 		});
 		btnBolList.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -995,7 +997,7 @@ public class Vvod extends JFrame {
 					if (tblDiag.getSelectedItem() != null)
 						if (JOptionPane.showConfirmDialog(Vvod.this, "Удалить запись?", "Удаление записи", JOptionPane.YES_NO_OPTION)==JOptionPane.YES_OPTION) {
 				  			MainForm.tcl.DeletePdiagAmb(tblDiag.getSelectedItem().getId());
-		//		  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr(), tblDiag.getSelectedItem().id);
+				  			MainForm.tcl.deleteDiag(tblDiag.getSelectedItem().getNpasp(), tblDiag.getSelectedItem().getDiag(), MainForm.authInfo.getCpodr(), tblDiag.getSelectedItem().id);
 				  			tblDiag.setData(MainForm.tcl.getPdiagAmb(tblPos.getSelectedItem().id));
 							tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
 						}
@@ -1039,7 +1041,7 @@ public class Vvod extends JFrame {
 				  		
 				  		pdiag = new PdiagZ();
 				  		pdisp = new Pdisp();
-			  			pdiag.setId_diag_amb(diagamb.id);
+			  			//pdiag.setId_diag_amb(diagamb.id);
 				  		if (rbtDiagPredv.isSelected())
 				  			diagamb.setPredv(true);
 				  		if (rbtDiagZakl.isSelected()) {
@@ -2240,6 +2242,11 @@ public class Vvod extends JFrame {
 						naprkons.setUserId(MainForm.authInfo.getUser_id());
 						naprkons.setNpasp(Vvod.zapVr.getNpasp());
 						naprkons.setObosnov(tbKonsObosnov.getText());
+						for (PdiagAmb pd : tblDiag.getData()) {
+							if ((pd.diag_stat==1) || (pd.diag_stat==3)) {
+								naprkons.setDiag(pd.diag);
+							}
+						}
 						if (cmbKonsMesto.getSelectedItem()!= null) naprkons.setCpol(cmbKonsMesto.getSelectedItem().getName());
 						naprkons.setNazv(cmbKonsMesto.getSelectedItem().toString());
 						naprkons.setCdol(MainForm.authInfo.getCdol());
@@ -2296,6 +2303,11 @@ public class Vvod extends JFrame {
 						if (cmbKonsMesto.getSelectedItem()!= null) napr.setClpu(cmbKonsMesto.getSelectedItem().getName());
 						napr.setCpodr_name(MainForm.authInfo.getCpodr_name());
 						napr.setClpu_name(MainForm.authInfo.getClpu_name());
+						for (PdiagAmb pd : tblDiag.getData()) {
+							if ((pd.diag_stat==1) || (pd.diag_stat==3)) {
+								napr.setDiag(pd.diag);
+							}
+						}
 						napr.setPvizitId(tblPos.getSelectedItem().getId_obr());
 						String servPath = MainForm.tcl.printNapr(napr);
 						String cliPath = File.createTempFile("napr", ".htm").getAbsolutePath();
@@ -3015,6 +3027,7 @@ public class Vvod extends JFrame {
 				btnRecPriem.setEnabled(!isStat);
 				chbDiagBer.setEnabled(btnBer.isEnabled());
 				tblZaklDiag.setData(MainForm.tcl.getPdiagZInfo(zapVr.npasp));
+				
 			} else {
 				btnRecPriem.setEnabled(false);
 				btnAnam.setEnabled(false);
