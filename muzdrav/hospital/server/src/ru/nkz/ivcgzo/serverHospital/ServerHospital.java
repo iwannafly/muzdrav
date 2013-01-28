@@ -1178,13 +1178,14 @@ public class ServerHospital extends Server implements Iface {
     public TRdIshod getRdIshodInfo(int npasp,int ngosp)
 			throws PrdIshodNotFoundException, KmiacServerException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "select * from c_rd_ishod where npasp = ? and ngosp = ? ", npasp, ngosp)) {
+		        "SELECT * " +
+		        "FROM c_rd_ishod " +
+		        "WHERE (npasp = ?) AND (ngosp = ?);", npasp, ngosp)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdIshod.map(acrs.getResultSet());
             } else {
                 throw new PrdIshodNotFoundException();
             }
-
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			log.log(Level.ERROR, "SqlException", e);
@@ -1800,6 +1801,33 @@ public class ServerHospital extends Server implements Iface {
             throw new KmiacServerException();
         }
 	}
+	
+	/**
+	 * Функция получения срока первой явки матери к врачу
+	 * @param npasp Идентификатор матери
+	 * @param childBirthDate Дата родов
+	 * @return Срок первой явки (количество недель беременности)
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private int getFirstConsultWeekNum(final int npasp, final Date childBirthDate)
+			throws KmiacServerException {
+		final String Query = "SELECT p_rd_sl.yavka1 " +
+				"FROM c_rd_ishod " +
+				"LEFT JOIN p_rd_sl ON (p_rd_sl.id = c_rd_ishod.id_berem) " +
+				"WHERE (c_rd_ishod.npasp = ?) AND (c_rd_ishod.daterod = ?);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+        		Query, npasp, childBirthDate)) {
+        	ResultSet rs = acrs.getResultSet();
+        	if (rs.next())
+        		return rs.getInt(1);
+        	else
+                return -1;
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
 
 	@Override
 	public List<IntegerClassifier> getChildBirths(final long BirthDate) throws KmiacServerException, TException {
@@ -1930,14 +1958,12 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public TPatientCommonInfo getPatientCommonInfo(final int npasp)
 			throws KmiacServerException, PatientNotFoundException, TException {
-		//FIXME: n_z00.pcod - символьное поле (???)
         String sqlQuery = "SELECT npasp, fam||' '||im||' '||ot as full_name, datar, "
-        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, "
-        		+ "n_z00.pcod_s as obraz, status "
+        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, "
+        		+ "adp_dom, adp_kv, obraz, status "
                 + "FROM patient "
                 + "LEFT JOIN n_z30 ON (n_z30.pcod = patient.pol) "
                 + "LEFT JOIN n_am0 ON (n_am0.pcod = patient.jitel) "
-                + "LEFT JOIN n_z00 ON (n_z00.pcod = patient.obraz) "
                 + "WHERE patient.npasp = ?;";
         ResultSet rs = null;
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
@@ -1962,10 +1988,13 @@ public class ServerHospital extends Server implements Iface {
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
         if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
         	throw new ChildDocNotFoundException();
+        //Загрузка данных:
         TRd_Svid_Rojd childDoc = getChildDocumentByDoc(ndoc);
         TRd_Novor childBirthInfo = getChildInfo(childDoc.getNpasp());
         TPatientCommonInfo childInfo = getPatientCommonInfo(childDoc.getNpasp());
         TPatientCommonInfo motherInfo = getPatientCommonInfo(getMotherId(childDoc.getNpasp()));
+        int iFirstConsult = getFirstConsultWeekNum(motherInfo.getNpasp(), new Date(childInfo.getDatar()));
+        //Создание документа:
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
         			path = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
@@ -2042,14 +2071,30 @@ public class ServerHospital extends Server implements Iface {
 	            childBirthMinute = childBirthTime.substring(3, 5);
             }
             //Образование матери:
+            int iEduc = (motherInfo.isSetObraz()) ? motherInfo.getObraz() : 0;
             String[] motherEduc = new String[] {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
-            if ((motherInfo.getStatus() > 0) && (motherInfo.getStatus() < 10)) {
-	            motherEduc[2*(motherInfo.getStatus() - 1)] = "<u>";
-	            motherEduc[2*motherInfo.getStatus() - 1] = "</u>";
+            if ((iEduc > 0) && (iEduc < 10)) {
+	            motherEduc[2*(iEduc - 1)] = "<u>";
+	            motherEduc[2*iEduc - 1] = "</u>";
             } else {	//Неизвестный код образования - ставим "Неизвестно":
 	            motherEduc[16] = "<u>";
 	            motherEduc[17] = "</u>";
             }
+            //Семейное положение матери:
+            int iStatus = motherInfo.isSetStatus() ? motherInfo.getStatus() : 0;
+            String[] motherStatus = new String[] {"", "", "", "", "", ""};
+            if ((iStatus > 0) && (iStatus < 5)) {
+            	if (iStatus == 1) {	//Состоит в браке
+	            	motherStatus[0] = "<u>";
+	            	motherStatus[1] = "</u>";
+            	} else {			//Не состоит в браке
+	            	motherStatus[2] = "<u>";
+	            	motherStatus[3] = "</u>";
+            	}
+            } else {	//Неизвестный код семейного положения - ставим "Неизвестно":
+            	motherStatus[4] = "<u>";
+            	motherStatus[5] = "</u>";
+            }            
             //Занятость матери:
             String[] motherWork = new String[] {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
             if ((childDoc.getZan() > 0) && (childDoc.getZan() < 11)) {
@@ -2059,6 +2104,10 @@ public class ServerHospital extends Server implements Iface {
             	motherWork[18] = "<u>";
             	motherWork[19] = "</u>";
             }
+            //Срок первой явки к врачу:
+            String firstConsult = "  ";
+            if (iFirstConsult >= 0)
+            	firstConsult = String.format("%2d", iFirstConsult);
             //Который по счёту:
             String nChildren = "  ";
             if (childBirthInfo.isSetKolchild())
@@ -2083,33 +2132,48 @@ public class ServerHospital extends Server implements Iface {
             	}
             }
             htmTemplate.replaceLabels(false,
+            	//Серия и номер свидетельства:
         		ServerHospital.childBirthDocSeries, childBirthNumber,
+        		//Дата выдачи:
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
+        		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
+        		//Фамилия, имя, отчество матери:
         		motherFullName,
+        		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
         		sdfYear.format(motherInfo.getDatar()),
+        		//Место регистрации матери:
         		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
         		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
         		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
         		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
         		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
         		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+				//Местность регистрации:
         		city1, city2, country1, country2,
+        		//Пол ребёнка:
         		boy1, boy2, girl1, girl2,
         		//TODO: ЗАПИСАТЬ ШАПКУ:
         		"", "", "", "",
+            	//Серия и номер свидетельства:
         		ServerHospital.childBirthDocSeries, childBirthNumber,
+        		//Дата выдачи:
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
+        		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()),
         		sdfMonth.format(childInfo.getDatar()).toUpperCase(),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
-        		motherSurname, motherFirstName, childDoc.getFamreb().toUpperCase(),
+        		//Фамилия, имя, отчество матери:
+        		motherSurname, motherFirstName,
+        		//Фамилия ребёнка:
+        		childDoc.getFamreb().toUpperCase(),
+        		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
         		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
         		sdfMonthShort.format(motherInfo.getDatar()).substring(0, 1),
@@ -2118,33 +2182,41 @@ public class ServerHospital extends Server implements Iface {
         		sdfYear.format(motherInfo.getDatar()).substring(1, 2),
         		sdfYear.format(motherInfo.getDatar()).substring(2, 3),
         		sdfYear.format(motherInfo.getDatar()).substring(3, 4),
+        		//Место регистрации матери:
         		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
         		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
         		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
         		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
         		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
         		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+        		//Местность регистрации:
         		city1, city2, country1, country2,
+        		//Семейное положение матери:
+        		motherStatus[0], motherStatus[1],
+        		motherStatus[2], motherStatus[3],
+        		motherStatus[4], motherStatus[5],
         		//МЕСТО РОЖДЕНИЯ:
     			"", "", "",
         		//МЕСТНОСТЬ РОЖДЕНИЯ:
     			cityChild1, cityChild2,
     			countryChild1, countryChild2,
-    			//РОДЫ ПРОИЗОШЛИ:
+    			//Роды произошли:
     			birthHappen[0], birthHappen[1],
     			birthHappen[2], birthHappen[3],
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
+        		//Пол ребёнка:
         		boy1, boy2, girl1, girl2,
-    			//РОДЫ ПРОИЗОШЛИ:
+    			//Роды произошли:
     			birthHappen[0], birthHappen[1],
     			birthHappen[2], birthHappen[3],
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
         		"",	//ДОЛЖНОСТЬ ВРАЧА
+        		//Текущая дата:
         		sdfDay.format(curDate.getTimeInMillis()), months[curDate.get(GregorianCalendar.MONTH)],
         		sdfYear.format(curDate.getTimeInMillis()),
-        		//ОБРАЗОВАНИЕ МАТЕРИ:
+        		//Образование матери:
         		motherEduc[0], motherEduc[1],
         		motherEduc[2], motherEduc[3],
         		motherEduc[4], motherEduc[5],
@@ -2154,7 +2226,8 @@ public class ServerHospital extends Server implements Iface {
         		motherEduc[12], motherEduc[13],
         		motherEduc[14], motherEduc[15],
         		motherEduc[16], motherEduc[17],
-        		//ЗАНЯТОСТЬ МАТЕРИ:
+        		//Занятость матери:
+        		motherWork[0], motherWork[1],
         		motherWork[0], motherWork[1],
         		motherWork[2], motherWork[3],
         		motherWork[4], motherWork[5],
@@ -2163,10 +2236,17 @@ public class ServerHospital extends Server implements Iface {
         		motherWork[10], motherWork[11],
         		motherWork[12], motherWork[13],
         		motherWork[14], motherWork[15],
+        		motherWork[14], motherWork[15],
         		motherWork[16], motherWork[17],
         		motherWork[18], motherWork[19],
+        		//Срок первой явки к врачу:
+        		firstConsult.substring(0, 1), firstConsult.substring(1, 2),
+        		//Которым по счету ребенок был рожден у матери:
         		nChildren.substring(0, 1), nChildren.substring(1, 2),
-        		weight.substring(0, 1), weight.substring(1, 2), weight.substring(2, 3), weight.substring(3, 4),
+        		//Масса тела при рождении:
+        		weight.substring(0, 1), weight.substring(1, 2),
+        		weight.substring(2, 3), weight.substring(3, 4),
+        		//Длина  тела при рождении:
         		height.substring(0, 1), height.substring(1, 2),
         		only, nreb, nreb_all,
         		""	//ДОЛЖНОСТЬ ВРАЧА

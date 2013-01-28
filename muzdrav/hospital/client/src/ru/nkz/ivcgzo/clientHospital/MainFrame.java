@@ -4,8 +4,6 @@ package ru.nkz.ivcgzo.clientHospital;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -32,8 +30,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.DopShablon;
-import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -399,11 +395,8 @@ public class MainFrame extends JFrame {
 //        setLifeHistoryPanel();
         setMedicalHistoryPanel();
         setStagePanel();
-        setChildrenPanel();
         setDiagnosisPanel();
 //        setChildbirthPanel();
-        setZaklPanel();
-
         if ((doctorAuth.getClpu() == 62)
             || (doctorAuth.getClpu() == 63)
             || (doctorAuth.getClpu() == 64)
@@ -413,11 +406,13 @@ public class MainFrame extends JFrame {
             || (doctorAuth.getCpodr() == 2412)
             || (doctorAuth.getCpodr() == 8301)
             || (doctorAuth.getCpodr() == 8305)) {
+        	setChildrenPanel();
         } else {
-            tabbedPane.removeTabAt(4);
+            //tabbedPane.removeTabAt(4);
             tabbedPane.removeTabAt(3);
 //            pChildbirth.setVisible(false);
         }
+        setZaklPanel();
     }
 
 	public final void onConnect() {
@@ -440,7 +435,8 @@ public class MainFrame extends JFrame {
             CBAkush.setData(ClientHospital.tcl.get_s_vrach());
             CBVrash.setData(ClientHospital.tcl.get_s_vrach());
             CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
-            pChildren.setDoctors(ClientHospital.tcl.get_s_vrach());
+            if (pChildren != null)
+            	pChildren.setDoctors(ClientHospital.tcl.get_s_vrach());
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -553,7 +549,8 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
-                    pChildren.setPatient(patient);
+                    if (pChildren != null)
+                    	pChildren.setPatient(patient);
 
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
@@ -3711,7 +3708,10 @@ public class MainFrame extends JFrame {
 
     private void setChildrenPanel() {
     	this.pChildren = new Children(this.doctorAuth, this.patient);
-        tabbedPane.addTab("Новорожденный", new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildren, null);
+        tabbedPane.addTab("Новорожденный",
+        		new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")),
+        		pChildren,
+        		null);
 	}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
