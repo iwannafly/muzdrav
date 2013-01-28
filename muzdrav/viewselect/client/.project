@@ -26,6 +26,16 @@
 			<locationURI>WORKSPACE_LOC/gitrep/muzdrav/viewselect/thrift/gen-java</locationURI>
 		</link>
 		<link>
+-			<name>src/ru/nkz/ivcgzo/clientLab/resources/issled.png</name>
+-			<type>1</type>
+-			<locationURI>WORKSPACE_LOC/gitrep/common/resources/issled.png</locationURI>
+-		</link>
+-		<link>
+-			<name>src/ru/nkz/ivcgzo/clientMedication/resources/medication.png</name>
+-			<type>1</type>
+-			<locationURI>WORKSPACE_LOC/gitrep/common/resources/medication.png</locationURI>
+-		</link>
+		<link>
 			<name>src/ru/nkz/ivcgzo/clientViewSelect/resources/1331789242_Add.png</name>
 			<type>1</type>
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/1331789242_Add.png</locationURI>
