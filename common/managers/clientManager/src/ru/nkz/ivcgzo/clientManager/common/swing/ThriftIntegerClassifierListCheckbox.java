@@ -75,13 +75,16 @@ public class ThriftIntegerClassifierListCheckbox extends ThriftIntegerClassifier
 	
 	@Override
 	public void setData(List<IntegerClassifier> list) {
-		super.setData(list);
-		
-		boxes = new JCheckBox[getModel().getSize()];
+		if (list == null)
+			list = new ArrayList<>();
+			
+		boxes = new JCheckBox[list.size()];
 		for (int i = 0; i < boxes.length; i++) {
 			boxes[i] = new JCheckBox(list.get(i).name);
 			boxes[i].addActionListener(boxListener);
 		}
+		
+		super.setData(list);
 	}
 	
 	private void setCellRenderer() {

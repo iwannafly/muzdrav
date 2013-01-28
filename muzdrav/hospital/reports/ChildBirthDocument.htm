@@ -91,7 +91,14 @@
 				border-bottom:1px solid black;
 			}
 
+			p.info{
+				text-align:center;
+				font_family:"Times New Roman";
+				font-size:9px;
+			}
+
 			p.serif{
+				text-align:center;
 				font_family:"Times New Roman";
 				font-size:11px;
 			}
@@ -193,7 +200,7 @@
 				<td class="leftcol" width="9%">~adp_kv</td>
 			</tr>
 		</table>
-		<table width="230">
+		<table>
 			<tr>
 				<td><b>5.</b>&nbsp;Местность:&nbsp; ~city1 городская ~city2</td>
 				<td class="box" width="15" align="center">1</td>
@@ -201,7 +208,7 @@
 				<td class="box" width="15" align="center">2</td>
 			</tr>
 		</table>
-		<table width="185">
+		<table>
 			<tr>
 				<td><b>6.</b>&nbsp;Пол:&nbsp; ~boy1 мальчик ~boy2</td>
 				<td class="box" width="15" align="center">1</td>
@@ -340,16 +347,16 @@
 								<table class="wide">
 									<tr>
 										<td width="40%"><b>3.</b>&nbsp;Дата рождения</td>
-										<td class="box" align="center" width="7%">~datar_mother_d1</td>
-										<td class="box" align="center" width="7%">~datar_mother_d2</td>
+										<td class="box" align="center" width="15">~datar_mother_d1</td>
+										<td class="box" align="center" width="15">~datar_mother_d2</td>
 										<td width="2%"></td>
-										<td class="box" align="center" width="7%">~datar_mother_m1</td>
-										<td class="box" align="center" width="7%">~datar_mother_m2</td>
+										<td class="box" align="center" width="15">~datar_mother_m1</td>
+										<td class="box" align="center" width="15">~datar_mother_m2</td>
 										<td width="2%"></td>
-										<td class="box" align="center" width="7%">~datar_mother_y1</td>
-										<td class="box" align="center" width="7%">~datar_mother_y2</td>
-										<td class="box" align="center" width="7%">~datar_mother_y3</td>
-										<td class="box" align="center" width="7%">~datar_mother_y4</td>
+										<td class="box" align="center" width="15">~datar_mother_y1</td>
+										<td class="box" align="center" width="15">~datar_mother_y2</td>
+										<td class="box" align="center" width="15">~datar_mother_y3</td>
+										<td class="box" align="center" width="15">~datar_mother_y4</td>
 									</tr>
 									<tr>
 										<td></td>
@@ -392,26 +399,26 @@
 							<td class="leftcol" width="10%">~adp_kv</td>
 						</tr>
 					</table>
-					<table width="230">
+					<table>
 						<tr>
-							<td><b>5.</b>&nbsp;Местность:&nbsp; ~city1 городская ~city2</td>
+							<td><b>5.</b>&nbsp;Местность:&nbsp; ~city1 городская ~city2 &nbsp;</td>
 							<td class="box" width="15" align="center">1</td>
-							<td>, ~country1 сельская ~country2</td>
+							<td>, ~country1 сельская ~country2 &nbsp;</td>
 							<td class="box" width="15" align="center">2</td>
 						</tr>
 					</table>
 					<table width="99%">
 						<tr>
-							<td><b>6.</b>&nbsp;Семейное положение: состоит в зарег. браке</td>
+							<td><b>6.</b>&nbsp;Семейное положение: ~motherMarried1 состоит в зарег. браке ~motherMarried2</td>
 							<td class="box" width="15" align="center">1</td>
 							<td align="left" width="14%">,</td>
 						</tr>
 					</table>
 					<table width="99%">
 						<tr>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;не состоит в зарег. браке</td>
+							<td>&nbsp;&nbsp;&nbsp;&nbsp; ~motherAlone1 не состоит в зарег. браке ~motherAlone2</td>
 							<td class="box" width="15" align="center">2</td>
-							<td>,&nbsp;неизвестно</td>
+							<td>,&nbsp; ~motherUnknownStatus1 неизвестно ~motherUnknownStatus2</td>
 							<td class="box" width="15" align="center">3</td>
 							<td width="18%"></td>
 						</tr>
@@ -445,7 +452,7 @@
 					</table>
 					<br />
 					<br />
-					<table width="240">
+					<table>
 						<tr>
 							<td><b>13.</b>&nbsp;Местность:&nbsp; ~cityChild1 городская ~cityChild2</td>
 							<td class="box" width="15" align="center">1</td>
@@ -454,24 +461,24 @@
 						</tr>
 					</table>
 					<b>&nbsp;14.</b>&nbsp;Роды произошли:
-					<table width="275">
+					<table>
 						<tr>
-							<td>&nbsp;&nbsp;&nbsp;в стационаре</td>
+							<td>&nbsp;&nbsp;&nbsp; ~stac1 в стационаре ~stac2</td>
 							<td class="box" width="15" align="center">1</td>
-							<td>, дома</td>
+							<td>, ~home1 дома ~home2</td>
 							<td class="box" width="15" align="center">2</td>
-							<td>, в другом месте</td>
+							<td>, ~another1 в другом месте ~another2</td>
 							<td class="box" width="15" align="center">3</td>
 							<td>,</td>
 						</tr>
 					</table>
-					<table width="90">
+					<table>
 						<tr>
-							<td>&nbsp;&nbsp;&nbsp;неизвестно</td>
+							<td>&nbsp;&nbsp;&nbsp; ~unknown1 неизвестно ~unknown2</td>
 							<td class="box" width="15" align="center">4</td>
 						</tr>
 					</table>
-					<table width="190">
+					<table>
 						<tr>
 							<td><b>&nbsp;15.</b>&nbsp;Пол:&nbsp; ~boy1 мальчик ~boy2</td>
 							<td class="box" width="15" align="center">1</td>
@@ -483,17 +490,17 @@
 			</tr>
 		</table>
 		<p class="more">&nbsp;</p>
-		<p align="center">2</p>
+		<p class="info">2</p>
 		<p align="right">Оборотная сторона</p>
-		<table width="70%">
+		<table>
 			<tr>
-				<td><b>7.</b>&nbsp;Роды произошли:&nbsp;в стационаре</td>
+				<td><b>7.</b>&nbsp;Роды произошли:&nbsp; ~stac1 в стационаре ~stac2</td>
 				<td class="box" width="15" align="center">1</td>
-				<td>, дома</td>
+				<td>, ~home1 дома ~home2</td>
 				<td class="box" width="15" align="center">2</td>
-				<td>, в другом месте</td>
+				<td>, ~another1 в другом месте ~another2</td>
 				<td class="box" width="15" align="center">3</td>
-				<td>, неизвестно</td>
+				<td>, ~unknown1 неизвестно ~unknown2</td>
 				<td class="box" width="15" align="center">4</td>
 			</tr>
 		</table>
@@ -562,9 +569,9 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td><i>профессиональное</i>: высшее &nbsp;</td>
+							<td><i>профессиональное</i>: ~highEduc1 высшее ~highEduc2 &nbsp;</td>
 							<td class="box" width="15" align="center">1</td>
-							<td>, неполное высшее &nbsp;</td>
+							<td>, ~highEducLow1 неполное высшее ~highEducLow2 &nbsp;</td>
 							<td class="box" width="15" align="center">2</td>
 							<td>,</td>
 						</tr>
@@ -575,9 +582,9 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>среднее &nbsp;</td>
+							<td>~midEduc1 среднее ~midEduc2 &nbsp;</td>
 							<td class="box" width="15" align="center">3</td>
-							<td>, начальное &nbsp;</td>
+							<td>, ~lowEduc1 начальное ~lowEduc2 &nbsp;</td>
 							<td class="box" width="15" align="center">4</td>
 							<td>;</td>
 						</tr>
@@ -588,11 +595,11 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td><i>общее</i>: среднее (полное) &nbsp;</td>
+							<td><i>общее</i>: ~comEducFull1 среднее (полное) ~comEducFull2 &nbsp;</td>
 							<td class="box" width="15" align="center">5</td>
-							<td>, основное &nbsp;</td>
+							<td>, ~basicEduc1 основное ~basicEduc2 &nbsp;</td>
 							<td class="box" width="15" align="center">6</td>
-							<td>, начальное &nbsp;</td>
+							<td>, ~comEducLow1 начальное ~comEducLow2 &nbsp;</td>
 							<td class="box" width="15" align="center">7</td>
 							<td>;</td>
 						</tr>
@@ -603,9 +610,9 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>не имеет начального образования &nbsp;</td>
+							<td>~noEduc1 не имеет начального образования ~noEduc2 &nbsp;</td>
 							<td class="box" width="15" align="center">8</td>
-							<td>; неизвестно &nbsp;</td>
+							<td>; ~unknownEduc1 неизвестно ~unknownEduc2 &nbsp;</td>
 							<td class="box" width="15" align="center">9</td>
 							<td>,</td>
 						</tr>
@@ -613,16 +620,16 @@
 					<table class="wide">
 						<tr class="smallrow"></tr>
 					</table>
-					<b>8.</b>&nbsp;Занятость: <i>была занята в экономике</i>: руководители и специалисты
+					<b>8.</b>&nbsp;Занятость: <i>была занята в экономике</i>: ~econHiSpec1 руководители и специалисты ~econHiSpec2
 					<table class="wide">
 						<tr class="smallrow"></tr>
 					</table>
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>высшего уровня квалификации &nbsp;</td>
+							<td>~econHiSpec1 высшего уровня квалификации ~econHiSpec2 &nbsp;</td>
 							<td class="box" width="15" align="center">1</td>
-							<td>, прочие специалисты &nbsp;</td>
+							<td>, ~econSpec1 прочие специалисты ~econSpec2 &nbsp;</td>
 							<td class="box" width="15" align="center">2</td>
 							<td>,</td>
 						</tr>
@@ -633,9 +640,9 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>квалифицированные рабочие &nbsp;</td>
+							<td>~qualWork1 квалифицированные рабочие ~qualWork2 &nbsp;</td>
 							<td class="box" width="15" align="center">3</td>
-							<td>, неквалифицированные рабочие &nbsp;</td>
+							<td>, ~unQualWork1 неквалифицированные рабочие ~unQualWork2 &nbsp;</td>
 							<td class="box" width="15" align="center">4</td>
 							<td>,</td>
 						</tr>
@@ -646,7 +653,7 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>занятые на военной службе &nbsp;</td>
+							<td>~milWork1 занятые на военной службе ~milWork2 &nbsp;</td>
 							<td class="box" width="15" align="center">5</td>
 							<td>; <i>не была занята в экономике &nbsp;</i>:</td>
 						</tr>
@@ -657,11 +664,11 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>пенсионеры &nbsp;</td>
+							<td>~oldPeople1 пенсионеры ~oldPeople2 &nbsp;</td>
 							<td class="box" width="15" align="center">6</td>
-							<td>, студенты и учащиеся &nbsp;</td>
+							<td>, ~studPupil1 студенты и учащиеся ~studPupil2 &nbsp;</td>
 							<td class="box" width="15" align="center">7</td>
-							<td>, работавшие в личном &nbsp;</td>
+							<td>, ~selfWork1 работавшие в личном ~selfWork2 &nbsp;</td>
 							<td></td>
 						</tr>
 					</table>
@@ -671,11 +678,11 @@
 					<table class="coll">
 						<tr>
 							<td width="5px"></td>
-							<td>подсобном хозяйстве &nbsp;</td>
+							<td>~selfWork1 подсобном хозяйстве ~selfWork2 &nbsp;</td>
 							<td class="box" width="15" align="center">8</td>
-							<td>, безработные &nbsp;</td>
+							<td>, ~unWork1 безработные ~unWork2 &nbsp;</td>
 							<td class="box" width="15" align="center">9</td>
-							<td>, прочие &nbsp;</td>
+							<td>, ~otherWork1 прочие ~otherWork2 &nbsp;</td>
 							<td class="box" width="15" align="center">10</td>
 							<td>.</td>
 						</tr>
@@ -686,8 +693,8 @@
 					<table class="coll">
 						<tr>
 							<td><b>9.</b>&nbsp;Срок первой явки к врачу (фельдшеру, акушерке) &nbsp;</td>
-							<td class="box" width="15" align="center"></td>
-							<td class="box" width="15" align="center"></td>
+							<td class="box" width="15" align="center">~firstConsult1</td>
+							<td class="box" width="15" align="center">~firstConsult2</td>
 							<td>&nbsp;недель</td>
 						</tr>
 					</table>
@@ -822,7 +829,7 @@
 		<br />
 		Печать
 		<br />
-		<p align="center" class="serif">
+		<p class="serif">
 			<b>
 			К сведению родителей!
 			<br />

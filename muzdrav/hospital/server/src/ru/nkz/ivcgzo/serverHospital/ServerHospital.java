@@ -49,7 +49,7 @@ import ru.nkz.ivcgzo.thriftHospital.TPatientCommonInfo;
 import ru.nkz.ivcgzo.thriftHospital.TPriemInfo;
 import ru.nkz.ivcgzo.thriftHospital.TRdIshod;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
-import ru.nkz.ivcgzo.thriftHospital.TRd_Svid;
+import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 import ru.nkz.ivcgzo.thriftHospital.TStage;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital;
 import ru.nkz.ivcgzo.thriftHospital.ThriftHospital.Iface;
@@ -80,7 +80,7 @@ public class ServerHospital extends Server implements Iface {
     private TResultSetMapper<TStage, TStage._Fields> rsmStage;
 	private TResultSetMapper<TRdIshod, TRdIshod._Fields> rsmRdIshod;
 	private TResultSetMapper<TRd_Novor, TRd_Novor._Fields> rsmRdNovor;
-	private TResultSetMapper<TRd_Svid, TRd_Svid._Fields> rsmRdSvid;
+	private TResultSetMapper<TRd_Svid_Rojd, TRd_Svid_Rojd._Fields> rsmRdSvidRojd;
 	private TResultSetMapper<TPatientCommonInfo, TPatientCommonInfo._Fields> rsmCommonPatient;
 	private TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
 	private TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
@@ -127,8 +127,8 @@ public class ServerHospital extends Server implements Iface {
 	   "npasp", "nrod", "timeon", "kolchild", "nreb", "massa", "rost",
 	   "apgar1", "apgar5", "krit1", "krit2", "krit3", "krit4", "mert", "donosh", "datazap"
    };
-    private static final String[] RDSVID_FIELD_NAMES = {
-    	"npasp", "ndoc", "doctype", "dateoff", "famreb", "svidvrach"
+    private static final String[] RDSVID_ROJD_FIELD_NAMES = {
+    	"npasp", "ndoc", "dateoff", "famreb", "m_rojd", "zan", "r_proiz", "svidvrach"
    };
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
@@ -201,9 +201,9 @@ public class ServerHospital extends Server implements Iface {
 	//	donosh,			datazap
     	Boolean.class,	Date.class
     };
-    private static final Class<?>[] CHILD_DOC_TYPES = new Class<?>[] {
-	//	npasp,			ndoc,   		doctype,		dateoff,	famreb,			svidvrach
-    	Integer.class,	Integer.class,	Boolean.class,	Date.class,	String.class,	Integer.class
+    private static final Class<?>[] CHILD_DOC_BIRTH_TYPES = new Class<?>[] {
+	//	npasp,			ndoc,   		dateoff,	famreb,			m_rojd			zan				r_proiz			svidvrach
+    	Integer.class,	Integer.class,	Date.class,	String.class,	Integer.class,	Integer.class,	Integer.class,	Integer.class
     };
 
     /**
@@ -230,8 +230,10 @@ public class ServerHospital extends Server implements Iface {
         rsmStrClas = new TResultSetMapper<>(StringClassifier.class, STR_CLAS_FIELD_NAMES);
         rsmStage = new TResultSetMapper<>(TStage.class, STAGE_FIELD_NAMES);
         rsmRdIshod = new TResultSetMapper<>(TRdIshod.class, RDISHOD_FIELD_NAMES);
+        rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, RdDinStruct_Fields_names);
+        rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, RdSlStruct_Fields_names);
         rsmRdNovor = new TResultSetMapper<>(TRd_Novor.class, RDNOVOR_FIELD_NAMES);
-        rsmRdSvid = new TResultSetMapper<>(TRd_Svid.class, RDSVID_FIELD_NAMES);
+        rsmRdSvidRojd = new TResultSetMapper<>(TRd_Svid_Rojd.class, RDSVID_ROJD_FIELD_NAMES);
         rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class, COMMON_PATIENT_FIELD_NAMES);
     }
 
@@ -1176,13 +1178,14 @@ public class ServerHospital extends Server implements Iface {
     public TRdIshod getRdIshodInfo(int npasp,int ngosp)
 			throws PrdIshodNotFoundException, KmiacServerException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "select * from c_rd_ishod where npasp = ? and ngosp = ? ", npasp, ngosp)) {
+		        "SELECT * " +
+		        "FROM c_rd_ishod " +
+		        "WHERE (npasp = ?) AND (ngosp = ?);", npasp, ngosp)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdIshod.map(acrs.getResultSet());
             } else {
                 throw new PrdIshodNotFoundException();
             }
-
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			log.log(Level.ERROR, "SqlException", e);
@@ -1445,12 +1448,16 @@ public class ServerHospital extends Server implements Iface {
 		public RdSlStruct getRdSlInfo(int npasp) 
 				throws PrdSlNotFoundException, KmiacServerException {
         AutoCloseableResultSet acrs1;
-        Date daterod =  new Date(System.currentTimeMillis()-280*24*60*60*1000);
-//         daterod =  new Date(System.currentTimeMillis()-24192000000);
+//        long fWeeks = 24192000000L;
+//        long test = System.currentTimeMillis()- fWeeks;
+//        Date daterod =  new Date(test);
+        Date daterod =  new Date(System.currentTimeMillis()-24192000000L);
 		Integer ish = 1;
-        System.out.println("случай родов");
-        System.out.println(npasp);
-        System.out.println(daterod);
+//        System.out.println("случай родов");
+//        System.out.println(npasp);
+//        System.out.println(System.currentTimeMillis());
+//        System.out.println(daterod);
+//        System.out.println(test);
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdSl.map(acrs.getResultSet());
@@ -1497,7 +1504,7 @@ public class ServerHospital extends Server implements Iface {
 	    Integer hdm = 0;
 	    Integer spl = 0;Integer chcc = 0;Integer polpl =0 ;Integer predpl =0;
 	    Integer serd =0 ;Integer serd1 =0 ; Integer idpos = 0;
-	    Double ves = 0.0; 
+	    Double ves = 0.0; Integer pozpl = 0; Integer vidpl = 0;
         System.out.println("динамика");
         System.out.println(npasp);
         System.out.println(ngosp);
@@ -1506,7 +1513,7 @@ public class ServerHospital extends Server implements Iface {
                 return rsmRdDin.map(acrs.getResultSet());
             } else {
 				AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select srok,oj, "+
-		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos "+	
+		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos,pozpl,vidpl "+	
 			    " from p_rd_din where npasp = ? order by id_pos", npasp);
 				if (acrs1.getResultSet().next()) {
 //присваиваем значения из динамики, в итоге из-за сортировки имеем последние 
@@ -1522,12 +1529,14 @@ public class ServerHospital extends Server implements Iface {
 				serd = acrs1.getResultSet().getInt(8);
 				serd1 = acrs1.getResultSet().getInt(9);
 				idpos = acrs1.getResultSet().getInt(11);
+				pozpl = acrs1.getResultSet().getInt(12);
+				vidpl = acrs1.getResultSet().getInt(13);
 				}
 				idpos = idpos+1;
 				try (SqlModifyExecutor sme = tse.startTransaction()) {
 					sme.execPrepared("insert into p_rd_din " +
-						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos);
-					int id = sme.getGeneratedKeys().getInt("id");
+						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos,pozpl,vidpl) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos,pozpl,vidpl);
+//					int id = sme.getGeneratedKeys().getInt("id");
 					sme.setCommit();
 			        System.out.println("динамика добавлена");
 				} catch (InterruptedException e) {
@@ -1548,8 +1557,8 @@ public class ServerHospital extends Server implements Iface {
 				}
             }
 //
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			log.log(Level.ERROR, "SqlException", e);
 			throw new KmiacServerException();
 		}
@@ -1655,7 +1664,8 @@ public class ServerHospital extends Server implements Iface {
 	 */
 	private boolean isPatientExist(final int npasp) {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT * FROM patient WHERE npasp = ?;", npasp)) {
+                "SELECT * FROM patient " +
+                "WHERE (npasp = ?);", npasp)) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -1671,7 +1681,8 @@ public class ServerHospital extends Server implements Iface {
 	 */
 	private boolean isChildExist(final int npasp) {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT * FROM c_rd_novor WHERE npasp = ?;", npasp)) {
+                "SELECT * FROM c_rd_novor " +
+                "WHERE (npasp = ?);", npasp)) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -1687,7 +1698,8 @@ public class ServerHospital extends Server implements Iface {
 	 */
 	private boolean isChildDocExist(final int npasp) {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT * FROM c_rd_svid WHERE (npasp = ?);", npasp)) {
+                "SELECT * FROM c_rd_svid_rojd " +
+                "WHERE (npasp = ?);", npasp)) {
             return acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -1696,16 +1708,16 @@ public class ServerHospital extends Server implements Iface {
     }
 
 	/**
-	 * Проверка уникальности номера свидетельства заданного типа
+	 * Проверка уникальности номера мед.свидетельства о рождении
 	 * @param ndoc Номер свидетельства
-	 * @param doctype Тип свидетельства (<code>true</code>, если свидетельство о рождении;
 	 * <code>false</code> - о перинатальной смерти новорождённого)
 	 * @return Возвращает <code>true</code>, если номер свидетельства уникален; иначе - <code>false</code>
 	 * @author Балабаев Никита Дмитриевич
 	 */
-	private boolean isChildDocUnique(final int ndoc, final boolean doctype) {
+	private boolean isChildDocUnique(final int ndoc) {
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-                "SELECT * FROM c_rd_svid WHERE (ndoc = ?) AND (doctype = ?);", ndoc, doctype)) {
+                "SELECT * FROM c_rd_svid_rojd " +
+                "WHERE (ndoc = ?);", ndoc)) {
             return !acrs.getResultSet().next();
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -1714,22 +1726,21 @@ public class ServerHospital extends Server implements Iface {
 	}
 	
 	/**
-	 * Функция получения информации о мед.свидетельстве о рождении/перинатальной
-	 * смерти новорождённого по номеру свидетельства
+	 * Функция получения информации о мед.свидетельстве о рождении
+	 * по номеру свидетельства
 	 * @param ndoc Идентификатор свидетельства
-	 * @param doctype Тип свидетельства (<code>true</code>, если свидетельство о рождении;
-	 * <code>false</code> - о перинатальной смерти новорождённого)
 	 * @return Возвращает информацию о свидетельстве
 	 * @throws ChildDocNotFoundException свидетельство не найдено
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-	private TRd_Svid getChildDocumentByDoc(final int ndoc, final boolean doctype)
+	private TRd_Svid_Rojd getChildDocumentByDoc(final int ndoc)
 			throws KmiacServerException, ChildDocNotFoundException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "SELECT * FROM c_rd_svid WHERE (ndoc = ?) AND (doctype = ?);", ndoc, doctype)) {
+		        "SELECT * FROM c_rd_svid_rojd " +
+		        "WHERE (ndoc = ?);", ndoc)) {
 			if (acrs.getResultSet().next()) {
-                return rsmRdSvid.map(acrs.getResultSet());
+                return rsmRdSvidRojd.map(acrs.getResultSet());
             } else
                 throw new ChildDocNotFoundException();
 		} catch (SQLException e) {
@@ -1790,6 +1801,33 @@ public class ServerHospital extends Server implements Iface {
             throw new KmiacServerException();
         }
 	}
+	
+	/**
+	 * Функция получения срока первой явки матери к врачу
+	 * @param npasp Идентификатор матери
+	 * @param childBirthDate Дата родов
+	 * @return Срок первой явки (количество недель беременности)
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private int getFirstConsultWeekNum(final int npasp, final Date childBirthDate)
+			throws KmiacServerException {
+		final String Query = "SELECT p_rd_sl.yavka1 " +
+				"FROM c_rd_ishod " +
+				"LEFT JOIN p_rd_sl ON (p_rd_sl.id = c_rd_ishod.id_berem) " +
+				"WHERE (c_rd_ishod.npasp = ?) AND (c_rd_ishod.daterod = ?);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+        		Query, npasp, childBirthDate)) {
+        	ResultSet rs = acrs.getResultSet();
+        	if (rs.next())
+        		return rs.getInt(1);
+        	else
+                return -1;
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
 
 	@Override
 	public List<IntegerClassifier> getChildBirths(final long BirthDate) throws KmiacServerException, TException {
@@ -1808,9 +1846,10 @@ public class ServerHospital extends Server implements Iface {
 	public void addChildInfo(final TRd_Novor Child)
 			throws KmiacServerException, PatientNotFoundException, TException {
         final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-        final String sqlQuery = "INSERT INTO c_rd_novor (npasp, nrod, timeon, kolchild, nreb, massa, rost, " +
-    		"apgar1, apgar5, krit1, krit2, krit3, krit4, mert, donosh, datazap) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        final String sqlQuery = "INSERT INTO c_rd_novor " +
+        		"(npasp, nrod, timeon, kolchild, nreb, massa, rost, " +
+        		"apgar1, apgar5, krit1, krit2, krit3, krit4, mert, donosh, datazap) " +
+        		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isPatientExist(Child.getNpasp())) {
                 sme.execPreparedT(sqlQuery, false, Child, CHILD_TYPES, indexes);
@@ -1827,7 +1866,8 @@ public class ServerHospital extends Server implements Iface {
 	public TRd_Novor getChildInfo(final int npasp)
 			throws KmiacServerException, PatientNotFoundException, TException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "SELECT * FROM c_rd_novor WHERE npasp = ?;", npasp)) {
+		        "SELECT * FROM c_rd_novor " +
+		        "WHERE (npasp = ?);", npasp)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdNovor.map(acrs.getResultSet());
             } else
@@ -1858,14 +1898,14 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-	public int addChildDocument(final TRd_Svid ChildDocument)
+	public int addChildDocument(final TRd_Svid_Rojd ChildDocument)
 			throws KmiacServerException, PatientNotFoundException, TException {
-        final int[] indexes = {0, 2, 3, 4, 5};
-        final String sqlQuery = "INSERT INTO c_rd_svid (npasp, doctype, dateoff, famreb, svidvrach) " +
-        						"VALUES (?, ?, ?, ?, ?);";
+        final int[] indexes = {0, 2, 3, 4, 5, 6, 7};
+        final String sqlQuery = "INSERT INTO c_rd_svid_rojd (npasp, dateoff, famreb, m_rojd, zan, r_proiz, svidvrach) " +
+        						"VALUES (?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildExist(ChildDocument.getNpasp())) {
-                sme.execPreparedT(sqlQuery, true, ChildDocument, CHILD_DOC_TYPES, indexes);
+                sme.execPreparedT(sqlQuery, true, ChildDocument, CHILD_DOC_BIRTH_TYPES, indexes);
                 int ndoc = sme.getGeneratedKeys().getInt("ndoc");
                 sme.setCommit();
                 return ndoc;
@@ -1880,12 +1920,13 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-	public TRd_Svid getChildDocument(final int npasp)
+	public TRd_Svid_Rojd getChildDocument(final int npasp)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-		        "SELECT * FROM c_rd_svid WHERE (npasp = ?);", npasp)) {
+		        "SELECT * FROM c_rd_svid_rojd " +
+		        "WHERE (npasp = ?);", npasp)) {
 			if (acrs.getResultSet().next()) {
-                return rsmRdSvid.map(acrs.getResultSet());
+                return rsmRdSvidRojd.map(acrs.getResultSet());
             } else
                 throw new ChildDocNotFoundException();
 		} catch (SQLException e) {
@@ -1895,16 +1936,16 @@ public class ServerHospital extends Server implements Iface {
 	}
 
 	@Override
-	public void updateChildDocument(final TRd_Svid ChildDocument)
+	public void updateChildDocument(final TRd_Svid_Rojd ChildDocument)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        final int[] indexes = {3, 4, 5, 0};
-        //Поля ndoc и doctype изменять нельзя (в списке параметров не присутствуют):
-        final String sqlQuery = "UPDATE c_rd_svid " +
-        						"SET dateoff = ?, famreb = ?, svidvrach = ? " +
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 0};
+        //Поле ndoc изменять нельзя (в списке параметров не присутствует):
+        final String sqlQuery = "UPDATE c_rd_svid_rojd " +
+        						"SET dateoff = ?, famreb = ?, m_rojd = ?, zan = ?, r_proiz = ?, svidvrach = ? " +
         						"WHERE (npasp = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildDocExist(ChildDocument.getNpasp())) {
-                sme.execPreparedT(sqlQuery, false, ChildDocument, CHILD_DOC_TYPES, indexes);
+                sme.execPreparedT(sqlQuery, false, ChildDocument, CHILD_DOC_BIRTH_TYPES, indexes);
                 sme.setCommit();
             } else
                 throw new ChildDocNotFoundException();
@@ -1918,7 +1959,8 @@ public class ServerHospital extends Server implements Iface {
 	public TPatientCommonInfo getPatientCommonInfo(final int npasp)
 			throws KmiacServerException, PatientNotFoundException, TException {
         String sqlQuery = "SELECT npasp, fam||' '||im||' '||ot as full_name, datar, "
-        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv "
+        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, "
+        		+ "adp_dom, adp_kv, obraz, status "
                 + "FROM patient "
                 + "LEFT JOIN n_z30 ON (n_z30.pcod = patient.pol) "
                 + "LEFT JOIN n_am0 ON (n_am0.pcod = patient.jitel) "
@@ -1944,15 +1986,18 @@ public class ServerHospital extends Server implements Iface {
         final String path;
         final String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
-        if (isChildDocUnique(ndoc, true))	//Свидетельство с таким номером не существует
+        if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
         	throw new ChildDocNotFoundException();
-        TRd_Svid childDoc = getChildDocumentByDoc(ndoc, true);
+        //Загрузка данных:
+        TRd_Svid_Rojd childDoc = getChildDocumentByDoc(ndoc);
         TRd_Novor childBirthInfo = getChildInfo(childDoc.getNpasp());
         TPatientCommonInfo childInfo = getPatientCommonInfo(childDoc.getNpasp());
         TPatientCommonInfo motherInfo = getPatientCommonInfo(getMotherId(childDoc.getNpasp()));
+        int iFirstConsult = getFirstConsultWeekNum(motherInfo.getNpasp(), new Date(childInfo.getDatar()));
+        //Создание документа:
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
-        			path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()
+        			path = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
         		), "UTF-8")) {
         	File a = new File(this.getClass().getProtectionDomain().getCodeSource()
                     .getLocation().getPath());
@@ -1982,6 +2027,20 @@ public class ServerHospital extends Server implements Iface {
             			country1 = "<u>";
             			country2 = "</u>";
                 	}
+            //Роды произошли:
+            String birthHappen[] = new String[] {"", "", "", "", "", "", "", ""};
+            birthHappen[2*(childDoc.getR_proiz() - 1)] = "<u>";
+            birthHappen[2*childDoc.getR_proiz() - 1] = "</u>";
+            
+            
+            //FIXME:
+            //Местность рождения:
+            String cityChild1 = "", cityChild2 = "";
+            String countryChild1 = "", countryChild2 = "";
+            
+            
+            
+            
             //Пол новорождённого:
             String boy1 = "", boy2 = "";
             String girl1 = "", girl2 = "";
@@ -2011,6 +2070,44 @@ public class ServerHospital extends Server implements Iface {
 	            childBirthHour = childBirthTime.substring(0, 2);
 	            childBirthMinute = childBirthTime.substring(3, 5);
             }
+            //Образование матери:
+            int iEduc = (motherInfo.isSetObraz()) ? motherInfo.getObraz() : 0;
+            String[] motherEduc = new String[] {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+            if ((iEduc > 0) && (iEduc < 10)) {
+	            motherEduc[2*(iEduc - 1)] = "<u>";
+	            motherEduc[2*iEduc - 1] = "</u>";
+            } else {	//Неизвестный код образования - ставим "Неизвестно":
+	            motherEduc[16] = "<u>";
+	            motherEduc[17] = "</u>";
+            }
+            //Семейное положение матери:
+            int iStatus = motherInfo.isSetStatus() ? motherInfo.getStatus() : 0;
+            String[] motherStatus = new String[] {"", "", "", "", "", ""};
+            if ((iStatus > 0) && (iStatus < 5)) {
+            	if (iStatus == 1) {	//Состоит в браке
+	            	motherStatus[0] = "<u>";
+	            	motherStatus[1] = "</u>";
+            	} else {			//Не состоит в браке
+	            	motherStatus[2] = "<u>";
+	            	motherStatus[3] = "</u>";
+            	}
+            } else {	//Неизвестный код семейного положения - ставим "Неизвестно":
+            	motherStatus[4] = "<u>";
+            	motherStatus[5] = "</u>";
+            }            
+            //Занятость матери:
+            String[] motherWork = new String[] {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+            if ((childDoc.getZan() > 0) && (childDoc.getZan() < 11)) {
+            	motherWork[2*(childDoc.getZan() - 1)] = "<u>";
+            	motherWork[2*childDoc.getZan() - 1] = "</u>";
+            } else {	//Неизвестный код занятости - ставим "Прочие":
+            	motherWork[18] = "<u>";
+            	motherWork[19] = "</u>";
+            }
+            //Срок первой явки к врачу:
+            String firstConsult = "  ";
+            if (iFirstConsult >= 0)
+            	firstConsult = String.format("%2d", iFirstConsult);
             //Который по счёту:
             String nChildren = "  ";
             if (childBirthInfo.isSetKolchild())
@@ -2035,33 +2132,48 @@ public class ServerHospital extends Server implements Iface {
             	}
             }
             htmTemplate.replaceLabels(false,
+            	//Серия и номер свидетельства:
         		ServerHospital.childBirthDocSeries, childBirthNumber,
+        		//Дата выдачи:
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
+        		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()), sdfMonth.format(childInfo.getDatar()).toUpperCase(),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
+        		//Фамилия, имя, отчество матери:
         		motherFullName,
+        		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()), sdfMonth.format(motherInfo.getDatar()).toUpperCase(),
         		sdfYear.format(motherInfo.getDatar()),
+        		//Место регистрации матери:
         		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
         		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
         		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
         		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
         		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
         		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+				//Местность регистрации:
         		city1, city2, country1, country2,
+        		//Пол ребёнка:
         		boy1, boy2, girl1, girl2,
         		//TODO: ЗАПИСАТЬ ШАПКУ:
         		"", "", "", "",
+            	//Серия и номер свидетельства:
         		ServerHospital.childBirthDocSeries, childBirthNumber,
+        		//Дата выдачи:
         		sdfDay.format(childDoc.getDateoff()), months[dateOff.get(GregorianCalendar.MONTH)],
         		sdfYear.format(childDoc.getDateoff()),
+        		//Ребенок родился:
         		sdfDay.format(childInfo.getDatar()),
         		sdfMonth.format(childInfo.getDatar()).toUpperCase(),
         		sdfYear.format(childInfo.getDatar()),
         		childBirthHour, childBirthMinute,
-        		motherSurname, motherFirstName, childDoc.getFamreb().toUpperCase(),
+        		//Фамилия, имя, отчество матери:
+        		motherSurname, motherFirstName,
+        		//Фамилия ребёнка:
+        		childDoc.getFamreb().toUpperCase(),
+        		//Дата рождения матери:
         		sdfDay.format(motherInfo.getDatar()).substring(0, 1),
         		sdfDay.format(motherInfo.getDatar()).substring(1, 2),
         		sdfMonthShort.format(motherInfo.getDatar()).substring(0, 1),
@@ -2070,29 +2182,75 @@ public class ServerHospital extends Server implements Iface {
         		sdfYear.format(motherInfo.getDatar()).substring(1, 2),
         		sdfYear.format(motherInfo.getDatar()).substring(2, 3),
         		sdfYear.format(motherInfo.getDatar()).substring(3, 4),
+        		//Место регистрации матери:
         		(motherInfo.isSetAdp_obl()) ? motherInfo.getAdp_obl() : "",
         		"",	//РАЙОН РЕГИСТРАЦИИ МАТЕРИ
         		(motherInfo.isSetAdp_gorod()) ? motherInfo.getAdp_gorod() : "",
         		(motherInfo.isSetAdp_ul()) ? motherInfo.getAdp_ul() : "",
         		(motherInfo.isSetAdp_dom()) ? motherInfo.getAdp_dom() : "",
         		(motherInfo.isSetAdp_kv()) ? motherInfo.getAdp_kv() : "",
+        		//Местность регистрации:
         		city1, city2, country1, country2,
+        		//Семейное положение матери:
+        		motherStatus[0], motherStatus[1],
+        		motherStatus[2], motherStatus[3],
+        		motherStatus[4], motherStatus[5],
         		//МЕСТО РОЖДЕНИЯ:
     			"", "", "",
         		//МЕСТНОСТЬ РОЖДЕНИЯ:
-    			"", "",
-    			"", "",
+    			cityChild1, cityChild2,
+    			countryChild1, countryChild2,
+    			//Роды произошли:
+    			birthHappen[0], birthHappen[1],
+    			birthHappen[2], birthHappen[3],
+    			birthHappen[4], birthHappen[5],
+    			birthHappen[6], birthHappen[7],
+        		//Пол ребёнка:
         		boy1, boy2, girl1, girl2,
-        		//ДОЛЖНОСТЬ ВРАЧА:
-        		"",
+    			//Роды произошли:
+    			birthHappen[0], birthHappen[1],
+    			birthHappen[2], birthHappen[3],
+    			birthHappen[4], birthHappen[5],
+    			birthHappen[6], birthHappen[7],
+        		"",	//ДОЛЖНОСТЬ ВРАЧА
+        		//Текущая дата:
         		sdfDay.format(curDate.getTimeInMillis()), months[curDate.get(GregorianCalendar.MONTH)],
         		sdfYear.format(curDate.getTimeInMillis()),
+        		//Образование матери:
+        		motherEduc[0], motherEduc[1],
+        		motherEduc[2], motherEduc[3],
+        		motherEduc[4], motherEduc[5],
+        		motherEduc[6], motherEduc[7],
+        		motherEduc[8], motherEduc[9],
+        		motherEduc[10], motherEduc[11],
+        		motherEduc[12], motherEduc[13],
+        		motherEduc[14], motherEduc[15],
+        		motherEduc[16], motherEduc[17],
+        		//Занятость матери:
+        		motherWork[0], motherWork[1],
+        		motherWork[0], motherWork[1],
+        		motherWork[2], motherWork[3],
+        		motherWork[4], motherWork[5],
+        		motherWork[6], motherWork[7],
+        		motherWork[8], motherWork[9],
+        		motherWork[10], motherWork[11],
+        		motherWork[12], motherWork[13],
+        		motherWork[14], motherWork[15],
+        		motherWork[14], motherWork[15],
+        		motherWork[16], motherWork[17],
+        		motherWork[18], motherWork[19],
+        		//Срок первой явки к врачу:
+        		firstConsult.substring(0, 1), firstConsult.substring(1, 2),
+        		//Которым по счету ребенок был рожден у матери:
         		nChildren.substring(0, 1), nChildren.substring(1, 2),
-        		weight.substring(0, 1), weight.substring(1, 2), weight.substring(2, 3), weight.substring(3, 4),
+        		//Масса тела при рождении:
+        		weight.substring(0, 1), weight.substring(1, 2),
+        		weight.substring(2, 3), weight.substring(3, 4),
+        		//Длина  тела при рождении:
         		height.substring(0, 1), height.substring(1, 2),
         		only, nreb, nreb_all,
-        		//ДОЛЖНОСТЬ ВРАЧА:
-        		"");
+        		""	//ДОЛЖНОСТЬ ВРАЧА
+        		);
             osw.write(htmTemplate.getTemplateText());
             return path;
         } catch (Exception e) {
@@ -2103,7 +2261,7 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public String printChildDeathDocument(final int ndoc)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        if (isChildDocUnique(ndoc, false))	//Свидетельства с таким номером не существует
+        if (isChildDocUnique(ndoc))	//Свидетельства с таким номером не существует
         	throw new ChildDocNotFoundException();
 		return null;
 	}

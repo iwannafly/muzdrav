@@ -26,6 +26,7 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 	private JTabbedPane tabbedPane;
 	private UserPanel tpUser;
 	private ShablonOsmPanel tpShablonOsm;
+	private ShablonOperPanel tpShablonOper;
 	private ShablonDopPanel tpShablonDop;
 	private ShablonLdsPanel tpShablonLds;
 
@@ -57,8 +58,10 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 				else if (tabbedPane.getSelectedIndex() == 1)
 					tpShablonOsm.prepareShTextFields();
 				else if (tabbedPane.getSelectedIndex() == 2)
-					tpShablonDop.prepareShTextFields();
+					tpShablonOper.prepareShTextFields();
 				else if (tabbedPane.getSelectedIndex() == 3)
+					tpShablonDop.prepareShTextFields();
+				else if (tabbedPane.getSelectedIndex() == 4)
 					tpShablonLds.prepareShTextFields();
 			}
 		});
@@ -83,6 +86,9 @@ public class MainForm extends Client<ThriftServerAdmin.Client> {
 		
 		tpShablonOsm = new ShablonOsmPanel();
 		tabbedPane.addTab("Шаблоны осмотра", null, tpShablonOsm, null);
+		
+		tpShablonOper = new ShablonOperPanel();
+		tabbedPane.addTab("Шаблоны операции", null, tpShablonOper, null);
 		
 		tpShablonDop = new ShablonDopPanel();
 		tabbedPane.addTab("Дополнительные шаблоны", null, tpShablonDop, null);

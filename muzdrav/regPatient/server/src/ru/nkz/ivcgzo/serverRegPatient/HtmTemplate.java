@@ -55,7 +55,7 @@ public class HtmTemplate {
     /**
      * Читает htm-файл с определенным именем из папки с шаблонами по умолчанию
      * для данного типа ОС.
-     * @param templateFileName
+     * @param templatePath
      * @return полный текст htm-шаблона
      */
     private String readTemplateFromFile(final String templatePath) {
@@ -200,7 +200,7 @@ public class HtmTemplate {
      */
     public final void replaceLabel(final int labelIndex, final String value) throws Exception {
         if (labelIndex <= labels.size()) {
-            if ((value != null) && (value != "null")) {
+            if ((value != null) && (!value.equals("null"))) {
                 template = template.replaceFirst(labels.get(labelIndex), value);
             } else {
                 template = template.replaceFirst(labels.get(labelIndex), "");
@@ -219,7 +219,7 @@ public class HtmTemplate {
      */
     public final void replaceLabel(final String labelName, final String value) throws Exception {
         if (labels.contains(labelName)) {
-            if ((value != null) && (value != "null")) {
+            if ((value != null) && (!value.equals("null"))) {
                 template = template.replaceFirst(labelName, value);
             } else {
                 template = template.replaceFirst(labelName, "");

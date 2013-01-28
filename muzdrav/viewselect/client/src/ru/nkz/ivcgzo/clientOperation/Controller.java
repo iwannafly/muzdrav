@@ -24,7 +24,6 @@ public class Controller implements IController{
         this.view = new MainFrame(this, model);
         view.createFrame();
         view.setControls();
-//        view.createControls();
     }
 
     @Override
@@ -504,7 +503,6 @@ public class Controller implements IController{
                 model.deleteAnesthesiaPaymentFund(anesthesiaPaymentFund);
                 model.setAnesthesiaPaymentFundsList(model.getCurrentAnesthesia().getId());
             } catch (KmiacServerException e1) {
-
                 JOptionPane.showMessageDialog(null,
                         "Ошибка при удалении фонда оплаты анестезии");
                 e1.printStackTrace();

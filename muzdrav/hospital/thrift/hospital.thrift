@@ -275,26 +275,30 @@ struct TRd_Novor {
 	16: optional i64 datazap;
 }
 
-struct TRd_Svid {
+struct TRd_Svid_Rojd {
 	1: i32 npasp;
 	2: optional i32 ndoc;
-	3: bool doctype;
-	4: i64 dateoff;
-	5: string famreb;
-	6: i32 svidvrach;
+	3: i64 dateoff;
+	4: string famreb;
+	5: i32 m_rojd;
+	6: i32 zan;
+	7: i32 r_proiz;
+	8: i32 svidvrach;
 }
 
 struct TPatientCommonInfo {
 	1: i32 npasp;
 	2: string full_name;
 	3: i64 datar;
-	4: string pol;
-	5: string jitel;
-	6: string adp_obl;
-	7: string adp_gorod;
-	8: string adp_ul;
-	9: string adp_dom;
-	10: string adp_kv;
+	4: optional string pol;
+	5: optional string jitel;
+	6: optional string adp_obl;
+	7: optional string adp_gorod;
+	8: optional string adp_ul;
+	9: optional string adp_dom;
+	10: optional string adp_kv;
+	11: optional i32 obraz;
+	12: optional i32 status;
 }
 
 struct TRd_SMPK {
@@ -549,7 +553,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-	i32 addChildDocument(1:TRd_Svid ChildDocument)
+	i32 addChildDocument(1:TRd_Svid_Rojd ChildDocument)
 		throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 	/**
 	 * Получение информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
@@ -559,7 +563,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-    TRd_Svid getChildDocument(1:i32 npasp)
+    TRd_Svid_Rojd getChildDocument(1:i32 npasp)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     /**
 	 * Обновление информации о мед.свидетельстве о рождении/перинатальной смерти новорождённого
@@ -568,7 +572,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 * @throws KmiacServerException исключение на стороне сервера
 	 * @author Балабаев Никита Дмитриевич
 	 */
-    void updateChildDocument(1:TRd_Svid ChildDocument)
+    void updateChildDocument(1:TRd_Svid_Rojd ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
     string printChildBirthDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
@@ -588,15 +592,18 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
-	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:PrdIshodNotFoundException pinfe, 	2:kmiacServer.KmiacServerException kse);
+	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp)
+		throws (1:PrdIshodNotFoundException pinfe, 2:kmiacServer.KmiacServerException kse);
     i32 addRdIshod(1:TRdIshod rdIs) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1:PrdSlNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 npasp)
+		throws (1:PrdSlNotFoundException pinfe, 2: kmiacServer.KmiacServerException kse);
     void AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
     void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
     void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
-	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1:PrdDinNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp)
+		throws (1:PrdDinNotFoundException pinfe, 2: kmiacServer.KmiacServerException kse);
     void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
     void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
     void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);

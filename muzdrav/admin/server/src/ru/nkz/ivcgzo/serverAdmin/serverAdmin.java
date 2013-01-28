@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +32,7 @@ import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.MestoRabNotFoundException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonDop;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonLds;
+import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOper;
 import ru.nkz.ivcgzo.thriftServerAdmin.ShablonOsm;
 import ru.nkz.ivcgzo.thriftServerAdmin.TemplateExistsException;
 import ru.nkz.ivcgzo.thriftServerAdmin.ThriftServerAdmin;
@@ -50,6 +52,7 @@ public class serverAdmin extends Server implements Iface {
 	private TResultSetMapper<StringClassifier, StringClassifier._Fields> rsmStrClas;
 	private TResultSetMapper<ShablonDop, ShablonDop._Fields> rsmShDopClas;
 	private TResultSetMapper<ShablonLds, ShablonLds._Fields> rsmShLdsClas;
+	private TResultSetMapper<ShablonOper, ShablonOper._Fields> rsmShOperClas;
 	
 	@Override
 	public void start() throws Exception {
@@ -74,6 +77,7 @@ public class serverAdmin extends Server implements Iface {
 		rsmStrClas = new TResultSetMapper<>(StringClassifier.class, "pcod", "name");
 		rsmShDopClas = new TResultSetMapper<>(ShablonDop.class, "id", "id_n_shablon", "name", "text");
 		rsmShLdsClas = new TResultSetMapper<>(ShablonLds.class, "id", "c_p0e1", "c_ldi", "name", "opis", "zakl");
+		rsmShOperClas = new TResultSetMapper<>(ShablonOper.class);
 	}
 
 	@Override
@@ -657,6 +661,80 @@ public class serverAdmin extends Server implements Iface {
 		} catch (SQLException | InterruptedException e) {
 			System.err.println(e.getCause());
 			throw new KmiacServerException("Error deleting template lds");
+		}
+	}
+	
+	@Override
+	public List<IntegerClassifier> getShOperStatList() throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execQuery("SELECT pcod, name FROM n_tip WHERE (pcod = 1) OR (pcod = 3) ORDER BY pcod ")) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates oper stat type list");
+		}
+	}
+	
+	@Override
+	public List<IntegerClassifier> getShOperList(int statTip, String srcStr) throws KmiacServerException, TException {
+		String sql = "SELECT id AS pcod, oper_pcod || ' ' || name AS name FROM sh_oper WHERE (stat_tip = ?) ";
+		if (srcStr != null)
+			sql += "AND (src_text LIKE ?) ";
+		sql += "ORDER BY oper_pcod ";
+		
+		try (AutoCloseableResultSet acrs = (srcStr == null) ? sse.execPreparedQuery(sql, statTip) :  sse.execPreparedQuery(sql, statTip, srcStr)) {
+			return rsmIntClas.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting templates oper list");
+		}
+	}
+	
+	@Override
+	public ShablonOper getShOper(int id) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT * FROM sh_oper WHERE id = ? ", id)) {
+			if (acrs.getResultSet().next())
+				return rsmShOperClas.map(acrs.getResultSet());
+			else
+				throw new KmiacServerException("No template oper found with this id");
+		} catch (SQLException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error getting template oper");
+		}
+	}
+	
+	@Override
+	public int saveShOper(ShablonOper shOper) throws KmiacServerException, TemplateExistsException, TException {
+		int shId = shOper.id;
+		String srcStr = String.format("%s %s %s %s %s %s %s %s", shOper.oper_pcod.toLowerCase(), shOper.oper_name.toLowerCase(), shOper.diag_pcod.toLowerCase(), shOper.diag_name.toLowerCase(), shOper.name.toLowerCase(), new Time(shOper.oper_dlit), shOper.mat.toLowerCase(), shOper.text.toLowerCase());
+		
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT id FROM sh_oper WHERE id = ? ", shId)) {
+			if (acrs.getResultSet().next()) {
+				sme.execPrepared("UPDATE sh_oper SET name = ?, oper_pcod = ?, diag_pcod = ?, oper_dlit = ?, mat = ?, text = ?, src_text = ? WHERE id = ? ", false, shOper.name, shOper.oper_pcod, shOper.diag_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr, shId);
+			} else {
+				sme.execPrepared("INSERT INTO sh_oper (stat_tip, name, oper_pcod, diag_pcod, oper_dlit, mat, text, src_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, shOper.stat_tip, shOper.name, shOper.oper_pcod, shOper.diag_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr);
+				shId = sme.getGeneratedKeys().getInt("id");
+			}
+			sme.setCommit();
+			
+			return shId;
+		} catch (SQLException | InterruptedException e) {
+			if (e instanceof SQLException)
+				if (((SQLException) e.getCause()).getSQLState().equals("23505"))
+					throw new TemplateExistsException();
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error saving template oper");
+		}
+	}
+	
+	@Override
+	public void deleteShOper(int id) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction()) {
+			sme.execPrepared("DELETE FROM sh_oper WHERE id = ? ", false, id);
+			sme.setCommit();
+		} catch (SQLException | InterruptedException e) {
+			System.err.println(e.getCause());
+			throw new KmiacServerException("Error deleting template oper");
 		}
 	}
 }
