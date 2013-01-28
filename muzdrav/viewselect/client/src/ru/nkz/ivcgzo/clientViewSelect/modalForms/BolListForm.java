@@ -173,12 +173,13 @@ public class BolListForm extends ModalForm {
 		
 		
 		try {
+			
 			tblPbol.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_bl1));
 			tblPbol.setIntegerClassifierSelector(3, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z30));
 			tblPbol.setData(MainForm.tcl.getPbol(idObr, idGosp, idPbol));
-			btnAdd.setEnabled(modEnabled);
-			btnDel.setEnabled(modEnabled);
-			btnUpd.setEnabled(modEnabled);
+//			btnAdd.setEnabled(modEnabled);
+//			btnDel.setEnabled(modEnabled);
+//			btnUpd.setEnabled(modEnabled);
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(BolListForm.this, "Не удалось загрузить больничный лист.");

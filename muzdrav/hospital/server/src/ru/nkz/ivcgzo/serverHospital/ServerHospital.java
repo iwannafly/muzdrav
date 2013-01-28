@@ -230,6 +230,8 @@ public class ServerHospital extends Server implements Iface {
         rsmStrClas = new TResultSetMapper<>(StringClassifier.class, STR_CLAS_FIELD_NAMES);
         rsmStage = new TResultSetMapper<>(TStage.class, STAGE_FIELD_NAMES);
         rsmRdIshod = new TResultSetMapper<>(TRdIshod.class, RDISHOD_FIELD_NAMES);
+        rsmRdDin = new TResultSetMapper<>(RdDinStruct.class, RdDinStruct_Fields_names);
+        rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, RdSlStruct_Fields_names);
         rsmRdNovor = new TResultSetMapper<>(TRd_Novor.class, RDNOVOR_FIELD_NAMES);
         rsmRdSvidRojd = new TResultSetMapper<>(TRd_Svid_Rojd.class, RDSVID_ROJD_FIELD_NAMES);
         rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class, COMMON_PATIENT_FIELD_NAMES);
@@ -1445,12 +1447,16 @@ public class ServerHospital extends Server implements Iface {
 		public RdSlStruct getRdSlInfo(int npasp) 
 				throws PrdSlNotFoundException, KmiacServerException {
         AutoCloseableResultSet acrs1;
-        Date daterod =  new Date(System.currentTimeMillis()-280*24*60*60*1000);
-//         daterod =  new Date(System.currentTimeMillis()-24192000000);
+//        long fWeeks = 24192000000L;
+//        long test = System.currentTimeMillis()- fWeeks;
+//        Date daterod =  new Date(test);
+        Date daterod =  new Date(System.currentTimeMillis()-24192000000L);
 		Integer ish = 1;
-        System.out.println("случай родов");
-        System.out.println(npasp);
-        System.out.println(daterod);
+//        System.out.println("случай родов");
+//        System.out.println(npasp);
+//        System.out.println(System.currentTimeMillis());
+//        System.out.println(daterod);
+//        System.out.println(test);
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdSl.map(acrs.getResultSet());
@@ -1497,7 +1503,7 @@ public class ServerHospital extends Server implements Iface {
 	    Integer hdm = 0;
 	    Integer spl = 0;Integer chcc = 0;Integer polpl =0 ;Integer predpl =0;
 	    Integer serd =0 ;Integer serd1 =0 ; Integer idpos = 0;
-	    Double ves = 0.0; 
+	    Double ves = 0.0; Integer pozpl = 0; Integer vidpl = 0;
         System.out.println("динамика");
         System.out.println(npasp);
         System.out.println(ngosp);
@@ -1506,7 +1512,7 @@ public class ServerHospital extends Server implements Iface {
                 return rsmRdDin.map(acrs.getResultSet());
             } else {
 				AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select srok,oj, "+
-		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos "+	
+		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos,pozpl,vidpl "+	
 			    " from p_rd_din where npasp = ? order by id_pos", npasp);
 				if (acrs1.getResultSet().next()) {
 //присваиваем значения из динамики, в итоге из-за сортировки имеем последние 
@@ -1522,12 +1528,14 @@ public class ServerHospital extends Server implements Iface {
 				serd = acrs1.getResultSet().getInt(8);
 				serd1 = acrs1.getResultSet().getInt(9);
 				idpos = acrs1.getResultSet().getInt(11);
+				pozpl = acrs1.getResultSet().getInt(12);
+				vidpl = acrs1.getResultSet().getInt(13);
 				}
 				idpos = idpos+1;
 				try (SqlModifyExecutor sme = tse.startTransaction()) {
 					sme.execPrepared("insert into p_rd_din " +
-						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos);
-					int id = sme.getGeneratedKeys().getInt("id");
+						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,id_pos,pozpl,vidpl) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves,idpos,pozpl,vidpl);
+//					int id = sme.getGeneratedKeys().getInt("id");
 					sme.setCommit();
 			        System.out.println("динамика добавлена");
 				} catch (InterruptedException e) {
@@ -1548,8 +1556,8 @@ public class ServerHospital extends Server implements Iface {
 				}
             }
 //
-		} catch (SQLException e) {
-			((SQLException) e.getCause()).printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 			log.log(Level.ERROR, "SqlException", e);
 			throw new KmiacServerException();
 		}
@@ -1922,11 +1930,14 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public TPatientCommonInfo getPatientCommonInfo(final int npasp)
 			throws KmiacServerException, PatientNotFoundException, TException {
+		//FIXME: n_z00.pcod - символьное поле (???)
         String sqlQuery = "SELECT npasp, fam||' '||im||' '||ot as full_name, datar, "
-        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv "
+        		+ "n_z30.name as pol, n_am0.name as jitel, adp_obl, adp_gorod, adp_ul, adp_dom, adp_kv, "
+        		+ "n_z00.pcod_s as obraz, status "
                 + "FROM patient "
                 + "LEFT JOIN n_z30 ON (n_z30.pcod = patient.pol) "
                 + "LEFT JOIN n_am0 ON (n_am0.pcod = patient.jitel) "
+                + "LEFT JOIN n_z00 ON (n_z00.pcod = patient.obraz) "
                 + "WHERE patient.npasp = ?;";
         ResultSet rs = null;
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, npasp)) {
@@ -1957,7 +1968,7 @@ public class ServerHospital extends Server implements Iface {
         TPatientCommonInfo motherInfo = getPatientCommonInfo(getMotherId(childDoc.getNpasp()));
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
-        			path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()
+        			path = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
         		), "UTF-8")) {
         	File a = new File(this.getClass().getProtectionDomain().getCodeSource()
                     .getLocation().getPath());
@@ -1987,6 +1998,20 @@ public class ServerHospital extends Server implements Iface {
             			country1 = "<u>";
             			country2 = "</u>";
                 	}
+            //Роды произошли:
+            String birthHappen[] = new String[] {"", "", "", "", "", "", "", ""};
+            birthHappen[2*(childDoc.getR_proiz() - 1)] = "<u>";
+            birthHappen[2*childDoc.getR_proiz() - 1] = "</u>";
+            
+            
+            //FIXME:
+            //Местность рождения:
+            String cityChild1 = "", cityChild2 = "";
+            String countryChild1 = "", countryChild2 = "";
+            
+            
+            
+            
             //Пол новорождённого:
             String boy1 = "", boy2 = "";
             String girl1 = "", girl2 = "";
@@ -2015,6 +2040,24 @@ public class ServerHospital extends Server implements Iface {
             if (childBirthInfo.isSetTimeon()) {
 	            childBirthHour = childBirthTime.substring(0, 2);
 	            childBirthMinute = childBirthTime.substring(3, 5);
+            }
+            //Образование матери:
+            String[] motherEduc = new String[] {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+            if ((motherInfo.getStatus() > 0) && (motherInfo.getStatus() < 10)) {
+	            motherEduc[2*(motherInfo.getStatus() - 1)] = "<u>";
+	            motherEduc[2*motherInfo.getStatus() - 1] = "</u>";
+            } else {	//Неизвестный код образования - ставим "Неизвестно":
+	            motherEduc[16] = "<u>";
+	            motherEduc[17] = "</u>";
+            }
+            //Занятость матери:
+            String[] motherWork = new String[] {"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""};
+            if ((childDoc.getZan() > 0) && (childDoc.getZan() < 11)) {
+            	motherWork[2*(childDoc.getZan() - 1)] = "<u>";
+            	motherWork[2*childDoc.getZan() - 1] = "</u>";
+            } else {	//Неизвестный код занятости - ставим "Прочие":
+            	motherWork[18] = "<u>";
+            	motherWork[19] = "</u>";
             }
             //Который по счёту:
             String nChildren = "  ";
@@ -2085,19 +2128,49 @@ public class ServerHospital extends Server implements Iface {
         		//МЕСТО РОЖДЕНИЯ:
     			"", "", "",
         		//МЕСТНОСТЬ РОЖДЕНИЯ:
-    			"", "",
-    			"", "",
+    			cityChild1, cityChild2,
+    			countryChild1, countryChild2,
+    			//РОДЫ ПРОИЗОШЛИ:
+    			birthHappen[0], birthHappen[1],
+    			birthHappen[2], birthHappen[3],
+    			birthHappen[4], birthHappen[5],
+    			birthHappen[6], birthHappen[7],
         		boy1, boy2, girl1, girl2,
-        		//ДОЛЖНОСТЬ ВРАЧА:
-        		"",
+    			//РОДЫ ПРОИЗОШЛИ:
+    			birthHappen[0], birthHappen[1],
+    			birthHappen[2], birthHappen[3],
+    			birthHappen[4], birthHappen[5],
+    			birthHappen[6], birthHappen[7],
+        		"",	//ДОЛЖНОСТЬ ВРАЧА
         		sdfDay.format(curDate.getTimeInMillis()), months[curDate.get(GregorianCalendar.MONTH)],
         		sdfYear.format(curDate.getTimeInMillis()),
+        		//ОБРАЗОВАНИЕ МАТЕРИ:
+        		motherEduc[0], motherEduc[1],
+        		motherEduc[2], motherEduc[3],
+        		motherEduc[4], motherEduc[5],
+        		motherEduc[6], motherEduc[7],
+        		motherEduc[8], motherEduc[9],
+        		motherEduc[10], motherEduc[11],
+        		motherEduc[12], motherEduc[13],
+        		motherEduc[14], motherEduc[15],
+        		motherEduc[16], motherEduc[17],
+        		//ЗАНЯТОСТЬ МАТЕРИ:
+        		motherWork[0], motherWork[1],
+        		motherWork[2], motherWork[3],
+        		motherWork[4], motherWork[5],
+        		motherWork[6], motherWork[7],
+        		motherWork[8], motherWork[9],
+        		motherWork[10], motherWork[11],
+        		motherWork[12], motherWork[13],
+        		motherWork[14], motherWork[15],
+        		motherWork[16], motherWork[17],
+        		motherWork[18], motherWork[19],
         		nChildren.substring(0, 1), nChildren.substring(1, 2),
         		weight.substring(0, 1), weight.substring(1, 2), weight.substring(2, 3), weight.substring(3, 4),
         		height.substring(0, 1), height.substring(1, 2),
         		only, nreb, nreb_all,
-        		//ДОЛЖНОСТЬ ВРАЧА:
-        		"");
+        		""	//ДОЛЖНОСТЬ ВРАЧА
+        		);
             osw.write(htmTemplate.getTemplateText());
             return path;
         } catch (Exception e) {

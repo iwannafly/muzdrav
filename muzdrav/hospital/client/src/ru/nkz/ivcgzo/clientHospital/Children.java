@@ -1,5 +1,6 @@
 package ru.nkz.ivcgzo.clientHospital;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
@@ -37,6 +38,7 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTimeEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.ChildDocNotFoundException;
@@ -46,8 +48,10 @@ import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
 
-//TODO: ЗАГРУЗИТЬ СПИСОК МЕСТ
 //TODO: УСТАНОВИТЬ ФИЛЬТР ВРАЧЕЙ
+//TODO: УЗНАТЬ О КЛАССИФИКАТОРЕ n_z00 (поле pcod символьное(2))
+//TODO: УЗНАТЬ О ТАБЛИЦАХ c_rd_sl и p_rd_sl - какая останется?
+//TODO: ВЗЯТЬ СРОК ПЕРВОЙ ЯВКИ ИЗ ТАБЛИЦЫ p_rd_sl(yavka1)
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич
@@ -60,11 +64,14 @@ public class Children extends JPanel {
     private TRd_Novor childInfo = null;
     private TRd_Svid_Rojd childDoc = null;
     private JPanel panelChildEdit, panelDoc;
-    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbDocGiven, ticcbBirthPlace;
-    private JButton btnSaveChild, btnGiveDoc;
-    private JTextField tfDocName;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbDocGiven;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbBirthPlace;
+    private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbMotherWork;
+    private JComboBox<String> cbBirthHappen;
+    private JButton btnSaveChild, btnGiveDoc, btnPrintBlank;
     private CustomDateEditor cdeDocDate;
-    private JCheckBox chckBxDead, chckBxFull;
+    private CustomTimeEditor cteBirthTime;
+    private JTextField tfDocName;
     private JSpinner spinnerDocNum;
     private JSpinner spinnerHeight;
     private JSpinner spinnerWeight;
@@ -72,15 +79,12 @@ public class Children extends JPanel {
     private JSpinner spinnerApgar5;
     private JSpinner spinnerChildNumGlobal;
     private JSpinner spinnerChildNumLocal;
-    private CustomTimeEditor cteBirthTime;
+    private JCheckBox chckBxDead, chckBxFull;
     private JCheckBox chckBxCriteria1;
     private JCheckBox chckBxCriteria2;
     private JCheckBox chckBxCriteria4;
     private JCheckBox chckBxCriteria3;
-    private JComboBox<String> cbMotherWork;
     private JLabel lblBirthHappen;
-    private JComboBox<String> cbBirthHappen;
-    private JButton btnPrintBlank;
     private JLabel lblDocStatus;
 
 	/**
@@ -169,7 +173,7 @@ public class Children extends JPanel {
 		this.ticcbDocGiven.setText(this.userAuth.getName());
 		this.spinnerDocNum.setValue(0);
 		this.cbBirthHappen.setSelectedIndex(-1);
-		this.cbMotherWork.setSelectedIndex(-1);
+		this.ticcbMotherWork.setSelectedItem(null);
 		try{
 			this.ticcbBirthPlace.setSelectedPcod(42);	//По умолчанию выбран г. Новокузнецк
 		} catch(Exception e) {
@@ -270,7 +274,7 @@ public class Children extends JPanel {
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
-		if (this.cbMotherWork.getSelectedItem() == null) {
+		if (this.ticcbMotherWork.getSelectedItem() == null) {
 			JOptionPane.showMessageDialog(this,
 					"Поле 'Занятость матери' не может быть пустым",
 					"Ошибка", JOptionPane.WARNING_MESSAGE);
@@ -287,8 +291,8 @@ public class Children extends JPanel {
 		this.childDoc.setFamreb(this.tfDocName.getText().toUpperCase());
 		this.childDoc.setSvidvrach(this.ticcbDocGiven.getSelectedPcod());
 		this.childDoc.setM_rojd(this.ticcbBirthPlace.getSelectedPcod());
-		this.childDoc.setR_proiz(this.cbBirthHappen.getSelectedIndex());
-		this.childDoc.setZan(this.cbMotherWork.getSelectedIndex());
+		this.childDoc.setR_proiz(this.cbBirthHappen.getSelectedIndex() + 1);
+		this.childDoc.setZan(this.ticcbMotherWork.getSelectedPcod());
 		//Загрузка фамилии ребёнка в интерфейс в верхнем регистре:
 		this.tfDocName.setText(this.childDoc.getFamreb());
 		return true;
@@ -340,8 +344,8 @@ public class Children extends JPanel {
 		}
 		this.cdeDocDate.setDate(this.childDoc.getDateoff());
 		this.tfDocName.setText(this.childDoc.getFamreb());
-		this.cbBirthHappen.setSelectedIndex(this.childDoc.getR_proiz());
-		this.cbMotherWork.setSelectedIndex(this.childDoc.getZan());
+		this.cbBirthHappen.setSelectedIndex(this.childDoc.getR_proiz() - 1);
+		this.ticcbMotherWork.setSelectedPcod(this.childDoc.getZan());
 		this.ticcbBirthPlace.setSelectedPcod(this.childDoc.getM_rojd());
 		this.ticcbDocGiven.setSelectedPcod(this.childDoc.getSvidvrach());
 		this.spinnerDocNum.setValue(this.childDoc.getNdoc());
@@ -398,7 +402,6 @@ public class Children extends JPanel {
 					this.updateChildInfo();	//Обновление информации о новорождённом
 				else
 					this.addChildInfo();	//Добавление информации о новорождённом
-				this.btnSaveChild.setToolTipText("Записать изменения");
 				return;
 			} catch (KmiacServerException|PatientNotFoundException e) {
 				e.printStackTrace();
@@ -491,7 +494,7 @@ public class Children extends JPanel {
 		if ((this.childInfo != null) && (this.childDoc != null)) {
 			String clientPath;
 			final int ndoc = this.childDoc.getNdoc();
-			clientPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
+			clientPath = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath();
             ClientHospital.conMan.transferFileFromServer(
             		ClientHospital.tcl.printChildBirthDocument(ndoc),
             		clientPath);
@@ -569,18 +572,15 @@ public class Children extends JPanel {
 	 */
 	private void updatePanel() {
 		final boolean isPatientSet = (this.patient != null);
-		this.panelChildEdit.setVisible(isPatientSet);
-		this.btnSaveChild.setVisible(isPatientSet);
+		this.btnGiveDoc.setEnabled(isPatientSet);
 		if (isPatientSet)
 		{
-			this.btnSaveChild.setToolTipText("Занести информацию");
 			final int childId = this.patient.getPatientId();
 			this.childInfo = null;
 			this.childDoc = null;
 			try {
 				this.childInfo = ClientHospital.tcl.getChildInfo(childId);
 				this.loadChildInfoIntoPanel();
-				this.btnSaveChild.setToolTipText("Записать изменения");
 				this.childDoc = ClientHospital.tcl.getChildDocument(childId);
 				this.loadChildDocIntoPanel();
 			} catch (KmiacServerException kse) {
@@ -609,11 +609,11 @@ public class Children extends JPanel {
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panelDoc, GroupLayout.PREFERRED_SIZE, 819, Short.MAX_VALUE)
-						.addComponent(panelChildEdit, GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE))
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(panelDoc, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(panelChildEdit, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -622,8 +622,8 @@ public class Children extends JPanel {
 					.addContainerGap()
 					.addComponent(panelChildEdit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panelDoc, GroupLayout.PREFERRED_SIZE, 353, Short.MAX_VALUE)
-					.addContainerGap())
+					.addComponent(panelDoc, GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+					.addGap(12))
 		);
 		
 		JLabel lblDocNum = new JLabel("Номер свидетельства:");
@@ -667,15 +667,18 @@ public class Children extends JPanel {
 		
 		JLabel lblMotherWork = new JLabel("Занятость матери:");
 		
-		ticcbBirthPlace = new ThriftIntegerClassifierCombobox<IntegerClassifier>(true);
+		ticcbBirthPlace = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_l00);
 		lblBirthPlace.setLabelFor(ticcbBirthPlace);
 		
-		cbMotherWork = new JComboBox<String>();
-		lblMotherWork.setLabelFor(cbMotherWork);
+		ticcbMotherWork = new ThriftIntegerClassifierCombobox<IntegerClassifier>(IntegerClassifiers.n_z42);
+		lblMotherWork.setLabelFor(ticcbMotherWork);
 		
 		lblBirthHappen = new JLabel("Роды произошли:");
 		
-		cbBirthHappen = new JComboBox<String>();
+		cbBirthHappen = new JComboBox<String>(
+				new DefaultComboBoxModel<String> (
+						new String[] {"в стационаре", "дома", "в другом месте", "неизвестно"}));
+
 		lblBirthHappen.setLabelFor(cbBirthHappen);
 		
 		btnPrintBlank = new JButton("Распечатать бланк");
@@ -701,11 +704,6 @@ public class Children extends JPanel {
 							.addComponent(spinnerDocNum, GroupLayout.PREFERRED_SIZE, 83, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panelDoc.createSequentialGroup()
 							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnGiveDoc)
-							.addPreferredGap(ComponentPlacement.RELATED, 275, Short.MAX_VALUE)
-							.addComponent(btnPrintBlank, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panelDoc.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED)
 							.addGroup(gl_panelDoc.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addComponent(lblDocGiven)
@@ -718,7 +716,7 @@ public class Children extends JPanel {
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addComponent(lblMotherWork)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(cbMotherWork, 0, 457, Short.MAX_VALUE))
+									.addComponent(ticcbMotherWork, 0, 457, Short.MAX_VALUE))
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addComponent(lblBirthPlace)
 									.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -730,7 +728,11 @@ public class Children extends JPanel {
 								.addGroup(gl_panelDoc.createSequentialGroup()
 									.addComponent(lblDocName)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)))))
+									.addComponent(tfDocName, GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
+								.addGroup(gl_panelDoc.createSequentialGroup()
+									.addComponent(btnGiveDoc)
+									.addPreferredGap(ComponentPlacement.RELATED, 275, Short.MAX_VALUE)
+									.addComponent(btnPrintBlank, GroupLayout.PREFERRED_SIZE, 131, GroupLayout.PREFERRED_SIZE)))))
 					.addGap(119))
 		);
 		gl_panelDoc.setVerticalGroup(
@@ -759,7 +761,7 @@ public class Children extends JPanel {
 								.addComponent(lblBirthHappen))))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
-						.addComponent(cbMotherWork, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(ticcbMotherWork, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblMotherWork))
 					.addPreferredGap(ComponentPlacement.UNRELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.BASELINE)
@@ -767,11 +769,11 @@ public class Children extends JPanel {
 						.addComponent(cdeDocDate, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblDocGiven)
 						.addComponent(ticcbDocGiven, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(74)
+					.addGap(18)
 					.addGroup(gl_panelDoc.createParallelGroup(Alignment.TRAILING, false)
 						.addComponent(btnPrintBlank, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(btnGiveDoc, GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE))
-					.addGap(53))
+					.addContainerGap())
 		);
 		this.panelDoc.setLayout(gl_panelDoc);
 		
@@ -831,7 +833,7 @@ public class Children extends JPanel {
 			}
 		});
 		this.btnSaveChild.setIcon(new ImageIcon(Children.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/1341981970_Accept.png")));
-		this.btnSaveChild.setToolTipText("Сохранить изменения");
+		this.btnSaveChild.setToolTipText("Занести информацию");
 		
 		GroupLayout gl_panelChildEdit = new GroupLayout(this.panelChildEdit);
 		gl_panelChildEdit.setHorizontalGroup(

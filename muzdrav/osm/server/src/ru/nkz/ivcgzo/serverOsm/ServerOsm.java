@@ -10,6 +10,8 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.apache.thrift.TException;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
@@ -1129,11 +1131,11 @@ public class ServerOsm extends Server implements Iface {
 					sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
 			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));
 			}
-			sb.append("<br>7. Код диагноза по МКБ: ");
-			acrs.close();
-			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", na.getPvizitId());
-			if (acrs.getResultSet().next()) 
-			sb.append(String.format("%s", acrs.getResultSet().getString(1)));
+			sb.append(String.format("<br>7. Код диагноза по МКБ: %s", na.diag));
+//			acrs.close();
+//			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", na.getPvizitId());
+//			if (acrs.getResultSet().next()) 
+//			sb.append(String.format("%s", acrs.getResultSet().getString(1)));
 			if (na.getObosnov()!=null) sb.append(String.format("<br>8. Обоснование направления: %s",na.getObosnov()));
 			else sb.append("<br>8. Обоснование направления: __________________________________________________");
 			sb.append("<br>Должность медицинского работника, направившего больного: ");
@@ -1206,11 +1208,12 @@ public class ServerOsm extends Server implements Iface {
 					sb.append(String.format("<br>6. Место работы/учебы: %s ",acrs.getResultSet().getString(8)));
 			if (acrs.getResultSet().getString(9)!=null) sb.append(String.format(", должность: %s ",acrs.getResultSet().getString(9)));
 			}
-			sb.append("<br>7. Код диагноза по МКБ: ");
-			acrs.close();
-			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", nk.getPvizitId());
-			if (acrs.getResultSet().next()) 
-			sb.append(String.format("%s", acrs.getResultSet().getString(1)));
+				sb.append(String.format("<br>7. Код диагноза по МКБ: %s", nk.diag));
+//			sb.append("<br>7. Код диагноза по МКБ: ");
+//			acrs.close();
+//			acrs = sse.execPreparedQuery("select p_diag_amb.diag from p_diag_amb join p_vizit_amb on (p_vizit_amb.id = p_diag_amb.id_pos AND p_vizit_amb.id_obr = p_diag_amb.id_obr) where p_diag_amb.id_obr=? and p_diag_amb.diag_stat=1 and p_diag_amb.predv=false order by p_vizit_amb.datap", nk.getPvizitId());
+//			if (acrs.getResultSet().next()) 
+//			sb.append(String.format("%s", acrs.getResultSet().getString(1)));
 			if (nk.getObosnov()!=null) sb.append(String.format("<br>8. Обоснование направления: %s",nk.getObosnov()));
 			else sb.append("<br>8. Обоснование направления: __________________________________________________");
 			sb.append("<br>Должность медицинского работника, направившего больного: ");
@@ -3217,10 +3220,16 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 
 	@Override
 	public void deleteDiag(int npasp, String diag, int pcod, int idDiagAmb) throws KmiacServerException, TException {
-		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPrepared("DELETE FROM p_diag WHERE id_diag_amb = ? AND datad = CURRENT_DATE ", false, idDiagAmb);
-			sme.execPrepared("DELETE FROM p_disp WHERE npasp = ? AND diag = ? AND pcod = ?", false, npasp, diag, pcod);
-			sme.setCommit();
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrs = sse.execPreparedQuery("SELECT id FROM p_diag_amb WHERE npasp = ? and diag = ?", npasp, diag)){
+			if (acrs.getResultSet().next()){
+				System.out.println("pos is not null");
+				//JOptionPane.showMessageDialog(this, "");
+			}else{			
+				sme.execPrepared("DELETE FROM p_diag WHERE npasp = ? AND diag = ? ", false, npasp, diag);
+				sme.execPrepared("DELETE FROM p_disp WHERE npasp = ? AND diag = ? AND pcod = ?", false, npasp, diag, pcod);
+				sme.setCommit();
+			}
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
 			throw new KmiacServerException();

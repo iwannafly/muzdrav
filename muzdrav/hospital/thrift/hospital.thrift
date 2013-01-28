@@ -297,6 +297,8 @@ struct TPatientCommonInfo {
 	8: string adp_ul;
 	9: string adp_dom;
 	10: string adp_kv;
+	11: i32 obraz;
+	12: i32 status;
 }
 
 struct TRd_SMPK {
