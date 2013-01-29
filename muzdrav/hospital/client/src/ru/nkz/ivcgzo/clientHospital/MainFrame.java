@@ -432,7 +432,8 @@ public class MainFrame extends JFrame {
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
             cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
             //Минимизируем общение с сервером, единожды получая список врачей:
-            List<IntegerClassifier> doctorsList = ClientHospital.tcl.get_s_vrach();
+            List<IntegerClassifier> doctorsList =
+            		ClientHospital.tcl.get_s_vrach(doctorAuth.getClpu());
             CBPrinial.setData(doctorsList);
             CBAkush.setData(doctorsList);
             CBVrash.setData(doctorsList);

@@ -47,8 +47,6 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
-
-//TODO: УСТАНОВИТЬ ФИЛЬТР ВРАЧЕЙ
 //TODO: ЗАПИСЫВАТЬ ДОЛЖНОСТЬ ВРАЧА (ЗАПОЛНИВШЕГО И ВЫДАВШЕГО СВИДЕТЕЛЬСТВО)
 //TODO: ЗАПИСЫВАТЬ ШАПКУ ДОКУМЕНТА (ОРГАНИЗАЦИЯ)
 /**

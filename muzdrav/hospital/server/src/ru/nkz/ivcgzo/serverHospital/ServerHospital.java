@@ -1441,10 +1441,13 @@ public class ServerHospital extends Server implements Iface {
     }
 
 	@Override
-	public List<IntegerClassifier> get_s_vrach() throws KmiacServerException, TException {
+	public List<IntegerClassifier> get_s_vrach(final int clpu)
+			throws KmiacServerException {
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
-	    		"SELECT pcod, fam||' '||im||' '||ot AS name " +
-	    		"FROM s_vrach;")) {
+	    		"SELECT s_vrach.pcod, fam||' '||im||' '||ot AS name " +
+	    		"FROM s_vrach " +
+	    		"JOIN s_mrab ON (s_mrab.pcod = s_vrach.pcod) " +
+	    		"WHERE (s_mrab.clpu = ?);", clpu)) {
 	        return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
         	((SQLException) e.getCause()).printStackTrace();
