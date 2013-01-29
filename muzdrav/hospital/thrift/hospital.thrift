@@ -290,15 +290,15 @@ struct TPatientCommonInfo {
 	1: i32 npasp;
 	2: string full_name;
 	3: i64 datar;
-	4: string pol;
-	5: string jitel;
-	6: string adp_obl;
-	7: string adp_gorod;
-	8: string adp_ul;
-	9: string adp_dom;
-	10: string adp_kv;
-	11: i32 obraz;
-	12: i32 status;
+	4: optional string pol;
+	5: optional string jitel;
+	6: optional string adp_obl;
+	7: optional string adp_gorod;
+	8: optional string adp_ul;
+	9: optional string adp_dom;
+	10: optional string adp_kv;
+	11: optional i32 obraz;
+	12: optional i32 status;
 }
 
 struct TRd_SMPK {
@@ -592,15 +592,18 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
-	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:PrdIshodNotFoundException pinfe, 	2:kmiacServer.KmiacServerException kse);
+	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp)
+		throws (1:PrdIshodNotFoundException pinfe, 2:kmiacServer.KmiacServerException kse);
     i32 addRdIshod(1:TRdIshod rdIs) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1:PrdSlNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 npasp)
+		throws (1:PrdSlNotFoundException pinfe, 2: kmiacServer.KmiacServerException kse);
     void AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
     void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
     void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
-	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1:PrdDinNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp)
+		throws (1:PrdDinNotFoundException pinfe, 2: kmiacServer.KmiacServerException kse);
     void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
     void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
     void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);
