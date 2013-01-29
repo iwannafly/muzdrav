@@ -431,12 +431,15 @@ public class MainFrame extends JFrame {
             cbxResult.setData(ClientHospital.tcl.getAq0());
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
             cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
-            CBPrinial.setData(ClientHospital.tcl.get_s_vrach());
-            CBAkush.setData(ClientHospital.tcl.get_s_vrach());
-            CBVrash.setData(ClientHospital.tcl.get_s_vrach());
-            CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
+            //Минимизируем общение с сервером, единожды получая список врачей:
+            List<IntegerClassifier> doctorsList =
+            		ClientHospital.tcl.get_s_vrach(doctorAuth.getClpu());
+            CBPrinial.setData(doctorsList);
+            CBAkush.setData(doctorsList);
+            CBVrash.setData(doctorsList);
+            CBOsmotr.setData(doctorsList);
             if (pChildren != null)
-            	pChildren.setDoctors(ClientHospital.tcl.get_s_vrach());
+            	pChildren.setDoctors(doctorsList);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
