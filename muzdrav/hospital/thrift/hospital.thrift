@@ -34,6 +34,12 @@ struct TPatient{
 	15:string realAddress;	
 }
 
+struct TBirthPlace{
+	1:string region;
+	2:string city;
+	3:i32 type;
+}
+
 struct TPriemInfo {
 	1:string pl_extr;
 	2:i64 datap;

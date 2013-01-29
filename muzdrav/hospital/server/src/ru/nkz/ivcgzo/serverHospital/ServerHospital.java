@@ -3,7 +3,6 @@ package ru.nkz.ivcgzo.serverHospital;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
-import java.sql.Array;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -44,6 +42,7 @@ import ru.nkz.ivcgzo.thriftHospital.RdDinStruct;
 import ru.nkz.ivcgzo.thriftHospital.RdSlStruct;
 import ru.nkz.ivcgzo.thriftHospital.Shablon;
 import ru.nkz.ivcgzo.thriftHospital.ShablonText;
+import ru.nkz.ivcgzo.thriftHospital.TBirthPlace;
 import ru.nkz.ivcgzo.thriftHospital.TDiagnosis;
 import ru.nkz.ivcgzo.thriftHospital.TLifeHistory;
 import ru.nkz.ivcgzo.thriftHospital.TMedicalHistory;
@@ -86,6 +85,7 @@ public class ServerHospital extends Server implements Iface {
 	private TResultSetMapper<TPatientCommonInfo, TPatientCommonInfo._Fields> rsmCommonPatient;
 	private TResultSetMapper<RdSlStruct, RdSlStruct._Fields> rsmRdSl;
 	private TResultSetMapper<RdDinStruct, RdDinStruct._Fields> rsmRdDin;
+	private TResultSetMapper<TBirthPlace, TBirthPlace._Fields> rsmBirthPlace;
 
     private static final String[] SIMPLE_PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "fam", "im", "ot", "datar", "datap", "cotd", "npal", "nist"
@@ -135,6 +135,9 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
         "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_kv"
+    };
+    private static final String[] BIRTHPLACE_FIELD_NAMES = {
+        "region", "city", "type"
     };
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 
@@ -237,6 +240,7 @@ public class ServerHospital extends Server implements Iface {
         rsmRdNovor = new TResultSetMapper<>(TRd_Novor.class, RDNOVOR_FIELD_NAMES);
         rsmRdSvidRojd = new TResultSetMapper<>(TRd_Svid_Rojd.class, RDSVID_ROJD_FIELD_NAMES);
         rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class, COMMON_PATIENT_FIELD_NAMES);
+        rsmBirthPlace = new TResultSetMapper<>(TBirthPlace.class, BIRTHPLACE_FIELD_NAMES);
     }
 
     @Override
@@ -1864,7 +1868,6 @@ public class ServerHospital extends Server implements Iface {
         }
 	}
 
-	
 	/**
 	 * Функция получения идентификатора специалиста, принимавшего роды
 	 * @param childbirthId Идентификатор родов
@@ -1884,6 +1887,32 @@ public class ServerHospital extends Server implements Iface {
         		return rs.getInt(1);
         	else
         		return -1;
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+	}
+
+	/**
+	 * Функция получения информации о месте рождения
+	 * @param cityId Идентификатор места рождения
+	 * @return Информация о месте рождения, содержащая область, нас. пункт и тип нас. пункта места рождения
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+	private TBirthPlace getChildBirthCityInfo(final int cityId)
+			throws KmiacServerException {
+		final String Query = "SELECT n_l02.name AS region, n_l00.name AS city, n_l00.vid_np AS type " +
+				"FROM n_l00 " +
+				"LEFT JOIN n_l02 ON (n_l02.c_ffomc = n_l00.c_ffomc) " +
+				"WHERE (n_l00.pcod = ?);";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+        		Query, cityId)) {
+        	ResultSet rs = acrs.getResultSet();
+        	if (rs.next())
+        		return rsmBirthPlace.map(rs);
+        	else
+        		return null;
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
@@ -2057,6 +2086,7 @@ public class ServerHospital extends Server implements Iface {
         int iFirstConsult = getFirstConsultWeekNum(motherInfo.getNpasp(), new Date(childInfo.getDatar()));
         int iChildCount = getChildCountInChildbirth(childBirthInfo.getNrod());
         ArrayList<Integer> arrCod_sp = getDoctorCod_sp(getDoctorWhoGetChildId(childBirthInfo.getNrod()));
+        TBirthPlace birthPlace = getChildBirthCityInfo(childDoc.getM_rojd());
         //Создание документа:
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
@@ -2094,16 +2124,20 @@ public class ServerHospital extends Server implements Iface {
             String birthHappen[] = new String[] {"", "", "", "", "", "", "", ""};
             birthHappen[2*(childDoc.getR_proiz() - 1)] = "<u>";
             birthHappen[2*childDoc.getR_proiz() - 1] = "</u>";
-            
-            
-            //FIXME:
             //Место рождения:
+            String birthPlaceRegion = birthPlace.getRegion();
+            int iCityType = birthPlace.getType();
+            String birthPlaceTown = (iCityType > 0) ? birthPlace.getCity() : "";
             //Местность рождения:
             String cityChild1 = "", cityChild2 = "";
             String countryChild1 = "", countryChild2 = "";
-            
-            
-            
+            if ((iCityType == 1) || (iCityType == 2)) {
+            	cityChild1 = "<u>";
+            	cityChild2 = "</u>";
+            } else {
+            	countryChild1 = "<u>";
+            	countryChild2 = "</u>";
+            }
             //Пол новорождённого:
             String boy1 = "", boy2 = "";
             String girl1 = "", girl2 = "";
@@ -2285,9 +2319,11 @@ public class ServerHospital extends Server implements Iface {
         		motherStatus[0], motherStatus[1],
         		motherStatus[2], motherStatus[3],
         		motherStatus[4], motherStatus[5],
-        		//МЕСТО РОЖДЕНИЯ:
-    			"", "", "",
-        		//МЕСТНОСТЬ РОЖДЕНИЯ:
+        		//Место рождения:
+        		birthPlaceRegion,
+        		"",	//РАЙОН РОЖДЕНИЯ
+        		birthPlaceTown,
+        		//Местность рождения:
     			cityChild1, cityChild2,
     			countryChild1, countryChild2,
     			//Роды произошли:
