@@ -143,7 +143,7 @@ service ThriftGenReestr extends kmiacServer.KmiacServer {
 	/**
         * Создает реестр параотделения и возвращает протокол проверок реестра
 	*/
-	string getReestrInfoLDS(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df, 9:i32 ter_mu, 10:i32 kod_mu) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
+	string getReestrInfoLDS(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
 
 	/**
         * Записывает код результата проверки реестра и возвращает протокол ошибок

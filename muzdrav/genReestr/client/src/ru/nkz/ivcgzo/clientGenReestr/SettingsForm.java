@@ -43,15 +43,13 @@ public class SettingsForm extends JDialog {
 	private JRadioButton rbtn3;
 	private JRadioButton rbtn4;
 	private int vidrstr;
-    private CustomTextField tf_Cpol;
-    private int Terp = 0;
+    private int Terp = 10;
     private ThriftIntegerClassifierCombobox <IntegerClassifier> cmb_podr;
-	private JPanel panel_4;
     public int Cslu;
 
 	public SettingsForm() {
 //		setModalityType(ModalityType.TOOLKIT_MODAL);
-		setBounds(100, 100, 344, 411); //ширина, высота
+		setBounds(100, 100, 344, 379); //ширина, высота
 		setTitle("Реестры пациентов");
 		
 		JPanel panel = new JPanel();
@@ -64,31 +62,24 @@ public class SettingsForm extends JDialog {
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBorder(new TitledBorder(null, "Подразделение ЛПУ :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
-		panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "Выберите поликлинику обслуживания", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_4.setVisible(false);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
 							.addComponent(panel_2, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+						.addGroup(groupLayout.createSequentialGroup()
 							.addGap(10)
 							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+							.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE))
+						.addGroup(groupLayout.createSequentialGroup()
 							.addContainerGap()
-							.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)))
+							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)))
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -100,44 +91,10 @@ public class SettingsForm extends JDialog {
 					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 120, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 51, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGap(18)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(52, Short.MAX_VALUE))
 		);
-		
-        tf_Cpol = new CustomTextField();
-        tf_Cpol.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent arg0) {
-                if (arg0.getClickCount() == 2) {
-                    int[] res = MainForm.conMan.showPolpTreeForm("Классификатор подразделений ЛПУ", 0, 0, 0);
-                    if (res != null) {
-                           tf_Cpol.setText(Integer.toString(res[2]));
-                           Terp = res[0];
-                    }
-                }
-            }
-        });
-        tf_Cpol.setColumns(10);
-        tf_Cpol.setVisible(false);
-
-        GroupLayout gl_panel_4 = new GroupLayout(panel_4);
-		gl_panel_4.setHorizontalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(tf_Cpol, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(209, Short.MAX_VALUE))
-		);
-		gl_panel_4.setVerticalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-					.addComponent(tf_Cpol, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(12, Short.MAX_VALUE))
-		);
-		panel_4.setLayout(gl_panel_4);
 		
 		cmb_podr = new ThriftIntegerClassifierCombobox<>(true);
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
@@ -241,24 +198,24 @@ public class SettingsForm extends JDialog {
 				        	String clpu = null;
 				        	if (Integer.toString(MainForm.authInfo.getClpu()).length() == 2)clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
 				        	else clpu = Integer.toString(MainForm.authInfo.getClpu());
-				        	if(cmb_podr.getSelectedPcod() != 0) servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
+				        	if(cmb_podr.getSelectedPcod() != null) servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
 				        	else servPath = MainForm.tcl.getReestrInfoOtd(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
 				        	cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+clpu+".rar";
 						}
 				        if (Cslu == 2){
-				        	if(cmb_podr.getSelectedPcod() != 0){
+				        	if(cmb_podr.getSelectedPcod() != null){
 				        		servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
 				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
 							}else
 								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
 				        if (Cslu == 3){
-				        	if(!tf_Cpol.getText().isEmpty() && Terp != 0){
-				        		if(cmb_podr.getSelectedPcod() != 0) servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
-				        		else servPath = MainForm.tcl.getReestrInfoLDS(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis(), Terp, Integer.valueOf(tf_Cpol.getText()));
-								cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+ tf_Cpol.getText()+"_usl.rar";
-				        	}else 
-				        		JOptionPane.showMessageDialog(null, "Выберите поликлинику обслуживания из классификатора.", null, JOptionPane.INFORMATION_MESSAGE);
+				        	String clpu = null;
+				        	if (Integer.toString(cmb_podr.getSelectedPcod()).length() == 2)clpu = "0"+Integer.toString(cmb_podr.getSelectedPcod());
+				        	else clpu = Integer.toString(cmb_podr.getSelectedPcod());
+			        		if(cmb_podr.getSelectedPcod() != null) servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+			        		else servPath = MainForm.tcl.getReestrInfoLDS(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+clpu+"_usl.rar";
 				        }
 				        
 				        if (servPath.endsWith("zip")){
@@ -269,6 +226,7 @@ public class SettingsForm extends JDialog {
 							cliPath = File.createTempFile("reestrInfo", ".htm").getAbsolutePath();
 	   						MainForm.conMan.transferFileFromServer(servPath, cliPath);
 	   						MainForm.conMan.openFileInEditor(cliPath, false);
+	                        //Integer res = MainForm.conMan.showPaspErrorsForm();
 						}
 						dispose();
 					}else
@@ -324,30 +282,25 @@ public class SettingsForm extends JDialog {
         if (!rbtn1.isSelected() && !rbtn2.isSelected() && !rbtn3.isSelected() && !rbtn4.isSelected()) rbtn1.setSelected(true);
 			try{
 		        if (Cslu == 1){//стационар
-//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 4) cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
-//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
-		        	if (MainForm.authInfo.getCpodr() == 0)
-		        		cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getClpu()));
-		        	else
-		        		cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (MainForm.authInfo.getCpodr() == 0)
+//		        		cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getClpu()));
+//		        	else
+//		        		cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+	        		cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getClpu()));
 				}
 		        if (Cslu == 2){//поликлиника
-//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 3) cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-		        	if (MainForm.authInfo.getCpodr() == 0)
-		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
-		        	else
-		        		cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	if (MainForm.authInfo.getCpodr() == 0)
+//		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
+//		        	else
+//		        		cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+	        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
 				}
 		        if (Cslu == 3){//лдс
-//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 7) cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
-//		        	if (Integer.toString(MainForm.authInfo.getCpodr()).length() == 2) 
-		        	if (MainForm.authInfo.getCpodr() == 0)
-		        		cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getClpu()));
-		        	else
-		        		cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
-		        	tf_Cpol.setVisible(true);
-		            panel_4.setVisible(true);
+//		        	if (MainForm.authInfo.getCpodr() == 0)
+//		        		cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getClpu()));
+//		        	else
+//		        		cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+	        		cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getClpu()));
 		        }
 	        	if (cmb_podr.getSelectedItem() != null)cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 			} catch (KmiacServerException e) {
