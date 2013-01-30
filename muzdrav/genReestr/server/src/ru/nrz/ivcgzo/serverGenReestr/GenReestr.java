@@ -1932,7 +1932,4 @@ public class GenReestr extends Server implements Iface {
 			throw new KmiacServerException("Could not get med pol errors.");
 		}
 	}
-
-
 }
-

@@ -43,6 +43,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.ClekInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CosmotrInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CotdInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.MedPolErrorInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.MedStaErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PaspErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamnez;
@@ -98,13 +99,14 @@ public class ServerViewSelect extends Server implements Iface {
     private final TResultSetMapper<PatientAnamnez, PatientAnamnez._Fields> rsmAnam;
 	private final TResultSetMapper<Pbol, Pbol._Fields> rsmPbol;
 	private final Class<?>[] pbolTypes; 
+	private final TResultSetMapper<MedStaErrorInfo, MedStaErrorInfo._Fields> rsmMedStaError;
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
 		
 		rsmPatBrief = new TResultSetMapper<>(PatientBriefInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom");
 		rsmPatComInfo = new TResultSetMapper<>(PatientCommonInfo.class, "npasp", "fam", "im", "ot", "datar", "poms_ser", "poms_nom", "pol", "jitel", "sgrp", "adp_obl", "adp_gorod", "adp_ul", "adp_dom", "adp_korp", "adp_kv", "adm_obl", "adm_gorod", "adm_ul", "adm_dom", "adm_korp", "adm_kv", "name_mr", "ncex", "poms_strg", "poms_tdoc", "poms_ndog", "pdms_strg", "pdms_ser", "pdms_nom", "pdms_ndog", "cpol_pr", "terp", "datapr", "tdoc", "docser", "docnum", "datadoc", "odoc", "snils", "dataz", "prof", "tel", "dsv", "prizn", "ter_liv", "region_liv", "mrab");
-		rsmPsign = new TResultSetMapper<>(PatientSignInfo.class, "npasp", "grup", "ph", "allerg", "farmkol", "vitae", "vred");
+		rsmPsign = new TResultSetMapper<>(PatientSignInfo.class, "npasp", "datap", "numstr", "name", "vybor", "comment", "yn");
 		rsmPvizit = new TResultSetMapper<>(PatientVizitInfo.class, "id", "npasp", "cpol", "datao", "ishod", "rezult", "talon", "cod_sp", "cdol", "cuser", "zakl", "dataz", "recomend", "lech", "cobr");
 		rsmRdSl = new TResultSetMapper<>(RdSlInfo.class, "id", "npasp", "datay", "dataosl", "abort", "shet", "datam", "yavka1", "ishod", "datasn", "datazs", "kolrod", "deti", "kont", "vesd", "dsp", "dsr", "dtroch", "cext", "indsol", "prmen", "dataz", "datasert", "nsert", "ssert", "oslab", "plrod", "prrod", "vozmen", "oslrod", "polj", "dataab", "srokab", "cdiagt", "cvera", "id_pvizit", "rost");
 		rsmPdiagZ = new TResultSetMapper<>(PatientDiagZInfo.class, "id", "id_diag_amb", "npasp", "diag", "cpodr", "d_vz", "d_grup", "ishod", "dataish", "datag", "datad", "cod_sp", "cdol_ot", "nmvd", "xzab", "stady", "disp", "pat", "prizb", "prizi", "named", "fio_vr");
@@ -127,6 +129,7 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmAnam = new TResultSetMapper<>(PatientAnamnez.class, "npasp", "datap", "numstr", "vybor", "comment", "name", "prof_anz");
 		rsmPbol = new TResultSetMapper<>(Pbol.class, "id",          "id_obr",      "id_gosp",     "npasp",       "bol_l",       "s_bl", 	"po_bl",    "pol",         "vozr",        "nombl", 	    "cod_sp",      "cdol",       "pcod",        "dataz");
 		pbolTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Integer.class, Date.class};
+		rsmMedStaError = new TResultSetMapper<>(MedStaErrorInfo.class);
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -369,15 +372,15 @@ public class ServerViewSelect extends Server implements Iface {
 			else
 				throw new SQLException("Patient common info not found");
 		} catch (SQLException e) {
-			throw new KmiacServerException(e.getMessage());
+			throw new KmiacServerException(e.getMessage());	
 		}
 	}
 
 	@Override
-	public PatientSignInfo getPatientSignInfo(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_sign WHERE npasp = ? ", npasp)) {
+	public List<PatientSignInfo> getPatientSignInfo(int npasp) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) where npasp=? order by numstr", npasp)) {
 			if (acrs.getResultSet().next())
-				return rsmPsign.map(acrs.getResultSet());
+				return rsmPsign.mapToList(acrs.getResultSet());
 			else
 				throw new SQLException("Patient sign info not found");
 		} catch (SQLException e) {
@@ -571,7 +574,7 @@ public class ServerViewSelect extends Server implements Iface {
 	public List<PaspErrorInfo> getPaspErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
 				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_pasp_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
-				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (e.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (p.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
 			sme.setCommit();
 			return rsmPaspError.mapToList(acrsq.getResultSet());
 		} catch (Exception e) {
@@ -592,7 +595,7 @@ public class ServerViewSelect extends Server implements Iface {
 	public List<MedPolErrorInfo> getMedPolErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction();
 				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_med_pol_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
-				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.sl_id AS id_obr, e.id_med AS id_pos, v.datao AS dat_obr, a.datap AS dat_pos, a.cod_sp AS vr_pcod, get_short_fio(r.fam, r.im, r.ot) AS vr_fio, a.cdol AS vr_cdol, s.name AS vr_cdol_name, e.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN p_vizit v ON (v.id = e.sl_id) JOIN p_vizit_amb a ON (a.id = e.id_med AND a.id_obr = e.sl_id) JOIN s_vrach r ON (r.pcod = a.cod_sp) JOIN n_s00 s ON (a.cdol = s.pcod) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 2) AND (e.cpodr = ?) AND (a.datap BETWEEN ? AND ?) ORDER BY v.datao DESC, a.datap DESC, p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, a.id_obr, a.id AS id_pos, v.datao AS dat_obr, a.datap AS dat_pos, a.cod_sp AS vr_pcod, get_short_fio(r.fam, r.im, r.ot) AS vr_fio, a.cdol AS vr_cdol, s.name AS vr_cdol_name, e.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN p_vizit_amb a ON (a.id = e.id_med) JOIN p_vizit v ON (v.id = a.id_obr) JOIN s_vrach r ON (r.pcod = a.cod_sp) JOIN n_s00 s ON (a.cdol = s.pcod) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 2) AND (e.cpodr = ?) AND (a.datap BETWEEN ? AND ?) ORDER BY v.datao DESC, a.datap DESC, p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
 			sme.setCommit();
 			return rsmMedPolError.mapToList(acrsq.getResultSet());
 		} catch (Exception e) {
@@ -719,44 +722,64 @@ public class ServerViewSelect extends Server implements Iface {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					if (cslu == 1){
-   						sqlQuery = "SELECT o.prlpu FROM n_o00 o WHERE o.pcod = ?";
-					}
-					if (cslu == 2){
-   						sqlQuery = "SELECT o.prlpu FROM n_n00 o WHERE o.pcod = ?";
-					}
-	            	try (AutoCloseableResultSet acr = sse.execPreparedQuery(sqlQuery, cpodr)) {
-						if (acr.getResultSet().next()){
-		      				prlpu = acr.getResultSet().getInt("prlpu");
-							if (acr.getResultSet().getInt("prlpu") == 5){
-		          				sb.append("<h4 align=center> <b>Эпидемиологический анамнез</b> </h4>");
-		      				}else{
-		          				sb.append("<h4 align=center> <b>ПЕРВИЧНЫЙ ОСМОТР В ПРИЕМНО-ДИАГНОСТИЧЕСКОМ ОТДЕЛЕНИИ</b> </h4>");
-		      				}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+				
    				    
 
-					
-  	   						/*acrs = sse.execPreparedQuery("select p_diag_amb.diag,n_vdi.name,p_diag_amb.named  from p_vizit_amb join p_diag_amb on (p_diag_amb.id_pos=p_vizit_amb.id) left join n_vdi on(p_diag_amb.diag_stat=n_vdi.pcod) where p_vizit_amb.id=? order by p_vizit_amb.id ", pk.getPvizit_ambId());
-				if (acrs.getResultSet().next()) {
-					do {
-						sb.append(String.format("<i>Код диагноза МКБ </i> %s <br>", acrs.getResultSet().getString(1)));
-						if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Статус диагноза</i> %s <br>", acrs.getResultSet().getString(2)));
-						if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>Медицинское описание диагноза </i> %s <br>", acrs.getResultSet().getString(3)));
-
-						} while (acrs.getResultSet().next());
-				}
-				acrs.close();*/
    					try {
-  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select * from p_anamnez inner join n_anz on (n_anz.nstr=p_anamnez.numstr) where npasp=? and comment is not null ", npasp); 
+  		            	AutoCloseableResultSet acr = sse.execPreparedQuery("select p_anamnez.npasp, p_anamnez.datap,p_anamnez.numstr,n_anz.name,p_anamnez.vybor,p_anamnez.comment,n_anz.yn,n_ot_str.prlpu,n_ot_str.numline from p_anamnez inner join n_anz on (n_anz.numstr=p_anamnez.numstr) inner join n_ot_str on (n_ot_str.nstr=n_anz.numstr) where n_ot_str.prlpu=? and npasp=? order by n_anz.numstr" , cslu, npasp); 
    							
 								if (acr.getResultSet().next()){
 									do {
-									sb.append(String.format("%s %s",acr.getResultSet().getString(7), acr.getResultSet().getString(5)));
-									sb.append("<br>");
+										if (acr.getResultSet().getBoolean(7)==true){
+												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) == null)){
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s да", numline, acr.getResultSet().getString(4)));
+														}
+													else {
+														sb.append(String.format("%s да", acr.getResultSet().getString(4)));
+														}
+													
+													sb.append("<br>");
+													
+												}
+												if ((acr.getResultSet().getBoolean(5)==true) && (acr.getResultSet().getString(6) != null)){
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s да, %s", numline,acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													}
+													else{
+														sb.append(String.format("%s да, %s", acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+													}
+													sb.append("<br>");
+												}
+												if (acr.getResultSet().getBoolean(5)==false){
+													if (acr.getResultSet().getString(4).charAt(0) != '-') {
+														++numline;
+														sb.append(String.format("%d. %s нет", numline, acr.getResultSet().getString(4)));
+													}
+													else {
+														sb.append(String.format("%s нет", acr.getResultSet().getString(4)));
+													}
+													sb.append("<br>");
+												}
+												
+										}
+										
+										if (acr.getResultSet().getBoolean(7)==false){
+											if (acr.getResultSet().getString(6) != null){
+												if (acr.getResultSet().getString(4).charAt(0) != '-') {
+													++numline;
+													sb.append(String.format("%d. %s %s", numline, acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+												}
+												else {
+													sb.append(String.format("%s %s", acr.getResultSet().getString(4), acr.getResultSet().getString(6)));
+												}
+												sb.append("<br>");
+											}
+									}
+										
+
 									}
 									while (acr.getResultSet().next());
 								}
@@ -780,16 +803,7 @@ public class ServerViewSelect extends Server implements Iface {
 			return path;
 	}
 			
-	@Override
-	public List<Pbol> getPbol(int npasp) throws KmiacServerException, TException {
-		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT * FROM p_bol WHERE npasp = ? ", npasp)) {
-			return rsmPbol.mapToList(acrs.getResultSet());
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new KmiacServerException("Could not get pbol list.");
-		}
-	}
-
+	
 	@Override
 	public int AddPbol(Pbol pbol) throws KmiacServerException, TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
@@ -822,6 +836,48 @@ public class ServerViewSelect extends Server implements Iface {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new KmiacServerException("Could not delete pbol.");
+		}
+	}
+
+	@Override
+	public List<Pbol> getPbol(int id_obr, int id_gosp, int id_bol)
+			throws KmiacServerException, TException {
+		String sqlQuery = null;
+		if (id_gosp == 0){
+			id_bol = id_obr;
+			sqlQuery = "select * from p_bol where id_obr = ?";
+		}
+		if (id_obr == 0){
+			id_bol = id_gosp;
+			sqlQuery = "select * from p_bol where id_gosp = ?";
+		}
+		if (id_bol == 0){
+			sqlQuery = "select * from p_bol where id_gosp = 0 and id_obr = ?";
+		}
+		
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery(sqlQuery, id_bol)) {
+					return rsmPbol.mapToList(acrs.getResultSet());
+				} catch (Exception e) {
+				e.printStackTrace();
+			throw new KmiacServerException("Could not get pbol list.");
+		}
+	}
+
+	@Override
+	public List<MedStaErrorInfo> getMedStaErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT g.id AS id_gosp, o.id AS id_otd, g.datagos AS dat_gosp, g.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, e.kderr, e.name_err AS err_name, e.comm AS err_comm FROM w_kderr w JOIN n_kderr e ON (e.kderr = w.kod_err AND e.pasp_med = 2) JOIN c_gosp g ON (g.ngosp = w.sl_id AND g.id = w.id_med) JOIN patient p ON (p.npasp = g.npasp) JOIN c_otd o ON (o.id_gosp = w.id_med) WHERE (o.cotd = ?) AND (g.datagos BETWEEN ? AND ?) ", cpodrz, new Date(datazf), new Date(datazt))) {
+			return rsmMedStaError.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<MedStaErrorInfo> getMedPriemErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT g.id AS id_gosp, o.id AS id_otd, g.datap AS dat_gosp, g.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, e.kderr, e.name_err AS err_name, e.comm AS err_comm FROM w_kderr w JOIN n_kderr e ON (e.kderr = w.kod_err AND e.pasp_med = 2) JOIN c_gosp g ON (g.ngosp = w.sl_id AND g.id = w.id_med) JOIN patient p ON (p.npasp = g.npasp) LEFT JOIN c_otd o ON (o.id_gosp = w.id_med) WHERE (o.id_gosp IS NULL)AND (g.datap BETWEEN ? AND ?) ", new Date(datazf), new Date(datazt))) {
+			return rsmMedStaError.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
 		}
 	}
 }

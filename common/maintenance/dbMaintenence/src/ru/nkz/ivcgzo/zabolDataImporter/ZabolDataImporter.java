@@ -3,8 +3,11 @@ package ru.nkz.ivcgzo.zabolDataImporter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Properties;
 
@@ -14,7 +17,12 @@ public class ZabolDataImporter {
 	
 	public void importData(String[] args) throws Exception {
 		if (args.length < 7)
-			throw new Exception("Not all params spectified.");
+			if (args.length == 4) {
+				importAllData(args);
+				return;
+			} else {
+				throw new Exception("Not all params spectified.");
+			}
 		
 		Class.forName("org.firebirdsql.jdbc.FBDriver");
 		Class.forName("org.postgresql.Driver");
@@ -47,6 +55,99 @@ public class ZabolDataImporter {
 		}
 	}
 	
+	private void importAllData(String[] args) {
+		ArrayList<String> stat = new ArrayList<>();
+		String path = null;
+		String log = null;
+		String pass = null;
+		Connection conn = null;
+		
+		try {
+			Class.forName("org.firebirdsql.jdbc.FBDriver");
+			Class.forName("org.postgresql.Driver");
+			
+			path = "10.0.0.100/d:\\shared\\db\\nas\\naselen.gdb";
+			log = "sysdba";
+			pass = "masterkey";
+			conn = DriverManager.getConnection("jdbc:firebirdsql://" + path, log, pass);
+			
+			Statement stm = conn.createStatement();
+			ResultSet rs = stm.executeQuery("SELECT * FROM PROTOKOL ORDER BY CPOL ");
+			
+			while (rs.next()) {
+				try {
+					stat.add(String.format("%s start import %s.", rs.getInt("CPOL"), new Date(System.currentTimeMillis())));
+					System.out.println(String.format("%s start import %s.", rs.getInt("CPOL"), new Date(System.currentTimeMillis())));
+					log = "sysdba";
+					pass = "masterkey";
+					path = rs.getString("IP").replace(':', '/') + rs.getString("DBPATH");
+					switch (rs.getInt("CPOL")) {
+					case 241:
+					case 242:
+					case 243:
+					case 245:
+					case 246:
+						pass = "2";
+						break;
+					}
+					importData(new String[] {args[0], args[1], args[2], args[3], path, log, pass});
+					stat.add(String.format("%s import succeeded %s.", rs.getInt("CPOL"), new Date(System.currentTimeMillis())));
+				} catch (SQLException e) {
+					switch (e.getSQLState()) {
+					case "08001":
+						stat.add(String.format("%s import failed: Could not find driver for databse %s.", rs.getInt("CPOL"), path));
+						break;
+					case "HY000":
+						stat.add(String.format("%s import failed: Could not connect to database %s. %s", rs.getInt("CPOL"), path, e.getMessage()));
+						break;
+
+					default:
+						stat.add(String.format("%s import failed: Unknown SQL error.", rs.getInt("CPOL")));
+						break;
+					}
+					e.printStackTrace();
+				} catch (Exception e) {
+					if ((e.getCause() != null) && e.getCause() instanceof SQLException) {
+						stat.add(String.format("%s import failed: %s\r%s", rs.getInt("CPOL"), e.getMessage(), e.getCause().getMessage()));
+					} else {
+						stat.add(String.format("%s import failed: %s", rs.getInt("CPOL"), e.getMessage()));
+					}
+					e.printStackTrace();
+				}
+			}
+			
+			rs.close();
+			stm.close();
+			conn.close();
+		} catch (ClassNotFoundException e) {
+			stat.add(String.format("Import failed: Could not load class %s.", e.getMessage()));
+			e.printStackTrace();
+		} catch (SQLException e) {
+			switch (e.getSQLState()) {
+			case "08001":
+				stat.add(String.format("Import failed: Could not find driver for databse %s.", path));
+				break;
+			case "HY000":
+				stat.add(String.format("Import failed: Could not connect to database %s. %s", path, e.getMessage()));
+				break;
+
+			default:
+				stat.add("Import failed: Unknown SQL error.");
+				break;
+			}
+			e.printStackTrace();
+		}
+		
+		if (stat.size() > 0) {
+			System.out.println();
+			System.out.println();
+			System.out.println("Import report");
+			for (String st : stat)
+				System.out.println(st);
+			System.out.println("Import completed.");
+		}
+	}
+
 	private void importPatient() throws Exception {
 		System.out.println("Importing patient.");
 		String[] patientSrcFld = new String[] {"NPASPG", "DATAZ", "FAM", "IM", "OT", "DATAR", "POL", "JITEL", "ADP_OBL", "ADP_GOROD", "ADP_UL", "ADP_DOM", "ADP_KORP", "ADP_KV", "ADM_OBL", "ADM_GOROD", "ADM_UL", "ADM_DOM", "ADM_KORP", "ADM_KV", "TDOC", "DOCSER", "DOCUM",  "ODOC", "DATADOC", "MRAB", "SGRP", "SNILS", "POMS_SER", "POMS_NOM", "PDMS_SER", "PDMS_NOM", "CPOL_PR", "POMS_STRG", "PDMS_STRG", "POMS_NDOG", "PDMS_NDOG", "DATAPR", "NAMEMR",  "NCEX", "PRIZN", "TEL", "TERP", "DSV", "TER_LIV", "VPOLIS"};
@@ -398,7 +499,7 @@ public class ZabolDataImporter {
 				Statement dstStm = dstCon.createStatement();
 			) {
 			ResultSet nparsSrcRs = srcStm.executeQuery(sql = "SELECT P1 FROM N_PARS WHERE PTS = 6 ");
-			if (!nparsSrcRs.next())
+			if (!nparsSrcRs.next() || (nparsSrcRs.getString(1) == null))
 				throw new Exception("No npars clpu specified.");
 			String clpu = nparsSrcRs.getString(1);
 			ResultSet srcRs = srcStm.executeQuery(sql = SqlGenerator.genSelect(srcFld, "S_VRACH", "S_VRACH.SNILS") + "WHERE (S_VRACH.PRIZN IS DISTINCT FROM '*') ");
@@ -813,6 +914,8 @@ public class ZabolDataImporter {
 							vals[8] = "0";
 							vals[9] = "0";
 						}
+						if (vals[9] == null)
+							vals[9] = "0";
 						if (vals[7] == null)
 							vals[7] = "2000-01-01";
 						if (vals[3] == null)

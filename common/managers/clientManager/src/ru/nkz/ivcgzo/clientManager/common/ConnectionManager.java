@@ -756,6 +756,24 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Вызов формы со списком ошибок в медицинской части приемного отделения.
+	 * @return код выбранного посещения 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public Integer showMedPriemErrorsForm() {
+		return (Integer) viewClient.showModal(client, 27, true);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в медицинской части стационара.
+	 * @return код выбранной госпитализации 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public Integer showMedStaErrorsForm() {
+		return (Integer) viewClient.showModal(client, 27, false);
+	}
+	
+	/**
 	 * Вызов формы с редактором анамнеза пациента
 	 * @param npasp - уникальный номер пациента.
 	 */

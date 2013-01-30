@@ -60,14 +60,14 @@ public class ServerOperation extends Server implements Iface {
     private static final Class<?>[] OPERATION_TYPES ={
 //          id             vid_st         cotd           id_gosp        npasp
             Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
-//          pcod           name_oper     date        vrem        pred_ep       op_oper
-            Integer.class, String.class, Date.class, Time.class, String.class, String.class,
+//          pcod          name_oper     date        vrem        pred_ep       op_oper
+            String.class, String.class, Date.class, Time.class, String.class, String.class,
 //          material      dlit           dataz
             String.class, Integer.class, Date.class
     };
     private static final Class<?>[] OPERATION_COMPLICATION_TYPES ={
 //          id           id_oper          name_osl      pcod           dataz
-            Integer.class, Integer.class, String.class, Integer.class, Date.class
+            Integer.class, Integer.class, String.class, String.class, Date.class
     };
     private static final Class<?>[] OPERATION_PAYMENT_FUND_TYPES ={
 //          id             id_oper        pcod           dataz
@@ -81,7 +81,7 @@ public class ServerOperation extends Server implements Iface {
     };
     private static final Class<?>[] ANESTHESIA_COMPLICATION_TYPES ={
 //          id             id_anast       name          pcod           dataz
-            Integer.class, Integer.class, String.class, Integer.class, Date.class
+            Integer.class, Integer.class, String.class, String.class, Date.class
     };
 
     private static final Class<?>[] ANESTHESIA_PAYMENT_FUND_TYPES ={
@@ -296,7 +296,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех источников оплаты данной операции
      *
-     * @param idOper - уникальный идентийикатор операции
+     * @param idOper - уникальный идентификатор операции
      */
     @Override
     public List<OperationPaymentFund> getOperationPaymentFunds(int idOper)
@@ -342,7 +342,7 @@ public class ServerOperation extends Server implements Iface {
     public void updateOperationPaymentFund(OperationPaymentFund curPaymentFund)
             throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 0};
-        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, name_osl = ?, pcod = ?, "
+        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, pcod = ?, "
                 + "dataz = ? WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, curPaymentFund,
@@ -453,14 +453,14 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех осложнений данной анастезии
      *
-     * @param idOper - уникальный идентификатор анестезии
+     * @param idAnest - уникальный идентификатор анестезии
      */
     @Override
-    public List<AnesthesiaComplication> getAnesthesiaComplications(int idOper)
+    public List<AnesthesiaComplication> getAnesthesiaComplications(int idAnest)
             throws KmiacServerException {
         String sqlQuery = "SELECT * FROM p_anast_osl WHERE p_anast_osl.id_anast = ? "
                 + "ORDER BY p_anast_osl.dataz ";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idAnest)) {
             return rsmAnesthesiaComplication.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -532,14 +532,14 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех источников оплаты данной анастезии
      *
-     * @param idOper - уникальный идентификатор операции
+     * @param idAnest - уникальный идентификатор операции
      */
     @Override
-    public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idOper)
+    public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idAnest)
             throws KmiacServerException {
         String sqlQuery = "SELECT * FROM p_anast_opl WHERE p_anast_opl.id_anast = ? "
                 + "ORDER BY p_anast_opl.dataz ";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idAnest)) {
             return rsmAnesthesiaPaymentFund.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);

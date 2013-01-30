@@ -33,10 +33,11 @@ public class BolListForm extends ModalForm {
 	private int npasp;
 	private int idObr;
 	private int idGosp;
+	private int idPbol;
 
 	public BolListForm() {
 		super(true);
-		
+		pbol = new Pbol();
 		setTitle("Больничный лист");
 		setBounds(100, 100, 640, 480);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
@@ -63,7 +64,7 @@ public class BolListForm extends ModalForm {
 		btnAdd.setIcon(new ImageIcon(BolListForm.class.getResource("/ru/nkz/ivcgzo/clientViewSelect/resources/1331789242_Add.png")));
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				 pbol = new Pbol();
+				 
 				pbol.setNpasp(npasp);
 				pbol.setPcod(MainForm.authInfo.getCpodr());
 				pbol.setId_obr(idObr);
@@ -103,7 +104,7 @@ public class BolListForm extends ModalForm {
 						}
 						
 						try {
-							tblPbol.setData(MainForm.tcl.getPbol(npasp));
+							tblPbol.setData(MainForm.tcl.getPbol(idObr, idGosp, idPbol));
 						} catch (KmiacServerException e1) {
 							e1.printStackTrace();
 							JOptionPane.showMessageDialog(BolListForm.this, "Не удалось загрузить больничный лист.");
@@ -129,12 +130,20 @@ public class BolListForm extends ModalForm {
 	
 					if (tblPbol.getSelectedItem() != null)
 						for (Pbol pb: tblPbol.getData())
-							if (pb != pbol)
-								if (pb.getNombl() == pbol.getNombl()){
+							if (pb != pbol){
+								if (pbol==null)System.out.println("xxxx");
+								else
+								if (pb.getNombl().equals(pbol.getNombl())){
 									JOptionPane.showMessageDialog(BolListForm.this, "Больничный с таким номером уже существует");
 									pbol = tblPbol.getSelectedItem();
 									return;
 								}
+								if ((pb.getBol_l() == pbol.getBol_l()) && (pb.getS_bl() == pbol.getS_bl())){
+										JOptionPane.showMessageDialog(BolListForm.this, "Больничный с такой датой и причиной уже существует");
+										pbol = tblPbol.getSelectedItem();
+										return;
+									}
+							}
 						MainForm.tcl.UpdatePbol(tblPbol.getSelectedItem());
 				} catch (KmiacServerException e1) {
 					e1.printStackTrace();
@@ -159,14 +168,18 @@ public class BolListForm extends ModalForm {
 		this.npasp = npasp;
 		this.idObr = idObr;
 		this.idGosp = idGosp;
+		if (idGosp == 0) idPbol = idObr;
+		if (idObr == 0) idPbol = idGosp;
+		
 		
 		try {
+			
 			tblPbol.setIntegerClassifierSelector(0, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_bl1));
 			tblPbol.setIntegerClassifierSelector(3, ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_z30));
-			tblPbol.setData(MainForm.tcl.getPbol(npasp));
-			btnAdd.setEnabled(modEnabled);
-			btnDel.setEnabled(modEnabled);
-			btnUpd.setEnabled(modEnabled);
+			tblPbol.setData(MainForm.tcl.getPbol(idObr, idGosp, idPbol));
+//			btnAdd.setEnabled(modEnabled);
+//			btnDel.setEnabled(modEnabled);
+//			btnUpd.setEnabled(modEnabled);
 		} catch (KmiacServerException e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(BolListForm.this, "Не удалось загрузить больничный лист.");

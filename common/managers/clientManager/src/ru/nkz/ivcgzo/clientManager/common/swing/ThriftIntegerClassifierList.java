@@ -21,7 +21,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 	private static final long serialVersionUID = -873049270461876460L;
 	private List<IntegerClassifier> items;
-	private StringListModel model;
 	private IntegerClassifiers classifier;
 	private boolean classifierLoaded;
 	
@@ -29,7 +28,6 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 	 * Конструктор списка.
 	 */
 	public ThriftIntegerClassifierList() {
-		setModel();
 		setData(null);
 	}
 	
@@ -51,11 +49,6 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 		this.classifier = classifierName;
 	}
 	
-	private void setModel() {
-		model = new StringListModel();
-		this.setModel(model);
-	}
-	
 	/**
 	 * Устанавливает список для отображения. 
 	 */
@@ -68,8 +61,8 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 		for (IntegerClassifier item : list) {
 			items.add(new IntegerClassifierItem(item));
 		}
+		setModel(new StringListModel());
 		selectFirstItem();
-		model.fireContentsChanged();
 	}
 	
 	/**
@@ -154,8 +147,36 @@ public class ThriftIntegerClassifierList extends JList<IntegerClassifier> {
 			return items.size();
 		}
 		
-		public void fireContentsChanged() {
-			super.fireContentsChanged(ThriftIntegerClassifierList.this, 0, getSize() - 1);
+		@Override
+		public IntegerClassifier remove(int index) {
+			IntegerClassifier element = items.get(index);
+			
+			items.remove(index);
+	        fireIntervalRemoved(this, index, index);
+			
+			return element;
+		}
+		
+		@Override
+		public void add(int index, IntegerClassifier element) {
+			items.add(new IntegerClassifierItem(element));
+			fireIntervalAdded(this, index, index);
+		}
+		
+		@Override
+		public void addElement(IntegerClassifier element) {
+			add(getSize(), element);
+			
+		}
+		
+		@Override
+		public IntegerClassifier set(int index, IntegerClassifier element) {
+			IntegerClassifier prevElement = items.get(index);
+			
+			items.set(index, new IntegerClassifierItem(element));
+			fireContentsChanged(this, index, index);
+			
+			return prevElement;
 		}
 	}
 	
