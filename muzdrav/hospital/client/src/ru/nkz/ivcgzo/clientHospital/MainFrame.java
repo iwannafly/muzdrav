@@ -333,6 +333,7 @@ public class MainFrame extends JFrame {
 	private JSpinner SKrov;
 	private JSpinner SVes;
 	private JSpinner SDlina;
+	private JSpinner SSRok;
 	private JTextField TGde;
 	private ThriftIntegerClassifierCombobox<IntegerClassifier> CBEff;
 	private JTextField TDet;
@@ -590,6 +591,7 @@ public class MainFrame extends JFrame {
             			Soj.setValue(rddin.getOj());
             			Shdm.setValue(rddin.getHdm());
                         Schcc.setValue(rddin.getChcc());
+                        SSRok.setValue(rddin.getSrok());
  //           			if ((rddin.isSetPozpl())||(rddin.getPozpl() != 0))
                    		if (rddin.getPozpl() != 0)
             			CBPoz.setSelectedPcod(rddin.getPozpl());
@@ -2051,6 +2053,7 @@ public class MainFrame extends JFrame {
 		lblNewLabel_33.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		
 		SVes = new JSpinner();
+		SVes.setModel(new SpinnerNumberModel(new Double(0), new Double(0), null, new Double(5)));
 		SVes.setFont(new Font("Tahoma", Font.BOLD, 12));
 		
 		TRod = new JTextField();
@@ -2259,7 +2262,16 @@ public class MainFrame extends JFrame {
  		   	trdIshod.setObvit(Obvit.getText());
       		trdIshod.setOsobp(TOsob.getText());
       		trdIshod.setPoln(TPoln.getText());
-      		trdIshod.setPupov((int) SDlina.getModel().getValue());
+      		trdIshod.setLpupov ((int) SDlina.getModel().getValue());
+      		trdIshod.setShvat(TShvat.getText());
+      		trdIshod.setVody(TVod.getText());
+      		trdIshod.setPotugi(TNash.getText());
+      		trdIshod.setVremp(TVremp.getText());
+     		trdIshod.setPsih(ChBpsi.isSelected()); 
+      		trdIshod.setPrr1(TPer1.getText());
+      		trdIshod.setPrr2(TPer2.getText());
+      		trdIshod.setPrr3(TPer3.getText());
+      		trdIshod.setVespl(Double.valueOf(TVes.getText()));
 			if (CBPosled.getSelectedPcod() != null)
 				trdIshod.setPosled(CBPosled.getSelectedPcod());
 				else trdIshod.unsetPosled();
@@ -2278,7 +2290,8 @@ public class MainFrame extends JFrame {
   		trdIshod.setDetmesto(TDet.getText());
  		System.out.println(trdIshod);	
       	rddin.setChcc( (int) Schcc.getModel().getValue());
-  		rddin.setVes((int) SVes.getModel().getValue());
+      	rddin.setSrok((int) SSRok.getModel().getValue());
+  		rddin.setVes((double) SVes.getModel().getValue());
   		rddin.setOj((int) Soj.getModel().getValue());
   		rddin.setHdm((int) Shdm.getModel().getValue());
 		if (CBVid.getSelectedPcod() != null)
@@ -2347,6 +2360,7 @@ public class MainFrame extends JFrame {
 		        btnNewButton.addActionListener(new ActionListener() {
 		        	public void actionPerformed(final ActionEvent e) {
 		    			try {
+		    				System.out.println("добавление родов");	
 		    				Integer id1 = 0; Integer numr = 0;Integer srok = 40;Integer numdin = 0;
 		    				Integer oj = 100; Integer hdm = 30; Integer polpl = 1;Integer predpl = 1;
 		    				Integer chcc = 110; Integer serd = 1; Integer serd1 = 1; double ves = 70.0;double vespl = 3.00;
@@ -2355,37 +2369,41 @@ public class MainFrame extends JFrame {
 //		    				Date datarod = Date(System.currentTimeMillis());
 		    	trdIshod.setNpasp(patient.getPatientId());
 		    	trdIshod.setNgosp(patient.gospitalCod);
+		    	trdIshod.setId_berem(rdsl.getId_pvizit());
 	 			if (TDatarod.getDate() != null)
 	            trdIshod.setDaterod(TDatarod.getDate().getTime());
-	 			else trdIshod.setDaterod(System.currentTimeMillis());
-  		trdIshod.setDeyat(TRod.getText());
-		if (CBEff.getSelectedPcod() != null)
-			trdIshod.setEff(CBEff.getSelectedPcod());
-			else trdIshod.unsetEff();
-  		trdIshod.setKashetv(TKash.getText());
-  		trdIshod.setKrov((int) SKrov.getModel().getValue());
-  		trdIshod.setMesto(TDet.getText());
-  		trdIshod.setObezb(TMed.getText());
-		   	trdIshod.setObol(TObol.getText());
-		   	trdIshod.setObvit(Obvit.getText());
-  		trdIshod.setOsobp(TOsob.getText());
-  		trdIshod.setPoln(TPoln.getText());
-		if (CBPosled.getSelectedPcod() != null)
-			trdIshod.setPosled(CBPosled.getSelectedPcod());
-			else trdIshod.unsetPosled();
-		if (CBAkush.getSelectedPcod() != null)
-			trdIshod.setAkush(CBAkush.getSelectedPcod());
-			else trdIshod.unsetAkush();
-		if (CBPrinial.getSelectedPcod() != null)
-			trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
-		    else trdIshod.unsetPrinyl();
-		if (CBVrash.getSelectedPcod() != null)
-			trdIshod.setVrash(CBVrash.getSelectedPcod());
-		    else trdIshod.unsetVrash();
-		if (CBOsmotr.getSelectedPcod() != null)
-			trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
-		else trdIshod.unsetOsmposl();
-		trdIshod.setDetmesto(TDet.getText());
+	 			else 
+	 				trdIshod.setDaterod(System.currentTimeMillis());
+//  		trdIshod.setDeyat(TRod.getText());
+//		if (CBEff.getSelectedPcod() != null)
+//			trdIshod.setEff(CBEff.getSelectedPcod());
+//			else trdIshod.unsetEff();
+//  		trdIshod.setKashetv(TKash.getText());
+//  		trdIshod.setKrov((int) SKrov.getModel().getValue());
+//  		trdIshod.setMesto(TDet.getText());
+//  		trdIshod.setObezb(TMed.getText());
+//		   	trdIshod.setObol(TObol.getText());
+//		   	trdIshod.setObvit(Obvit.getText());
+//  		trdIshod.setOsobp(TOsob.getText());
+//  		trdIshod.setPoln(TPoln.getText());
+//		if (CBPosled.getSelectedPcod() != null)
+//			trdIshod.setPosled(CBPosled.getSelectedPcod());
+//			else trdIshod.unsetPosled();
+//		if (CBAkush.getSelectedPcod() != null)
+//			trdIshod.setAkush(CBAkush.getSelectedPcod());
+//			else trdIshod.unsetAkush();
+//		if (CBPrinial.getSelectedPcod() != null)
+//			trdIshod.setPrinyl(CBPrinial.getSelectedPcod());
+//		    else trdIshod.unsetPrinyl();
+//		if (CBVrash.getSelectedPcod() != null)
+//			trdIshod.setVrash(CBVrash.getSelectedPcod());
+//		    else trdIshod.unsetVrash();
+//		if (CBOsmotr.getSelectedPcod() != null)
+//			trdIshod.setOsmposl(CBOsmotr.getSelectedPcod());
+//		else trdIshod.unsetOsmposl();
+//		trdIshod.setDetmesto(TDet.getText());
+				System.out.println("перед добавлением");	
+    				System.out.println(trdIshod);	
 		    	trdIshod.setId(ClientHospital.tcl.addRdIshod(trdIshod));
 						} catch (KmiacServerException e1) {
 							// TODO Auto-generated catch block
@@ -2441,7 +2459,7 @@ public class MainFrame extends JFrame {
 		        					.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
 		        					.addPreferredGap(ComponentPlacement.UNRELATED)
 		        					.addComponent(btnNewButton_2, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)))
-		        			.addContainerGap(416, Short.MAX_VALUE))
+		        			.addContainerGap(440, Short.MAX_VALUE))
 		        );
 		        gl_panel_4.setVerticalGroup(
 		        	gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -2481,10 +2499,10 @@ public class MainFrame extends JFrame {
 		        					.addGap(3)
 		        					.addComponent(lblNewLabel_32))
 		        				.addComponent(btnNewButton_2)
-		        				.addComponent(btnNewButton_1)
-		        				.addComponent(btnNewButton)
-		        				.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		        			.addContainerGap(21, Short.MAX_VALUE))
+		        				.addComponent(TDatarod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        				.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 35, GroupLayout.PREFERRED_SIZE)
+		        				.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE))
+		        			.addContainerGap(19, Short.MAX_VALUE))
 		        );
 		        panel_4.setLayout(gl_panel_4);
 		        GroupLayout gl_pChildbirth = new GroupLayout(pChildbirth);
@@ -2534,6 +2552,12 @@ public class MainFrame extends JFrame {
 		        
 		        SKrov = new JSpinner();
 		        SKrov.setFont(new Font("Tahoma", Font.BOLD, 12));
+		        
+		        JLabel lblNewLabel_45 = new JLabel("Срок:");
+		        lblNewLabel_45.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		        
+		        SSRok = new JSpinner();
+		        SSRok.setFont(new Font("Tahoma", Font.BOLD, 12));
 		        GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		        gl_panel_3.setHorizontalGroup(
 		        	gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -2547,7 +2571,11 @@ public class MainFrame extends JFrame {
 		        					.addGap(4)
 		        					.addComponent(lblNewLabel_35)
 		        					.addGap(10)
-		        					.addComponent(Srod, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE))
+		        					.addComponent(Srod, GroupLayout.PREFERRED_SIZE, 49, GroupLayout.PREFERRED_SIZE)
+		        					.addPreferredGap(ComponentPlacement.UNRELATED)
+		        					.addComponent(lblNewLabel_45)
+		        					.addPreferredGap(ComponentPlacement.UNRELATED)
+		        					.addComponent(SSRok, GroupLayout.PREFERRED_SIZE, 52, GroupLayout.PREFERRED_SIZE))
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addContainerGap()
 		        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
@@ -2622,12 +2650,12 @@ public class MainFrame extends JFrame {
 		        								.addComponent(TRod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(10)
-		        					.addGroup(gl_panel_3.createParallelGroup(Alignment.TRAILING, false)
+		        					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING, false)
 		        						.addGroup(gl_panel_3.createSequentialGroup()
 		        							.addComponent(lblNewLabel_36)
 		        							.addPreferredGap(ComponentPlacement.RELATED)
 		        							.addComponent(Tdatam, 0, 0, Short.MAX_VALUE))
-		        						.addGroup(Alignment.LEADING, gl_panel_3.createSequentialGroup()
+		        						.addGroup(gl_panel_3.createSequentialGroup()
 		        							.addComponent(lblNewLabel_37)
 		        							.addPreferredGap(ComponentPlacement.UNRELATED)
 		        							.addComponent(Tdataosl, GroupLayout.PREFERRED_SIZE, 98, GroupLayout.PREFERRED_SIZE))))
@@ -2677,7 +2705,10 @@ public class MainFrame extends JFrame {
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(2)
 		        					.addComponent(lblNewLabel_35))
-		        				.addComponent(Srod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+		        				.addGroup(gl_panel_3.createParallelGroup(Alignment.BASELINE)
+		        					.addComponent(Srod, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		        					.addComponent(lblNewLabel_45)
+		        					.addComponent(SSRok, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 		        			.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(14)
@@ -2690,9 +2721,7 @@ public class MainFrame extends JFrame {
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(15)
 		        					.addComponent(lblNewLabel_37))
-		        				.addGroup(gl_panel_3.createSequentialGroup()
-		        					.addPreferredGap(ComponentPlacement.RELATED)
-		        					.addComponent(Tdataosl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		        				.addComponent(Tdataosl, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addGap(11)
 		        			.addComponent(panel_6, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
 		        			.addGap(6)
@@ -2772,9 +2801,7 @@ public class MainFrame extends JFrame {
 		        			.addPreferredGap(ComponentPlacement.RELATED)
 		        			.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
 		        				.addComponent(lblNewLabel_17)
-		        				.addGroup(gl_panel_3.createSequentialGroup()
-		        					.addPreferredGap(ComponentPlacement.RELATED, 4, GroupLayout.PREFERRED_SIZE)
-		        					.addComponent(TDet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+		        				.addComponent(TDet, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 		        			.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
 		        				.addGroup(gl_panel_3.createSequentialGroup()
 		        					.addGap(12)
@@ -3618,7 +3645,7 @@ public class MainFrame extends JFrame {
 	private void setDefaultValues() {
 	try {
 		System.out.println("начальные значения");		
-		SDlina.setValue(trdIshod.getPupov());
+		SDlina.setValue(trdIshod.getLpupov());
 		SKrov.setValue(trdIshod.getKrov());
 		if (trdIshod.getObvit() == null)
 		Obvit.setText(""); else
