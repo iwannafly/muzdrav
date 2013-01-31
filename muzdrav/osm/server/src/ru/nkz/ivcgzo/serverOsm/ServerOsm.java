@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.thriftOsm.RdSlStruct;
 import ru.nkz.ivcgzo.thriftOsm.RdVizit;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
+import ru.nkz.ivcgzo.thriftOsm.SpravNetrud;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm;
 import ru.nkz.ivcgzo.thriftOsm.ThriftOsm.Iface;
 import ru.nkz.ivcgzo.thriftOsm.VrachInfo;
@@ -3275,5 +3276,96 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 			e.printStackTrace();
 			throw new KmiacServerException();
 		}
+	}
+
+	@Override
+	public String printSpravNetrud(SpravNetrud sn) throws KmiacServerException,
+			TException {
+	String path;
+		
+		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("spravNetrud", ".htm").getAbsolutePath()), "utf-8")) {
+			AutoCloseableResultSet acrs;
+			
+			StringBuilder sb = new StringBuilder(0x10000);
+			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+			sb.append("<head>");
+				sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+				sb.append("<title> Справка о временной нетрудоспособности</title>");
+				sb.append("</head>");
+				sb.append("<body>");
+				sb.append("<div><table cellpadding=\"5\" cellspacing=\"0\">");
+				sb.append("<tr valign=\"top\">");
+				sb.append("<td style=\"border-top: 1px solid white; border-bottom: 1px solid white; border-left: 1px solid white; border-right: none; padding: 5px; \" width=\"800px\">");
+				sb.append("<div align=\"right\" style font: 11px times new roman;>");
+				sb.append("<font size=2 color=black>Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</font></div>");
+				sb.append("<br>");
+				sb.append("<div style=\"width:170px; float:left;\"><font size=2 color=black>Министерство здравоохранения ");
+				sb.append("<br> Российской федерации<br>");
+				sb.append("<br>Консультативное отделение (для проведения консультаций в стационарных отделениях), Мблпу \"Городская клиническая больница 1\"</font></div>");
+				sb.append("<div style=\"width:90px; float:right;\">");
+				sb.append("<font size=2 color=black>Форма № 095/у");
+				sb.append("<br> Утверждена Минздравом СССР<br>04.10.80, №1030</font></div>");
+				sb.append("<br><br><br><br><br><br><br><br><br>");
+				sb.append("<h3 align=center>Контрольный талон к справке №____</h3>");
+				sb.append("<font size=3 color=black>Дата выдачи \"___\" ______________ 20__г.<br>");
+				sb.append("Фамилия, имя, отчество: 88 88 88<br />");
+				sb.append("Название учебного заведения, детского дошкольного учреждения: _________________________<br />");
+				sb.append("Диагноз заболевания ___________________________<br>");
+				sb.append("Освобожден с _________________________________ по _____________________");
+				sb.append("<br>");
+				sb.append("Освобождение продлено с _________________________________ по _____________________<br>");
+				sb.append("Фамилия врача, выдающего справку________________________<br></font>");
+				sb.append("<font size=1 color=black>Примечание: Контрольные талоны служат для учета выданных справок</font>");
+				sb.append("</td>");
+				sb.append("<td style=\"border: 1px solid white; padding: 5px;\" width=\"200px\">");
+				sb.append("<div align=\"right\">");
+				sb.append("<font size=2 color=black>Код формы по ОКУД____________<br>Код учреждения по ОКПО_______________</font></div>");
+				sb.append("<br>");
+				sb.append("<div style=\"width:220px; float:left;\"><font size=2 color=black>Министерство здравоохранения ");
+				sb.append("<br> Российской федерации<br>");
+				sb.append("<br>Консультативное отделение (для проведения консультаций в стационарных отделениях), Мблпу \"Городская клиническая больница 1\"</font></div>");
+				sb.append("<div  style=\"width:200px; float:right;\" >");
+				sb.append("<font size=2 color=black>Медицинская документация<br>Форма № 095/у");
+				sb.append("<br> Утверждена Минздравом СССР<br>04.10.80, №1030</font></div>");
+				sb.append("<br><br><br><br><br><br><br><br><br>");
+				sb.append("<h3 align=center>С П Р А В К А</h3>");
+				sb.append("<font size=3 color=black><b><center>о временной нетрудоспособности студента, учащегося техникума, профессионально-технического училища, о болезни, карантине и прочих причинах отсутствия ребенка, посещающего школу, детское дошкольное учреждение (нужное подчеркнуть)</b></center>");
+				sb.append("<br> Дата выдачи \"___\" ______________ 20__г.<br>");
+				sb.append("Студенту, учащемуся, ребенку, посещаещему дошкольное учреждение (нужное подчеркнуть)___________________________________________________");
+				sb.append("____________________________________________________________________");
+				sb.append("<br>");
+				sb.append("Фамилия, имя, отчество: 88 88 88<br />");
+				sb.append("Дата рождения (год, месяц, для детей до 1 года - день): 01.01.2011<br />");
+				sb.append("Диагноз заболевания (прочие причины отсутствия)___________________________<br>");
+				sb.append("Наличие контакта с инфекционными больными (нет, да, какими)_________________________________</font>");
+				sb.append("<br><center> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=1 color=black>подчеркнуть, вписать</font></center>");
+				sb.append("____________________________________________________________________________________________<br>");
+				sb.append("<center><font size=1 color=black>освобожден от занятий, посещений детского дошкольного учреждения</font></center><br>");
+				sb.append("<font size=3 color=black>с_______________ по ______________________<br>");
+				sb.append("с_______________ по ______________________<br>");
+				sb.append("<br>мп</font>");
+				sb.append("</td>");
+				sb.append("</div>");
+				sb.append("</body>");
+				sb.append("</html>");
+				
+				/*acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", id_pvizit); 
+				if (acrs.getResultSet().next()) {
+					if (acrs.getResultSet().getString(1)!=null)
+						{sb.append("<br><b>	Анамнез заболевания</b><br>");
+						sb.append(String.format(" %s.", acrs.getResultSet().getString(1)));
+						sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
+						}
+				}				
+			acrs.close();*/
+			osw.write(sb.toString());
+			return path;
+			}
+		 catch (IOException e) {
+			e.printStackTrace();
+			throw new KmiacServerException();
+		}
+	
 	}
 }
