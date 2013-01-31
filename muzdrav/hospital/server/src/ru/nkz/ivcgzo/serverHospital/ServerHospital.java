@@ -736,19 +736,26 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void addZakl(final Zakl zakl) throws KmiacServerException {
+    public final void addZakl(final Zakl zakl, final int otd) throws KmiacServerException {
         String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
             + "sostv = ?, recom = ?, vrach = ?,  vid_opl = ?, vid_pom = ?, ukl = ? "
             + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
-                sqlQuery = "UPDATE c_otd SET ishod = ?, "
-                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
-                    + "WHERE id_gosp = ?";
-                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
-                    zakl.getSostv(), zakl.getRecom(),
-                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
-                    zakl.getIdGosp());
+                int newIdGosp = addToGosp(zakl, otd);
+                addToOtd(zakl, newIdGosp);
+                sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
+                        new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                        zakl.getSostv(), zakl.getRecom(),
+                        null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+                        zakl.getIdGosp());
+//                sqlQuery = "UPDATE c_otd SET ishod = ?, "
+//                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
+//                    + "WHERE id_gosp = ?";
+//                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
+//                    zakl.getSostv(), zakl.getRecom(),
+//                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+//                    zakl.getIdGosp());
             } else {
                 sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
                     new Date(zakl.getDatav()), new Time(zakl.getVremv()),
@@ -759,6 +766,36 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private int addToOtd(final Zakl zakl, final int idGosp)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_otd (id_gosp, cotd, dataz) VALUES (?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, idGosp, zakl.getNewOtd(),
+                    new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private int addToGosp(final Zakl zakl, final int otd)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_gosp (npasp, naprav, n_org, dataz) VALUES (?, ?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, zakl.getNpasp(), "С", otd,
+                    new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }

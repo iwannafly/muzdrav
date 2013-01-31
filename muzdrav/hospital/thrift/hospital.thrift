@@ -117,6 +117,7 @@ struct Zakl {
 	9: optional i32 vidOpl;
 	10: optional i32 vidPom;
 	11: optional double ukl;
+	12: optional i32 npasp;
 }
 
 struct TStage {
@@ -454,7 +455,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 
 	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
-	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
+	void addZakl(1:Zakl zakl, 2:i32 otd) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,

@@ -3939,11 +3939,13 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                tmpZakl.setNpasp(patient.getPatientId());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
-                                ClientHospital.tcl.addZakl(tmpZakl);
+                                ClientHospital.tcl.addZakl(tmpZakl,
+                                        ClientHospital.authInfo.getCpodr());
                                 JOptionPane.showMessageDialog(MainFrame.this,
                                     "Пациент успешно выписан", "Выписка пациента",
                                     JOptionPane.INFORMATION_MESSAGE);
@@ -3958,11 +3960,13 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                tmpZakl.setNpasp(patient.getPatientId());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
-                                ClientHospital.tcl.addZakl(tmpZakl);
+                                ClientHospital.tcl.addZakl(tmpZakl,
+                                        ClientHospital.authInfo.getCpodr());
                                 JOptionPane.showMessageDialog(MainFrame.this,
                                     "Пациент успешно выписан", "Выписка пациента",
                                     JOptionPane.INFORMATION_MESSAGE);
@@ -3979,11 +3983,13 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                tmpZakl.setNpasp(patient.getPatientId());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
-                                ClientHospital.tcl.addZakl(tmpZakl);
+                                ClientHospital.tcl.addZakl(tmpZakl,
+                                        ClientHospital.authInfo.getCpodr());
                                 JOptionPane.showMessageDialog(MainFrame.this,
                                     "Пациент успешно выписан", "Выписка пациента",
                                     JOptionPane.INFORMATION_MESSAGE);
