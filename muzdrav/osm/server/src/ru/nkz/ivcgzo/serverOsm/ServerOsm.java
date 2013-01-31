@@ -889,6 +889,7 @@ public class ServerOsm extends Server implements Iface {
 	@Override
 	public String printIsslMetod(IsslMet im) throws KmiacServerException, TException {
 		String path;
+		int kod_lab;
 		
 		try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()), "utf-8")) {
 			AutoCloseableResultSet acrs;
@@ -907,12 +908,16 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<tr valign=\"top\">");
 				sb.append("<td style=\"border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black; border-right: none; padding: 5px; font: 11px times new roman;\" width=\"150px\">");
 					sb.append("<b>Информация для пациента:</b><br><br>");
-					acrs = sse.execPreparedQuery("select substr(adres,8), name_s from n_m00 where pcod = ? ", im.getClpu());
-					if (acrs.getResultSet().next()) {
-						sb.append(String.format("<b>ЛПУ: </b>%s<br />", acrs.getResultSet().getString(2)));
-						sb.append(String.format("<b>Адрес: </b> %s <br />", acrs.getResultSet().getString(1)));
+					acrs = sse.execPreparedQuery("select cpol from n_lds where pcod = ? ", im.getKod_lab());
+					if (acrs.getResultSet().next()) kod_lab=acrs.getResultSet().getInt(1);
+					acrs.close();
+					acrs = sse.execPreparedQuery("select adres, name_u from n_n00 where pcod = ? ", im.getCpodr());
+					if (im.cpodr == im.kod_lab){
+							if (acrs.getResultSet().next()) {
+								sb.append(String.format("<b>Поликлиника: </b>%s<br />", acrs.getResultSet().getString(2)));
+								sb.append(String.format("<b>Адрес: </b> %s <br />", acrs.getResultSet().getString(1)));
 					}
-					if (im.getMesto()!=null) sb.append(String.format("<b>Лаборатория: </b>%s<br />", im.getMesto()));
+					}
 					if (im.getKab()!=null) sb.append(String.format("<b>Каб. №: </b>%s<br />", im.getKab()));
 					sb.append("<b>Дата:</b><br />");
 					sb.append("<b>Время:</b><br />");
@@ -923,15 +928,12 @@ public class ServerOsm extends Server implements Iface {
 				if (acrs.getResultSet().next()) {
 					sb.append("<td style=\"border: 1px solid black; padding: 5px; font: 11px times new roman;\" width=\"250px\">");
 					sb.append(String.format("<b>%s</b><br /><br>", im.getClpu_name()));
-					sb.append(String.format("<b>%s</b><br><br />", im.getCpodr_name()));
+					sb.append("<b>Направление на исследование</b><br /><br>");
+					sb.append(String.format("<b>Лаборатория: %s</b><br><br />", im.getMesto()));
 				}
 				String vrInfo = String.format("%s %s %s", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3));
 				acrs.close();
-				acrs = sse.execPreparedQuery("SELECT name FROM n_p0e1 WHERE pcod = ?", im.getKodVidIssl());
-				if (acrs.getResultSet().next())
-					sb.append(String.format("<b>Направление на: %s</b><br>", acrs.getResultSet().getString(1)));
-				acrs.close();
-				acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
+							acrs = sse.execPreparedQuery("SELECT fam, im, ot, datar, adm_ul, adm_dom, poms_ser, poms_nom FROM patient WHERE npasp = ? ", im.getNpasp());
 				if (acrs.getResultSet().next()) {
 					sb.append(String.format("<b>ФИО пациента:</b> %s %s %s<br />", acrs.getResultSet().getString(1), acrs.getResultSet().getString(2), acrs.getResultSet().getString(3)));
 					if (acrs.getResultSet().getString(8)!=null)sb.append(String.format("<b>Серия и номер полиса:</b> %s %s<br />", acrs.getResultSet().getString(7), acrs.getResultSet().getString(8)));
@@ -1142,11 +1144,11 @@ public class ServerOsm extends Server implements Iface {
 			sb.append("<br>Должность медицинского работника, направившего больного: ");
 			acrs.close();
 			acrs = sse.execPreparedQuery("SELECT s_vrach.fam, s_vrach.im, s_vrach.ot,n_s00.name from s_mrab "+ 
-  "join n_s00 on(s_mrab.cdol=n_s00.pcod)  join s_vrach on "+ 
-  "(s_vrach.pcod=s_mrab.pcod) WHERE s_mrab.user_id = ? ",na.getUserId());
-			if (acrs.getResultSet().next())
-			sb.append(String.format("%s ", acrs.getResultSet().getString(4)));
-			sb.append(String.format("<br>ФИО: %s %s %s", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
+					  "join n_s00 on(s_mrab.cdol=n_s00.pcod)  join s_vrach on "+ 
+					  "(s_vrach.pcod=s_mrab.pcod) WHERE s_mrab.user_id = ? ",na.getUserId());
+								if (acrs.getResultSet().next())
+								sb.append(String.format("%s ", acrs.getResultSet().getString(4)));
+								sb.append(String.format("<br>ФИО: %s %s %s", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
 			sb.append(" Подпись_______________");
 			sb.append("<br>Заведующий отделением_____________________________________________________________________________");
 			sb.append(String.format("<p align=\"left\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
@@ -1547,7 +1549,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				acrs = sse.execPreparedQuery("select p_diag_amb.diag,n_vdi.name,p_diag_amb.named  from p_vizit_amb join p_diag_amb on (p_diag_amb.id_pos=p_vizit_amb.id) left join n_vdi on(p_diag_amb.diag_stat=n_vdi.pcod) where p_vizit_amb.id=? order by p_vizit_amb.id ", pk.getPvizit_ambId());
 				if (acrs.getResultSet().next()) {
 					do {
-						sb.append(String.format("<i>Код диагноза МКБ </i> %s <br>", acrs.getResultSet().getString(1)));
+						sb.append(String.format("<i>Код диагноза МКБ 10 </i> %s <br>", acrs.getResultSet().getString(1)));
 						if (acrs.getResultSet().getString(2)!=null) sb.append(String.format("<i>Статус диагноза</i> %s <br>", acrs.getResultSet().getString(2)));
 						if (acrs.getResultSet().getString(3)!=null) sb.append(String.format("<i>Медицинское описание диагноза </i> %s <br>", acrs.getResultSet().getString(3)));
 
@@ -1608,7 +1610,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 					if (acrs.getResultSet().isBeforeFirst()) {
 						sb.append("<br><br><b>Назначенные исследования </b><br>");
 						while (acrs.getResultSet().next()) {
-						//	if (acrs.getResultSet().getString(4) != null) 
+							if (acrs.getResultSet().getString(4) != null) 
 								sb.append(String.format("<br>Код показателя  %s <br>  Наименование показателя %s <br> Результат %s <br>", acrs.getResultSet().getString(2), acrs.getResultSet().getString(3), acrs.getResultSet().getString(4)));
 						}			
 					}
@@ -3302,20 +3304,26 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("<br>");
 				sb.append("<div style=\"width:170px; float:left;\"><font size=2 color=black>Министерство здравоохранения ");
 				sb.append("<br> Российской федерации<br>");
-				sb.append("<br>Консультативное отделение (для проведения консультаций в стационарных отделениях), Мблпу \"Городская клиническая больница 1\"</font></div>");
+				sb.append(String.format("<br> %s <br> %s</font></div>", sn.cpodr_name, sn.clpu_name));
 				sb.append("<div style=\"width:90px; float:right;\">");
 				sb.append("<font size=2 color=black>Форма № 095/у");
 				sb.append("<br> Утверждена Минздравом СССР<br>04.10.80, №1030</font></div>");
-				sb.append("<br><br><br><br><br><br><br><br><br>");
+				sb.append("<br><br><br><br><br><br><br><br><br><br><br><br>");
 				sb.append("<h3 align=center>Контрольный талон к справке №____</h3>");
 				sb.append("<font size=3 color=black>Дата выдачи \"___\" ______________ 20__г.<br>");
-				sb.append("Фамилия, имя, отчество: 88 88 88<br />");
-				sb.append("Название учебного заведения, детского дошкольного учреждения: _________________________<br />");
-				sb.append("Диагноз заболевания ___________________________<br>");
-				sb.append("Освобожден с _________________________________ по _____________________");
-				sb.append("<br>");
+				sb.append(String.format("Фамилия, имя, отчество: %s %s %s<br />", sn.fam, sn.im, sn.oth));
+				acrs = sse.execPreparedQuery("select mrab from patient where npasp=?", sn.npasp); 
+				if (acrs.getResultSet().next()) 
+						sb.append(String.format("Название учебного заведения, детского дошкольного учреждения: %s.<br>", acrs.getResultSet().getString(1)));
+					acrs.close();
+				sb.append(String.format("Диагноз заболевания %s<br>", sn.diag));
+				sb.append("Освобожден с _________________________________ по _____________________<br>");
 				sb.append("Освобождение продлено с _________________________________ по _____________________<br>");
-				sb.append("Фамилия врача, выдающего справку________________________<br></font>");
+				acrs = sse.execPreparedQuery("SELECT s_vrach.fam, s_vrach.im, s_vrach.ot,n_s00.name from s_mrab "+ 
+						  "join n_s00 on(s_mrab.cdol=n_s00.pcod)  join s_vrach on "+ 
+						  "(s_vrach.pcod=s_mrab.pcod) WHERE s_mrab.user_id = ? ",sn.getUserId());
+									if (acrs.getResultSet().next())
+									sb.append(String.format("<br>Фамилия врача, выдающего справку: %s %s %s <br> </font>", acrs.getResultSet().getString(1),acrs.getResultSet().getString(2),acrs.getResultSet().getString(3)));
 				sb.append("<font size=1 color=black>Примечание: Контрольные талоны служат для учета выданных справок</font>");
 				sb.append("</td>");
 				sb.append("<td style=\"border: 1px solid white; padding: 5px;\" width=\"200px\">");
@@ -3324,7 +3332,7 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("<br>");
 				sb.append("<div style=\"width:220px; float:left;\"><font size=2 color=black>Министерство здравоохранения ");
 				sb.append("<br> Российской федерации<br>");
-				sb.append("<br>Консультативное отделение (для проведения консультаций в стационарных отделениях), Мблпу \"Городская клиническая больница 1\"</font></div>");
+				sb.append(String.format("<br> %s, %s</font></div>", sn.cpodr_name, sn.clpu_name));
 				sb.append("<div  style=\"width:200px; float:right;\" >");
 				sb.append("<font size=2 color=black>Медицинская документация<br>Форма № 095/у");
 				sb.append("<br> Утверждена Минздравом СССР<br>04.10.80, №1030</font></div>");
@@ -3335,9 +3343,9 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("Студенту, учащемуся, ребенку, посещаещему дошкольное учреждение (нужное подчеркнуть)___________________________________________________");
 				sb.append("____________________________________________________________________");
 				sb.append("<br>");
-				sb.append("Фамилия, имя, отчество: 88 88 88<br />");
-				sb.append("Дата рождения (год, месяц, для детей до 1 года - день): 01.01.2011<br />");
-				sb.append("Диагноз заболевания (прочие причины отсутствия)___________________________<br>");
+				sb.append(String.format("Фамилия, имя, отчество: %s %s %s<br />", sn.fam, sn.im, sn.oth));
+				sb.append(String.format("Дата рождения (год, месяц, для детей до 1 года - день): %1$td.%1$tm.%1$tY <br />", sn.datar));
+				sb.append(String.format("Диагноз заболевания %s<br>", sn.diag));
 				sb.append("Наличие контакта с инфекционными больными (нет, да, какими)_________________________________</font>");
 				sb.append("<br><center> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size=1 color=black>подчеркнуть, вписать</font></center>");
 				sb.append("____________________________________________________________________________________________<br>");
@@ -3350,18 +3358,14 @@ acrs = sse.execPreparedQuery("select s_vrach.fam,s_vrach.im,s_vrach.ot from s_us
 				sb.append("</body>");
 				sb.append("</html>");
 				
-				/*acrs = sse.execPreparedQuery("select t_ist_zab from p_anam_zab where id_pvizit=?", id_pvizit); 
-				if (acrs.getResultSet().next()) {
-					if (acrs.getResultSet().getString(1)!=null)
-						{sb.append("<br><b>	Анамнез заболевания</b><br>");
-						sb.append(String.format(" %s.", acrs.getResultSet().getString(1)));
-						sb.append(String.format("<p align=\"right\"></p> %1$td.%1$tm.%1$tY<br />", new Date(System.currentTimeMillis())));
-						}
-				}				
-			acrs.close();*/
+				
 			osw.write(sb.toString());
 			return path;
 			}
+		catch (SQLException e) {
+			 ((SQLException) e.getCause()).printStackTrace();
+			throw new KmiacServerException();
+		}
 		 catch (IOException e) {
 			e.printStackTrace();
 			throw new KmiacServerException();
