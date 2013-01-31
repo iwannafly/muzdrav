@@ -57,6 +57,8 @@ public class GenReestr extends Server implements Iface {
 	private final Class<?>[] MedTypes;
 	private final TResultSetMapper<Pasp, Pasp._Fields> rsmPasp;
 	private final Class<?>[] PaspTypes;
+	private final TResultSetMapper<PaspErrorInfo, PaspErrorInfo._Fields> rsmPaspError;
+	private final TResultSetMapper<MedPolErrorInfo, MedPolErrorInfo._Fields> rsmMedPolError;
 
 	@Override
 	public void start() throws Exception {
@@ -90,6 +92,8 @@ public class GenReestr extends Server implements Iface {
 		MedTypes = new Class<?>[] {               Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Date.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,Double.class,Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Double.class,Double.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,String.class,Date.class,Integer.class,String.class};
 		rsmErr = new TResultSetMapper<>(Err.class, "sl_id",      "ter_mu",    "kod_mu",     "id_med",     "kod_err",     "prim");
 		ErrTypes = new Class<?>[] {                Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class};
+		rsmPaspError = new TResultSetMapper<>(PaspErrorInfo.class);
+		rsmMedPolError = new TResultSetMapper<>(MedPolErrorInfo.class);
 	}
 
 	@Override
@@ -109,121 +113,65 @@ public class GenReestr extends Server implements Iface {
         String sqlwhere;
         String sqlmed;
         String sqlpasp;
-        String sqlr;
         String path;
         boolean flag = false;
         sqlwhere = "";
+        int npasp=0;
+        
         if (vidr == 1) sqlwhere = "AND (v.dataz >= ? AND v.dataz <= ?) AND v.kod_rez = 0";
-        if (vidr == 2) sqlwhere = "AND ((v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.datak >= ? AND v.datak <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 11)))";
-        if (vidr == 3) sqlwhere = "AND (v.datak >= ? AND v.datak <= ?) AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
-
-        sqlr = "SELECT v.id::integer AS sl_id, v.id::integer AS id_med, v.kod_rez::integer AS kod_rez, v.datap::date as d_pst, 2::integer AS kl_usl, v.pl_extr::integer AS pl_extr, " +
-				"v.uet::double precision AS kol_usl, v.diag::char(7) AS diag, v.stoim::double precision AS stoim, v.cpos::integer AS case, v.rezult::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-				"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end)::integer AS c_mu, "+
-				"(select get_prof(?, v.cod_sp))::integer AS prof_fn, " +
-				"(select get_kodsp(v.cod_sp))::integer AS spec, " +
-				"(select get_kodvr(v.cod_sp)::integer) AS prvd, " +
-				"(select get_vmu(v.cod_sp))::integer AS v_mu, " +
-				"(select get_vrach_snils(v.cod_sp))::char(14) AS ssd, " +
-				"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end)::integer AS place, " +
-				"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-				"null::integer AS kod_otd, null::date AS d_end, null::integer AS pr_exp, null::integer AS etap, null::char(15) AS usl, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
-
-				" 2::integer AS vid_rstr, " +
-				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-				"v.kod_ter::integer AS ter_mu, v.cpol::integer AS kod_mu, ?::date AS df_per, " +
-				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
-				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-				"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-				"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-				"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-				"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-				"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-				"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-				"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-//				"(select get_name_str(p.npasp,p.poms_strg))::char(50) AS name_str, " +
-//				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-//				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
-				"(select get_region(p.poms_strg))::integer AS region," +
-				"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
-				"(select get_kov(p.npasp))::char(30) AS kob, " +
-				"v.pl_extr::integer AS vid_hosp, (select get_talon(v.id_obr))::char(11) AS talon, " +
-				"p.terp::integer AS ter_pol, p.cpol_pr::integer AS pol, p.npasp::integer AS id_lpu, " +
-				"(select get_namb(p.npasp,v.cpol))::char(20) AS n_mk, " +
-				"null::char(10) AS ist_bol, null::integer AS id_smo, null::integer AS ter_mu_dir, null::integer AS kod_mu_dir "+
-			    "FROM p_vizit_amb v, patient p " + 
-				"WHERE v.npasp=p.npasp AND v.opl = ?  AND v.cpol = ? ";
-        	sqlr += sqlwhere;
-        	sqlr += " ORDER BY v.npasp";
-		try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df),vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)))) {
-            ResultSet rs = acrs.getResultSet();
-            
-   			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
-   				StringBuilder sb = new StringBuilder(0x10000);
-    				
-				while (rs.next()){
-	           		if (rs.isFirst()){
-	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-	        			sb.append("<head>");
-             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-           				sb.append("<title>Файл проверок реестра</title>");
-           				sb.append("</head>");
-           				sb.append("<body>");
-        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-	            	}
-
-	           		String str = RsTest(rs, 2);
-    	            	
-    	           	if(str!=null){
-   	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
-   						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
-   						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-   						if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
-   						else sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
-   						sb.append("<br>"+str+"<br>");
-   						flag = true;
-   	                }
-   	            }
-   					osw.write(sb.toString());
-   	   				if (sb.length()==0) {
-	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-	        			sb.append("<head>");
-	           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-	       				sb.append("<title>Файл проверок реестра</title>");
-	       				sb.append("</head>");
-	       				sb.append("<body>");
-	      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-	       				sb.append("ДАННЫЕ ДЛЯ ФОРМИРОВАНИЯ РЕЕСТА ОТСУТСТВУЮТ !!!");
-   	   					osw.write(sb.toString());
-   	   					return path;
-   	   				}
-            	
-   			} catch (IOException e) {
-   				e.printStackTrace();
-   				throw new KmiacServerException();
-   			}
-   		} catch (SQLException e) {
-   			log.log(Level.ERROR, "SQl Exception: ", e);
-    		((SQLException) e.getCause()).printStackTrace();
-    		throw new KmiacServerException();
-		}
+        if (vidr == 2) sqlwhere = "AND ((v.kod_rez = 0 AND v.dataz >= ? AND v.dataz <= ?) OR (v.d_rez >= ? AND v.d_rez <= ? AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 11)))";
+        if (vidr == 3) sqlwhere = "AND (v.d_rez >= ? AND v.d_rez <= ?) AND (v.kod_rez = 2 OR v.kod_rez = 4 OR v.kod_rez = 5 OR v.kod_rez = 11)";
 
 		try (SqlModifyExecutor sme = tse.startTransaction();
-				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT get_reestr_pasp_errors(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
-				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (e.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodr, new Date(dn), new Date(dk))) {
+			AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_errors_pasp_pol(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
+			AutoCloseableResultSet acrsm = sme.execPreparedQuery("SELECT check_reestr_med_pol_errors(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
+			AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (e.cpodr = ?) AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", cpodr, new Date(System.currentTimeMillis()) )) {
 			sme.setCommit();
-//			return rsmPaspError.mapToList(acrsq.getResultSet());
+			ResultSet rs = acrsq.getResultSet();
+			
+			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
+				StringBuilder sb = new StringBuilder(0x10000);
+			
+				while (rs.next()){
+					if (rs.isFirst()){
+						flag = true;
+						sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+						sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+						sb.append("<head>");
+						sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+						sb.append("<title>Файл проверок реестра</title>");
+						sb.append("</head>");
+						sb.append("<body>");
+						sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+						sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+					}
+
+					if(npasp != rs.getInt("npasp")){
+						sb.append(String.format("<br> %s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("ot").trim()));
+						sb.append(String.format("   Д.р. </b>  %1$td.%1$tm.%1$tY <br>", rs.getDate("datar").getTime()));
+					}
+					sb.append(String.format("%s %s ; %s <br>", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm")));
+						if(rs.getInt("pasp_med") == 2){
+	   						if(rs.getInt("sl_id") != 0){
+	   							try {
+	   								AutoCloseableResultSet acr = sse.execPreparedQuery("select datap, diag from p_vizit_amb where id = ?", rs.getInt("sl_id"));
+	   								if (acr.getResultSet().next()){
+	   									sb.append(String.format("%s %s ; %s ; ДИАГНОЗ: %s ; ", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm"), acr.getResultSet().getString("diag") ));
+	   									if (acr.getResultSet().getDate("datap") != null) sb.append(String.format("Дата посещения: </b> %1$td.%1$tm.%1$tY <br>", new Date(acr.getResultSet().getDate("datap").getTime())));
+	   								}
+	   							} catch (SQLException e1) {
+	   								e1.printStackTrace();
+	   							}
+	   						} 
+							
+						}
+					npasp = rs.getInt("npasp");
+				}
+				osw.write(sb.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new KmiacServerException();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new KmiacServerException("Could not get pasp errors.");
@@ -234,46 +182,46 @@ public class GenReestr extends Server implements Iface {
 					ZipOutputStream zos = new ZipOutputStream(fos)) {
 				byte[] buffer = new byte[8192];
 				int bufRead;
-					sqlmed = "SELECT v.id::integer AS sl_id, " +
-							"v.id::integer AS id_med, " +
-							"v.kod_rez::integer AS kod_rez, " +
-							"null::integer AS kod_otd, "+
-							"v.datap::date as d_pst, " +
-							"null::date AS d_end, "+
-							"2::integer AS kl_usl, " +
-							"null::integer AS pr_exp, "+
-							"v.pl_extr::integer AS pl_extr, " +
-							"null::char(15) AS usl, "+
-							"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then v.uet else null end)::double precision AS kol_usl, " +
-							"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end)::integer AS c_mu, "+
-							"v.diag::char(7) AS diag, " +
-							"null::char(15) AS ds_s, "+
-							"null::char(6) AS pa_diag, "+
-							"null::integer AS pr_out, "+
-							"null::integer AS res_l, "+
-							"(CASE WHEN (m.c_nom = 2) THEN s.prof_d WHEN ((m.c_nom = 1) OR (m.c_nom = 3) OR (m.c_nom = 5) OR (m.c_nom = 6) OR (m.c_nom = 8) OR (m.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
-							"v.stoim::double precision AS stoim, " +
-							"v.cpos::integer AS case, " +
-							"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end)::integer AS place, " +
-							"s.cod_sp::integer AS spec, " +
-							"s.cod_m::integer AS prvd, " +
-							"v.rezult::integer AS res_g, " +
-							"vr.snils::char(14) AS ssd, " +
-							"null::integer AS id_med_tf, "+
-							"1::integer AS psv, " +
-							"0::integer AS pr_pv, " +
-							"null::char(15) AS obst, " +
-							"null::char(20) AS n_schet, " +
-							"null::date AS d_schet, " +
-							"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-							"null::char(12) AS talon_omt "+
-						    "FROM p_vizit_amb v JOIN patient p ON (v.npasp = p.npasp) " +
-						    "LEFT JOIN n_n00 n ON (n.pcod = v.cpol) "+ 
-							"LEFT JOIN n_m00 m ON (m.pcod = n.clpu) "+
-						    "LEFT JOIN n_s00 s ON (s.pcod = v.cdol) "+
-						    "LEFT JOIN s_vrach vr ON (vr.pcod = v.cod_sp) "+
-							"WHERE  v.opl = ?  AND v.cpol = ? ";
-				    	sqlmed += sqlwhere;
+				sqlmed ="SELECT v.id::integer AS sl_id, " +
+						"v.id::integer AS id_med, " +
+						"v.kod_rez::integer AS kod_rez, " +
+						"null::integer AS kod_otd, "+
+						"v.datap::date as d_pst, " +
+						"null::date AS d_end, "+
+						"2::integer AS kl_usl, " +
+						"null::integer AS pr_exp, "+
+						"(case v.pl_extr is not null when true then v.pl_extr else 1 end)::integer AS pl_extr, " +
+						"null::char(15) AS usl, "+
+						"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then v.uet else null end)::double precision AS kol_usl, " +
+						"(case when ((v.cdol::integer=33)or(v.cdol::integer=34)or(v.cdol::integer=142)or(v.cdol::integer=143)or(v.cdol::integer=172)or(v.cdol::integer=212)) then 3 else 1 end)::integer AS c_mu, "+
+						"v.diag::char(7) AS diag, " +
+						"null::char(15) AS ds_s, "+
+						"null::char(6) AS pa_diag, "+
+						"null::integer AS pr_out, "+
+						"null::integer AS res_l, "+
+						"(CASE WHEN (m.c_nom = 2) THEN s.prof_d WHEN ((m.c_nom = 1) OR (m.c_nom = 3) OR (m.c_nom = 5) OR (m.c_nom = 6) OR (m.c_nom = 8) OR (m.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
+						"v.stoim::double precision AS stoim, " +
+						"v.cpos::integer AS case, " +
+						"(case when ((v.mobs=1)or(v.mobs=4)or(v.mobs=8)or(v.mobs=9)) then 1 when (v.mobs = 2) then 2  when (v.mobs = 3) then 3 else 1 end)::integer AS place, " +
+						"s.cod_sp::integer AS spec, " +
+						"s.cod_m::integer AS prvd, " +
+						"v.rezult::integer AS res_g, " +
+						"vr.snils::char(14) AS ssd, " +
+						"null::integer AS id_med_tf, "+
+						"1::integer AS psv, " +
+						"0::integer AS pr_pv, " +
+						"null::char(15) AS obst, " +
+						"null::char(20) AS n_schet, " +
+						"null::date AS d_schet, " +
+						"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
+						"null::char(12) AS talon_omt "+
+					    "FROM p_vizit_amb v JOIN patient p ON (v.npasp = p.npasp) " +
+					    "LEFT JOIN n_n00 n ON (n.pcod = v.cpol) "+ 
+						"LEFT JOIN n_m00 m ON (m.pcod = n.clpu) "+
+					    "LEFT JOIN n_s00 s ON (s.pcod = v.cdol) "+
+					    "LEFT JOIN s_vrach vr ON (vr.pcod = v.cod_sp) "+
+						"WHERE  v.opl = ?  AND v.cpol = ? ";
+			    sqlmed += sqlwhere;
 
 //					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk)));
 //						InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
@@ -284,92 +232,82 @@ public class GenReestr extends Server implements Iface {
 //				        log.log(Level.ERROR, "SQl Exception: ", e);
 //						throw new KmiacServerException();
 //					}
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, clpu, vopl, cpodr, new Date(dn), new Date(dk)))){
-						while (acrs.getResultSet().next()){
-							try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-								zos.putNextEntry(new ZipEntry("med.dbf"));
-								while ((bufRead = dbfStr.read(buffer)) > 0)
-									zos.write(buffer, 0, bufRead);
-							}
+				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, vopl, cpodr, new Date(dn), new Date(dk)))){
+					while (acrs.getResultSet().next()){
+						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
+							zos.putNextEntry(new ZipEntry("med.dbf"));
+							while ((bufRead = dbfStr.read(buffer)) > 0)
+								zos.write(buffer, 0, bufRead);
 						}
-					} catch (SQLException e) {
-						log.log(Level.ERROR, "SQl Exception: ", e);
-						throw new KmiacServerException();
 					}
+				} catch (SQLException e) {
+					log.log(Level.ERROR, "SQl Exception: ", e);
+					throw new KmiacServerException();
+				}
 				    
-					sqlpasp = "SELECT  v.id AS sl_id, " +
-							"2::integer AS vid_rstr, " +
-							"k.kdpsk::integer AS str_org, " +
-							"v.kod_ter::integer AS ter_mu, " +
-							"v.cpol::integer AS kod_mu, " +
-							"?::date AS df_per, " +
-							"p.fam::char(60) AS fam, " +
-							"p.im::char(40) AS im, " +
-							"p.ot::char(60) AS otch, " +
-							"p.datar AS dr, " +
-							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-							"(case p.poms_strg>99 when true then p.snils else null end)::char(14) AS ssp, " +
-							"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_tdoc END)::integer AS vpolis, "+ 
-							"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_ser END)::char(10) AS spolis, "+
-							"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_nom END)::char(20) AS polis, "+
-							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
-							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
-							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
-							"d.fam::char(60) AS fam_pr, "+
-							"d.im::char(40) AS im_pr, "+
-							"d.ot::char(40) AS otch_pr," +
-							"d.datar::date AS dr_pr, "+
-							"(case d.pol=1 when true then 'М' else 'Ж' end)::char(1) AS sex_pr, "+
-							"d.vpolis::char(10) AS vpolis_pr, "+
-							"d.spolis::char(10) AS spolis_pr, "+
-							"d.npolis::char(20) AS polis_pr, " +
-							"d.tdoc::integer AS type_docpr, "+
-							"d.docser::char(10) AS docser_pr, "+
-							"d.docnum::char(20) AS docnum_pr, " +
-							"k.region::integer AS region, " +
-							"null::char(10) AS ist_bol, " +
-							"v.pl_extr::integer AS vid_hosp, " +
-							"p.terp::integer AS ter_pol, " +
-							"p.cpol_pr::integer AS pol, " +
-							"(case n.nambk is not null when true then n.nambk else cast(p.npasp as char(20)) end)::char(20) AS n_mk, " +
-							"p.npasp::integer AS id_lpu, " +
-		    				"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
-							"null::integer AS ter_mu_dir, " +
-							"null::integer AS kod_mu_dir "+
-				    		"FROM p_vizit_amb v JOIN patient p ON (v.npasp = p.npasp) " +
-				    		"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+ //podumat
-				    		"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
-				    		"LEFT JOIN p_preds d ON (d.npasp = p.npasp) "+
-				    		"WHERE  v.opl = ?  AND v.cpol = ? ";
-							sqlpasp += sqlwhere;
-//					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), vopl, cpodr, new Date(dn), new Date(dk)));
-//							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-//						zos.putNextEntry(new ZipEntry("pasp.dbf"));
-//						while ((bufRead = dbfStr.read(buffer)) > 0)
-//							zos.write(buffer, 0, bufRead);
-//					} catch (SQLException e) {
-//				        log.log(Level.ERROR, "SQl Exception: ", e);
-//						throw new KmiacServerException();
-//					}
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, new Date(df), cpodr, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, new Date(df), cpodr, vopl, cpodr, new Date(dn), new Date(dk)))){
-						while (acrs.getResultSet().next()){
-							try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()){
-								zos.putNextEntry(new ZipEntry("pasp.dbf"));
-								while ((bufRead = dbfStr.read(buffer)) > 0)
-									zos.write(buffer, 0, bufRead);
-							}
+				sqlpasp = "SELECT  v.id AS sl_id, " +
+						"2::integer AS vid_rstr, " +
+						"k.kdpsk::integer AS str_org, " +
+						"v.kod_ter::integer AS ter_mu, " +
+						"v.cpol::integer AS kod_mu, " +
+						"CURRENT_DATE::date AS df_per, " +
+						"p.fam::char(60) AS fam, " +
+						"p.im::char(40) AS im, " +
+						"p.ot::char(60) AS otch, " +
+						"p.datar AS dr, " +
+						"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
+						"(case p.poms_strg>99 when true then p.snils else null end)::char(14) AS ssp, " +
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_tdoc END)::integer AS vpolis, "+ 
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_ser END)::char(10) AS spolis, "+
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_nom END)::char(20) AS polis, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
+						"ds.fam::char(60) AS fam_pr, "+
+						"ds.im::char(40) AS im_pr, "+
+						"ds.ot::char(40) AS otch_pr," +
+						"ds.datar::date AS dr_pr, "+
+						"(CASE (p.poms_strg > 99 AND CURRENT_DATE - p.datar < 18*365) OR (CURRENT_DATE - p.datar < 3*31 AND p.poms_ser IS NULL AND p.poms_nom IS NULL) WHEN TRUE THEN (CASE ds.pol = 1 WHEN TRUE THEN 'М' ELSE 'Ж' END) ELSE NULL END)::char(1) AS sex_pr, "+
+						"ds.vpolis::char(10) AS vpolis_pr, "+
+						"ds.spolis::char(10) AS spolis_pr, "+
+						"ds.npolis::char(20) AS polis_pr, " +
+						"ds.tdoc::integer AS type_docpr, "+
+						"ds.docser::char(10) AS docser_pr, "+
+						"ds.docnum::char(20) AS docnum_pr, " +
+						"k.region::integer AS region, " +
+						"null::char(10) AS ist_bol, " +
+						"v.pl_extr::integer AS vid_hosp, " +
+						"p.terp::integer AS ter_pol, " +
+						"p.cpol_pr::integer AS pol, " +
+						"(case n.nambk is not null when true then n.nambk else cast(p.npasp as char(20)) end)::char(20) AS n_mk, " +
+						"p.npasp::integer AS id_lpu, " +
+		    			"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
+						"null::integer AS ter_mu_dir, " +
+						"null::integer AS kod_mu_dir "+
+				   		"FROM p_vizit_amb v JOIN patient p ON (v.npasp = p.npasp) " +
+				   		"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
+				   		"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
+				   		"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) "+
+				   		"WHERE  v.opl = ?  AND v.cpol = ? ";
+				sqlpasp += sqlwhere;
+
+				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, cpodr, vopl, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, cpodr, vopl, cpodr, new Date(dn), new Date(dk)))){
+					while (acrs.getResultSet().next()){
+						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()){
+							zos.putNextEntry(new ZipEntry("pasp.dbf"));
+							while ((bufRead = dbfStr.read(buffer)) > 0)
+								zos.write(buffer, 0, bufRead);
 						}
-					} catch (SQLException e) {
-				        log.log(Level.ERROR, "SQl Exception: ", e);
-						throw new KmiacServerException();
 					}
+				} catch (SQLException e) {
+				    log.log(Level.ERROR, "SQl Exception: ", e);
+					throw new KmiacServerException();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-
 		return path;
-		
 	}
 
 	private void InsertToKderr(int cslu, String snils, int kod_mu, int sl_id, int id_med, int id_lpu, int kod_err, String name_err) throws KmiacServerException, SQLException {
@@ -852,10 +790,23 @@ public class GenReestr extends Server implements Iface {
 		}
 	}
 
+//	@Override
+//	public List<IntegerClassifier> getAllLDSForCurrentLpu(int lpuId)
+//			throws KmiacServerException, TException {
+//		final String sqlQuery = "SELECT pcod, name FROM n_lds WHERE clpu = ?";
+//    	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmLDS =
+//    			new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
+//		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
+//			return rsmLDS.mapToList(acrs.getResultSet());
+//		} catch (SQLException e) {
+//			log.log(Level.ERROR, "SQl Exception: ", e);
+//			throw new TException(e);
+//		}
+//	}
 	@Override
 	public List<IntegerClassifier> getAllLDSForCurrentLpu(int lpuId)
 			throws KmiacServerException, TException {
-		final String sqlQuery = "SELECT pcod, name FROM n_lds WHERE clpu = ?";
+		final String sqlQuery = "SELECT cpol as pcod, name FROM n_lds WHERE clpu = ?";
     	final TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmLDS =
     			new TResultSetMapper<>(IntegerClassifier.class, "pcod", "name");
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, lpuId)) {
@@ -909,7 +860,7 @@ public class GenReestr extends Server implements Iface {
 	
 	@Override		//ЛДС
 	public String getReestrInfoLDS(int cpodr, long dn, long dk, int vidr,
-			int vopl, int clpu, int terp, long df, int ter_mu, int kod_mu)
+			int vopl, int clpu, int terp, long df)
 			throws KmiacServerException, ReestrNotFoundException, TException {
         String sqlwhere = null;
         String sqlmed = null;
@@ -920,6 +871,7 @@ public class GenReestr extends Server implements Iface {
         String isl = null;
         boolean flag = false;
 		AutoCloseableResultSet acr;
+		int npasp = 0;
 
         if (vidr == 1) 
         	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND (ld.dataz >= ? AND ld.dataz <= ?) AND d.kod_rez = 0 ";
@@ -928,211 +880,171 @@ public class GenReestr extends Server implements Iface {
         if (vidr == 3) 
         	sqlwhere = "WHERE ld.vopl = ? AND s.kdomc = 1 AND d.d_rez >= ? AND d.d_rez <= ? AND (d.kod_rez = 2 OR d.kod_rez = 4 OR d.kod_rez = 5 OR d.kod_rez = 11) ";
 
-        if (cpodr != 0) sqlwhere += " AND ld.kodotd = ?";
-        else sqlwhere += " AND substr(cast(ld.kodotd as varchar(10)),1,2)=cast(? as varchar(10))";
+    	sqlwhere += " AND lds.cpol = ?";
+//        if (cpodr != 0) {
+//        	sqlwhere += " AND ld.kodotd = ?";
+//        	clpu = cpodr;
+//        }
+//        else 
+//        	sqlwhere += " AND substr(cast(ld.kodotd as varchar(10)),1,2)=cast(? as varchar(10))";
 
-        try {
-			acr = sse.execPreparedQuery("select tip from n_lds where pcod=?", cpodr);
-			if (acr.getResultSet().next()){
-				if (acr.getResultSet().getString("tip").equals("Л")){
-			        sqlr = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.cpok,2,length(d.cpok))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-							"1::integer AS c_mu, 1::integer AS pl_extr, "+
-							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
-							"(select get_kodsp(ld.cuser))::integer AS spec, " +
-							"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
-							"(select get_vmu(ld.cuser))::integer AS v_mu, " +
-							"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
-							"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
-							" 2::integer AS vid_rstr, " +
-							"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-							"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
-							"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
-							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-							"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-							"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-							"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-							"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-							"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-							"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-							"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-							"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-							"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-							"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-							"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-		    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-		    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-		    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-//							"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-//							"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
-							"(select get_region(p.poms_strg))::integer AS region," +
-							"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
-							"(select get_kov(p.npasp))::char(30) AS kob, " +
-							"1::integer AS vid_hosp, null::char(11) AS talon, " +
-							"p.terp::integer AS ter_pol, p.cpol_pr::integer AS pol, p.npasp::integer AS id_lpu, " +
-							"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
-							"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
-							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_errors_pasp_lds(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
+				AutoCloseableResultSet acrsm = sme.execPreparedQuery("SELECT check_reestr_med_lds_errors(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) LEFT JOIN n_lds lds ON (e.cpodr = lds.pcod )  WHERE (lds.cpol = ?) AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", cpodr, new Date(System.currentTimeMillis()) )) {
+				sme.setCommit();
+				ResultSet rs = acrsq.getResultSet();
+				
+				try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
+					StringBuilder sb = new StringBuilder(0x10000);
+				
+					while (rs.next()){
+						if (rs.isFirst()){
+							flag = true;
+							sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+							sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+							sb.append("<head>");
+							sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+							sb.append("<title>Файл проверок реестра</title>");
+							sb.append("</head>");
+							sb.append("<body>");
+							sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+							sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+						}
 
-			        sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) " +
-			        		  "JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
-							  "JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) " +
-							  "JOIN n_s00 s ON (m.cdol = s.pcod) "+
-							  "LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
-							  "LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
-							  "LEFT JOIN p_preds d ON (d.npasp = p.npasp) ";
-
-		        	sqlwhere += " AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) OR ((substr(d.cpok,1,1)='B') AND (substr(cast(ld.kodotd as varchar(7)),1,2)=substr(cast(ld.naprotd as varchar(7)),1,2)))) ";        
-					isl = "Л";
+						if(npasp != rs.getInt("npasp")){
+							sb.append(String.format("<br> %s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("ot").trim()));
+							sb.append(String.format("   Д.р. </b>  %1$td.%1$tm.%1$tY <br>", rs.getDate("datar").getTime()));
+						}
+						sb.append(String.format("%s %s ; %s <br>", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm")));
+   						if(rs.getInt("pasp_med") == 2){
+   	   						if(rs.getInt("sl_id") != 0){
+   	   							try {
+   	   								acr = sse.execPreparedQuery("select datav as datap, diag from p_isl_ld where nisl = ?", rs.getInt("sl_id"));
+   	   								if (acr.getResultSet().next()){
+   	   									sb.append(String.format("%s %s ; %s ; ДИАГНОЗ: %s ; ", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm"), acr.getResultSet().getString("diag") ));
+   	   									if (acr.getResultSet().getDate("datap") != null) sb.append(String.format("Дата посещения: </b> %1$td.%1$tm.%1$tY <br>", new Date(acr.getResultSet().getDate("datap").getTime())));
+   	   								}
+   	   							} catch (SQLException e1) {
+   	   								e1.printStackTrace();
+   	   							}
+   	   						} 
+   							
+   						}
+						npasp = rs.getInt("npasp");
+					}
+					osw.write(sb.toString());
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new KmiacServerException();
 				}
-				if (acr.getResultSet().getString("tip").equals("Д") || acr.getResultSet().getString("tip").equals("Т")){
-			        sqlr = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.kodisl,2,length(d.kodisl))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-							"1::integer AS c_mu, 1::integer AS pl_extr, "+
-							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
-							"(select get_kodsp(ld.cuser))::integer AS spec, " +
-							"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
-							"(select get_vmu(ld.cuser))::integer AS v_mu, " +
-							"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
-							"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt, "+
-							" 2::integer AS vid_rstr, " +
-							"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-							"?::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
-							"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
-							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-							"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-							"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-							"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-							"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-							"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-							"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-							"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-							"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-							"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-							"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-							"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-		    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-		    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-		    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-							"(select get_region(p.poms_strg))::integer AS region," +
-							"p.ter_liv::integer AS ter_liv, p.region_liv::integer AS region_liv, (select get_status(p.sgrp))::integer AS status, " +
-							"(select get_kov(p.npasp))::char(30) AS kob, " +
-							"1::integer AS vid_hosp, null::char(11) AS talon, " +
-							"p.terp::integer AS ter_pol, p.cpol_pr::integer AS pol, p.npasp::integer AS id_lpu, " +
-							"(select get_namb(p.npasp,?))::char(20) AS n_mk, " +
-							"null::char(10) AS ist_bol, null::integer AS id_smo, 10::integer AS ter_mu_dir, " +
-							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
-					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) " +
-							  "JOIN p_rez_d d ON (ld.nisl = d.nisl) "+
-							  "JOIN s_mrab m ON (ld.cuser = m.pcod and ld.kodotd = m.cpodr) " +
-							  "JOIN n_s00 s ON (m.cdol = s.pcod) "+
-							  "LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
-							  "LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
-							  "LEFT JOIN p_preds d ON (d.npasp = p.npasp) ";
-
-		        	sqlwhere += " AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) OR ((substr(d.kodisl,1,1)='B') AND (substr(cast(ld.kodotd as varchar(7)),1,2)=substr(cast(ld.naprotd as varchar(7)),1,2)))) ";        
-					isl = "Д";
-				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new KmiacServerException("Could not get pasp errors.");
 			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-
-        sqlr += sqlfrom;
-        sqlr += sqlwhere;
-        sqlr += " ORDER BY p.npasp";
-
-        try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, ter_mu, kod_mu, new Date(df), kod_mu, cpodr, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlr, clpu, clpu, ter_mu, kod_mu, new Date(df), kod_mu, cpodr, vopl, new Date(dn), new Date(dk), cpodr))) {
-            ResultSet rs = acrs.getResultSet();
-            
-   			try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
-   				StringBuilder sb = new StringBuilder(0x10000);
-    				
-				while (rs.next()){
-	           		if (rs.isFirst()){
-	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-	        			sb.append("<head>");
-	           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-	       				sb.append("<title>Файл проверок реестра</title>");
-	       				sb.append("</head>");
-	       				sb.append("<body>");
-	      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-	            	}
-
-	           		String str = RsTest(rs, 3);
-    	            	
-    	           	if(str!=null){
-   	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
-   						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
-   						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-   						if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
-   						else sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
-   						sb.append("<br>"+str+"<br>");
-   						flag = true;
-   	                }
-   	            }
-   					osw.write(sb.toString());
-   	   				if (sb.length()==0) {
-	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-	        			sb.append("<head>");
-	           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-	       				sb.append("<title>Файл проверок реестра</title>");
-	       				sb.append("</head>");
-	       				sb.append("<body>");
-	      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-	       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-	       				sb.append("ДАННЫЕ ДЛЯ ФОРМИРОВАНИЯ РЕЕСТА ОТСУТСТВУЮТ !!!");
-   	   					osw.write(sb.toString());
-   	   					return path;
-   	   				}
-            	
-   			} catch (IOException e) {
-   				e.printStackTrace();
-   				throw new KmiacServerException();
-   			}
-   		} catch (SQLException e) {
-   			log.log(Level.ERROR, "SQl Exception: ", e);
-    		((SQLException) e.getCause()).printStackTrace();
-    		throw new KmiacServerException();
-		}
-
+        
 		if (!flag){
 			try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoPol", ".zip").getAbsolutePath());
 					ZipOutputStream zos = new ZipOutputStream(fos)) {
 				byte[] buffer = new byte[8192];
 				int bufRead;
 
-				if (isl.equals("Л"))
-					sqlmed = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.cpok,2,length(d.cpok))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-							"1::integer AS c_mu, 1::integer AS pl_extr, "+
-							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
-							"(select get_kodsp(ld.cuser))::integer AS spec, " +
-							"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
-							"(select get_vmu(ld.cuser))::integer AS v_mu, " +
-							"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
+//				if (isl.equals("Л"))
+					sqlmed = "SELECT d.id::integer AS sl_id, " +
+							"d.nisl::integer AS id_med, " +
+							"d.kod_rez::integer AS kod_rez, " +
+							"null::integer AS kod_otd, " +
+							"ld.datav::date as d_pst, " +
+							"null::date AS d_end, "+
+							"9::integer AS kl_usl, " +
+							"0::integer AS pr_exp, " +
+							"1::integer AS pl_extr, " +
+							"substr(d.cpok,2,length(d.cpok))::char(15) AS usl, " +
+							"1::double precision AS kol_usl, " +
+							"1::integer AS c_mu, "+
+							"ld.diag::char(7) AS diag, " +
+							"null::char(15) AS ds_s, " +
+							"null::char(6) AS pa_diag, " +
+							"null::integer AS pr_out, " +
+							"null::integer AS res_l, " +
+							"(CASE WHEN (m00.c_nom = 2) THEN s.prof_d WHEN ((m00.c_nom = 1) OR (m00.c_nom = 3) OR (m00.c_nom = 5) OR (m00.c_nom = 6) OR (m00.c_nom = 8) OR (m00.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
+							"d.stoim::double precision AS stoim, " +
+							"5::integer AS case, " +
+							"1::integer AS place, " +
+							"s.cod_sp::integer AS spec, " +
+							"s.cod_m::integer AS prvd, " +
+							"3::integer AS res_g, " +
+							"vr.snils::char(14) AS ssd, " +
+							"null::integer AS id_med_tf, " +
+							"1::integer AS psv, " +
+							"0::integer AS pr_pv, " +
+							"null::char(15) AS obst, " +
+							"null::char(20) AS n_schet, " +
+							"null::date AS d_schet, " +
 							"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt ";
-				if (isl.equals("Д"))
-					sqlmed = "SELECT d.id::integer AS sl_id, d.nisl::integer AS id_med, d.kod_rez::integer AS kod_rez, ld.datav::date as d_pst, 9::integer AS kl_usl, 0::integer AS pr_exp, " +
-							"substr(d.kodisl,2,length(d.kodisl))::char(15) AS usl, d.kol::double precision AS kol_usl, ld.diag::char(7) AS diag, d.stoim::double precision AS stoim, 5::integer AS case, 1::integer AS place, 3::integer AS res_g, 1::integer AS psv, 0::integer AS pr_pv, " +
-							"1::integer AS c_mu, 1::integer AS pl_extr, "+
-							"(select get_prof(?, ld.cuser))::integer AS prof_fn, " +
-							"(select get_kodsp(ld.cuser))::integer AS spec, " +
-							"(select get_kodvr(ld.cuser)::integer) AS prvd, " +
-							"(select get_vmu(ld.cuser))::integer AS v_mu, " +
-							"(select get_vrach_snils(ld.cuser))::char(14) AS ssd, " +
+							"null::char(12) AS talon_omt ";
+			        sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) " +
+			        		"JOIN p_rez_l d ON (ld.nisl = d.nisl) "+
+			        		"JOIN n_lds lds ON (lds.pcod = ld.kodotd) "+
+							"LEFT JOIN s_mrab m ON (ld.kodvr = m.pcod and ld.kodotd = m.cpodr) " +
+							"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
+//							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
+							"LEFT JOIN n_m00 m00 ON (m00.pcod = lds.clpu) "+
+							"LEFT JOIN s_vrach vr ON (vr.pcod = ld.kodvr) ";
+			    	sqlwhere += " AND ld.id_gosp IS NULL AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) ";        
+					sqlmed += sqlfrom;
+					sqlmed += sqlwhere;
+					sqlmed += " ORDER BY p.npasp";
+					sqlmed += " UNION ";
+//				if (isl.equals("Д"))
+					sqlmed = "SELECT d.id::integer AS sl_id, " +
+							"d.nisl::integer AS id_med, " +
+							"d.kod_rez::integer AS kod_rez, " +
+							"null::integer AS kod_otd, " +
+							"ld.datav::date as d_pst, " +
+							"null::date AS d_end, "+
+							"9::integer AS kl_usl, " +
+							"0::integer AS pr_exp, " +
+							"1::integer AS pl_extr, " +
+							"substr(d.kodisl,2,length(d.kodisl))::char(15) AS usl, " +
+							"d.kol::double precision AS kol_usl, " +
+							"1::integer AS c_mu, "+
+							"ld.diag::char(7) AS diag, " +
+							"null::char(15) AS ds_s, " +
+							"null::char(6) AS pa_diag, " +
+							"null::integer AS pr_out, " +
+							"null::integer AS res_l, " +
+							"(CASE WHEN (m00.c_nom = 2) THEN s.prof_d WHEN ((m00.c_nom = 1) OR (m00.c_nom = 3) OR (m00.c_nom = 5) OR (m00.c_nom = 6) OR (m00.c_nom = 8) OR (m00.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
+							"d.stoim::double precision AS stoim, " +
+							"5::integer AS case, " +
+							"1::integer AS place, " +
+							"s.cod_sp::integer AS spec, " +
+							"s.cod_m::integer AS prvd, " +
+							"3::integer AS res_g, " +
+							"vr.snils::char(14) AS ssd, " +
+							"null::integer AS id_med_tf, " +
+							"1::integer AS psv, " +
+							"0::integer AS pr_pv, " +
+							"null::char(15) AS obst, " +
+							"null::char(20) AS n_schet, " +
+							"null::date AS d_schet, " +
 							"(select get_v_sch(p.npasp, ?))::integer AS v_sch, "+
-							"null::integer AS kod_otd, null::date AS d_end, null::integer AS etap, null::char(15) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, null::double precision AS st_acpt, null::integer AS id_med_smo, null::integer AS id_med_tf, null::integer AS pk_mc, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::char(12) AS talon_omt ";
-						sqlmed += sqlfrom;
-						sqlmed += sqlwhere;
-						sqlmed += " ORDER BY p.npasp";
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, clpu, cpodr, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlmed, clpu, clpu, cpodr, vopl, new Date(dn), new Date(dk), cpodr));
+							"null::char(12) AS talon_omt ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) " +
+							"JOIN p_rez_d d ON (ld.nisl = d.nisl) "+
+							"JOIN n_lds lds ON (lds.pcod = ld.kodotd) "+
+							"LEFT JOIN s_mrab m ON (ld.kodvr = m.pcod and ld.kodotd = m.cpodr) " +
+							"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
+//							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
+							"LEFT JOIN n_m00 m00 ON (m00.pcod = lds.clpu) "+
+							"LEFT JOIN s_vrach vr ON (vr.pcod = ld.kodvr) ";
+			    	sqlwhere += " AND ld.id_gosp IS NULL AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) OR ((substr(d.kodisl,1,1)='B') AND (substr(cast(ld.kodotd as varchar(7)),1,2)=substr(cast(ld.naprotd as varchar(7)),1,2)))) ";        
+
+					sqlmed += sqlfrom;
+					sqlmed += sqlwhere;
+					sqlmed += " ORDER BY p.npasp";
+					
+					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlmed, clpu, vopl, new Date(dn), new Date(dk), cpodr));
 							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 						zos.putNextEntry(new ZipEntry("med.dbf"));
 						while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -1143,11 +1055,11 @@ public class GenReestr extends Server implements Iface {
 					}
 				    
 					sqlpasp = "SELECT d.id::integer AS sl_id, " +
-							"2::integer AS vid_rstr, " +
+							"ld.napravl::integer AS vid_rstr, " +
 							"k.kdpsk::integer AS str_org, " +
-							"?::integer AS ter_mu, " +
-							"?::integer AS kod_mu, " +
-							"?::date AS df_per, " +
+							"10::integer AS ter_mu, " +
+							"lds.cpol::integer AS kod_mu, " +
+							"CURRENT_DATE::date AS df_per, " +
 							"p.fam::char(60) AS fam, " +
 							"p.im::char(40) AS im, " +
 							"p.ot::char(60) AS otch, " +
@@ -1160,32 +1072,101 @@ public class GenReestr extends Server implements Iface {
 							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
 							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
 							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
-							"d.fam::char(60) AS fam_pr, "+
-							"d.im::char(40) AS im_pr, "+
-							"d.ot::char(40) AS otch_pr," +
-							"d.datar::date AS dr_pr, "+
-							"(case d.pol=1 when true then 'М' else 'Ж' end)::char(1) AS sex_pr, "+
-							"d.vpolis::char(10) AS vpolis_pr, "+
-							"d.spolis::char(10) AS spolis_pr, "+
-							"d.npolis::char(20) AS polis_pr, " +
-							"d.tdoc::integer AS type_docpr, "+
-							"d.docser::char(10) AS docser_pr, "+
-							"d.docnum::char(20) AS docnum_pr, " +
+							"ds.fam::char(60) AS fam_pr, "+
+							"ds.im::char(40) AS im_pr, "+
+							"ds.ot::char(40) AS otch_pr," +
+							"ds.datar::date AS dr_pr, " +
+							"(CASE (p.poms_strg > 99 AND CURRENT_DATE - p.datar < 18*365) OR (CURRENT_DATE - p.datar < 3*31 AND p.poms_ser IS NULL AND p.poms_nom IS NULL) WHEN TRUE THEN (CASE ds.pol = 1 WHEN TRUE THEN 'М' ELSE 'Ж' END) ELSE NULL END)::char(1) AS sex_pr, "+
+							"ds.vpolis::char(10) AS vpolis_pr, "+
+							"ds.spolis::char(10) AS spolis_pr, "+
+							"ds.npolis::char(20) AS polis_pr, " +
+							"ds.tdoc::integer AS type_docpr, "+
+							"ds.docser::char(10) AS docser_pr, "+
+							"ds.docnum::char(20) AS docnum_pr, " +
 							"k.region::integer AS region, " +
 							"null::char(10) AS ist_bol, " +
-							"v.pl_extr::integer AS vid_hosp, " +
+							"1::integer AS vid_hosp, " +
 							"p.terp::integer AS ter_pol, " +
 							"p.cpol_pr::integer AS pol, " +
-							"(case n.nambk is not null when true then n.nambk else cast(p.npasp as char(20)) end)::char(20) AS n_mk, " +
+//							"(case n.nambk is not null when true then n.nambk else cast(p.npasp as char(20)) end)::char(20) AS n_mk, " +
+							"p.npasp::char(20) AS n_mk, " +
 							"p.npasp::integer AS id_lpu, " +
 		    				"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
 							"10::integer AS ter_mu_dir, " +
-							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
-						sqlpasp += sqlfrom;
-						sqlpasp += sqlwhere;
-						sqlpasp += " ORDER BY p.npasp";
+							"ld.naprotd::integer AS kod_mu_dir ";
+//							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) " +
+							"JOIN p_rez_d d ON (d.nisl = ld.nisl) " +
+							"JOIN n_lds lds ON (lds.pcod = ld.kodotd) "+
+							"LEFT JOIN s_mrab m ON (ld.kodvr = m.pcod and ld.kodotd = m.cpodr) " +
+							"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
+//							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
+							"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
+							"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) "+
+							"LEFT JOIN n_m00 m00 ON (m00.pcod = lds.clpu) "+
+							"LEFT JOIN s_vrach vr ON (vr.pcod = ld.kodvr) ";
+			    	sqlwhere += " AND ld.id_gosp IS NULL AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) OR ((substr(d.kodisl,1,1)='B') AND (substr(cast(ld.kodotd as varchar(7)),1,2)=substr(cast(ld.naprotd as varchar(7)),1,2)))) ";        
+					sqlpasp += sqlfrom;
+					sqlpasp += sqlwhere;
+					sqlpasp += " ORDER BY p.npasp ";
+		        	sqlpasp += " UNION ";
+					sqlpasp = "SELECT d.id::integer AS sl_id, " +
+							"ld.napravl::integer AS vid_rstr, " +
+							"k.kdpsk::integer AS str_org, " +
+							"10::integer AS ter_mu, " +
+							"lds.cpol::integer AS kod_mu, " +
+							"CURRENT_DATE::date AS df_per, " +
+							"p.fam::char(60) AS fam, " +
+							"p.im::char(40) AS im, " +
+							"p.ot::char(60) AS otch, " +
+							"p.datar AS dr, " +
+							"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
+							"(case p.poms_strg>99 when true then p.snils else null end)::char(14) AS ssp, " +
+							"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_tdoc END)::integer AS vpolis, "+ 
+							"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_ser END)::char(10) AS spolis, "+
+							"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_nom END)::char(20) AS polis, "+
+							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
+							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
+							"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
+							"ds.fam::char(60) AS fam_pr, "+
+							"ds.im::char(40) AS im_pr, "+
+							"ds.ot::char(40) AS otch_pr," +
+							"ds.datar::date AS dr_pr, " +
+							"(CASE (p.poms_strg > 99 AND CURRENT_DATE - p.datar < 18*365) OR (CURRENT_DATE - p.datar < 3*31 AND p.poms_ser IS NULL AND p.poms_nom IS NULL) WHEN TRUE THEN (CASE ds.pol = 1 WHEN TRUE THEN 'М' ELSE 'Ж' END) ELSE NULL END)::char(1) AS sex_pr, "+
+							"ds.vpolis::char(10) AS vpolis_pr, "+
+							"ds.spolis::char(10) AS spolis_pr, "+
+							"ds.npolis::char(20) AS polis_pr, " +
+							"ds.tdoc::integer AS type_docpr, "+
+							"ds.docser::char(10) AS docser_pr, "+
+							"ds.docnum::char(20) AS docnum_pr, " +
+							"k.region::integer AS region, " +
+							"null::char(10) AS ist_bol, " +
+							"1::integer AS vid_hosp, " +
+							"p.terp::integer AS ter_pol, " +
+							"p.cpol_pr::integer AS pol, " +
+//							"(case n.nambk is not null when true then n.nambk else cast(p.npasp as char(20)) end)::char(20) AS n_mk, " +
+							"p.npasp::char(20) AS n_mk, " +
+							"p.npasp::integer AS id_lpu, " +
+		    				"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
+							"10::integer AS ter_mu_dir, " +
+							"ld.naprotd::integer AS kod_mu_dir ";
+//							"(case when (length(cast(ld.kodotd as varchar(7)))>3) then substr(cast(ld.kodotd as varchar(7)),1,2)::integer when (length(cast(ld.kodotd as varchar(7)))<=3) then ld.kodotd else 0 end)::integer AS kod_mu_dir ";
+					sqlfrom = "FROM patient p JOIN p_isl_ld ld ON (p.npasp = ld.npasp) " +
+							"JOIN p_rez_l d ON (d.nisl = ld.nisl) " +
+							"JOIN n_lds lds ON (lds.pcod = ld.kodotd) "+
+							"LEFT JOIN s_mrab m ON (ld.kodvr = m.pcod and ld.kodotd = m.cpodr) " +
+							"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
+//							"LEFT JOIN p_nambk n ON (n.npasp = p.npasp and n.cpol = ?) "+
+							"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
+							"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) "+
+							"LEFT JOIN n_m00 m00 ON (m00.pcod = lds.clpu) "+
+							"LEFT JOIN s_vrach vr ON (vr.pcod = ld.kodvr) ";
+			    	sqlwhere += " AND ld.id_gosp IS NULL AND ((substr(cast(ld.kodotd as varchar(7)),1,2)<>substr(cast(ld.naprotd as varchar(7)),1,2)) ";        
+					sqlpasp += sqlfrom;
+					sqlpasp += sqlwhere;
+					sqlpasp += " ORDER BY p.npasp ";
 						
-					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, ter_mu, kod_mu, new Date(df), kod_mu, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlpasp, ter_mu, kod_mu, new Date(df), kod_mu, vopl, new Date(dn), new Date(dk), cpodr));
+					try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, vopl, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlpasp, vopl, new Date(dn), new Date(dk), cpodr));
 							InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 						zos.putNextEntry(new ZipEntry("pasp.dbf"));
 						while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -1213,180 +1194,161 @@ public class GenReestr extends Server implements Iface {
         String sqlfrom = null;
         String sqlwhere = null;
         boolean flag = false;
+        int npasp =0;
 
         if (vidr == 1) sqlwhere = " AND g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0";
         if (vidr == 2) sqlwhere = " AND ((g.dataz >= ? AND g.dataz <= ? AND g.kod_rez = 0) OR (g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)))";
         if (vidr == 3) sqlwhere = " AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
 
-        if (cpodr != 0) sqlwhere += " AND g.cotd = ?";
-        else sqlwhere += " AND substr(cast(g.cotd as varchar(10)),1,2)=cast(? as varchar(10))";
+   		try (SqlModifyExecutor sme = tse.startTransaction();
+   				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_errors_pasp_hosp(?, ?, ?) ", clpu, new Date(dn), new Date(dk));
+   				AutoCloseableResultSet acrsm = sme.execPreparedQuery("SELECT check_reestr_med_sta_errors(?, ?, ?) ", clpu, new Date(dn), new Date(dk));
+   				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE e.cslu=1 AND substr(cast(e.cpodr as varchar(10)),1,2)=cast(? as varchar(10)) AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", clpu, new Date(System.currentTimeMillis()) )) {
+   				sme.setCommit();
+   				ResultSet rs = acrsq.getResultSet();
+   				
+   				try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
+   					StringBuilder sb = new StringBuilder(0x10000);
+   				
+   					while (rs.next()){
+   						if (rs.isFirst()){
+   							flag = true;
+   							sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
+   							sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+   							sb.append("<head>");
+   							sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
+   							sb.append("<title>Файл проверок реестра</title>");
+   							sb.append("</head>");
+   							sb.append("<body>");
+   							sb.append("Протокол проверок реестра случаев оказания мед. помощи");
+   							sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
+   						}
 
-        sqlr = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
-				"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, g.diag_p::char(7) AS diag, null::char(7) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, "+
-				"(select get_prof(?, g.cuser))::integer AS prof_fn, " +
-				"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
-				"(select get_kodsp(g.cuser))::integer AS spec, " +
-				"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
-				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt, "+
-				" 1::integer AS vid_rstr, " +
-				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-				"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
-				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
-				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-				"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-				"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-				"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-				"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-				"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-				"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-				"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-				"(select get_region(p.poms_strg))::integer AS region, " +
-				"p.ter_liv::integer AS ter_liv, (select get_status(p.sgrp))::integer AS status, "+
-				"(select get_kov(p.npasp))::char(30) AS kob, null::char(10) AS ist_bol, null::integer AS vid_hosp, "+
-				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
-				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
-
-        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
-        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
-        	sqlr += sqlfrom; 
-        	sqlr += "WHERE g.pr_out<>0 "+sqlwhere;
-        	sqlr += " UNION ";
-            sqlr = "SELECT g.id::integer AS sl_id, d.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
-    				"d.stl::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
-    				"(select get_pr_out(o.ishod))::integer AS pr_out, (select get_res_l(o.result))::integer AS res_l, "+
-    				"(select get_prof(?, o.vrach))::integer AS prof_fn, " +
-    				"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
-    				"(select get_kodsp(o.vrach))::integer AS spec, " +
-    				"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
-    				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt, "+
-    				" 1::integer AS vid_rstr, " +
-    				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-    				"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
-    				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
-    				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-    				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-    				"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-    				"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-    				"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-    				"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-    				"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-    				"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-    				"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-    				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-    				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-    				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-    				"(select get_region(p.poms_strg))::integer AS region, " +
-    				"p.ter_liv::integer AS ter_liv, (select get_status(p.sgrp))::integer AS status, "+
-    				"(select get_kov(p.npasp))::char(30) AS kob, o.nist::char(10) AS ist_bol, g.pl_extr::integer AS vid_hosp, "+
-    				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
-    				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-//    				"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-//    				"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, " +
-    				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
-
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
-            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
-            	sqlr += sqlfrom; 
-            	sqlr += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
-//            	sqlr += " ORDER BY p.npasp ";
-            	
-           try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlr, clpu, clpu, new Date(df), new Date(dn), new Date(dk), cpodr))) {
-        	   ResultSet rs = acrs.getResultSet();
-            
-            	try	(OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path = File.createTempFile("reestr_error", ".htm").getAbsolutePath()), "utf-8")) {
-            		StringBuilder sb = new StringBuilder(0x10000);
-    				
-				while (rs.next()){
-					if (rs.isFirst()){
-	        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-	        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-	        			sb.append("<head>");
-             			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-           				sb.append("<title>Файл проверок реестра</title>");
-           				sb.append("</head>");
-           				sb.append("<body>");
-        				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-        				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-	            	}
-
-					String str = RsTest(rs, 1);
-    	            	
-    	           	if(str!=null){
-   	    				sb.append(String.format("%s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("otch").trim()));
-   						sb.append(String.format("   Д.р. </b> %1$td.%1$tm.%1$tY", rs.getDate("dr").getTime()));
-   						sb.append(String.format("<br>   Дата :  %1$td.%1$tm.%1$tY", rs.getDate("d_pst").getTime()));
-   						if (rs.getString("diag") == null) sb.append("</b>   Диагноз :  ОТСУТСТВУЕТ");
-   						else sb.append(String.format("   Диагноз :  %s", rs.getString("diag")));
-   						sb.append("<br>"+str+"<br>");
-   						flag = true;
-   	                }
-   	            }
-   				osw.write(sb.toString());
-   				if (sb.length()==0) {
-        			sb.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">");
-        			sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
-        			sb.append("<head>");
-           			sb.append("<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml; charset=utf-8\" />");
-       				sb.append("<title>Файл проверок реестра</title>");
-       				sb.append("</head>");
-       				sb.append("<body>");
-      				sb.append("Протокол проверок реестра случаев оказания мед. помощи");
-       				sb.append(String.format(" от %1$td.%1$tm.%1$tY  <br><br>", new Date(System.currentTimeMillis())));
-       				sb.append("ДАННЫЕ ДЛЯ ФОРМИРОВАНИЯ РЕЕСТА ОТСУТСТВУЮТ !!!");
+   						if(npasp != rs.getInt("npasp")){
+   							sb.append(String.format("<br> %s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("ot").trim()));
+   							sb.append(String.format("   Д.р. </b>  %1$td.%1$tm.%1$tY <br>", rs.getDate("datar").getTime()));
+   						}
+   						
+						sb.append(String.format("%s %s ; %s <br>", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm")));
+   						if(rs.getInt("pasp_med") == 2){
+   	   						if(rs.getInt("sl_id") != 0){
+   	   							try {
+   	   								AutoCloseableResultSet acr = sse.execPreparedQuery("select datagos as datap, diag_p as diag from c_gosp where ngosp = ?", rs.getInt("sl_id"));
+   	   								if (acr.getResultSet().next()){
+   	   									sb.append(String.format("%s %s ; %s ; ДИАГНОЗ: %s ; ", rs.getInt("kderr"), rs.getString("err_name"), rs.getString("err_comm"), acr.getResultSet().getString("diag") ));
+   	   									if (acr.getResultSet().getDate("datap") != null) sb.append(String.format("Дата госпитализации: </b> %1$td.%1$tm.%1$tY <br>", new Date(acr.getResultSet().getDate("datap").getTime())));
+   	   							}
+   	   							} catch (SQLException e1) {
+   	   								e1.printStackTrace();
+   	   							}
+   	   						} 
+   							
+   						}
+   							
+   						npasp = rs.getInt("npasp");
+   					}
    					osw.write(sb.toString());
-   					return path;
+   				} catch (IOException e) {
+   					e.printStackTrace();
+   					throw new KmiacServerException();
    				}
-            	
-   			} catch (IOException e) {
+   			} catch (Exception e) {
    				e.printStackTrace();
-   				throw new KmiacServerException();
+   				throw new KmiacServerException("Could not get pasp errors.");
    			}
-   		} catch (SQLException e) {
-   			log.log(Level.ERROR, "SQl Exception: ", e);
-    		((SQLException) e.getCause()).printStackTrace();
-    		throw new KmiacServerException();
-		}
 
-		if (!flag){
+   		if (!flag){
 			try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoPol", ".zip").getAbsolutePath());
 					ZipOutputStream zos = new ZipOutputStream(fos)) {
 				byte[] buffer = new byte[8192];
 				int bufRead;
-		        sqlmed = "SELECT g.id::integer AS sl_id, g.id::integer AS id_med, g.kod_rez::integer AS kod_rez, g.cotd_p::integer AS kod_otd, g.datap::date as d_pst, g.datap::date as d_end, 3::integer AS kl_usl, null::integer AS pr_exp, " +
-						"null::integer AS etap, null::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, g.diag_p::char(7) AS diag, null::char(7) AS ds_s, null::char(6) AS pa_diag, null::integer AS pr_out, null::integer AS res_l, "+
-						"(select get_prof(?, g.cuser))::integer AS prof_fn, " +
-						"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
-						"(select get_kodsp(g.cuser))::integer AS spec, " +
-						"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
-						"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
-	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
-	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
+		        sqlmed = "SELECT g.ngosp::integer AS sl_id, " +
+		        		"g.id::integer AS id_med, " +
+		        		"g.kod_rez::integer AS kod_rez, " +
+		        		"g.cotd_p::integer AS kod_otd, " +
+		        		"g.datap::date as d_pst, " +
+		        		"null::date as d_end, " +
+		        		"3::integer AS kl_usl, " +
+		        		"null::integer AS pr_exp, " +
+						"null::integer AS pl_extr, " +
+						"null::char(15) AS usl, " +
+						"null::double precision AS kol_usl, " +
+						"2::integer AS c_mu, " +
+						"g.diag_p::char(7) AS diag, " +
+						"null::char(7) AS ds_s, " +
+						"null::char(6) AS pa_diag, " +
+						"null::integer AS pr_out, " +
+						"null::integer AS res_l, "+
+						"(CASE WHEN (m00.c_nom = 2) THEN s.prof_d WHEN ((m00.c_nom = 1) OR (m00.c_nom = 3) OR (m00.c_nom = 5) OR (m00.c_nom = 6) OR (m00.c_nom = 8) OR (m00.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
+						"null::double precision AS stoim, " +
+						"null::integer AS case, " +
+						"null::integer AS place," +
+						"s.cod_sp::integer AS spec, " +
+						"null::integer AS prvd, " +
+						"null::integer AS res_g, " +
+						"null::char(14) AS ssd, " +
+						"null::integer AS id_med_tf, " +
+						"1::integer AS psv, " +
+						"null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
+	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) " +
+	        			"JOIN n_o00 o ON (o.pcod = g.cotd_p) "+
+	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) " +
+	        			"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
+	        			"LEFT JOIN n_m00 m00 ON (m00.pcod = m.clpu) ";
 	        	sqlmed += sqlfrom; 
-	        	sqlmed += "WHERE g.pr_out<>0 "+sqlwhere;
+	        	sqlmed += "WHERE g.pr_out<>0 ";
+	            if (cpodr != 0) {
+	            	sqlmed += " AND g.cotd = ? "+sqlwhere;
+	            	clpu = cpodr;
+	            }
+	            else 
+	            	sqlmed += " AND substr(cast(g.cotd as varchar(10)),1,2)=cast(? as varchar(10)) "+sqlwhere;
 	        	sqlmed += " UNION ";
-	            sqlmed = "SELECT g.id::integer AS sl_id, d.id::integer AS id_med, g.kod_rez::integer AS kod_rez, o.cotd::integer AS kod_otd, d.date_start::date as d_pst, d.date_end::date as d_end, 1::integer AS kl_usl, 0::integer AS pr_exp, " +
-	    				"d.stl::integer AS etap, g.pl_extr::integer AS pl_extr, null::char(15) AS usl, null::double precision AS kol_usl, 2::integer AS c_mu, c.cod::char(7) AS diag, (select get_ds_s(c.id_gosp))::char(7) AS ds_s, null::char(6) AS pa_diag, " +
-	    				"(select get_pr_out(o.ishod))::integer AS pr_out, (select get_res_l(o.result))::integer AS res_l, "+
-	    				"(select get_prof(?, o.vrach))::integer AS prof_fn, " +
-	    				"null::double precision AS stoim, null::double precision AS st_acpt, null::integer AS case, null::integer AS place," +
-	    				"(select get_kodsp(o.vrach))::integer AS spec, " +
-	    				"null::integer AS prvd, null::integer AS v_mu, null::integer AS res_g, null::char(14) AS ssd, " +
-	    				"null::integer AS id_med_smo, null::integer AS id_med_tf, 1::integer AS psv, 0::integer AS pk_mc, null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp) LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
-            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
+	            sqlmed = "SELECT g.ngosp::integer AS sl_id, " +
+	            		"g.id::integer AS id_med, " +
+	            		"g.kod_rez::integer AS kod_rez, " +
+	            		"o.cotd::integer AS kod_otd, " +
+	            		"g.datagos::date as d_pst, " +
+	            		"o.datav::date as d_end, " +
+	            		"1::integer AS kl_usl, " +
+	            		"0::integer AS pr_exp, " +
+	    				"(CASE g.pl_extr=1 when true then 2 else (CASE g.pl_extr=2 when true then 1 else 1 end) end)::integer AS pl_extr, " +
+	    				"null::char(15) AS usl, " +
+	    				"null::double precision AS kol_usl, " +
+	    				"2::integer AS c_mu, " +
+	    				"c.cod::char(7) AS diag, " +
+	    				"(select get_ds_s(c.id_gosp))::char(7) AS ds_s, " +
+	    				"null::char(6) AS pa_diag, " +
+	    				"ap0.c_obl::integer AS pr_out, " +
+	    				"aq0.cod_obl::integer AS res_l, "+
+						"(CASE WHEN (m00.c_nom = 2) THEN s.prof_d WHEN ((m00.c_nom = 1) OR (m00.c_nom = 3) OR (m00.c_nom = 5) OR (m00.c_nom = 6) OR (m00.c_nom = 8) OR (m00.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
+	    				"null::double precision AS stoim, " +
+	    				"null::integer AS case," +
+	    				"null::integer AS place," +
+						"s.cod_sp::integer AS spec, " +
+	    				"null::integer AS prvd, " +
+	    				"null::integer AS res_g, " +
+	    				"null::char(14) AS ssd, " +
+	    				"null::integer AS id_med_tf, " +
+	    				"1::integer AS psv, " +
+	    				"null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) " +
+            			"JOIN c_otd o ON (g.id = o.id_gosp) " +
+	        			"JOIN n_o00 o00 ON (o00.pcod = o.cotd) "+
+            			"LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) " +
+            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) " +
+            			"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
+            			"LEFT JOIN n_ap0 ap0 ON (ap0.pcod = o.ishod) "+
+            			"LEFT JOIN n_aq0 aq0 ON (aq0.pcod = o.result) "+
+            			"LEFT JOIN n_m00 m00 ON (m00.pcod = m.clpu) ";
             	sqlmed += sqlfrom; 
-            	sqlmed += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
+            	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null ";
+	            if (cpodr != 0) {
+	            	sqlmed += " AND o.cotd = ? "+sqlwhere;
+	            	clpu = cpodr;
+	            }
+	            else 
+	            	sqlmed += " AND substr(cast(o.cotd as varchar(10)),1,2)=cast(? as varchar(10)) "+sqlwhere;
             	sqlmed += " ORDER BY p.npasp "; //ругается
 
 //    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)));
@@ -1399,7 +1361,7 @@ public class GenReestr extends Server implements Iface {
 //							throw new KmiacServerException();
 //						}
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), cpodr))){
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)))){
 					while (acrs.getResultSet().next()){
 						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 							zos.putNextEntry(new ZipEntry("med.dbf"));
@@ -1412,82 +1374,117 @@ public class GenReestr extends Server implements Iface {
     				}
 				}
 				    
-				sqlpasp ="SELECT g.id::integer AS sl_id, 1::integer AS vid_rstr, " +
-						"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-						"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-						"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
-						"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
+				sqlpasp ="SELECT g.ngosp::integer AS sl_id, " +
+						"1::integer AS vid_rstr, " +
+						"k.kdpsk::integer AS str_org, " +
+						"10::integer AS ter_mu," +
+						"m.clpu::integer AS kod_mu," +
+						"current_date::date AS df_per, " +
+						"p.fam::char(60) AS fam, " +
+						"p.im::char(40) AS im, " +
+						"p.ot::char(60) AS otch, " +
+						"p.datar AS dr, " +
 						"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-						"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-						"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-						"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-						"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-						"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-						"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-						"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-						"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-						"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-						"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-						"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-						"(select get_region(p.poms_strg))::integer AS region, " +
-						"p.ter_liv::integer AS ter_liv, (select get_status(p.sgrp))::integer AS status, "+
-						"(select get_kov(p.npasp))::char(30) AS kob, null::char(10) AS ist_bol, null::integer AS vid_hosp, "+
-						"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
-						"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-//						"(case when p.poms_strg>=100 then (select get_ogrn(p.npasp)) else null end)::char(15) AS ogrn_str, " +
-//						"(case when p.poms_strg>=100 then (select get_birthplace(p.npasp)) else null end)::char(100) AS birthplace, "+
-						"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-						"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-						"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
-
-	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) ";
-//	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
+						"(case p.poms_strg>99 when true then p.snils else null end)::char(14) AS ssp, " +
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_tdoc END)::integer AS vpolis, "+ 
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_ser END)::char(10) AS spolis, "+
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_nom END)::char(20) AS polis, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
+						"ds.fam::char(60) AS fam_pr, "+
+						"ds.im::char(40) AS im_pr, "+
+						"ds.ot::char(40) AS otch_pr," +
+						"ds.datar::date AS dr_pr, " +
+						"(CASE (p.poms_strg > 99 AND CURRENT_DATE - p.datar < 18*365) OR (CURRENT_DATE - p.datar < 3*31 AND p.poms_ser IS NULL AND p.poms_nom IS NULL) WHEN TRUE THEN (CASE ds.pol = 1 WHEN TRUE THEN 'М' ELSE 'Ж' END) ELSE NULL END)::char(1) AS sex_pr, "+
+						"ds.vpolis::char(10) AS vpolis_pr, "+
+						"ds.spolis::char(10) AS spolis_pr, "+
+						"ds.npolis::char(20) AS polis_pr, " +
+						"ds.tdoc::integer AS type_docpr, "+
+						"ds.docser::char(10) AS docser_pr, "+
+						"ds.docnum::char(20) AS docnum_pr, " +
+						"k.region::integer AS region, " +
+						"null::char(10) AS ist_bol, " +
+						"null::integer AS vid_hosp, " +
+						"null::integer AS ter_pol, " +
+						"null::integer AS pol, " +
+						"null::char(20) AS n_mk, " +
+						"p.npasp::integer AS id_lpu, " +
+		    			"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
+						"null::integer AS ter_mu_dir, " +
+						"null::integer AS kod_mu_dir ";
+						
+	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
+	        			"JOIN n_o00 o ON (o.pcod = g.cotd_p) "+
+	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) " +
+	      				"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
+	      				"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) ";
 	        	sqlpasp += sqlfrom; 
-	        	sqlpasp += "WHERE g.pr_out<>0 "+sqlwhere;
+	        	sqlpasp += "WHERE g.pr_out<>0 ";
+	            if (cpodr != 0) {
+	            	sqlpasp += " AND g.cotd = ? "+sqlwhere;
+	            	clpu = cpodr;
+	            }
+	            else 
+	            	sqlpasp += " AND substr(cast(g.cotd as varchar(10)),1,2)=cast(? as varchar(10)) "+sqlwhere;
 	        	sqlpasp += " UNION ";
-	            sqlpasp = "SELECT g.id::integer AS sl_id, 1::integer AS vid_rstr, " +
-	    				"(case when p.poms_strg>0 then (select get_str_org(p.poms_strg)) end) AS str_org, " +
-	    				"(case when p.poms_strg>=100 then (select get_name_smo(p.ogrn_smo)) else null end)::char(50) AS name_str, " +
-	    				"10::integer AS ter_mu, ?::integer AS kod_mu, ?::date AS df_per, " +
-	    				"p.fam::char(60) AS fam, p.im::char(40) AS im, p.ot::char(60) AS otch, p.datar AS dr, " +
-	    				"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-	    				"(select get_preds_fam(p.npasp))::char(60) AS fam_rp, "+
-	    				"(select get_preds_im(p.npasp))::char(40) AS im_rp, "+
-	    				"(select get_preds_ot(p.npasp))::char(40) AS otch_rp," +
-	    				"(select get_preds_dr(p.npasp))::date AS dr_pr, "+
-	    				"(select get_preds_sex(p.npasp))::char(1) AS sex_pr, "+
-	    				"(select get_preds_spolis(p.npasp))::char(10) AS spolis_pr, "+
-	    				"(select get_preds_npolis(p.npasp))::char(20) AS polis_pr, " +
-	    				"p.poms_tdoc::integer AS vpolis, p.poms_ser::char(10) AS spolis, p.poms_nom::char(20) AS polis, " +
-	    				"(case when p.poms_strg>=100 then p.tdoc else null end)::integer AS type_doc, "+
-	    				"(case when p.poms_strg>=100 then p.docser else null end)::char(10) AS docser, "+
-	    				"(case when p.poms_strg>=100 then p.docnum else null end)::char(20) AS docnum, " +
-	    				"(select get_region(p.poms_strg))::integer AS region, " +
-	    				"p.ter_liv::integer AS ter_liv, (select get_status(p.sgrp))::integer AS status, "+
-	    				"(select get_kov(p.npasp))::char(30) AS kob, o.nist::char(10) AS ist_bol, g.pl_extr::integer AS vid_hosp, "+
-	    				"(case when g.pl_extr=1 then g.ntalon else null end)::char(11) AS talon, " +
-	    				"null::integer AS ter_pol, null::integer AS pol, null::integer AS n_mk, p.npasp::integer AS id_lpu, null::integer AS id_smo, p.region_liv::integer AS region_liv," +
-	    				"(case when p.poms_strg>=100 then p.ogrn_smo else null end)::char(15) AS ogrn_str, " +
-	    				"(case when p.poms_strg>=100 then p.birthplace else null end)::char(100) AS birthplace, " +
-	    				"null::integer AS ter_mu_dir, null::integer AS kod_mu_dir ";
+				sqlpasp ="SELECT g.ngosp::integer AS sl_id, " +
+						"1::integer AS vid_rstr, " +
+						"k.kdpsk::integer AS str_org, " +
+						"10::integer AS ter_mu," +
+						"m.clpu::integer AS kod_mu," +
+						"current_date::date AS df_per, " +
+						"p.fam::char(60) AS fam, " +
+						"p.im::char(40) AS im, " +
+						"p.ot::char(60) AS otch, " +
+						"p.datar AS dr, " +
+						"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
+						"(case p.poms_strg>99 when true then p.snils else null end)::char(14) AS ssp, " +
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_tdoc END)::integer AS vpolis, "+ 
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_ser END)::char(10) AS spolis, "+
+						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_nom END)::char(20) AS polis, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
+						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
+						"ds.fam::char(60) AS fam_pr, "+
+						"ds.im::char(40) AS im_pr, "+
+						"ds.ot::char(40) AS otch_pr," +
+						"ds.datar::date AS dr_pr, " +
+						"(CASE (p.poms_strg > 99 AND CURRENT_DATE - p.datar < 18*365) OR (CURRENT_DATE - p.datar < 3*31 AND p.poms_ser IS NULL AND p.poms_nom IS NULL) WHEN TRUE THEN (CASE ds.pol = 1 WHEN TRUE THEN 'М' ELSE 'Ж' END) ELSE NULL END)::char(1) AS sex_pr, "+
+						"ds.vpolis::char(10) AS vpolis_pr, "+
+						"ds.spolis::char(10) AS spolis_pr, "+
+						"ds.npolis::char(20) AS polis_pr, " +
+						"ds.tdoc::integer AS type_docpr, "+
+						"ds.docser::char(10) AS docser_pr, "+
+						"ds.docnum::char(20) AS docnum_pr, " +
+						"k.region::integer AS region, " +
+						"o.nist::char(10) AS ist_bol, " +
+						"(CASE g.pl_extr=1 when true then 2 else (CASE g.pl_extr=2 when true then 1 else 1 end) end)::integer AS vid_hosp, " +
+						"null::integer AS ter_pol, " +
+						"null::integer AS pol, " +
+						"null::char(20) AS n_mk, " +
+						"p.npasp::integer AS id_lpu, " +
+		    			"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
+						"null::integer AS ter_mu_dir, " +
+						"null::integer AS kod_mu_dir ";
 
-            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) JOIN c_otd o ON (g.id = o.id_gosp)";
-//            			"LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) LEFT JOIN c_etap d ON (o.id_gosp = d.id_gosp) "+
-//            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) LEFT JOIN n_s00 s ON (m.cdol = s.pcod) ";
+            	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) " +
+            			"JOIN c_otd o ON (g.id = o.id_gosp) " +
+	        			"JOIN n_o00 o00 ON (o00.pcod = o.cotd) "+
+            			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) " +
+        				"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
+        				"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) ";
             	sqlpasp += sqlfrom; 
-            	sqlpasp += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null "+sqlwhere;
+            	sqlpasp += "WHERE g.pr_out=0 AND o.datav is not null ";
+	            if (cpodr != 0) {
+	            	sqlpasp += " AND o.cotd = ? "+sqlwhere;
+	            	clpu = cpodr;
+	            }
+	            else 
+	            	sqlpasp += " AND substr(cast(o.cotd as varchar(10)),1,2)=cast(? as varchar(10)) "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
 
-//				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
-//					InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-//						zos.putNextEntry(new ZipEntry("pasp.dbf"));
-//						while ((bufRead = dbfStr.read(buffer)) > 0)
-//							zos.write(buffer, 0, bufRead);
-//					} catch (SQLException e) {
-//						log.log(Level.ERROR, "SQl Exception: ", e);
-//						throw new KmiacServerException();
-//					}
-				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk), cpodr)) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), cpodr))){
+				try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)))){
 					while (acrs.getResultSet().next()){
 						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
 							zos.putNextEntry(new ZipEntry("pasp.dbf"));
@@ -1911,18 +1908,28 @@ public class GenReestr extends Server implements Iface {
 	}
 
 	@Override
-	public List<PaspErrorInfo> getPaspErrors(int cpodrz, long datazf,
-			long datazt) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PaspErrorInfo> getPaspErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_pasp_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 1) AND (e.cpodr = ?) AND (e.dataz BETWEEN ? AND ?) ORDER BY p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+			sme.setCommit();
+			return rsmPaspError.mapToList(acrsq.getResultSet());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not get pasp errors.");
+		}
 	}
 
 	@Override
-	public List<MedPolErrorInfo> getMedPolErrors(int cpodrz, long datazf,
-			long datazt) throws KmiacServerException, TException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<MedPolErrorInfo> getMedPolErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (SqlModifyExecutor sme = tse.startTransaction();
+				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_reestr_med_pol_errors(?, ?, ?) ", cpodrz, new Date(datazf), new Date(datazt));
+				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.id, e.sl_id AS id_obr, e.id_med AS id_pos, v.datao AS dat_obr, a.datap AS dat_pos, a.cod_sp AS vr_pcod, get_short_fio(r.fam, r.im, r.ot) AS vr_fio, a.cdol AS vr_cdol, s.name AS vr_cdol_name, e.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN p_vizit v ON (v.id = e.sl_id) JOIN p_vizit_amb a ON (a.id = e.id_med AND a.id_obr = e.sl_id) JOIN s_vrach r ON (r.pcod = a.cod_sp) JOIN n_s00 s ON (a.cdol = s.pcod) JOIN patient p ON (p.npasp = e.npasp) WHERE (n.pasp_med = 2) AND (e.cpodr = ?) AND (a.datap BETWEEN ? AND ?) ORDER BY v.datao DESC, a.datap DESC, p.fam, p.im, p.ot, n.kderr ", cpodrz, new Date(datazf), new Date(datazt))) {
+			sme.setCommit();
+			return rsmMedPolError.mapToList(acrsq.getResultSet());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new KmiacServerException("Could not get med pol errors.");
+		}
 	}
-
-
 }

@@ -47,12 +47,8 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
-
-//TODO: УСТАНОВИТЬ ФИЛЬТР ВРАЧЕЙ
 //TODO: ЗАПИСЫВАТЬ ДОЛЖНОСТЬ ВРАЧА (ЗАПОЛНИВШЕГО И ВЫДАВШЕГО СВИДЕТЕЛЬСТВО)
 //TODO: ЗАПИСЫВАТЬ ШАПКУ ДОКУМЕНТА (ОРГАНИЗАЦИЯ)
-//TODO: ЗАПИСЫВАТЬ МЕСТО И МЕСТНОСТЬ РОЖДЕНИЯ РЕБЁНКА
-//TODO: ЗАПИСЫВАТЬ ЛИЦО, ПРИНИМАВШЕЕ РОДЫ
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич

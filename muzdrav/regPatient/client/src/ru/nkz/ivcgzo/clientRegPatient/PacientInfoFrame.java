@@ -642,7 +642,7 @@ public class PacientInfoFrame extends JFrame {
                     if (!tfMr.getText().isEmpty()) PersonalInfo.setMrab(Integer.valueOf(tfMr.getText()));
                     if (!tfDolj.getText().isEmpty()) PersonalInfo.setProf(tfDolj.getText());
                     if (!tfTel.getText().isEmpty()) PersonalInfo.setTel(tfTel.getText());
-                    if (!tf_Snils.getText().isEmpty()) PersonalInfo.setSnils(tf_Snils.getText());
+                    if (!tf_Snils.getText().equals("   -   -      ")) PersonalInfo.setSnils(tf_Snils.getText());
                     if (!tf_Odoc.getText().isEmpty()) PersonalInfo.setOdoc(tf_Odoc.getText());
                     if (!tf_serdoc.getText().isEmpty()) PersonalInfo.setDocser(tf_serdoc.getText());
                     if (!tf_nomdoc.getText().isEmpty()) PersonalInfo.setDocnum(tf_nomdoc.getText());

@@ -34,6 +34,12 @@ struct TPatient{
 	15:string realAddress;	
 }
 
+struct TBirthPlace{
+	1:string region;
+	2:string city;
+	3:i32 type;
+}
+
 struct TPriemInfo {
 	1:string pl_extr;
 	2:i64 datap;
@@ -505,7 +511,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		throws (1:kmiacServer.KmiacServerException kse);
 		
 /* Родовспоможение */
-	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Получение списка врачей заданного ЛПУ
+	 * @param clpu Код ЛПУ
+	 * @return Возвращает список врачей, классифицируемых целым числом - идентификатором врача
+	 * @throws KmiacServerException исключение на стороне сервера
+	 */
+	list<classifier.IntegerClassifier> get_s_vrach(1: i32 clpu)
+		throws (1:kmiacServer.KmiacServerException kse);
 	
 /* Новорождённый */
 	/**
