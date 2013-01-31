@@ -31,7 +31,8 @@ struct TPatient{
 	12:string job;
 	13:i32 chamber;
 	14:string registrationAddress;
-	15:string realAddress;	
+	15:string realAddress;
+	16:i32 ngosp;
 }
 
 struct TBirthPlace{
@@ -124,6 +125,7 @@ struct Zakl {
 	10: optional i32 vidPom;
 	11: optional double ukl;
 	12: optional i32 npasp;
+	13: optional i32 ngosp;
 }
 
 struct TStage {
@@ -427,7 +429,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod)
+	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod, 4:i32 nist)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,

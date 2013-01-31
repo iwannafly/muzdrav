@@ -924,7 +924,6 @@ public class MainFrame extends JFrame {
 
         lblNumberDesiaseHistory = new JLabel("Номер истории болезни");
         tfNumberOfDesiaseHistory = new JTextField();
-        tfNumberOfDesiaseHistory.setEditable(false);
         tfNumberOfDesiaseHistory.setColumns(15);
 
         lblSurname = new JLabel("Фамилия");
@@ -989,7 +988,8 @@ public class MainFrame extends JFrame {
                         ClientHospital.tcl.updatePatientChamberNumber(
                             patient.gospitalCod,
                             Integer.parseInt(tfChamber.getText()),
-                            tfStatus.getSelectedPcod());
+                            tfStatus.getSelectedPcod(),
+                            Integer.parseInt(tfNumberOfDesiaseHistory.getText()));
                         JOptionPane.showMessageDialog(MainFrame.this,
                                 "Информация успешно сохранена!", "Сохранение завершено!",
                                 JOptionPane.INFORMATION_MESSAGE);
@@ -3943,6 +3943,7 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
                                 tmpZakl.setNpasp(patient.getPatientId());
+                                tmpZakl.setNgosp(patient.getNgosp());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
@@ -3964,6 +3965,7 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
                                 tmpZakl.setNpasp(patient.getPatientId());
+                                tmpZakl.setNgosp(patient.getNgosp());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
@@ -3987,6 +3989,7 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
                                 tmpZakl.setNpasp(patient.getPatientId());
+                                tmpZakl.setNgosp(patient.getNgosp());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }

@@ -92,7 +92,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
-        "pdms", "mrab", "npal", "reg_add", "real_add"
+        "pdms", "mrab", "npal", "reg_add", "real_add", "ngosp"
     };
     private static final String[] LIFE_HISTORY_FIELD_NAMES = {
         "npasp", "allerg", "farmkol", "vitae"
@@ -326,7 +326,8 @@ public class ServerHospital extends Server implements Iface {
                 + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
                 + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
-                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
+                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add, "
+                + "c_gosp.ngosp "
                 + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
                 + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
                 + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
@@ -351,10 +352,10 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void updatePatientChamberNumber(final int gospId, final int chamberNum,
-            final int profPcod) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ? WHERE id_gosp = ?;";
+            final int profPcod, final int nist) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ?, nist = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, gospId);
+            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, nist, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new KmiacServerException();
@@ -793,9 +794,11 @@ public class ServerHospital extends Server implements Iface {
 
     private int addToGosp(final Zakl zakl, final int otd)
             throws KmiacServerException {
-        String sqlQuery = "INSERT INTO c_gosp (npasp, naprav, n_org, dataz) VALUES (?, ?, ?, ?);";
+        String sqlQuery = "INSERT INTO c_gosp (npasp, ngosp, naprav, n_org, dataz, datagos, datap) "
+        		+ " VALUES (?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, true, zakl.getNpasp(), "С", otd,
+            sme.execPrepared(sqlQuery, true, zakl.getNpasp(), zakl.getNgosp(), "С", otd,
+                    new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()),
                     new Date(System.currentTimeMillis()));
             int id = sme.getGeneratedKeys().getInt("id");
             sme.setCommit();
