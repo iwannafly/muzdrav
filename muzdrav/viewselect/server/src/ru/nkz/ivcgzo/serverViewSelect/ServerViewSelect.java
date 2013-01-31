@@ -43,6 +43,7 @@ import ru.nkz.ivcgzo.thriftViewSelect.ClekInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CosmotrInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.CotdInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.MedPolErrorInfo;
+import ru.nkz.ivcgzo.thriftViewSelect.MedStaErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PaspErrorInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamZabInfo;
 import ru.nkz.ivcgzo.thriftViewSelect.PatientAnamnez;
@@ -98,6 +99,7 @@ public class ServerViewSelect extends Server implements Iface {
     private final TResultSetMapper<PatientAnamnez, PatientAnamnez._Fields> rsmAnam;
 	private final TResultSetMapper<Pbol, Pbol._Fields> rsmPbol;
 	private final Class<?>[] pbolTypes; 
+	private final TResultSetMapper<MedStaErrorInfo, MedStaErrorInfo._Fields> rsmMedStaError;
 
 	public ServerViewSelect(ISqlSelectExecutor sse, ITransactedSqlExecutor tse) {
 		super(sse, tse);
@@ -127,6 +129,7 @@ public class ServerViewSelect extends Server implements Iface {
 		rsmAnam = new TResultSetMapper<>(PatientAnamnez.class, "npasp", "datap", "numstr", "vybor", "comment", "name", "prof_anz");
 		rsmPbol = new TResultSetMapper<>(Pbol.class, "id",          "id_obr",      "id_gosp",     "npasp",       "bol_l",       "s_bl", 	"po_bl",    "pol",         "vozr",        "nombl", 	    "cod_sp",      "cdol",       "pcod",        "dataz");
 		pbolTypes = new Class<?>[] {                 Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Date.class, Date.class, Integer.class, Integer.class, String.class, Integer.class, String.class, Integer.class, Date.class};
+		rsmMedStaError = new TResultSetMapper<>(MedStaErrorInfo.class);
 		
 		ccm = new ClassifierManager(sse);
 	}
@@ -857,6 +860,24 @@ public class ServerViewSelect extends Server implements Iface {
 				} catch (Exception e) {
 				e.printStackTrace();
 			throw new KmiacServerException("Could not get pbol list.");
+		}
+	}
+
+	@Override
+	public List<MedStaErrorInfo> getMedStaErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT g.id AS id_gosp, o.id AS id_otd, g.datagos AS dat_gosp, g.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, e.kderr, e.name_err AS err_name, e.comm AS err_comm FROM w_kderr w JOIN n_kderr e ON (e.kderr = w.kod_err AND e.pasp_med = 2) JOIN c_gosp g ON (g.ngosp = w.sl_id AND g.id = w.id_med) JOIN patient p ON (p.npasp = g.npasp) JOIN c_otd o ON (o.id_gosp = w.id_med) WHERE (o.cotd = ?) AND (g.datagos BETWEEN ? AND ?) ", cpodrz, new Date(datazf), new Date(datazt))) {
+			return rsmMedStaError.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
+		}
+	}
+
+	@Override
+	public List<MedStaErrorInfo> getMedPriemErrors(int cpodrz, long datazf, long datazt) throws KmiacServerException, TException {
+		try (AutoCloseableResultSet	acrs = sse.execPreparedQuery("SELECT g.id AS id_gosp, o.id AS id_otd, g.datap AS dat_gosp, g.npasp, get_short_fio(p.fam, p.im, p.ot) AS pat_fio, p.datar AS pat_datar, e.kderr, e.name_err AS err_name, e.comm AS err_comm FROM w_kderr w JOIN n_kderr e ON (e.kderr = w.kod_err AND e.pasp_med = 2) JOIN c_gosp g ON (g.ngosp = w.sl_id AND g.id = w.id_med) JOIN patient p ON (p.npasp = g.npasp) LEFT JOIN c_otd o ON (o.id_gosp = w.id_med) WHERE (o.id_gosp IS NULL)AND (g.datap BETWEEN ? AND ?) ", new Date(datazf), new Date(datazt))) {
+			return rsmMedStaError.mapToList(acrs.getResultSet());
+		} catch (SQLException e) {
+			throw new KmiacServerException(e.getMessage());
 		}
 	}
 }

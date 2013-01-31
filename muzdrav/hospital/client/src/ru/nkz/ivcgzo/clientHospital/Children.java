@@ -47,11 +47,8 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
-
-//TODO: УСТАНОВИТЬ ФИЛЬТР ВРАЧЕЙ
-//TODO: УЗНАТЬ О КЛАССИФИКАТОРЕ n_z00 (поле pcod символьное(2))
-//TODO: УЗНАТЬ О ТАБЛИЦАХ c_rd_sl и p_rd_sl - какая останется?
-//TODO: ВЗЯТЬ СРОК ПЕРВОЙ ЯВКИ ИЗ ТАБЛИЦЫ p_rd_sl(yavka1)
+//TODO: ЗАПИСЫВАТЬ ДОЛЖНОСТЬ ВРАЧА (ЗАПОЛНИВШЕГО И ВЫДАВШЕГО СВИДЕТЕЛЬСТВО)
+//TODO: ЗАПИСЫВАТЬ ШАПКУ ДОКУМЕНТА (ОРГАНИЗАЦИЯ)
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич

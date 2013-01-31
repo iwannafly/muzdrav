@@ -705,14 +705,14 @@ public class serverAdmin extends Server implements Iface {
 	@Override
 	public int saveShOper(ShablonOper shOper) throws KmiacServerException, TemplateExistsException, TException {
 		int shId = shOper.id;
-		String srcStr = String.format("%s %s %s %s %s", shOper.oper_pcod.toLowerCase(), shOper.name.toLowerCase(), new Time(shOper.oper_dlit), shOper.mat.toLowerCase(), shOper.text.toLowerCase());
+		String srcStr = String.format("%s %s %s %s %s %s %s %s", shOper.oper_pcod.toLowerCase(), shOper.oper_name.toLowerCase(), shOper.diag_pcod.toLowerCase(), shOper.diag_name.toLowerCase(), shOper.name.toLowerCase(), new Time(shOper.oper_dlit), shOper.mat.toLowerCase(), shOper.text.toLowerCase());
 		
 		try (SqlModifyExecutor sme = tse.startTransaction();
 				AutoCloseableResultSet acrs = sme.execPreparedQuery("SELECT id FROM sh_oper WHERE id = ? ", shId)) {
 			if (acrs.getResultSet().next()) {
-				sme.execPrepared("UPDATE sh_oper SET name = ?, oper_pcod = ?, oper_dlit = ?, mat = ?, text = ?, src_text = ? WHERE id = ? ", false, shOper.name, shOper.oper_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr, shId);
+				sme.execPrepared("UPDATE sh_oper SET name = ?, oper_pcod = ?, diag_pcod = ?, oper_dlit = ?, mat = ?, text = ?, src_text = ? WHERE id = ? ", false, shOper.name, shOper.oper_pcod, shOper.diag_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr, shId);
 			} else {
-				sme.execPrepared("INSERT INTO sh_oper (stat_tip, name, oper_pcod, oper_dlit, mat, text, src_text) VALUES (?, ?, ?, ?, ?, ?, ?) ", true, shOper.stat_tip, shOper.name, shOper.oper_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr);
+				sme.execPrepared("INSERT INTO sh_oper (stat_tip, name, oper_pcod, diag_pcod, oper_dlit, mat, text, src_text) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ", true, shOper.stat_tip, shOper.name, shOper.oper_pcod, shOper.diag_pcod, new Time(shOper.oper_dlit), shOper.mat, shOper.text, srcStr);
 				shId = sme.getGeneratedKeys().getInt("id");
 			}
 			sme.setCommit();

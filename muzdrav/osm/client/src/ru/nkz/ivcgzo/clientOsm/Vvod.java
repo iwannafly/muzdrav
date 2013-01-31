@@ -109,6 +109,7 @@ import ru.nkz.ivcgzo.thriftOsm.PvizitAmb;
 import ru.nkz.ivcgzo.thriftOsm.PvizitNotFoundException;
 import ru.nkz.ivcgzo.thriftOsm.Shablon;
 import ru.nkz.ivcgzo.thriftOsm.ShablonText;
+import ru.nkz.ivcgzo.thriftOsm.SpravNetrud;
 import ru.nkz.ivcgzo.thriftOsm.VrachInfo;
 import ru.nkz.ivcgzo.thriftOsm.Vypis;
 import ru.nkz.ivcgzo.thriftOsm.ZapVr;
@@ -461,6 +462,56 @@ public class Vvod extends JFrame {
 					}
 				});
 				menu.add(mi4);
+				
+				JMenuItem mi6 = new JMenuItem("Справка о временной нетрудоспособности");
+				mi6.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						try{
+							SpravNetrud spr = new SpravNetrud();
+							spr.setFam(Vvod.zapVr.getFam());
+							spr.setIm(Vvod.zapVr.getIm());
+							spr.setOth(Vvod.zapVr.getOth());
+							spr.setDatar(Vvod.zapVr.getDatar());
+							spr.setNpasp(Vvod.zapVr.getNpasp());
+							for (PdiagAmb pd : tblDiag.getData())
+					  			if (pd.diag_stat == 1) {
+					  				pvizitAmb.setDiag(pd.getDiag());
+					  				spr.setDiag(pd.diag);}
+       						String servPath = MainForm.tcl.printSpravNetrud(spr);
+       						String cliPath = File.createTempFile("spravNetrud", ".htm").getAbsolutePath();
+       						MainForm.conMan.transferFileFromServer(servPath, cliPath);
+       						MainForm.conMan.openFileInEditor(cliPath, false);
+						}
+						catch (TException e1) {
+							e1.printStackTrace();
+							MainForm.conMan.reconnect(e1);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				menu.add(mi6);
+				
+				JMenuItem mi7 = new JMenuItem("Справка в бассейн");
+				mi7.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						try{
+								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
+								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
+								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+	       						MainForm.conMan.openFileInEditor(cliPath, false);
+						}
+						catch (TException e1) {
+							e1.printStackTrace();
+							MainForm.conMan.reconnect(e1);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+				menu.add(mi7);
 				
 				menu.show(btnPrint, 0, btnPrint.getHeight());
 			}

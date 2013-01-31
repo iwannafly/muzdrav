@@ -31,7 +31,14 @@ struct TPatient{
 	12:string job;
 	13:i32 chamber;
 	14:string registrationAddress;
-	15:string realAddress;	
+	15:string realAddress;
+	16:i32 ngosp;
+}
+
+struct TBirthPlace{
+	1:string region;
+	2:string city;
+	3:i32 type;
 }
 
 struct TPriemInfo {
@@ -117,6 +124,8 @@ struct Zakl {
 	9: optional i32 vidOpl;
 	10: optional i32 vidPom;
 	11: optional double ukl;
+	12: optional i32 npasp;
+	13: optional i32 ngosp;
 }
 
 struct TStage {
@@ -290,15 +299,15 @@ struct TPatientCommonInfo {
 	1: i32 npasp;
 	2: string full_name;
 	3: i64 datar;
-	4: string pol;
-	5: string jitel;
-	6: string adp_obl;
-	7: string adp_gorod;
-	8: string adp_ul;
-	9: string adp_dom;
-	10: string adp_kv;
-	11: i32 obraz;
-	12: i32 status;
+	4: optional string pol;
+	5: optional string jitel;
+	6: optional string adp_obl;
+	7: optional string adp_gorod;
+	8: optional string adp_ul;
+	9: optional string adp_dom;
+	10: optional string adp_kv;
+	11: optional i32 obraz;
+	12: optional i32 status;
 }
 
 struct TRd_SMPK {
@@ -420,7 +429,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod)
+	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod, 4:i32 nist)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
@@ -454,7 +463,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 
 	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
-	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
+	void addZakl(1:Zakl zakl, 2:i32 otd) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
@@ -504,7 +513,14 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		throws (1:kmiacServer.KmiacServerException kse);
 		
 /* Родовспоможение */
-	list<classifier.IntegerClassifier> get_s_vrach() throws (1:kmiacServer.KmiacServerException kse);
+	/**
+	 * Получение списка врачей заданного ЛПУ
+	 * @param clpu Код ЛПУ
+	 * @return Возвращает список врачей, классифицируемых целым числом - идентификатором врача
+	 * @throws KmiacServerException исключение на стороне сервера
+	 */
+	list<classifier.IntegerClassifier> get_s_vrach(1: i32 clpu)
+		throws (1:kmiacServer.KmiacServerException kse);
 	
 /* Новорождённый */
 	/**
@@ -592,15 +608,18 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     	throws (1:kmiacServer.KmiacServerException kse, 2:PatientNotFoundException pnfe);
 
 /*DispBer*/
-	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp) throws (1:PrdIshodNotFoundException pinfe, 	2:kmiacServer.KmiacServerException kse);
+	TRdIshod getRdIshodInfo(1:i32 npasp, 2:i32 ngosp)
+		throws (1:PrdIshodNotFoundException pinfe, 2:kmiacServer.KmiacServerException kse);
     i32 addRdIshod(1:TRdIshod rdIs) throws (1:kmiacServer.KmiacServerException kse);
     void updateRdIshod(1:TRdIshod RdIs) throws (1:kmiacServer.KmiacServerException kse);
     void deleteRdIshod(1:i32 npasp, 2:i32 ngosp) throws (1:kmiacServer.KmiacServerException kse);
-	RdSlStruct getRdSlInfo(1: i32 npasp) throws (1:PrdSlNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+	RdSlStruct getRdSlInfo(1: i32 npasp)
+		throws (1:PrdSlNotFoundException pinfe, 2: kmiacServer.KmiacServerException kse);
     void AddRdSl(1:RdSlStruct rdSl) throws (1: kmiacServer.KmiacServerException kse);
     void DeleteRdSl(1:i32 id_pvizit,2:i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
     void UpdateRdSl(1: RdSlStruct Dispb) throws (1: kmiacServer.KmiacServerException kse);
-	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp) throws (1:PrdDinNotFoundException pinfe, 	2: kmiacServer.KmiacServerException kse);
+	RdDinStruct getRdDinInfo(1:i32 npasp,2: i32 ngosp)
+		throws (1:PrdDinNotFoundException pinfe, 2: kmiacServer.KmiacServerException kse);
     void AddRdDin(1:i32 npasp,2: i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
     void DeleteRdDin(1:i32 ngosp) throws (1: kmiacServer.KmiacServerException kse);
     void UpdateRdDin(1: RdDinStruct Din) throws (1: kmiacServer.KmiacServerException kse);

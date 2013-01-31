@@ -4,8 +4,6 @@ package ru.nkz.ivcgzo.clientHospital;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -32,8 +30,6 @@ import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftHospital.DiagnosisNotFoundException;
-import ru.nkz.ivcgzo.thriftHospital.DopShablon;
-import ru.nkz.ivcgzo.thriftHospital.LifeHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MedicalHistoryNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.MesNotFoundException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -400,11 +396,8 @@ public class MainFrame extends JFrame {
 //        setLifeHistoryPanel();
         setMedicalHistoryPanel();
         setStagePanel();
-        setChildrenPanel();
         setDiagnosisPanel();
 //        setChildbirthPanel();
-        setZaklPanel();
-
         if ((doctorAuth.getClpu() == 62)
             || (doctorAuth.getClpu() == 63)
             || (doctorAuth.getClpu() == 64)
@@ -414,11 +407,13 @@ public class MainFrame extends JFrame {
             || (doctorAuth.getCpodr() == 2412)
             || (doctorAuth.getCpodr() == 8301)
             || (doctorAuth.getCpodr() == 8305)) {
+        	setChildrenPanel();
         } else {
-            tabbedPane.removeTabAt(4);
+            //tabbedPane.removeTabAt(4);
             tabbedPane.removeTabAt(3);
 //            pChildbirth.setVisible(false);
         }
+        setZaklPanel();
     }
 
 	public final void onConnect() {
@@ -437,11 +432,15 @@ public class MainFrame extends JFrame {
             cbxResult.setData(ClientHospital.tcl.getAq0());
             tfStatus.setData(ClientHospital.tcl.getStationTypes(doctorAuth.getCpodr()));
             cbxAnotherOtd.setData(ClientHospital.tcl.getOtd(doctorAuth.getClpu()));
-            CBPrinial.setData(ClientHospital.tcl.get_s_vrach());
-            CBAkush.setData(ClientHospital.tcl.get_s_vrach());
-            CBVrash.setData(ClientHospital.tcl.get_s_vrach());
-            CBOsmotr.setData(ClientHospital.tcl.get_s_vrach());
-            pChildren.setDoctors(ClientHospital.tcl.get_s_vrach());
+            //Минимизируем общение с сервером, единожды получая список врачей:
+            List<IntegerClassifier> doctorsList =
+            		ClientHospital.tcl.get_s_vrach(doctorAuth.getClpu());
+            CBPrinial.setData(doctorsList);
+            CBAkush.setData(doctorsList);
+            CBVrash.setData(doctorsList);
+            CBOsmotr.setData(doctorsList);
+            if (pChildren != null)
+            	pChildren.setDoctors(doctorsList);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
@@ -554,7 +553,8 @@ public class MainFrame extends JFrame {
                     fillMedHistoryTable();
                     fillDiagnosisTable();
                     fillStageTable();
-                    pChildren.setPatient(patient);
+                    if (pChildren != null)
+                    	pChildren.setPatient(patient);
 
         			try {
 						trdIshod = ClientHospital.tcl.getRdIshodInfo(
@@ -926,7 +926,6 @@ public class MainFrame extends JFrame {
 
         lblNumberDesiaseHistory = new JLabel("Номер истории болезни");
         tfNumberOfDesiaseHistory = new JTextField();
-        tfNumberOfDesiaseHistory.setEditable(false);
         tfNumberOfDesiaseHistory.setColumns(15);
 
         lblSurname = new JLabel("Фамилия");
@@ -991,7 +990,8 @@ public class MainFrame extends JFrame {
                         ClientHospital.tcl.updatePatientChamberNumber(
                             patient.gospitalCod,
                             Integer.parseInt(tfChamber.getText()),
-                            tfStatus.getSelectedPcod());
+                            tfStatus.getSelectedPcod(),
+                            Integer.parseInt(tfNumberOfDesiaseHistory.getText()));
                         JOptionPane.showMessageDialog(MainFrame.this,
                                 "Информация успешно сохранена!", "Сохранение завершено!",
                                 JOptionPane.INFORMATION_MESSAGE);
@@ -3738,7 +3738,10 @@ public class MainFrame extends JFrame {
 
     private void setChildrenPanel() {
     	this.pChildren = new Children(this.doctorAuth, this.patient);
-        tabbedPane.addTab("Новорожденный", new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")), pChildren, null);
+        tabbedPane.addTab("Новорожденный",
+        		new ImageIcon(MainFrame.class.getResource("/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png")),
+        		pChildren,
+        		null);
 	}
     
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3966,11 +3969,14 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                tmpZakl.setNpasp(patient.getPatientId());
+                                tmpZakl.setNgosp(patient.getNgosp());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
-                                ClientHospital.tcl.addZakl(tmpZakl);
+                                ClientHospital.tcl.addZakl(tmpZakl,
+                                        ClientHospital.authInfo.getCpodr());
                                 JOptionPane.showMessageDialog(MainFrame.this,
                                     "Пациент успешно выписан", "Выписка пациента",
                                     JOptionPane.INFORMATION_MESSAGE);
@@ -3985,11 +3991,14 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                tmpZakl.setNpasp(patient.getPatientId());
+                                tmpZakl.setNgosp(patient.getNgosp());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
-                                ClientHospital.tcl.addZakl(tmpZakl);
+                                ClientHospital.tcl.addZakl(tmpZakl,
+                                        ClientHospital.authInfo.getCpodr());
                                 JOptionPane.showMessageDialog(MainFrame.this,
                                     "Пациент успешно выписан", "Выписка пациента",
                                     JOptionPane.INFORMATION_MESSAGE);
@@ -4006,11 +4015,14 @@ public class MainFrame extends JFrame {
                                 tmpZakl.setVremv(cdeZaklTime.getTime().getTime());
                                 tmpZakl.setVidOpl(cbxVidOpl.getSelectedPcod());
                                 tmpZakl.setVidPom(cbxVidPom.getSelectedPcod());
+                                tmpZakl.setNpasp(patient.getPatientId());
+                                tmpZakl.setNgosp(patient.getNgosp());
                                 if (!tfUkl.getText().isEmpty()) {
                                     tmpZakl.setUkl(Double.valueOf(tfUkl.getText()));
                                 }
                                 tmpZakl.setIdGosp(patient.getGospitalCod());
-                                ClientHospital.tcl.addZakl(tmpZakl);
+                                ClientHospital.tcl.addZakl(tmpZakl,
+                                        ClientHospital.authInfo.getCpodr());
                                 JOptionPane.showMessageDialog(MainFrame.this,
                                     "Пациент успешно выписан", "Выписка пациента",
                                     JOptionPane.INFORMATION_MESSAGE);

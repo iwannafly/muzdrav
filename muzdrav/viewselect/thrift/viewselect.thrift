@@ -510,6 +510,18 @@ struct Pbol{
 	14: optional i64 dataz;
 }
 
+struct MedStaErrorInfo {
+	1: optional i32 id_gosp;
+	2: optional i32 id_otd;
+	3: optional i64 dat_gosp;
+	4: optional i32 npasp;
+	5: optional string pat_fio;
+	6: optional i64 pat_datar;
+	7: optional i32 kderr;
+	8: optional string err_name;
+	9: optional string err_comm;
+}
+
 exception TipPodrNotFoundException {
 }
 
@@ -571,6 +583,8 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	void deleteAnam(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	void updateAnam(1: list<PatientAnamnez> patAnam) throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamnez(1: i32 npasp, 2: i32 cpodr, 3: i32 cslu) throws (1:kmiacServer.KmiacServerException kse);
+	list<MedStaErrorInfo> getMedStaErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
+	list<MedStaErrorInfo> getMedPriemErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
 
 	list<Pbol> getPbol (1: i32 id_obr, 2: i32 id_gosp, 3: i32 id_bol) throws (1: kmiacServer.KmiacServerException kse);
 	i32 AddPbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
