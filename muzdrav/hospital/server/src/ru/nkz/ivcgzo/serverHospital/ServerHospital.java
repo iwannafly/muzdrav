@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 public class ServerHospital extends Server implements Iface {
     //TODO: при изменении региона или серии в регионе - поменять:
 	private static final String childBirthDocSeries = "32";
+	private static final String childBirthDocPath = "\\plugin\\reports\\ChildBirthDocument.htm";
     private static Logger log = Logger.getLogger(ServerHospital.class.getName());
     private TServer tServer;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
@@ -92,7 +93,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
-        "pdms", "mrab", "npal", "reg_add", "real_add"
+        "pdms", "mrab", "npal", "reg_add", "real_add", "ngosp"
     };
     private static final String[] LIFE_HISTORY_FIELD_NAMES = {
         "npasp", "allerg", "farmkol", "vitae"
@@ -122,7 +123,7 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] RDISHOD_FIELD_NAMES = {
    "npasp","ngosp","id_berem","id","serdm","mesto",
    "deyat","shvat","vody","kashetv","poln","potugi",
-   "posled","vremp","obol","pupov","obvit","osobp","krov","psih","obezb",
+   "posled","vremp","obol","lpupov","obvit","osobp","krov","psih","obezb",
    "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","vespl","detmesto"
    };
     private static final String[] RDNOVOR_FIELD_NAMES = {
@@ -130,7 +131,7 @@ public class ServerHospital extends Server implements Iface {
 	   "apgar1", "apgar5", "krit1", "krit2", "krit3", "krit4", "mert", "donosh", "datazap"
    };
     private static final String[] RDSVID_ROJD_FIELD_NAMES = {
-    	"npasp", "ndoc", "dateoff", "famreb", "m_rojd", "zan", "r_proiz", "svidvrach"
+    	"npasp", "ndoc", "dateoff", "famreb", "m_rojd", "zan", "r_proiz", "svid_write", "svid_give"
    };
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
@@ -144,7 +145,7 @@ public class ServerHospital extends Server implements Iface {
      Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
 //    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
      String.class,String.class,String.class,String.class,String.class,String.class,
-//    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
+//    	   "posled",     "vremp",        "obol",      "lpupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
      Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
 //    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",        "vespl", "detmesto"
      Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Double.class,String.class
@@ -207,8 +208,10 @@ public class ServerHospital extends Server implements Iface {
     	Boolean.class,	Date.class
     };
     private static final Class<?>[] CHILD_DOC_BIRTH_TYPES = new Class<?>[] {
-	//	npasp,			ndoc,   		dateoff,	famreb,			m_rojd			zan				r_proiz			svidvrach
-    	Integer.class,	Integer.class,	Date.class,	String.class,	Integer.class,	Integer.class,	Integer.class,	Integer.class
+	//	npasp,			ndoc,   		dateoff,	famreb,			m_rojd			zan				r_proiz
+    	Integer.class,	Integer.class,	Date.class,	String.class,	Integer.class,	Integer.class,	Integer.class,
+    //	svid_write		svid_give
+    	Integer.class,	Integer.class
     };
 
     /**
@@ -326,7 +329,8 @@ public class ServerHospital extends Server implements Iface {
                 + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
                 + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
-                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
+                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add, "
+                + "c_gosp.ngosp "
                 + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
                 + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
                 + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
@@ -351,10 +355,10 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void updatePatientChamberNumber(final int gospId, final int chamberNum,
-            final int profPcod) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ? WHERE id_gosp = ?;";
+            final int profPcod, final int nist) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ?, nist = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, gospId);
+            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, nist, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new KmiacServerException();
@@ -742,19 +746,26 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void addZakl(final Zakl zakl) throws KmiacServerException {
+    public final void addZakl(final Zakl zakl, final int otd) throws KmiacServerException {
         String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
             + "sostv = ?, recom = ?, vrach = ?,  vid_opl = ?, vid_pom = ?, ukl = ? "
             + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
-                sqlQuery = "UPDATE c_otd SET ishod = ?, "
-                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
-                    + "WHERE id_gosp = ?";
-                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
-                    zakl.getSostv(), zakl.getRecom(),
-                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
-                    zakl.getIdGosp());
+                int newIdGosp = addToGosp(zakl, otd);
+                addToOtd(zakl, newIdGosp);
+                sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
+                        new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                        zakl.getSostv(), zakl.getRecom(),
+                        null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+                        zakl.getIdGosp());
+//                sqlQuery = "UPDATE c_otd SET ishod = ?, "
+//                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
+//                    + "WHERE id_gosp = ?";
+//                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
+//                    zakl.getSostv(), zakl.getRecom(),
+//                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+//                    zakl.getIdGosp());
             } else {
                 sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
                     new Date(zakl.getDatav()), new Time(zakl.getVremv()),
@@ -765,6 +776,38 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private int addToOtd(final Zakl zakl, final int idGosp)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_otd (id_gosp, cotd, dataz) VALUES (?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, idGosp, zakl.getNewOtd(),
+                    new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private int addToGosp(final Zakl zakl, final int otd)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_gosp (npasp, ngosp, naprav, n_org, dataz, datagos, datap) "
+        		+ " VALUES (?, ?, ?, ?, ?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, zakl.getNpasp(), zakl.getNgosp(), "С", otd,
+                    new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()),
+                    new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
@@ -1183,6 +1226,10 @@ public class ServerHospital extends Server implements Iface {
 	@Override
     public TRdIshod getRdIshodInfo(int npasp, int ngosp)
 			throws PrdIshodNotFoundException, KmiacServerException {
+        System.out.println("случай родов выбор");
+        System.out.println(npasp);
+        System.out.println(ngosp);
+
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
 		        "SELECT * " +
 		        "FROM c_rd_ishod " +
@@ -1202,37 +1249,26 @@ public class ServerHospital extends Server implements Iface {
 	public int addRdIshod(TRdIshod rdIs) throws KmiacServerException,
 			TException {
         System.out.println("Добавление случая родов");
- 		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
+        System.out.println(rdIs);
+  		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
 		Integer id1 = 0; Integer numr = 0;Integer numdin = 0;
+		rdIs.setId_berem(0);
 		Date datarod = Date(System.currentTimeMillis());
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			 acrs = sse.execPreparedQuery("select max(id) from p_rd_sl where npasp= ? ", 1);
 			 if (acrs.getResultSet().next()) {id1 = acrs.getResultSet().getInt(1);     System.out.println(id1);
 				 acrs1 = sse.execPreparedQuery("select (current_date-datay)/7+yavka1,id_pvizit from p_rd_sl where id= ? ", id1);
 				 if (acrs1.getResultSet().next()){
-				 numr = acrs1.getResultSet().getInt(2);
+				 rdIs.setId_berem(acrs1.getResultSet().getInt(2));
 				 }
 				 acrs1.close();
 				 acrs1 = sse.execPreparedQuery("select max(id_pos) from p_rd_din where id_pvizit = ? ", numr);
 				 if (acrs1.getResultSet().next()) {
                     numdin = acrs1.getResultSet().getInt(1);
                 }
-//				 acrs1.close();
-//				 acrs1 = sse.execPreparedQuery("select (current_date-datap)/7+srok,oj,hdm,polpl,predpl,chcc,serd,serd1,ves from p_rd_din,p_vizit_amb where p_rd_din.id_pos=p_vizit_amb.id and p_rd_din.id_pos= ? ", numdin);
-//				 if (acrs1.getResultSet().next()){
-//					 srok = acrs1.getResultSet().getInt(1);oj = acrs1.getResultSet().getInt(2); 
-//					 hdm = acrs1.getResultSet().getInt(3); polpl = acrs1.getResultSet().getInt(4);
-//					 predpl = acrs1.getResultSet().getInt(5);chcc = acrs1.getResultSet().getInt(6); 
-//					 serd = acrs1.getResultSet().getInt(7); serd1 = acrs1.getResultSet().getInt(8); 
-//					 ves = acrs1.getResultSet().getDouble(9);
-//					 vespl = ((oj*hdm)/4*100+oj*hdm+(hdm-11)*155+ves/20)/4;
-//					}
 				}
-//				int id = sme.getGeneratedKeys().getInt("id");
-			sme.execPrepared("insert into c_rd_ishod (npasp,ngosp,id_berem,serdm,mesto,deyat,shvat,vody,kashetv, "+
-   "poln,potugi,posled,vremp,obol,pupov,obvit,osobp,krov,psih,obezb,eff, "+
-	"prr1,prr2,prr3,prinyl,osmposl,vrash,akush,daterod,vespl,detmesto) "+				
-   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ", true,1,2,numr,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32);
+				sme.execPreparedT("insert into c_rd_ishod (npasp,ngosp,daterod,id_berem) "+				
+						   "VALUES (?,?,?,?) ", true, rdIs, RdIshodtipes,0,1,29,2);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 	        System.out.println("Добавление случая родов готово");
@@ -1270,9 +1306,9 @@ public class ServerHospital extends Server implements Iface {
     public final void updateRdIshod(TRdIshod RdIs) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPreparedT("UPDATE c_rd_ishod SET oj = ?,hdm = ?,polpl = ?,predpl = ?,vidpl = ?,serd = ?,serd1 = ?,serdm = ?,chcc = ?,pozpl = ?,mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
-"posled = ?,vremp = ?,obol = ?,pupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
-"daterod = ?  WHERE ngosp = ? and npasp = ?", false,RdIs, RdIshodtipes,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,0,1);
+		sme.execPreparedT("UPDATE c_rd_ishod SET mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
+"posled = ?,vremp = ?,obol = ?,lpupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
+"daterod = ?, vespl =?, detmesto = ?  WHERE npasp = ? and ngosp = ?", false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,0,1);
 		sme.setCommit();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
@@ -1641,7 +1677,9 @@ public class ServerHospital extends Server implements Iface {
 	public void UpdateRdDin(RdDinStruct Din) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_rd_din SET  srok = ?, grr = ?, ball = ?, oj = ?, hdm = ?, dspos = ?, art1 = ?, art2 = ?, art3 = ?, art4 = ?, spl = ?, oteki = ?, chcc = ?, polpl = ?, predpl = ?, serd = ?, serd1 = ?, ves = ?,ngosp = ?, pozpl = ?,vidpl = ?  WHERE ngosp = ? and npasp = ? ", false, Din, rdDinTypes,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24,22, 2);
+			sme.execPreparedT("UPDATE p_rd_din SET  srok = ?, oj = ?, hdm = ?, chcc = ?, polpl = ?, "+
+		"predpl = ?, serd = ?, serd1 = ?, ves = ?, pozpl = ?, "+
+		"vidpl = ?  WHERE ngosp = ? and npasp = ? ", false, Din, rdDinTypes,3,6,7,15,16,17,18,19,21,23,24, 22,2);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -1993,9 +2031,10 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public int addChildDocument(final TRd_Svid_Rojd ChildDocument)
 			throws KmiacServerException, PatientNotFoundException, TException {
-        final int[] indexes = {0, 2, 3, 4, 5, 6, 7};
-        final String sqlQuery = "INSERT INTO c_rd_svid_rojd (npasp, dateoff, famreb, m_rojd, zan, r_proiz, svidvrach) " +
-        						"VALUES (?, ?, ?, ?, ?, ?, ?);";
+        final int[] indexes = {0, 2, 3, 4, 5, 6, 7, 8};
+        final String sqlQuery = "INSERT INTO c_rd_svid_rojd " +
+        						"(npasp, dateoff, famreb, m_rojd, zan, r_proiz, svid_write, svid_give) " +
+        						"VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildExist(ChildDocument.getNpasp())) {
                 sme.execPreparedT(sqlQuery, true, ChildDocument, CHILD_DOC_BIRTH_TYPES, indexes);
@@ -2031,10 +2070,11 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public void updateChildDocument(final TRd_Svid_Rojd ChildDocument)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        final int[] indexes = {2, 3, 4, 5, 6, 7, 0};
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 0};
         //Поле ndoc изменять нельзя (в списке параметров не присутствует):
         final String sqlQuery = "UPDATE c_rd_svid_rojd " +
-        						"SET dateoff = ?, famreb = ?, m_rojd = ?, zan = ?, r_proiz = ?, svidvrach = ? " +
+        						"SET dateoff = ?, famreb = ?, m_rojd = ?, zan = ?, r_proiz = ?, " +
+        						"svid_write = ?, svid_give = ? " +
         						"WHERE (npasp = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildDocExist(ChildDocument.getNpasp())) {
@@ -2076,7 +2116,7 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public String printChildBirthDocument(final int ndoc)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        final String path;
+        final String pathToReturn;
         final String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
         if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
@@ -2093,12 +2133,12 @@ public class ServerHospital extends Server implements Iface {
         //Создание документа:
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
-        			path = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
+        			pathToReturn = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
         		), "UTF-8")) {
         	File a = new File(this.getClass().getProtectionDomain().getCodeSource()
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().getAbsolutePath()
-                    + "\\plugin\\reports\\ChildBirthDocument.htm");
+                    + ServerHospital.childBirthDocPath);
             String childBirthNumber = String.format("%6d", ndoc);
             childBirthNumber = childBirthNumber.replaceAll(" ", "0");
             SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
@@ -2106,7 +2146,6 @@ public class ServerHospital extends Server implements Iface {
             SimpleDateFormat sdfMonthShort = new SimpleDateFormat("MM");
             SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
             GregorianCalendar dateOff = new GregorianCalendar();
-            GregorianCalendar curDate = new GregorianCalendar();
             dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи мед.свид-ва
             //Местность регистрации матери:
             String city1 = "", city2 = "";
@@ -2341,10 +2380,7 @@ public class ServerHospital extends Server implements Iface {
     			birthHappen[2], birthHappen[3],
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
-        		"",	//ДОЛЖНОСТЬ ВРАЧА
-        		//Текущая дата:
-        		sdfDay.format(curDate.getTimeInMillis()), months[curDate.get(GregorianCalendar.MONTH)],
-        		sdfYear.format(curDate.getTimeInMillis()),
+        		"",	//ДОЛЖНОСТЬ ВРАЧА, ВЫДАВШЕГО СВИДЕТЕЛЬСТВО
         		//Образование матери:
         		motherEduc[0], motherEduc[1],
         		motherEduc[2], motherEduc[3],
@@ -2382,47 +2418,37 @@ public class ServerHospital extends Server implements Iface {
         		whoGetChild[0], whoGetChild[1],
         		whoGetChild[2], whoGetChild[3],
         		whoGetChild[4], whoGetChild[5],
-        		""	//ДОЛЖНОСТЬ ВРАЧА
+        		""	//ДОЛЖНОСТЬ ВРАЧА, ЗАПОЛНИВШЕГО СВИДЕТЕЛЬСТВО
         		);
             osw.write(htmTemplate.getTemplateText());
-            return path;
+            return pathToReturn;
         } catch (Exception e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
 	}
 
 	@Override
-	public String printChildDeathDocument(final int ndoc)
-			throws KmiacServerException, ChildDocNotFoundException, TException {
-        if (isChildDocUnique(ndoc))	//Свидетельства с таким номером не существует
-        	throw new ChildDocNotFoundException();
-		return null;
-	}
-
-	@Override
-	public String printChildBlankDocument(boolean isLiveChild)
+	public String printChildBirthBlankDocument()
 			throws KmiacServerException, TException {
-        final String path, patternPath;
-        if (isLiveChild)	//Печать бланка мед.свидетельства о рождении
-        	patternPath = "\\plugin\\reports\\ChildBirthDocument.htm";
-        else				//Печать бланка мед.свидетельства о перинатальной смерти
-        	patternPath = "\\plugin\\reports\\ChildDeathDocument.htm";
+        final String blankDocPath;
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
-        			path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()
+        			blankDocPath = File.createTempFile("svid_blank_", ".htm").getAbsolutePath()
         		), "UTF-8")) {
         	File a = new File(this.getClass().getProtectionDomain().getCodeSource()
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().
-            		getAbsolutePath() + patternPath);
+            		getAbsolutePath() + ServerHospital.childBirthDocPath);
             htmTemplate.replaceLabel("~seria", ServerHospital.childBirthDocSeries);
             htmTemplate.replaceLabel("~seria", ServerHospital.childBirthDocSeries);
             htmTemplate.replaceLabel("~ndoc", "______");
             htmTemplate.replaceLabel("~ndoc", "______");
             htmTemplate.replaceLabels(true);
 	        osw.write(htmTemplate.getTemplateText());
-	        return path;
+	        return blankDocPath;
 	    } catch (Exception e) {
+            log.log(Level.ERROR, "Exception: ", e);
 	        throw new KmiacServerException();
 	    }
 	}

@@ -435,6 +435,8 @@ struct IsslMet {
 	10: optional string clpu_name;
 	11: optional i32 clpu;
 	12: optional i32 pvizitambId;
+	13: optional i32 cpodr;
+	14: optional i32 kod_lab;
 }
 
 struct IsslPokaz {
@@ -633,6 +635,18 @@ struct VrachInfo {
 	5: optional string short_fio;
 }
 
+struct SpravNetrud {
+	1: optional string fam;
+	2: optional string im;
+	3: optional string oth;
+	4: optional i64 datar;
+	5: optional i32 npasp;
+	6: optional string diag;
+	7: optional i32 userId;
+	8: optional string cpodr_name;
+	9: optional string clpu_name;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -736,6 +750,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	string printSpravNetrud(1: SpravNetrud sn) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
