@@ -141,6 +141,16 @@ service ThriftGenReestr extends kmiacServer.KmiacServer {
 	string getProtokolErrPol(1:string pf) throws (1:kmiacServer.KmiacServerException kse);
 
 	/**
+        * Создает реестр дсп и возвращает протокол проверок реестра
+	*/
+	string getReestrInfoDSP(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
+
+	/**
+        * Записывает код результата проверки реестра и возвращает протокол ошибок
+	*/
+	string getProtokolErrDSP(1:string pf) throws (1:kmiacServer.KmiacServerException kse);
+
+	/**
         * Создает реестр параотделения и возвращает протокол проверок реестра
 	*/
 	string getReestrInfoLDS(1:i32 cpodr, 2:i64 dn, 3:i64 dk, 4:i32 vidreestr, 5:i32 vopl, 6:i32 clpu, 7:i32 terp, 8:i64 df) throws (1:kmiacServer.KmiacServerException kse, 2:ReestrNotFoundException rnfe);
