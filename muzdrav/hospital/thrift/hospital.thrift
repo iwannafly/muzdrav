@@ -158,7 +158,7 @@ struct TRdIshod {
   13: optional i32 posled;
   14: optional string vremp;
   15: optional string obol;
-  16: optional i32 pupov;
+  16: optional i32 lpupov;
   17: optional string obvit;
   18: optional string osobp;
   19: optional i32 krov;
