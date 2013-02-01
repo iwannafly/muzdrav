@@ -68,6 +68,7 @@ import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
 public class ServerHospital extends Server implements Iface {
     //TODO: при изменении региона или серии в регионе - поменять:
 	private static final String childBirthDocSeries = "32";
+	private static final String childBirthDocPath = "\\plugin\\reports\\ChildBirthDocument.htm";
     private static Logger log = Logger.getLogger(ServerHospital.class.getName());
     private TServer tServer;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
@@ -130,7 +131,7 @@ public class ServerHospital extends Server implements Iface {
 	   "apgar1", "apgar5", "krit1", "krit2", "krit3", "krit4", "mert", "donosh", "datazap"
    };
     private static final String[] RDSVID_ROJD_FIELD_NAMES = {
-    	"npasp", "ndoc", "dateoff", "famreb", "m_rojd", "zan", "r_proiz", "svidvrach"
+    	"npasp", "ndoc", "dateoff", "famreb", "m_rojd", "zan", "r_proiz", "svid_write", "svid_give"
    };
     private static final String[] COMMON_PATIENT_FIELD_NAMES = {
         "npasp", "full_name", "datar", "pol", "jitel",
@@ -207,8 +208,10 @@ public class ServerHospital extends Server implements Iface {
     	Boolean.class,	Date.class
     };
     private static final Class<?>[] CHILD_DOC_BIRTH_TYPES = new Class<?>[] {
-	//	npasp,			ndoc,   		dateoff,	famreb,			m_rojd			zan				r_proiz			svidvrach
-    	Integer.class,	Integer.class,	Date.class,	String.class,	Integer.class,	Integer.class,	Integer.class,	Integer.class
+	//	npasp,			ndoc,   		dateoff,	famreb,			m_rojd			zan				r_proiz
+    	Integer.class,	Integer.class,	Date.class,	String.class,	Integer.class,	Integer.class,	Integer.class,
+    //	svid_write		svid_give
+    	Integer.class,	Integer.class
     };
 
     /**
@@ -1993,9 +1996,10 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public int addChildDocument(final TRd_Svid_Rojd ChildDocument)
 			throws KmiacServerException, PatientNotFoundException, TException {
-        final int[] indexes = {0, 2, 3, 4, 5, 6, 7};
-        final String sqlQuery = "INSERT INTO c_rd_svid_rojd (npasp, dateoff, famreb, m_rojd, zan, r_proiz, svidvrach) " +
-        						"VALUES (?, ?, ?, ?, ?, ?, ?);";
+        final int[] indexes = {0, 2, 3, 4, 5, 6, 7, 8};
+        final String sqlQuery = "INSERT INTO c_rd_svid_rojd " +
+        						"(npasp, dateoff, famreb, m_rojd, zan, r_proiz, svid_write, svid_give) " +
+        						"VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildExist(ChildDocument.getNpasp())) {
                 sme.execPreparedT(sqlQuery, true, ChildDocument, CHILD_DOC_BIRTH_TYPES, indexes);
@@ -2031,10 +2035,11 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public void updateChildDocument(final TRd_Svid_Rojd ChildDocument)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        final int[] indexes = {2, 3, 4, 5, 6, 7, 0};
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 0};
         //Поле ndoc изменять нельзя (в списке параметров не присутствует):
         final String sqlQuery = "UPDATE c_rd_svid_rojd " +
-        						"SET dateoff = ?, famreb = ?, m_rojd = ?, zan = ?, r_proiz = ?, svidvrach = ? " +
+        						"SET dateoff = ?, famreb = ?, m_rojd = ?, zan = ?, r_proiz = ?, " +
+        						"svid_write = ?, svid_give = ? " +
         						"WHERE (npasp = ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isChildDocExist(ChildDocument.getNpasp())) {
@@ -2076,7 +2081,7 @@ public class ServerHospital extends Server implements Iface {
 	@Override
 	public String printChildBirthDocument(final int ndoc)
 			throws KmiacServerException, ChildDocNotFoundException, TException {
-        final String path;
+        final String pathToReturn;
         final String[] months = {"января", "февраля", "марта", "апреля", "мая", "июня",
         						"июля", "августа", "сентября", "октября", "ноября", "декабря"};
         if (isChildDocUnique(ndoc))	//Свидетельство с таким номером не существует
@@ -2093,12 +2098,12 @@ public class ServerHospital extends Server implements Iface {
         //Создание документа:
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
-        			path = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
+        			pathToReturn = File.createTempFile("svid_rojd_", ".htm").getAbsolutePath()
         		), "UTF-8")) {
         	File a = new File(this.getClass().getProtectionDomain().getCodeSource()
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().getAbsolutePath()
-                    + "\\plugin\\reports\\ChildBirthDocument.htm");
+                    + ServerHospital.childBirthDocPath);
             String childBirthNumber = String.format("%6d", ndoc);
             childBirthNumber = childBirthNumber.replaceAll(" ", "0");
             SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
@@ -2106,7 +2111,6 @@ public class ServerHospital extends Server implements Iface {
             SimpleDateFormat sdfMonthShort = new SimpleDateFormat("MM");
             SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
             GregorianCalendar dateOff = new GregorianCalendar();
-            GregorianCalendar curDate = new GregorianCalendar();
             dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи мед.свид-ва
             //Местность регистрации матери:
             String city1 = "", city2 = "";
@@ -2341,10 +2345,7 @@ public class ServerHospital extends Server implements Iface {
     			birthHappen[2], birthHappen[3],
     			birthHappen[4], birthHappen[5],
     			birthHappen[6], birthHappen[7],
-        		"",	//ДОЛЖНОСТЬ ВРАЧА
-        		//Текущая дата:
-        		sdfDay.format(curDate.getTimeInMillis()), months[curDate.get(GregorianCalendar.MONTH)],
-        		sdfYear.format(curDate.getTimeInMillis()),
+        		"",	//ДОЛЖНОСТЬ ВРАЧА, ВЫДАВШЕГО СВИДЕТЕЛЬСТВО
         		//Образование матери:
         		motherEduc[0], motherEduc[1],
         		motherEduc[2], motherEduc[3],
@@ -2382,47 +2383,37 @@ public class ServerHospital extends Server implements Iface {
         		whoGetChild[0], whoGetChild[1],
         		whoGetChild[2], whoGetChild[3],
         		whoGetChild[4], whoGetChild[5],
-        		""	//ДОЛЖНОСТЬ ВРАЧА
+        		""	//ДОЛЖНОСТЬ ВРАЧА, ЗАПОЛНИВШЕГО СВИДЕТЕЛЬСТВО
         		);
             osw.write(htmTemplate.getTemplateText());
-            return path;
+            return pathToReturn;
         } catch (Exception e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
 	}
 
 	@Override
-	public String printChildDeathDocument(final int ndoc)
-			throws KmiacServerException, ChildDocNotFoundException, TException {
-        if (isChildDocUnique(ndoc))	//Свидетельства с таким номером не существует
-        	throw new ChildDocNotFoundException();
-		return null;
-	}
-
-	@Override
-	public String printChildBlankDocument(boolean isLiveChild)
+	public String printChildBirthBlankDocument()
 			throws KmiacServerException, TException {
-        final String path, patternPath;
-        if (isLiveChild)	//Печать бланка мед.свидетельства о рождении
-        	patternPath = "\\plugin\\reports\\ChildBirthDocument.htm";
-        else				//Печать бланка мед.свидетельства о перинатальной смерти
-        	patternPath = "\\plugin\\reports\\ChildDeathDocument.htm";
+        final String blankDocPath;
         try (OutputStreamWriter osw = new OutputStreamWriter(
         		new FileOutputStream(
-        			path = File.createTempFile("muzdrav", ".htm").getAbsolutePath()
+        			blankDocPath = File.createTempFile("svid_blank_", ".htm").getAbsolutePath()
         		), "UTF-8")) {
         	File a = new File(this.getClass().getProtectionDomain().getCodeSource()
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().
-            		getAbsolutePath() + patternPath);
+            		getAbsolutePath() + ServerHospital.childBirthDocPath);
             htmTemplate.replaceLabel("~seria", ServerHospital.childBirthDocSeries);
             htmTemplate.replaceLabel("~seria", ServerHospital.childBirthDocSeries);
             htmTemplate.replaceLabel("~ndoc", "______");
             htmTemplate.replaceLabel("~ndoc", "______");
             htmTemplate.replaceLabels(true);
 	        osw.write(htmTemplate.getTemplateText());
-	        return path;
+	        return blankDocPath;
 	    } catch (Exception e) {
+            log.log(Level.ERROR, "Exception: ", e);
 	        throw new KmiacServerException();
 	    }
 	}

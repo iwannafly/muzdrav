@@ -283,13 +283,14 @@ struct TRd_Novor {
 
 struct TRd_Svid_Rojd {
 	1: i32 npasp;
-	2: optional i32 ndoc;
-	3: i64 dateoff;
+	2: i32 ndoc;
+	3: optional i64 dateoff;
 	4: string famreb;
 	5: i32 m_rojd;
 	6: i32 zan;
 	7: i32 r_proiz;
-	8: i32 svidvrach;
+	8: i32 svid_write;
+	9: optional i32 svid_give;
 }
 
 struct TPatientCommonInfo {
@@ -587,11 +588,23 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 	 */
     void updateChildDocument(1:TRd_Svid_Rojd ChildDocument)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
+	/**
+	 * Печать мед.свидетельства о рождении
+	 * @param ndoc Номер свидетельства о рождении
+	 * @return Возвращает строку адреса файла свидетельства
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @throws ChildDocNotFoundException свидетельство не найдено
+	 * @author Балабаев Никита Дмитриевич
+	 */
     string printChildBirthDocument(1:i32 ndoc)
     	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
-    string printChildDeathDocument(1:i32 ndoc)
-    	throws (1:kmiacServer.KmiacServerException kse, 2:ChildDocNotFoundException cdnfe);
-    string printChildBlankDocument(1:bool isLiveChild)
+	/**
+	 * Печать бланка мед.свидетельства о рождении
+	 * @return Возвращает строку адреса файла свидетельства
+	 * @throws KmiacServerException исключение на стороне сервера
+	 * @author Балабаев Никита Дмитриевич
+	 */
+    string printChildBirthBlankDocument()
     	throws (1:kmiacServer.KmiacServerException kse);
     /**
 	 * Получение информации о пациенте
