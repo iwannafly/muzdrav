@@ -478,6 +478,9 @@ public class Vvod extends JFrame {
 					  			if (pd.diag_stat == 1) {
 					  				pvizitAmb.setDiag(pd.getDiag());
 					  				spr.setDiag(pd.diag);}
+							spr.setUserId(MainForm.authInfo.user_id);
+							spr.setCpodr_name(MainForm.authInfo.getCpodr_name());
+							spr.setClpu_name(MainForm.authInfo.getClpu_name());
        						String servPath = MainForm.tcl.printSpravNetrud(spr);
        						String cliPath = File.createTempFile("spravNetrud", ".htm").getAbsolutePath();
        						MainForm.conMan.transferFileFromServer(servPath, cliPath);
@@ -493,25 +496,25 @@ public class Vvod extends JFrame {
 				});
 				menu.add(mi6);
 				
-				JMenuItem mi7 = new JMenuItem("Справка в бассейн");
-				mi7.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-						try{
-								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
-								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
-								MainForm.conMan.transferFileFromServer(servPath, cliPath);
-	       						MainForm.conMan.openFileInEditor(cliPath, false);
-						}
-						catch (TException e1) {
-							e1.printStackTrace();
-							MainForm.conMan.reconnect(e1);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-					}
-				});
-				menu.add(mi7);
+//				JMenuItem mi7 = new JMenuItem("Справка в бассейн");
+//				mi7.addActionListener(new ActionListener() {
+//					@Override
+//					public void actionPerformed(ActionEvent arg0) {
+//						try{
+//								String servPath = MainForm.tcl.printMSK(zapVr.getNpasp());
+//								String cliPath = File.createTempFile("msk", ".htm").getAbsolutePath();
+//								MainForm.conMan.transferFileFromServer(servPath, cliPath);
+//	       						MainForm.conMan.openFileInEditor(cliPath, false);
+//						}
+//						catch (TException e1) {
+//							e1.printStackTrace();
+//							MainForm.conMan.reconnect(e1);
+//						} catch (Exception e1) {
+//							e1.printStackTrace();
+//						}
+//					}
+//				});
+//				menu.add(mi7);
 				
 				menu.show(btnPrint, 0, btnPrint.getHeight());
 			}
@@ -1966,11 +1969,16 @@ public class Vvod extends JFrame {
 							isslmet.setUserId(MainForm.authInfo.getUser_id());
 							isslmet.setNpasp(Vvod.zapVr.getNpasp());
 							isslmet.setPokaz(selItems);
-							if (cmbNaprMesto.getSelectedItem() != null) isslmet.setMesto(cmbNaprMesto.getSelectedItem().getName());
+							if (cmbNaprMesto.getSelectedItem() != null) {
+								isslmet.setMesto(cmbNaprMesto.getSelectedItem().getName());
+								isslmet.setKod_lab(cmbNaprMesto.getSelectedItem().getPcod());
+							}
 							isslmet.setKab(getTextOrNull(tbNaprKab.getText()));
 							isslmet.setClpu(cmbLpu.getSelectedPcod());
-							isslmet.setClpu_name(MainForm.authInfo.getClpu_name());
+							isslmet.setClpu_name(cmbLpu.getSelectedItem().getName());
 							isslmet.setCpodr_name(MainForm.authInfo.getCpodr_name());
+							isslmet.setCpodr(MainForm.authInfo.getCpodr());
+							
 							String servPath = MainForm.tcl.printIsslMetod(isslmet);
 							String cliPath = File.createTempFile("muzdrav", ".htm").getAbsolutePath();
 							MainForm.conMan.transferFileFromServer(servPath, cliPath);	

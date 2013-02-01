@@ -435,6 +435,8 @@ struct IsslMet {
 	10: optional string clpu_name;
 	11: optional i32 clpu;
 	12: optional i32 pvizitambId;
+	13: optional i32 cpodr;
+	14: optional i32 kod_lab;
 }
 
 struct IsslPokaz {
@@ -640,6 +642,9 @@ struct SpravNetrud {
 	4: optional i64 datar;
 	5: optional i32 npasp;
 	6: optional string diag;
+	7: optional i32 userId;
+	8: optional string cpodr_name;
+	9: optional string clpu_name;
 }
 
 exception PvizitNotFoundException {

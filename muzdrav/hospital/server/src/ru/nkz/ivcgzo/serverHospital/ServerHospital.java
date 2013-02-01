@@ -93,7 +93,7 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] PATIENT_FIELD_NAMES = {
         "npasp", "id_gosp", "datar", "fam", "im", "ot", "pol", "nist", "sgrp", "poms",
-        "pdms", "mrab", "npal", "reg_add", "real_add"
+        "pdms", "mrab", "npal", "reg_add", "real_add", "ngosp"
     };
     private static final String[] LIFE_HISTORY_FIELD_NAMES = {
         "npasp", "allerg", "farmkol", "vitae"
@@ -123,7 +123,7 @@ public class ServerHospital extends Server implements Iface {
     private static final String[] RDISHOD_FIELD_NAMES = {
    "npasp","ngosp","id_berem","id","serdm","mesto",
    "deyat","shvat","vody","kashetv","poln","potugi",
-   "posled","vremp","obol","pupov","obvit","osobp","krov","psih","obezb",
+   "posled","vremp","obol","lpupov","obvit","osobp","krov","psih","obezb",
    "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","vespl","detmesto"
    };
     private static final String[] RDNOVOR_FIELD_NAMES = {
@@ -145,7 +145,7 @@ public class ServerHospital extends Server implements Iface {
      Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
 //    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
      String.class,String.class,String.class,String.class,String.class,String.class,
-//    	   "posled",     "vremp",        "obol",      "pupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
+//    	   "posled",     "vremp",        "obol",      "lpupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
      Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
 //    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",        "vespl", "detmesto"
      Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Double.class,String.class
@@ -329,7 +329,8 @@ public class ServerHospital extends Server implements Iface {
                 + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
                 + "n_z43.name_s as mrab, c_otd.npal, "
                 + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
-                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add "
+                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add, "
+                + "c_gosp.ngosp "
                 + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
                 + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
                 + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
@@ -354,10 +355,10 @@ public class ServerHospital extends Server implements Iface {
 
     @Override
     public final void updatePatientChamberNumber(final int gospId, final int chamberNum,
-            final int profPcod) throws KmiacServerException {
-        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ? WHERE id_gosp = ?;";
+            final int profPcod, final int nist) throws KmiacServerException {
+        final String sqlQuery = "UPDATE c_otd SET npal = ?, cprof = ?, nist = ? WHERE id_gosp = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
-            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, gospId);
+            sme.execPrepared(sqlQuery, false, chamberNum, profPcod, nist, gospId);
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             throw new KmiacServerException();
@@ -745,19 +746,26 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final void addZakl(final Zakl zakl) throws KmiacServerException {
+    public final void addZakl(final Zakl zakl, final int otd) throws KmiacServerException {
         String sqlQuery = "UPDATE c_otd SET result = ?, ishod = ?, datav = ?, vremv = ?, "
             + "sostv = ?, recom = ?, vrach = ?,  vid_opl = ?, vid_pom = ?, ukl = ? "
             + "WHERE id_gosp = ?";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (zakl.isSetNewOtd() && (zakl.getIshod() == 3)) {
-                sqlQuery = "UPDATE c_otd SET ishod = ?, "
-                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
-                    + "WHERE id_gosp = ?";
-                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
-                    zakl.getSostv(), zakl.getRecom(),
-                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
-                    zakl.getIdGosp());
+                int newIdGosp = addToGosp(zakl, otd);
+                addToOtd(zakl, newIdGosp);
+                sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
+                        new Date(zakl.getDatav()), new Time(zakl.getVremv()),
+                        zakl.getSostv(), zakl.getRecom(),
+                        null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+                        zakl.getIdGosp());
+//                sqlQuery = "UPDATE c_otd SET ishod = ?, "
+//                    + "sostv = ?, recom = ?, vrach = ?, vid_opl = ?, vid_pom = ?, ukl = ? "
+//                    + "WHERE id_gosp = ?";
+//                sme.execPrepared(sqlQuery, false, zakl.getIshod(),
+//                    zakl.getSostv(), zakl.getRecom(),
+//                    null, zakl.getVidOpl(), zakl.getVidPom(), zakl.getUkl(),
+//                    zakl.getIdGosp());
             } else {
                 sme.execPrepared(sqlQuery, false, zakl.getResult(), zakl.getIshod(),
                     new Date(zakl.getDatav()), new Time(zakl.getVremv()),
@@ -768,6 +776,38 @@ public class ServerHospital extends Server implements Iface {
             sme.setCommit();
         } catch (SQLException | InterruptedException e) {
             log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private int addToOtd(final Zakl zakl, final int idGosp)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_otd (id_gosp, cotd, dataz) VALUES (?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, idGosp, zakl.getNewOtd(),
+                    new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    private int addToGosp(final Zakl zakl, final int otd)
+            throws KmiacServerException {
+        String sqlQuery = "INSERT INTO c_gosp (npasp, ngosp, naprav, n_org, dataz, datagos, datap) "
+        		+ " VALUES (?, ?, ?, ?, ?, ?, ?);";
+        try (SqlModifyExecutor sme = tse.startTransaction()) {
+            sme.execPrepared(sqlQuery, true, zakl.getNpasp(), zakl.getNgosp(), "С", otd,
+                    new Date(System.currentTimeMillis()), new Date(System.currentTimeMillis()),
+                    new Date(System.currentTimeMillis()));
+            int id = sme.getGeneratedKeys().getInt("id");
+            sme.setCommit();
+            return id;
+        } catch (SQLException | InterruptedException e) {
+            log.log(Level.ERROR, "SQl Exception: ", e);
             throw new KmiacServerException();
         }
     }
@@ -1186,6 +1226,10 @@ public class ServerHospital extends Server implements Iface {
 	@Override
     public TRdIshod getRdIshodInfo(int npasp, int ngosp)
 			throws PrdIshodNotFoundException, KmiacServerException {
+        System.out.println("случай родов выбор");
+        System.out.println(npasp);
+        System.out.println(ngosp);
+
 	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
 		        "SELECT * " +
 		        "FROM c_rd_ishod " +
@@ -1205,37 +1249,26 @@ public class ServerHospital extends Server implements Iface {
 	public int addRdIshod(TRdIshod rdIs) throws KmiacServerException,
 			TException {
         System.out.println("Добавление случая родов");
- 		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
+        System.out.println(rdIs);
+  		AutoCloseableResultSet acrs = null; AutoCloseableResultSet acrs1 = null;
 		Integer id1 = 0; Integer numr = 0;Integer numdin = 0;
+		rdIs.setId_berem(0);
 		Date datarod = Date(System.currentTimeMillis());
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 			 acrs = sse.execPreparedQuery("select max(id) from p_rd_sl where npasp= ? ", 1);
 			 if (acrs.getResultSet().next()) {id1 = acrs.getResultSet().getInt(1);     System.out.println(id1);
 				 acrs1 = sse.execPreparedQuery("select (current_date-datay)/7+yavka1,id_pvizit from p_rd_sl where id= ? ", id1);
 				 if (acrs1.getResultSet().next()){
-				 numr = acrs1.getResultSet().getInt(2);
+				 rdIs.setId_berem(acrs1.getResultSet().getInt(2));
 				 }
 				 acrs1.close();
 				 acrs1 = sse.execPreparedQuery("select max(id_pos) from p_rd_din where id_pvizit = ? ", numr);
 				 if (acrs1.getResultSet().next()) {
                     numdin = acrs1.getResultSet().getInt(1);
                 }
-//				 acrs1.close();
-//				 acrs1 = sse.execPreparedQuery("select (current_date-datap)/7+srok,oj,hdm,polpl,predpl,chcc,serd,serd1,ves from p_rd_din,p_vizit_amb where p_rd_din.id_pos=p_vizit_amb.id and p_rd_din.id_pos= ? ", numdin);
-//				 if (acrs1.getResultSet().next()){
-//					 srok = acrs1.getResultSet().getInt(1);oj = acrs1.getResultSet().getInt(2); 
-//					 hdm = acrs1.getResultSet().getInt(3); polpl = acrs1.getResultSet().getInt(4);
-//					 predpl = acrs1.getResultSet().getInt(5);chcc = acrs1.getResultSet().getInt(6); 
-//					 serd = acrs1.getResultSet().getInt(7); serd1 = acrs1.getResultSet().getInt(8); 
-//					 ves = acrs1.getResultSet().getDouble(9);
-//					 vespl = ((oj*hdm)/4*100+oj*hdm+(hdm-11)*155+ves/20)/4;
-//					}
 				}
-//				int id = sme.getGeneratedKeys().getInt("id");
-			sme.execPrepared("insert into c_rd_ishod (npasp,ngosp,id_berem,serdm,mesto,deyat,shvat,vody,kashetv, "+
-   "poln,potugi,posled,vremp,obol,pupov,obvit,osobp,krov,psih,obezb,eff, "+
-	"prr1,prr2,prr3,prinyl,osmposl,vrash,akush,daterod,vespl,detmesto) "+				
-   "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ", true,1,2,numr,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32);
+				sme.execPreparedT("insert into c_rd_ishod (npasp,ngosp,daterod,id_berem) "+				
+						   "VALUES (?,?,?,?) ", true, rdIs, RdIshodtipes,0,1,29,2);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 	        System.out.println("Добавление случая родов готово");
@@ -1273,9 +1306,9 @@ public class ServerHospital extends Server implements Iface {
     public final void updateRdIshod(TRdIshod RdIs) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPreparedT("UPDATE c_rd_ishod SET oj = ?,hdm = ?,polpl = ?,predpl = ?,vidpl = ?,serd = ?,serd1 = ?,serdm = ?,chcc = ?,pozpl = ?,mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
-"posled = ?,vremp = ?,obol = ?,pupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
-"daterod = ?  WHERE ngosp = ? and npasp = ?", false,RdIs, RdIshodtipes,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,0,1);
+		sme.execPreparedT("UPDATE c_rd_ishod SET mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
+"posled = ?,vremp = ?,obol = ?,lpupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
+"daterod = ?, vespl =?, detmesto = ?  WHERE npasp = ? and ngosp = ?", false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,0,1);
 		sme.setCommit();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
@@ -1644,7 +1677,9 @@ public class ServerHospital extends Server implements Iface {
 	public void UpdateRdDin(RdDinStruct Din) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_rd_din SET  srok = ?, grr = ?, ball = ?, oj = ?, hdm = ?, dspos = ?, art1 = ?, art2 = ?, art3 = ?, art4 = ?, spl = ?, oteki = ?, chcc = ?, polpl = ?, predpl = ?, serd = ?, serd1 = ?, ves = ?,ngosp = ?, pozpl = ?,vidpl = ?  WHERE ngosp = ? and npasp = ? ", false, Din, rdDinTypes,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23,24,22, 2);
+			sme.execPreparedT("UPDATE p_rd_din SET  srok = ?, oj = ?, hdm = ?, chcc = ?, polpl = ?, "+
+		"predpl = ?, serd = ?, serd1 = ?, ves = ?, pozpl = ?, "+
+		"vidpl = ?  WHERE ngosp = ? and npasp = ? ", false, Din, rdDinTypes,3,6,7,15,16,17,18,19,21,23,24, 22,2);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

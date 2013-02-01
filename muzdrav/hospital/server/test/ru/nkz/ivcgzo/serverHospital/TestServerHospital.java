@@ -98,7 +98,8 @@ public class TestServerHospital {
         final int gospId = 4;
         final int chamberNum = 108;
         final int profPcod = 123;
-        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod);
+        final int nist = 1;
+        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod, nist);
     }
 
     @Test

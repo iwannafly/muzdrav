@@ -31,7 +31,8 @@ struct TPatient{
 	12:string job;
 	13:i32 chamber;
 	14:string registrationAddress;
-	15:string realAddress;	
+	15:string realAddress;
+	16:i32 ngosp;
 }
 
 struct TBirthPlace{
@@ -123,6 +124,8 @@ struct Zakl {
 	9: optional i32 vidOpl;
 	10: optional i32 vidPom;
 	11: optional double ukl;
+	12: optional i32 npasp;
+	13: optional i32 ngosp;
 }
 
 struct TStage {
@@ -155,7 +158,7 @@ struct TRdIshod {
   13: optional i32 posled;
   14: optional string vremp;
   15: optional string obol;
-  16: optional i32 pupov;
+  16: optional i32 lpupov;
   17: optional string obvit;
   18: optional string osobp;
   19: optional i32 krov;
@@ -427,7 +430,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
-	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod)
+	void updatePatientChamberNumber(1:i32 gospId, 2:i32 chamberNum, 3:i32 profPcod, 4:i32 nist)
 		throws (1:kmiacServer.KmiacServerException kse);
 	
 	TLifeHistory getLifeHistory(1:i32 patientId) throws (1:LifeHistoryNotFoundException lhnfe,
@@ -461,7 +464,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
     void deleteDiagnosis(1:i32 id) throws (1:kmiacServer.KmiacServerException kse);
 
 	void disharge(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
-	void addZakl(1:Zakl zakl) throws (1:kmiacServer.KmiacServerException kse);
+	void addZakl(1:Zakl zakl, 2:i32 otd) throws (1:kmiacServer.KmiacServerException kse);
 
 	list<TStage> getStage(1:i32 idGosp) throws (1:kmiacServer.KmiacServerException kse);
 	i32 addStage(1:TStage stage) throws (1:kmiacServer.KmiacServerException kse,
