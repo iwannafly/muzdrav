@@ -195,11 +195,12 @@ public class SettingsForm extends JDialog {
 				try {		//формирование реестров
 					if((tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
 						if (Cslu == 1){
-				        	String clpu = null;
-				        	if (Integer.toString(MainForm.authInfo.getClpu()).length() == 2)clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
-				        	else clpu = Integer.toString(MainForm.authInfo.getClpu());
-				        	if(cmb_podr.getSelectedPcod() != null) servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
-				        	else servPath = MainForm.tcl.getReestrInfoOtd(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
+				        	String clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
+			        		if(cmb_podr.getSelectedPcod() != null){ 
+//			        			if (Integer.toString(cmb_podr.getSelectedPcod()).length() == 2)clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
+//			        			else clpu = Integer.toString(cmb_podr.getSelectedPcod());
+			        			servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
+			        		}else servPath = MainForm.tcl.getReestrInfoOtd(0, tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
 				        	cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+clpu+".rar";
 						}
 				        if (Cslu == 2){
@@ -210,12 +211,21 @@ public class SettingsForm extends JDialog {
 								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
 				        if (Cslu == 3){
-				        	String clpu = null;
-				        	if (Integer.toString(cmb_podr.getSelectedPcod()).length() == 2)clpu = "0"+Integer.toString(cmb_podr.getSelectedPcod());
-				        	else clpu = Integer.toString(cmb_podr.getSelectedPcod());
-			        		if(cmb_podr.getSelectedPcod() != null) servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-			        		else servPath = MainForm.tcl.getReestrInfoLDS(MainForm.authInfo.getClpu(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        	String clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
+			        		if(cmb_podr.getSelectedPcod() != null){ 
+					        	if (Integer.toString(cmb_podr.getSelectedPcod()).length() == 2)clpu = "0"+Integer.toString(cmb_podr.getSelectedPcod());
+					        	else clpu = Integer.toString(cmb_podr.getSelectedPcod());
+			        			servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+			        		}
+			        		else servPath = MainForm.tcl.getReestrInfoLDS(0, tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
 							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+clpu+"_usl.rar";
+				        }
+				        if (Cslu == 4){
+				        	if(cmb_podr.getSelectedPcod() != null){
+				        		servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+							}else
+								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
 				        
 				        if (servPath.endsWith("zip")){
@@ -284,25 +294,31 @@ public class SettingsForm extends JDialog {
 		        if (Cslu == 1){//стационар
 //		        	if (MainForm.authInfo.getCpodr() == 0)
 //		        		cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getClpu()));
-//		        	else
-//		        		cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	else cmb_podr.setData(MainForm.tcl.getOtdForCurrentLpu(MainForm.authInfo.getCpodr()));
 	        		cmb_podr.setData(MainForm.tcl.getAllOtdForCurrentLpu(MainForm.authInfo.getClpu()));
+	        		cmb_podr.setSelectedPcod(MainForm.authInfo.getClpu());
 				}
 		        if (Cslu == 2){//поликлиника
 //		        	if (MainForm.authInfo.getCpodr() == 0)
 //		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
-//		        	else
-//		        		cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
-	        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
+//		        	else	cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
+		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 				}
 		        if (Cslu == 3){//лдс
 //		        	if (MainForm.authInfo.getCpodr() == 0)
 //		        		cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getClpu()));
-//		        	else
-//		        		cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
+//		        	else	cmb_podr.setData(MainForm.tcl.getLDSForCurrentLpu(MainForm.authInfo.getCpodr()));
 	        		cmb_podr.setData(MainForm.tcl.getAllLDSForCurrentLpu(MainForm.authInfo.getClpu()));
+		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getClpu());
 		        }
-	        	if (cmb_podr.getSelectedItem() != null)cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+		        if (Cslu == 4){//дсп
+//		        	if (MainForm.authInfo.getCpodr() == 0)
+//		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
+//		        	else	cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
+		        	cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
+		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
+				}
 			} catch (KmiacServerException e) {
 				e.printStackTrace();
 			} catch (TException e) {
