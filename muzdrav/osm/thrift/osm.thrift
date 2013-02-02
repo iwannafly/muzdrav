@@ -112,7 +112,7 @@ struct Priem{
 	8: optional i32 n_lek;
 	9: optional string t_chss;
 	10: optional string t_temp;
-	11: optional string t_ad;
+	11: optional string t_ad_sist;
 	12: optional string t_rost;
 	13: optional string t_ves;
 	14: optional string t_st_localis;
@@ -121,6 +121,7 @@ struct Priem{
 	17: optional string t_status_praesense;
 	18: optional string t_fiz_obsl;
 	19: optional string t_recom;
+	20: optional string t_ad_dist;
 }
 
 struct AnamZab{
@@ -763,6 +764,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_tip() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_m00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_p0c() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PrdslNotFoundException pnf);
