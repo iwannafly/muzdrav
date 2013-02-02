@@ -266,26 +266,26 @@ public class PatientInfoForm extends ModalForm {
 							MainForm.conMan.reconnect(e1);
 						}
 		 				
-						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
-							
-		 					if (issl.isSetNisl()) {
-		 						addHeader("");
-		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
-		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
-		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
-		 					if (issl.getGruppa()==2)
-		 					{
-		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
-			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
-	
-		 					}
-		 					}
-		 				}
+//						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+//							
+//		 					if (issl.isSetNisl()) {
+//		 						addHeader("");
+//		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
+//		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
+//		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+//		 					if (issl.getGruppa()==2)
+//		 					{
+//		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
+//			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
+//	
+//		 					}
+//		 					}
+//		 				}
 						 addHeader("");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование мед.документа, выписанного пациенту",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование для направления",pnapr.isSetText(),pnapr.getText());
-		 					addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
+		 					///addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
 		 				}
 						if ((pvizit.isSetZakl()) || (pvizit.isSetRecomend()) || (pvizit.isSetLech())) addHeader("");
 		 				addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
@@ -293,7 +293,7 @@ public class PatientInfoForm extends ModalForm {
 			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());
 						if ((pvizit.isSetIshod()) || (pvizit.isSetRezult())) addHeader("");
 			 			addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
+						//addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
 	
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitAmbNode) {
@@ -326,6 +326,21 @@ public class PatientInfoForm extends ModalForm {
 		 					if (pdiagamb.predv==false) addHeader("Вид диагноза: заключительный");
 		 					else addHeader("Вид диагноза: предварительный");
 		 					}
+						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pam.getId())) {
+							
+		 					if (issl.isSetNisl()) {
+		 						addHeader("");
+		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
+		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
+		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+		 					if (issl.getGruppa()==2)
+		 					{
+		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
+			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
+	
+		 					}
+		 					}
+		 				}
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 			 		} else if (lastPath instanceof RdslTreeNode) {
