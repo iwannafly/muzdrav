@@ -195,18 +195,18 @@ public class SettingsForm extends JDialog {
 				try {		//формирование реестров
 					if((tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
 						if (Cslu == 1){
-				        	String clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
+				        	String clpu = "100"+Integer.toString(MainForm.authInfo.getClpu());
 			        		if(cmb_podr.getSelectedPcod() != null){ 
 //			        			if (Integer.toString(cmb_podr.getSelectedPcod()).length() == 2)clpu = "0"+Integer.toString(MainForm.authInfo.getClpu());
 //			        			else clpu = Integer.toString(cmb_podr.getSelectedPcod());
 			        			servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
 			        		}else servPath = MainForm.tcl.getReestrInfoOtd(0, tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
-				        	cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+clpu+".rar";
+				        	cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+clpu+".rar";
 						}
 				        if (Cslu == 2){
 				        	if(cmb_podr.getSelectedPcod() != null){
 				        		servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+cmb_podr.getSelectedPcod()+".rar";
 							}else
 								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
@@ -222,8 +222,8 @@ public class SettingsForm extends JDialog {
 				        }
 				        if (Cslu == 4){
 				        	if(cmb_podr.getSelectedPcod() != null){
-				        		servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+MainForm.authInfo.getKdate()+cmb_podr.getSelectedPcod()+".rar";
+				        		servPath = MainForm.tcl.getReestrInfoDSP(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
+				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+cmb_podr.getSelectedPcod()+".rar";
 							}else
 								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
