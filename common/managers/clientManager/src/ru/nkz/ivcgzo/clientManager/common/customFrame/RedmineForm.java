@@ -2,19 +2,12 @@ package ru.nkz.ivcgzo.clientManager.common.customFrame;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
@@ -33,7 +26,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
 import ru.nkz.ivcgzo.clientManager.common.redmineManager.Issue;
-import ru.nkz.ivcgzo.clientManager.common.redmineManager.IssueStatus;
 import ru.nkz.ivcgzo.clientManager.common.redmineManager.RedmineManager;
 import ru.nkz.ivcgzo.clientManager.common.redmineManager.Tracker;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextComponentWrapper;
@@ -41,21 +33,23 @@ import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 
 public class RedmineForm extends JDialog {
 	private static final long serialVersionUID = 5470717605761333268L;
+	private String redmineServerAddr;
 	private RedmineManager rmg;
-	private com.taskadapter.redmineapi.RedmineManager rmg1;
 	private String prKey;
 	private List<Issue> issLst;
 	private List<Tracker> trcLst;
-	private List<IssueStatus> staLst;
+//	private List<IssueStatus> staLst;
 	private JTable tblIssues;
 	private JComboBox<Tracker> cmbTracker;
 	private CustomTextField tbSubject;
 	private JTextArea tbDesc;
 	private JButton btnAdd;
 	
-	public RedmineForm() {
+	public RedmineForm(String redmineServerAddr) {
+		this.redmineServerAddr = redmineServerAddr;
+		
 		setModalityType(ModalityType.APPLICATION_MODAL);
-		setTitle("Просмотр/редактирование ошибок");
+		setTitle("Просмотр/редактирование задач");
 		setBounds(100, 100, 800, 600);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 		
@@ -144,7 +138,7 @@ public class RedmineForm extends JDialog {
 					addIssue();
 				} catch (Exception e1) {
 					e1.printStackTrace();
-					JOptionPane.showMessageDialog(RedmineForm.this, "Не удалось добавить ошибку.");
+					JOptionPane.showMessageDialog(RedmineForm.this, "Не удалось добавить задачу.");
 				}
 			}
 		});
@@ -185,20 +179,20 @@ public class RedmineForm extends JDialog {
 				JOptionPane.showMessageDialog(this, "Не удалось загрузить список типов.");
 				return;
 			}
-			try {
-				staLst = rmg.getIssueStatusList();
-			} catch (Exception e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Не удалось загрузить список статусов.");
-				return;
-			}
+//			try {
+//				staLst = rmg.getIssueStatusList();
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//				JOptionPane.showMessageDialog(this, "Не удалось загрузить список статусов.");
+//				return;
+//			}
 			try {
 				issLst = getIssuesList();
 				setTableModel();
 				clearFields();
 			} catch (Exception e) {
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Не удалось загрузить список ошибок.");
+				JOptionPane.showMessageDialog(this, "Не удалось загрузить список задач.");
 				return;
 			}
 		} else {
@@ -208,8 +202,7 @@ public class RedmineForm extends JDialog {
 	}
 	
 	private void redmineConnect() {
-		rmg = new RedmineManager("http://cds:3000", "1646ce420d7a4651d474c6eaa273b8ff1e251f64");
-		rmg1 = new com.taskadapter.redmineapi.RedmineManager("http://cds:3000", "1646ce420d7a4651d474c6eaa273b8ff1e251f64");
+		rmg = new RedmineManager(redmineServerAddr, "1646ce420d7a4651d474c6eaa273b8ff1e251f64");
 	}
 	
 	private List<Issue> getIssuesList() throws Exception {
@@ -222,24 +215,24 @@ public class RedmineForm extends JDialog {
 		clearFields();
 	}
 	
-	private com.taskadapter.redmineapi.bean.Attachment uploadScreenShot() {
-		com.taskadapter.redmineapi.bean.Attachment res = null;
-		
-		try {
-			BufferedImage rawImgStr = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-			ByteArrayOutputStream outPngStr = new ByteArrayOutputStream();
-			ImageIO.write(rawImgStr, "png", outPngStr);
-			ByteArrayInputStream inpPngStr = new ByteArrayInputStream(outPngStr.toByteArray());
-			outPngStr.close();
-			//TODO need albert
-			res = rmg1.uploadAttachment("alala.png", "application/octet-stream", inpPngStr);
-			inpPngStr.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return res;
-	}
+//TODO fix later
+//	private com.taskadapter.redmineapi.bean.Attachment uploadScreenShot() {
+//		com.taskadapter.redmineapi.bean.Attachment res = null;
+//		
+//		try {
+//			BufferedImage rawImgStr = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+//			ByteArrayOutputStream outPngStr = new ByteArrayOutputStream();
+//			ImageIO.write(rawImgStr, "png", outPngStr);
+//			ByteArrayInputStream inpPngStr = new ByteArrayInputStream(outPngStr.toByteArray());
+//			outPngStr.close();
+//			res = rmg1.uploadAttachment("alala.png", "application/octet-stream", inpPngStr);
+//			inpPngStr.close();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return res;
+//	}
 	
 	private void setTableModel() {
 		tblIssues.setModel(new TableModel() {

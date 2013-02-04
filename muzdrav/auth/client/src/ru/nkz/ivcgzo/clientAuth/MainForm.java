@@ -76,22 +76,27 @@ public class MainForm {
 		if (args.length == 0) {
 			System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
 			appServerIp = "localhost";
+			CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 		} else {
 			if (args[0].equals("tst")) {
 				System.out.println("Using test application server.");
 				appServerIp = "10.0.0.248";
+				CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 			} else if (args[0].equals("int")) {
 				System.out.println("Using internal application server.");
 				appServerIp = "10.0.0.243";
+				CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 			} else if (args[0].equals("ext")) {
 				System.out.println("Using external application server.");
 				appServerIp = "10.1.1.8";
+				CustomFrame.redmineServerAddr = "http://10.1.1.11:3000";
 			} else if (ipPattern.matcher(args[0]).matches()) {
 				appServerIp = args[0];
 				System.out.println(String.format("Using %s application server.", appServerIp));
 			} else {
 				System.out.println("No valid application server alias (tst, int, ext) or ip address specified. Using dev server.");
 				appServerIp = "localhost";
+				CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 			}
 			if (args.length > 1)
 				if (args.length > 3) {
@@ -166,6 +171,8 @@ public class MainForm {
 		frame.setBounds(100, 100, 600, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		frame.setMmIssuesListener("auth");
+		frame.setMmHelpListener("projects/auth/wiki/Ввод_логина_и_пароля");
 		
 		pnlLogin = new JPanel();
 		frame.getContentPane().add(pnlLogin, BorderLayout.CENTER);
@@ -395,6 +402,8 @@ public class MainForm {
 		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);
 		frame.getContentPane().validate();
 		
+		frame.setMmHelpListener("projects/auth/wiki/Выбор_доступного_модуля");
+
 		showPluginList();
 	}
 	

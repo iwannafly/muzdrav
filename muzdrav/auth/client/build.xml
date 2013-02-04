@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="clientAuth" default="main_d" basedir=".">
+<project name="clientAuth" default="main_d" basedir="." xmlns:fx="javafx:com.sun.javafx.tools.ant">
 	
 	<!-- Создание свойств, используемых далее в текущем скрипте -->
 	<property name="src_client.dir" location="src" />
@@ -63,6 +63,11 @@
 	
 	<!-- Создание jar файла -->
 	<target name="jar" depends="compile" description="Создание jar">
+		<property environment="env" />
+		<taskdef resource="com/sun/javafx/tools/ant/antlib.xml"      
+			uri="javafx:com.sun.javafx.tools.ant"
+			classpath=".:${env.JAVA_HOME}\lib\ant-javafx.jar" />    
+		
 		<condition property="libr.dir" value="${lib.dir}" else="${lib.only.dir}">
 			<equals arg1="${debug.build}" arg2="true" />
 		</condition>
@@ -76,13 +81,16 @@
 			</mapper>
 		</pathconvert>
 		
-		<jar destfile="${export.file}" basedir="${build.dir}" >
+		<fx:jar destfile="${export.file}" >
+			<fx:application name="Muzdrav" mainClass="${main.class}"/>
+			
+			<fileset dir="${build.dir}" />
 			<fileset dir="${bin_client_manager.dir}" excludes="**/thriftCommon/" />
 			<manifest>
-				<attribute name="Main-Class" value="${main.class}" />
 				<attribute name="Class-Path" value=". ${jar.classpath}"/>
 			</manifest>
-		</jar>
+		</fx:jar>
+		
 		<copy file="${export.file}" todir="${manager.dir}" overwrite="true" force="true" />
 		
 		<antcall target="compileLauncher">

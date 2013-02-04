@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
@@ -19,14 +20,20 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 public class CustomFrame extends JFrame {
 	private static final long serialVersionUID = -3739385239668692352L;
 	public static UserAuthInfo authInfo;
+	public static String redmineServerAddr;
+	protected JMenuBar menuBar;
+	protected JMenu mmIssues;
+	protected JMenu mmHelp;
+	private MouseAdapter issuesListener;
+	private MouseAdapter helpListener;
 	private RedmineForm redmineFrm;
 	private HelpForm helpFrm;
 	
 	public CustomFrame() {
-		redmineFrm = new RedmineForm();
-		helpFrm = new HelpForm();
+		redmineFrm = new RedmineForm(redmineServerAddr);
+		helpFrm = new HelpForm(redmineServerAddr);
 		
-		JMenuBar menuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
 		JMenu mmFile = new JMenu("Файл");
@@ -52,26 +59,54 @@ public class CustomFrame extends JFrame {
 		Component horizontalGlue = Box.createHorizontalGlue();
 		menuBar.add(horizontalGlue);
 		
-		JMenu mmErrors = new JMenu("Ошибки");
-		mmErrors.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				redmineFrm.setVisible("auth", true);
-			}
-		});
-		menuBar.add(mmErrors);
+		mmIssues = new JMenu("Задачи");
+		setMmIssuesListener(null);
+		mmIssues.setEnabled(redmineServerAddr != null);
+		menuBar.add(mmIssues);
 		
-		JMenu mmHelp = new JMenu("Справка");
-		mmHelp.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				helpFrm.showHelp("http://cds:3000/projects/sysdev/wiki/%D0%9D%D0%B0%D1%87%D0%B0%D0%BB%D0%BE_%D1%80%D0%B0%D0%B1%D0%BE%D1%82%D1%8B_%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0_msysgit_%D0%BE%D1%81%D0%BD%D0%BE%D0%B2%D1%8B");
-			}
-		});
+		mmHelp = new JMenu("Справка");
+		setMmHelpListener(null);
+		mmHelp.setEnabled(redmineServerAddr != null);
 		menuBar.add(mmHelp);
 	}
 	
 	public static void setAuthInfo(UserAuthInfo authInfo) {
 		CustomFrame.authInfo = authInfo;
+	}
+	
+	public void setMmIssuesListener(final String projectId) {
+		if (issuesListener != null)
+			mmIssues.removeMouseListener(issuesListener);
+		
+		if (mmIssues.isEnabled()) {
+			issuesListener = new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if ((redmineServerAddr != null) && (projectId != null) && (projectId.length() > 0))
+						redmineFrm.setVisible(projectId, true);
+					else
+						JOptionPane.showMessageDialog(CustomFrame.this, "Не указан путь к серверу задач.");
+				}
+			};
+			mmIssues.addMouseListener(issuesListener);
+		}
+	}
+	
+	public void setMmHelpListener(final String helpUrl) {
+		if (helpListener != null)
+			mmHelp.removeMouseListener(helpListener);
+		
+		if (mmHelp.isEnabled()) {
+			helpListener = new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if ((redmineServerAddr != null) && (helpUrl != null) && (helpUrl.length() > 0))
+						helpFrm.showHelp(helpUrl);
+					else
+						JOptionPane.showMessageDialog(CustomFrame.this, "Не указан путь к справке.");
+				}
+			};
+			mmHelp.addMouseListener(helpListener);
+		}
 	}
 }
