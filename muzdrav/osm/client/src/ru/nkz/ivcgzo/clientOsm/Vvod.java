@@ -178,6 +178,7 @@ public class Vvod extends JFrame {
 	private CustomTextField tfNuch;
 	private JTextArea tbJal;
 	private CustomTextField tbStatAd;
+	private CustomTextField tbAdDist;
 	private CustomTextField tbStatTemp;
 	private CustomTextField tbStatChss;
 	private CustomTextField tbStatRost;
@@ -802,7 +803,7 @@ public class Vvod extends JFrame {
 		tbStatTemp.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatTemp.setColumns(10);
 		
-		JLabel lblStatAd = new JLabel("АД");
+		JLabel lblStatAd = new JLabel("АД сист.");
 		
 		tbStatAd = new CustomTextField();
 		tbStatAd.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -825,30 +826,39 @@ public class Vvod extends JFrame {
 		tbStatChss = new CustomTextField();
 		tbStatChss.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		tbStatChss.setColumns(10);
+		
+		JLabel lblAdDist = new JLabel("АД диаст.");
+		
+		tbAdDist = new CustomTextField();
+		tbAdDist.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		tbAdDist.setColumns(10);
 		GroupLayout gl_pnlStat = new GroupLayout(pnlStat);
 		gl_pnlStat.setHorizontalGroup(
-			gl_pnlStat.createParallelGroup(Alignment.LEADING)
+			gl_pnlStat.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_pnlStat.createSequentialGroup()
 					.addComponent(lblStatTemp)
 					.addGap(4)
 					.addComponent(tbStatTemp, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
 					.addGap(10)
-					.addComponent(lblStatAd, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-					.addGap(12)
+					.addComponent(lblStatAd, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tbStatAd, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-					.addGap(10)
-					.addComponent(lblStatRost, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
 					.addGap(12)
+					.addComponent(lblAdDist)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tbAdDist, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblStatRost)
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addComponent(tbStatRost, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-					.addGap(10)
-					.addComponent(lblStatVes, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-					.addGap(12)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lblStatVes, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tbStatVes, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
 					.addGap(10)
 					.addComponent(lblStatChss)
 					.addGap(10)
-					.addComponent(tbStatChss, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
+					.addComponent(tbStatChss, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE))
 				.addComponent(spStat)
 		);
 		gl_pnlStat.setVerticalGroup(
@@ -859,24 +869,26 @@ public class Vvod extends JFrame {
 							.addGap(3)
 							.addComponent(lblStatTemp))
 						.addComponent(tbStatTemp, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlStat.createSequentialGroup()
-							.addGap(2)
-							.addComponent(lblStatAd))
 						.addComponent(tbStatAd, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlStat.createSequentialGroup()
-							.addGap(2)
-							.addComponent(lblStatRost))
-						.addComponent(tbStatRost, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_pnlStat.createSequentialGroup()
-							.addGap(2)
+						.addGroup(gl_pnlStat.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tbStatVes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addComponent(lblStatVes))
-						.addComponent(tbStatVes, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_pnlStat.createSequentialGroup()
 							.addGap(3)
 							.addComponent(lblStatChss))
-						.addComponent(tbStatChss, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(tbStatChss, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pnlStat.createSequentialGroup()
+							.addGap(2)
+							.addComponent(lblStatAd))
+						.addGroup(gl_pnlStat.createParallelGroup(Alignment.BASELINE)
+							.addComponent(tbStatRost, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(lblStatRost))
+						.addComponent(tbAdDist, GroupLayout.PREFERRED_SIZE, 21, GroupLayout.PREFERRED_SIZE)
+						.addGroup(gl_pnlStat.createSequentialGroup()
+							.addGap(2)
+							.addComponent(lblAdDist)))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(spStat, GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE))
+					.addComponent(spStat, GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE))
 		);
 		
 		tbStat = new JTextArea();
@@ -2531,7 +2543,7 @@ public class Vvod extends JFrame {
 		JLabel lblVidOpl = new JLabel("Вид опл.");
 		lblVidOpl.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		cmbCelObr = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_p0c);
+		cmbCelObr = new ThriftIntegerClassifierCombobox<>(true);
 		cmbCelObr.setMaximumSize(new Dimension(123, 32767));
 		cmbCelObr.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
@@ -2902,7 +2914,8 @@ public class Vvod extends JFrame {
 					cmbVidOpl.setSelectedItem(null);
 				pvizitAmb.setPl_extr(1);
 				tbJal.setText(priem.getT_jalob());	
-				tbStatAd.setText(priem.getT_ad());	
+				tbStatAd.setText(priem.getT_ad_sist());	
+				tbAdDist.setText(priem.getT_ad_dist());	
 				tbStatTemp.setText(priem.getT_temp());	
 				tbStatChss.setText(priem.getT_chss());	
 				tbStatRost.setText(priem.getT_rost());	
@@ -3058,6 +3071,7 @@ public class Vvod extends JFrame {
 				setTblPosToStatMode();
 			cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 			cmbLpu.setData(MainForm.tcl.get_m00());
+			cmbCelObr.setData(MainForm.tcl.get_n_p0c());
 			cmbLpu.setSelectedPcod(MainForm.authInfo.getClpu());
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			if (!isStat)
@@ -3134,40 +3148,31 @@ public class Vvod extends JFrame {
 		if (sh == null)
 			return;
 		
-		tbJal.setText("");
-		tbAnam.setText("");
-		tbStat.setText("");
-		tbLoc.setText("");
-		tbLech.setText("");
-		tbOcen.setText("");
-		tbZakl.setText("");
-		tbRecom.setText("");
-
 		for (ShablonText st : sh.textList) {
 			switch (st.grupId) {
 			case 1:
-				tbJal.setText(st.text);
+				tbJal.setText(tbJal.getText() + st.text);
 				break;
 			case 2:
-				tbAnam.setText(st.text);
+				tbAnam.setText(tbAnam.getText() + st.text);
 				break;
 			case 6:
-				tbStat.setText(st.text);
+				tbStat.setText(tbStat.getText() + st.text);
 				break;
 			case 8:
-				tbLoc.setText(st.text);
+				tbLoc.setText(tbLoc.getText() + st.text);
 				break;
 			case 10:
-				tbLech.setText(st.text);
+				tbLech.setText(tbLech.getText() + st.text);
 				break;
 			case 14:
-				tbOcen.setText(st.text);
+				tbOcen.setText(tbOcen.getText() + st.text);
 				break;
 			case 13:
-				tbZakl.setText(st.text);
+				tbZakl.setText(tbZakl.getText() + st.text);
 				break;
 			case 12:
-				tbRecom.setText(st.text);
+				tbRecom.setText(tbRecom.getText() + st.text);
 				break;
 			default:
 				break;
@@ -3345,7 +3350,8 @@ public class Vvod extends JFrame {
 			priem.setNpasp(pvizit.getNpasp());
 			priem.setIdpos(pvizitAmb.getId());
 			priem.setT_temp(getTextOrNull(tbStatTemp.getText()));
-			priem.setT_ad(getTextOrNull(tbStatAd.getText()));
+			priem.setT_ad_sist(getTextOrNull(tbStatAd.getText()));
+			priem.setT_ad_dist(getTextOrNull(tbAdDist.getText()));
 			priem.setT_chss(getTextOrNull(tbStatChss.getText()));
 			priem.setT_rost(getTextOrNull(tbStatRost.getText()));
 			priem.setT_ves(getTextOrNull(tbStatVes.getText()));

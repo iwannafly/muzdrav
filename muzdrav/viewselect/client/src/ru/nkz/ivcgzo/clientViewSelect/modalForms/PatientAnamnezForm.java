@@ -90,8 +90,8 @@ public class PatientAnamnezForm extends ModalForm{
 		btn_PrintAn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                  String servPath;
-				try {
-					servPath = MainForm.tcl.printAnamnez(1000126, MainForm.authInfo.cpodr, MainForm.authInfo.cslu);
+ 				try {
+					servPath = MainForm.tcl.printAnamnez(anam.get(0).npasp, MainForm.authInfo.cpodr, MainForm.authInfo.cslu);
 						String cliPath = File.createTempFile("anam", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);	
 						MainForm.conMan.openFileInEditor(cliPath, false);

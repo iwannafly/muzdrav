@@ -11,6 +11,7 @@ import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOperation.Anesthesia;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaComplication;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaPaymentFund;
+import ru.nkz.ivcgzo.thriftOperation.OperShablon;
 import ru.nkz.ivcgzo.thriftOperation.Operation;
 import ru.nkz.ivcgzo.thriftOperation.OperationComplication;
 import ru.nkz.ivcgzo.thriftOperation.OperationPaymentFund;
@@ -553,6 +554,34 @@ public class Controller implements IController{
         model.setPatient(new Patient(id,surname, name, middlename, idGosp));
         this.setOperationsList();
         view.updateOperationTable();
+    }
+
+    @Override
+    public void setOperationShablonList() {
+        try {
+            view.setOperationShablonList(model.getOperationShablonList());
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            e.printStackTrace();
+            ClientOperation.conMan.reconnect(e);
+        }
+    }
+
+    @Override
+    public void getShablon(int selectedPcod) {
+        OperShablon sh;
+        try {
+            sh = model.getShablon(selectedPcod);
+            if (sh != null) {
+                view.fillOperInfo(sh.getMat(), sh.getText());
+            }
+        } catch (KmiacServerException e) {
+            e.printStackTrace();
+        } catch (TException e) {
+            e.printStackTrace();
+            ClientOperation.conMan.reconnect(e);
+        }
     }
 
 }

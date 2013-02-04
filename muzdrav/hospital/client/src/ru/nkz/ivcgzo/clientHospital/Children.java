@@ -45,8 +45,6 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
-//TODO: ЗАПИСЫВАТЬ ДОЛЖНОСТЬ ВРАЧА (ЗАПОЛНИВШЕГО И ВЫДАВШЕГО СВИДЕТЕЛЬСТВО)
-//TODO: ЗАПИСЫВАТЬ ШАПКУ ДОКУМЕНТА (ОРГАНИЗАЦИЯ)
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич
@@ -239,6 +237,7 @@ public class Children extends JPanel {
 					"20 символов", "Ошибка", JOptionPane.WARNING_MESSAGE);
 			return false;
 		}
+		//TODO: ПРОВЕРЯТЬ ТЕКСТОВЫЕ ПОЛЯ
 		if (this.ticcbBirthPlace.getSelectedItem() == null) {
 			JOptionPane.showMessageDialog(this,
 					"Поле 'Место рождения' не может быть пустым",
@@ -259,10 +258,12 @@ public class Children extends JPanel {
 		}
 		//Установка значений полей childDoc:
 		this.childDoc.setFamreb(this.tfDocName.getText().toUpperCase());
-		this.childDoc.setSvid_write(this.userAuth.getPcod());
 		this.childDoc.setM_rojd(this.ticcbBirthPlace.getSelectedPcod());
 		this.childDoc.setR_proiz(this.cbBirthHappen.getSelectedIndex() + 1);
 		this.childDoc.setZan(this.ticcbMotherWork.getSelectedPcod());
+		this.childDoc.setSvid_write(this.userAuth.getPcod());
+		this.childDoc.setCdol_write(this.userAuth.getCdol());
+		this.childDoc.setClpu(this.userAuth.getClpu());
 		//Загрузка фамилии ребёнка в интерфейс в верхнем регистре:
 		this.tfDocName.setText(this.childDoc.getFamreb());
 		return true;
@@ -317,7 +318,7 @@ public class Children extends JPanel {
 		this.ticcbMotherWork.setSelectedPcod(this.childDoc.getZan());
 		this.ticcbBirthPlace.setSelectedPcod(this.childDoc.getM_rojd());
 		this.spinnerDocNum.setValue(this.childDoc.getNdoc());
-		this.lblDocStatus.setText("Выдано");
+		this.UpdateDocStatus();
 	}
 
 	/**
@@ -356,7 +357,7 @@ public class Children extends JPanel {
 		this.childInfo = null;
 		//Вызов функции сервера на добавление информации:
 		ClientHospital.tcl.addChildInfo(tmpInfo);
-		//Выполняется в случае успешного добавления:
+		//Выполняется только в случае успешного добавления:
 		this.childInfo = tmpInfo;
 	}
 	
@@ -395,6 +396,16 @@ public class Children extends JPanel {
 					"Ошибка", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	/**
+	 * Заполнение полей мед.свидетельства о рождении при выдаче:
+	 */
+	private void fillChildBirthGiveFields() {
+		//Установка даты выдачи, кода выдающего специалиста и его должности:
+		this.childDoc.setSvid_give(this.userAuth.getPcod());
+		this.childDoc.setCdol_give(this.userAuth.getCdol());
+		this.childDoc.setDateoff(new Date().getTime());
+	}
 
 	/**
 	 * Обновление информации о мед.свидетельстве
@@ -421,10 +432,9 @@ public class Children extends JPanel {
 				this.childDoc = oldDoc;	//Откат изменений (элементы интерфейса не будут затронуты)
 			}
 		} else {	//Данные не изменены
-			if (isGive && !this.childDoc.isSetSvid_give()) {	//Процесс выдачи заполненного свидетельства
-				//Установка даты выдачи и кода выдающего специалиста:
-				this.childDoc.setDateoff(new Date().getTime());
-				this.childDoc.setSvid_give(this.userAuth.getPcod());
+			if (isGive && !this.childDoc.isSetSvid_give()) {
+				this.fillChildBirthGiveFields();	//Процесс выдачи заполненного свидетельства
+				ClientHospital.tcl.updateChildDocument(this.childDoc);
 			} else {
 				//Повторная печать уже выданного свидетельства
 			}
@@ -454,19 +464,17 @@ public class Children extends JPanel {
 		}
 		//Установка идентификатора новорождённого:
 		this.childDoc.setNpasp(this.patient.getPatientId());
-		if (isGive) {	//Установка даты выдачи и кода выдающего специалиста:
-			this.childDoc.setDateoff(new Date().getTime());
-			this.childDoc.setSvid_give(this.userAuth.getPcod());
-		}
+		if (isGive)
+			this.fillChildBirthGiveFields();
 		//Небольшие танцы с бубном:
 		TRd_Svid_Rojd tmpDoc = this.childDoc;
 		//Поле childDoc останется null, если сервер вернёт исключение:
 		this.childDoc = null;
 		//Вызов функции сервера на добавление информации о свидетельстве:
 		final int ndoc = ClientHospital.tcl.addChildDocument(tmpDoc);
-		//Выполняется в случае успешного добавления:
+		//Выполняется только в случае успешного добавления:
 		this.childDoc = tmpDoc;
-		//Установка номера выданного свидетельства в поле экземпляра:
+		//Установка номера выданного свидетельства в поле свидетельства:
 		this.childDoc.setNdoc(ndoc);
 		//Загрузка номера выданного свидетельства в интерфейс:
 		this.spinnerDocNum.setValue(ndoc);
@@ -506,7 +514,7 @@ public class Children extends JPanel {
 	 * @return Возвращает <code>true</code>, если свидетельство заполнено;
 	 * иначе - <code>false</code>
 	 */
-	private boolean fillChildBirthDoc(boolean isGive) {
+	private boolean btnFillChildBirthDoc(boolean isGive) {
 		if (!this.checkPatient())
 			return false;
 		if (this.childInfo == null)
@@ -543,7 +551,7 @@ public class Children extends JPanel {
 	 * Нажатие на кнопку выдачи мед.свидетельства о рождении
 	 */
 	private void btnGiveDocClick() {
-		if (this.fillChildBirthDoc(true)) {
+		if (this.btnFillChildBirthDoc(true)) {
 			try{
 				this.printChildDocument();	//Печать мед.свидетельства
 			} catch (IOException e) {	//Поглощает FileNotFoundException
@@ -604,7 +612,9 @@ public class Children extends JPanel {
 		if (this.childDoc == null)
 			this.lblDocStatus.setText("Не заполнено");
 		else
-			if (this.childDoc.isSetSvid_give())
+			if (this.childDoc.isSetSvid_give() &&
+				this.childDoc.isSetCdol_give() &&
+				this.childDoc.isSetDateoff())
 				this.lblDocStatus.setText("Выдано");
 			else
 				this.lblDocStatus.setText("Заполнено");
@@ -727,7 +737,7 @@ public class Children extends JPanel {
 		this.btnFillDoc = new JButton("Заполнить свидетельство");
 		this.btnFillDoc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				fillChildBirthDoc(false);
+				btnFillChildBirthDoc(false);
 			}
 		});
 		GroupLayout gl_panelDoc = new GroupLayout(this.panelDoc);
