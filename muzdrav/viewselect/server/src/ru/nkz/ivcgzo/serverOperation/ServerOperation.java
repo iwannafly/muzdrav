@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.serverOperation;
 
 import java.io.File;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.apache.thrift.transport.TNonblockingServerSocket;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.*;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOperation.*;
 import ru.nkz.ivcgzo.thriftOperation.ThriftOperation.Iface;
@@ -35,6 +37,9 @@ public class ServerOperation extends Server implements Iface {
             AnesthesiaComplication._Fields> rsmAnesthesiaComplication;
     private TResultSetMapper<AnesthesiaPaymentFund,
             AnesthesiaPaymentFund._Fields> rsmAnesthesiaPaymentFund;
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+    private TResultSetMapper<OperShablon,
+            OperShablon._Fields> rsmOperShablon;
 
     private static final String[] OPERATION_FIELD_NAMES = {
             "id", "vid_st", "cotd", "id_gosp", "npasp", "pcod", "name_oper", "date", "vrem",
@@ -55,6 +60,12 @@ public class ServerOperation extends Server implements Iface {
     };
     private static final String[] ANESTHESIA_PAYMENT_FUND_FIELD_NAMES = {
             "id", "id_anast", "pcod", "dataz"
+    };
+    private static final String[] INT_CLAS_FIELD_NAMES = {
+        "pcod", "name"
+    };
+    private static final String[] OPER_SHABLON_FIELD_NAMES = {
+        "id", "name", "oper_pcod", "mat", "text", "src_text"
     };
 
     private static final Class<?>[] OPERATION_TYPES ={
@@ -108,6 +119,8 @@ public class ServerOperation extends Server implements Iface {
                 ANESTHESIA_COMPLICATION_FIELD_NAMES);
         rsmAnesthesiaPaymentFund = new TResultSetMapper<>(AnesthesiaPaymentFund.class,
                 ANESTHESIA_PAYMENT_FUND_FIELD_NAMES);
+        rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, INT_CLAS_FIELD_NAMES);
+        rsmOperShablon = new TResultSetMapper<>(OperShablon.class, OPER_SHABLON_FIELD_NAMES);
     }
 
     @Override
@@ -604,6 +617,38 @@ public class ServerOperation extends Server implements Iface {
             sme.setCommit();
         } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public List<IntegerClassifier> getShablonNames(String operPcod)
+            throws KmiacServerException, TException {
+        String sql = "SELECT DISTINCT id AS pcod, name "
+                + "FROM sh_oper "
+                + "WHERE sh_oper.oper_pcod = ? ORDER BY name;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, operPcod)) {
+            return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Template searching error", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public OperShablon getShablon(int id) throws KmiacServerException,
+            TException {
+        String sqlQuery = "SELECT * FROM sh_oper WHERE id = ?;";
+        ResultSet rs = null;
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
+            rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rsmOperShablon.map(rs);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }

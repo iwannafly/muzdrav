@@ -1,16 +1,19 @@
 package ru.nkz.ivcgzo.clientOperation.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientOperation.ClientOperation;
 import ru.nkz.ivcgzo.clientOperation.IOperationObserver;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOperation.Anesthesia;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaComplication;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaPaymentFund;
+import ru.nkz.ivcgzo.thriftOperation.OperShablon;
 import ru.nkz.ivcgzo.thriftOperation.Operation;
 import ru.nkz.ivcgzo.thriftOperation.OperationComplication;
 import ru.nkz.ivcgzo.thriftOperation.OperationPaymentFund;
@@ -319,5 +322,21 @@ public class OperationModel implements IOperationModel{
         for (IOperationObserver obs: operationObservers) {
             obs.anesthesiaPaymentFundChanged();
         }
+    }
+
+    @Override
+    public List<IntegerClassifier> getOperationShablonList()
+            throws KmiacServerException, TException {
+        if (currentOperation != null) {
+            return ClientOperation.tcl.getShablonNames(currentOperation.getPcod());
+        } else {
+            return Collections.<IntegerClassifier>emptyList();
+        }
+    }
+
+    @Override
+    public OperShablon getShablon(int id) throws KmiacServerException,
+            TException {
+        return ClientOperation.tcl.getShablon(id);
     }
 }

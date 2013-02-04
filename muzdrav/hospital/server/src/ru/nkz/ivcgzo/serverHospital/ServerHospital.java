@@ -249,7 +249,8 @@ public class ServerHospital extends Server implements Iface {
         rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, RdSlStruct_Fields_names);
         rsmRdNovor = new TResultSetMapper<>(TRd_Novor.class, RDNOVOR_FIELD_NAMES);
         rsmRdSvidRojd = new TResultSetMapper<>(TRd_Svid_Rojd.class, RDSVID_ROJD_FIELD_NAMES);
-        rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class, COMMON_PATIENT_FIELD_NAMES);
+        rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class,
+                COMMON_PATIENT_FIELD_NAMES);
         rsmBirthPlace = new TResultSetMapper<>(TBirthPlace.class, BIRTHPLACE_FIELD_NAMES);
         rsmInfoLPU = new TResultSetMapper<>(TInfoLPU.class, LPU_FIELD_NAMES);
     }
@@ -329,7 +330,7 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
+    public final TPatient getPatientPersonalInfo(final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
                 + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
@@ -344,15 +345,48 @@ public class ServerHospital extends Server implements Iface {
                 + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
                 + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
                 + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
-                + "WHERE patient.npasp= ? AND c_otd.id_gosp = ?;";
+                + "WHERE c_otd.id_gosp = ?;"; // тут был еще npasp, но он лишний
         ResultSet rs = null;
 
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId, idGosp)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmPatient.map(rs);
             } else {
-                log.log(Level.INFO, "PatientNotFoundException, patientId = " + patientId);
+                log.log(Level.INFO, "PatientNotFoundException ");
+                throw new PatientNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final TPatient getPatientPersonalInfoByCotd(final int idCotd)
+            throws PatientNotFoundException, KmiacServerException {
+        String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
+                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
+                + "(patient.poms_ser||patient.poms_nom) as poms, "
+                + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
+                + "n_z43.name_s as mrab, c_otd.npal, "
+                + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
+                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add, "
+                + "c_gosp.ngosp "
+                + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
+                + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
+                + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
+                + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
+                + "WHERE c_otd.id = ?;"; // тут был еще npasp, но он лишний
+        ResultSet rs = null;
+
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idCotd)) {
+            rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rsmPatient.map(rs);
+            } else {
+                log.log(Level.INFO, "PatientNotFoundException ");
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {

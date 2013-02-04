@@ -82,4 +82,8 @@ public interface IController {
     void setTitle(String format);
 
     void fillPatient(int id, String surname, String name, String middlename, int idGosp);
+
+    void setOperationShablonList();
+
+    void getShablon(int selectedPcod);
 }

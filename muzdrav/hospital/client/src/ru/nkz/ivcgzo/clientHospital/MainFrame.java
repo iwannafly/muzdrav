@@ -185,7 +185,6 @@ public class MainFrame extends JFrame {
     private JRadioButton rdbtnSoput;
     private JRadioButton rdbtnOsl;
     private CustomTextField tfDiagShablonFilter;
-    private ThriftIntegerClassifierList lDiagShablonNames;
     private CustomTable<TDiagnosis, TDiagnosis._Fields> tbDiag;
     private RdDinStruct rddin;
     private RdSlStruct rdsl;
@@ -361,6 +360,7 @@ public class MainFrame extends JFrame {
     private JButton btnOperation;
     private JButton btnShowPatientAnamnez;
     private JButton btnShowPatientBolList;
+    private JButton btnReestr;
 
     public MainFrame(final UserAuthInfo authInfo) {
         setMinimumSize(new Dimension(950, 700));
@@ -424,8 +424,6 @@ public class MainFrame extends JFrame {
                 doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
 //            lLifeHistoryShabloNames.setData(ClientHospital.tcl.getDopShablonNames(
 //                3, null));
-            lDiagShablonNames.setData(ClientHospital.tcl.getShablonNames(
-                doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             lZaklShablonNames.setData(ClientHospital.tcl.getShablonNames(
                 doctorAuth.getCpodr(), doctorAuth.getCslu(),  null));
             cbxIshod.setData(ClientHospital.tcl.getAp0());
@@ -545,6 +543,21 @@ public class MainFrame extends JFrame {
             public void windowClosing(final WindowEvent arg0) {
                 if (frmPatientSelect.getCurrentPatient() != null) {
                     clearAllComponentsAndObjects();
+                    try {
+                        patient = ClientHospital.tcl.getPatientPersonalInfo(
+                            frmPatientSelect.getCurrentPatient().getIdGosp());
+                            MainFrame.this.setTitle(String.format("%s %s %s",
+                            patient.getSurname(), patient.getName(),
+                            patient.getMiddlename()));
+                    } catch (PatientNotFoundException e) {
+                        patient = null;
+                    } catch (KmiacServerException e) {
+                        patient = null;
+                        e.printStackTrace();
+                    } catch (TException e) {
+                        patient = null;
+                        ClientHospital.conMan.reconnect(e);
+                    }
                     fillPersonalInfoTextFields();
                     fillReceptionPanel();
 //                    fillLifeHistoryPanel();
@@ -900,6 +913,47 @@ public class MainFrame extends JFrame {
         btnOperation.setIcon(new ImageIcon(MainFrame.class.getResource(
             "/ru/nkz/ivcgzo/clientHospital/resources/Skalpell.png")));
         btnOperation.setRequestFocusEnabled(false);
+
+        btnReestr = new JButton();
+        btnReestr.setToolTipText("Исправление ошибок реестра");
+//        btnReestr.setVisible(false);
+        toolBar.add(btnReestr);
+        btnReestr.setMaximumSize(new Dimension(35, 35));
+        btnReestr.setMinimumSize(new Dimension(35, 35));
+        btnReestr.setPreferredSize(new Dimension(35, 35));
+        btnReestr.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                Integer result = ClientHospital.conMan.showMedStaErrorsForm();
+                if (result != null) {
+                    clearAllComponentsAndObjects();
+                    try {
+                        patient = ClientHospital.tcl.getPatientPersonalInfoByCotd(result);
+                        MainFrame.this.setTitle(String.format("%s %s %s",
+                            patient.getSurname(), patient.getName(),
+                            patient.getMiddlename()));
+                    } catch (PatientNotFoundException e1) {
+                        patient = null;
+                    } catch (KmiacServerException e1) {
+                        e1.printStackTrace();
+                    } catch (TException e1) {
+                        ClientHospital.conMan.reconnect(e1);
+                    }
+                    fillPersonalInfoTextFields();
+                    fillReceptionPanel();
+//                    fillLifeHistoryPanel();
+                    fillMedHistoryTable();
+                    fillDiagnosisTable();
+                    fillStageTable();
+                    if (pChildren != null) {
+                        pChildren.setPatient(patient);
+                    }
+                }
+            }
+        });
+        btnReestr.setBorder(null);
+        btnReestr.setIcon(new ImageIcon(MainFrame.class.getResource(
+            "/ru/nkz/ivcgzo/clientHospital/resources/archive.png")));
+        btnReestr.setRequestFocusEnabled(false);
     }
 
 
@@ -1032,20 +1086,6 @@ public class MainFrame extends JFrame {
     }
 
     private void fillPersonalInfoTextFields() {
-        try {
-            patient = ClientHospital.tcl.getPatientPersonalInfo(
-                frmPatientSelect.getCurrentPatient().getPatientId(),
-                frmPatientSelect.getCurrentPatient().getIdGosp());
-            setTitle(String.format("%s %s %s",
-                patient.getSurname(), patient.getName(),
-                patient.getMiddlename()));
-        } catch (PatientNotFoundException e) {
-            patient = null;
-        } catch (KmiacServerException e) {
-            e.printStackTrace();
-        } catch (TException e) {
-            ClientHospital.conMan.reconnect(e);
-        }
 
         if (patient != null) {
             tfNumberOfDesiaseHistory.setText(String.valueOf(patient.getNist()));
@@ -2819,11 +2859,6 @@ public class MainFrame extends JFrame {
 
         hsDiagnosisSecond = Box.createHorizontalStrut(5);
         pDiagnosis.add(hsDiagnosisSecond);
-
-        setDiagnosisVerticalShablonPanel();
-
-        hsDiagnosisThird = Box.createHorizontalStrut(5);
-        pDiagnosis.add(hsDiagnosisThird);
     }
 
     private void setDiagnosisVerticalTextComponents() {
@@ -3019,80 +3054,6 @@ public class MainFrame extends JFrame {
         btgDiag.add(rdbtnMain);
         btgDiag.add(rdbtnSoput);
         btgDiag.add(rdbtnOsl);
-    }
-
-    private void setDiagnosisVerticalShablonPanel() {
-        vbDiagnosisShablonComponents = Box.createVerticalBox();
-        vbDiagnosisShablonComponents.setBorder(
-            new EtchedBorder(EtchedBorder.LOWERED, Color.BLACK, Color.GRAY));
-        vbDiagnosisShablonComponents.setPreferredSize(new Dimension(300, 0));
-        pDiagnosis.add(vbDiagnosisShablonComponents);
-
-        setDiagnosisShablonLabel();
-        setDiagnosisShablonHorizontalBox();
-        setDiagnosisShablonScrollPane();
-        setDiagnosisShablonListener();
-    }
-
-    private void setDiagnosisShablonLabel() {
-        lblDiagnosisShablonHeader = new JLabel("Строка поиска шаблона");
-        lblDiagnosisShablonHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
-        lblDiagnosisShablonHeader.setFont(new Font("Tahoma", Font.BOLD, 13));
-        vbDiagnosisShablonComponents.add(lblDiagnosisShablonHeader);
-        lblDiagnosisShablonHeader.setHorizontalTextPosition(SwingConstants.LEFT);
-        lblDiagnosisShablonHeader.setHorizontalAlignment(SwingConstants.LEFT);
-        lblDiagnosisShablonHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
-    }
-
-    private void setDiagnosisShablonHorizontalBox() {
-        hbDiagnosisShablonFind = Box.createHorizontalBox();
-        vbDiagnosisShablonComponents.add(hbDiagnosisShablonFind);
-
-        setDiagnosisShablonTextField();
-        setDiagnosisShablonButton();
-    }
-
-    private void setDiagnosisShablonTextField() {
-        tfDiagShablonFilter = new CustomTextField(true, true, false);
-        tfDiagShablonFilter.setMaximumSize(new Dimension(450, 50));
-        hbDiagnosisShablonFind.add(tfDiagShablonFilter);
-        tfDiagShablonFilter.setColumns(10);
-    }
-
-    private void setDiagnosisShablonButton() {
-        btnDiagnosisShablonFind = new JButton("...");
-        btnDiagnosisShablonFind.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                frmShablon.showShablonForm(tfDiagShablonFilter.getText(),
-                    lDiagShablonNames.getSelectedValue());
-                syncShablonList(frmShablon.getSearchString(), frmShablon.getShablon(),
-                    diagSearchListener, lDiagShablonNames);
-//                pasteSelectedShablon(frmShablon.getShablon());
-            }
-        });
-        btnDiagnosisShablonFind.setMinimumSize(new Dimension(63, 23));
-        btnDiagnosisShablonFind.setMaximumSize(new Dimension(63, 23));
-        btnDiagnosisShablonFind.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnDiagnosisShablonFind.setPreferredSize(new Dimension(63, 23));
-        hbDiagnosisShablonFind.add(btnDiagnosisShablonFind);
-    }
-
-    private void setDiagnosisShablonScrollPane() {
-        spDiagShablonNames = new JScrollPane();
-        vbDiagnosisShablonComponents.add(spDiagShablonNames);
-
-        setDiagnosisShablonList();
-    }
-
-    private void setDiagnosisShablonList() {
-        lDiagShablonNames = new ThriftIntegerClassifierList();
-        lDiagShablonNames.setBorder(new LineBorder(new Color(0, 0, 0)));
-        spDiagShablonNames.setViewportView(lDiagShablonNames);
-    }
-
-    private void setDiagnosisShablonListener() {
-        diagSearchListener = new ShablonSearchListener(tfDiagShablonFilter, lDiagShablonNames);
-        tfDiagShablonFilter.getDocument().addDocumentListener(diagSearchListener);
     }
 
     private void clearDiagnosisText() {

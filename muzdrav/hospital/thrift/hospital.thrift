@@ -436,7 +436,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	list<TSimplePatient> getAllPatientFromOtd(1:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);	
-	TPatient getPatientPersonalInfo(1:i32 patientId, 2:i32 idGosp) throws (1:PatientNotFoundException pnfe,
+	TPatient getPatientPersonalInfo(1:i32 idGosp) throws (1:PatientNotFoundException pnfe,
+		2:kmiacServer.KmiacServerException kse);
+	TPatient getPatientPersonalInfoByCotd(1:i32 idCotd) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -489,6 +491,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		throws (1:kmiacServer.KmiacServerException kse);		
 	string printHospitalSummary(1: i32 idGosp, 2: string lpuInfo, 3: TPatient patient)
 		throws (1:kmiacServer.KmiacServerException kse);
+
 	
 /* Классификаторы */
 	
