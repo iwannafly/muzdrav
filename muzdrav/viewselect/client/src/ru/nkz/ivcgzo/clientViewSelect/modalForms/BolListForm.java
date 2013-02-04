@@ -64,15 +64,16 @@ public class BolListForm extends ModalForm {
 		btnAdd.setIcon(new ImageIcon(BolListForm.class.getResource("/ru/nkz/ivcgzo/clientViewSelect/resources/1331789242_Add.png")));
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				 
-				pbol.setNpasp(npasp);
-				pbol.setPcod(MainForm.authInfo.getCpodr());
-				pbol.setId_obr(idObr);
-				pbol.setId_gosp(idGosp);
-				pbol.setDataz(System.currentTimeMillis());
-				pbol.setCdol(MainForm.authInfo.getCdol());
-				pbol.setCod_sp(MainForm.authInfo.getPcod());
 				try {
+					tblPbol.requestFocus();
+					pbol = new Pbol();
+					pbol.setNpasp(npasp);
+					pbol.setPcod(MainForm.authInfo.getCpodr());
+					pbol.setId_obr(idObr);
+					pbol.setId_gosp(idGosp);
+					pbol.setDataz(System.currentTimeMillis());
+					pbol.setCdol(MainForm.authInfo.getCdol());
+					pbol.setCod_sp(MainForm.authInfo.getPcod());
 					pbol.setId(MainForm.tcl.AddPbol(pbol));
 					tblPbol.addItem(pbol);
 				} catch (KmiacServerException e1) {
@@ -122,24 +123,25 @@ public class BolListForm extends ModalForm {
 		btnUpd.setIcon(new ImageIcon(BolListForm.class.getResource("/ru/nkz/ivcgzo/clientViewSelect/resources/1341981970_Accept.png")));
 		btnUpd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
 				try {
+					pbol = tblPbol.getSelectedItem();
 					if (!DatCompBol()) {
 						JOptionPane.showMessageDialog(BolListForm.this, "Дата начала больничного не может быть больше даты конца больничного", "Предупреждение", JOptionPane.ERROR_MESSAGE);
 							return;
 					}
-	
 					if (tblPbol.getSelectedItem() != null)
 						for (Pbol pb: tblPbol.getData())
 							if (pb != pbol){
-								if (pbol==null)System.out.println("xxxx");
-								else
+//								if (pbol==null)System.out.println("xxxx");
+		//						else
 								if (pb.getNombl().equals(pbol.getNombl())){
 									JOptionPane.showMessageDialog(BolListForm.this, "Больничный с таким номером уже существует");
 									pbol = tblPbol.getSelectedItem();
 									return;
 								}
-								if ((pb.getBol_l() == pbol.getBol_l()) && (pb.getS_bl() == pbol.getS_bl())){
-										JOptionPane.showMessageDialog(BolListForm.this, "Больничный с такой датой и причиной уже существует");
+								if ((pb.getBol_l() == pbol.getBol_l()) && (pb.getS_bl() == pbol.getS_bl()) && (pb.getNombl().equals(pbol.getNombl()))){
+										JOptionPane.showMessageDialog(BolListForm.this, "Больничный с такой датой, причиной и номером уже существует");
 										pbol = tblPbol.getSelectedItem();
 										return;
 									}

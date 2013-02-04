@@ -16,7 +16,7 @@ import ru.nkz.ivcgzo.thriftInfomat.TSheduleDay;
 public class SheduleTableModel implements TableModel {
     private Set<TableModelListener> listeners = new HashSet<TableModelListener>();
     private List<TSheduleDay> sheduleList;
-    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("HH-mm");
+    private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("HH:mm");
     private static final int ROW_COUNT = 4;
     private static final String[] COLUMN_NAMES = {
         "Понедельник", "Вторник", "Среда" , "Четверг" , "Пятница", "Суббота", "Воскресенье"

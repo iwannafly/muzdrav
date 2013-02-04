@@ -449,8 +449,6 @@ public class MainFrame extends JFrame {
             CBAkush.setData(doctorsList);
             CBVrash.setData(doctorsList);
             CBOsmotr.setData(doctorsList);
-            if (pChildren != null)
-            	pChildren.setDoctors(doctorsList);
         } catch (KmiacServerException e) {
             e.printStackTrace();
         } catch (TException e) {
