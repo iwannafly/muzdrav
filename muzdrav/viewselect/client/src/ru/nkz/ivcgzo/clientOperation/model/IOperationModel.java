@@ -5,10 +5,12 @@ import java.util.List;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientOperation.IOperationObserver;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOperation.Anesthesia;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaComplication;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaPaymentFund;
+import ru.nkz.ivcgzo.thriftOperation.OperShablon;
 import ru.nkz.ivcgzo.thriftOperation.Operation;
 import ru.nkz.ivcgzo.thriftOperation.OperationComplication;
 import ru.nkz.ivcgzo.thriftOperation.OperationPaymentFund;
@@ -106,5 +108,9 @@ public interface IOperationModel {
     void registerOperationObserver(IOperationObserver obs);
 
     void removeOperationObserver(IOperationObserver obs);
+
+    List<IntegerClassifier> getOperationShablonList() throws KmiacServerException, TException;
+
+    OperShablon getShablon(int id) throws KmiacServerException, TException;
 
 }

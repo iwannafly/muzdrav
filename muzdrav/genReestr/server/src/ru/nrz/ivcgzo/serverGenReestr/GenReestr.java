@@ -771,8 +771,7 @@ public class GenReestr extends Server implements Iface {
 //	            	sqlmed += " AND g.cotd_p = ? "+sqlwhere;
 //	            	clpu = cpodr;
 //	            }
-//	            else 
-//	            	sqlmed += " AND o00.clpu = ? "+sqlwhere;
+//	            else sqlmed += " AND o00.clpu = ? "+sqlwhere;
 	        	sqlmed += " UNION ";
 	            sqlmed = "SELECT g.ngosp::integer AS sl_id, " +
 	            		"g.id::integer AS id_med, " +
@@ -787,7 +786,7 @@ public class GenReestr extends Server implements Iface {
 	    				"null::double precision AS kol_usl, " +
 	    				"2::integer AS c_mu, " +
 	    				"c.cod::char(7) AS diag, " +
-	    				"(select get_ds_s(c.id_gosp))::char(7) AS ds_s, " +
+	    				"null::char(7) AS ds_s, " +
 	    				"null::char(6) AS pa_diag, " +
 	    				"ap0.c_obl::integer AS pr_out, " +
 	    				"aq0.cod_obl::integer AS res_l, "+
@@ -812,7 +811,7 @@ public class GenReestr extends Server implements Iface {
             			"LEFT JOIN n_aq0 aq0 ON (aq0.pcod = o.result) "+
             			"LEFT JOIN n_m00 m00 ON (m00.pcod = m.clpu) ";
             	sqlmed += sqlfrom; 
-            	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null AND o00.clpu = ? "+sqlwhere;
+            	sqlmed += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null AND o00.clpu = ? "+sqlwhere;
 //            	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null ";
 //	            if (cpodr != 0) {
 //	            	sqlmed += " AND o.cotd = ? "+sqlwhere;
@@ -946,16 +945,14 @@ public class GenReestr extends Server implements Iface {
         				"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
         				"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) ";
             	sqlpasp += sqlfrom; 
-            	sqlpasp += "WHERE g.pr_out=0 AND o.datav is not null AND o00.clpu = ? "+sqlwhere;
+            	sqlpasp += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null AND o00.clpu = ? "+sqlwhere;
 //	            if (cpodr != 0) {
 //	            	sqlpasp += " AND o.cotd = ? "+sqlwhere;
 //	            	clpu = cpodr;
-//	            }
-//	            else 
-//	            	sqlpasp += " AND o00.clpu = ? "+sqlwhere;
+//	            } else 	sqlpasp += " AND o00.clpu = ? "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(dn), new Date(dk)));
         				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
         					zos.putNextEntry(new ZipEntry("pasp.dbf"));
         					while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -1001,9 +998,9 @@ public class GenReestr extends Server implements Iface {
         if (vidr == 3) sqlwhere = " AND g.d_rez >= ? AND g.d_rez <= ? AND (g.kod_rez = 2 OR g.kod_rez = 4 OR g.kod_rez = 5 OR g.kod_rez = 11)";
 
    		try (SqlModifyExecutor sme = tse.startTransaction();
-   				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_errors_pasp_hosp(?, ?, ?) ", clpu, new Date(dn), new Date(dk));
-   				AutoCloseableResultSet acrsm = sme.execPreparedQuery("SELECT check_reestr_med_sta_errors(?, ?, ?) ", clpu, new Date(dn), new Date(dk));
-   				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE e.cslu=1 AND substr(cast(e.cpodr as varchar(10)),1,2)=cast(? as varchar(10)) AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", clpu, new Date(System.currentTimeMillis()) )) {
+   				AutoCloseableResultSet acrsf = sme.execPreparedQuery("SELECT check_errors_pasp_dsp(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
+   				AutoCloseableResultSet acrsm = sme.execPreparedQuery("SELECT check_reestr_med_dsp_errors(?, ?, ?) ", cpodr, new Date(dn), new Date(dk));
+   				AutoCloseableResultSet acrsq = sme.execPreparedQuery("SELECT e.sl_id, e.id_med, e.npasp, p.fam, p.im, p.ot, p.datar, n.kderr, n.name_err AS err_name, n.comm AS err_comm, n.pasp_med FROM w_kderr e JOIN n_kderr n ON (n.kderr = e.kod_err) JOIN patient p ON (p.npasp = e.npasp) WHERE e.cslu=1 AND e.cpodr = ? AND (e.dataz = ?) ORDER BY p.npasp, n.kderr ", cpodr, new Date(System.currentTimeMillis()) )) {
    				sme.setCommit();
    				ResultSet rs = acrsq.getResultSet();
    				
@@ -1025,7 +1022,7 @@ public class GenReestr extends Server implements Iface {
    						}
 
    						if(npasp != rs.getInt("npasp")){
-   							sb.append(String.format("<br> %s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("ot").trim()));
+   							sb.append(String.format("<br><br> %s %s %s", rs.getString("fam").trim(), rs.getString("im").trim(), rs.getString("ot").trim()));
    							sb.append(String.format("   Д.р. </b>  %1$td.%1$tm.%1$tY <br>", rs.getDate("datar").getTime()));
    						}
    						
@@ -1061,63 +1058,20 @@ public class GenReestr extends Server implements Iface {
 					ZipOutputStream zos = new ZipOutputStream(fos)) {
 				byte[] buffer = new byte[8192];
 				int bufRead;
-		        sqlmed = "SELECT g.ngosp::integer AS sl_id, " +
-		        		"g.id::integer AS id_med, " +
-		        		"g.kod_rez::integer AS kod_rez, " +
-		        		"g.cotd_p::integer AS kod_otd, " +
-		        		"g.datap::date as d_pst, " +
-		        		"null::date as d_end, " +
-		        		"3::integer AS kl_usl, " +
-		        		"null::integer AS pr_exp, " +
-						"null::integer AS pl_extr, " +
-						"null::char(15) AS usl, " +
-						"null::double precision AS kol_usl, " +
-						"2::integer AS c_mu, " +
-						"g.diag_p::char(7) AS diag, " +
-						"null::char(7) AS ds_s, " +
-						"null::char(6) AS pa_diag, " +
-						"null::integer AS pr_out, " +
-						"null::integer AS res_l, "+
-						"(CASE WHEN (m00.c_nom = 2) THEN s.prof_d WHEN ((m00.c_nom = 1) OR (m00.c_nom = 3) OR (m00.c_nom = 5) OR (m00.c_nom = 6) OR (m00.c_nom = 8) OR (m00.c_nom = 9)) THEN s.prof_v ELSE NULL END)::integer AS profil, " +
-						"null::double precision AS stoim, " +
-						"null::integer AS case, " +
-						"null::integer AS place," +
-						"s.cod_sp::integer AS spec, " +
-						"null::integer AS prvd, " +
-						"null::integer AS res_g, " +
-						"null::char(14) AS ssd, " +
-						"null::integer AS id_med_tf, " +
-						"1::integer AS psv, " +
-						"null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
-	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) " +
-	        			"JOIN n_o00 o00 ON (o00.pcod = g.cotd_p) " +
-	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) " +
-	        			"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
-	        			"LEFT JOIN n_m00 m00 ON (m00.pcod = m.clpu) ";
-	        	sqlmed += sqlfrom; 
-	        	sqlmed += "WHERE g.pr_out<>0 AND o00.clpu = ? "+sqlwhere;
-//	        	sqlmed += "WHERE g.pr_out<>0 ";
-//	            if (cpodr != 0) {
-//	            	sqlmed += " AND g.cotd_p = ? "+sqlwhere;
-//	            	clpu = cpodr;
-//	            }
-//	            else 
-//	            	sqlmed += " AND o00.clpu = ? "+sqlwhere;
-	        	sqlmed += " UNION ";
 	            sqlmed = "SELECT g.ngosp::integer AS sl_id, " +
 	            		"g.id::integer AS id_med, " +
 	            		"g.kod_rez::integer AS kod_rez, " +
 	            		"o.cotd::integer AS kod_otd, " +
 	            		"g.datagos::date as d_pst, " +
 	            		"o.datav::date as d_end, " +
-	            		"1::integer AS kl_usl, " +
+	            		"5::integer AS kl_usl, " +
 	            		"0::integer AS pr_exp, " +
 	    				"(CASE g.pl_extr=1 when true then 2 else (CASE g.pl_extr=2 when true then 1 else 1 end) end)::integer AS pl_extr, " +
 	    				"null::char(15) AS usl, " +
 	    				"null::double precision AS kol_usl, " +
 	    				"2::integer AS c_mu, " +
 	    				"c.cod::char(7) AS diag, " +
-	    				"(select get_ds_s(c.id_gosp))::char(7) AS ds_s, " +
+	    				"null::char(7) AS ds_s, " +
 	    				"null::char(6) AS pa_diag, " +
 	    				"ap0.c_obl::integer AS pr_out, " +
 	    				"aq0.cod_obl::integer AS res_l, "+
@@ -1125,7 +1079,7 @@ public class GenReestr extends Server implements Iface {
 	    				"null::double precision AS stoim, " +
 	    				"null::integer AS case," +
 	    				"null::integer AS place," +
-						"s.cod_sp::integer AS spec, " +
+						"s.idmsp::integer AS spec, " +
 	    				"null::integer AS prvd, " +
 	    				"null::integer AS res_g, " +
 	    				"null::char(14) AS ssd, " +
@@ -1134,7 +1088,7 @@ public class GenReestr extends Server implements Iface {
 	    				"null::integer AS pr_pv, null::char(15) AS obst, null::char(20) AS n_schet, null::date AS d_schet, null::integer AS v_sch, null::char(12) AS talon_omt ";
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) " +
             			"JOIN c_otd o ON (g.id = o.id_gosp) " +
-	        			"JOIN n_o00 o00 ON (o00.pcod = o.cotd) "+
+	        			"JOIN n_n00 n00 ON (n00.pcod = o.cotd) "+
             			"LEFT JOIN c_diag c ON (o.id_gosp = c.id_gosp AND c.prizn=4) " +
             			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) " +
             			"LEFT JOIN n_s00 s ON (m.cdol = s.pcod) "+
@@ -1142,17 +1096,10 @@ public class GenReestr extends Server implements Iface {
             			"LEFT JOIN n_aq0 aq0 ON (aq0.pcod = o.result) "+
             			"LEFT JOIN n_m00 m00 ON (m00.pcod = m.clpu) ";
             	sqlmed += sqlfrom; 
-            	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null AND o00.clpu = ? "+sqlwhere;
-//            	sqlmed += "WHERE g.pr_out=0 AND o.datav is not null ";
-//	            if (cpodr != 0) {
-//	            	sqlmed += " AND o.cotd = ? "+sqlwhere;
-//	            	clpu = cpodr;
-//	            }
-//	            else 
-//	            	sqlmed += " AND o00.clpu = ? "+sqlwhere;
+            	sqlmed += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null AND n00.pcod = ? "+sqlwhere;
             	sqlmed += " ORDER BY p.npasp "; //ругается
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)));
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, cpodr, new Date(dn), new Date(dk)));
     				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
     					zos.putNextEntry(new ZipEntry("med.dbf"));
     					while ((bufRead = dbfStr.read(buffer)) > 0)
@@ -1162,78 +1109,11 @@ public class GenReestr extends Server implements Iface {
     					throw new KmiacServerException();
     				}
 
-//    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlmed, clpu, new Date(dn), new Date(dk)))){
-//					while (acrs.getResultSet().next()){
-//						try(InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
-//							zos.putNextEntry(new ZipEntry("med.dbf"));
-//							while ((bufRead = dbfStr.read(buffer)) > 0)
-//								zos.write(buffer, 0, bufRead);
-//						} catch (SQLException e) {
-//							log.log(Level.ERROR, "SQl Exception: ", e);
-//							throw new KmiacServerException();
-//						}
-//    				}
-//				}
-				    
 				sqlpasp ="SELECT g.ngosp::integer AS sl_id, " +
-						"1::integer AS vid_rstr, " +
+						"3::integer AS vid_rstr, " +
 						"k.kdpsk::integer AS str_org, " +
 						"10::integer AS ter_mu," +
-						"m.clpu::integer AS kod_mu," +
-						"current_date::date AS df_per, " +
-						"p.fam::char(60) AS fam, " +
-						"p.im::char(40) AS im, " +
-						"p.ot::char(60) AS otch, " +
-						"p.datar AS dr, " +
-						"(case when p.pol=1 then 'М' else 'Ж' end)::char(1) AS sex, "+
-						"(case p.poms_strg>99 when true then p.snils else null end)::char(14) AS ssp, " +
-						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_tdoc END)::integer AS vpolis, "+ 
-						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_ser END)::char(10) AS spolis, "+
-						"(CASE CURRENT_DATE - p.datar < 3*30 AND p.poms_ser IS NULL AND p.poms_nom IS NULL WHEN TRUE THEN NULL ELSE p.poms_nom END)::char(20) AS polis, "+
-						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.tdoc IS NOT NULL WHEN TRUE then p.tdoc else null end)::integer AS type_doc, "+
-						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docser IS NOT NULL WHEN TRUE then p.docser else null end)::char(10) AS docser, "+
-						"(CASE p.poms_strg>99 and CURRENT_DATE - p.datar >= 3*30 AND p.docnum IS NOT NULL WHEN TRUE then p.docnum else null end)::char(20) AS docnum, " +
-						"ds.fam::char(60) AS fam_pr, "+
-						"ds.im::char(40) AS im_pr, "+
-						"ds.ot::char(40) AS otch_pr," +
-						"ds.datar::date AS dr_pr, " +
-						"(CASE (p.poms_strg > 99 AND CURRENT_DATE - p.datar < 18*365) OR (CURRENT_DATE - p.datar < 3*31 AND p.poms_ser IS NULL AND p.poms_nom IS NULL) WHEN TRUE THEN (CASE ds.pol = 1 WHEN TRUE THEN 'М' ELSE 'Ж' END) ELSE NULL END)::char(1) AS sex_pr, "+
-						"ds.vpolis::char(10) AS vpolis_pr, "+
-						"ds.spolis::char(10) AS spolis_pr, "+
-						"ds.npolis::char(20) AS polis_pr, " +
-						"ds.tdoc::integer AS type_docpr, "+
-						"ds.docser::char(10) AS docser_pr, "+
-						"ds.docnum::char(20) AS docnum_pr, " +
-						"k.region::integer AS region, " +
-						"null::char(10) AS ist_bol, " +
-						"null::integer AS vid_hosp, " +
-						"null::integer AS ter_pol, " +
-						"null::integer AS pol, " +
-						"null::char(20) AS n_mk, " +
-						"p.npasp::integer AS id_lpu, " +
-		    			"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
-						"null::integer AS ter_mu_dir, " +
-						"null::integer AS kod_mu_dir ";
-						
-	        	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) "+
-	        			"JOIN n_o00 o00 ON (o00.pcod = g.cotd_p) "+
-	        			"LEFT JOIN s_mrab m ON (g.cuser = m.pcod and g.cotd_p = m.cpodr) " +
-	      				"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
-	      				"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) ";
-	        	sqlpasp += sqlfrom; 
-	        	sqlpasp += "WHERE g.pr_out<>0 AND o00.clpu = ? "+sqlwhere;
-//	            if (cpodr != 0) {
-//	            	sqlpasp += " AND g.cotd = ? "+sqlwhere;
-//	            	clpu = cpodr;
-//	            }
-//	            else 
-//	            	sqlpasp += " AND o00.clpu = ? "+sqlwhere;
-	        	sqlpasp += " UNION ";
-				sqlpasp ="SELECT g.ngosp::integer AS sl_id, " +
-						"1::integer AS vid_rstr, " +
-						"k.kdpsk::integer AS str_org, " +
-						"10::integer AS ter_mu," +
-						"m.clpu::integer AS kod_mu," +
+						"n00.pcod::integer AS kod_mu," +
 						"current_date::date AS df_per, " +
 						"p.fam::char(60) AS fam, " +
 						"p.im::char(40) AS im, " +
@@ -1268,24 +1148,17 @@ public class GenReestr extends Server implements Iface {
 		    			"(case p.poms_strg>99 when true then p.birthplace else null end)::char(100) AS birthplace, " +
 						"null::integer AS ter_mu_dir, " +
 						"null::integer AS kod_mu_dir ";
-
             	sqlfrom = "FROM patient p JOIN c_gosp g ON (p.npasp = g.npasp) " +
             			"JOIN c_otd o ON (g.id = o.id_gosp) " +
-	        			"JOIN n_o00 o00 ON (o00.pcod = o.cotd) "+
+	        			"JOIN n_n00 n00 ON (n00.pcod = o.cotd) "+
             			"LEFT JOIN s_mrab m ON (o.vrach = m.pcod and o.cotd = m.cpodr) " +
         				"LEFT JOIN n_kas k ON (k.pcod = p.poms_strg) "+
         				"LEFT JOIN p_preds ds ON (ds.npasp = p.npasp) ";
             	sqlpasp += sqlfrom; 
-            	sqlpasp += "WHERE g.pr_out=0 AND o.datav is not null AND o00.clpu = ? "+sqlwhere;
-//	            if (cpodr != 0) {
-//	            	sqlpasp += " AND o.cotd = ? "+sqlwhere;
-//	            	clpu = cpodr;
-//	            }
-//	            else 
-//	            	sqlpasp += " AND o00.clpu = ? "+sqlwhere;
+            	sqlpasp += "WHERE (g.pr_out=0 or g.pr_out is null) AND o.datav is not null AND n00.pcod = ? "+sqlwhere;
             	sqlpasp += " ORDER BY p.npasp ";
 
-    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, clpu, new Date(df), new Date(dn), new Date(dk)));
+    			try (AutoCloseableResultSet acrs = (vidr == 2) ? (sse.execPreparedQuery(sqlpasp, cpodr, new Date(dn), new Date(dk), new Date(dn), new Date(dk))) : (sse.execPreparedQuery(sqlpasp, cpodr, new Date(dn), new Date(dk)));
         				InputStream dbfStr = new DbfMapper(acrs.getResultSet()).mapToStream()) {
         					zos.putNextEntry(new ZipEntry("pasp.dbf"));
         					while ((bufRead = dbfStr.read(buffer)) > 0)

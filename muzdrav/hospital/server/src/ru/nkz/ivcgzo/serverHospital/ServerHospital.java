@@ -125,9 +125,10 @@ public class ServerHospital extends Server implements Iface {
     };
     private static final String[] RDISHOD_FIELD_NAMES = {
    "npasp","ngosp","id_berem","id","serdm","mesto",
-   "deyat","shvat","vody","kashetv","poln","potugi",
+   "deyat","shvatd","vodyd","kashetv","polnd","potugid",
    "posled","vremp","obol","lpupov","obvit","osobp","krov","psih","obezb",
-   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","vespl","detmesto"
+   "eff","prr1","prr2","prr3","prinyl","osmposl","vrash","akush","daterod","vespl","detmesto",
+   "shvatt","vodyt","polnt","potugit"
    };
     private static final String[] RDNOVOR_FIELD_NAMES = {
 	   "npasp", "nrod", "timeon", "kolchild", "nreb", "massa", "rost",
@@ -150,12 +151,14 @@ public class ServerHospital extends Server implements Iface {
     private static final Class<?>[] RdIshodtipes = new Class<?>[] {
 //    	   "npasp",      "ngosp",   "id_berem",         "id",	   "serdm",     "mesto", 
      Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,String.class,
-//    	  "deyat",     "shvat",     "vody",   "kashetv",       "poln",    "potugi",
-     String.class,String.class,String.class,String.class,String.class,String.class,
+//    	  "deyat",  "shvatd",   "vodyd",   "kashetv",   "polnd","potugid",
+     String.class,Date.class,Date.class,String.class,Date.class,Date.class,
 //    	   "posled",     "vremp",        "obol",      "lpupov",     "obvit",      "osobp",       "krov",      "psih",    "obezb",
-     Integer.class, String.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
+     Integer.class, Integer.class, String.class,Integer.class,String.class,String.class,Integer.class,Boolean.class,String.class, 
 //    	     "eff",      "prr1",      "prr2",      "prr3",   "prinyl",   "osmposl",      "vrash",     "akush", "daterod",        "vespl", "detmesto"
-     Integer.class,String.class,String.class,String.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Double.class,String.class
+     Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Integer.class,Date.class,Double.class,String.class,
+//     "shvatt",   "vodyt",   "polnt", "potugit"
+     Time.class,Time.class,Time.class,Time.class
     };
      private static final String[] RdSlStruct_Fields_names  = {
     "id","npasp","datay","dataosl","abort","shet","datam","yavka1","ishod",
@@ -249,7 +252,8 @@ public class ServerHospital extends Server implements Iface {
         rsmRdSl = new TResultSetMapper<>(RdSlStruct.class, RdSlStruct_Fields_names);
         rsmRdNovor = new TResultSetMapper<>(TRd_Novor.class, RDNOVOR_FIELD_NAMES);
         rsmRdSvidRojd = new TResultSetMapper<>(TRd_Svid_Rojd.class, RDSVID_ROJD_FIELD_NAMES);
-        rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class, COMMON_PATIENT_FIELD_NAMES);
+        rsmCommonPatient = new TResultSetMapper<>(TPatientCommonInfo.class,
+                COMMON_PATIENT_FIELD_NAMES);
         rsmBirthPlace = new TResultSetMapper<>(TBirthPlace.class, BIRTHPLACE_FIELD_NAMES);
         rsmInfoLPU = new TResultSetMapper<>(TInfoLPU.class, LPU_FIELD_NAMES);
     }
@@ -329,7 +333,7 @@ public class ServerHospital extends Server implements Iface {
     }
 
     @Override
-    public final TPatient getPatientPersonalInfo(final int patientId, final int idGosp)
+    public final TPatient getPatientPersonalInfo(final int idGosp)
             throws PatientNotFoundException, KmiacServerException {
         String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
                 + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
@@ -344,15 +348,48 @@ public class ServerHospital extends Server implements Iface {
                 + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
                 + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
                 + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
-                + "WHERE patient.npasp= ? AND c_otd.id_gosp = ?;";
+                + "WHERE c_otd.id_gosp = ?;"; // тут был еще npasp, но он лишний
         ResultSet rs = null;
 
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, patientId, idGosp)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idGosp)) {
             rs = acrs.getResultSet();
             if (rs.next()) {
                 return rsmPatient.map(rs);
             } else {
-                log.log(Level.INFO, "PatientNotFoundException, patientId = " + patientId);
+                log.log(Level.INFO, "PatientNotFoundException ");
+                throw new PatientNotFoundException();
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public final TPatient getPatientPersonalInfoByCotd(final int idCotd)
+            throws PatientNotFoundException, KmiacServerException {
+        String sqlQuery = "SELECT patient.npasp, c_otd.id_gosp, patient.datar, patient.fam, "
+                + "patient.im, patient.ot, n_z30.name as pol, c_otd.nist, n_t00.pcod as sgrp, "
+                + "(patient.poms_ser||patient.poms_nom) as poms, "
+                + "(patient.pdms_ser || patient.pdms_nom) as pdms, "
+                + "n_z43.name_s as mrab, c_otd.npal, "
+                + "(adp_gorod || ', ' || adp_ul || ', ' || adp_dom) as reg_add, "
+                + "(adm_gorod || ', ' || adm_UL || ', ' || adm_dom) as real_add, "
+                + "c_gosp.ngosp "
+                + "FROM patient JOIN c_gosp ON c_gosp.npasp = patient.npasp "
+                + "JOIN  c_otd ON c_gosp.id = c_otd.id_gosp "
+                + "LEFT JOIN n_t00 ON n_t00.pcod = c_otd.cprof "
+                + "LEFT JOIN n_z30 ON n_z30.pcod = patient.pol "
+                + "LEFT JOIN n_z43 ON n_z43.pcod = patient.mrab "
+                + "WHERE c_otd.id = ?;"; // тут был еще npasp, но он лишний
+        ResultSet rs = null;
+
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idCotd)) {
+            rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rsmPatient.map(rs);
+            } else {
+                log.log(Level.INFO, "PatientNotFoundException ");
                 throw new PatientNotFoundException();
             }
         } catch (SQLException e) {
@@ -1314,9 +1351,10 @@ public class ServerHospital extends Server implements Iface {
     public final void updateRdIshod(TRdIshod RdIs) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPreparedT("UPDATE c_rd_ishod SET mesto = ?,deyat = ?,shvat = ?,vody = ?,kashetv = ?,poln = ?,potugi = ?, "+
+		sme.execPreparedT("UPDATE c_rd_ishod SET mesto = ?,deyat = ?,shvatd = ?,vodyd = ?,kashetv = ?,polnd = ?,potugid = ?, "+
 "posled = ?,vremp = ?,obol = ?,lpupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
-"daterod = ?, vespl =?, detmesto = ?  WHERE npasp = ? and ngosp = ?", false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,0,1);
+"daterod = ?, vespl =?, detmesto = ?,shvatt = ?,vodyt = ?,polnt = ?,potugit = ?  WHERE npasp = ? and ngosp = ?", 
+false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,0,1);
 		sme.setCommit();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
@@ -1703,7 +1741,9 @@ public class ServerHospital extends Server implements Iface {
 	public void UpdateRdSl(RdSlStruct Dispb) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-			sme.execPreparedT("UPDATE p_rd_sl SET npasp = ?, datay = ?, dataosl = ?, abort = ?, shet = ?, datam = ?, yavka1 = ?, ishod = ?,datasn = ?, datazs = ?,kolrod = ?, deti = ?, kont = ?, vesd = ?, dsp = ?,dsr = ?,dtroch = ?, cext = ?, indsol = ?, prmen = ?,dataz = ?, datasert = ?, nsert = ?, ssert = ?, oslab = ?, plrod = ?, prrod = ?, vozmen = ?, oslrod = ?, polj = ?, dataab = ?, srokab = ?, cdiagt = ?, cvera = ?, rost = ?,eko =?, rub = ?, predp = ?, osp = ?, cmer = ?  WHERE id_pvizit = ?", false, Dispb, rdSlTypes, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,36,37,38,39,40,41, 35);
+		sme.execPreparedT("UPDATE p_rd_sl SET  dataosl = ?, shet = ?, datam = ?, ishod = ?,datasn = ?, kolrod = ?, " +
+		"dsp = ?,dsr = ?,dtroch = ?, cext = ?, cdiagt = ?, cvera = ?  WHERE npasp = ?", 
+		false, Dispb, rdSlTypes, 3,5,6,8,9,11,15,16,17,18,33,34,1);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

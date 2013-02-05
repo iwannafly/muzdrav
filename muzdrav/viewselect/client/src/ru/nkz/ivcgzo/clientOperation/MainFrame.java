@@ -5,19 +5,18 @@ import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import javax.swing.Box;
 
-import java.awt.BorderLayout;
 import javax.swing.JTabbedPane;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
+import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierList;
 import ru.nkz.ivcgzo.clientOperation.model.IOperationModel;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifiers;
 import ru.nkz.ivcgzo.thriftCommon.classifier.StringClassifiers;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOperation.Anesthesia;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaComplication;
 import ru.nkz.ivcgzo.thriftOperation.AnesthesiaPaymentFund;
@@ -35,10 +34,14 @@ import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import org.apache.thrift.TException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.Font;
+import java.util.List;
+
+import javax.swing.JTextField;
 
 public class MainFrame extends JFrame implements IOperationObserver {
 
@@ -100,30 +103,45 @@ public class MainFrame extends JFrame implements IOperationObserver {
     private JLabel lblOperationMaterial;
     private JTextArea taOperationMaterial;
     private JScrollPane spOperationMaterial;
+    private Box hbMain;
+    private Box vbShablon;
+    private JLabel lblShablon;
+    private JTextField tfShablon;
+    private ThriftIntegerClassifierList lShablon;
+    private JScrollPane spShablon;
 
     public MainFrame(final IController inController,
             final IOperationModel inModel) {
+        setMinimumSize(new Dimension(600, 500));
         this.controller = inController;
         this.model = inModel;
         model.registerOperationObserver(this);
         setDefaults();
-        initialization();
+//        initialization();
     }
 
     public void createFrame() {
         initialization();
+        createShablonComponents();
     }
 
     private void setDefaults() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setPreferredSize(new Dimension(980, 600));
-        setSize(new Dimension(980, 600));
-        getContentPane().setLayout(new BorderLayout(0, 0));
+        setPreferredSize(new Dimension(980, 700));
+        setSize(new Dimension(980, 700));
     }
 
     private void initialization() {
+        getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+        
+        hbMain = Box.createHorizontalBox();
+        hbMain.setSize(new Dimension(980, 660));
+        hbMain.setMaximumSize(new Dimension(32000, 32000));
+        hbMain.setMinimumSize(new Dimension(600, 500));
+        hbMain.setPreferredSize(new Dimension(980, 660));
+        getContentPane().add(hbMain);
         tbMain = new JTabbedPane(JTabbedPane.TOP);
-        getContentPane().add(tbMain, BorderLayout.CENTER);
+        hbMain.add(tbMain);
         
         pOperation = new JPanel();
         tbMain.addTab("Операции", null, pOperation, null);
@@ -152,29 +170,30 @@ public class MainFrame extends JFrame implements IOperationObserver {
         
         btnOperationAdd = new JButton("");
         btnOperationAdd.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnOperationAdd.setMaximumSize(new Dimension(50, 50));
-        btnOperationAdd.setPreferredSize(new Dimension(50, 50));
+        btnOperationAdd.setMaximumSize(new Dimension(40, 40));
+        btnOperationAdd.setPreferredSize(new Dimension(40, 40));
         btnOperationAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789242_Add.png")));
         vbOperationTableControls.add(btnOperationAdd);
         
         btnOperationDelete = new JButton("");
         btnOperationDelete.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnOperationDelete.setMaximumSize(new Dimension(50, 50));
-        btnOperationDelete.setPreferredSize(new Dimension(50, 50));
+        btnOperationDelete.setMaximumSize(new Dimension(40, 40));
+        btnOperationDelete.setPreferredSize(new Dimension(40, 40));
         btnOperationDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
         vbOperationTableControls.add(btnOperationDelete);
         
         btnOperationUpdate = new JButton("");
         btnOperationUpdate.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btnOperationUpdate.setMaximumSize(new Dimension(50, 50));
-        btnOperationUpdate.setPreferredSize(new Dimension(50, 50));
+        btnOperationUpdate.setMaximumSize(new Dimension(40, 40));
+        btnOperationUpdate.setPreferredSize(new Dimension(40, 40));
         btnOperationUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         vbOperationTableControls.add(btnOperationUpdate);
         
         verticalBox = Box.createVerticalBox();
+        verticalBox.setPreferredSize(new Dimension(0, 450));
         verticalBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         pOperation.add(verticalBox);
         
@@ -186,6 +205,8 @@ public class MainFrame extends JFrame implements IOperationObserver {
         verticalBox.add(spOperationDescription);
         
         taOperationDescription = new JTextArea();
+        taOperationDescription.setPreferredSize(new Dimension(4, 40));
+        taOperationDescription.setSize(new Dimension(0, 100));
         taOperationDescription.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spOperationDescription.setViewportView(taOperationDescription);
         
@@ -197,6 +218,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         verticalBox.add(spOperationEpicris);
         
         taOperationEpicris = new JTextArea();
+        taOperationEpicris.setPreferredSize(new Dimension(4, 40));
         taOperationEpicris.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spOperationEpicris.setViewportView(taOperationEpicris);
         
@@ -208,6 +230,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         verticalBox.add(spOperationMaterial);
         
         taOperationMaterial = new JTextArea();
+        taOperationMaterial.setPreferredSize(new Dimension(4, 40));
         taOperationMaterial.setFont(new Font("Monospaced", Font.PLAIN, 11));
         spOperationMaterial.setViewportView(taOperationMaterial);
         
@@ -236,24 +259,24 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnOperationComplicationAdd.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnOperationComplicationAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789242_Add.png")));
-        btnOperationComplicationAdd.setPreferredSize(new Dimension(50, 50));
-        btnOperationComplicationAdd.setMaximumSize(new Dimension(50, 50));
+        btnOperationComplicationAdd.setPreferredSize(new Dimension(40, 40));
+        btnOperationComplicationAdd.setMaximumSize(new Dimension(40, 40));
         vbOperationComplicationTableControls.add(btnOperationComplicationAdd);
         
         btnOperationComplicationDelete = new JButton("");
         btnOperationComplicationDelete.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnOperationComplicationDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
-        btnOperationComplicationDelete.setPreferredSize(new Dimension(50, 50));
-        btnOperationComplicationDelete.setMaximumSize(new Dimension(50, 50));
+        btnOperationComplicationDelete.setPreferredSize(new Dimension(40, 40));
+        btnOperationComplicationDelete.setMaximumSize(new Dimension(40, 40));
         vbOperationComplicationTableControls.add(btnOperationComplicationDelete);
         
         btnOperationComplicationUpdate = new JButton("");
         btnOperationComplicationUpdate.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnOperationComplicationUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
-        btnOperationComplicationUpdate.setPreferredSize(new Dimension(50, 50));
-        btnOperationComplicationUpdate.setMaximumSize(new Dimension(50, 50));
+        btnOperationComplicationUpdate.setPreferredSize(new Dimension(40, 40));
+        btnOperationComplicationUpdate.setMaximumSize(new Dimension(40, 40));
         vbOperationComplicationTableControls.add(btnOperationComplicationUpdate);
         
         hbOperationPaymentFundsControls = Box.createHorizontalBox();
@@ -280,22 +303,22 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnOperationPaymentFundsAdd = new JButton("");
         btnOperationPaymentFundsAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789242_Add.png")));
-        btnOperationPaymentFundsAdd.setPreferredSize(new Dimension(50, 50));
-        btnOperationPaymentFundsAdd.setMaximumSize(new Dimension(50, 50));
+        btnOperationPaymentFundsAdd.setPreferredSize(new Dimension(40, 40));
+        btnOperationPaymentFundsAdd.setMaximumSize(new Dimension(40, 40));
         vbOperationPaymentFundsTableControls.add(btnOperationPaymentFundsAdd);
         
         btnOperationPaymentFundsDelete = new JButton("");
         btnOperationPaymentFundsDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
-        btnOperationPaymentFundsDelete.setPreferredSize(new Dimension(50, 50));
-        btnOperationPaymentFundsDelete.setMaximumSize(new Dimension(50, 50));
+        btnOperationPaymentFundsDelete.setPreferredSize(new Dimension(40, 40));
+        btnOperationPaymentFundsDelete.setMaximumSize(new Dimension(40, 40));
         vbOperationPaymentFundsTableControls.add(btnOperationPaymentFundsDelete);
         
         btnOperationPaymentFundsUpdate = new JButton("");
         btnOperationPaymentFundsUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
-        btnOperationPaymentFundsUpdate.setPreferredSize(new Dimension(50, 50));
-        btnOperationPaymentFundsUpdate.setMaximumSize(new Dimension(50, 50));
+        btnOperationPaymentFundsUpdate.setPreferredSize(new Dimension(40, 40));
+        btnOperationPaymentFundsUpdate.setMaximumSize(new Dimension(40, 40));
         vbOperationPaymentFundsTableControls.add(btnOperationPaymentFundsUpdate);
         
         pAnesthesia = new JPanel();
@@ -325,22 +348,22 @@ public class MainFrame extends JFrame implements IOperationObserver {
         hbAnesthesiaControl.add(vbAnesthesiaTableControls);
 
         btnAnesthesiaAdd = new JButton("");
-        btnAnesthesiaAdd.setMaximumSize(new Dimension(50, 50));
-        btnAnesthesiaAdd.setPreferredSize(new Dimension(50, 50));
+        btnAnesthesiaAdd.setMaximumSize(new Dimension(40, 40));
+        btnAnesthesiaAdd.setPreferredSize(new Dimension(40, 40));
         btnAnesthesiaAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789242_Add.png")));
         vbAnesthesiaTableControls.add(btnAnesthesiaAdd);
 
         btnAnesthesiaDelete = new JButton("");
-        btnAnesthesiaDelete.setMaximumSize(new Dimension(50, 50));
-        btnAnesthesiaDelete.setPreferredSize(new Dimension(50, 50));
+        btnAnesthesiaDelete.setMaximumSize(new Dimension(40, 40));
+        btnAnesthesiaDelete.setPreferredSize(new Dimension(40, 40));
         btnAnesthesiaDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
         vbAnesthesiaTableControls.add(btnAnesthesiaDelete);
 
         btnAnesthesiaUpdate = new JButton("");
-        btnAnesthesiaUpdate.setMaximumSize(new Dimension(50, 50));
-        btnAnesthesiaUpdate.setPreferredSize(new Dimension(50, 50));
+        btnAnesthesiaUpdate.setMaximumSize(new Dimension(40, 40));
+        btnAnesthesiaUpdate.setPreferredSize(new Dimension(40, 40));
         btnAnesthesiaUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
         vbAnesthesiaTableControls.add(btnAnesthesiaUpdate);
@@ -370,22 +393,22 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnAnesthesiaComplicationAdd = new JButton("");
         btnAnesthesiaComplicationAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789242_Add.png")));
-        btnAnesthesiaComplicationAdd.setPreferredSize(new Dimension(50, 50));
-        btnAnesthesiaComplicationAdd.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaComplicationAdd.setPreferredSize(new Dimension(40, 40));
+        btnAnesthesiaComplicationAdd.setMaximumSize(new Dimension(40, 40));
         vbAnesthesiaComplicationTableControls.add(btnAnesthesiaComplicationAdd);
 
         btnAnesthesiaComplicationDelete = new JButton("");
         btnAnesthesiaComplicationDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
-        btnAnesthesiaComplicationDelete.setPreferredSize(new Dimension(50, 50));
-        btnAnesthesiaComplicationDelete.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaComplicationDelete.setPreferredSize(new Dimension(40, 40));
+        btnAnesthesiaComplicationDelete.setMaximumSize(new Dimension(40, 40));
         vbAnesthesiaComplicationTableControls.add(btnAnesthesiaComplicationDelete);
 
         btnAnesthesiaComplicationUpdate = new JButton("");
         btnAnesthesiaComplicationUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
-        btnAnesthesiaComplicationUpdate.setPreferredSize(new Dimension(50, 50));
-        btnAnesthesiaComplicationUpdate.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaComplicationUpdate.setPreferredSize(new Dimension(40, 40));
+        btnAnesthesiaComplicationUpdate.setMaximumSize(new Dimension(40, 40));
         vbAnesthesiaComplicationTableControls.add(btnAnesthesiaComplicationUpdate);
 
         hbAnesthesiaPaymentFundsControls = Box.createHorizontalBox();
@@ -413,26 +436,63 @@ public class MainFrame extends JFrame implements IOperationObserver {
         btnAnesthesiaPaymentFundsAdd = new JButton("");
         btnAnesthesiaPaymentFundsAdd.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789242_Add.png")));
-        btnAnesthesiaPaymentFundsAdd.setPreferredSize(new Dimension(50, 50));
-        btnAnesthesiaPaymentFundsAdd.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaPaymentFundsAdd.setPreferredSize(new Dimension(40, 40));
+        btnAnesthesiaPaymentFundsAdd.setMaximumSize(new Dimension(40, 40));
         vbAnesthesiaPaymentFundsTableControls.add(btnAnesthesiaPaymentFundsAdd);
 
         btnAnesthesiaPaymentFundsDelete = new JButton("");
         btnAnesthesiaPaymentFundsDelete.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1331789259_Delete.png")));
-        btnAnesthesiaPaymentFundsDelete.setPreferredSize(new Dimension(50, 50));
-        btnAnesthesiaPaymentFundsDelete.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaPaymentFundsDelete.setPreferredSize(new Dimension(40, 40));
+        btnAnesthesiaPaymentFundsDelete.setMaximumSize(new Dimension(40, 40));
         vbAnesthesiaPaymentFundsTableControls.add(btnAnesthesiaPaymentFundsDelete);
 
         btnAnesthesiaPaymentFundsUpdate = new JButton("");
         btnAnesthesiaPaymentFundsUpdate.setIcon(new ImageIcon(MainFrame.class.getResource(
                 "/ru/nkz/ivcgzo/clientOperation/resources/1341981970_Accept.png")));
-        btnAnesthesiaPaymentFundsUpdate.setPreferredSize(new Dimension(50, 50));
-        btnAnesthesiaPaymentFundsUpdate.setMaximumSize(new Dimension(50, 50));
+        btnAnesthesiaPaymentFundsUpdate.setPreferredSize(new Dimension(40, 40));
+        btnAnesthesiaPaymentFundsUpdate.setMaximumSize(new Dimension(40, 40));
         vbAnesthesiaPaymentFundsTableControls.add(btnAnesthesiaPaymentFundsUpdate);
     }
 
     public void onConnect() {
+    }
+    
+    private void createShablonComponents() {        
+        vbShablon = Box.createVerticalBox();
+        vbShablon.setMaximumSize(new Dimension(250, 32000));
+        vbShablon.setSize(new Dimension(250, 600));
+        vbShablon.setMinimumSize(new Dimension(250, 600));
+        hbMain.add(vbShablon);
+        
+        lblShablon = new JLabel("Фильтр:");
+        lblShablon.setSize(new Dimension(250, 25));
+        vbShablon.add(lblShablon);
+        
+        tfShablon = new JTextField();
+        tfShablon.setAlignmentX(Component.LEFT_ALIGNMENT);
+        tfShablon.setMaximumSize(new Dimension(250, 25));
+        vbShablon.add(tfShablon);
+        tfShablon.setColumns(10);
+        
+        spShablon = new JScrollPane();
+        spShablon.setAlignmentX(Component.LEFT_ALIGNMENT);
+        vbShablon.add(spShablon);
+        
+        lShablon = new ThriftIntegerClassifierList();
+        lShablon.setAlignmentX(Component.LEFT_ALIGNMENT);
+        spShablon.setViewportView(lShablon);
+
+        lShablon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    if (lShablon.getSelectedValue() != null) {
+                        controller.getShablon(lShablon.getSelectedPcod());
+                    }
+                }
+            }
+        });
     }
 
     public void setControls() {
@@ -721,6 +781,7 @@ public class MainFrame extends JFrame implements IOperationObserver {
         controller.setOperationComplicationsList();
         controller.setOperationPaymentFundsList();
         controller.setAnesthesiasList();
+        controller.setOperationShablonList();
 
         if (model.getAnesthesiasList() != null) {
             tbAnesthesia.setData(model.getAnesthesiasList());
@@ -769,4 +830,18 @@ public class MainFrame extends JFrame implements IOperationObserver {
     public void updateOperationTable() {
         tbOperation.setData(model.getOperationsList());
     }
+
+    public void setOperationShablonList(List<IntegerClassifier> shablonNames) {
+        lShablon.setData(shablonNames);
+    }
+
+    public void fillOperInfo(String mat, String text) {
+        if (mat != null) {
+            taOperationMaterial.setText(mat);
+        }
+        if (text != null) {
+            taOperationDescription.setText(text);
+        }
+    }
+
 }

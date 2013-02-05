@@ -170,7 +170,7 @@ public class ReestrForm extends JFrame {
 		        OpenWindowFileChooser();
 				try {
 					pathfile = new File(pathfile).getParentFile().getAbsolutePath();
-					String servPath = MainForm.tcl.getProtokolErrPol(pathfile);//????
+					String servPath = MainForm.tcl.getProtokolErrDSP(pathfile);//????
 					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
 					MainForm.conMan.transferFileFromServer(servPath, cliPath);
 					MainForm.conMan.openFileInEditor(cliPath, false);

@@ -144,13 +144,13 @@ struct TRdIshod {
    5: optional i32 serdm;
    6: optional string mesto;
    7: optional string deyat;
-   8: optional string shvat;
-   9: optional string vody;
+   8: optional i64 shvatd;
+   9: optional i64 vodyd;
   10: optional string kashetv;
-  11: optional string poln;
-  12: optional string potugi;
+  11: optional i64 polnd;
+  12: optional i64 potugid;
   13: optional i32 posled;
-  14: optional string vremp;
+  14: optional i32 vremp;
   15: optional string obol;
   16: optional i32 lpupov;
   17: optional string obvit;
@@ -159,9 +159,9 @@ struct TRdIshod {
   20: optional bool psih;
   21: optional string obezb;
   22: optional i32 eff;
-  23: optional string prr1;
-  24: optional string prr2;
-  25: optional string prr3;
+  23: optional i32 prr1;
+  24: optional i32 prr2;
+  25: optional i32 prr3;
   26: optional i32 prinyl;
   27: optional i32 osmposl;
   28: optional i32 vrash;
@@ -169,6 +169,11 @@ struct TRdIshod {
   30: optional i64 daterod;
   31: optional double vespl; 
   32: optional string detmesto;
+  33: optional i64 vodyt;
+  34: optional i64 shvatt;
+  35: optional i64 polnt;
+  36: optional i64 potugit;
+
 }
 struct RdSlStruct{
         1: optional  i32 id;
@@ -436,7 +441,9 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		2:kmiacServer.KmiacServerException kse);
 	list<TSimplePatient> getAllPatientFromOtd(1:i32 otdNum) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);	
-	TPatient getPatientPersonalInfo(1:i32 patientId, 2:i32 idGosp) throws (1:PatientNotFoundException pnfe,
+	TPatient getPatientPersonalInfo(1:i32 idGosp) throws (1:PatientNotFoundException pnfe,
+		2:kmiacServer.KmiacServerException kse);
+	TPatient getPatientPersonalInfoByCotd(1:i32 idCotd) throws (1:PatientNotFoundException pnfe,
 		2:kmiacServer.KmiacServerException kse);
 	TPriemInfo getPriemInfo(1:i32 idGosp) throws (1: PriemInfoNotFoundException pinfe,
 		2:kmiacServer.KmiacServerException kse);
@@ -489,6 +496,7 @@ service ThriftHospital extends kmiacServer.KmiacServer{
 		throws (1:kmiacServer.KmiacServerException kse);		
 	string printHospitalSummary(1: i32 idGosp, 2: string lpuInfo, 3: TPatient patient)
 		throws (1:kmiacServer.KmiacServerException kse);
+
 	
 /* Классификаторы */
 	
