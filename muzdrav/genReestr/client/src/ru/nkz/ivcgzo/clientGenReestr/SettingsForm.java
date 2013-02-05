@@ -307,9 +307,6 @@ public class SettingsForm extends JDialog {
 		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getClpu());
 		        }
 		        if (Cslu == 4){//дсп
-//		        	if (MainForm.authInfo.getCpodr() == 0)
-//		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
-//		        	else	cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
 		        	cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
 		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 				}
