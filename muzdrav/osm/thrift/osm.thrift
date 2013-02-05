@@ -112,7 +112,7 @@ struct Priem{
 	8: optional i32 n_lek;
 	9: optional string t_chss;
 	10: optional string t_temp;
-	11: optional string t_ad;
+	11: optional string t_ad_sist;
 	12: optional string t_rost;
 	13: optional string t_ves;
 	14: optional string t_st_localis;
@@ -121,6 +121,7 @@ struct Priem{
 	17: optional string t_status_praesense;
 	18: optional string t_fiz_obsl;
 	19: optional string t_recom;
+	20: optional string t_ad_dist;
 }
 
 struct AnamZab{
@@ -435,6 +436,8 @@ struct IsslMet {
 	10: optional string clpu_name;
 	11: optional i32 clpu;
 	12: optional i32 pvizitambId;
+	13: optional i32 cpodr;
+	14: optional i32 kod_lab;
 }
 
 struct IsslPokaz {
@@ -633,6 +636,18 @@ struct VrachInfo {
 	5: optional string short_fio;
 }
 
+struct SpravNetrud {
+	1: optional string fam;
+	2: optional string im;
+	3: optional string oth;
+	4: optional i64 datar;
+	5: optional i32 npasp;
+	6: optional string diag;
+	7: optional i32 userId;
+	8: optional string cpodr_name;
+	9: optional string clpu_name;
+}
+
 exception PvizitNotFoundException {
 }
 
@@ -736,6 +751,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	string printProtokol(1: Protokol pk) throws (1: kmiacServer.KmiacServerException kse);
 	string printMSK(1: i32 npasp)  throws (1: kmiacServer.KmiacServerException kse);
 	string printAnamZab(1: i32 id_pvizit) throws (1: kmiacServer.KmiacServerException kse);
+	string printSpravNetrud(1: SpravNetrud sn) throws (1: kmiacServer.KmiacServerException kse);
 
 
 //classifiers
@@ -748,6 +764,7 @@ service ThriftOsm extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> get_n_c00(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_n_tip() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> get_m00() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> get_n_p0c() throws (1: kmiacServer.KmiacServerException kse);
 
 /*DispBer*/
 	RdSlStruct getRdSlInfo(1: i32 id_pvizit, 2: i32 npasp) throws (1: kmiacServer.KmiacServerException kse, 2: PrdslNotFoundException pnf);

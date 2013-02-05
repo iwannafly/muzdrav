@@ -52,6 +52,11 @@
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/Skalpell.png</locationURI>
 		</link>
 		<link>
+			<name>src/ru/nkz/ivcgzo/clientHospital/resources/archive.png</name>
+			<type>1</type>
+			<locationURI>WORKSPACE_LOC/gitrep/common/resources/archive.png</locationURI>
+		</link>
+		<link>
 			<name>src/ru/nkz/ivcgzo/clientHospital/resources/childbirth.png</name>
 			<type>1</type>
 			<locationURI>WORKSPACE_LOC/gitrep/common/resources/childbirth.png</locationURI>

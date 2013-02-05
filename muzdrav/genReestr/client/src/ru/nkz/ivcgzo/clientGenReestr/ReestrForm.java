@@ -86,6 +86,16 @@ public class ReestrForm extends JFrame {
 			}
 		});
 		
+		JMenuItem ReestrDSPMenu = new JMenuItem ("Реестры ДСП");
+		ReestrDSPMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		ReestrDSPMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				sfrm = new SettingsForm();
+				sfrm.Cslu = 4;
+				sfrm.showSettingsForm();
+			}
+		});
+
 		JMenuItem LoadReestrPolMenu = new JMenuItem ("Реестры поликлиники");
 		LoadReestrPolMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		LoadReestrPolMenu.addActionListener(new ActionListener() {
@@ -152,12 +162,36 @@ public class ReestrForm extends JFrame {
 				}
 			}
 		});
+
+		JMenuItem LoadReestrDSPMenu = new JMenuItem ("Реестры ДСП");
+		LoadReestrDSPMenu.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		LoadReestrDSPMenu.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+		        OpenWindowFileChooser();
+				try {
+					pathfile = new File(pathfile).getParentFile().getAbsolutePath();
+					String servPath = MainForm.tcl.getProtokolErrDSP(pathfile);//????
+					String cliPath = File.createTempFile("protokol", ".htm").getAbsolutePath();
+					MainForm.conMan.transferFileFromServer(servPath, cliPath);
+					MainForm.conMan.openFileInEditor(cliPath, false);
+				} catch (KmiacServerException e) {
+					e.printStackTrace();
+				} catch (TException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		});
 		menu2.add (ReestrPolMenu);
 		menu2.add (ReestrLDSMenu);
 		menu2.add (ReestrStMenu);
+		menu2.add (ReestrDSPMenu);
 		menu3.add (LoadReestrPolMenu);
 		menu3.add (LoadReestrLDSMenu);
 		menu3.add (LoadReestrStMenu);
+		menu3.add (LoadReestrDSPMenu);
 		
 		JPanel panel = new JPanel();
 		GroupLayout gl_panel = new GroupLayout(panel);

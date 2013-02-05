@@ -74,7 +74,7 @@ public class TestServerHospital {
         final int patientId = 450; //10001;
         final int idGosp = 25;
         TPatient patient =
-                testServer.getPatientPersonalInfo(patientId, idGosp);
+                testServer.getPatientPersonalInfo(idGosp);
         System.out.print(patient);
         final int cGosp = 4;
         final Date birthdate = new Date(104, 4, 1); // 2004-05-01
@@ -98,7 +98,8 @@ public class TestServerHospital {
         final int gospId = 4;
         final int chamberNum = 108;
         final int profPcod = 123;
-        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod);
+        final int nist = 1;
+        testServer.updatePatientChamberNumber(gospId, chamberNum, profPcod, nist);
     }
 
     @Test

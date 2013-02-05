@@ -460,13 +460,13 @@ public class ServerViewSelect extends Server implements Iface {
 			     "FROM p_isl_ld JOIN p_rez_l ON (p_rez_l.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_l.cpok) " + 
 			     "JOIN n_nsikodrez ON (n_nsikodrez.kod_rez=p_rez_l.kod_rez) "+
 				 "JOIN n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
-			     "WHERE p_isl_ld.pvizit_id = ? " +
+			     "WHERE p_isl_ld.id_pos = ? " +
 				 "UNION " +
 				 "SELECT p_isl_ld.nisl, n_ldi.pcod AS cldi, n_ldi.name_n AS nldi, n_arez.name, p_isl_ld.datav, p_rez_d.op_name, p_rez_d.rez_name, n_p0e1.gruppa as gruppa " + 
 				 "FROM p_isl_ld JOIN p_rez_d ON (p_rez_d.nisl = p_isl_ld.nisl) JOIN n_ldi ON (n_ldi.pcod = p_rez_d.kodisl) " + 
 				 "LEFT JOIN n_arez ON (n_arez.pcod = p_rez_d.rez) " +
 				 "JOIN n_p0e1 on (n_ldi.c_p0e1=n_p0e1.pcod) "+
-				 "WHERE p_isl_ld.pvizit_id = ? ";
+				 "WHERE p_isl_ld.id_pos = ? ";
 		try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, pvizitId, pvizitId)) {
 			return rsmIsslInfo.mapToList(acrs.getResultSet());
 		} catch (SQLException e) {

@@ -82,7 +82,22 @@ struct Anesthesia {
 	11: optional i64 dataz;
 }
 
+struct OperShablon {
+	1: optional i32 id;
+	2: optional string name;
+	3: optional string operPcod;
+	4: optional string mat;
+	5: optional string text;
+	6: optional string src_text;
+}
+
 service ThriftOperation extends kmiacServer.KmiacServer {
+
+	/**
+     * Возвращает списао названий шаблонов
+	 */
+	list<classifier.IntegerClassifier> getShablonNames(1:string operPcod)
+		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Возвращает список всех операций для данной записи госпитализации
 	 */
@@ -207,5 +222,10 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	 * Удаляет источник оплаты анастезии
 	 */
 	void deleteAnesthesiaPaymentFund(1: i32 id)
+		throws (1: kmiacServer.KmiacServerException kse);
+	/**
+	 * Возвращает текст выбранного шаблона
+	 */
+	OperShablon getShablon(1: i32 id)
 		throws (1: kmiacServer.KmiacServerException kse);
 }
