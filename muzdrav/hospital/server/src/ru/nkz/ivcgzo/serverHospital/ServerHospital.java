@@ -1314,8 +1314,8 @@ public class ServerHospital extends Server implements Iface {
                     numdin = acrs1.getResultSet().getInt(1);
                 }
 				}
-				sme.execPreparedT("insert into c_rd_ishod (npasp,ngosp,daterod,id_berem) "+				
-						   "VALUES (?,?,?,?) ", true, rdIs, RdIshodtipes,0,1,29,2);
+				sme.execPreparedT("insert into c_rd_ishod (npasp,ngosp,daterod,id_berem,shvatd,potugid,polnd,vodyd) "+				
+						   "VALUES (?,?,?,?,?,?,?,?) ", true, rdIs, RdIshodtipes,0,1,29,2,7,11,10,8);
 			int id = sme.getGeneratedKeys().getInt("id");
 			sme.setCommit();
 	        System.out.println("Добавление случая родов готово");
@@ -1355,8 +1355,8 @@ public class ServerHospital extends Server implements Iface {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
 		sme.execPreparedT("UPDATE c_rd_ishod SET mesto = ?,deyat = ?,shvatd = ?,vodyd = ?,kashetv = ?,polnd = ?,potugid = ?, "+
 "posled = ?,vremp = ?,obol = ?,lpupov = ?,obvit = ?,osobp = ?,krov = ?,psih = ?,obezb = ?,eff = ?,prr1 = ?,prr2 = ?,prr3 = ?,prinyl = ?,osmposl = ?,vrash = ?,akush = ?, "+
-"daterod = ?, vespl =?, detmesto = ?,shvatt = ?,vodyt = ?,polnt = ?,potugit = ?  WHERE npasp = ? and ngosp = ?", 
-false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,0,1);
+"daterod = ?, vespl =?, detmesto = ?,shvatt = ?,vodyt = ?,polnt = ?,potugit = ?  WHERE npasp = ? and ngosp = ? and id = ? ", 
+false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,0,1,3);
 		sme.setCommit();
 	} catch (SQLException e) {
 		((SQLException) e.getCause()).printStackTrace();
@@ -1544,22 +1544,35 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 		public RdSlStruct getRdSlInfo(int npasp) 
 				throws PrdSlNotFoundException, KmiacServerException {
         AutoCloseableResultSet acrs1;
-//        long fWeeks = 24192000000L;
-//        long test = System.currentTimeMillis()- fWeeks;
-//        Date daterod =  new Date(test);
         Date daterod =  new Date(System.currentTimeMillis()-24192000000L);
+        Date daterod1 =  new Date(System.currentTimeMillis());
 		Integer ish = 1;
-//        System.out.println("случай родов");
-//        System.out.println(npasp);
-//        System.out.println(System.currentTimeMillis());
-//        System.out.println(daterod);
-//        System.out.println(test);
         try (AutoCloseableResultSet acrs = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
 			if (acrs.getResultSet().next()) {
                 return rsmRdSl.map(acrs.getResultSet());
             } else {
-                throw new PrdSlNotFoundException();
-            }
+						try (SqlModifyExecutor sme = tse.startTransaction()) {
+							sme.execPrepared("insert into p_rd_sl " +
+								"(npasp,yavka1,datay,datasn) VALUES (?,?,?,?) ",true, npasp,40,daterod1,daterod1);
+							sme.setCommit();
+					        System.out.println("случай беременности добавлен");
+						} catch (InterruptedException e) {
+							throw new KmiacServerException();
+						}
+		 //          	
+				  		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery("select * from p_rd_sl where npasp = ? ", npasp)) {
+							if (acrs2.getResultSet().next()) {
+				                return rsmRdSl.map(acrs2.getResultSet());
+				            } else {
+				                throw new PrdSlNotFoundException();
+				            }
+
+						} catch (SQLException e) {
+							((SQLException) e.getCause()).printStackTrace();
+							log.log(Level.ERROR, "SqlException", e);
+							throw new KmiacServerException();
+						}
+		            }
 
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();
@@ -1567,30 +1580,6 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 			throw new KmiacServerException();
 		}
 	}
-//			if (!acrs.getResultSet().next()) {
-//				try (SqlModifyExecutor sme = tse.startTransaction()) {
-//					sme.execPrepared("insert into p_rd_sl " +
-//						"(npasp,datay,ishod) VALUES (?,?,?) ",true, npasp,daterod,ish);
-//					int id = sme.getGeneratedKeys().getInt("id");
-//					sme.setCommit();
-//				} catch (InterruptedException e) {
-//					throw new KmiacServerException();
-//				}
-//			}
-//		} catch (SQLException e) {
-//			((SQLException) e.getCause()).printStackTrace();
-//			throw new KmiacServerException();
-//		}
-//		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery(
-//				"select * from p_rd_sl where npasp = ? and datay>= ? ", npasp,daterod)) {
-//			if (acrs2.getResultSet().next())
-//				return rsmRdSl.map(acrs2.getResultSet());
-//			else
-//				throw new KmiacServerException("rd sl not found");
-//		} catch (SQLException e) {
-//			throw new KmiacServerException();
-//		}	
-//	}
 
 	@Override
 	public RdDinStruct getRdDinInfo(int npasp,int ngosp)
@@ -1659,48 +1648,6 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 			throw new KmiacServerException();
 		}
 	}
-//			if (!acrs.getResultSet().next()) {
-//				AutoCloseableResultSet acrs1 = sse.execPreparedQuery("select srok,oj, "+
-//		        "hdm,spl,chcc,polpl,predpl,serd,serd1,ves "+	
-//			    " from p_rd_din where npasp = ? order by id_pos", npasp);
-//				if (acrs1.getResultSet().next()) {
-////присваиваем значения из динамики, в итоге из-за сортировки имеем последние 
-//// значения, если в поликлинике не было записей - значения будут нулевыми					
-//				srok = acrs1.getResultSet().getInt(1);
-//				oj = acrs1.getResultSet().getInt(2);
-//				ves = acrs1.getResultSet().getDouble(10);
-//				hdm = acrs1.getResultSet().getInt(3);
-//				spl = acrs1.getResultSet().getInt(4);
-//				chcc = acrs1.getResultSet().getInt(5);
-//				polpl = acrs1.getResultSet().getInt(6);
-//				predpl = acrs1.getResultSet().getInt(7);
-//				serd = acrs1.getResultSet().getInt(8);
-//				serd1 = acrs1.getResultSet().getInt(9);
-//				}
-//				try (SqlModifyExecutor sme = tse.startTransaction()) {
-//					sme.execPrepared("insert into p_rd_din " +
-//						"(npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ",true, npasp,ngosp,srok,oj,hdm,spl,chcc,polpl,predpl,serd,serd1,ves);
-////					int id = sme.getGeneratedKeys().getInt("id");
-//					sme.setCommit();
-//			        System.out.println("динамика добавлена");
-//				} catch (InterruptedException e) {
-//					throw new KmiacServerException();
-//				}
-//			}
-//		} catch (SQLException e) {
-//			((SQLException) e.getCause()).printStackTrace();
-//			throw new KmiacServerException();
-//		}
-//		try (AutoCloseableResultSet acrs2 = sse.execPreparedQuery(
-//				"select * from p_rd_din where npasp = ? and ngosp= ? ", npasp,ngosp)) {
-//			if (acrs2.getResultSet().next())
-//				return rsmRdDin.map(acrs2.getResultSet());
-//			else
-//				throw new KmiacServerException("rd sl not found");
-//		} catch (SQLException e) {
-//			throw new KmiacServerException();
-//		}	
-//	}
 
 	@Override
 	public void AddRdSl(RdSlStruct rdSl) throws KmiacServerException, TException {
@@ -1743,9 +1690,9 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	public void UpdateRdSl(RdSlStruct Dispb) throws KmiacServerException,
 			TException {
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
-		sme.execPreparedT("UPDATE p_rd_sl SET  dataosl = ?, shet = ?, datam = ?, ishod = ?,datasn = ?, kolrod = ?, " +
-		"dsp = ?,dsr = ?,dtroch = ?, cext = ?, cdiagt = ?, cvera = ?  WHERE npasp = ?", 
-		false, Dispb, rdSlTypes, 3,5,6,8,9,11,15,16,17,18,33,34,1);
+		sme.execPreparedT("UPDATE p_rd_sl SET  dataosl = ?, shet = ?, datam = ?, ishod = ?, kolrod = ?, " +
+		"dsp = ?,dsr = ?,dtroch = ?, cext = ?, cdiagt = ?, cvera = ?  WHERE npasp = ? and datasn = ?", 
+		false, Dispb, rdSlTypes, 3,5,6,8,11,15,16,17,18,33,34,1,9);
 			sme.setCommit();
 		} catch (SQLException e) {
 			((SQLException) e.getCause()).printStackTrace();

@@ -2454,7 +2454,7 @@ public class Vvod extends JFrame {
 		
 		spZakl = new JScrollPane();
 		
-		cmbZaklIsh = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_ap0);
+		cmbZaklIsh = new ThriftIntegerClassifierCombobox<>(true);
 		
 		lblZaklRek = new JLabel("Медицинские рекомендации");
 		
@@ -3073,6 +3073,7 @@ public class Vvod extends JFrame {
 			cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 			cmbLpu.setData(MainForm.tcl.get_m00());
 			cmbCelObr.setData(MainForm.tcl.get_n_p0c());
+			cmbZaklIsh.setData(MainForm.tcl.get_n_ap0());
 			cmbLpu.setSelectedPcod(MainForm.authInfo.getClpu());
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			if (!isStat)
