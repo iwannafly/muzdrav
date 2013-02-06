@@ -70,7 +70,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
-
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
@@ -1879,6 +1878,8 @@ public class Vvod extends JFrame {
 				try {
 					if (cmbNaprMesto.getSelectedItem() != null)
 						cmbOrgan.setData(MainForm.tcl.get_n_nz1(cmbNaprMesto.getSelectedItem().pcod));
+						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet("", 0));
+
 				} catch (KmiacServerException e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
@@ -3485,6 +3486,8 @@ public class Vvod extends JFrame {
 			pvizit.setCpol(MainForm.authInfo.getCpodr());
 			pvizit.setDatao(getDateMills(System.currentTimeMillis()));
 			pvizit.setCuser(MainForm.authInfo.getUser_id());
+			pvizit.setCdol(MainForm.authInfo.getCdol());
+			pvizit.setCod_sp(MainForm.authInfo.getPcod());
 			pvizit.setDataz(System.currentTimeMillis());
 			pvizit.setId(idPvizit);
 			if (idPvizit == 0)
