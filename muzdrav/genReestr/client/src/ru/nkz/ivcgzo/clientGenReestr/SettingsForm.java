@@ -2,8 +2,6 @@ package ru.nkz.ivcgzo.clientGenReestr;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,12 +23,9 @@ import javax.swing.border.TitledBorder;
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
 import ru.nkz.ivcgzo.clientManager.common.swing.ThriftIntegerClassifierCombobox;
 import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
 import java.awt.Font;
 
 public class SettingsForm extends JDialog {
@@ -194,6 +189,8 @@ public class SettingsForm extends JDialog {
 				if (rbtn4.isSelected()) vidrstr = 4;
 				try {		//формирование реестров
 					if((tfDn.getDate().getTime() <= tfDk.getDate().getTime() || vidrstr != 0)){
+						File f = new File("C:\\OUTPUT\\REESTR\\");
+						if (!f.exists()) f.mkdirs();
 						if (Cslu == 1){
 				        	String clpu = "100"+Integer.toString(MainForm.authInfo.getClpu());
 			        		if(cmb_podr.getSelectedPcod() != null){ 
@@ -201,12 +198,12 @@ public class SettingsForm extends JDialog {
 //			        			else clpu = Integer.toString(cmb_podr.getSelectedPcod());
 			        			servPath = MainForm.tcl.getReestrInfoOtd(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
 			        		}else servPath = MainForm.tcl.getReestrInfoOtd(0, tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), 10, System.currentTimeMillis());
-				        	cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+clpu+".rar";
+				        	cliPath = f.getAbsolutePath()+"\\L_"+sdf.format(new Date())+"_"+clpu+".rar";
 						}
 				        if (Cslu == 2){
 				        	if(cmb_podr.getSelectedPcod() != null){
 				        		servPath = MainForm.tcl.getReestrInfoPol(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+cmb_podr.getSelectedPcod()+".rar";
+				        		cliPath = f.getAbsolutePath()+"\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+cmb_podr.getSelectedPcod()+"_app"+".rar";
 							}else
 								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
@@ -218,12 +215,12 @@ public class SettingsForm extends JDialog {
 			        			servPath = MainForm.tcl.getReestrInfoLDS(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
 			        		}
 			        		else servPath = MainForm.tcl.getReestrInfoLDS(0, tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-							cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+clpu+"_usl.rar";
+							cliPath = f.getAbsolutePath()+"\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+clpu+"_usl.rar";
 				        }
 				        if (Cslu == 4){
 				        	if(cmb_podr.getSelectedPcod() != null){
 				        		servPath = MainForm.tcl.getReestrInfoDSP(cmb_podr.getSelectedPcod(), tfDn.getDate().getTime(), tfDk.getDate().getTime(), vidrstr, 2, MainForm.authInfo.getClpu(), MainForm.authInfo.getKdate(), System.currentTimeMillis());
-				        		cliPath = "C:\\Temp_err\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+cmb_podr.getSelectedPcod()+".rar";
+				        		cliPath = f.getAbsolutePath()+"\\L_"+sdf.format(new Date())+"_"+Integer.valueOf(Terp)+cmb_podr.getSelectedPcod()+"_dsp"+".rar";
 							}else
 								JOptionPane.showMessageDialog(null, "Выберите подразделение ЛПУ.", null, JOptionPane.INFORMATION_MESSAGE); 
 				        }
@@ -242,15 +239,12 @@ public class SettingsForm extends JDialog {
 					}else
 						JOptionPane.showMessageDialog(null, "Укажите все параметры формирования реестра.", null, JOptionPane.INFORMATION_MESSAGE); 
 				} catch (KmiacServerException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (TException e) {
 					e.printStackTrace();
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -313,9 +307,6 @@ public class SettingsForm extends JDialog {
 		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getClpu());
 		        }
 		        if (Cslu == 4){//дсп
-//		        	if (MainForm.authInfo.getCpodr() == 0)
-//		        		cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
-//		        	else	cmb_podr.setData(MainForm.tcl.getPolForCurrentLpu(MainForm.authInfo.getCpodr()));
 		        	cmb_podr.setData(MainForm.tcl.getAllPolForCurrentLpu(MainForm.authInfo.getClpu()));
 		        	cmb_podr.setSelectedPcod(MainForm.authInfo.getCpodr());
 				}
