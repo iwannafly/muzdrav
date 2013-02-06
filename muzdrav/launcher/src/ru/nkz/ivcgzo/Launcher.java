@@ -122,6 +122,7 @@ public class Launcher {
 			appServerIp = "10.1.1.8";
 			break;
 		}
+//		checkForJavaFx();
 		try (Socket servSct = new Socket(appServerIp, 55201)) {
 			handShake(servSct);
 			Document domLibList = getLibrariesList(servSct);
@@ -130,6 +131,30 @@ public class Launcher {
 		}
 	}
 	
+//	private void checkForJavaFx() throws Exception {
+//		String javaHome;
+//		Path jfxLibFile, jfxMuzFile;
+//		
+//		javaHome = System.getProperty("java.home");
+//		if (javaHome == null) {
+//			JOptionPane.showMessageDialog(null, "Исполняемая среда Java установлена некорректно.\nПереустановите ее, скачав последний дистрибутив с официального сайта http://www.oracle.com/technetwork/java/javase/downloads/index.html.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//			throw new Exception("Jre not set up correctly.");
+//		}
+//		
+//		jfxLibFile = Paths.get(javaHome, "lib", "jfxrt.jar");
+//		if (!jfxLibFile.toFile().exists()) {
+//			JOptionPane.showMessageDialog(null, "Библиотека JavaFX не установлена.\nУстановите ее, скачав последний дистрибутив с официального сайта http://www.oracle.com/technetwork/java/javase/downloads/index.html.", "Ошибка", JOptionPane.ERROR_MESSAGE);
+//			throw new Exception("Jfx not set up.");
+//		}
+//		
+//		jfxMuzFile = Paths.get(new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getAbsolutePath(), "lib", "jfxrt.jar");
+//		if (!jfxMuzFile.toFile().exists()) {
+//			Files.copy(jfxLibFile, jfxMuzFile);
+//		} else if (jfxLibFile.toFile().length() != jfxMuzFile.toFile().length()) {
+//			Files.copy(jfxLibFile, jfxMuzFile, StandardCopyOption.REPLACE_EXISTING);
+//		}
+//	}
+
 	private void handShake(Socket servSct) throws Exception {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(servSct.getInputStream()));

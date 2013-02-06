@@ -1,7 +1,5 @@
 package ru.nkz.ivcgzo.clientGenReestr;
 
-import java.awt.BorderLayout;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
@@ -9,25 +7,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
-import javax.swing.JTabbedPane;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.thrift.TException;
 
 import ru.nkz.ivcgzo.configuration;
-import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
-import ru.nkz.ivcgzo.thriftCommon.fileTransfer.OpenFileException;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
-import ru.nkz.ivcgzo.thriftGenReestr.ReestrNotFoundException;
 import java.awt.Font;
 
 

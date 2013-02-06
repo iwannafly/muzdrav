@@ -70,7 +70,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.thrift.TException;
-
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomDateEditor;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
@@ -1879,6 +1878,8 @@ public class Vvod extends JFrame {
 				try {
 					if (cmbNaprMesto.getSelectedItem() != null)
 						cmbOrgan.setData(MainForm.tcl.get_n_nz1(cmbNaprMesto.getSelectedItem().pcod));
+						tblNaprPokazMet.setData(MainForm.tcl.getPokazMet("", 0));
+
 				} catch (KmiacServerException e1) {
 					JOptionPane.showMessageDialog(Vvod.this, "Ошибка на сервере", "Ошибка", JOptionPane.ERROR_MESSAGE);
 				} catch (TException e1) {
@@ -2453,7 +2454,7 @@ public class Vvod extends JFrame {
 		
 		spZakl = new JScrollPane();
 		
-		cmbZaklIsh = new ThriftIntegerClassifierCombobox<>(IntegerClassifiers.n_ap0);
+		cmbZaklIsh = new ThriftIntegerClassifierCombobox<>(true);
 		
 		lblZaklRek = new JLabel("Медицинские рекомендации");
 		
@@ -3072,6 +3073,7 @@ public class Vvod extends JFrame {
 			cmbVidStacionar.setData(MainForm.tcl.get_n_tip());
 			cmbLpu.setData(MainForm.tcl.get_m00());
 			cmbCelObr.setData(MainForm.tcl.get_n_p0c());
+			cmbZaklIsh.setData(MainForm.tcl.get_n_ap0());
 			cmbLpu.setSelectedPcod(MainForm.authInfo.getClpu());
 			listVidIssl = MainForm.tcl.get_vid_issl();
 			if (!isStat)
@@ -3485,6 +3487,8 @@ public class Vvod extends JFrame {
 			pvizit.setCpol(MainForm.authInfo.getCpodr());
 			pvizit.setDatao(getDateMills(System.currentTimeMillis()));
 			pvizit.setCuser(MainForm.authInfo.getUser_id());
+			pvizit.setCdol(MainForm.authInfo.getCdol());
+			pvizit.setCod_sp(MainForm.authInfo.getPcod());
 			pvizit.setDataz(System.currentTimeMillis());
 			pvizit.setId(idPvizit);
 			if (idPvizit == 0)

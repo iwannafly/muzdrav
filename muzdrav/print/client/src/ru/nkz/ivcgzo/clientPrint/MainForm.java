@@ -29,6 +29,7 @@ public class MainForm extends Client<ThriftPrint.Client> {
 		setFrame(frame);
 		
 		instance = this;
+		
 	}
 
 
