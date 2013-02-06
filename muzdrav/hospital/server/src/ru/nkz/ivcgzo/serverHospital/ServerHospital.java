@@ -72,7 +72,7 @@ public class ServerHospital extends Server implements Iface {
 	private static final String childBirthDocSeries = "32";
 	private static final String childBirthDocPath = "\\plugin\\reports\\ChildBirthDocument.htm";
     private static Logger log = Logger.getLogger(ServerHospital.class.getName());
-    private TServer tServer;
+    private TServer tServer = null;
     private TResultSetMapper<TSimplePatient, TSimplePatient._Fields> rsmSimplePatient;
     private TResultSetMapper<TPatient, TPatient._Fields> rsmPatient;
     private TResultSetMapper<TPriemInfo, TPriemInfo._Fields> rsmPriemInfo;
@@ -265,14 +265,16 @@ public class ServerHospital extends Server implements Iface {
 
         tServer = new TThreadedSelectorServer(new Args(
                 new TNonblockingServerSocket(configuration.thrPort)).processor(proc));
-        log.log(Level.INFO, "hospital server started");
+        log.log(Level.INFO, "Hospital server started");
         tServer.serve();
     }
 
     @Override
     public final void stop() {
-        tServer.stop();
-        log.log(Level.INFO, "hospital server stopped");
+    	if (this.tServer != null) {
+    		tServer.stop();
+    		log.log(Level.INFO, "Hospital server stopped");
+    	}
     }
 
     @Override
@@ -2273,14 +2275,14 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
                     .getLocation().getPath());
             HtmTemplate htmTemplate = new HtmTemplate(a.getParentFile().getParentFile().getAbsolutePath()
                     + ServerHospital.childBirthDocPath);
+            //Номер свидетельства:
             String childBirthNumber = String.format("%6d", ndoc);
             childBirthNumber = childBirthNumber.replaceAll(" ", "0");
-            SimpleDateFormat sdfDay = new SimpleDateFormat("dd");
-            SimpleDateFormat sdfMonth = new SimpleDateFormat("MMMMMMM");
-            SimpleDateFormat sdfMonthShort = new SimpleDateFormat("MM");
-            SimpleDateFormat sdfYear = new SimpleDateFormat("yyyy");
+            //Форматы вывода даты:
+            SimpleDateFormat sdfDay = new SimpleDateFormat("dd"), sdfMonth = new SimpleDateFormat("MMMMMMM"),
+    			sdfMonthShort = new SimpleDateFormat("MM"), sdfYear = new SimpleDateFormat("yyyy");
             GregorianCalendar dateOff = new GregorianCalendar();
-            dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи мед.свид-ва
+            dateOff.setTimeInMillis(childDoc.getDateoff());	//Дата выдачи мед. свидетельства
             //Местность регистрации матери:
             String city1 = "", city2 = "";
             String country1 = "", country2 = "";

@@ -45,7 +45,9 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
-//TODO: ТЕСТИРОВАТЬ!
+//TODO: ЮНИТ-ТЕСТИРОВАНИЕ
+//TODO: СОВМЕСТИМОСТЬ С LibreOffice
+//TODO: НУЖЕН ЛИ toUpperCase В СВИДЕТЕЛЬСТВЕ О РОЖДЕНИИ
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич
@@ -60,8 +62,8 @@ public class Children extends JPanel {
     private JPanel panelChildEdit, panelDoc;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbBirthPlace;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbMotherWork;
-    private JComboBox<String> cbBirthHappen;
     private JButton btnSaveChild, btnGiveDoc, btnPrintBlank, btnFillDoc;
+    private JComboBox<String> cbBirthHappen;
     private CustomTimeEditor cteBirthTime;
     private JTextField tfDocName;
     private JSpinner spinnerDocNum;
