@@ -900,6 +900,7 @@ public class PacientInfoFrame extends JFrame {
         panel_7.setBorder(new TitledBorder(null, "Документ, удостоверяющий личность :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         
         JPanel panel_37 = new JPanel();
+        panel_37.setVisible(false);
         panel_37.setBorder(new TitledBorder(null, "Для инообластных граждан :", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         GroupLayout gl_tpPersonal = new GroupLayout(tpPersonal);
         gl_tpPersonal.setHorizontalGroup(
