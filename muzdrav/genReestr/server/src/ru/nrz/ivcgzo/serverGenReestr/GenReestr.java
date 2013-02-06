@@ -1024,7 +1024,6 @@ public class GenReestr extends Server implements Iface {
    	   								e1.printStackTrace();
    	   							}
    	   						} 
-   							
    						}
    						npasp = rs.getInt("npasp");
    					}
@@ -1038,8 +1037,8 @@ public class GenReestr extends Server implements Iface {
    				throw new KmiacServerException("Could not get pasp errors.");
    			}
 
-   		//if (!flag){
-			try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoPol", ".zip").getAbsolutePath());
+   		if (!flag){
+			try (FileOutputStream fos = new FileOutputStream(path = File.createTempFile("reestrInfoDsp", ".zip").getAbsolutePath());
 					ZipOutputStream zos = new ZipOutputStream(fos)) {
 				byte[] buffer = new byte[8192];
 				int bufRead;
@@ -1168,7 +1167,7 @@ public class GenReestr extends Server implements Iface {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		//}
+		}
 		return path;
 	}
 
