@@ -66,6 +66,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 	public FacZd pFacZd;
 	public tableVrach pTableVrach;
 	public PlanDisp pPlanDisp;
+	public PasUch pPasUch;
 	static int disp; 
 
 	/**
@@ -123,6 +124,18 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 			}
 		});
 		menu_3.add(menuItem_1);
+		
+		final JMenuItem menuItem_10 = new JMenuItem("Паспорт участка");
+		menuItem_10.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				pPasUch = new PasUch();
+				panel.removeAll();
+				panel.add(pPasUch);
+				panel.revalidate();
+				frame.setTitle("Статистическая отчетность: "+menuItem_1.getText());
+			}
+		});
+		menu_2.add(menuItem_10);
 		
 		JMenu menu_4 = new JMenu("Сводки по форме 039");
 		menu_2.add(menu_4);
@@ -200,6 +213,7 @@ public class MainForm extends Client<ThriftOutputInfo.Client> {
 		JMenu menu_9 = new JMenu("Годовые отчеты");
 		menu_2.add(menu_9);
 		
+	
 		JMenuItem menuItem_2 = new JMenuItem("Табель врача");
 		menuItem_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

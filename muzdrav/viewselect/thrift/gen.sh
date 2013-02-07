@@ -11,6 +11,7 @@ thrift --gen java lab.thrift \
 && thrift --gen java reception.thrift \
 && thrift --gen java ../../../common/thrift/classifier.thrift \
 && thrift --gen java ../../../common/thrift/kmiacServer.thrift \
+&& thrift --gen java medication.thrift \
 && echo "${GREEN}$CUR_THRIFT_FILE sources successfully generated" \
 || echo "${RED}!!!ERROR!!! $CUR_THRIFT_FILE sources generation failed"
 tput sgr0
