@@ -91,6 +91,7 @@ public class PIslForm {
 	private CustomTable<ObInfIsl, ObInfIsl._Fields> tn_ldi;
 	private CustomTable<LabIsl, LabIsl._Fields> tlab_isl;
 	private CustomTextField tFkodisl;
+	private CustomTextField tFTalon;
 	public ThriftStringClassifierCombobox<StringClassifier> cBpcisl;
 	public ThriftStringClassifierCombobox<StringClassifier> cBkodisl;
 	public ThriftStringClassifierCombobox<StringClassifier> cBpcod_m;
@@ -108,6 +109,8 @@ public class PIslForm {
 	public JTextPane tPop_name;
 	public JTextPane tFrez_name;
 	public JSpinner spkol;
+	public JButton btnNewButton_9;
+
 	
 	/**
 	 * Create the application.
@@ -276,6 +279,16 @@ public class PIslForm {
 				
 			}
 		});
+		
+		btnNewButton_9 = new JButton("Информация о пациенте");
+		btnNewButton_9.setVisible(false);
+		btnNewButton_9.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				MainForm.conMan.showPatientInfoForm("Информация о пациенте", tpatient.getSelectedItem().npasp);
+				
+			}
+		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -284,14 +297,17 @@ public class PIslForm {
 					.addComponent(btnNewButton)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(btnNewButton_8)
-					.addContainerGap(685, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED, 514, Short.MAX_VALUE)
+					.addComponent(btnNewButton_9)
+					.addContainerGap())
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(btnNewButton)
-						.addComponent(btnNewButton_8))
+						.addComponent(btnNewButton_8)
+						.addComponent(btnNewButton_9))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		panel.setLayout(gl_panel);
@@ -434,6 +450,8 @@ public class PIslForm {
 					upnisl.setNprob(Integer.parseInt(tFnprob.getText()));
 				}
 				
+				upnisl.setTalon(tFTalon.getText());
+				
 				upnisl.setPcisl(cBpcisl.getSelectedPcod());
 				
 				
@@ -482,6 +500,8 @@ public class PIslForm {
 				if (tFnprob.getText() != null){
 					tn_ldi.getSelectedItem().setNprob(Integer.parseInt(tFnprob.getText()));
 				}
+				
+				tn_ldi.getSelectedItem().setTalon(tFTalon.getText());
 				
 				tn_ldi.getSelectedItem().setPcisl(cBpcisl.getSelectedPcod());
 				tn_ldi.getSelectedItem().setDatap(tFdatap.getDate().getTime());
@@ -730,6 +750,7 @@ public class PIslForm {
 				
 				tFnprob.setText(String.valueOf(tn_ldi.getSelectedItem().nprob));
 				
+				tFTalon.setText(tn_ldi.getSelectedItem().talon);
 								
 				if(tn_ldi.getSelectedItem().prichina != 0){
 					cBprichina.setSelectedPcod(tn_ldi.getSelectedItem().prichina);
@@ -998,6 +1019,75 @@ public class PIslForm {
 			cBnapravl = new ThriftIntegerClassifierCombobox<>(true);
 			
 			tFnaprotd = new CustomTextField();
+			tFnaprotd.addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusLost(FocusEvent e) {
+					Boolean ch = true;  
+					
+					try {					
+											
+						if (cBnapravl.getSelectedPcod() == 1){
+							List<IntegerClassifier> Pus;
+
+								Pus = MainForm.ltc.GetKlasPrvO00(MainForm.authInfo.clpu, Integer.valueOf(tFnaprotd.getText()));
+						
+							if (Pus.size()==0){
+								System.out.println(Pus.size());
+								ch = false;
+							}
+						
+						}else{
+							if (cBnapravl.getSelectedPcod() == 2){
+								List <IntegerClassifier> Pus = MainForm.ltc.GetKlasPrvN00(Integer.valueOf(tFnaprotd.getText()));
+							
+								if (Pus.size()==0){
+									System.out.println(Pus.size());
+									ch = false;
+								}	
+							}else{
+								List <IntegerClassifier> Pus = MainForm.ltc.GetKlasPrvM00(Integer.valueOf(tFnaprotd.getText()));
+							
+								if (Pus.size()==0){
+									//System.out.println(Pus.size());
+									ch = false;
+								}	
+							}
+						
+						}
+					
+												
+					} catch (NumberFormatException | TException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+					
+					if ((ch == false)&&(tFnaprotd.getText().trim().isEmpty()==false)){
+						if (cBnapravl.getSelectedPcod() == 1){
+							IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_o00);
+						
+							if (res != null)
+								tFnaprotd.setText(String.valueOf(res.pcod));
+						}else{
+						
+							if (cBnapravl.getSelectedPcod() == 2){
+								IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_n00);
+							
+									if (res != null)
+										tFnaprotd.setText(String.valueOf(res.pcod));
+							}else{
+									IntegerClassifier res = MainForm.conMan.showIntegerClassifierSelector(IntegerClassifiers.n_m00);
+							
+									if (res != null)
+										tFnaprotd.setText(String.valueOf(res.pcod));
+							}
+						
+						}
+					}
+					
+					
+				}
+			});
 			tFnaprotd.getDocument().addDocumentListener(new DocumentListener() {
 				
 				@Override
@@ -1122,6 +1212,11 @@ public class PIslForm {
 			
 			cBCuser = new ThriftIntegerClassifierCombobox<>(true);
 			
+			JLabel lblNewLabel_11 = new JLabel("№ талона");
+			
+			tFTalon = new CustomTextField();
+			tFTalon.setColumns(10);
+			
 			GroupLayout gl_panel_1 = new GroupLayout(panel_1);
 			gl_panel_1.setHorizontalGroup(
 				gl_panel_1.createParallelGroup(Alignment.LEADING)
@@ -1144,7 +1239,11 @@ public class PIslForm {
 								.addGap(4)
 								.addComponent(lblNewLabel_3)
 								.addGap(4)
-								.addComponent(tFnprob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+								.addComponent(tFnprob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(lblNewLabel_11)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(tFTalon, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addContainerGap()
 								.addComponent(lblNewLabel_4)
@@ -1210,7 +1309,10 @@ public class PIslForm {
 							.addGroup(gl_panel_1.createSequentialGroup()
 								.addGap(3)
 								.addComponent(lblNewLabel_3))
-							.addComponent(tFnprob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+								.addComponent(tFnprob, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblNewLabel_11)
+								.addComponent(tFTalon, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 						.addGap(2)
 						.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
 							.addGroup(gl_panel_1.createSequentialGroup()
@@ -2187,7 +2289,7 @@ public class PIslForm {
 		try {
 			//tpatient.setData(MainForm.ltc.getPatDat(new SimpleDateFormat("dd.MM.yyyy").parse("14.08.2012").getTime(), 2000004));
 				
-				System.out.println(System.currentTimeMillis());
+				//System.out.println(System.currentTimeMillis());
 				tpatient.setData(MainForm.ltc.getPatDat(MainForm.authInfo.cpodr));
 			
 			//tn_ldi.setData(MainForm.ltc.GetObInfIslt( tpatient.getSelectedItem().npasp, 2000004));
