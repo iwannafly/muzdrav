@@ -2038,7 +2038,8 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 				"FROM c_rd_ishod a " +
 				"JOIN patient b ON (a.npasp = b.npasp) " +
 				"WHERE (a.daterod = ?);";
-	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(SQLQuery, new Date(BirthDate))) {
+	    try (AutoCloseableResultSet acrs = sse.execPreparedQuery(
+	    		SQLQuery, new Date(BirthDate))) {
 	        return rsmIntClas.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "SQLException (getChildBirths): ", e);
@@ -2050,11 +2051,13 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	@Override
 	public void addChildInfo(final TRd_Novor Child)
 			throws KmiacServerException, PatientNotFoundException {
-        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+        final int[] indexes = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+        //Поле "Дата записи" (datazap) не присутствует в списке параметров 
+        //из-за наличия соответствующего правила (rule) на СУБД:
         final String sqlQuery = "INSERT INTO c_rd_novor " +
         		"(npasp, nrod, timeon, kolchild, nreb, massa, rost, " +
-        		"apgar1, apgar5, krit1, krit2, krit3, krit4, mert, donosh, datazap) " +
-        		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        		"apgar1, apgar5, krit1, krit2, krit3, krit4, mert, donosh) " +
+        		"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isPatientExist(Child.getNpasp())) {
                 sme.execPreparedT(sqlQuery, false, Child, CHILD_TYPES, indexes);
@@ -2087,10 +2090,12 @@ false,RdIs, RdIshodtipes,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,
 	@Override
 	public void updateChildInfo(final TRd_Novor Child)
 			throws KmiacServerException, PatientNotFoundException {
-        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0};
+        final int[] indexes = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0};
         final String sqlQuery = "UPDATE c_rd_novor " +
-        						"SET timeon = ?, kolchild = ?, nreb = ?, massa = ?, rost = ?, apgar1 = ?, apgar5 = ?, " +
-        						"krit1 = ?, krit2 = ?, krit3 = ?, krit4 = ?, mert = ?, donosh = ?, datazap = ? " +
+        						"SET timeon = ?, kolchild = ?, nreb = ?, massa = ?, rost = ?, " +
+        						"apgar1 = ?, apgar5 = ?, " +
+        						"krit1 = ?, krit2 = ?, krit3 = ?, krit4 = ?, " +
+        						"mert = ?, donosh = ? " +
         						"WHERE npasp = ?;";
 		try (SqlModifyExecutor sme = tse.startTransaction()) {
             if (isPatientExist(Child.getNpasp())) {
