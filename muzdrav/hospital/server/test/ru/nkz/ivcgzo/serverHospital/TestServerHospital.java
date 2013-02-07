@@ -3,6 +3,7 @@ package ru.nkz.ivcgzo.serverHospital;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.apache.thrift.TException;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import ru.nkz.ivcgzo.serverManager.common.ISqlSelectExecutor;
 import ru.nkz.ivcgzo.serverManager.common.ITransactedSqlExecutor;
 import ru.nkz.ivcgzo.serverManager.common.SqlSelectExecutor;
+import ru.nkz.ivcgzo.serverManager.common.ThreadedServer;
 import ru.nkz.ivcgzo.serverManager.common.TransactedSqlManager;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftHospital.PatientNotFoundException;
@@ -36,13 +38,33 @@ public class TestServerHospital {
         testServer = new ServerHospital(sse, tse);
     }
 
+    /**
+     * Тест запуска сервера
+     * @author Балабаев Никита Дмитриевич
+     */
     @Test
     public void testStart() {
+    	ThreadedServer ts = new ThreadedServer(testServer);
+    	try {
+			ts.start();
+		} catch (Exception e) {
+			//Исключение выбрасывается только в случае попытки повторного запуска сервера
+		}
+    	//Ожидание запуска потока:
+    	for(int i = 0; (i < Integer.MAX_VALUE) && !ts.isRunning(); i++) ;
+    	assertEquals("is server running", true, ts.isRunning());
+    	ts.stop();
     }
 
+    /**
+     * Тест остановки сервера
+     * @author Балабаев Никита Дмитриевич
+     */
     @Test
     public void testStop() {
-        //fail("Not yet implemented"); // TODO
+    	ThreadedServer ts = new ThreadedServer(testServer);
+    	ts.stop();
+    	assertEquals("is server stop serving", true, !ts.isRunning());
     }
 
     @Test
@@ -67,7 +89,6 @@ public class TestServerHospital {
         assertEquals("list size", expectedListSize, patientList.size());
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public final void getPatientPersonalInfo_isInfoCorrect()
             throws KmiacServerException, TException, PatientNotFoundException {
@@ -77,7 +98,7 @@ public class TestServerHospital {
                 testServer.getPatientPersonalInfo(idGosp);
         System.out.print(patient);
         final int cGosp = 4;
-        final Date birthdate = new Date(104, 4, 1); // 2004-05-01
+        final Date birthdate = new GregorianCalendar(2004, 4, 1).getTime(); // 2004-05-01
         final String fam = "РЫМАНОВ";
         final String im = "СЕРГЕЙ";
         final String ot = "АЛЕКСАНДРОВИЧ";

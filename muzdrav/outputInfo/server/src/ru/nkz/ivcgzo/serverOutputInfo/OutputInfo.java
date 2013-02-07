@@ -1502,18 +1502,32 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 				graph5 = 0, sum5 = 0,
 				graph6 = 0, sum6 = 0,
 				graph7 = 0, sum7 = 0,
-				graph9 = 0, sum9 = 0,
-				graph10 = 0, sum10 = 0,
 				graph12 = 0, sum12 = 0,
 				graph13 = 0, sum13 = 0;
-			double graph8 = 0, sum8 = 0, 
+			double graph8 = 0, sum8 = 0,
+				   graph9 = 0, sum9 = 0,
+				   graph10 = 9, sum10 = 0,
 				   graph11 = 0, sum11 = 0;
 			
-			//Расчетные переменные
-			int hp = 0, mp = 0,
-				hd = 0, md = 0,
-				hprf = 0, mprf = 0,
-				hpr = 0, mpr = 0;
+			//Время в минутах из табеля врача
+			double hpol = 0,
+				   hprof = 0,
+				   hdom = 0,
+				   hproch = 0,
+				   hall = 0;
+			
+			//Время из норматива n63
+			double pospol = 0,
+				   posprof = 0,
+				   posdom = 0;
+			
+			//Рассчетные переменные
+			int fondf = 0,
+				fondr = 0,
+				kzag = 0;
+			int rasch = 0;
+			
+			
 						
 			java.util.Date kpg = null;
 			
@@ -1528,8 +1542,9 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 					"ORDER BY a.cod_sp";
 			//AND cpol=?
 			
-			final String sqlQueryCalc = "SELECT a.prproch, a.pospol, a.posprof, a.posdom, b.timep b.timed, b.timeprf, b.timepr " +
-					"FROM n_n63 a, s_tabel b, s_vrach c WHERE a.codvrdol=b.cdol AND b.pcod=c.pcod";
+			final String sqlQueryTabel = "SELECT timep, timed, timeprf, timepr, pcod, cdol FROM s_tabel";
+			
+			final String sqlQueryN63 = "SELECT pospol, posprof, posdom, codvrdol FROM n_n63"; // WHERE codpol = ?
 			
 			String sdfoDate1 = null;
 			String sdfoDate2 = null;
@@ -1751,12 +1766,7 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 					
 					if (graph7!=0 && graph2!=0) {
 						graph8=(double)graph7/graph2;	 
-						//sum8+=(double)graph7/graph2;
 						}
-					
-					/*
-					 * Расчетные графы: 9,10,11
-					 */
 					
 					//Посещения иногородних
 					if (ter_liv!=10) {
@@ -1774,31 +1784,69 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 				e1.printStackTrace();
 			}
 			
-			//Расчет времени
+			//Расчет из s_tabel
 			try {
-				AutoCloseableResultSet calc = sse.execPreparedQuery(sqlQueryCalc);
+				AutoCloseableResultSet s_tabel = sse.execPreparedQuery(sqlQueryTabel);
 				
-			while (calc.getResultSet().next()) {
-				hp = hp+(int)calc.getResultSet().getFloat("timep");
-				mp = mp+(int)((calc.getResultSet().getFloat("timep")-(int)calc.getResultSet().getFloat("timep"))*100);
-				hd = hd+(int)calc.getResultSet().getFloat("timed");
-				md = md+ (int)((calc.getResultSet().getFloat("timed")-(int)calc.getResultSet().getFloat("timed"))*100);
-				hprf = hprf+(int)calc.getResultSet().getFloat("timeprf");
-				mprf = mprf+ (int)((calc.getResultSet().getFloat("timeprf")-(int)calc.getResultSet().getFloat("timeprf"))*100);
-				hpr = hpr+(int)calc.getResultSet().getFloat("timepr");
-				mpr = mpr+ (int)((calc.getResultSet().getFloat("timepr")-(int)calc.getResultSet().getFloat("timepr"))*100);
+			while (s_tabel.getResultSet().next()) {
+				String pcodTab = s_tabel.getResultSet().getString("pcod");
 
+				String cdol = s_tabel.getResultSet().getString("cdol");
+
+				
+				if (pcodTab.equals(spec)) {
+					hpol = hpol + (int)(s_tabel.getResultSet().getFloat("timep")*60) + (int)((s_tabel.getResultSet().getFloat("timep")-(int)s_tabel.getResultSet().getFloat("timep"))*100);
+					hprof = hprof + (int)(s_tabel.getResultSet().getFloat("timeprf")*60) + (int)((s_tabel.getResultSet().getFloat("timeprf")-(int)s_tabel.getResultSet().getFloat("timeprf"))*100);
+					hdom = hdom + (int)(s_tabel.getResultSet().getFloat("timed")*60) + (int)((s_tabel.getResultSet().getFloat("timed")-(int)s_tabel.getResultSet().getFloat("timed"))*100);
+					hproch = hproch + (int)(s_tabel.getResultSet().getFloat("timepr")*60) + (int)((s_tabel.getResultSet().getFloat("timepr")-(int)s_tabel.getResultSet().getFloat("timepr"))*100);
+										
+					//Фактический фонд времени
+					graph10 = (int)((hpol + hprof + hdom)/60) + (((hpol + hprof + hdom)%60)/100);
+					
+					
+					//Расчет из n_n63
+					try {
+						AutoCloseableResultSet n_n63 = sse.execPreparedQuery(sqlQueryN63);
+						
+					while (n_n63.getResultSet().next()) {
+						String codvrdol = n_n63.getResultSet().getString("codvrdol").trim();
+						pospol = n_n63.getResultSet().getFloat("pospol");
+						posdom = n_n63.getResultSet().getFloat("posdom");
+						posprof = n_n63.getResultSet().getFloat("posprof");
+						
+						if(codvrdol.equals(cdol)) {
+							//Расчетный фонд  времени
+							if (pospol!=0 && posdom!=0){ 
+								graph9 = (double)graph3/pospol + (double)graph4/posdom;
+								graph11 = graph9/graph10;
+								}
+							if (pospol!=0){ 
+								graph9 = (double)graph3/pospol;
+								graph11 = graph9/graph10;
+								}
+							if (posdom!=0){ 
+								graph9 = (double)graph4/posdom;
+								graph11 = graph9/graph10;
+								}
+							
+						}
+					}
+					} catch (SqlExecutorException e1) {
+						e1.printStackTrace();
+					}
+					
+					
+					
+				}
 			}
 			} catch (SqlExecutorException e1) {
 				e1.printStackTrace();
 			}
 			
+
 			
-			//Коэффициент загрузки
-			Integer g15=0, pospol=0, posprof=0, posdom=0, hpol=0, hprof=0, hdom=0;
 			
-			graph11=((graph2-g15)/pospol+g15/posprof+graph4/posdom)/(hpol+hprof+hdom);
-						
+			
 			// Вывод значений
 				sb.append(String.format("	<TR VALIGN=TOP>"));
 				sb.append(String.format("		<TD WIDTH=66 STYLE=\"border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm\">"));
@@ -1826,13 +1874,13 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%.2f</FONT></P>", graph8));
 				sb.append(String.format("		</TD>"));
 				sb.append(String.format("		<TD WIDTH=60 STYLE=\"border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm\">"));
-				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%s</FONT></P>", graph9));
+				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%.2f</FONT></P>", graph9));
 				sb.append(String.format("		</TD>"));
 				sb.append(String.format("		<TD WIDTH=74 STYLE=\"border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm\">"));
-				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%s</FONT></P>", graph10));
+				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%.2f</FONT></P>", graph10));
 				sb.append(String.format("		</TD>"));
 				sb.append(String.format("		<TD WIDTH=78 STYLE=\"border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm\">"));
-				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%s</FONT></P>", graph11));
+				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%.2f</FONT></P>", graph11));
 				sb.append(String.format("		</TD>"));
 				sb.append(String.format("		<TD WIDTH=76 STYLE=\"border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm\">"));
 				sb.append(String.format("			<P ALIGN=CENTER><FONT SIZE=2>%s</FONT></P>", graph12));
@@ -1843,10 +1891,8 @@ public String printSvedDispObs(InputPlanDisp ipd) throws KmiacServerException,
 				sb.append(String.format("	</TR>"));
 			}
 			
-			sum8=(double)sum7/sum2; 
-			
-			
-			
+			sum8=(double)sum7/sum2;
+						
 			//Всего:
 			sb.append(String.format("	<TR VALIGN=TOP>"));
 			sb.append(String.format("		<TD WIDTH=66 STYLE=\"border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: none; padding-top: 0cm; padding-bottom: 0.1cm; padding-left: 0.1cm; padding-right: 0cm\">"));

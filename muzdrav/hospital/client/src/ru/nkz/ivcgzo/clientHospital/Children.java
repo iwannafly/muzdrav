@@ -45,6 +45,9 @@ import ru.nkz.ivcgzo.thriftHospital.TPatient;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Novor;
 import ru.nkz.ivcgzo.thriftHospital.TRd_Svid_Rojd;
 
+//TODO: ЮНИТ-ТЕСТИРОВАНИЕ
+//TODO: СОВМЕСТИМОСТЬ С LibreOffice
+//TODO: НУЖЕН ЛИ toUpperCase В СВИДЕТЕЛЬСТВЕ О РОЖДЕНИИ
 /**
  * Панель ввода\редактирования\отображения информации о новорождённом
  * @author Балабаев Никита Дмитриевич
@@ -59,8 +62,8 @@ public class Children extends JPanel {
     private JPanel panelChildEdit, panelDoc;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbBirthPlace;
     private ThriftIntegerClassifierCombobox<IntegerClassifier> ticcbMotherWork;
-    private JComboBox<String> cbBirthHappen;
     private JButton btnSaveChild, btnGiveDoc, btnPrintBlank, btnFillDoc;
+    private JComboBox<String> cbBirthHappen;
     private CustomTimeEditor cteBirthTime;
     private JTextField tfDocName;
     private JSpinner spinnerDocNum;
@@ -151,7 +154,7 @@ public class Children extends JPanel {
 	 * Установка начальных значений элементов панели информации о свидетельстве
 	 */
 	private void setDefaultDocValues() {
-		this.tfDocName.setText("");
+		this.tfDocName.setText((this.patient != null) ? this.patient.getSurname() : "");
 		this.spinnerDocNum.setValue(0);
 		this.cbBirthHappen.setSelectedIndex(-1);
 		this.ticcbMotherWork.setSelectedItem(null);
@@ -225,19 +228,14 @@ public class Children extends JPanel {
 	private boolean loadChildDocFromPanel() {
 		if (this.childDoc == null)
 			return false;
-		if (this.tfDocName.getText().isEmpty()) {
+		String childName = this.tfDocName.getText().trim().toUpperCase();
+		if (!childName.matches("^[А-Я]{1,20}$")) {
 			JOptionPane.showMessageDialog(this,
-					"Поле 'Фамилия новорождённого' не может быть пустым",
-					"Ошибка", JOptionPane.WARNING_MESSAGE);
-			return false;
+					"Поле 'Фамилия новорождённого' может состоять " +
+					"только из русскоязычных букв и не может быть пустым или " +
+					"превышать длину в 20 символов", "Ошибка", JOptionPane.WARNING_MESSAGE);
+			return false;	
 		}
-		if (this.tfDocName.getText().length() > 20) {
-			JOptionPane.showMessageDialog(this,
-					"Длина поля 'Фамилия новорождённого' не может превышать " +
-					"20 символов", "Ошибка", JOptionPane.WARNING_MESSAGE);
-			return false;
-		}
-		//TODO: ПРОВЕРЯТЬ ТЕКСТОВЫЕ ПОЛЯ
 		if (this.ticcbBirthPlace.getSelectedItem() == null) {
 			JOptionPane.showMessageDialog(this,
 					"Поле 'Место рождения' не может быть пустым",
@@ -257,7 +255,7 @@ public class Children extends JPanel {
 			return false;
 		}
 		//Установка значений полей childDoc:
-		this.childDoc.setFamreb(this.tfDocName.getText().toUpperCase());
+		this.childDoc.setFamreb(childName);
 		this.childDoc.setM_rojd(this.ticcbBirthPlace.getSelectedPcod());
 		this.childDoc.setR_proiz(this.cbBirthHappen.getSelectedIndex() + 1);
 		this.childDoc.setZan(this.ticcbMotherWork.getSelectedPcod());
@@ -265,7 +263,7 @@ public class Children extends JPanel {
 		this.childDoc.setCdol_write(this.userAuth.getCdol());
 		this.childDoc.setClpu(this.userAuth.getClpu());
 		//Загрузка фамилии ребёнка в интерфейс в верхнем регистре:
-		this.tfDocName.setText(this.childDoc.getFamreb());
+		this.tfDocName.setText(childName);
 		return true;
 	}
 	

@@ -81,25 +81,25 @@ struct InputStructPos {
 
 
 /**
- * РРЅС„РѕСЂРјР°С†РёСЏ РѕС‚СЃС‚СѓС‚СЃС‚РІСѓРµС‚
+ * No information
  */
 exception VINotFoundException {
 }
 
 /**
- * РўР°РєР°СЏ СѓР¶Рµ Р·Р°РїРёСЃСЊ СЃСѓС‰РµСЃС‚РІСѓРµС‚
+ * Already exists
  */
 exception VTDuplException {
 }
 
 /*
- * РРЅС„РѕСЂРјР°С†РёСЏ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚
+ * No information
  */
 exception VTException {
 }
 
 /**
- * Информация отстутствует
+ * No information
  */
 exception UchException {
 }
@@ -107,34 +107,34 @@ exception UchException {
 service ThriftOutputInfo extends kmiacServer.KmiacServer {
     
     /**
-     * Р’РѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЂР°С‡РµР№, РІРµРґСѓС‰РёС… РїСЂРёРµРј
-     * @param pcod - РЈРЅРёРєР°Р»СЊРЅС‹Р№ РєРѕРґ СЃРїРµС†РёР°Р»РёСЃС‚Р°
-     * @return СЃРїРёСЃРѕРє thrift-РѕР±СЉРµРєС‚РѕРІ, СЃРѕРґРµСЂР¶Р°С‰РёС… РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Р°С…
+     * Возвращает список врачей, ведущих прием
+     * @param pcod - Уникальный код специалиста
+     * @return список thrift-объектов, содержащих информацию о врачах
      */
     list<VrachInfo> getVrachTableInfo(1:i32 cpodr) throws (1: VINotFoundException vinfe,
 		2:kmiacServer.KmiacServerException kse);
     
 
      /**
-     * Р’РѕР·РІСЂР°С‰Р°РµС‚ РІСЂРµРјСЏ СЂР°Р±РѕС‚С‹ РІСЂР°С‡РµР№
+     * Возвращает время работы врачей
      */
     list<VrachTabel> getVrachTabel(1:i32 pcod) throws (1: VTException vte, 2:VTDuplException vtde,
 		3:kmiacServer.KmiacServerException kse);
 		
 		
     /**
-     * Р”РѕР±Р°РІР»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
+     * Добавляет информацию о враче
      */
     i32 addVT(1:VrachTabel vt) throws (1: VTException vte, 2:VTDuplException vtde,
 		3:kmiacServer.KmiacServerException kse);
 
     /**
-     * РћР±РЅРѕРІР»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
+     * Обновляет информацию о враче
      */
 	void updateVT(1:VrachTabel vt) throws (1:kmiacServer.KmiacServerException kse); 
     
 	/**
-     * РЈРґР°Р»СЏРµС‚ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РІСЂР°С‡Рµ
+     * Удаляет информацию о враче
      */
 	void deleteVT(1:i32 vt);
 		
@@ -161,7 +161,7 @@ service ThriftOutputInfo extends kmiacServer.KmiacServer {
     string printFacZd(1: InputAuthInfo iaf 2: InputFacZd ifz) throws (1: kmiacServer.KmiacServerException kse);
 	
    /**
-    * РЎРІРѕРґРєРё РїРѕ С„РѕСЂРјРµ 39
+    * Сводки по форме 39
     */
     string printDnevVr() throws (1: kmiacServer.KmiacServerException kse);
 
