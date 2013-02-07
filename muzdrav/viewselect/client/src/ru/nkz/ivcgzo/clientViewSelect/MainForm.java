@@ -36,8 +36,10 @@ import ru.nkz.ivcgzo.clientManager.common.IClient;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTable;
 import ru.nkz.ivcgzo.clientMedication.ClientMedication;
 import ru.nkz.ivcgzo.clientOperation.ClientOperation;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.BolListForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.ClassifierManager;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.MedPolErrorsForm;
+import ru.nkz.ivcgzo.clientViewSelect.modalForms.MedStaErrorsForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PaspErrorsForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientAnamnezForm;
 import ru.nkz.ivcgzo.clientViewSelect.modalForms.PatientInfoForm;
@@ -77,6 +79,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 	public PaspErrorsForm paspFrm;
 	public MedPolErrorsForm medPolFrm;
 	public PatientAnamnezForm patAnamFrm;
+	public BolListForm bolFrm;
+	public MedStaErrorsForm medStaFrm;
 
 	public MainForm(ConnectionManager conMan, UserAuthInfo authInfo, int lncPrm) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, ClassNotFoundException {
 		super(conMan, authInfo, ThriftViewSelect.Client.class, configuration.appId, configuration.thrPort, lncPrm);
@@ -271,6 +275,8 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
 		paspFrm = new PaspErrorsForm();
 		medPolFrm = new MedPolErrorsForm();
 		patAnamFrm = new PatientAnamnezForm();
+		bolFrm = new BolListForm();
+		medStaFrm = new MedStaErrorsForm();
 	}
 	
 	@Override
@@ -506,6 +512,35 @@ public class MainForm extends Client<ThriftViewSelect.Client> {
                     operationFrm.showModal(parent, params[1], params[2], params[3], params[4], params[5]);
                     break;
 
+				case 26:
+					setFrame(bolFrm);
+					dialog = prepareModal(parent);
+					bolFrm.setModalityListener();
+					try {
+						bolFrm.prepareForm((int) params[1], (int) params[2], (int) params[3]);
+						dialog.setVisible(true);
+					} catch (Exception e) {
+					} finally {
+						setFrame(frame);
+						bolFrm.removeModalityListener();
+						disposeModal();
+					}
+					break;
+					
+				case 27:
+					medStaFrm.setPriem((boolean) params[1]);
+					setFrame(medStaFrm);
+					dialog = prepareModal(parent);
+					medStaFrm.setModalityListener();
+					dialog.setVisible(true);
+					try {
+						return medStaFrm.getResults();
+					} finally {
+						setFrame(frame);
+						medStaFrm.removeModalityListener();
+						disposeModal();
+					}
+					
                 }
 			}
 				

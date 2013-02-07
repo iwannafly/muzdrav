@@ -59,6 +59,19 @@ struct ShablonLds {
 	6: string zakl;
 }
 
+struct ShablonOper {
+	 1: i32 id;
+	 2: i32 stat_tip;
+	 3: string name;
+	 4: string oper_pcod;
+	 5: string oper_name;
+	 6: string diag_pcod;
+	 7: string diag_name;
+	 8: i64 oper_dlit;
+	 9: string mat;
+	10: string text;
+}
+
 /**
  * Врач с такими данными уже существует.
  */
@@ -182,15 +195,23 @@ service ThriftServerAdmin extends kmiacServer.KmiacServer {
 	list<classifier.StringClassifier> getShablonOsmDiagList(1: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShablonOsmListByDiag(1: string diag) throws (1: kmiacServer.KmiacServerException kse);
 	void deleteShablonOsm(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+
 	list<classifier.IntegerClassifier> getShDopRazdList() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShDopList(1: i32 idNshablon) throws (1: kmiacServer.KmiacServerException kse);
 	ShablonDop getShDop(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	i32 saveShDop(1: ShablonDop shDop) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
 	void deleteShDop(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+
 	list<classifier.IntegerClassifier> getShLdsVidIsslList() throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.StringClassifier> getShLdsIsslList(1: i32 cP0e1) throws (1: kmiacServer.KmiacServerException kse);
 	list<classifier.IntegerClassifier> getShLdsList(1: i32 cP0e1, 2: string cLdi) throws (1: kmiacServer.KmiacServerException kse);
 	ShablonLds getShLds(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 	i32 saveShLds(1: ShablonLds shLds) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
 	void deleteShLds(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+
+	list<classifier.IntegerClassifier> getShOperStatList() throws (1: kmiacServer.KmiacServerException kse);
+	list<classifier.IntegerClassifier> getShOperList(1: i32 statTip, 2: string srcStr) throws (1: kmiacServer.KmiacServerException kse);
+	ShablonOper getShOper(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
+	i32 saveShOper(1: ShablonOper shOper) throws (1: kmiacServer.KmiacServerException kse, 2: TemplateExistsException tee);
+	void deleteShOper(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

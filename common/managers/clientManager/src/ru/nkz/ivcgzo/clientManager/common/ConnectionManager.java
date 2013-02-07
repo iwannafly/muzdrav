@@ -116,6 +116,13 @@ public class ConnectionManager {
 		return client;
 	}
 	
+	/**
+	 * Получение главной формы клиента.
+	 */
+	public JFrame getMainForm() {
+		return mainForm;
+	}
+	
 	private void addToCommon(int port) {
 		commonTransports.put(port, transports.get(port));
 		commonConnections.put(port, connections.get(port));
@@ -756,11 +763,39 @@ public class ConnectionManager {
 	}
 	
 	/**
+	 * Вызов формы со списком ошибок в медицинской части приемного отделения.
+	 * @return код выбранного посещения 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public Integer showMedPriemErrorsForm() {
+		return (Integer) viewClient.showModal(client, 27, true);
+	}
+	
+	/**
+	 * Вызов формы со списком ошибок в медицинской части стационара.
+	 * @return код выбранной госпитализации 
+	 * или <code>null</code>, если пользователь закрыл форму
+	 */
+	public Integer showMedStaErrorsForm() {
+		return (Integer) viewClient.showModal(client, 27, false);
+	}
+	
+	/**
 	 * Вызов формы с редактором анамнеза пациента
 	 * @param npasp - уникальный номер пациента.
 	 */
 	public void showPatientAnamnezForm(int npasp) {
 		viewClient.showModal(client, 24, npasp);
+	}
+	
+	/**
+	 * Вызов формы с редактором больничного листа пациента.
+	 * @param npasp - уникальный номер пациента.
+	 * @param idObr - уникальный номер обращения.
+	 * @param idGosp - уникальный номер госпитализации.
+	 */
+	public void showBolListForm(int npasp, int idObr, int idGosp) {
+		viewClient.showModal(client, 26, npasp, idObr, idGosp);
 	}
 	
 	/**

@@ -10,7 +10,7 @@ struct OperationComplication {
 	1: optional i32 id;
 	2: optional i32 idOper;
 	3: optional string nameOsl;
-	4: optional i32 pcod;
+	4: optional string pcod;
 	5: optional i64 dataz;
 }
 
@@ -33,7 +33,7 @@ struct Operation {
 	3: optional i32 cotd;
 	4: optional i32 idGosp;
 	5: optional i32 npasp;
-	6: optional i32 pcod;
+	6: optional string pcod;
 	7: optional string nameOper;
 	8: optional i64 date;
 	9: optional i64 vrem;
@@ -51,7 +51,7 @@ struct AnesthesiaComplication {
 	1: optional i32 id;
 	2: optional i32 idAnast;
 	3: optional string name;
-	4: optional i32 pcod;
+	4: optional string pcod;
 	5: optional i64 dataz;
 }
 
@@ -82,7 +82,22 @@ struct Anesthesia {
 	11: optional i64 dataz;
 }
 
+struct OperShablon {
+	1: optional i32 id;
+	2: optional string name;
+	3: optional string operPcod;
+	4: optional string mat;
+	5: optional string text;
+	6: optional string src_text;
+}
+
 service ThriftOperation extends kmiacServer.KmiacServer {
+
+	/**
+     * Возвращает списао названий шаблонов
+	 */
+	list<classifier.IntegerClassifier> getShablonNames(1:string operPcod)
+		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Возвращает список всех операций для данной записи госпитализации
 	 */
@@ -170,7 +185,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Возвращает список всех осложнений данной анастезии
 	 */
-	list<AnesthesiaComplication> getAnesthesiaComplications(1: i32 idOper)
+	list<AnesthesiaComplication> getAnesthesiaComplications(1: i32 idAnest)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новое осложнение после анастезии
@@ -191,7 +206,7 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	/**
 	 * Возвращает список всех источников оплаты данной анастезии
 	 */
-	list<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(1: i32 idOper)
+	list<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(1: i32 idAnest)
 		throws (1: kmiacServer.KmiacServerException kse);
 	/**
 	 * Добавляет новый источник оплаты анастезии
@@ -207,5 +222,10 @@ service ThriftOperation extends kmiacServer.KmiacServer {
 	 * Удаляет источник оплаты анастезии
 	 */
 	void deleteAnesthesiaPaymentFund(1: i32 id)
+		throws (1: kmiacServer.KmiacServerException kse);
+	/**
+	 * Возвращает текст выбранного шаблона
+	 */
+	OperShablon getShablon(1: i32 id)
 		throws (1: kmiacServer.KmiacServerException kse);
 }

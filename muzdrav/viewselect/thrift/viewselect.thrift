@@ -118,12 +118,12 @@ struct PatientCommonInfo {
 
 struct PatientSignInfo {
 	1: optional i32 npasp;
-	2: optional string grup;
-	3: optional string ph;
-	4: optional string allerg;
-	5: optional string farmkol;
-	6: optional string vitae;
-	7: optional string vred;
+	2: optional i64 datap;
+	3: optional i32 numstr;
+	4: optional string name;
+	5: optional bool vybor;
+	6: optional string comment;
+	7: optional string yn;
 }
 
 struct PatientVizitInfo {
@@ -493,6 +493,35 @@ struct PatientAnamnez {
 	7: optional string pranz;
 }
 
+struct Pbol{
+	 1: optional i32 id;
+	 2: optional i32 id_obr;
+	 3: optional i32 id_gosp;
+	 4: optional i32 npasp;
+	 5: optional i32 bol_l;
+	 6: optional i64 s_bl;
+	 7: optional i64 po_bl;
+	 8: optional i32 pol;
+	 9: optional i32 vozr;
+	10: optional string nombl;
+	11: optional i32 cod_sp;
+	12: optional string cdol;
+	13: optional i32 pcod;
+	14: optional i64 dataz;
+}
+
+struct MedStaErrorInfo {
+	1: optional i32 id_gosp;
+	2: optional i32 id_otd;
+	3: optional i64 dat_gosp;
+	4: optional i32 npasp;
+	5: optional string pat_fio;
+	6: optional i64 pat_datar;
+	7: optional i32 kderr;
+	8: optional string err_name;
+	9: optional string err_comm;
+}
+
 exception TipPodrNotFoundException {
 }
 
@@ -530,7 +559,7 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<mrab_0> getMrab_0() throws (1: kmiacServer.KmiacServerException kse);
 
 	PatientCommonInfo getPatientCommonInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
-	PatientSignInfo getPatientSignInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
+	list<PatientSignInfo> getPatientSignInfo(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<PatientVizitInfo> getPatientVizitInfoList(1: i32 npasp, 2: i64 datan, 3: i64 datak) throws (1: kmiacServer.KmiacServerException kse);
 	list<RdSlInfo> getRdSlInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
 	list<PatientDiagZInfo> getPatientDiagZInfoList(1: i32 npasp) throws (1: kmiacServer.KmiacServerException kse);
@@ -553,4 +582,12 @@ service ThriftViewSelect extends kmiacServer.KmiacServer {
 	list<PatientAnamnez> getAnamnez(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: TipPodrNotFoundException tpfe, 2:kmiacServer.KmiacServerException kse);
 	void deleteAnam(1:i32 npasp, 2:i32 cslu, 3:i32 cpodr) throws (1: kmiacServer.KmiacServerException kse);
 	void updateAnam(1: list<PatientAnamnez> patAnam) throws (1: kmiacServer.KmiacServerException kse);
+	string printAnamnez(1: i32 npasp, 2: i32 cpodr, 3: i32 cslu) throws (1:kmiacServer.KmiacServerException kse);
+	list<MedStaErrorInfo> getMedStaErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
+	list<MedStaErrorInfo> getMedPriemErrors(1: i32 cpodrz, 2: i64 datazf, 3: i64 datazt) throws (1: kmiacServer.KmiacServerException kse);
+
+	list<Pbol> getPbol (1: i32 id_obr, 2: i32 id_gosp, 3: i32 id_bol) throws (1: kmiacServer.KmiacServerException kse);
+	i32 AddPbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
+	void UpdatePbol(1: Pbol pbol) throws (1: kmiacServer.KmiacServerException kse);
+	void DeletePbol(1: i32 id) throws (1: kmiacServer.KmiacServerException kse);
 }

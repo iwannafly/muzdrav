@@ -212,25 +212,22 @@ public class PatientInfoForm extends ModalForm {
 //		 				addLineToDetailInfo("Территория проживания", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_l01), info.isSetTer_liv(), info.getTer_liv()));
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath.toString() ==  "Анамнез жизни"){
-		 				try {
-	 						PatientSignInfo psign = MainForm.tcl.getPatientSignInfo(info.npasp);
-							addLineToDetailInfo("Группа крови", psign.getGrup());
-							addLineToDetailInfo("Резус-фактор", psign.getPh());
-							addLineToDetailInfo("Аллерго-анамнез", psign.getAllerg());
-							addLineToDetailInfo("Фармакологический анамнез", psign.getFarmkol());
-							addLineToDetailInfo("Анамнез жизни", psign.getVitae());
-							addBoldFont("Вредные привычки");
-							if (psign.getVred().charAt(0) == '1') addHeader("курение");
-							if (psign.getVred().charAt(1) == '1') addHeader("злоупотребление алкоголем");
-							if (psign.getVred().charAt(2) == '1') addHeader("алкоголизм");
-							if (psign.getVred().charAt(3) == '1') addHeader("наркотики");
-							if (psign.getVred() == "0000") addHeader("-");
-						} catch (KmiacServerException e1) {
-							System.err.println(e1.getMessage());
-							eptxt.setText("");
-						} catch (TException e1) {
-							MainForm.conMan.reconnect(e1);
-						}
+		 				for (PatientSignInfo sign : MainForm.tcl.getPatientSignInfo(info.npasp)){
+		 					if ((sign.getYn().equals("T") && (sign.isVybor() == true) && (sign.getComment() != null)))
+		 						addLineSignInfo(sign.getName()+": да, "+sign.getComment(), sign.isSetName());
+		 					if ((sign.getYn().equals("T") && (sign.isVybor() == true) && (sign.getComment() == null)))
+		 						addLineSignInfo(sign.getName()+": да", sign.isSetName());
+		 					if ((sign.getYn().equals("T") && (sign.isVybor() == false)))
+		 						addLineSignInfo( sign.getName()+": нет", sign.isSetName());
+		 					if ((sign.getYn().equals("F") && (sign.getComment() != null)))
+		 						addLineToDetailInfo(sign.getName(), sign.isSetComment(), sign.getComment());
+		 				}
+//						} catch (KmiacServerException e1) {
+//							System.err.println(e1.getMessage());
+//							eptxt.setText("");
+//						} catch (TException e1) {
+//							MainForm.conMan.reconnect(e1);
+//						}
 						eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PdiagTreeNode) {
 			 			PdiagTreeNode pdiagNode = (PdiagTreeNode) lastPath;
@@ -269,26 +266,26 @@ public class PatientInfoForm extends ModalForm {
 							MainForm.conMan.reconnect(e1);
 						}
 		 				
-						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
-							
-		 					if (issl.isSetNisl()) {
-		 						addHeader("");
-		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
-		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
-		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
-		 					if (issl.getGruppa()==2)
-		 					{
-		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
-			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
-	
-		 					}
-		 					}
-		 				}
+//						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pvizit.getId())) {
+//							
+//		 					if (issl.isSetNisl()) {
+//		 						addHeader("");
+//		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
+//		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
+//		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+//		 					if (issl.getGruppa()==2)
+//		 					{
+//		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
+//			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
+//	
+//		 					}
+//		 					}
+//		 				}
 						 addHeader("");
 		 				for (PatientNaprInfo pnapr : MainForm.tcl.getPatientNaprInfoList(pvizit.getId())) {
 		 	 				addLineToDetailInfo("Наименование мед.документа, выписанного пациенту",pnapr.isSetName(),pnapr.getName());
 		 					addLineToDetailInfo("Обоснование для направления",pnapr.isSetText(),pnapr.getText());
-		 					addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
+		 					///addLineToDetailInfo("Врач, выписавший документ",pnapr.isSetZaved(),pnapr.getZaved());
 		 				}
 						if ((pvizit.isSetZakl()) || (pvizit.isSetRecomend()) || (pvizit.isSetLech())) addHeader("");
 		 				addLineToDetailInfo("Заключение специалиста",pvizit.isSetZakl(),pvizit.getZakl());
@@ -296,7 +293,7 @@ public class PatientInfoForm extends ModalForm {
 			 			addLineToDetailInfo("Назначенное лечение", pvizit.isSetLech(), pvizit.getLech());
 						if ((pvizit.isSetIshod()) || (pvizit.isSetRezult())) addHeader("");
 			 			addLineToDetailInfo("Исход", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_ap0), pvizit.isSetIshod(), pvizit.getIshod()));
-						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
+						//addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pvizit.isSetRezult(), pvizit.getRezult()));
 	
 		 				eptxt.setText(sb.toString());
 		 			} else if (lastPath instanceof PvizitAmbNode) {
@@ -329,6 +326,21 @@ public class PatientInfoForm extends ModalForm {
 		 					if (pdiagamb.predv==false) addHeader("Вид диагноза: заключительный");
 		 					else addHeader("Вид диагноза: предварительный");
 		 					}
+						for (PatientIsslInfo issl : MainForm.tcl.getPatientIsslInfoList(pam.getId())) {
+							
+		 					if (issl.isSetNisl()) {
+		 						addHeader("");
+		 	 				addLineToDetailInfo("Показатель исследования",issl.isSetPokaz_name(),issl.getPokaz_name());
+		 					addLineToDetailInfo("Результат исследования",issl.isSetRez(),issl.getRez());
+		 					addLineToDetailInfo("Дата проведения исследования",issl.isSetDatav(),DateFormat.getDateInstance().format(new Date(issl.getDatav())));
+		 					if (issl.getGruppa()==2)
+		 					{
+		 						addLineToDetailInfo("Описание исследования",issl.isSetOp_name(),issl.getOp_name());
+			 					addLineToDetailInfo("Заключение",issl.isSetRez_name(),issl.getRez_name());
+	
+		 					}
+		 					}
+		 				}
 						addLineToDetailInfo("Результат", getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_aq0), pam.isSetRezult(), pam.getRezult()));
 						eptxt.setText(sb.toString());
 			 		} else if (lastPath instanceof RdslTreeNode) {
@@ -766,6 +778,12 @@ public class PatientInfoForm extends ModalForm {
 					if (value.equals("Т"))
 						sb.append(String.format("%s: %s%s<br>", txt, getValueFromClassifier(ConnectionManager.instance.getIntegerClassifier(IntegerClassifiers.n_o00), isSet, valueCls), lineSep));
 				}
+	}
+	
+	private void addLineSignInfo(String txt, boolean isSet){
+		if (isSet)
+				if (txt.toString().length() > 0)
+					sb.append(String.format("%s<br>", txt));
 	}
 	
 	@Override

@@ -218,6 +218,12 @@ public class CustomDateEditor extends JFormattedTextField {
 			return super.processKeyBinding(ks, e, condition, pressed);
 	}
 	
+	@Override
+	public void setEnabled(boolean enabled) {
+		btnCal.setEnabled(enabled);
+		super.setEnabled(enabled);
+	}
+	
 	class TableDateSelector implements CaretListener {
 		private boolean updating = false;
 		

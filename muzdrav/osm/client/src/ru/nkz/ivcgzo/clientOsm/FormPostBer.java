@@ -99,9 +99,6 @@ public class FormPostBer extends JFrame {
 	 * Launch the application.
 	 */
 	private JCheckBox CBKontr;
-	private JTextField fam;
-	private JTextField im;
-	private JTextField ot;
 	private JTextField TSSert;
 	private JTextField TNSert;
 	private int mes;
@@ -136,9 +133,10 @@ public class FormPostBer extends JFrame {
 			public void componentShown(ComponentEvent arg0) {
 				System.out.println("постановка по +");		
 				System.out.println(Vvod.zapVr.getNpasp());		
-				fam.setText(Vvod.zapVr.getFam());
-				im.setText(Vvod.zapVr.getIm());
-				ot.setText(Vvod.zapVr.getOth());
+				setTitle(String.format(" %s - %d, %s %s %s, %6$td.%6$tm.%6$tY ", getTitle(), Vvod.zapVr.getNpasp(), Vvod.zapVr.getFam(), Vvod.zapVr.getIm(), Vvod.zapVr.getOth(),  Vvod.zapVr.getDatar()));
+//				fam.setText(Vvod.zapVr.getFam());
+//				im.setText(Vvod.zapVr.getIm());
+//				ot.setText(Vvod.zapVr.getOth());
 				
 				try {
 					rdSlStruct = new RdSlStruct();
@@ -150,17 +148,6 @@ public class FormPostBer extends JFrame {
 					rdSlStruct = MainForm.tcl.getRdSlInfo(Vvod.zapVr.getId_pvizit(), Vvod.zapVr.getNpasp());
 					setPostBerData();
 				} 
-//				catch (PrdslNotFoundException e1) {
-//					try {
-//						rdSlStruct.setId(MainForm.tcl.AddRdSl(rdSlStruct));
-//						setPostBerData();
-//					} catch (KmiacServerException e2) {
-//						JOptionPane.showMessageDialog(FormPostBer.this, "Не удалось поставить на учет", "Ошибка", JOptionPane.ERROR_MESSAGE);
-//					} catch (TException e2) {
-//						e2.printStackTrace();
-//						MainForm.conMan.reconnect(e2);
-//					}
-//				} 
 				catch (KmiacServerException e1) {
 					e1.printStackTrace();
 					JOptionPane.showMessageDialog(FormPostBer.this, e1.getLocalizedMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
@@ -317,23 +304,6 @@ public class FormPostBer extends JFrame {
 			}
 		});
 		
-		
-		fam = new JTextField();
-		fam.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-		fam.setColumns(10);
-//		fam.setText(Vvod.zapVr.fam);
-		
-		im = new JTextField();
-		im.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-//		im.setText("");
-		im.setColumns(10);
-//		im.setText(Vvod.zapVr.im);
-		
-		ot = new JTextField();
-		ot.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 13));
-//		ot.setText("");
-		ot.setColumns(10);
-		
 		JButton BPeshOK = new JButton("Печать обменной карты");
 		BPeshOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -376,22 +346,16 @@ public class FormPostBer extends JFrame {
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addGap(10)
-							.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGap(46)
 							.addComponent(btnNewButton)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(ButSave)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(ButDelete)
-							.addGap(18)
-							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(BPeshOK, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(btnNewButton_1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+							.addGap(133)
+							.addComponent(btnNewButton_1, GroupLayout.PREFERRED_SIZE, 219, GroupLayout.PREFERRED_SIZE)
+							.addGap(39)
+							.addComponent(BPeshOK))
 						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 1011, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap(3, Short.MAX_VALUE))
 		);
@@ -400,17 +364,12 @@ public class FormPostBer extends JFrame {
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-							.addComponent(fam, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(im, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(ot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(BPeshOK)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnNewButton_1))
-						.addComponent(btnNewButton)
+							.addComponent(btnNewButton_1)
+							.addComponent(BPeshOK))
 						.addComponent(ButDelete)
-						.addComponent(ButSave))
-					.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(ButSave)
+						.addComponent(btnNewButton))
+					.addGap(29)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 624, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap(57, Short.MAX_VALUE))
 		);
@@ -491,33 +450,31 @@ public class FormPostBer extends JFrame {
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel_10, GroupLayout.PREFERRED_SIZE, 610, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 254, GroupLayout.PREFERRED_SIZE))
-							.addGap(6)
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-								.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
-									.addGap(69)
-									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-											.addComponent(panel_8, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE))
-										.addComponent(panel_9, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
+								.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 270, GroupLayout.PREFERRED_SIZE)
+								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 271, GroupLayout.PREFERRED_SIZE))
+							.addGap(26)
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)))
-							.addContainerGap())
-						.addGroup(gl_panel.createSequentialGroup()
-							.addComponent(panel_10, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addGap(635))))
+									.addComponent(panel_7, GroupLayout.DEFAULT_SIZE, 726, Short.MAX_VALUE))
+								.addGroup(gl_panel.createSequentialGroup()
+									.addGap(69)
+									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+										.addComponent(panel_9, GroupLayout.PREFERRED_SIZE, 448, GroupLayout.PREFERRED_SIZE)
+										.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+											.addComponent(panel_8, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+											.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)))))))
+					.addContainerGap())
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-						.addGroup(Alignment.LEADING, gl_panel.createSequentialGroup()
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
 							.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_1, GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE))
@@ -530,8 +487,8 @@ public class FormPostBer extends JFrame {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addComponent(panel_7, GroupLayout.PREFERRED_SIZE, 154, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_10, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
-					.addGap(136))
+					.addComponent(panel_10, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
+					.addGap(150))
 		);
 		
 		JLabel LPrish = new JLabel("Причина снятия с учета");
@@ -549,18 +506,15 @@ public class FormPostBer extends JFrame {
 		gl_panel_10.setHorizontalGroup(
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_10.createSequentialGroup()
-					.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_10.createSequentialGroup()
-							.addGap(33)
-							.addComponent(LDataSn))
-						.addGroup(gl_panel_10.createSequentialGroup()
-							.addContainerGap()
-							.addComponent(LPrish)))
+					.addContainerGap()
+					.addComponent(LPrish)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_panel_10.createParallelGroup(Alignment.LEADING)
-						.addComponent(TDataSn, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-						.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(31, Short.MAX_VALUE))
+					.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, 174, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(LDataSn)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(TDataSn, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(32, Short.MAX_VALUE))
 		);
 		gl_panel_10.setVerticalGroup(
 			gl_panel_10.createParallelGroup(Alignment.LEADING)
@@ -568,12 +522,10 @@ public class FormPostBer extends JFrame {
 					.addContainerGap()
 					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
 						.addComponent(CBPrishSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(LPrish, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_10.createParallelGroup(Alignment.BASELINE)
+						.addComponent(LPrish, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
 						.addComponent(TDataSn, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(LDataSn, GroupLayout.PREFERRED_SIZE, 14, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(29, Short.MAX_VALUE))
 		);
 		panel_10.setLayout(gl_panel_10);
 		panel_10.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{LPrish, LDataSn, CBPrishSn, TDataSn}));
@@ -604,7 +556,7 @@ public class FormPostBer extends JFrame {
 						.addGroup(gl_panel_9.createSequentialGroup()
 							.addComponent(lblNewLabel)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(SDataSert, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+							.addComponent(SDataSert, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_9.createSequentialGroup()
 							.addComponent(lblNewLabel_1)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -613,7 +565,7 @@ public class FormPostBer extends JFrame {
 							.addComponent(lblNewLabel_2)
 							.addGap(18)
 							.addComponent(TNSert, 0, 0, Short.MAX_VALUE)))
-					.addContainerGap(26, Short.MAX_VALUE))
+					.addContainerGap(118, Short.MAX_VALUE))
 		);
 		gl_panel_9.setVerticalGroup(
 			gl_panel_9.createParallelGroup(Alignment.LEADING)
@@ -669,10 +621,9 @@ public class FormPostBer extends JFrame {
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panel_8.createParallelGroup(Alignment.LEADING)
 						.addComponent(CBRod, GroupLayout.PREFERRED_SIZE, 181, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_8.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(SDataRod, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-							.addComponent(SDataOsl, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-					.addContainerGap(22, Short.MAX_VALUE))
+						.addComponent(SDataRod, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
+						.addComponent(SDataOsl, GroupLayout.PREFERRED_SIZE, 102, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(89, Short.MAX_VALUE))
 		);
 		gl_panel_8.setVerticalGroup(
 			gl_panel_8.createParallelGroup(Alignment.TRAILING)
@@ -735,22 +686,19 @@ public class FormPostBer extends JFrame {
 		 				.addGroup(gl_panel_7.createSequentialGroup()
 		 					.addContainerGap()
 		 					.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-		 						.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
+		 						.addGroup(gl_panel_7.createSequentialGroup()
 		 							.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-		 								.addGroup(gl_panel_7.createSequentialGroup()
-		 									.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-		 										.addComponent(CHosp1)
-		 										.addComponent(CHosp3))
-		 									.addPreferredGap(ComponentPlacement.RELATED, 86, Short.MAX_VALUE))
-		 								.addGroup(gl_panel_7.createSequentialGroup()
-		 									.addComponent(CHosp9)
-		 									.addGap(31)))
-		 							.addGroup(gl_panel_7.createSequentialGroup()
-		 								.addComponent(CHosp5)
-		 								.addPreferredGap(ComponentPlacement.RELATED)))
+		 								.addComponent(CHosp1)
+		 								.addComponent(CHosp3)
+		 								.addComponent(CHosp9))
+		 							.addGap(18))
+		 						.addGroup(gl_panel_7.createSequentialGroup()
+		 							.addComponent(CHosp5)
+		 							.addGap(194))
 		 						.addGroup(Alignment.TRAILING, gl_panel_7.createSequentialGroup()
 		 							.addComponent(CHosp8)
-		 							.addGap(120)))
+		 							.addGap(56)))
+		 					.addGap(18)
 		 					.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
 		 						.addComponent(CHosp7, GroupLayout.PREFERRED_SIZE, 285, GroupLayout.PREFERRED_SIZE)
 		 						.addComponent(CHosp10)
@@ -767,26 +715,28 @@ public class FormPostBer extends JFrame {
 		 		.addGroup(gl_panel_7.createSequentialGroup()
 		 			.addComponent(label, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)
 		 			.addPreferredGap(ComponentPlacement.RELATED)
-		 			.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
-		 				.addComponent(CHosp1)
-		 				.addComponent(CHosp2))
-		 			.addPreferredGap(ComponentPlacement.RELATED)
-		 			.addGroup(gl_panel_7.createParallelGroup(Alignment.BASELINE)
-		 				.addComponent(CHosp4)
-		 				.addComponent(CHosp3))
-		 			.addPreferredGap(ComponentPlacement.RELATED)
-		 			.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-		 				.addComponent(CHosp6)
-		 				.addComponent(CHosp5))
-		 			.addPreferredGap(ComponentPlacement.RELATED)
-		 			.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-		 				.addComponent(CHosp8)
-		 				.addComponent(CHosp7))
-		 			.addPreferredGap(ComponentPlacement.UNRELATED)
-		 			.addGroup(gl_panel_7.createParallelGroup(Alignment.LEADING)
-		 				.addComponent(CHosp9)
-		 				.addComponent(CHosp10))
-		 			.addContainerGap(11, Short.MAX_VALUE))
+		 			.addGroup(gl_panel_7.createParallelGroup(Alignment.TRAILING)
+		 				.addGroup(gl_panel_7.createSequentialGroup()
+		 					.addComponent(CHosp1)
+		 					.addPreferredGap(ComponentPlacement.RELATED)
+		 					.addComponent(CHosp3)
+		 					.addPreferredGap(ComponentPlacement.RELATED)
+		 					.addComponent(CHosp5)
+		 					.addPreferredGap(ComponentPlacement.RELATED)
+		 					.addComponent(CHosp8)
+		 					.addPreferredGap(ComponentPlacement.UNRELATED)
+		 					.addComponent(CHosp9))
+		 				.addGroup(gl_panel_7.createSequentialGroup()
+		 					.addComponent(CHosp2)
+		 					.addPreferredGap(ComponentPlacement.RELATED)
+		 					.addComponent(CHosp4)
+		 					.addPreferredGap(ComponentPlacement.RELATED)
+		 					.addComponent(CHosp6)
+		 					.addPreferredGap(ComponentPlacement.RELATED)
+		 					.addComponent(CHosp7)
+		 					.addPreferredGap(ComponentPlacement.UNRELATED)
+		 					.addComponent(CHosp10)))
+		 			.addContainerGap(17, Short.MAX_VALUE))
 		 );
 		 panel_7.setLayout(gl_panel_7);
 		 panel_7.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{label, CHosp1, CHosp2, CHosp3, CHosp4, CHosp5, CHosp6, CHosp7, CHosp8, CHosp9, CHosp10}));
@@ -842,29 +792,29 @@ public class FormPostBer extends JFrame {
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 						.addComponent(TNKart, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING)
-							.addComponent(SDataM, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addComponent(SYavka, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE))
+						.addComponent(SYavka, GroupLayout.PREFERRED_SIZE, 57, GroupLayout.PREFERRED_SIZE)
+						.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, 103, GroupLayout.PREFERRED_SIZE)
+						.addComponent(SDataM, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE))
 					.addContainerGap())
 		);
 		gl_panel_4.setVerticalGroup(
 			gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.TRAILING, false)
 						.addGroup(gl_panel_4.createSequentialGroup()
-							.addContainerGap()
 							.addComponent(TNKart, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(Alignment.TRAILING, gl_panel_4.createSequentialGroup()
-							.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addGroup(gl_panel_4.createSequentialGroup()
 							.addComponent(LNslu)
 							.addGap(9)))
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panel_4.createSequentialGroup()
 							.addGap(3)
-							.addComponent(LDatap)))
+							.addComponent(LDatap))
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(SDataPos, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
 						.addComponent(LYavka)
@@ -1228,9 +1178,9 @@ public class FormPostBer extends JFrame {
 	public void showForm() {
 		System.out.println("постановка на входе");		
 		System.out.println(Vvod.zapVr.getNpasp());		
-		fam.setText(Vvod.zapVr.getFam());
-		im.setText(Vvod.zapVr.getIm());
-		ot.setText(Vvod.zapVr.getOth());
+//		fam.setText(Vvod.zapVr.getFam());
+//		im.setText(Vvod.zapVr.getIm());
+//		ot.setText(Vvod.zapVr.getOth());
 		
 		try {
 			rdSlStruct = new RdSlStruct();

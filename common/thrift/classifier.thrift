@@ -130,7 +130,10 @@ enum IntegerClassifiers {
 	n_db11 = 112,
 	n_db12 = 113,
 	n_db13 = 114,
-	n_anz = 115
+	n_anz = 115,
+	n_bl1 = 116,
+	n_akd = 117,
+	n_aj0 = 118
 }
 
 enum StringClassifiers {
@@ -151,7 +154,8 @@ enum StringClassifiers {
 	n_messtet = 16,
 	n_nsi_obst = 17,
 	n_nz2 = 18,
-	n_s0m = 19
+	n_s0m = 19,
+	n_ak2 = 20
 }
 
 enum ClassifierSortOrder {

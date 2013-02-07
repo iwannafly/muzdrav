@@ -36,8 +36,8 @@ import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager;
 import ru.nkz.ivcgzo.clientManager.common.ConnectionManager.ConnectionException;
 import ru.nkz.ivcgzo.clientManager.common.IClient;
+import ru.nkz.ivcgzo.clientManager.common.customFrame.CustomFrame;
 import ru.nkz.ivcgzo.clientManager.common.swing.CustomTextField;
-import ru.nkz.ivcgzo.thriftCommon.kmiacServer.UserAuthInfo;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth;
 import ru.nkz.ivcgzo.thriftServerAuth.ThriftServerAuth.Client;
 import ru.nkz.ivcgzo.thriftServerAuth.UserNotFoundException;
@@ -48,7 +48,7 @@ public class MainForm {
 	private static String paramLogin;
 	private static String paramPassword;
 	private static int paramModuleIndex;
-	private JFrame frame;
+	private CustomFrame frame;
 	private JPanel pnlLogin;
 	private CustomTextField tbLogin;
 	private CustomTextField tbPass;
@@ -63,7 +63,6 @@ public class MainForm {
 	
 	private static ConnectionManager conMan;
 	private static ThriftServerAuth.Client client; 
-	private UserAuthInfo authInfo;
 	private IClient plug;
 	//private ModulesUpdater modUpd;
 
@@ -77,22 +76,27 @@ public class MainForm {
 		if (args.length == 0) {
 			System.out.println("No application server alias (tst, int, ext) specified. Using dev server.");
 			appServerIp = "localhost";
+			CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 		} else {
 			if (args[0].equals("tst")) {
 				System.out.println("Using test application server.");
 				appServerIp = "10.0.0.248";
+				CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 			} else if (args[0].equals("int")) {
 				System.out.println("Using internal application server.");
 				appServerIp = "10.0.0.243";
+				CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 			} else if (args[0].equals("ext")) {
 				System.out.println("Using external application server.");
 				appServerIp = "10.1.1.8";
+				CustomFrame.redmineServerAddr = "http://10.1.1.11:3000";
 			} else if (ipPattern.matcher(args[0]).matches()) {
 				appServerIp = args[0];
 				System.out.println(String.format("Using %s application server.", appServerIp));
 			} else {
 				System.out.println("No valid application server alias (tst, int, ext) or ip address specified. Using dev server.");
 				appServerIp = "localhost";
+				CustomFrame.redmineServerAddr = "http://10.0.0.245:3000";
 			}
 			if (args.length > 1)
 				if (args.length > 3) {
@@ -160,13 +164,15 @@ public class MainForm {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
+		frame = new CustomFrame();
 		frame.setTitle("Аутентификация");
 		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(MainForm.class.getResource("/ru/nkz/ivcgzo/clientAuth/resources/icon_2_32x32.png")));
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 600, 400);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		frame.setMmIssuesListener("auth");
+		frame.setMmHelpListener("projects/auth/wiki/Ввод_логина_и_пароля");
 		
 		pnlLogin = new JPanel();
 		frame.getContentPane().add(pnlLogin, BorderLayout.CENTER);
@@ -213,8 +219,8 @@ public class MainForm {
 		btnEnter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					authInfo = client.auth(tbLogin.getText(), tbPass.getText());
-					conMan.createPluginLoader(authInfo);
+					CustomFrame.setAuthInfo(client.auth(tbLogin.getText(), tbPass.getText()));
+					conMan.createPluginLoader(CustomFrame.authInfo);
 					showSelectionPane();
 				} catch (UserNotFoundException e1) {
 					JOptionPane.showMessageDialog(frame, "Пользователя с таким логином и паролем не существует");
@@ -318,6 +324,7 @@ public class MainForm {
 					} catch (Exception e1) {
 						e1.printStackTrace();
 						JOptionPane.showMessageDialog(frame, e1.getLocalizedMessage(), "Ошибка загрузки модуля", JOptionPane.ERROR_MESSAGE);
+						btnLaunch.setEnabled(true);
 					}
 			}
 		});
@@ -381,20 +388,22 @@ public class MainForm {
 	}
 	
 	private void showSelectionPane() {
-		if (!hasLoginParams && (authInfo.cslu == -1)) {
+		if (!hasLoginParams && (CustomFrame.authInfo.cslu == -1)) {
 			JOptionPane.showMessageDialog(frame, "Для пользователя с данным логином и паролем не доступен ручной выбор модуля. Программа будет закрыта.");
 			System.exit(2);
 		}
 		
 		frame.setTitle("Выбор модуля");
-		lblFio.setText(String.format("<html>%s, %s, %s</html>", authInfo.getName(), authInfo.getCdol_name(), authInfo.getPriznd_name()));
-		lblLpu.setText(String.format("<html>%s</html>", authInfo.getClpu_name()));
-		lblPodr.setText(String.format("<html>%s, %s</html>", authInfo.getCpodr_name(), authInfo.getCslu_name()));
+		lblFio.setText(String.format("<html>%s, %s, %s</html>", CustomFrame.authInfo.getName(), CustomFrame.authInfo.getCdol_name(), CustomFrame.authInfo.getPriznd_name()));
+		lblLpu.setText(String.format("<html>%s</html>", CustomFrame.authInfo.getClpu_name()));
+		lblPodr.setText(String.format("<html>%s, %s</html>", CustomFrame.authInfo.getCpodr_name(), CustomFrame.authInfo.getCslu_name()));
 		
 		frame.getContentPane().remove(pnlLogin);
 		frame.getContentPane().add(pnlSysSelect, BorderLayout.CENTER);
 		frame.getContentPane().validate();
 		
+		frame.setMmHelpListener("projects/auth/wiki/Выбор_доступного_модуля");
+
 		showPluginList();
 	}
 	
@@ -404,7 +413,7 @@ public class MainForm {
 				try {
 					
 //					TODO На этапе разработки апдейтер будет только мешать
-					//modUpd.checkAndUpdate(authInfo.pdost);
+					//modUpd.checkAndUpdate(CustomFrame.authInfo.pdost);
 					conMan.getPluginLoader().loadPluginList(this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
 					conMan.loadViewClient();
 					break;

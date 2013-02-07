@@ -2,6 +2,7 @@ package ru.nkz.ivcgzo.serverOperation;
 
 import java.io.File;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.apache.thrift.transport.TNonblockingServerSocket;
 import ru.nkz.ivcgzo.configuration;
 import ru.nkz.ivcgzo.serverManager.common.*;
 import ru.nkz.ivcgzo.serverManager.common.thrift.TResultSetMapper;
+import ru.nkz.ivcgzo.thriftCommon.classifier.IntegerClassifier;
 import ru.nkz.ivcgzo.thriftCommon.kmiacServer.KmiacServerException;
 import ru.nkz.ivcgzo.thriftOperation.*;
 import ru.nkz.ivcgzo.thriftOperation.ThriftOperation.Iface;
@@ -35,6 +37,9 @@ public class ServerOperation extends Server implements Iface {
             AnesthesiaComplication._Fields> rsmAnesthesiaComplication;
     private TResultSetMapper<AnesthesiaPaymentFund,
             AnesthesiaPaymentFund._Fields> rsmAnesthesiaPaymentFund;
+    private TResultSetMapper<IntegerClassifier, IntegerClassifier._Fields> rsmIntClas;
+    private TResultSetMapper<OperShablon,
+            OperShablon._Fields> rsmOperShablon;
 
     private static final String[] OPERATION_FIELD_NAMES = {
             "id", "vid_st", "cotd", "id_gosp", "npasp", "pcod", "name_oper", "date", "vrem",
@@ -56,18 +61,24 @@ public class ServerOperation extends Server implements Iface {
     private static final String[] ANESTHESIA_PAYMENT_FUND_FIELD_NAMES = {
             "id", "id_anast", "pcod", "dataz"
     };
+    private static final String[] INT_CLAS_FIELD_NAMES = {
+        "pcod", "name"
+    };
+    private static final String[] OPER_SHABLON_FIELD_NAMES = {
+        "id", "name", "oper_pcod", "mat", "text", "src_text"
+    };
 
     private static final Class<?>[] OPERATION_TYPES ={
 //          id             vid_st         cotd           id_gosp        npasp
             Integer.class, Integer.class, Integer.class, Integer.class, Integer.class,
-//          pcod           name_oper     date        vrem        pred_ep       op_oper
-            Integer.class, String.class, Date.class, Time.class, String.class, String.class,
+//          pcod          name_oper     date        vrem        pred_ep       op_oper
+            String.class, String.class, Date.class, Time.class, String.class, String.class,
 //          material      dlit           dataz
             String.class, Integer.class, Date.class
     };
     private static final Class<?>[] OPERATION_COMPLICATION_TYPES ={
 //          id           id_oper          name_osl      pcod           dataz
-            Integer.class, Integer.class, String.class, Integer.class, Date.class
+            Integer.class, Integer.class, String.class, String.class, Date.class
     };
     private static final Class<?>[] OPERATION_PAYMENT_FUND_TYPES ={
 //          id             id_oper        pcod           dataz
@@ -81,7 +92,7 @@ public class ServerOperation extends Server implements Iface {
     };
     private static final Class<?>[] ANESTHESIA_COMPLICATION_TYPES ={
 //          id             id_anast       name          pcod           dataz
-            Integer.class, Integer.class, String.class, Integer.class, Date.class
+            Integer.class, Integer.class, String.class, String.class, Date.class
     };
 
     private static final Class<?>[] ANESTHESIA_PAYMENT_FUND_TYPES ={
@@ -108,6 +119,8 @@ public class ServerOperation extends Server implements Iface {
                 ANESTHESIA_COMPLICATION_FIELD_NAMES);
         rsmAnesthesiaPaymentFund = new TResultSetMapper<>(AnesthesiaPaymentFund.class,
                 ANESTHESIA_PAYMENT_FUND_FIELD_NAMES);
+        rsmIntClas = new TResultSetMapper<>(IntegerClassifier.class, INT_CLAS_FIELD_NAMES);
+        rsmOperShablon = new TResultSetMapper<>(OperShablon.class, OPER_SHABLON_FIELD_NAMES);
     }
 
     @Override
@@ -296,7 +309,7 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех источников оплаты данной операции
      *
-     * @param idOper - уникальный идентийикатор операции
+     * @param idOper - уникальный идентификатор операции
      */
     @Override
     public List<OperationPaymentFund> getOperationPaymentFunds(int idOper)
@@ -342,7 +355,7 @@ public class ServerOperation extends Server implements Iface {
     public void updateOperationPaymentFund(OperationPaymentFund curPaymentFund)
             throws KmiacServerException {
         final int[] indexes = {1, 2, 3, 0};
-        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, name_osl = ?, pcod = ?, "
+        final String sqlQuery = "UPDATE p_oper_opl SET id_oper = ?, pcod = ?, "
                 + "dataz = ? WHERE id = ?;";
         try (SqlModifyExecutor sme = tse.startTransaction()) {
             sme.execPreparedT(sqlQuery, false, curPaymentFund,
@@ -453,14 +466,14 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех осложнений данной анастезии
      *
-     * @param idOper - уникальный идентификатор анестезии
+     * @param idAnest - уникальный идентификатор анестезии
      */
     @Override
-    public List<AnesthesiaComplication> getAnesthesiaComplications(int idOper)
+    public List<AnesthesiaComplication> getAnesthesiaComplications(int idAnest)
             throws KmiacServerException {
         String sqlQuery = "SELECT * FROM p_anast_osl WHERE p_anast_osl.id_anast = ? "
                 + "ORDER BY p_anast_osl.dataz ";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idAnest)) {
             return rsmAnesthesiaComplication.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -532,14 +545,14 @@ public class ServerOperation extends Server implements Iface {
     /**
      * Возвращает список всех источников оплаты данной анастезии
      *
-     * @param idOper - уникальный идентификатор операции
+     * @param idAnest - уникальный идентификатор операции
      */
     @Override
-    public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idOper)
+    public List<AnesthesiaPaymentFund> getAnesthesiaPaymentFunds(int idAnest)
             throws KmiacServerException {
         String sqlQuery = "SELECT * FROM p_anast_opl WHERE p_anast_opl.id_anast = ? "
                 + "ORDER BY p_anast_opl.dataz ";
-        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idOper)) {
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, idAnest)) {
             return rsmAnesthesiaPaymentFund.mapToList(acrs.getResultSet());
         } catch (SQLException e) {
             log.log(Level.ERROR, "Exception: ", e);
@@ -604,6 +617,38 @@ public class ServerOperation extends Server implements Iface {
             sme.setCommit();
         } catch (SqlSelectExecutor.SqlExecutorException | InterruptedException e) {
             log.log(Level.ERROR, "SqlException", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public List<IntegerClassifier> getShablonNames(String operPcod)
+            throws KmiacServerException, TException {
+        String sql = "SELECT DISTINCT id AS pcod, name "
+                + "FROM sh_oper "
+                + "WHERE sh_oper.oper_pcod = ? ORDER BY name;";
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sql, operPcod)) {
+            return rsmIntClas.mapToList(acrs.getResultSet());
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Template searching error", e);
+            throw new KmiacServerException();
+        }
+    }
+
+    @Override
+    public OperShablon getShablon(int id) throws KmiacServerException,
+            TException {
+        String sqlQuery = "SELECT * FROM sh_oper WHERE id = ?;";
+        ResultSet rs = null;
+        try (AutoCloseableResultSet acrs = sse.execPreparedQuery(sqlQuery, id)) {
+            rs = acrs.getResultSet();
+            if (rs.next()) {
+                return rsmOperShablon.map(rs);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            log.log(Level.ERROR, "Exception: ", e);
             throw new KmiacServerException();
         }
     }
